@@ -1,0 +1,125 @@
+/*
+ * Copyright 2021 Peter Kenji Yamanaka
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: "com.android.application"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+//noinspection GroovyMissingReturnStatement
+android {
+    compileSdkVersion rootProject.ext.maxSdk
+
+    defaultConfig {
+        applicationId "com.pyamsoft.tickertape"
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.maxSdk
+        versionCode 1
+        versionName "1"
+
+        // For vector drawables
+        vectorDrawables.useSupportLibrary = true
+
+        resConfigs "en"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+            storePassword "android"
+        }
+        release {
+            storeFile new File(BUNDLE_STORE_FILE)
+            keyAlias BUNDLE_KEY_ALIAS
+            keyPassword BUNDLE_KEY_PASSWD
+            storePassword BUNDLE_STORE_PASSWD
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    // Fixes this error message
+    // More than one file was found with OS independent path 'META-INF/core_release.kotlin_module'
+    packagingOptions {
+        pickFirst 'META-INF/core_release.kotlin_module'
+        pickFirst 'META-INF/ui_release.kotlin_module'
+    }
+}
+
+// Kapt flags
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+    mapDiagnosticLocations = true
+
+    javacOptions {
+        option("-Xlint:unchecked")
+        option("-Xlint:deprecation")
+        option("-Xmaxerrs", 10000)
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+
+    // Leak Canary
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
+    implementation "com.squareup.leakcanary:plumber-android:$leakCanary"
+
+    debugImplementation "com.github.pyamsoft.pydroid:autopsy:$pydroid"
+
+    // Dagger
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+
+    implementation project(':main')
+    implementation project(':setting')
+    implementation project(':stocks')
+    implementation project(':ui')
+}
+
+// Leave at bottom
+// apply plugin: 'com.google.gms.google-services'

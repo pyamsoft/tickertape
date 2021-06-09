@@ -23,12 +23,9 @@ import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
 
 internal interface RoomTickerDb {
 
-    @CheckResult
-    fun roomSymbolQueryDao(): RoomSymbolQueryDao
+  @CheckResult fun roomSymbolQueryDao(): RoomSymbolQueryDao
 
-    @CheckResult
-    fun roomSymbolInsertDao(): RoomSymbolInsertDao
+  @CheckResult fun roomSymbolInsertDao(): RoomSymbolInsertDao
 
-    @CheckResult
-    fun roomSymbolDeleteDao(): RoomSymbolDeleteDao
+  @CheckResult fun roomSymbolDeleteDao(): RoomSymbolDeleteDao
 }

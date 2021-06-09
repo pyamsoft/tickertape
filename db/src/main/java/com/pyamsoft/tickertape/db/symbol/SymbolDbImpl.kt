@@ -26,73 +26,80 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Singleton
-internal class SymbolDbImpl @Inject internal constructor(
+internal class SymbolDbImpl
+@Inject
+internal constructor(
     @DbApi realQueryDao: SymbolQueryDao,
     @param:DbApi private val realInsertDao: SymbolInsertDao,
     @param:DbApi private val realDeleteDao: SymbolDeleteDao,
-) : BaseDbImpl<SymbolChangeEvent, SymbolRealtime, SymbolQueryDao, SymbolInsertDao, SymbolDeleteDao>(),
+) :
+    BaseDbImpl<
+        SymbolChangeEvent, SymbolRealtime, SymbolQueryDao, SymbolInsertDao, SymbolDeleteDao>(),
     SymbolDb {
 
-    private val queryCache = cachify<List<DbSymbol>> {
+  private val queryCache =
+      cachify<List<DbSymbol>> {
         Enforcer.assertOffMainThread()
         return@cachify realQueryDao.query(true)
-    }
+      }
 
-    override fun realtime(): SymbolRealtime {
-        return this
-    }
+  override fun realtime(): SymbolRealtime {
+    return this
+  }
 
-    override fun queryDao(): SymbolQueryDao {
-        return this
-    }
+  override fun queryDao(): SymbolQueryDao {
+    return this
+  }
 
-    override fun insertDao(): SymbolInsertDao {
-        return this
-    }
+  override fun insertDao(): SymbolInsertDao {
+    return this
+  }
 
-    override fun deleteDao(): SymbolDeleteDao {
-        return this
-    }
+  override fun deleteDao(): SymbolDeleteDao {
+    return this
+  }
 
-    override suspend fun invalidate() = withContext(context = Dispatchers.IO) {
+  override suspend fun invalidate() =
+      withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         queryCache.clear()
-    }
+      }
 
-    override suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
-        withContext(context = Dispatchers.IO) {
-            Enforcer.assertOffMainThread()
-            onEvent(onChange)
+  override suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        onEvent(onChange)
+      }
+
+  override suspend fun query(force: Boolean): List<DbSymbol> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        if (force) {
+          invalidate()
         }
 
-    override suspend fun query(force: Boolean): List<DbSymbol> =
-        withContext(context = Dispatchers.IO) {
-            Enforcer.assertOffMainThread()
-            if (force) {
-                invalidate()
-            }
+        return@withContext queryCache.call()
+      }
 
-            return@withContext queryCache.call()
-        }
-
-    override suspend fun insert(o: DbSymbol): Boolean = withContext(context = Dispatchers.IO) {
+  override suspend fun insert(o: DbSymbol): Boolean =
+      withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { inserted ->
-            if (inserted) {
-                publish(SymbolChangeEvent.Insert(o))
-            } else {
-                publish(SymbolChangeEvent.Update(o))
-            }
+          if (inserted) {
+            publish(SymbolChangeEvent.Insert(o))
+          } else {
+            publish(SymbolChangeEvent.Update(o))
+          }
         }
-    }
+      }
 
-    override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =
-        withContext(context = Dispatchers.IO) {
-            Enforcer.assertOffMainThread()
-            return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
-                if (deleted) {
-                    publish(SymbolChangeEvent.Delete(o, offerUndo))
-                }
-            }
+  override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
+          if (deleted) {
+            publish(SymbolChangeEvent.Delete(o, offerUndo))
+          }
         }
+      }
 }

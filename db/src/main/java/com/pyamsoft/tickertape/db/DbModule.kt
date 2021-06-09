@@ -28,55 +28,50 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-private annotation class InternalApi
+@Qualifier @Retention(AnnotationRetention.BINARY) private annotation class InternalApi
 
 @Module
 abstract class DbModule {
 
-    @Binds
+  @Binds @CheckResult internal abstract fun provideSymbolDbImpl(impl: SymbolDbImpl): SymbolDb
+
+  @Module
+  companion object {
+
+    @JvmStatic
+    @Provides
     @CheckResult
-    internal abstract fun provideSymbolDbImpl(impl: SymbolDbImpl): SymbolDb
-
-    @Module
-    companion object {
-
-        @JvmStatic
-        @Provides
-        @CheckResult
-        @InternalApi
-        internal fun provideSymbolDb(db: TickerDb): SymbolDb {
-            return db.symbols()
-        }
-
-        @JvmStatic
-        @Provides
-        @CheckResult
-        internal fun provideSymbolRealtimeDao(@InternalApi db: SymbolDb): SymbolRealtime {
-            return db.realtime()
-        }
-
-        @JvmStatic
-        @Provides
-        @CheckResult
-        internal fun provideSymbolQueryDao(@InternalApi db: SymbolDb): SymbolQueryDao {
-            return db.queryDao()
-        }
-
-        @JvmStatic
-        @Provides
-        @CheckResult
-        internal fun provideSymbolInsertDao(@InternalApi db: SymbolDb): SymbolInsertDao {
-            return db.insertDao()
-        }
-
-        @JvmStatic
-        @Provides
-        @CheckResult
-        internal fun provideSymbolDeleteDao(@InternalApi db: SymbolDb): SymbolDeleteDao {
-            return db.deleteDao()
-        }
-
+    @InternalApi
+    internal fun provideSymbolDb(db: TickerDb): SymbolDb {
+      return db.symbols()
     }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSymbolRealtimeDao(@InternalApi db: SymbolDb): SymbolRealtime {
+      return db.realtime()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSymbolQueryDao(@InternalApi db: SymbolDb): SymbolQueryDao {
+      return db.queryDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSymbolInsertDao(@InternalApi db: SymbolDb): SymbolInsertDao {
+      return db.insertDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSymbolDeleteDao(@InternalApi db: SymbolDb): SymbolDeleteDao {
+      return db.deleteDao()
+    }
+  }
 }

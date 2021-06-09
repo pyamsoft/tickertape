@@ -22,8 +22,8 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 data class QuoteViewState(val symbol: StockSymbol, val data: QuoteData) : UiViewState {
 
-    sealed class QuoteData {
-        data class Quote(val quote: StockQuote) : QuoteData()
-        data class Error(val error: Throwable) : QuoteData()
-    }
+  sealed class QuoteData {
+    data class Quote(val quote: StockQuote) : QuoteData()
+    data class Error(val error: Throwable) : QuoteData()
+  }
 }

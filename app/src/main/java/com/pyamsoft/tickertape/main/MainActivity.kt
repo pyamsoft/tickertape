@@ -41,150 +41,135 @@ import javax.inject.Inject
 
 internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEvent> {
 
-    override val checkForUpdates = false
+  override val checkForUpdates = false
 
-    override val applicationIcon = R.mipmap.ic_launcher
+  override val applicationIcon = R.mipmap.ic_launcher
 
-    override val changelog: ChangeLogBuilder = buildChangeLog {}
+  override val changelog: ChangeLogBuilder = buildChangeLog {}
 
-    override val versionName = BuildConfig.VERSION_NAME
+  override val versionName = BuildConfig.VERSION_NAME
 
-    override val fragmentContainerId: Int
-        get() = requireNotNull(container).id()
+  override val fragmentContainerId: Int
+    get() = requireNotNull(container).id()
 
-    override val snackbarRoot: ViewGroup
-        get() {
-            return requireNotNull(rootBinding).layoutCoordinator
+  override val snackbarRoot: ViewGroup
+    get() {
+      return requireNotNull(rootBinding).layoutCoordinator
+    }
+
+  private var rootBinding: LayoutCoordinatorBinding? = null
+  private var stateSaver: StateSaver? = null
+
+  @JvmField @Inject internal var factory: MainViewModel.Factory? = null
+  private val viewModel by fromViewModelFactory<MainViewModel> {
+    createSavedStateViewModelFactory(factory)
+  }
+
+  @JvmField @Inject internal var container: MainContainer? = null
+
+  @JvmField @Inject internal var bottomBar: MainBar? = null
+
+  @JvmField @Inject internal var addNew: MainBarAdd? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    setTheme(R.style.Theme_TickerTape)
+    super.onCreate(savedInstanceState)
+    val binding = LayoutCoordinatorBinding.inflate(layoutInflater).apply { rootBinding = this }
+    setContentView(binding.root)
+
+    Injector.obtainFromApplication<TickerComponent>(this)
+        .plusMainComponent()
+        .create(this, this, this, binding.layoutCoordinator, this)
+        .inject(this)
+
+    stableLayoutHideNavigation()
+
+    inflateComponents(savedInstanceState)
+  }
+
+  private fun inflateComponents(savedInstanceState: Bundle?) {
+    val container = requireNotNull(container)
+    val bottomBar = requireNotNull(bottomBar)
+    val addNew = requireNotNull(addNew)
+
+    stateSaver =
+        createComponent(
+            savedInstanceState,
+            this,
+            viewModel,
+            this,
+            container,
+            container,
+            bottomBar,
+            addNew,
+        ) {
+          return@createComponent when (it) {
+            is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
+            is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
+            is MainViewEvent.OpenWatchList ->
+                viewModel.handleSelectPage(MainPage.WatchList, force = false)
+            is MainViewEvent.OpenSettings ->
+                viewModel.handleSelectPage(MainPage.Settings, force = false)
+          }
         }
 
-    private var rootBinding: LayoutCoordinatorBinding? = null
-    private var stateSaver: StateSaver? = null
+    val existingFragment = supportFragmentManager.findFragmentById(fragmentContainerId)
+    if (savedInstanceState == null || existingFragment == null) {
+      viewModel.handleLoadDefaultPage()
+    }
+  }
 
-    @JvmField
-    @Inject
-    internal var factory: MainViewModel.Factory? = null
-    private val viewModel by fromViewModelFactory<MainViewModel> {
-        createSavedStateViewModelFactory(factory)
+  override fun onControllerEvent(event: MainControllerEvent) {
+    return when (event) {
+      is MainControllerEvent.PushPage -> handlePushPage(event.newPage, event.oldPage, event.force)
+    }
+  }
+
+  private fun handlePushPage(newPage: MainPage, oldPage: MainPage?, force: Boolean) {
+    val fragment: Fragment
+    val tag: String
+    when (newPage) {
+      is MainPage.Settings -> {
+        fragment = SettingsFragment.newInstance()
+        tag = SettingsFragment.TAG
+      }
+      is MainPage.WatchList -> {
+        fragment = WatchlistFragment.newInstance()
+        tag = WatchlistFragment.TAG
+      }
     }
 
-    @JvmField
-    @Inject
-    internal var container: MainContainer? = null
+    supportFragmentManager.commitNow(this) { replace(fragmentContainerId, fragment, tag) }
+  }
 
-    @JvmField
-    @Inject
-    internal var bottomBar: MainBar? = null
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+  }
 
-    @JvmField
-    @Inject
-    internal var addNew: MainBarAdd? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_TickerTape)
-        super.onCreate(savedInstanceState)
-        val binding = LayoutCoordinatorBinding.inflate(layoutInflater).apply { rootBinding = this }
-        setContentView(binding.root)
-
-        Injector.obtainFromApplication<TickerComponent>(this)
-            .plusMainComponent()
-            .create(this, this, this, binding.layoutCoordinator, this)
-            .inject(this)
-
-        stableLayoutHideNavigation()
-
-        inflateComponents(savedInstanceState)
+  override fun onBackPressed() {
+    onBackPressedDispatcher.also { dispatcher ->
+      if (dispatcher.hasEnabledCallbacks()) {
+        dispatcher.onBackPressed()
+      } else {
+        super.onBackPressed()
+      }
     }
+  }
 
-    private fun inflateComponents(savedInstanceState: Bundle?) {
-        val container = requireNotNull(container)
-        val bottomBar = requireNotNull(bottomBar)
-        val addNew = requireNotNull(addNew)
+  override fun onSaveInstanceState(outState: Bundle) {
+    stateSaver?.saveState(outState)
+    super.onSaveInstanceState(outState)
+  }
 
-        stateSaver =
-            createComponent(
-                savedInstanceState,
-                this,
-                viewModel,
-                this,
-                container,
-                container,
-                bottomBar,
-                addNew,
-            ) {
-                return@createComponent when (it) {
-                    is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
-                    is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
-                    is MainViewEvent.OpenWatchList ->
-                        viewModel.handleSelectPage(MainPage.WatchList, force = false)
-                    is MainViewEvent.OpenSettings ->
-                        viewModel.handleSelectPage(MainPage.Settings, force = false)
-                }
-            }
+  override fun onDestroy() {
+    super.onDestroy()
+    stateSaver = null
+    factory = null
 
-        val existingFragment = supportFragmentManager.findFragmentById(fragmentContainerId)
-        if (savedInstanceState == null || existingFragment == null) {
-            viewModel.handleLoadDefaultPage()
-        }
-    }
-
-    override fun onControllerEvent(event: MainControllerEvent) {
-        return when (event) {
-            is MainControllerEvent.PushPage -> handlePushPage(
-                event.newPage,
-                event.oldPage,
-                event.force
-            )
-        }
-    }
-
-    private fun handlePushPage(newPage: MainPage, oldPage: MainPage?, force: Boolean) {
-        val fragment: Fragment
-        val tag: String
-        when (newPage) {
-            is MainPage.Settings -> {
-                fragment = SettingsFragment.newInstance()
-                tag = SettingsFragment.TAG
-            }
-            is MainPage.WatchList -> {
-                fragment = WatchlistFragment.newInstance()
-                tag = WatchlistFragment.TAG
-            }
-        }
-
-        supportFragmentManager.commitNow(this) {
-            replace(fragmentContainerId, fragment, tag)
-        }
-    }
-
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-    }
-
-    override fun onBackPressed() {
-        onBackPressedDispatcher.also { dispatcher ->
-            if (dispatcher.hasEnabledCallbacks()) {
-                dispatcher.onBackPressed()
-            } else {
-                super.onBackPressed()
-            }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        stateSaver?.saveState(outState)
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stateSaver = null
-        factory = null
-
-        rootBinding = null
-        container = null
-        bottomBar = null
-        addNew = null
-    }
+    rootBinding = null
+    container = null
+    bottomBar = null
+    addNew = null
+  }
 }

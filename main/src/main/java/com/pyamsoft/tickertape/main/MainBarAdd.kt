@@ -25,17 +25,15 @@ import javax.inject.Inject
 class MainBarAdd @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<MainViewState, MainViewEvent, MainAddBinding>(parent) {
 
-    override val viewBinding = MainAddBinding::inflate
+  override val viewBinding = MainAddBinding::inflate
 
-    override val layoutRoot by boundView { mainBarAdd }
+  override val layoutRoot by boundView { mainBarAdd }
 
-    override fun onRender(state: UiRender<MainViewState>) {
-        state.mapChanged { it.isFabVisible }.render(viewScope) { handleFabVisible(it) }
-    }
+  override fun onRender(state: UiRender<MainViewState>) {
+    state.mapChanged { it.isFabVisible }.render(viewScope) { handleFabVisible(it) }
+  }
 
-    private fun handleFabVisible(visible: Boolean) {
-        binding.mainBarAdd.apply {
-            if (visible) show() else hide()
-        }
-    }
+  private fun handleFabVisible(visible: Boolean) {
+    binding.mainBarAdd.apply { if (visible) show() else hide() }
+  }
 }

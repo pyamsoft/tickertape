@@ -31,30 +31,29 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
 
-    override suspend fun insert(o: DbSymbol): Boolean = withContext(context = Dispatchers.IO) {
+  override suspend fun insert(o: DbSymbol): Boolean =
+      withContext(context = Dispatchers.IO) {
         val roomSymbol = RoomDbSymbol.create(o)
         return@withContext if (daoQuery(roomSymbol.id()) == null) {
-            daoInsert(roomSymbol)
-            true
+          daoInsert(roomSymbol)
+          true
         } else {
-            daoUpdate(roomSymbol)
-            false
+          daoUpdate(roomSymbol)
+          false
         }
-    }
+      }
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    internal abstract suspend fun daoInsert(symbol: RoomDbSymbol)
+  @Insert(onConflict = OnConflictStrategy.ABORT)
+  internal abstract suspend fun daoInsert(symbol: RoomDbSymbol)
 
-    @CheckResult
-    @Query(
-        """
+  @CheckResult
+  @Query(
+      """
         SELECT * FROM ${RoomDbSymbol.TABLE_NAME} WHERE
         ${RoomDbSymbol.COLUMN_ID} = :id
         LIMIT 1
-        """
-    )
-    internal abstract suspend fun daoQuery(id: DbSymbol.Id): RoomDbSymbol?
+        """)
+  internal abstract suspend fun daoQuery(id: DbSymbol.Id): RoomDbSymbol?
 
-    @Update
-    internal abstract suspend fun daoUpdate(symbol: RoomDbSymbol)
+  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbSymbol)
 }

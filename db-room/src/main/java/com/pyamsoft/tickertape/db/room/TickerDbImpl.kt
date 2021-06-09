@@ -24,11 +24,11 @@ import javax.inject.Singleton
 internal class TickerDbImpl @Inject internal constructor(private val symbolDb: SymbolDb) :
     TickerDb {
 
-    override fun symbols(): SymbolDb {
-        return symbolDb
-    }
+  override fun symbols(): SymbolDb {
+    return symbolDb
+  }
 
-    override suspend fun invalidate() {
-        symbolDb.invalidate()
-    }
+  override suspend fun invalidate() {
+    symbolDb.invalidate()
+  }
 }

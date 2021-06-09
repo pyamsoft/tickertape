@@ -29,18 +29,18 @@ import dagger.Subcomponent
 @Subcomponent(modules = [ThemeProviderModule::class])
 internal interface MainComponent {
 
-    fun inject(activity: MainActivity)
+  fun inject(activity: MainActivity)
 
-    @Subcomponent.Factory
-    interface Factory {
+  @Subcomponent.Factory
+  interface Factory {
 
-        @CheckResult
-        fun create(
-            @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
-            @BindsInstance activity: Activity,
-            @BindsInstance owner: LifecycleOwner,
-            @BindsInstance parent: ViewGroup,
-            @BindsInstance toolbarProvider: ToolbarActivityProvider,
-        ): MainComponent
-    }
+    @CheckResult
+    fun create(
+        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
+        @BindsInstance activity: Activity,
+        @BindsInstance owner: LifecycleOwner,
+        @BindsInstance parent: ViewGroup,
+        @BindsInstance toolbarProvider: ToolbarActivityProvider,
+    ): MainComponent
+  }
 }

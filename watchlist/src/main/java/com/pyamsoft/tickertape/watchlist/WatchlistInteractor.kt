@@ -28,54 +28,46 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Singleton
-class WatchlistInteractor @Inject internal constructor(
+class WatchlistInteractor
+@Inject
+internal constructor(
     private val symbolQueryDao: SymbolQueryDao,
     private val interactor: StockInteractor
 ) {
 
-    @CheckResult
-    private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
-        withContext(context = Dispatchers.IO) {
-            Enforcer.assertOffMainThread()
-            return@withContext symbolQueryDao.query(force).map { it.symbol() }
+  @CheckResult
+  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext symbolQueryDao.query(force).map { it.symbol() }
+      }
+
+  @CheckResult
+  suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
+      withContext(context = Dispatchers.IO) {
+        var symbols = getSymbols(force)
+        if (symbols.isEmpty()) {
+          symbols =
+              listOf("MSFT", "AAPL", "AMD", "GME", "BB", "AMC", "CLOV", "VTI", "VOO").map {
+                it.toSymbol()
+              }
         }
 
-    @CheckResult
-    suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
-        withContext(context = Dispatchers.IO) {
-            var symbols = getSymbols(force)
-            if (symbols.isEmpty()) {
-                symbols = listOf(
-                    "MSFT",
-                    "AAPL",
-                    "AMD",
-                    "GME",
-                    "BB",
-                    "AMC",
-                    "CLOV",
-                    "VTI",
-                    "VOO"
-                ).map { it.toSymbol() }
-            }
-
-            // If we have no symbols, don't even make the trip
-            if (symbols.isEmpty()) {
-                return@withContext emptyList()
-            }
-
-            val quotePairs = mutableListOf<WatchListViewState.QuotePair>()
-            val quotes = interactor.getQuotes(force, symbols)
-            for (symbol in symbols) {
-                val quote = quotes.find { it.symbol().symbol() == symbol.symbol() }
-                quotePairs.add(
-                    WatchListViewState.QuotePair(
-                        symbol = symbol,
-                        quote = quote,
-                        error = if (quote == null) Throwable("Missing quote for $symbol") else null
-                    )
-                )
-            }
-            return@withContext quotePairs
+        // If we have no symbols, don't even make the trip
+        if (symbols.isEmpty()) {
+          return@withContext emptyList()
         }
 
+        val quotePairs = mutableListOf<WatchListViewState.QuotePair>()
+        val quotes = interactor.getQuotes(force, symbols)
+        for (symbol in symbols) {
+          val quote = quotes.find { it.symbol().symbol() == symbol.symbol() }
+          quotePairs.add(
+              WatchListViewState.QuotePair(
+                  symbol = symbol,
+                  quote = quote,
+                  error = if (quote == null) Throwable("Missing quote for $symbol") else null))
+        }
+        return@withContext quotePairs
+      }
 }

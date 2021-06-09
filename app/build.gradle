@@ -20,109 +20,109 @@ apply plugin: 'kotlin-kapt'
 
 //noinspection GroovyMissingReturnStatement
 android {
-    compileSdkVersion rootProject.ext.maxSdk
+  compileSdkVersion rootProject.ext.maxSdk
 
-    defaultConfig {
-        applicationId "com.pyamsoft.tickertape"
-        minSdkVersion rootProject.ext.minSdk
-        targetSdkVersion rootProject.ext.maxSdk
-        versionCode 1
-        versionName "1"
+  defaultConfig {
+    applicationId "com.pyamsoft.tickertape"
+    minSdkVersion rootProject.ext.minSdk
+    targetSdkVersion rootProject.ext.maxSdk
+    versionCode 1
+    versionName "1"
 
-        // For vector drawables
-        vectorDrawables.useSupportLibrary = true
+    // For vector drawables
+    vectorDrawables.useSupportLibrary = true
 
-        resConfigs "en"
+    resConfigs "en"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+
+    // Flag to enable support for the new language APIs
+    coreLibraryDesugaringEnabled true
+  }
+
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+
+  signingConfigs {
+    debug {
+      storeFile file("debug.keystore")
+      keyAlias "androiddebugkey"
+      keyPassword "android"
+      storePassword "android"
+    }
+    release {
+      storeFile new File(BUNDLE_STORE_FILE)
+      keyAlias BUNDLE_KEY_ALIAS
+      keyPassword BUNDLE_KEY_PASSWD
+      storePassword BUNDLE_STORE_PASSWD
+    }
+  }
+
+  buildTypes {
+    release {
+      signingConfig signingConfigs.release
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
+          "proguard-rules.pro"
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-
-        // Flag to enable support for the new language APIs
-        coreLibraryDesugaringEnabled true
+    debug {
+      signingConfig signingConfigs.debug
+      applicationIdSuffix ".dev"
+      versionNameSuffix "-dev"
     }
+  }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+  buildFeatures {
+    viewBinding true
+  }
 
-    signingConfigs {
-        debug {
-            storeFile file("debug.keystore")
-            keyAlias "androiddebugkey"
-            keyPassword "android"
-            storePassword "android"
-        }
-        release {
-            storeFile new File(BUNDLE_STORE_FILE)
-            keyAlias BUNDLE_KEY_ALIAS
-            keyPassword BUNDLE_KEY_PASSWD
-            storePassword BUNDLE_STORE_PASSWD
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
-        }
-
-        debug {
-            signingConfig signingConfigs.debug
-            applicationIdSuffix ".dev"
-            versionNameSuffix "-dev"
-        }
-    }
-
-    buildFeatures {
-        viewBinding true
-    }
-
-    // Fixes this error message
-    // More than one file was found with OS independent path 'META-INF/core_release.kotlin_module'
-    packagingOptions {
-        pickFirst 'META-INF/core_release.kotlin_module'
-        pickFirst 'META-INF/ui_release.kotlin_module'
-    }
+  // Fixes this error message
+  // More than one file was found with OS independent path 'META-INF/core_release.kotlin_module'
+  packagingOptions {
+    pickFirst 'META-INF/core_release.kotlin_module'
+    pickFirst 'META-INF/ui_release.kotlin_module'
+  }
 }
 
 // Kapt flags
 kapt {
-    correctErrorTypes = true
-    useBuildCache = true
-    mapDiagnosticLocations = true
+  correctErrorTypes = true
+  useBuildCache = true
+  mapDiagnosticLocations = true
 
-    javacOptions {
-        option("-Xlint:unchecked")
-        option("-Xlint:deprecation")
-        option("-Xmaxerrs", 10000)
-    }
+  javacOptions {
+    option("-Xlint:unchecked")
+    option("-Xlint:deprecation")
+    option("-Xmaxerrs", 10000)
+  }
 }
 
 dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
 
-    // Leak Canary
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
-    implementation "com.squareup.leakcanary:plumber-android:$leakCanary"
+  // Leak Canary
+  debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
+  implementation "com.squareup.leakcanary:plumber-android:$leakCanary"
 
-    debugImplementation "com.github.pyamsoft.pydroid:autopsy:$pydroid"
+  debugImplementation "com.github.pyamsoft.pydroid:autopsy:$pydroid"
 
-    // Dagger
-    kapt "com.google.dagger:dagger-compiler:$dagger"
+  // Dagger
+  kapt "com.google.dagger:dagger-compiler:$dagger"
 
-    implementation project(':db')
-    implementation project(':db-room')
-    implementation project(':main')
-    implementation project(':quote')
-    implementation project(':setting')
-    implementation project(':stocks')
-    implementation project(':ui')
-    implementation project(':watchlist')
+  implementation project(':db')
+  implementation project(':db-room')
+  implementation project(':main')
+  implementation project(':quote')
+  implementation project(':setting')
+  implementation project(':stocks')
+  implementation project(':ui')
+  implementation project(':watchlist')
 }
 
 // Leave at bottom

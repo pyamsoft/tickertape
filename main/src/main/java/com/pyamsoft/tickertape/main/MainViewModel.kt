@@ -35,77 +35,73 @@ class MainViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
-) : UiSavedStateViewModel<MainViewState, MainControllerEvent>(
-    savedState,
-    MainViewState(
-        page = null,
-        isFabVisible = true
-    )
-) {
+) :
+    UiSavedStateViewModel<MainViewState, MainControllerEvent>(
+        savedState, MainViewState(page = null, isFabVisible = true)) {
 
-    fun handleLoadDefaultPage() {
-        viewModelScope.launch(context = Dispatchers.Default) {
-            val page = restoreSavedState(KEY_PAGE) { MainPage.WatchList.asString() }.asPage()
-            Timber.d("Loading initial page: $page")
-            handleSelectPage(page, force = true)
+  fun handleLoadDefaultPage() {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val page = restoreSavedState(KEY_PAGE) { MainPage.WatchList.asString() }.asPage()
+      Timber.d("Loading initial page: $page")
+      handleSelectPage(page, force = true)
+    }
+  }
+
+  fun handleConsumeBottomBarHeight(height: Int) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      bottomOffsetBus.send(BottomOffset(height))
+    }
+  }
+
+  fun handlePublishFabVisibility(isVisible: Boolean) {
+    setState { copy(isFabVisible = isVisible) }
+  }
+
+  fun handleSelectPage(
+      newPage: MainPage,
+      force: Boolean,
+  ) {
+    Timber.d("Select entry: $newPage")
+
+    // If the pages match we can just run the after, no need to set and publish
+    val oldPage = state.page
+    setState(
+        stateChange = { copy(page = newPage) },
+        andThen = { newState ->
+          publishNewSelection(requireNotNull(newState.page), oldPage, force)
+        })
+  }
+
+  private suspend inline fun publishNewSelection(
+      newPage: MainPage,
+      oldPage: MainPage?,
+      force: Boolean,
+  ) {
+    Timber.d("Publish selection: $oldPage -> $newPage")
+    putSavedState(KEY_PAGE, newPage.asString())
+    publish(MainControllerEvent.PushPage(newPage, oldPage, force))
+  }
+
+  companion object {
+
+    @CheckResult
+    private fun MainPage.asString(): String {
+      return this::class.java.name
+    }
+
+    @CheckResult
+    private fun String.asPage(): MainPage =
+        when (this) {
+          MainPage.WatchList::class.java.name -> MainPage.WatchList
+          MainPage.Settings::class.java.name -> MainPage.Settings
+          else -> throw IllegalStateException("Cannot convert to MainPage: $this")
         }
-    }
 
-    fun handleConsumeBottomBarHeight(height: Int) {
-        viewModelScope.launch(context = Dispatchers.Default) {
-            bottomOffsetBus.send(BottomOffset(height))
-        }
-    }
+    private const val KEY_PAGE = "page"
+  }
 
-    fun handlePublishFabVisibility(isVisible: Boolean) {
-        setState { copy(isFabVisible = isVisible) }
-    }
-
-    fun handleSelectPage(
-        newPage: MainPage,
-        force: Boolean,
-    ) {
-        Timber.d("Select entry: $newPage")
-
-        // If the pages match we can just run the after, no need to set and publish
-        val oldPage = state.page
-        setState(
-            stateChange = { copy(page = newPage) },
-            andThen = { newState ->
-                publishNewSelection(requireNotNull(newState.page), oldPage, force)
-            })
-    }
-
-    private suspend inline fun publishNewSelection(
-        newPage: MainPage,
-        oldPage: MainPage?,
-        force: Boolean,
-    ) {
-        Timber.d("Publish selection: $oldPage -> $newPage")
-        putSavedState(KEY_PAGE, newPage.asString())
-        publish(MainControllerEvent.PushPage(newPage, oldPage, force))
-    }
-
-    companion object {
-
-        @CheckResult
-        private fun MainPage.asString(): String {
-            return this::class.java.name
-        }
-
-        @CheckResult
-        private fun String.asPage(): MainPage =
-            when (this) {
-                MainPage.WatchList::class.java.name -> MainPage.WatchList
-                MainPage.Settings::class.java.name -> MainPage.Settings
-                else -> throw IllegalStateException("Cannot convert to MainPage: $this")
-            }
-
-        private const val KEY_PAGE = "page"
-    }
-
-    @AssistedFactory
-    interface Factory : UiSavedStateViewModelProvider<MainViewModel> {
-        override fun create(savedState: UiSavedState): MainViewModel
-    }
+  @AssistedFactory
+  interface Factory : UiSavedStateViewModelProvider<MainViewModel> {
+    override fun create(savedState: UiSavedState): MainViewModel
+  }
 }

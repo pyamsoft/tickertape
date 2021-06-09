@@ -23,10 +23,7 @@ import com.pyamsoft.tickertape.db.room.converter.DbSymbolIdConverter
 import com.pyamsoft.tickertape.db.room.converter.StockSymbolConverter
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 
-@Database(
-    version = 1,
-    entities = [RoomDbSymbol::class]
-)
+@Database(version = 1, entities = [RoomDbSymbol::class])
 @TypeConverters(
     DbSymbolIdConverter::class,
     StockSymbolConverter::class,

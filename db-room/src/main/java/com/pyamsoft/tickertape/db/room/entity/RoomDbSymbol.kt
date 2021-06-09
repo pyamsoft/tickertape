@@ -25,42 +25,38 @@ import com.pyamsoft.tickertape.db.symbol.DbSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 @Entity(tableName = RoomDbSymbol.TABLE_NAME)
-internal data class RoomDbSymbol internal constructor(
+internal data class RoomDbSymbol
+internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbSymbol.Id,
     @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol
 ) : DbSymbol {
 
-    @Ignore
-    override fun id(): DbSymbol.Id {
-        return id
-    }
+  @Ignore
+  override fun id(): DbSymbol.Id {
+    return id
+  }
+
+  @Ignore
+  override fun symbol(): StockSymbol {
+    return symbol
+  }
+
+  companion object {
+
+    @Ignore internal const val TABLE_NAME = "room_symbol_table"
+
+    @Ignore internal const val COLUMN_ID = "_id"
+
+    @Ignore internal const val COLUMN_SYMBOL = "symbol"
 
     @Ignore
-    override fun symbol(): StockSymbol {
-        return symbol
+    @JvmStatic
+    @CheckResult
+    internal fun create(symbol: DbSymbol): RoomDbSymbol {
+      return if (symbol is RoomDbSymbol) symbol
+      else {
+        RoomDbSymbol(symbol.id(), symbol.symbol())
+      }
     }
-
-    companion object {
-
-        @Ignore
-        internal const val TABLE_NAME = "room_symbol_table"
-
-        @Ignore
-        internal const val COLUMN_ID = "_id"
-
-        @Ignore
-        internal const val COLUMN_SYMBOL = "symbol"
-
-        @Ignore
-        @JvmStatic
-        @CheckResult
-        internal fun create(symbol: DbSymbol): RoomDbSymbol {
-            return if (symbol is RoomDbSymbol) symbol else {
-                RoomDbSymbol(
-                    symbol.id(),
-                    symbol.symbol()
-                )
-            }
-        }
-    }
+  }
 }

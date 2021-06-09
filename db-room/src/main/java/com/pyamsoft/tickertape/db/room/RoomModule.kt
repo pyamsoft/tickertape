@@ -30,56 +30,48 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-private annotation class InternalApi
+@Qualifier @Retention(AnnotationRetention.BINARY) private annotation class InternalApi
 
 @Module
 abstract class RoomModule {
 
-    @Binds
+  @Binds @CheckResult internal abstract fun provideDb(impl: TickerDbImpl): TickerDb
+
+  @Binds @CheckResult internal abstract fun provideDbCache(impl: TickerDbImpl): DbCache
+
+  @Module
+  companion object {
+
+    private const val DB_NAME = "tickertape_room_db.db"
+
+    @Provides
+    @JvmStatic
     @CheckResult
-    internal abstract fun provideDb(impl: TickerDbImpl): TickerDb
-
-    @Binds
-    @CheckResult
-    internal abstract fun provideDbCache(impl: TickerDbImpl): DbCache
-
-    @Module
-    companion object {
-
-        private const val DB_NAME = "tickertape_room_db.db"
-
-        @Provides
-        @JvmStatic
-        @CheckResult
-        @InternalApi
-        internal fun provideRoom(context: Context): RoomTickerDb {
-            val appContext = context.applicationContext
-            return Room.databaseBuilder(appContext, RoomTickerDbImpl::class.java, DB_NAME)
-                .build()
-        }
-
-        @DbApi
-        @Provides
-        @JvmStatic
-        internal fun provideRoomSymbolQueryDao(@InternalApi db: RoomTickerDb): SymbolQueryDao {
-            return db.roomSymbolQueryDao()
-        }
-
-        @DbApi
-        @Provides
-        @JvmStatic
-        internal fun provideRoomSymbolInsertDao(@InternalApi db: RoomTickerDb): SymbolInsertDao {
-            return db.roomSymbolInsertDao()
-        }
-
-        @DbApi
-        @Provides
-        @JvmStatic
-        internal fun provideRoomSymbolDeleteDao(@InternalApi db: RoomTickerDb): SymbolDeleteDao {
-            return db.roomSymbolDeleteDao()
-        }
-
+    @InternalApi
+    internal fun provideRoom(context: Context): RoomTickerDb {
+      val appContext = context.applicationContext
+      return Room.databaseBuilder(appContext, RoomTickerDbImpl::class.java, DB_NAME).build()
     }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomSymbolQueryDao(@InternalApi db: RoomTickerDb): SymbolQueryDao {
+      return db.roomSymbolQueryDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomSymbolInsertDao(@InternalApi db: RoomTickerDb): SymbolInsertDao {
+      return db.roomSymbolInsertDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomSymbolDeleteDao(@InternalApi db: RoomTickerDb): SymbolDeleteDao {
+      return db.roomSymbolDeleteDao()
+    }
+  }
 }

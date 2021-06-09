@@ -35,83 +35,78 @@ import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
-    @JvmField
-    @Inject
-    internal var factory: TickerViewModelFactory? = null
-    private val viewModel by fromViewModelFactory<WatchlistViewModel>(activity = true) {
-        factory?.create(requireActivity())
-    }
+  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
+  private val viewModel by fromViewModelFactory<WatchlistViewModel>(activity = true) {
+    factory?.create(requireActivity())
+  }
 
-    private var stateSaver: StateSaver? = null
+  private var stateSaver: StateSaver? = null
 
-    @JvmField
-    @Inject
-    internal var list: WatchList? = null
+  @JvmField @Inject internal var list: WatchList? = null
 
-    override fun onControllerEvent(event: WatchListControllerEvent) {}
+  override fun onControllerEvent(event: WatchListControllerEvent) {}
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.layout_coordinator, container, false)
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.layout_coordinator, container, false)
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val binding = LayoutCoordinatorBinding.bind(view)
-        Injector.obtainFromApplication<TickerComponent>(view.context)
-            .plusWatchListComponent()
-            .create(
-                requireToolbarActivity(),
-                requireActivity(),
-                viewLifecycleOwner,
-                binding.layoutCoordinator
-            )
-            .inject(this)
+    val binding = LayoutCoordinatorBinding.bind(view)
+    Injector.obtainFromApplication<TickerComponent>(view.context)
+        .plusWatchListComponent()
+        .create(
+            requireToolbarActivity(),
+            requireActivity(),
+            viewLifecycleOwner,
+            binding.layoutCoordinator)
+        .inject(this)
 
-        stateSaver =
-            createComponent(
-                savedInstanceState,
-                viewLifecycleOwner,
-                viewModel,
-                this,
-                requireNotNull(list),
-            ) {
-                return@createComponent when (it) {
-                    is WatchListViewEvent.ForceRefresh -> viewModel.fetchQuotes(true)
-                }
-            }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.fetchQuotes(false)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        stateSaver?.saveState(outState)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        stateSaver = null
-        factory = null
-
-        list = null
-    }
-
-    companion object {
-
-        const val TAG = "WatchlistFragment"
-
-        @JvmStatic
-        @CheckResult
-        fun newInstance(): Fragment {
-            return WatchlistFragment().apply { arguments = Bundle().apply {} }
+    stateSaver =
+        createComponent(
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            requireNotNull(list),
+        ) {
+          return@createComponent when (it) {
+            is WatchListViewEvent.ForceRefresh -> viewModel.fetchQuotes(true)
+          }
         }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    viewModel.fetchQuotes(false)
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    stateSaver?.saveState(outState)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    stateSaver = null
+    factory = null
+
+    list = null
+  }
+
+  companion object {
+
+    const val TAG = "WatchlistFragment"
+
+    @JvmStatic
+    @CheckResult
+    fun newInstance(): Fragment {
+      return WatchlistFragment().apply { arguments = Bundle().apply {} }
     }
+  }
 }

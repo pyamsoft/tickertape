@@ -18,12 +18,12 @@ package com.pyamsoft.tickertape.db.symbol
 
 sealed class SymbolChangeEvent {
 
-    data class Insert(val symbol: DbSymbol) : SymbolChangeEvent()
+  data class Insert(val symbol: DbSymbol) : SymbolChangeEvent()
 
-    data class Update(val symbol: DbSymbol) : SymbolChangeEvent()
+  data class Update(val symbol: DbSymbol) : SymbolChangeEvent()
 
-    data class Delete(
-        val symbol: DbSymbol,
-        val offerUndo: Boolean,
-    ) : SymbolChangeEvent()
+  data class Delete(
+      val symbol: DbSymbol,
+      val offerUndo: Boolean,
+  ) : SymbolChangeEvent()
 }

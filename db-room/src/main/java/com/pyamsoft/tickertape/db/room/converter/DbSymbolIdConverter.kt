@@ -22,17 +22,17 @@ import com.pyamsoft.tickertape.db.symbol.DbSymbol
 
 internal object DbSymbolIdConverter {
 
-    @JvmStatic
-    @TypeConverter
-    @CheckResult
-    fun toId(id: String): DbSymbol.Id {
-        return DbSymbol.Id(id)
-    }
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toId(id: String): DbSymbol.Id {
+    return DbSymbol.Id(id)
+  }
 
-    @JvmStatic
-    @TypeConverter
-    @CheckResult
-    fun fromId(id: DbSymbol.Id): String {
-        return id.id
-    }
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromId(id: DbSymbol.Id): String {
+    return id.id
+  }
 }

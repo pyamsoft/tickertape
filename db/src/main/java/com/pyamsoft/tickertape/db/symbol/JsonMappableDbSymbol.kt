@@ -27,26 +27,26 @@ internal constructor(
     internal val symbol: StockSymbol,
 ) : DbSymbol {
 
-    override fun id(): DbSymbol.Id {
-        return id
-    }
+  override fun id(): DbSymbol.Id {
+    return id
+  }
 
-    override fun symbol(): StockSymbol {
-        return symbol
-    }
+  override fun symbol(): StockSymbol {
+    return symbol
+  }
 
-    companion object {
+  companion object {
 
-        @JvmStatic
-        @CheckResult
-        fun from(item: DbSymbol): JsonMappableDbSymbol {
-            return if (item is JsonMappableDbSymbol) item
-            else {
-                JsonMappableDbSymbol(
-                    item.id(),
-                    item.symbol(),
-                )
-            }
-        }
+    @JvmStatic
+    @CheckResult
+    fun from(item: DbSymbol): JsonMappableDbSymbol {
+      return if (item is JsonMappableDbSymbol) item
+      else {
+        JsonMappableDbSymbol(
+            item.id(),
+            item.symbol(),
+        )
+      }
     }
+  }
 }

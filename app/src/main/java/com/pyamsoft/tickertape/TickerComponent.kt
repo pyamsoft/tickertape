@@ -36,50 +36,55 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [TickerComponent.TickerProvider::class, StockModule::class, DbModule::class, RoomModule::class, UiModule::class])
+@Component(
+    modules =
+        [
+            TickerComponent.TickerProvider::class,
+            StockModule::class,
+            DbModule::class,
+            RoomModule::class,
+            UiModule::class])
 internal interface TickerComponent {
 
-    /** Not actually used, just here so graph can compile */
-    @CheckResult
-    @Suppress("FunctionName")
-    fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
+
+  @CheckResult fun plusMainComponent(): MainComponent.Factory
+
+  @CheckResult fun plusWatchListComponent(): WatchlistComponent.Factory
+
+  @Component.Factory
+  interface Factory {
 
     @CheckResult
-    fun plusMainComponent(): MainComponent.Factory
+    fun create(
+        @BindsInstance application: Application,
+        @Named("debug") @BindsInstance debug: Boolean,
+        @BindsInstance theming: Theming,
+        @BindsInstance imageLoader: ImageLoader,
+    ): TickerComponent
+  }
 
-    @CheckResult
-    fun plusWatchListComponent(): WatchlistComponent.Factory
-
-    @Component.Factory
-    interface Factory {
-
-        @CheckResult
-        fun create(
-            @BindsInstance application: Application,
-            @Named("debug") @BindsInstance debug: Boolean,
-            @BindsInstance theming: Theming,
-            @BindsInstance imageLoader: ImageLoader,
-        ): TickerComponent
-    }
+  @Module
+  abstract class TickerProvider {
 
     @Module
-    abstract class TickerProvider {
+    companion object {
 
-        @Module
-        companion object {
+      @Provides
+      @JvmStatic
+      internal fun provideContext(application: Application): Context {
+        return application
+      }
 
-            @Provides
-            @JvmStatic
-            internal fun provideContext(application: Application): Context {
-                return application
-            }
-
-            @Provides
-            @JvmStatic
-            @Named("app_name")
-            internal fun provideAppNameRes(): Int {
-                return R.string.app_name
-            }
-        }
+      @Provides
+      @JvmStatic
+      @Named("app_name")
+      internal fun provideAppNameRes(): Int {
+        return R.string.app_name
+      }
     }
+  }
 }

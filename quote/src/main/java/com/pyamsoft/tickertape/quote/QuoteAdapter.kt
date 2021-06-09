@@ -28,49 +28,46 @@ import com.pyamsoft.pydroid.ui.util.teardownAdapter
 class QuoteAdapter private constructor(private val factory: QuoteComponent.Factory) :
     ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER) {
 
-    companion object {
+  companion object {
 
-        @JvmStatic
-        @CheckResult
-        fun createWithFactory(factory: QuoteComponent.Factory): QuoteAdapter {
-            return QuoteAdapter(factory)
+    @JvmStatic
+    @CheckResult
+    fun createWithFactory(factory: QuoteComponent.Factory): QuoteAdapter {
+      return QuoteAdapter(factory)
+    }
+
+    private val DIFFER =
+        object : DiffUtil.ItemCallback<QuoteViewState>() {
+          override fun areItemsTheSame(oldItem: QuoteViewState, newItem: QuoteViewState): Boolean {
+            return oldItem.symbol.symbol() == newItem.symbol.symbol()
+          }
+
+          override fun areContentsTheSame(
+              oldItem: QuoteViewState,
+              newItem: QuoteViewState
+          ): Boolean {
+            return oldItem == newItem
+          }
         }
+  }
 
-        private val DIFFER =
-            object : DiffUtil.ItemCallback<QuoteViewState>() {
-                override fun areItemsTheSame(
-                    oldItem: QuoteViewState,
-                    newItem: QuoteViewState
-                ): Boolean {
-                    return oldItem.symbol.symbol() == newItem.symbol.symbol()
-                }
+  override fun getItemId(position: Int): Long {
+    return getItem(position).symbol.symbol().hashCode().toLong()
+  }
 
-                override fun areContentsTheSame(
-                    oldItem: QuoteViewState,
-                    newItem: QuoteViewState
-                ): Boolean {
-                    return oldItem == newItem
-                }
-            }
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
+    val inflater = LayoutInflater.from(parent.context)
+    val binding = ListitemFrameBinding.inflate(inflater, parent, false)
+    return QuoteViewHolder(binding, factory)
+  }
 
-    override fun getItemId(position: Int): Long {
-        return getItem(position).symbol.symbol().hashCode().toLong()
-    }
+  override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
+    val state = getItem(position)
+    holder.bindState(state)
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ListitemFrameBinding.inflate(inflater, parent, false)
-        return QuoteViewHolder(binding, factory)
-    }
-
-    override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
-        val state = getItem(position)
-        holder.bindState(state)
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        teardownAdapter(recyclerView)
-    }
+  override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+    super.onDetachedFromRecyclerView(recyclerView)
+    teardownAdapter(recyclerView)
+  }
 }

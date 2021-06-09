@@ -28,13 +28,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSymbolDeleteDao : SymbolDeleteDao {
 
-    override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =
-        withContext(context = Dispatchers.IO) {
-            val roomSymbol = RoomDbSymbol.create(o)
-            return@withContext daoDelete(roomSymbol) > 0
-        }
+  override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =
+      withContext(context = Dispatchers.IO) {
+        val roomSymbol = RoomDbSymbol.create(o)
+        return@withContext daoDelete(roomSymbol) > 0
+      }
 
-    @Delete
-    @CheckResult
-    internal abstract fun daoDelete(symbol: RoomDbSymbol): Int
+  @Delete @CheckResult internal abstract fun daoDelete(symbol: RoomDbSymbol): Int
 }

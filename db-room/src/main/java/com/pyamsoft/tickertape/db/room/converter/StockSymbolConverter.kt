@@ -23,17 +23,17 @@ import com.pyamsoft.tickertape.stocks.api.toSymbol
 
 internal object StockSymbolConverter {
 
-    @JvmStatic
-    @TypeConverter
-    @CheckResult
-    fun toSymbol(symbol: String): StockSymbol {
-        return symbol.toSymbol()
-    }
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toSymbol(symbol: String): StockSymbol {
+    return symbol.toSymbol()
+  }
 
-    @JvmStatic
-    @TypeConverter
-    @CheckResult
-    fun fromSymbol(symbol: StockSymbol): String {
-        return symbol.symbol()
-    }
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromSymbol(symbol: StockSymbol): String {
+    return symbol.symbol()
+  }
 }

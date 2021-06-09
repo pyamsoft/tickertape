@@ -21,6 +21,5 @@ import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
 interface TickerDb : DbCache {
 
-    @CheckResult
-    fun symbols(): SymbolDb
+  @CheckResult fun symbols(): SymbolDb
 }

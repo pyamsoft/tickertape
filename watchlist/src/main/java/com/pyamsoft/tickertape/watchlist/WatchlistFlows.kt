@@ -29,16 +29,13 @@ data class WatchListViewState(
     val bottomOffset: Int,
 ) : UiViewState {
 
-    data class QuotePair internal constructor(
-        val symbol: StockSymbol,
-        val quote: StockQuote?,
-        val error: Throwable?
-    )
+  data class QuotePair
+  internal constructor(val symbol: StockSymbol, val quote: StockQuote?, val error: Throwable?)
 }
 
 sealed class WatchListViewEvent : UiViewEvent {
 
-    object ForceRefresh : WatchListViewEvent()
+  object ForceRefresh : WatchListViewEvent()
 }
 
 sealed class WatchListControllerEvent : UiControllerEvent

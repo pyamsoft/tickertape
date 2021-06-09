@@ -21,23 +21,20 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DbSymbol {
 
-    @CheckResult
-    fun id(): Id
+  @CheckResult fun id(): Id
+
+  @CheckResult fun symbol(): StockSymbol
+
+  data class Id(val id: String) {
 
     @CheckResult
-    fun symbol(): StockSymbol
-
-    data class Id(val id: String) {
-
-        @CheckResult
-        fun isEmpty(): Boolean {
-            return id.isBlank()
-        }
-
-        companion object {
-
-            @JvmField
-            val EMPTY = Id("")
-        }
+    fun isEmpty(): Boolean {
+      return id.isBlank()
     }
+
+    companion object {
+
+      @JvmField val EMPTY = Id("")
+    }
+  }
 }

@@ -27,44 +27,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WatchlistViewModel @Inject internal constructor(
+class WatchlistViewModel
+@Inject
+internal constructor(
     private val interactor: WatchlistInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>
-) : UiViewModel<WatchListViewState, WatchListControllerEvent>(
-    initialState = WatchListViewState(
-        error = null,
-        isLoading = false,
-        quotes = emptyList(),
-        bottomOffset = 0
-    )
-) {
+) :
+    UiViewModel<WatchListViewState, WatchListControllerEvent>(
+        initialState =
+            WatchListViewState(
+                error = null, isLoading = false, quotes = emptyList(), bottomOffset = 0)) {
 
-    private val quoteFetcher =
-        highlander<Unit, Boolean> { force ->
-            setState(
-                stateChange = { copy(isLoading = true) },
-                andThen = {
-                    try {
-                        val quotes = interactor.getQuotes(force)
-                        setState { copy(error = null, quotes = quotes, isLoading = false) }
-                    } catch (error: Throwable) {
-                        error.onActualError { e ->
-                            Timber.e(e, "Failed to fetch quotes")
-                            setState { copy(error = e, isLoading = false) }
-                        }
-                    }
-                })
-        }
+  private val quoteFetcher =
+      highlander<Unit, Boolean> { force ->
+        setState(
+            stateChange = { copy(isLoading = true) },
+            andThen = {
+              try {
+                val quotes = interactor.getQuotes(force)
+                setState { copy(error = null, quotes = quotes, isLoading = false) }
+              } catch (error: Throwable) {
+                error.onActualError { e ->
+                  Timber.e(e, "Failed to fetch quotes")
+                  setState { copy(error = e, isLoading = false) }
+                }
+              }
+            })
+      }
 
-    init {
-        viewModelScope.launch(context = Dispatchers.Default) {
-            bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
-        }
+  init {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
     }
+  }
 
-    fun fetchQuotes(force: Boolean) {
-        viewModelScope.launch(context = Dispatchers.Default) {
-            quoteFetcher.call(force)
-        }
-    }
+  fun fetchQuotes(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { quoteFetcher.call(force) }
+  }
 }

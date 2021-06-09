@@ -28,12 +28,10 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSymbolQueryDao : SymbolQueryDao {
 
-    override suspend fun query(force: Boolean): List<DbSymbol> =
-        withContext(context = Dispatchers.IO) {
-            daoQuery()
-        }
+  override suspend fun query(force: Boolean): List<DbSymbol> =
+      withContext(context = Dispatchers.IO) { daoQuery() }
 
-    @CheckResult
-    @Query("""SELECT * FROM ${RoomDbSymbol.TABLE_NAME}""")
-    internal abstract suspend fun daoQuery(): List<RoomDbSymbol>
+  @CheckResult
+  @Query("""SELECT * FROM ${RoomDbSymbol.TABLE_NAME}""")
+  internal abstract suspend fun daoQuery(): List<RoomDbSymbol>
 }

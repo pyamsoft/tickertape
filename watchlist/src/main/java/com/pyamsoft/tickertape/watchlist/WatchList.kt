@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.quote.QuoteAdapter
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
+import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
@@ -89,6 +90,12 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
             // For some reason, the margin registers only half as large as it needs to
             // be, so we must double it.
             LinearMarginDecoration.create(margin = margin).apply {
+                binding.watchlistList.addItemDecoration(this)
+            }
+
+            // The bottom has additional space to fit the FAB
+            val bottomMargin = 56.asDp(binding.watchlistList.context)
+            LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
                 binding.watchlistList.addItemDecoration(this)
             }
         }

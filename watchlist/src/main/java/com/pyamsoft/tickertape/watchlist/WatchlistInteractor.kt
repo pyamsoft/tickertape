@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.toSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,20 @@ class WatchlistInteractor @Inject internal constructor(
     @CheckResult
     suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
         withContext(context = Dispatchers.IO) {
-            val symbols = getSymbols(force)
+            var symbols = getSymbols(force)
+            if (symbols.isEmpty()) {
+                symbols = listOf(
+                    "MSFT",
+                    "AAPL",
+                    "AMD",
+                    "GME",
+                    "BB",
+                    "AMC",
+                    "CLOV",
+                    "VTI",
+                    "VOO"
+                ).map { it.toSymbol() }
+            }
 
             // If we have no symbols, don't even make the trip
             if (symbols.isEmpty()) {

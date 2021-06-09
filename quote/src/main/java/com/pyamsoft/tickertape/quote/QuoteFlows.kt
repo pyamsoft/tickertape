@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.quote
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-interface StockMoneyValue : StockNumberValue {
-
-  @CheckResult fun value(): String
-}
+data class QuoteViewState(val quote: StockQuote) : UiViewState

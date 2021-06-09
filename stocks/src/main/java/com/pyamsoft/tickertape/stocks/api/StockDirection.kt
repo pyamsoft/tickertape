@@ -18,7 +18,9 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 
-interface StockDirection {
+interface StockDirection : StockNumberValue {
 
-  @CheckResult fun direction(): String
+  @CheckResult fun isUp(): Boolean
+
+  @CheckResult fun isDown(): Boolean
 }

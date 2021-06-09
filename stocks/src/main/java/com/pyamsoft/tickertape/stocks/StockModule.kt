@@ -84,7 +84,12 @@ abstract class StockModule {
 
   @Binds
   @CheckResult
-  internal abstract fun bindInteractor(impl: StockNetworkInteractor): StockInteractor
+  @InternalApi
+  internal abstract fun bindNetworkInteractor(impl: StockNetworkInteractor): StockInteractor
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindRealInteractor(impl: StockInteractorImpl): StockInteractor
 
   @Module
   companion object {

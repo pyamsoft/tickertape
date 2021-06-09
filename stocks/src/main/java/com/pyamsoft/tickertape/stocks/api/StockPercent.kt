@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 
-interface StockPercent {
+interface StockPercent : StockNumberValue {
 
   @CheckResult fun percent(): String
 }

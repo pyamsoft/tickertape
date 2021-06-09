@@ -13,9 +13,11 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/main" />
+            <option value="$PROJECT_DIR$/quote" />
             <option value="$PROJECT_DIR$/setting" />
             <option value="$PROJECT_DIR$/stocks" />
             <option value="$PROJECT_DIR$/ui" />
+            <option value="$PROJECT_DIR$/watchlist" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

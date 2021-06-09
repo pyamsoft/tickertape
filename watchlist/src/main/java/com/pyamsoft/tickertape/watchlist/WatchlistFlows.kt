@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.watchlist
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.arch.UiControllerEvent
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-interface StockMoneyValue : StockNumberValue {
+data class WatchListViewState(
+    val error: Throwable?,
+    val isLoading: Boolean,
+    val quotes: List<StockQuote>
+) : UiViewState
 
-  @CheckResult fun value(): String
+sealed class WatchListViewEvent : UiViewEvent {
+
+  object ForceRefresh : WatchListViewEvent()
 }
+
+sealed class WatchListControllerEvent : UiControllerEvent

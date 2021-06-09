@@ -20,11 +20,15 @@ import com.pyamsoft.tickertape.stocks.api.StockDirection
 
 internal data class StockDirectionImpl(private val price: Float) : StockDirection {
 
-  private val stockDirection by lazy(LazyThreadSafetyMode.NONE) {
-    if (price < 0) "-" else if (price > 0) "+" else ""
+  override fun isUp(): Boolean {
+    return price > 0F
   }
 
-  override fun direction(): String {
-    return stockDirection
+  override fun isDown(): Boolean {
+    return price < 0F
+  }
+
+  override fun isZero(): Boolean {
+    return price == 0F
   }
 }

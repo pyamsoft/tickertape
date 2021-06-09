@@ -25,9 +25,11 @@ import com.pyamsoft.pydroid.ui.changelog.ChangeLogActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
+import com.pyamsoft.pydroid.ui.util.commitNow
 import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 
 internal class MainActivity : ChangeLogActivity() {
 
@@ -60,6 +62,12 @@ internal class MainActivity : ChangeLogActivity() {
         .plusMainComponent()
         .create(this, this, this, binding.layoutConstraint, this)
         .inject(this)
+
+    if (savedInstanceState == null) {
+      supportFragmentManager.commitNow(this) {
+        replace(fragmentContainerId, WatchlistFragment.newInstance(), WatchlistFragment.TAG)
+      }
+    }
   }
 
   override fun onNewIntent(intent: Intent) {

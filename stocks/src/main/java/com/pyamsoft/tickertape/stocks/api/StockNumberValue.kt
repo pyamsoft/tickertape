@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 
-interface StockMoneyValue : StockNumberValue {
+interface StockNumberValue {
 
-  @CheckResult fun value(): String
+  @CheckResult fun isZero(): Boolean
 }

@@ -37,7 +37,7 @@ internal class YahooFinanceSource
 @Inject
 internal constructor(@InternalApi private val service: QuoteService) : QuoteSource {
 
-  override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
+  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         val result =

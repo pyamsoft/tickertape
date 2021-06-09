@@ -22,7 +22,9 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
+import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -34,7 +36,14 @@ import javax.inject.Singleton
 @Component(modules = [TickerComponent.TickerProvider::class, StockModule::class])
 internal interface TickerComponent {
 
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
+
   @CheckResult fun plusMainComponent(): MainComponent.Factory
+
+  @CheckResult fun plusWatchListComponent(): WatchlistComponent.Factory
 
   @Component.Factory
   interface Factory {

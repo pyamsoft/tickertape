@@ -16,23 +16,36 @@
 
 package com.pyamsoft.tickertape.stocks
 
+import com.pyamsoft.cachify.MemoryCacheStorage
+import com.pyamsoft.cachify.cachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal class StockNetworkInteractor
+@Singleton
+internal class StockInteractorImpl
 @Inject
-internal constructor(
-    @InternalApi private val quoteSource: QuoteSource,
-) : StockInteractor {
+internal constructor(@InternalApi private val interactor: StockInteractor) : StockInteractor {
+
+  private val quoteCache =
+      cachify<List<StockQuote>, List<StockSymbol>>(
+          storage = { listOf(MemoryCacheStorage.create(15, TimeUnit.MINUTES)) }) { symbols ->
+        interactor.getQuotes(true, symbols)
+      }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext quoteSource.getQuotes(force, symbols)
+
+        if (force) {
+          quoteCache.clear()
+        }
+
+        return@withContext quoteCache.call(symbols)
       }
 }

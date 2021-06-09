@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.quote
 
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-interface StockMoneyValue : StockNumberValue {
+@Subcomponent
+interface QuoteComponent {
 
-  @CheckResult fun value(): String
+  fun inject(holder: QuoteViewHolder)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): QuoteComponent
+  }
 }

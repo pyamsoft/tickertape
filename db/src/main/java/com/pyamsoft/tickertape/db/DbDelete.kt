@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db
+
+import androidx.annotation.CheckResult
+
+interface DbDelete<T : Any> {
+
+  @CheckResult suspend fun delete(o: T, offerUndo: Boolean): Boolean
+}

@@ -21,6 +21,8 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.db.DbModule
+import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
@@ -33,48 +35,50 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [TickerComponent.TickerProvider::class, StockModule::class])
+@Component(modules = [TickerComponent.TickerProvider::class, StockModule::class, DbModule::class, RoomModule::class])
 internal interface TickerComponent {
 
-  /** Not actually used, just here so graph can compile */
-  @CheckResult
-  @Suppress("FunctionName")
-  fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
-
-  @CheckResult fun plusMainComponent(): MainComponent.Factory
-
-  @CheckResult fun plusWatchListComponent(): WatchlistComponent.Factory
-
-  @Component.Factory
-  interface Factory {
+    /** Not actually used, just here so graph can compile */
+    @CheckResult
+    @Suppress("FunctionName")
+    fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
 
     @CheckResult
-    fun create(
-        @BindsInstance application: Application,
-        @Named("debug") @BindsInstance debug: Boolean,
-        @BindsInstance theming: Theming,
-        @BindsInstance imageLoader: ImageLoader,
-    ): TickerComponent
-  }
+    fun plusMainComponent(): MainComponent.Factory
 
-  @Module
-  abstract class TickerProvider {
+    @CheckResult
+    fun plusWatchListComponent(): WatchlistComponent.Factory
+
+    @Component.Factory
+    interface Factory {
+
+        @CheckResult
+        fun create(
+            @BindsInstance application: Application,
+            @Named("debug") @BindsInstance debug: Boolean,
+            @BindsInstance theming: Theming,
+            @BindsInstance imageLoader: ImageLoader,
+        ): TickerComponent
+    }
 
     @Module
-    companion object {
+    abstract class TickerProvider {
 
-      @Provides
-      @JvmStatic
-      internal fun provideContext(application: Application): Context {
-        return application
-      }
+        @Module
+        companion object {
 
-      @Provides
-      @JvmStatic
-      @Named("app_name")
-      internal fun provideAppNameRes(): Int {
-        return R.string.app_name
-      }
+            @Provides
+            @JvmStatic
+            internal fun provideContext(application: Application): Context {
+                return application
+            }
+
+            @Provides
+            @JvmStatic
+            @Named("app_name")
+            internal fun provideAppNameRes(): Int {
+                return R.string.app_name
+            }
+        }
     }
-  }
 }

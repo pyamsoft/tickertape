@@ -115,6 +115,8 @@ dependencies {
     // Dagger
     kapt "com.google.dagger:dagger-compiler:$dagger"
 
+    implementation project(':db')
+    implementation project(':db-room')
     implementation project(':main')
     implementation project(':quote')
     implementation project(':setting')

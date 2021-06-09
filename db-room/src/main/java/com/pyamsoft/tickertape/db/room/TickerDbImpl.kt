@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.pyamsoft.tickertape.db.room
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+import com.pyamsoft.tickertape.db.TickerDb
+import com.pyamsoft.tickertape.db.symbol.SymbolDb
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+internal class TickerDbImpl @Inject internal constructor(private val symbolDb: SymbolDb) :
+    TickerDb {
+
+    override fun symbols(): SymbolDb {
+        return symbolDb
+    }
+
+    override suspend fun invalidate() {
+        symbolDb.invalidate()
+    }
+}

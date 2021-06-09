@@ -50,6 +50,9 @@ buildscript {
     // Logging
     timber = "4.7.1"
 
+    // Room
+    room = "2.3.0"
+
     // Dagger
     dagger = "2.35.1"
 

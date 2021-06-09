@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db
+
+import javax.inject.Qualifier
+
+/** Scope for anything used internally by the Db implementation */
+@Qualifier @Retention(AnnotationRetention.BINARY) annotation class DbApi

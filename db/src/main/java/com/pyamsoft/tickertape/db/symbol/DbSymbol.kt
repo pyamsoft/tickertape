@@ -14,14 +14,30 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db.symbol
+
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+
+interface DbSymbol {
+
+    @CheckResult
+    fun id(): Id
+
+    @CheckResult
+    fun symbol(): StockSymbol
+
+    data class Id(val id: String) {
+
+        @CheckResult
+        fun isEmpty(): Boolean {
+            return id.isBlank()
+        }
+
+        companion object {
+
+            @JvmField
+            val EMPTY = Id("")
+        }
+    }
+}

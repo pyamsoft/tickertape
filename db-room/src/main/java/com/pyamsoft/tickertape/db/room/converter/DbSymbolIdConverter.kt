@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db.room.converter
+
+import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.db.symbol.DbSymbol
+
+internal object DbSymbolIdConverter {
+
+    @JvmStatic
+    @TypeConverter
+    @CheckResult
+    fun toId(id: String): DbSymbol.Id {
+        return DbSymbol.Id(id)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    @CheckResult
+    fun fromId(id: DbSymbol.Id): String {
+        return id.id
+    }
+}

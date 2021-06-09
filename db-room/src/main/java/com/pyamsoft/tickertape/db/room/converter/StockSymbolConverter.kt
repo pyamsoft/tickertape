@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db.room.converter
+
+import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.toSymbol
+
+internal object StockSymbolConverter {
+
+    @JvmStatic
+    @TypeConverter
+    @CheckResult
+    fun toSymbol(symbol: String): StockSymbol {
+        return symbol.toSymbol()
+    }
+
+    @JvmStatic
+    @TypeConverter
+    @CheckResult
+    fun fromSymbol(symbol: StockSymbol): String {
+        return symbol.symbol()
+    }
+}

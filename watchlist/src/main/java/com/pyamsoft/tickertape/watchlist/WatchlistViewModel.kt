@@ -20,42 +20,36 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.onActualError
-import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.toSymbol
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WatchlistViewModel @Inject internal constructor(private val interactor: StockInteractor) :
+class WatchlistViewModel @Inject internal constructor(private val interactor: WatchlistInteractor) :
     UiViewModel<WatchListViewState, WatchListControllerEvent>(
-        initialState = WatchListViewState(error = null, isLoading = false, quotes = emptyList())) {
+        initialState = WatchListViewState(error = null, isLoading = false, quotes = emptyList())
+    ) {
 
-  private val quoteFetcher =
-      highlander<Unit, Boolean, List<StockSymbol>> { force, symbols ->
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              try {
-                val quotes = interactor.getQuotes(force, symbols)
-                setState { copy(error = null, quotes = quotes, isLoading = false) }
-              } catch (error: Throwable) {
-                error.onActualError { e ->
-                  Timber.e(e, "Failed to fetch quotes: $symbols")
-                  setState { copy(error = e, isLoading = false) }
-                }
-              }
-            })
-      }
+    private val quoteFetcher =
+        highlander<Unit, Boolean> { force ->
+            setState(
+                stateChange = { copy(isLoading = true) },
+                andThen = {
+                    try {
+                        val quotes = interactor.getQuotes(force)
+                        setState { copy(error = null, quotes = quotes, isLoading = false) }
+                    } catch (error: Throwable) {
+                        error.onActualError { e ->
+                            Timber.e(e, "Failed to fetch quotes")
+                            setState { copy(error = e, isLoading = false) }
+                        }
+                    }
+                })
+        }
 
-  fun fetchQuotes(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      val symbols =
-          listOf("MSFT", "AAPL", "VTI", "AMD", "GME", "CLOV", "AMC", "BB", "CLNE").map {
-            it.toSymbol()
-          }
-      quoteFetcher.call(force, symbols)
+    fun fetchQuotes(force: Boolean) {
+        viewModelScope.launch(context = Dispatchers.Default) {
+            quoteFetcher.call(force)
+        }
     }
-  }
 }

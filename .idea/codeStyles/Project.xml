@@ -1,7 +1,6 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <JavaCodeStyleSettings>
-      <option name="USE_FQ_CLASS_NAMES" value="true" />
       <option name="IMPORT_LAYOUT_TABLE">
         <value>
           <package name="" withSubpackages="true" static="false" />

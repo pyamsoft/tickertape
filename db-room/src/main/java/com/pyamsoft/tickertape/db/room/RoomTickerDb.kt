@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db.room
+
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolDeleteDao
+import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolInsertDao
+import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
+
+internal interface RoomTickerDb {
+
+    @CheckResult
+    fun roomSymbolQueryDao(): RoomSymbolQueryDao
+
+    @CheckResult
+    fun roomSymbolInsertDao(): RoomSymbolInsertDao
+
+    @CheckResult
+    fun roomSymbolDeleteDao(): RoomSymbolDeleteDao
+}

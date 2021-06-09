@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db.symbol
+
+import com.pyamsoft.tickertape.db.DbQuery
+
+interface SymbolQueryDao : DbQuery<DbSymbol>

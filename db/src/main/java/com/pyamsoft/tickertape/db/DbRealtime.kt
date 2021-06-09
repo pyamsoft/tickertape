@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
+package com.pyamsoft.tickertape.db
+
+interface DbRealtime<T : Any> {
+
+  suspend fun listenForChanges(onChange: suspend (event: T) -> Unit)
+}

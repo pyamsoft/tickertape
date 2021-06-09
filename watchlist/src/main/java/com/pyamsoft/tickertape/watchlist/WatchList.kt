@@ -28,7 +28,6 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuoteAdapter
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.quote.QuoteViewState
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -38,110 +37,119 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
     BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener {
 
-  override val viewBinding = WatchlistBinding::inflate
+    override val viewBinding = WatchlistBinding::inflate
 
-  override val layoutRoot by boundView { watchlistRoot }
+    override val layoutRoot by boundView { watchlistRoot }
 
-  private var modelAdapter: QuoteAdapter? = null
+    private var modelAdapter: QuoteAdapter? = null
 
-  private var lastScrollPosition = 0
+    private var lastScrollPosition = 0
 
-  init {
-    doOnInflate {
-      binding.watchlistList.layoutManager =
-          LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
-    }
-
-    doOnInflate {
-      modelAdapter = QuoteAdapter.createWithFactory(factory)
-      binding.watchlistList.adapter = modelAdapter
-    }
-
-    doOnInflate { binding.watchlistSwipeRefresh.setOnRefreshListener(this) }
-
-    doOnInflate { savedInstanceState ->
-      val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
-      if (position >= 0) {
-        Timber.d("Last scroll position saved at: $position")
-        lastScrollPosition = position
-      }
-    }
-
-    doOnSaveState { outState ->
-      val manager = binding.watchlistList.layoutManager
-      if (manager is GridLayoutManager) {
-        val position = manager.findFirstVisibleItemPosition()
-        if (position > 0) {
-          outState.put(LAST_SCROLL_POSITION, position)
-          return@doOnSaveState
+    init {
+        doOnInflate {
+            binding.watchlistList.layoutManager =
+                LinearLayoutManager(binding.watchlistList.context).apply {
+                    isItemPrefetchEnabled = true
+                    initialPrefetchItemCount = 3
+                }
         }
-      }
 
-      outState.remove<Nothing>(LAST_SCROLL_POSITION)
+        doOnInflate {
+            modelAdapter = QuoteAdapter.createWithFactory(factory)
+            binding.watchlistList.adapter = modelAdapter
+        }
+
+        doOnInflate { binding.watchlistSwipeRefresh.setOnRefreshListener(this) }
+
+        doOnInflate { savedInstanceState ->
+            val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
+            if (position >= 0) {
+                Timber.d("Last scroll position saved at: $position")
+                lastScrollPosition = position
+            }
+        }
+
+        doOnSaveState { outState ->
+            val manager = binding.watchlistList.layoutManager
+            if (manager is GridLayoutManager) {
+                val position = manager.findFirstVisibleItemPosition()
+                if (position > 0) {
+                    outState.put(LAST_SCROLL_POSITION, position)
+                    return@doOnSaveState
+                }
+            }
+
+            outState.remove<Nothing>(LAST_SCROLL_POSITION)
+        }
+
+        doOnInflate {
+            val margin = 16.asDp(binding.watchlistList.context)
+
+            // Standard margin on all items
+            // For some reason, the margin registers only half as large as it needs to
+            // be, so we must double it.
+            LinearMarginDecoration.create(margin = margin).apply {
+                binding.watchlistList.addItemDecoration(this)
+            }
+        }
+
+        doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
+
+        doOnTeardown {
+            binding.watchlistList.adapter = null
+
+            binding.watchlistSwipeRefresh.setOnRefreshListener(null)
+
+            modelAdapter = null
+        }
     }
 
-    doOnInflate {
-      val margin = 16.asDp(binding.watchlistList.context)
-
-      // Standard margin on all items
-      // For some reason, the margin registers only half as large as it needs to
-      // be, so we must double it.
-      LinearMarginDecoration.create(margin = margin).apply {
-        binding.watchlistList.addItemDecoration(this)
-      }
+    @CheckResult
+    private fun usingAdapter(): QuoteAdapter {
+        return requireNotNull(modelAdapter)
     }
 
-    doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
-
-    doOnTeardown {
-      binding.watchlistList.adapter = null
-
-      binding.watchlistSwipeRefresh.setOnRefreshListener(null)
-
-      modelAdapter = null
+    override fun onRefresh() {
+        publish(WatchListViewEvent.ForceRefresh)
     }
-  }
 
-  @CheckResult
-  private fun usingAdapter(): QuoteAdapter {
-    return requireNotNull(modelAdapter)
-  }
-
-  override fun onRefresh() {
-    publish(WatchListViewEvent.ForceRefresh)
-  }
-
-  override fun onRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
-    state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
-  }
-
-  private fun setList(list: List<StockQuote>) {
-    val data = list.map { QuoteViewState(quote = it) }
-    Timber.d("Submit data list: $data")
-    usingAdapter().submitList(data)
-  }
-
-  private fun clearList() {
-    usingAdapter().submitList(null)
-  }
-
-  private fun handleLoading(loading: Boolean) {
-    binding.watchlistSwipeRefresh.isRefreshing = loading
-  }
-
-  private fun handleList(schedule: List<StockQuote>) {
-    if (schedule.isEmpty()) {
-      clearList()
-    } else {
-      setList(schedule)
+    override fun onRender(state: UiRender<WatchListViewState>) {
+        state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
+        state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     }
-  }
 
-  companion object {
-    private const val LAST_SCROLL_POSITION = "watchlist_last_scroll_position"
-  }
+    @CheckResult
+    private fun createQuoteData(pair: WatchListViewState.QuotePair): QuoteViewState.QuoteData {
+        return when {
+            pair.quote != null -> QuoteViewState.QuoteData.Quote(pair.quote)
+            pair.error != null -> QuoteViewState.QuoteData.Error(pair.error)
+            else -> throw IllegalStateException("Missing quote and error for symbol ${pair.symbol}")
+        }
+    }
+
+    private fun setList(list: List<WatchListViewState.QuotePair>) {
+        val data = list.map { QuoteViewState(symbol = it.symbol, data = createQuoteData(it)) }
+        Timber.d("Submit data list: $data")
+        usingAdapter().submitList(data)
+    }
+
+    private fun clearList() {
+        usingAdapter().submitList(null)
+    }
+
+    private fun handleLoading(loading: Boolean) {
+        binding.watchlistSwipeRefresh.isRefreshing = loading
+    }
+
+    private fun handleList(schedule: List<WatchListViewState.QuotePair>) {
+        if (schedule.isEmpty()) {
+            clearList()
+        } else {
+            setList(schedule)
+        }
+    }
+
+    companion object {
+        private const val LAST_SCROLL_POSITION = "watchlist_last_scroll_position"
+    }
 }

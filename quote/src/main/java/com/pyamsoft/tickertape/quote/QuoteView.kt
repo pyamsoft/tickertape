@@ -25,150 +25,187 @@ import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.quote.databinding.QuoteItemBinding
+import com.pyamsoft.tickertape.quote.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 class QuoteView @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<QuoteViewState, Nothing, QuoteItemBinding>(parent) {
 
-  override val viewBinding = QuoteItemBinding::inflate
+    override val viewBinding = QuoteItemBinding::inflate
 
-  override val layoutRoot by boundView { quoteItem }
+    override val layoutRoot by boundView { quoteItem }
 
-  init {
-    doOnTeardown {
-      binding.quoteItemData.quoteItemAfterNumbers.apply {
-        quoteChange.text = ""
-        quotePercent.text = ""
-        quotePrice.text = ""
-      }
+    init {
+        doOnTeardown {
+            clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
+            clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
 
-      binding.quoteItemData.quoteItemNormalNumbers.apply {
-        quoteChange.text = ""
-        quotePercent.text = ""
-        quotePrice.text = ""
-      }
-
-      binding.quoteItemSymbol.text = ""
-      binding.quoteItemCompany.text = ""
-    }
-  }
-
-  override fun onRender(state: UiRender<QuoteViewState>) {
-    state.mapChanged { it.quote }.mapChanged { it.symbol() }.render(viewScope) {
-      handleSymbolChanged(it)
-    }
-
-    state.mapChanged { it.quote }.mapChanged { it.company() }.render(viewScope) {
-      handleCompanyChanged(it)
-    }
-
-    state.mapChanged { it.quote }.mapChanged { it.regular() }.render(viewScope) {
-      handleRegularSessionChanged(it)
-    }
-
-    state.mapChanged { it.quote }.mapChanged { it.afterHours() }.render(viewScope) {
-      handleAfterSessionChanged(it)
-    }
-  }
-
-  private fun handleAfterSessionChanged(session: StockMarketSession?) {
-    if (session == null) {
-      binding.quoteItemData.quoteAfterHours.isGone = true
-    } else {
-      val data = getDataFromSession(session)
-      val percent = data.percent
-      val changeAmount = data.changeAmount
-      val directionSign = data.directionSign
-      val color = data.color
-
-      binding.quoteItemData.quoteItemAfterNumbers.apply {
-        quotePrice.apply {
-          text = "\$${session.price().value()}"
-          setTextColor(color)
+            binding.quoteItemSymbol.text = ""
+            binding.quoteItemCompany.text = ""
         }
-        quotePercent.apply {
-          text = "(${directionSign}${percent}%)"
-          setTextColor(color)
-        }
-        quoteChange.apply {
-          text = "$directionSign${changeAmount}"
-          setTextColor(color)
-        }
-      }
-
-      binding.quoteItemData.quoteAfterHours.isVisible = true
     }
-  }
 
-  private fun handleRegularSessionChanged(session: StockMarketSession) {
-    val data = getDataFromSession(session)
-    val percent = data.percent
-    val changeAmount = data.changeAmount
-    val directionSign = data.directionSign
-    val color = data.color
+    override fun onRender(state: UiRender<QuoteViewState>) {
+        state.mapChanged { it.symbol }.render(viewScope) {
+            handleSymbolChanged(it)
+        }
 
-    binding.quoteItemData.quoteItemNormalNumbers.apply {
-      quotePrice.apply {
-        text = "\$${session.price().value()}"
-        setTextColor(color)
-      }
-      quotePercent.apply {
-        text = "(${directionSign}${percent}%)"
-        setTextColor(color)
-      }
-      quoteChange.apply {
-        text = "$directionSign${changeAmount}"
-        setTextColor(color)
-      }
+        state.mapChanged { it.data }.render(viewScope) { data ->
+            when (data) {
+                is QuoteViewState.QuoteData.Error -> handleDataMissing(data.error)
+                is QuoteViewState.QuoteData.Quote -> handleDataPresent(data.quote)
+            }
+        }
     }
-  }
 
-  private fun handleCompanyChanged(company: StockCompany) {
-    binding.quoteItemCompany.text = company.company()
-  }
+    private fun handleDataMissing(error: Throwable) {
+        binding.quoteItemData.quoteAfterHours.isGone = true
+        clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
+        clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
+        handleSessionError(error, binding.quoteItemData.quoteItemNormalNumbers)
+    }
 
-  private fun handleSymbolChanged(symbol: StockSymbol) {
-    binding.quoteItemSymbol.text = symbol.symbol()
-  }
+    private fun handleDataPresent(quote: StockQuote) {
+        handleCompanyChanged(quote.company())
+        handleRegularSessionChanged(quote.regular())
+        handleAfterSessionChanged(quote.afterHours())
+    }
 
-  private data class SessionData(
-      val percent: String,
-      val changeAmount: String,
-      val directionSign: String,
-      @ColorInt val color: Int
-  )
+    private fun handleRegularSessionChanged(session: StockMarketSession) {
+        handleSessionChanged(session, binding.quoteItemData.quoteItemNormalNumbers)
+    }
 
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun getDataFromSession(session: StockMarketSession): SessionData {
-      val percent: String
-      val changeAmount: String
-      val directionSign: String
-      val color: Int
-      if (session.direction().isZero()) {
-        directionSign = ""
-        color = Color.WHITE
-        percent = "0"
-        changeAmount = "0.00"
-      } else {
-        percent = session.percent().percent()
-        changeAmount = session.amount().value()
-        if (session.direction().isUp()) {
-          directionSign = "+"
-          color = Color.GREEN
+    private fun handleAfterSessionChanged(session: StockMarketSession?) {
+        if (session == null) {
+            binding.quoteItemData.quoteAfterHours.isGone = true
         } else {
-          // Direction sign not needed for negative numbers
-          directionSign = ""
-          color = Color.RED
+            handleSessionChanged(session, binding.quoteItemData.quoteItemAfterNumbers)
+            binding.quoteItemData.quoteAfterHours.isVisible = true
         }
-      }
-
-      return SessionData(percent, changeAmount, directionSign, color)
     }
-  }
+
+
+    private fun handleCompanyChanged(company: StockCompany) {
+        binding.quoteItemCompany.text = company.company()
+    }
+
+    private fun handleSymbolChanged(symbol: StockSymbol) {
+        binding.quoteItemSymbol.text = symbol.symbol()
+    }
+
+    private data class SessionData(
+        val percent: String,
+        val changeAmount: String,
+        val directionSign: String,
+        @ColorInt val color: Int
+    )
+
+    companion object {
+
+        @JvmStatic
+        @CheckResult
+        private fun getDataFromSession(session: StockMarketSession): SessionData {
+            val percent: String
+            val changeAmount: String
+            val directionSign: String
+            val color: Int
+            if (session.direction().isZero()) {
+                directionSign = ""
+                color = Color.WHITE
+                percent = "0"
+                changeAmount = "0.00"
+            } else {
+                percent = session.percent().percent()
+                changeAmount = session.amount().value()
+                if (session.direction().isUp()) {
+                    directionSign = "+"
+                    color = Color.GREEN
+                } else {
+                    // Direction sign not needed for negative numbers
+                    directionSign = ""
+                    color = Color.RED
+                }
+            }
+
+            return SessionData(percent, changeAmount, directionSign, color)
+        }
+
+
+        @JvmStatic
+        private fun handleSessionChanged(
+            session: StockMarketSession,
+            binding: QuoteNumbersBinding
+        ) {
+            val data = getDataFromSession(session)
+            val percent = data.percent
+            val changeAmount = data.changeAmount
+            val directionSign = data.directionSign
+            val color = data.color
+
+            binding.apply {
+                quoteError.apply {
+                    text = ""
+                    isGone = true
+                }
+
+                quotePrice.apply {
+                    text = "\$${session.price().value()}"
+                    setTextColor(color)
+                    isVisible = true
+                }
+
+                quotePercent.apply {
+                    text = "(${directionSign}${percent}%)"
+                    setTextColor(color)
+                    isVisible = true
+                }
+
+                quoteChange.apply {
+                    text = "$directionSign${changeAmount}"
+                    setTextColor(color)
+                    isVisible = true
+                }
+            }
+        }
+
+        @JvmStatic
+        private fun handleSessionError(error: Throwable, binding: QuoteNumbersBinding) {
+            binding.apply {
+                quoteError.apply {
+                    text = error.message
+                    setTextColor(Color.RED)
+                    isVisible = true
+                }
+
+                quotePrice.apply {
+                    text = ""
+                    isGone = true
+                }
+
+                quotePercent.apply {
+                    text = ""
+                    isGone = true
+                }
+
+                quoteChange.apply {
+                    text = ""
+                    isGone = true
+                }
+            }
+        }
+
+        @JvmStatic
+        private fun clearBindingGroup(binding: QuoteNumbersBinding) {
+            binding.apply {
+                quoteChange.text = ""
+                quotePercent.text = ""
+                quotePrice.text = ""
+                quoteError.text = ""
+            }
+        }
+    }
 }

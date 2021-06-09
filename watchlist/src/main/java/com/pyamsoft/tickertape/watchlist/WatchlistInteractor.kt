@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,9 +40,28 @@ class WatchlistInteractor @Inject internal constructor(
         }
 
     @CheckResult
-    suspend fun getQuotes(force: Boolean): List<StockQuote> =
+    suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
         withContext(context = Dispatchers.IO) {
-            return@withContext interactor.getQuotes(force, getSymbols(force))
+            val symbols = getSymbols(force)
+
+            // If we have no symbols, don't even make the trip
+            if (symbols.isEmpty()) {
+                return@withContext emptyList()
+            }
+
+            val quotePairs = mutableListOf<WatchListViewState.QuotePair>()
+            val quotes = interactor.getQuotes(force, symbols)
+            for (symbol in symbols) {
+                val quote = quotes.find { it.symbol().symbol() == symbol.symbol() }
+                quotePairs.add(
+                    WatchListViewState.QuotePair(
+                        symbol = symbol,
+                        quote = quote,
+                        error = if (quote == null) Throwable("Missing quote for $symbol") else null
+                    )
+                )
+            }
+            return@withContext quotePairs
         }
 
 }

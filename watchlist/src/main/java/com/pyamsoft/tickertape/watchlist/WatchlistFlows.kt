@@ -20,16 +20,24 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 data class WatchListViewState(
     val error: Throwable?,
     val isLoading: Boolean,
-    val quotes: List<StockQuote>
-) : UiViewState
+    val quotes: List<QuotePair>
+) : UiViewState {
+
+    data class QuotePair internal constructor(
+        val symbol: StockSymbol,
+        val quote: StockQuote?,
+        val error: Throwable?
+    )
+}
 
 sealed class WatchListViewEvent : UiViewEvent {
 
-  object ForceRefresh : WatchListViewEvent()
+    object ForceRefresh : WatchListViewEvent()
 }
 
 sealed class WatchListControllerEvent : UiControllerEvent

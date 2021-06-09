@@ -38,17 +38,22 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
   override val layoutRoot by boundView { quoteItem }
 
   init {
-      doOnTeardown {
-        binding.quoteItemAfterLabel.text = ""
-        binding.quoteItemAfterChange.text = ""
-        binding.quoteItemAfterPercent.text = ""
-        binding.quoteItemAfterPrice.text = ""
-        binding.quoteItemNormalChange.text = ""
-        binding.quoteItemNormalPercent.text = ""
-        binding.quoteItemNormalPrice.text = ""
-        binding.quoteItemSymbol.text = ""
-        binding.quoteItemCompany.text = ""
+    doOnTeardown {
+      binding.quoteItemData.quoteItemAfterNumbers.apply {
+        quoteChange.text = ""
+        quotePercent.text = ""
+        quotePrice.text = ""
       }
+
+      binding.quoteItemData.quoteItemNormalNumbers.apply {
+        quoteChange.text = ""
+        quotePercent.text = ""
+        quotePrice.text = ""
+      }
+
+      binding.quoteItemSymbol.text = ""
+      binding.quoteItemCompany.text = ""
+    }
   }
 
   override fun onRender(state: UiRender<QuoteViewState>) {
@@ -71,10 +76,7 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleAfterSessionChanged(session: StockMarketSession?) {
     if (session == null) {
-      binding.quoteItemAfterPrice.isGone = true
-      binding.quoteItemAfterPercent.isGone = true
-      binding.quoteItemAfterChange.isGone = true
-      binding.quoteItemAfterLabel.isGone = true
+      binding.quoteItemData.quoteAfterHours.isGone = true
     } else {
       val data = getDataFromSession(session)
       val percent = data.percent
@@ -82,23 +84,22 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
       val directionSign = data.directionSign
       val color = data.color
 
-      binding.quoteItemAfterPrice.apply {
-        text = "\$${session.price().value()}"
-        setTextColor(color)
-      }
-      binding.quoteItemAfterPercent.apply {
-        text = "(${directionSign}${percent}%)"
-        setTextColor(color)
-      }
-      binding.quoteItemAfterChange.apply {
-        text = "$directionSign${changeAmount}"
-        setTextColor(color)
+      binding.quoteItemData.quoteItemAfterNumbers.apply {
+        quotePrice.apply {
+          text = "\$${session.price().value()}"
+          setTextColor(color)
+        }
+        quotePercent.apply {
+          text = "(${directionSign}${percent}%)"
+          setTextColor(color)
+        }
+        quoteChange.apply {
+          text = "$directionSign${changeAmount}"
+          setTextColor(color)
+        }
       }
 
-      binding.quoteItemAfterLabel.isVisible = true
-      binding.quoteItemAfterPrice.isVisible = true
-      binding.quoteItemAfterPercent.isVisible = true
-      binding.quoteItemAfterChange.isVisible = true
+      binding.quoteItemData.quoteAfterHours.isVisible = true
     }
   }
 
@@ -109,17 +110,19 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     val directionSign = data.directionSign
     val color = data.color
 
-    binding.quoteItemNormalPrice.apply {
-      text = "\$${session.price().value()}"
-      setTextColor(color)
-    }
-    binding.quoteItemNormalPercent.apply {
-      text = "(${directionSign}${percent}%)"
-      setTextColor(color)
-    }
-    binding.quoteItemNormalChange.apply {
-      text = "$directionSign${changeAmount}"
-      setTextColor(color)
+    binding.quoteItemData.quoteItemNormalNumbers.apply {
+      quotePrice.apply {
+        text = "\$${session.price().value()}"
+        setTextColor(color)
+      }
+      quotePercent.apply {
+        text = "(${directionSign}${percent}%)"
+        setTextColor(color)
+      }
+      quoteChange.apply {
+        text = "$directionSign${changeAmount}"
+        setTextColor(color)
+      }
     }
   }
 

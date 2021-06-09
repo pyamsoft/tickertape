@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.symbol
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.squareup.moshi.JsonClass
 
@@ -36,6 +37,12 @@ internal constructor(
   }
 
   companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(symbol: StockSymbol): DbSymbol {
+      return JsonMappableDbSymbol(id = DbSymbol.Id(IdGenerator.generate()), symbol = symbol)
+    }
 
     @JvmStatic
     @CheckResult

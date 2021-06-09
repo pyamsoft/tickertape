@@ -132,7 +132,9 @@ internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolA
   }
 
   override fun onControllerEvent(event: SymbolAddControllerEvent) {
-    // TODO handle
+    return when (event) {
+      is SymbolAddControllerEvent.Close -> dismiss()
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

@@ -21,8 +21,11 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.BottomOffset
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -59,6 +62,40 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
     }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      interactor.listenForChanges { handleRealtimeEvent(it) }
+    }
+  }
+
+  private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
+      when (event) {
+        is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
+        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol())
+        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
+      }
+
+  private fun handleInsertSymbol(symbol: StockSymbol) {
+    Timber.d("New symbol inserted: $symbol")
+
+    // Don't actually insert anything to the list here, but call a full refresh
+    // This will re-fetch the DB and the network and give us back quotes
+    fetchQuotes(true)
+  }
+
+  private fun handleUpdateSymbol(symbol: StockSymbol) {
+    Timber.d("Existing symbol updated: $symbol")
+
+    // Don't actually update anything in the list here, but call a full refresh
+    // This will re-fetch the DB and the network and give us back quotes
+    fetchQuotes(true)
+  }
+
+  private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
+    setState { copy(quotes = quotes.filterNot { it.symbol.symbol() == symbol.symbol() }) }
+    // TODO offer up undo ability
+
+    // On delete, we don't need to re-fetch quotes from the network
   }
 
   fun fetchQuotes(force: Boolean) {

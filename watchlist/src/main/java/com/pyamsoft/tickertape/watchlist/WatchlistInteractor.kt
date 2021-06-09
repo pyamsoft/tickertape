@@ -18,10 +18,11 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.toSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 class WatchlistInteractor
 @Inject
 internal constructor(
+    private val symbolRealtime: SymbolRealtime,
     private val symbolQueryDao: SymbolQueryDao,
     private val interactor: StockInteractor
 ) {
@@ -42,16 +44,16 @@ internal constructor(
         return@withContext symbolQueryDao.query(force).map { it.symbol() }
       }
 
+  suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        return@withContext symbolRealtime.listenForChanges(onChange)
+      }
+
   @CheckResult
   suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
       withContext(context = Dispatchers.IO) {
-        var symbols = getSymbols(force)
-        if (symbols.isEmpty()) {
-          symbols =
-              listOf("MSFT", "AAPL", "AMD", "GME", "BB", "AMC", "CLOV", "VTI", "VOO").map {
-                it.toSymbol()
-              }
-        }
+        val symbols = getSymbols(force)
 
         // If we have no symbols, don't even make the trip
         if (symbols.isEmpty()) {

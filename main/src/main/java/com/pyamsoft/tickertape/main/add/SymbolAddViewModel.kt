@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.stocks.api.toSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -31,6 +32,7 @@ class SymbolAddViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
+    private val interactor: SymbolAddInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState, SymbolAddViewState(symbol = "")) {
@@ -54,7 +56,11 @@ internal constructor(
 
   fun handleCommitSymbol() {
     val symbol = state.symbol
-    Timber.d("Commit symbol to DB: $symbol")
+    viewModelScope.launch(context = Dispatchers.Default) {
+      Timber.d("Commit symbol to DB: $symbol")
+      interactor.commitSymbol(symbol.toSymbol())
+        publish(SymbolAddControllerEvent.Close)
+    }
   }
 
   companion object {

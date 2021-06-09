@@ -24,6 +24,7 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.add.SymbolAddComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.ui.UiModule
@@ -50,6 +51,8 @@ internal interface TickerComponent {
   @CheckResult
   @Suppress("FunctionName")
   fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
+
+  @CheckResult fun plusSymbolAddComponent(): SymbolAddComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
 import javax.inject.Inject
 
@@ -28,6 +29,14 @@ class MainBarAdd @Inject internal constructor(parent: ViewGroup) :
   override val viewBinding = MainAddBinding::inflate
 
   override val layoutRoot by boundView { mainBarAdd }
+
+  init {
+    doOnInflate {
+      binding.mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddNewSymbol) }
+    }
+
+    doOnTeardown { binding.mainBarAdd.setOnDebouncedClickListener(null) }
+  }
 
   override fun onRender(state: UiRender<MainViewState>) {
     state.mapChanged { it.isFabVisible }.render(viewScope) { handleFabVisible(it) }

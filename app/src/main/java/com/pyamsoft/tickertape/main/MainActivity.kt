@@ -31,10 +31,12 @@ import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.commitNow
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.main.add.SymbolAddDialog
 import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
@@ -110,6 +112,7 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
                 viewModel.handleSelectPage(MainPage.WatchList, force = false)
             is MainViewEvent.OpenSettings ->
                 viewModel.handleSelectPage(MainPage.Settings, force = false)
+            is MainViewEvent.AddNewSymbol -> handleOpenSymbolAddDialog()
           }
         }
 
@@ -117,6 +120,10 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
     if (savedInstanceState == null || existingFragment == null) {
       viewModel.handleLoadDefaultPage()
     }
+  }
+
+  private fun handleOpenSymbolAddDialog() {
+    SymbolAddDialog.newInstance().show(this, SymbolAddDialog.TAG)
   }
 
   override fun onControllerEvent(event: MainControllerEvent) {

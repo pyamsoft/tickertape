@@ -20,15 +20,24 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.onActualError
+import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.ui.BottomOffset
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WatchlistViewModel @Inject internal constructor(private val interactor: WatchlistInteractor) :
-    UiViewModel<WatchListViewState, WatchListControllerEvent>(
-        initialState = WatchListViewState(error = null, isLoading = false, quotes = emptyList())
-    ) {
+class WatchlistViewModel @Inject internal constructor(
+    private val interactor: WatchlistInteractor,
+    private val bottomOffsetBus: EventConsumer<BottomOffset>
+) : UiViewModel<WatchListViewState, WatchListControllerEvent>(
+    initialState = WatchListViewState(
+        error = null,
+        isLoading = false,
+        quotes = emptyList(),
+        bottomOffset = 0
+    )
+) {
 
     private val quoteFetcher =
         highlander<Unit, Boolean> { force ->
@@ -46,6 +55,12 @@ class WatchlistViewModel @Inject internal constructor(private val interactor: Wa
                     }
                 })
         }
+
+    init {
+        viewModelScope.launch(context = Dispatchers.Default) {
+            bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+        }
+    }
 
     fun fetchQuotes(force: Boolean) {
         viewModelScope.launch(context = Dispatchers.Default) {

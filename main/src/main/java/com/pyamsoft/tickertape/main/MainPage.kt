@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.main
 
-import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.watchlist.databinding.WatchAddBinding
-import javax.inject.Inject
-
-class WatchAdd @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<WatchListViewState, WatchListViewEvent, WatchAddBinding>(parent) {
-
-    override val viewBinding = WatchAddBinding::inflate
-
-    override val layoutRoot by boundView { watchbarAdd }
-
+sealed class MainPage {
+    object WatchList : MainPage()
+    object Settings : MainPage()
 }

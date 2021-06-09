@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -123,6 +124,11 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
     override fun onRender(state: UiRender<WatchListViewState>) {
         state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
         state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
+        state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+    }
+
+    private fun handleBottomOffset(offset: Int) {
+        layoutRoot.updatePadding(bottom = offset)
     }
 
     @CheckResult

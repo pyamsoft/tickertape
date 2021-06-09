@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
   ~ Copyright 2021 Peter Kenji Yamanaka
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +16,17 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <item name="watchbar_root" type="id" />
-</resources>
+<merge>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main_bar_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/blank"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        app:layout_anchor="@id/main_bar_root"
+        app:pressedTranslationZ="12dp" />
+</merge>
+

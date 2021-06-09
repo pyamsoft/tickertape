@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
+import com.pyamsoft.tickertape.ui.UiModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import dagger.BindsInstance
 import dagger.Component
@@ -35,7 +36,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [TickerComponent.TickerProvider::class, StockModule::class, DbModule::class, RoomModule::class])
+@Component(modules = [TickerComponent.TickerProvider::class, StockModule::class, DbModule::class, RoomModule::class, UiModule::class])
 internal interface TickerComponent {
 
     /** Not actually used, just here so graph can compile */

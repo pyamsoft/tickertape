@@ -48,14 +48,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     @Inject
     internal var list: WatchList? = null
 
-    @JvmField
-    @Inject
-    internal var bottomBar: WatchBar? = null
-
-    @JvmField
-    @Inject
-    internal var add: WatchAdd? = null
-
     override fun onControllerEvent(event: WatchListControllerEvent) {}
 
     override fun onCreateView(
@@ -87,8 +79,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
                 viewModel,
                 this,
                 requireNotNull(list),
-                requireNotNull(bottomBar),
-                requireNotNull(add)
             ) {
                 return@createComponent when (it) {
                     is WatchListViewEvent.ForceRefresh -> viewModel.fetchQuotes(true)

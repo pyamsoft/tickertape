@@ -21,7 +21,7 @@
     <com.google.android.material.bottomappbar.BottomAppBar xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@id/watchbar_root"
+        android:id="@id/main_bar_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -31,7 +31,7 @@
         tools:ignore="BottomAppBar">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/watchbar_bottom_nav"
+            android:id="@+id/main_bar_nav"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/transparent"

@@ -14,31 +14,32 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.main
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class WatchListViewState(
-    val error: Throwable?,
-    val isLoading: Boolean,
-    val quotes: List<QuotePair>,
-    val bottomOffset: Int,
-) : UiViewState {
+data class MainViewState
+internal constructor(
+    val page: MainPage?,
+    val isFabVisible: Boolean
+) : UiViewState
 
-    data class QuotePair internal constructor(
-        val symbol: StockSymbol,
-        val quote: StockQuote?,
-        val error: Throwable?
-    )
+sealed class MainViewEvent : UiViewEvent {
+
+    object OpenWatchList : MainViewEvent()
+
+    object OpenSettings : MainViewEvent()
+
+    data class BottomBarMeasured internal constructor(val height: Int) : MainViewEvent()
+
+    data class FabCradleVisibility internal constructor(val visible: Boolean) : MainViewEvent()
 }
 
-sealed class WatchListViewEvent : UiViewEvent {
+sealed class MainControllerEvent : UiControllerEvent {
 
-    object ForceRefresh : WatchListViewEvent()
+    data class PushPage
+    internal constructor(val newPage: MainPage, val oldPage: MainPage?, val force: Boolean) :
+        MainControllerEvent()
 }
-
-sealed class WatchListControllerEvent : UiControllerEvent

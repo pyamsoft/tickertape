@@ -25,6 +25,7 @@ import android.os.IBinder
 import androidx.core.content.getSystemService
 import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -47,6 +48,8 @@ class TapeService : Service() {
   /** The current page of symbol info */
   private var currentIndex = DEFAULT_INDEX
 
+  private var screenReceiverRegistration: ScreenReceiver.Registration? = null
+
   override fun onBind(intent: Intent?): IBinder? {
     return null
   }
@@ -59,6 +62,8 @@ class TapeService : Service() {
     Timber.d("Start notification in foreground: $NOTIFICATION_ID")
     val notification = requireNotNull(tapeRemote).createNotification(notificationManager)
     startForeground(NOTIFICATION_ID, notification)
+
+    screenReceiverRegistration = ScreenReceiver.register(this)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -86,6 +91,9 @@ class TapeService : Service() {
     stopForeground(true)
     stopSelf()
 
+    screenReceiverRegistration?.unregister()
+    screenReceiverRegistration = null
+
     serviceScope.cancel()
   }
 
@@ -95,9 +103,17 @@ class TapeService : Service() {
     private const val NOTIFICATION_ID = 42069
 
     @JvmStatic
-    fun start(context: Context) {
+    @JvmOverloads
+    fun start(context: Context, options: TapeRemote.NotificationOptions? = null) {
       val appContext = context.applicationContext
-      val service = Intent(appContext, TapeService::class.java)
+      val service =
+          Intent(appContext, TapeService::class.java).apply {
+            options?.also { opts ->
+              putExtra(TapeRemote.KEY_CURRENT_INDEX, opts.index)
+              putExtra(TapeRemote.KEY_FORCE_REFRESH, opts.forceRefresh)
+            }
+          }
+
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         appContext.startForegroundService(service)
       } else {

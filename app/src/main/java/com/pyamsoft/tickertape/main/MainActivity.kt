@@ -121,7 +121,10 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
     if (savedInstanceState == null || existingFragment == null) {
       viewModel.handleLoadDefaultPage()
     }
+  }
 
+  override fun onStart() {
+    super.onStart()
     TapeService.start(this)
   }
 

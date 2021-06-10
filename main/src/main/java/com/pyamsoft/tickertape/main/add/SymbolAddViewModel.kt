@@ -59,7 +59,7 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
       interactor.commitSymbol(symbol.toSymbol())
-        publish(SymbolAddControllerEvent.Close)
+      publish(SymbolAddControllerEvent.Close)
     }
   }
 

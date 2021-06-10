@@ -18,8 +18,6 @@ package com.pyamsoft.tickertape.quote
 
 import android.graphics.Color
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView

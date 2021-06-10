@@ -41,7 +41,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-          // TODO move this query into the DAO layer
+        // TODO move this query into the DAO layer
         val existingDbSymbol =
             symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
         if (existingDbSymbol != null) {

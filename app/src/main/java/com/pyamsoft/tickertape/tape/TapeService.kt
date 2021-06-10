@@ -18,9 +18,7 @@ package com.pyamsoft.tickertape.tape
 
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import androidx.core.content.getSystemService
 import com.pyamsoft.pydroid.ui.Injector
@@ -116,6 +114,5 @@ class TapeService : Service() {
 
     private const val DEFAULT_INDEX = 0
     private const val NOTIFICATION_ID = 42069
-
   }
 }

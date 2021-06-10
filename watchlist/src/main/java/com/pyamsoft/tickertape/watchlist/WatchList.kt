@@ -153,7 +153,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     return when {
       pair.quote != null -> QuoteViewState.QuoteData.Quote(requireNotNull(pair.quote))
       pair.error != null -> QuoteViewState.QuoteData.Error(requireNotNull(pair.error))
-      else -> throw IllegalStateException("Missing quote and error for symbol ${pair.symbol}")
+      else -> throw IllegalStateException("Missing quote and error for symbol ${pair.symbol.symbol()}")
     }
   }
 

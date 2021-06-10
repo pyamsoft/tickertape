@@ -46,31 +46,43 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 format = YF_QUOTE_FORMAT,
                 fields = YF_QUOTE_FIELDS,
                 symbols = symbols.joinToString(",") { it.symbol() })
-        return@withContext result.quoteResponse.result.map {
-          StockQuoteImpl(
-              symbol = StockSymbolImpl(it.symbol),
-              company = StockCompanyImpl(it.shortName),
-              regular =
-                  StockMarketSessionImpl(
-                      amount = StockMoneyValueImpl(it.regularMarketChange),
-                      direction = StockDirectionImpl(it.regularMarketChange),
-                      percent = StockPercentImpl(it.regularMarketChangePercent),
-                      price = StockMoneyValueImpl(it.regularMarketPrice),
-                  ),
-              afterHours =
-                  if (it.postMarketChange != null &&
-                      it.postMarketPrice != null &&
-                      it.postMarketChangePercent != null) {
-                    StockMarketSessionImpl(
-                        amount = StockMoneyValueImpl(it.postMarketChange),
-                        direction = StockDirectionImpl(it.postMarketChange),
-                        percent = StockPercentImpl(it.postMarketChangePercent),
-                        price = StockMoneyValueImpl(it.postMarketPrice),
-                    )
-                  } else {
-                    null
-                  })
-        }
+        return@withContext result
+            .quoteResponse
+            .result
+            .asSequence()
+            // If the symbol does not exist, these values will return null
+            // We need all of these values to have a valid ticker
+            .filterNot { it.shortName == null }
+            .filterNot { it.regularMarketChange == null }
+            .filterNot { it.regularMarketPrice == null }
+            .filterNot { it.regularMarketChangePercent == null }
+            // Only valid tickers here, so requireNotNull should never throw
+            .map {
+              StockQuoteImpl(
+                  symbol = StockSymbolImpl(it.symbol),
+                  company = StockCompanyImpl(requireNotNull(it.shortName)),
+                  regular =
+                      StockMarketSessionImpl(
+                          amount = StockMoneyValueImpl(requireNotNull(it.regularMarketChange)),
+                          direction = StockDirectionImpl(requireNotNull(it.regularMarketChange)),
+                          percent = StockPercentImpl(requireNotNull(it.regularMarketChangePercent)),
+                          price = StockMoneyValueImpl(requireNotNull(it.regularMarketPrice)),
+                      ),
+                  afterHours =
+                      if (it.postMarketChange != null &&
+                          it.postMarketPrice != null &&
+                          it.postMarketChangePercent != null) {
+                        StockMarketSessionImpl(
+                            amount = StockMoneyValueImpl(it.postMarketChange),
+                            direction = StockDirectionImpl(it.postMarketChange),
+                            percent = StockPercentImpl(it.postMarketChangePercent),
+                            price = StockMoneyValueImpl(it.postMarketPrice),
+                        )
+                      } else {
+                        null
+                      })
+            }
+            .toList()
       }
 
   companion object {

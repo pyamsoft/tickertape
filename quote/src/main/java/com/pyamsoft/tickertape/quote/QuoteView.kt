@@ -71,6 +71,8 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     binding.quoteItemData.quoteAfterHours.isGone = true
     clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
     clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
+
+    handleCompanyChanged(null)
     handleSessionError(error, binding.quoteItemData.quoteItemNormalNumbers)
   }
 
@@ -93,8 +95,8 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  private fun handleCompanyChanged(company: StockCompany) {
-    binding.quoteItemCompany.text = company.company()
+  private fun handleCompanyChanged(company: StockCompany?) {
+    binding.quoteItemCompany.text = company?.company().orEmpty()
   }
 
   private fun handleSymbolChanged(symbol: StockSymbol) {

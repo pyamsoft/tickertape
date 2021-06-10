@@ -59,7 +59,7 @@ internal constructor(
               QuotePair(
                   symbol = symbol,
                   quote = quote,
-                  error = if (quote == null) Throwable("Missing quote for $symbol") else null))
+                  error = if (quote == null) Throwable("Missing quote for ${symbol.symbol()}") else null))
         }
         return@withContext quotePairs
       }

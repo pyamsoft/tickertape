@@ -29,13 +29,13 @@ class TapeLauncher
 internal constructor(private val context: Context, private val serviceClass: Class<out Service>) {
 
   @JvmOverloads
-  fun start(options: TapeRemote.NotificationOptions? = null) {
+  fun start(options: Options? = null) {
     val appContext = context.applicationContext
     val service =
         Intent(appContext, serviceClass).apply {
           options?.also { opts ->
-            putExtra(TapeRemote.KEY_CURRENT_INDEX, opts.index)
-            putExtra(TapeRemote.KEY_FORCE_REFRESH, opts.forceRefresh)
+            opts.index?.also { i -> putExtra(TapeRemote.KEY_CURRENT_INDEX, i) }
+            opts.forceRefresh?.also { f -> putExtra(TapeRemote.KEY_FORCE_REFRESH, f) }
           }
         }
 
@@ -45,4 +45,6 @@ internal constructor(private val context: Context, private val serviceClass: Cla
       appContext.startService(service)
     }
   }
+
+  data class Options(val index: Int?, val forceRefresh: Boolean?)
 }

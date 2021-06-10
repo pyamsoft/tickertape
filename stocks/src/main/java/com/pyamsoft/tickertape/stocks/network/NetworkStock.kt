@@ -22,10 +22,10 @@ import com.squareup.moshi.JsonClass
 internal data class NetworkStock
 internal constructor(
     internal val symbol: String,
-    internal val shortName: String,
-    internal val regularMarketPrice: Float,
-    internal val regularMarketChange: Float,
-    internal val regularMarketChangePercent: Float,
+    internal val shortName: String?,
+    internal val regularMarketPrice: Float?,
+    internal val regularMarketChange: Float?,
+    internal val regularMarketChangePercent: Float?,
     internal val postMarketPrice: Float?,
     internal val postMarketChange: Float?,
     internal val postMarketChangePercent: Float?,

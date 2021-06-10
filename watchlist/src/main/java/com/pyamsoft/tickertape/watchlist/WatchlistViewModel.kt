@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,7 @@ import timber.log.Timber
 class WatchlistViewModel
 @Inject
 internal constructor(
+    private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>
 ) :
@@ -103,7 +105,12 @@ internal constructor(
   }
 
   private fun CoroutineScope.fetchQuotes(force: Boolean) {
-    launch(context = Dispatchers.Default) { quoteFetcher.call(force) }
+    launch(context = Dispatchers.Default) {
+        quoteFetcher.call(force)
+
+        // After the quotes are fetched, start the tape
+        tapeLauncher.start()
+    }
   }
 
   fun handleRemove(index: Int) {

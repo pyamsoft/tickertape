@@ -21,10 +21,9 @@
     android:baselineAligned="false"
     android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -32,9 +31,12 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:ellipsize="end"
+            android:maxWidth="@dimen/remote_view_symbol_max_width"
             android:maxLines="1"
-            android:textSize="18sp"
+            android:textSize="@dimen/remote_view_large_text"
             android:textStyle="bold" />
 
         <TextView
@@ -42,17 +44,42 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:layout_alignTop="@id/remote_views_symbol1"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/remote_views_symbol1"
+            android:ellipsize="none"
             android:maxLines="1"
-            android:textSize="14sp" />
+            android:textSize="@dimen/remote_view_large_text" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/remote_views_change1"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/remote_views_symbol1"
+            android:layout_alignStart="@id/remote_views_symbol1"
+            android:ellipsize="none"
+            android:maxLines="1"
+            android:textSize="@dimen/remote_view_small_text" />
 
-    <LinearLayout
-        android:layout_width="0dp"
+        <TextView
+            android:id="@+id/remote_views_percent1"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/remote_views_change1"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/remote_views_change1"
+            android:ellipsize="none"
+            android:maxLines="1"
+            android:textSize="@dimen/remote_view_small_text" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_weight="1"
+        android:layout_marginStart="8dp"
         android:orientation="vertical">
 
         <TextView
@@ -60,9 +87,12 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:ellipsize="end"
+            android:maxWidth="@dimen/remote_view_symbol_max_width"
             android:maxLines="1"
-            android:textSize="18sp"
+            android:textSize="@dimen/remote_view_large_text"
             android:textStyle="bold" />
 
         <TextView
@@ -70,17 +100,42 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:layout_alignTop="@id/remote_views_symbol2"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/remote_views_symbol2"
+            android:ellipsize="none"
             android:maxLines="1"
-            android:textSize="14sp" />
+            android:textSize="@dimen/remote_view_large_text" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/remote_views_change2"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/remote_views_symbol2"
+            android:layout_alignStart="@id/remote_views_symbol2"
+            android:ellipsize="none"
+            android:maxLines="1"
+            android:textSize="@dimen/remote_view_small_text" />
 
-    <LinearLayout
-        android:layout_width="0dp"
+        <TextView
+            android:id="@+id/remote_views_percent2"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/remote_views_change2"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/remote_views_change2"
+            android:ellipsize="none"
+            android:maxLines="1"
+            android:textSize="@dimen/remote_view_small_text" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_weight="1"
+        android:layout_marginStart="8dp"
         android:orientation="vertical">
 
         <TextView
@@ -88,9 +143,12 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:ellipsize="end"
+            android:maxWidth="@dimen/remote_view_symbol_max_width"
             android:maxLines="1"
-            android:textSize="18sp"
+            android:textSize="@dimen/remote_view_large_text"
             android:textStyle="bold" />
 
         <TextView
@@ -98,38 +156,36 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:layout_alignTop="@id/remote_views_symbol3"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/remote_views_symbol3"
+            android:ellipsize="none"
             android:maxLines="1"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+            android:textSize="@dimen/remote_view_large_text" />
 
         <TextView
-            android:id="@+id/remote_views_symbol4"
+            android:id="@+id/remote_views_change3"
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:layout_below="@id/remote_views_symbol3"
+            android:layout_alignStart="@id/remote_views_symbol3"
+            android:ellipsize="none"
             android:maxLines="1"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/remote_view_small_text" />
 
         <TextView
-            android:id="@+id/remote_views_price4"
+            android:id="@+id/remote_views_percent3"
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:layout_alignTop="@id/remote_views_change3"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/remote_views_change3"
+            android:ellipsize="none"
             android:maxLines="1"
-            android:textSize="14sp" />
+            android:textSize="@dimen/remote_view_small_text" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

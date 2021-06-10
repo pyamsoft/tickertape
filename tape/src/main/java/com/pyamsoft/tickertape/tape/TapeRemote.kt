@@ -25,16 +25,11 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.IconCompat
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotePair
@@ -91,10 +86,16 @@ internal constructor(
   }
 
   @CheckResult
-  private fun getServicePendingIntent(index: Int, requestCode: Int): PendingIntent {
+  private fun getServicePendingIntent(
+      requestCode: Int,
+      options: PendingIntentOptions
+  ): PendingIntent {
     val appContext = context.applicationContext
     val serviceIntent =
-        Intent(appContext, serviceClass).apply { putExtra(KEY_CURRENT_INDEX, index) }
+        Intent(appContext, serviceClass).apply {
+          putExtra(KEY_CURRENT_INDEX, options.index)
+          putExtra(KEY_FORCE_REFRESH, options.forceRefresh)
+        }
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       PendingIntent.getForegroundService(
           appContext, requestCode, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -126,11 +127,25 @@ internal constructor(
     }
 
     val session = getQuoteSession(quote)
-    val color = getTradeColor(session)
+    val data = StockMarketSession.getDataFromSession(session)
+    val percent = data.percent
+    val changeAmount = data.changeAmount
+    val directionSign = data.directionSign
+    val color = data.color
     val priceText = "\$${session.price().value()}"
+    val percentText = "(${directionSign}${percent}%)"
+    val changeText = "$directionSign${changeAmount}"
+
     remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol().symbol())
+
     remoteViews.setTextViewText(remoteViewIdGroup.priceViewId, priceText)
     remoteViews.setTextColor(remoteViewIdGroup.priceViewId, color)
+
+    remoteViews.setTextViewText(remoteViewIdGroup.changeViewId, changeText)
+    remoteViews.setTextColor(remoteViewIdGroup.changeViewId, color)
+
+    remoteViews.setTextViewText(remoteViewIdGroup.percentViewId, percentText)
+    remoteViews.setTextColor(remoteViewIdGroup.percentViewId, color)
   }
 
   private fun updateTickers(quotes: List<QuotePair>, index: Int, pageSize: Int) {
@@ -154,36 +169,14 @@ internal constructor(
   }
 
   @CheckResult
-  private fun createNotificationBuilder(icon: SmallIcon?): NotificationCompat.Builder {
+  private fun createNotificationBuilder(): NotificationCompat.Builder {
     return NotificationCompat.Builder(context.applicationContext, CHANNEL_ID)
-        .apply {
-          if (icon == null) {
-            setSmallIcon(R.drawable.ic_code_24dp)
-          } else {
-            setSmallIcon(textAsIcon(icon))
-          }
-        }
+        .setSmallIcon(R.drawable.ic_code_24dp)
         .setShowWhen(false)
         .setAutoCancel(false)
         .setOngoing(false)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setSilent(true)
-  }
-
-  @CheckResult
-  private fun resolveSmallIcon(index: Int, quotes: List<QuotePair>): SmallIcon? {
-    if (quotes.isEmpty()) {
-      return null
-    }
-
-    val quote = quotes[index].quote
-    if (quote == null) {
-      Timber.w("Missing quote for index $index $quotes")
-      return null
-    }
-
-    return SmallIcon(
-        symbol = quote.symbol().symbol(), price = getQuoteSession(quote).price().value())
   }
 
   @CheckResult
@@ -194,24 +187,31 @@ internal constructor(
   ): Notification {
     guaranteeNotificationChannelExists(notificationManager)
 
+    val builder = createNotificationBuilder()
     if (quotes.isEmpty()) {
-      return createNotificationBuilder(null).build()
+      return builder.build()
     }
 
     val pageSize = getPageSize()
-    val safeIndex = correctIndex(index * pageSize, quotes.size)
+    val safeIndex = correctIndex(index, quotes.size)
     updateTickers(quotes, safeIndex, pageSize)
 
-    val smallIcon = resolveSmallIcon(correctIndex(index, quotes.size), quotes)
-
-    return createNotificationBuilder(smallIcon)
+    return builder
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setCustomContentView(remoteViews)
         .addAction(generateNotificationAction("Open", getActivityPendingIntent()))
         .addAction(
             generateNotificationAction(
                 "Next",
-                getServicePendingIntent(correctIndex(index, quotes.size) + 1, REQUEST_CODE_NEXT)))
+                getServicePendingIntent(
+                    REQUEST_CODE_NEXT,
+                    PendingIntentOptions(index = safeIndex + pageSize, forceRefresh = false))))
+        .addAction(
+            generateNotificationAction(
+                "Refresh",
+                getServicePendingIntent(
+                    REQUEST_CODE_REFRESH,
+                    PendingIntentOptions(index = safeIndex, forceRefresh = true))))
         .build()
   }
 
@@ -223,49 +223,26 @@ internal constructor(
   @CheckResult
   suspend fun updateNotification(
       notificationManager: NotificationManager,
-      index: Int,
-      force: Boolean
+      options: NotificationOptions
   ): Notification =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
-        val quotePairs = interactor.getQuotes(force)
-        return@withContext hydrateNotification(notificationManager, quotePairs, index)
+        val quotePairs = interactor.getQuotes(options.forceRefresh)
+        return@withContext hydrateNotification(notificationManager, quotePairs, options.index)
       }
 
-  private data class RemoteViewIds(@IdRes val symbolViewId: Int, @IdRes val priceViewId: Int)
+  private data class RemoteViewIds(
+      @IdRes val symbolViewId: Int,
+      @IdRes val priceViewId: Int,
+      @IdRes val changeViewId: Int,
+      @IdRes val percentViewId: Int
+  )
 
-  private data class SmallIcon(val symbol: String, val price: String)
+  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
+
+  private data class PendingIntentOptions(val index: Int, val forceRefresh: Boolean)
 
   companion object {
-
-    private const val NOTIFICATION_SIZE = 64
-
-    private val symbolPaint =
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-          textSize = NOTIFICATION_SIZE / 2.5F
-          color = Color.WHITE
-          textAlign = Paint.Align.LEFT
-        }
-
-    private val pricePaint =
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-          textSize = NOTIFICATION_SIZE / 3.5F
-          color = Color.WHITE
-          textAlign = Paint.Align.LEFT
-        }
-
-    @JvmStatic
-    @CheckResult
-    private fun textAsIcon(icon: SmallIcon): IconCompat {
-
-      val image = Bitmap.createBitmap(NOTIFICATION_SIZE, NOTIFICATION_SIZE, Bitmap.Config.ARGB_8888)
-      val canvas = Canvas(image)
-
-      canvas.drawText(icon.symbol, 0F, NOTIFICATION_SIZE / 2F, symbolPaint)
-      canvas.drawText(icon.price, 0F, NOTIFICATION_SIZE * 0.8F, pricePaint)
-
-      return IconCompat.createWithBitmap(image)
-    }
 
     @JvmStatic
     @CheckResult
@@ -278,25 +255,26 @@ internal constructor(
             RemoteViewIds(
                 symbolViewId = R.id.remote_views_symbol1,
                 priceViewId = R.id.remote_views_price1,
-            ),
+                changeViewId = R.id.remote_views_change1,
+                percentViewId = R.id.remote_views_percent1),
             RemoteViewIds(
                 symbolViewId = R.id.remote_views_symbol2,
                 priceViewId = R.id.remote_views_price2,
-            ),
+                changeViewId = R.id.remote_views_change2,
+                percentViewId = R.id.remote_views_percent2),
             RemoteViewIds(
                 symbolViewId = R.id.remote_views_symbol3,
                 priceViewId = R.id.remote_views_price3,
-            ),
-            RemoteViewIds(
-                symbolViewId = R.id.remote_views_symbol4,
-                priceViewId = R.id.remote_views_price4,
-            ),
+                changeViewId = R.id.remote_views_change3,
+                percentViewId = R.id.remote_views_percent3),
         )
 
     const val KEY_CURRENT_INDEX = "key_current_index"
+    const val KEY_FORCE_REFRESH = "key_force_refresh"
 
     private const val REQUEST_CODE_ACTIVITY = 69420
     private const val REQUEST_CODE_NEXT = REQUEST_CODE_ACTIVITY + 1
+    private const val REQUEST_CODE_REFRESH = REQUEST_CODE_ACTIVITY + 2
 
     private const val CHANNEL_ID = "channel_tickers_foreground"
     private const val CHANNEL_TITLE = "My Watchlist"
@@ -309,16 +287,6 @@ internal constructor(
         index >= maxIndex -> index % maxIndex
         index < 0 -> correctIndex(maxIndex + index, maxIndex)
         else -> index
-      }
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun getTradeColor(session: StockMarketSession): Int {
-      return when {
-        session.direction().isZero() -> Color.WHITE
-        session.direction().isUp() -> Color.GREEN
-        else -> Color.RED
       }
     }
   }

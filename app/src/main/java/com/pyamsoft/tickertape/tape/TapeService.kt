@@ -44,6 +44,9 @@ class TapeService : Service() {
 
   @Inject @JvmField internal var tapeRemote: TapeRemote? = null
 
+  /** The current page of symbol info */
+  private var currentIndex = DEFAULT_INDEX
+
   override fun onBind(intent: Intent?): IBinder? {
     return null
   }
@@ -59,13 +62,16 @@ class TapeService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, DEFAULT_INDEX) ?: DEFAULT_INDEX
+    val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, currentIndex) ?: currentIndex
+    currentIndex = index
+
+    val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
 
     serviceScope.launch(context = Dispatchers.Default) {
-      val notification =
-          requireNotNull(tapeRemote).updateNotification(notificationManager, index, false)
+      val options = TapeRemote.NotificationOptions(index = index, forceRefresh = forceRefresh)
+      val notification = requireNotNull(tapeRemote).updateNotification(notificationManager, options)
       withContext(context = Dispatchers.Main) {
-        Timber.d("Update notification in foreground: $NOTIFICATION_ID $index")
+        Timber.d("Update notification in foreground: $NOTIFICATION_ID $options")
         notificationManager.notify(NOTIFICATION_ID, notification)
       }
     }

@@ -94,46 +94,11 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     binding.quoteItemSymbol.text = symbol.symbol()
   }
 
-  private data class SessionData(
-      val percent: String,
-      val changeAmount: String,
-      val directionSign: String,
-      @ColorInt val color: Int
-  )
-
   companion object {
 
     @JvmStatic
-    @CheckResult
-    private fun getDataFromSession(session: StockMarketSession): SessionData {
-      val percent: String
-      val changeAmount: String
-      val directionSign: String
-      val color: Int
-      if (session.direction().isZero()) {
-        directionSign = ""
-        color = Color.WHITE
-        percent = "0"
-        changeAmount = "0.00"
-      } else {
-        percent = session.percent().percent()
-        changeAmount = session.amount().value()
-        if (session.direction().isUp()) {
-          directionSign = "+"
-          color = Color.GREEN
-        } else {
-          // Direction sign not needed for negative numbers
-          directionSign = ""
-          color = Color.RED
-        }
-      }
-
-      return SessionData(percent, changeAmount, directionSign, color)
-    }
-
-    @JvmStatic
     private fun handleSessionChanged(session: StockMarketSession, binding: QuoteNumbersBinding) {
-      val data = getDataFromSession(session)
+      val data = StockMarketSession.getDataFromSession(session)
       val percent = data.percent
       val changeAmount = data.changeAmount
       val directionSign = data.directionSign

@@ -16,7 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
+import android.graphics.Color
 import androidx.annotation.CheckResult
+import androidx.annotation.ColorInt
 
 interface StockMarketSession {
 
@@ -27,4 +29,43 @@ interface StockMarketSession {
   @CheckResult fun amount(): StockMoneyValue
 
   @CheckResult fun percent(): StockPercent
+
+  data class SessionData
+  internal constructor(
+      val percent: String,
+      val changeAmount: String,
+      val directionSign: String,
+      @ColorInt val color: Int
+  )
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun getDataFromSession(session: StockMarketSession): SessionData {
+      val percent: String
+      val changeAmount: String
+      val directionSign: String
+      val color: Int
+      if (session.direction().isZero()) {
+        directionSign = ""
+        color = Color.WHITE
+        percent = "0"
+        changeAmount = "0.00"
+      } else {
+        percent = session.percent().percent()
+        changeAmount = session.amount().value()
+        if (session.direction().isUp()) {
+          directionSign = "+"
+          color = Color.GREEN
+        } else {
+          // Direction sign not needed for negative numbers
+          directionSign = ""
+          color = Color.RED
+        }
+      }
+
+      return SessionData(percent, changeAmount, directionSign, color)
+    }
+  }
 }

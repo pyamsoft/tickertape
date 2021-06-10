@@ -24,9 +24,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.ui.util.teardownAdapter
+import me.zhanghai.android.fastscroll.PopupTextProvider
 
 class QuoteAdapter private constructor(private val factory: QuoteComponent.Factory) :
-    ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER) {
+    ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER), PopupTextProvider {
 
   companion object {
 
@@ -49,6 +50,11 @@ class QuoteAdapter private constructor(private val factory: QuoteComponent.Facto
             return oldItem == newItem
           }
         }
+  }
+
+  override fun getPopupText(position: Int): String {
+    val state = getItem(position)
+    return state.symbol.symbol()
   }
 
   override fun getItemId(position: Int): Long {

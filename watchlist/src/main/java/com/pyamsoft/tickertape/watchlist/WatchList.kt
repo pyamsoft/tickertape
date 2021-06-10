@@ -34,6 +34,7 @@ import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
 class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteComponent.Factory) :
@@ -100,6 +101,13 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.watchlistList.addItemDecoration(this)
       }
+    }
+
+    doOnInflate {
+      FastScrollerBuilder(binding.watchlistList)
+        .useMd2Style()
+        .setPopupTextProvider(usingAdapter())
+        .build()
     }
 
     doOnTeardown { binding.watchlistList.removeAllItemDecorations() }

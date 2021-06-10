@@ -37,18 +37,21 @@ import timber.log.Timber
 
 class TapeService : Service() {
 
-  /** CoroutineScope for the Service level */
-  private val serviceScope = MainScope()
-
+  /** Create and update notificatons */
   private val notificationManager by lazy {
     requireNotNull(applicationContext.getSystemService<NotificationManager>())
   }
 
+  /** CoroutineScope for the Service level */
+  private val serviceScope = MainScope()
+
+  /** The custom notification */
   @Inject @JvmField internal var tapeRemote: TapeRemote? = null
 
   /** The current page of symbol info */
   private var currentIndex = DEFAULT_INDEX
 
+  /** Watch the screen ON state */
   private var screenReceiverRegistration: ScreenReceiver.Registration? = null
 
   override fun onBind(intent: Intent?): IBinder? {
@@ -72,6 +75,11 @@ class TapeService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    updateTape(intent)
+    return START_STICKY
+  }
+
+  private fun updateTape(intent: Intent?) {
     val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, currentIndex) ?: currentIndex
     currentIndex = index
 
@@ -85,8 +93,6 @@ class TapeService : Service() {
         notificationManager.notify(NOTIFICATION_ID, notification)
       }
     }
-
-    return START_STICKY
   }
 
   override fun onDestroy() {
@@ -111,23 +117,5 @@ class TapeService : Service() {
     private const val DEFAULT_INDEX = 0
     private const val NOTIFICATION_ID = 42069
 
-    @JvmStatic
-    @JvmOverloads
-    fun start(context: Context, options: TapeRemote.NotificationOptions? = null) {
-      val appContext = context.applicationContext
-      val service =
-          Intent(appContext, TapeService::class.java).apply {
-            options?.also { opts ->
-              putExtra(TapeRemote.KEY_CURRENT_INDEX, opts.index)
-              putExtra(TapeRemote.KEY_FORCE_REFRESH, opts.forceRefresh)
-            }
-          }
-
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        appContext.startForegroundService(service)
-      } else {
-        appContext.startService(service)
-      }
-    }
   }
 }

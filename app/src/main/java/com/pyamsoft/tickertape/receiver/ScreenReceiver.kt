@@ -21,15 +21,30 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.ui.Injector
+import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
-import com.pyamsoft.tickertape.tape.TapeService
+import com.pyamsoft.tickertape.tape.TapeLauncher
+import javax.inject.Inject
 import timber.log.Timber
 
 internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
+
+  @Inject @JvmField internal var tapeLauncher: TapeLauncher? = null
+
+  private fun inject(context: Context) {
+    if (tapeLauncher != null) {
+      return
+    }
+
+    Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+  }
+
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action === Intent.ACTION_SCREEN_ON) {
       Timber.d("Start service on screen on")
-      TapeService.start(context)
+      inject(context)
+      requireNotNull(tapeLauncher).start()
     }
   }
 

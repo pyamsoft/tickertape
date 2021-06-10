@@ -38,7 +38,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.main.add.SymbolAddDialog
 import com.pyamsoft.tickertape.setting.SettingsFragment
-import com.pyamsoft.tickertape.tape.TapeService
+import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
 
@@ -62,6 +62,8 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
 
   private var rootBinding: LayoutCoordinatorBinding? = null
   private var stateSaver: StateSaver? = null
+
+  @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
 
   @JvmField @Inject internal var factory: MainViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<MainViewModel> {
@@ -125,7 +127,7 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
 
   override fun onStart() {
     super.onStart()
-    TapeService.start(this)
+    requireNotNull(tapeLauncher).start()
   }
 
   private fun handleOpenSymbolAddDialog() {

@@ -29,6 +29,8 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.add.SymbolAddComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
+import com.pyamsoft.tickertape.receiver.BootReceiver
+import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeService
@@ -56,6 +58,10 @@ internal interface TickerComponent {
   @CheckResult
   @Suppress("FunctionName")
   fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
+
+  fun inject(receiver: BootReceiver)
+
+  fun inject(receiver: ScreenReceiver)
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 

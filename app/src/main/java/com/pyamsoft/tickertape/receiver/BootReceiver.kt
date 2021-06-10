@@ -22,14 +22,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.tape.TapeService
+import com.pyamsoft.pydroid.ui.Injector
+import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.tape.TapeLauncher
+import javax.inject.Inject
 import timber.log.Timber
 
 internal class BootReceiver internal constructor() : BroadcastReceiver() {
+
+  @Inject @JvmField internal var tapeLauncher: TapeLauncher? = null
+
+  private fun inject(context: Context) {
+    if (tapeLauncher != null) {
+      return
+    }
+
+    Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+  }
+
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action === Intent.ACTION_BOOT_COMPLETED) {
       Timber.d("Start service on boot")
-      TapeService.start(context)
+      inject(context)
+      requireNotNull(tapeLauncher).start()
     }
   }
 

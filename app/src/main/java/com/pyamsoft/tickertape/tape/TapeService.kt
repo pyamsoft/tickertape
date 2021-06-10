@@ -25,6 +25,7 @@ import android.os.IBinder
 import androidx.core.content.getSystemService
 import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +65,10 @@ class TapeService : Service() {
     startForeground(NOTIFICATION_ID, notification)
 
     screenReceiverRegistration = ScreenReceiver.register(this)
+
+    if (!BootReceiver.isEnabled(this)) {
+      BootReceiver.setEnabled(this, true)
+    }
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -93,6 +98,10 @@ class TapeService : Service() {
 
     screenReceiverRegistration?.unregister()
     screenReceiverRegistration = null
+
+    if (BootReceiver.isEnabled(this)) {
+      BootReceiver.setEnabled(this, false)
+    }
 
     serviceScope.cancel()
   }

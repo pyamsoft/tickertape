@@ -17,8 +17,11 @@
 package com.pyamsoft.tickertape.receiver
 
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.tape.TapeService
 import timber.log.Timber
 
@@ -27,6 +30,33 @@ internal class BootReceiver internal constructor() : BroadcastReceiver() {
     if (intent.action === Intent.ACTION_BOOT_COMPLETED) {
       Timber.d("Start service on boot")
       TapeService.start(context)
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    fun setEnabled(context: Context, enable: Boolean) {
+      val appContext = context.applicationContext
+      val name = ComponentName(appContext, BootReceiver::class.java)
+      val state =
+          if (enable) {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+          } else {
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+          }
+
+      appContext.packageManager.setComponentEnabledSetting(
+          name, state, PackageManager.DONT_KILL_APP)
+    }
+
+    @JvmStatic
+    @CheckResult
+    fun isEnabled(context: Context): Boolean {
+      val appContext = context.applicationContext
+      val name = ComponentName(appContext, BootReceiver::class.java)
+      val state = appContext.packageManager.getComponentEnabledSetting(name)
+      return state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
     }
   }
 }

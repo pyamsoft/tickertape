@@ -31,6 +31,7 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.ui.applyToolbarOffset
 import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
@@ -56,6 +57,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+      view.applyToolbarOffset(viewLifecycleOwner)
 
     val binding = LayoutCoordinatorBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)

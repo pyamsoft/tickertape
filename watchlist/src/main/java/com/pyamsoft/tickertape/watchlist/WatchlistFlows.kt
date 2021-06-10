@@ -31,6 +31,8 @@ data class WatchListViewState(
 sealed class WatchListViewEvent : UiViewEvent {
 
   object ForceRefresh : WatchListViewEvent()
+
+  data class Remove internal constructor(val index: Int) : WatchListViewEvent()
 }
 
 sealed class WatchListControllerEvent : UiControllerEvent

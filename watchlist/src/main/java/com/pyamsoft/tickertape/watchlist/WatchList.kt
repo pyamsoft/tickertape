@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.watchlist
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.updatePadding
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -37,9 +38,12 @@ import javax.inject.Inject
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
-class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteComponent.Factory) :
+class WatchList
+@Inject
+internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteComponent.Factory) :
     BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
-    SwipeRefreshLayout.OnRefreshListener {
+    SwipeRefreshLayout.OnRefreshListener,
+    QuoteAdapter.Callback {
 
   override val viewBinding = WatchlistBinding::inflate
 
@@ -59,7 +63,7 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
     }
 
     doOnInflate {
-      modelAdapter = QuoteAdapter.createWithFactory(factory)
+      modelAdapter = QuoteAdapter.create(factory, owner, this)
       binding.watchlistList.adapter = modelAdapter
     }
 
@@ -105,9 +109,9 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
 
     doOnInflate {
       FastScrollerBuilder(binding.watchlistList)
-        .useMd2Style()
-        .setPopupTextProvider(usingAdapter())
-        .build()
+          .useMd2Style()
+          .setPopupTextProvider(usingAdapter())
+          .build()
     }
 
     doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
@@ -128,6 +132,10 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
 
   override fun onRefresh() {
     publish(WatchListViewEvent.ForceRefresh)
+  }
+
+  override fun onRemove(index: Int) {
+    publish(WatchListViewEvent.Remove(index))
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {

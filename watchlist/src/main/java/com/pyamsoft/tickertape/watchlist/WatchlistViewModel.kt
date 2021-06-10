@@ -75,7 +75,7 @@ internal constructor(
         is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
       }
 
-  private fun handleInsertSymbol(symbol: StockSymbol) {
+  private fun CoroutineScope.handleInsertSymbol(symbol: StockSymbol) {
     Timber.d("New symbol inserted: $symbol")
 
     // Don't actually insert anything to the list here, but call a full refresh
@@ -83,7 +83,7 @@ internal constructor(
     fetchQuotes(true)
   }
 
-  private fun handleUpdateSymbol(symbol: StockSymbol) {
+  private fun CoroutineScope.handleUpdateSymbol(symbol: StockSymbol) {
     Timber.d("Existing symbol updated: $symbol")
 
     // Don't actually update anything in the list here, but call a full refresh
@@ -98,7 +98,18 @@ internal constructor(
     // On delete, we don't need to re-fetch quotes from the network
   }
 
-  fun fetchQuotes(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { quoteFetcher.call(force) }
+  fun handleFetchQuotes(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchQuotes(force) }
+  }
+
+  private fun CoroutineScope.fetchQuotes(force: Boolean) {
+    launch(context = Dispatchers.Default) { quoteFetcher.call(force) }
+  }
+
+  fun handleRemove(index: Int) {
+      viewModelScope.launch(context = Dispatchers.Default) {
+          val quote = state.quotes[index]
+          interactor.removeQuote(quote.symbol)
+      }
   }
 }

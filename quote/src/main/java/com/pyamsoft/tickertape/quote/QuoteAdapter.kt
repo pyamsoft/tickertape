@@ -19,22 +19,29 @@ package com.pyamsoft.tickertape.quote
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
-import com.pyamsoft.pydroid.ui.util.teardownAdapter
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class QuoteAdapter private constructor(private val factory: QuoteComponent.Factory) :
-    ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER), PopupTextProvider {
+class QuoteAdapter
+private constructor(
+    private val factory: QuoteComponent.Factory,
+    private val owner: LifecycleOwner,
+    private val callback: Callback
+) : ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER), PopupTextProvider {
 
   companion object {
 
     @JvmStatic
     @CheckResult
-    fun createWithFactory(factory: QuoteComponent.Factory): QuoteAdapter {
-      return QuoteAdapter(factory)
+    fun create(
+        factory: QuoteComponent.Factory,
+        owner: LifecycleOwner,
+        callback: Callback
+    ): QuoteAdapter {
+      return QuoteAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
@@ -64,7 +71,7 @@ class QuoteAdapter private constructor(private val factory: QuoteComponent.Facto
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ListitemFrameBinding.inflate(inflater, parent, false)
-    return QuoteViewHolder(binding, factory)
+    return QuoteViewHolder(binding, factory, owner, callback)
   }
 
   override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
@@ -72,13 +79,8 @@ class QuoteAdapter private constructor(private val factory: QuoteComponent.Facto
     holder.bindState(state)
   }
 
-  override fun onViewRecycled(holder: QuoteViewHolder) {
-    super.onViewRecycled(holder)
-    holder.teardown()
-  }
+  interface Callback {
 
-  override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-    super.onDetachedFromRecyclerView(recyclerView)
-    teardownAdapter(recyclerView)
+    fun onRemove(index: Int)
   }
 }

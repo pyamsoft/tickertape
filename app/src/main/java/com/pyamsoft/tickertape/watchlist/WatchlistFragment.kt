@@ -76,14 +76,15 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             requireNotNull(list),
         ) {
           return@createComponent when (it) {
-            is WatchListViewEvent.ForceRefresh -> viewModel.fetchQuotes(true)
+            is WatchListViewEvent.ForceRefresh -> viewModel.handleFetchQuotes(true)
+            is WatchListViewEvent.Remove -> viewModel.handleRemove(it.index)
           }
         }
   }
 
   override fun onStart() {
     super.onStart()
-    viewModel.fetchQuotes(false)
+    viewModel.handleFetchQuotes(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

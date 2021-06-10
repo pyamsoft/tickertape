@@ -31,13 +31,22 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 class QuoteView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<QuoteViewState, Nothing, QuoteItemBinding>(parent) {
+    BaseUiView<QuoteViewState, QuoteViewEvent, QuoteItemBinding>(parent) {
 
   override val viewBinding = QuoteItemBinding::inflate
 
   override val layoutRoot by boundView { quoteItem }
 
   init {
+    doOnInflate {
+      binding.quoteItem.setOnLongClickListener {
+        publish(QuoteViewEvent.Remove)
+        return@setOnLongClickListener true
+      }
+    }
+
+    doOnTeardown { binding.quoteItem.setOnLongClickListener(null) }
+
     doOnTeardown {
       clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
       clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)

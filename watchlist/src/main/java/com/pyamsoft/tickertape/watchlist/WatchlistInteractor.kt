@@ -19,18 +19,24 @@ package com.pyamsoft.tickertape.watchlist
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
+import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotePair
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 class WatchlistInteractor
 @Inject
 internal constructor(
+    private val symbolQueryDao: SymbolQueryDao,
+    private val symbolDeleteDao: SymbolDeleteDao,
     private val symbolRealtime: SymbolRealtime,
     private val interactor: QuoteInteractor
 ) {
@@ -45,5 +51,18 @@ internal constructor(
   suspend fun getQuotes(force: Boolean): List<QuotePair> =
       withContext(context = Dispatchers.IO) {
         return@withContext interactor.getQuotes(force)
+      }
+
+  @CheckResult
+  suspend fun removeQuote(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        // TODO move this query into the DAO layer
+        val dbSymbol = symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
+        if (dbSymbol == null) {
+          Timber.d("Symbol does not exist in DB: $symbol")
+          return@withContext
+        }
+
+        symbolDeleteDao.delete(dbSymbol, offerUndo = true)
       }
 }

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote
 
+import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -26,4 +27,9 @@ data class QuoteViewState(val symbol: StockSymbol, val data: QuoteData) : UiView
     data class Quote(val quote: StockQuote) : QuoteData()
     data class Error(val error: Throwable) : QuoteData()
   }
+}
+
+sealed class QuoteViewEvent : UiViewEvent {
+
+  object Remove : QuoteViewEvent()
 }

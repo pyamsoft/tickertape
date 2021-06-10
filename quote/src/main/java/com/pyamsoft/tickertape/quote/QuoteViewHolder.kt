@@ -16,15 +16,21 @@
 
 package com.pyamsoft.tickertape.quote
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.pydroid.util.doOnDestroy
 import javax.inject.Inject
 
 class QuoteViewHolder
-internal constructor(binding: ListitemFrameBinding, factory: QuoteComponent.Factory) :
-    RecyclerView.ViewHolder(binding.root), ViewBinder<QuoteViewState> {
+internal constructor(
+    binding: ListitemFrameBinding,
+    factory: QuoteComponent.Factory,
+    owner: LifecycleOwner,
+    callback: QuoteAdapter.Callback
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<QuoteViewState> {
 
   @Inject @JvmField internal var quote: QuoteView? = null
 
@@ -35,7 +41,14 @@ internal constructor(binding: ListitemFrameBinding, factory: QuoteComponent.Fact
 
     val quote = requireNotNull(quote)
 
-    viewBinder = createViewBinder(quote) {}
+    viewBinder =
+        createViewBinder(quote) {
+          return@createViewBinder when (it) {
+            is QuoteViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
+          }
+        }
+
+    owner.doOnDestroy { teardown() }
   }
 
   override fun bindState(state: QuoteViewState) {

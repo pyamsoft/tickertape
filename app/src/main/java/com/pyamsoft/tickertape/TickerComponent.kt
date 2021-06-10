@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import androidx.annotation.CheckResult
@@ -23,10 +24,12 @@ import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
+import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.add.SymbolAddComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
+import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.ui.UiModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import dagger.BindsInstance
@@ -52,6 +55,8 @@ internal interface TickerComponent {
   @Suppress("FunctionName")
   fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
 
+  @CheckResult fun plusTapeComponent(): TapeComponent.Factory
+
   @CheckResult fun plusSymbolAddComponent(): SymbolAddComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
@@ -75,6 +80,12 @@ internal interface TickerComponent {
 
     @Module
     companion object {
+
+      @Provides
+      @JvmStatic
+      internal fun provideActivityClass(): Class<out Activity> {
+        return MainActivity::class.java
+      }
 
       @Provides
       @JvmStatic

@@ -17,6 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pyamsoft.tickertape">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".TickerTape"
         android:allowBackup="true"
@@ -37,6 +39,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".tape.TapeService"
+            android:exported="false"
+            android:foregroundServiceType="" />
     </application>
 
 </manifest>

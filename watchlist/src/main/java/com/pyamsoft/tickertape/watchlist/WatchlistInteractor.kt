@@ -19,10 +19,9 @@ package com.pyamsoft.tickertape.watchlist
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
-import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.quote.QuotePair
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -33,16 +32,8 @@ class WatchlistInteractor
 @Inject
 internal constructor(
     private val symbolRealtime: SymbolRealtime,
-    private val symbolQueryDao: SymbolQueryDao,
-    private val interactor: StockInteractor
+    private val interactor: QuoteInteractor
 ) {
-
-  @CheckResult
-  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext symbolQueryDao.query(force).map { it.symbol() }
-      }
 
   suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
@@ -51,25 +42,8 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getQuotes(force: Boolean): List<WatchListViewState.QuotePair> =
+  suspend fun getQuotes(force: Boolean): List<QuotePair> =
       withContext(context = Dispatchers.IO) {
-        val symbols = getSymbols(force)
-
-        // If we have no symbols, don't even make the trip
-        if (symbols.isEmpty()) {
-          return@withContext emptyList()
-        }
-
-        val quotePairs = mutableListOf<WatchListViewState.QuotePair>()
-        val quotes = interactor.getQuotes(force, symbols)
-        for (symbol in symbols) {
-          val quote = quotes.find { it.symbol().symbol() == symbol.symbol() }
-          quotePairs.add(
-              WatchListViewState.QuotePair(
-                  symbol = symbol,
-                  quote = quote,
-                  error = if (quote == null) Throwable("Missing quote for $symbol") else null))
-        }
-        return@withContext quotePairs
+        return@withContext interactor.getQuotes(force)
       }
 }

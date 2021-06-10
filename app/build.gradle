@@ -121,6 +121,7 @@ dependencies {
   implementation project(':quote')
   implementation project(':setting')
   implementation project(':stocks')
+  implementation project(':tape')
   implementation project(':ui')
   implementation project(':watchlist')
 }

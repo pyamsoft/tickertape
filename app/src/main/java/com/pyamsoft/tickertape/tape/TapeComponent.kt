@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
+package com.pyamsoft.tickertape.tape
+
+import androidx.annotation.CheckResult
+import dagger.Subcomponent
+
+@Subcomponent
+internal interface TapeComponent {
+
+  fun inject(service: TapeService)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(): TapeComponent
+  }
+}

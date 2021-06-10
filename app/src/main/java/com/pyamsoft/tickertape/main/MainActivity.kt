@@ -38,6 +38,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.main.add.SymbolAddDialog
 import com.pyamsoft.tickertape.setting.SettingsFragment
+import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
 
@@ -120,6 +121,8 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
     if (savedInstanceState == null || existingFragment == null) {
       viewModel.handleLoadDefaultPage()
     }
+
+    TapeService.start(this)
   }
 
   private fun handleOpenSymbolAddDialog() {

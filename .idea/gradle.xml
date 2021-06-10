@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/quote" />
             <option value="$PROJECT_DIR$/setting" />
             <option value="$PROJECT_DIR$/stocks" />
+            <option value="$PROJECT_DIR$/tape" />
             <option value="$PROJECT_DIR$/ui" />
             <option value="$PROJECT_DIR$/watchlist" />
           </set>

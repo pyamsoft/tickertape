@@ -28,6 +28,7 @@ import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuoteAdapter
 import com.pyamsoft.tickertape.quote.QuoteComponent
+import com.pyamsoft.tickertape.quote.QuotePair
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -132,15 +133,15 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
   }
 
   @CheckResult
-  private fun createQuoteData(pair: WatchListViewState.QuotePair): QuoteViewState.QuoteData {
+  private fun createQuoteData(pair: QuotePair): QuoteViewState.QuoteData {
     return when {
-      pair.quote != null -> QuoteViewState.QuoteData.Quote(pair.quote)
-      pair.error != null -> QuoteViewState.QuoteData.Error(pair.error)
+      pair.quote != null -> QuoteViewState.QuoteData.Quote(requireNotNull(pair.quote))
+      pair.error != null -> QuoteViewState.QuoteData.Error(requireNotNull(pair.error))
       else -> throw IllegalStateException("Missing quote and error for symbol ${pair.symbol}")
     }
   }
 
-  private fun setList(list: List<WatchListViewState.QuotePair>) {
+  private fun setList(list: List<QuotePair>) {
     val data = list.map { QuoteViewState(symbol = it.symbol, data = createQuoteData(it)) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
@@ -154,7 +155,7 @@ class WatchList @Inject internal constructor(parent: ViewGroup, factory: QuoteCo
     binding.watchlistSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(schedule: List<WatchListViewState.QuotePair>) {
+  private fun handleList(schedule: List<QuotePair>) {
     if (schedule.isEmpty()) {
       clearList()
     } else {

@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':setting'
-include ':ui'
-include ':stocks'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
+package com.pyamsoft.tickertape.quote
+
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+
+data class QuotePair
+internal constructor(val symbol: StockSymbol, val quote: StockQuote?, val error: Throwable?)

@@ -19,19 +19,14 @@ package com.pyamsoft.tickertape.watchlist
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.quote.QuotePair
 
 data class WatchListViewState(
     val error: Throwable?,
     val isLoading: Boolean,
     val quotes: List<QuotePair>,
     val bottomOffset: Int,
-) : UiViewState {
-
-  data class QuotePair
-  internal constructor(val symbol: StockSymbol, val quote: StockQuote?, val error: Throwable?)
-}
+) : UiViewState
 
 sealed class WatchListViewEvent : UiViewEvent {
 

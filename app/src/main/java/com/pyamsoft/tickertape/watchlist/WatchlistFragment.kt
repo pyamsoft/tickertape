@@ -57,7 +57,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-      view.applyToolbarOffset(viewLifecycleOwner)
+    view.applyToolbarOffset(viewLifecycleOwner)
 
     val binding = LayoutCoordinatorBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)

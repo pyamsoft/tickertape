@@ -18,35 +18,118 @@
     android:id="@+id/remote_views"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
     android:orientation="horizontal">
-
-    <ImageView
-        android:id="@+id/remote_view_previous"
-        style="@style/TextAppearance.Compat.Notification.Info"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/blank" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/remote_views_text"
-            style="@style/TextAppearance.Compat.Notification.Info"
+            android:id="@+id/remote_views_symbol1"
+            style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/remote_views_price1"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/remote_view_next"
-        style="@style/TextAppearance.Compat.Notification.Info"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/blank" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/remote_views_symbol2"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/remote_views_price2"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/remote_views_symbol3"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/remote_views_price3"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/remote_views_symbol4"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/remote_views_price4"
+            style="@style/TextAppearance.Compat.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
 </LinearLayout>

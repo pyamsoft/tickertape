@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape
 
 import android.app.Activity
 import android.app.Application
+import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.loader.ImageLoader
@@ -30,6 +31,7 @@ import com.pyamsoft.tickertape.main.add.SymbolAddComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.tape.TapeComponent
+import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ui.UiModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import dagger.BindsInstance
@@ -85,6 +87,12 @@ internal interface TickerComponent {
       @JvmStatic
       internal fun provideActivityClass(): Class<out Activity> {
         return MainActivity::class.java
+      }
+
+      @Provides
+      @JvmStatic
+      internal fun provideServiceClass(): Class<out Service> {
+        return TapeService::class.java
       }
 
       @Provides

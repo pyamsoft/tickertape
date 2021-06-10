@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.tape
 
-import android.app.Notification
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
@@ -60,10 +59,13 @@ class TapeService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, DEFAULT_INDEX) ?: DEFAULT_INDEX
+
     serviceScope.launch(context = Dispatchers.Default) {
-      val notification = requireNotNull(tapeRemote).updateNotification(notificationManager)
+      val notification =
+          requireNotNull(tapeRemote).updateNotification(notificationManager, index, false)
       withContext(context = Dispatchers.Main) {
-        Timber.d("Update notification in foreground: $NOTIFICATION_ID")
+        Timber.d("Update notification in foreground: $NOTIFICATION_ID $index")
         notificationManager.notify(NOTIFICATION_ID, notification)
       }
     }
@@ -83,6 +85,7 @@ class TapeService : Service() {
 
   companion object {
 
+    private const val DEFAULT_INDEX = 0
     private const val NOTIFICATION_ID = 42069
 
     @JvmStatic

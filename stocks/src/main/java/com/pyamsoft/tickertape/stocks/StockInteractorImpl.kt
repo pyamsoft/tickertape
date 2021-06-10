@@ -34,7 +34,7 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
 
   private val quoteCache =
       cachify<List<StockQuote>, List<StockSymbol>>(
-          storage = { listOf(MemoryCacheStorage.create(15, TimeUnit.MINUTES)) }) { symbols ->
+          storage = { listOf(MemoryCacheStorage.create(2, TimeUnit.MINUTES)) }) { symbols ->
         interactor.getQuotes(true, symbols)
       }
 

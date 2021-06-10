@@ -61,7 +61,7 @@ buildscript {
     okhttp = "4.9.1"
 
     // AndroidX
-    core = "1.3.2"
+    core = "1.5.0"
     constraintLayout = "2.0.4"
     preference = "1.1.1"
     recyclerView = "1.2.0"

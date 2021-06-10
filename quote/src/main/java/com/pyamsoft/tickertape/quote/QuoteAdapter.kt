@@ -72,6 +72,11 @@ class QuoteAdapter private constructor(private val factory: QuoteComponent.Facto
     holder.bindState(state)
   }
 
+  override fun onViewRecycled(holder: QuoteViewHolder) {
+    super.onViewRecycled(holder)
+    holder.teardown()
+  }
+
   override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     super.onDetachedFromRecyclerView(recyclerView)
     teardownAdapter(recyclerView)

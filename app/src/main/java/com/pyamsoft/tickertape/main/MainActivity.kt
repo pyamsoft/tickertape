@@ -35,6 +35,7 @@ import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
@@ -109,6 +110,8 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
             is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
+            is MainViewEvent.OpenPortfolio ->
+              viewModel.handleSelectPage(MainPage.Portfolio, force = false)
             is MainViewEvent.OpenWatchList ->
                 viewModel.handleSelectPage(MainPage.WatchList, force = false)
             is MainViewEvent.OpenSettings ->
@@ -145,6 +148,10 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
       is MainPage.WatchList -> {
         fragment = WatchlistFragment.newInstance()
         tag = WatchlistFragment.TAG
+      }
+      is MainPage.Portfolio -> {
+        fragment = PortfolioFragment.newInstance()
+        tag = PortfolioFragment.TAG
       }
     }
 

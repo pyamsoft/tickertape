@@ -18,5 +18,6 @@ package com.pyamsoft.tickertape.main
 
 sealed class MainPage {
   object WatchList : MainPage()
+  object Portfolio : MainPage()
   object Settings : MainPage()
 }

@@ -17,12 +17,19 @@
 package com.pyamsoft.tickertape.setting
 
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.ui.settings.AppSettingsFragment
 import com.pyamsoft.pydroid.ui.settings.AppSettingsPreferenceFragment
+import com.pyamsoft.tickertape.ui.applyToolbarOffset
 
 internal class SettingsFragment : AppSettingsFragment() {
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    view.applyToolbarOffset(viewLifecycleOwner)
+  }
 
   override fun provideSettingsFragment(): AppSettingsPreferenceFragment {
     return SettingsPreferenceFragment()

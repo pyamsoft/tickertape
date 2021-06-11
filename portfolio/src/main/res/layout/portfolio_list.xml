@@ -19,17 +19,17 @@
 <merge>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/watchlist_root"
+        android:id="@+id/portfolio_list_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/watchlist_swipe_refresh"
+            android:id="@+id/portfolio_list_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/watchlist_list"
+                android:id="@+id/portfolio_list_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none" />

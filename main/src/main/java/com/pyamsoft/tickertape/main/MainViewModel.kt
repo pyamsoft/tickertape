@@ -100,6 +100,7 @@ internal constructor(
         when (this) {
           MainPage.WatchList::class.java.name -> MainPage.WatchList
           MainPage.Settings::class.java.name -> MainPage.Settings
+          MainPage.Portfolio::class.java.name -> MainPage.Portfolio
           else -> throw IllegalStateException("Cannot convert to MainPage: $this")
         }
 

@@ -63,6 +63,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
         return@setOnNavigationItemSelectedListener when (item.itemId) {
           R.id.menu_watchlist -> select(MainViewEvent.OpenWatchList)
           R.id.menu_settings -> select(MainViewEvent.OpenSettings)
+          R.id.menu_portfolio -> select(MainViewEvent.OpenPortfolio)
           else -> false
         }
       }
@@ -96,8 +97,10 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
     val isVisible =
         when (viewEvent) {
           is MainViewEvent.OpenSettings -> false
-          is MainViewEvent.OpenWatchList -> true
-          else -> {
+          is MainViewEvent.OpenWatchList, is MainViewEvent.OpenPortfolio -> true
+          is MainViewEvent.AddRequest,
+          is MainViewEvent.BottomBarMeasured,
+          is MainViewEvent.FabCradleVisibility -> {
             Timber.d("ViewEvent does not affect FAB visibility: $viewEvent")
             return
           }
@@ -123,6 +126,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
         when (page) {
           is MainPage.WatchList -> R.id.menu_watchlist
           is MainPage.Settings -> R.id.menu_settings
+          is MainPage.Portfolio -> R.id.menu_portfolio
         }
       }
     }

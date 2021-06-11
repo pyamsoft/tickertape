@@ -14,33 +14,28 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.portfolio
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.quote.QuotePair
 
-data class MainViewState internal constructor(val page: MainPage?, val isFabVisible: Boolean) :
-    UiViewState
+data class PortfolioViewState(
+    val error: Throwable?,
+    val isLoading: Boolean,
+    val holdings: List<QuotePair>,
+    val bottomOffset: Int,
+) : UiViewState
 
-sealed class MainViewEvent : UiViewEvent {
+sealed class PortfolioViewEvent : UiViewEvent {
 
-  object OpenWatchList : MainViewEvent()
+  object ForceRefresh : PortfolioViewEvent()
 
-  object OpenPortfolio : MainViewEvent()
-
-  object OpenSettings : MainViewEvent()
-
-  data class BottomBarMeasured internal constructor(val height: Int) : MainViewEvent()
-
-  data class FabCradleVisibility internal constructor(val visible: Boolean) : MainViewEvent()
-
-  object AddRequest : MainViewEvent()
+  data class Remove internal constructor(val index: Int) : PortfolioViewEvent()
 }
 
-sealed class MainControllerEvent : UiControllerEvent {
+sealed class PortfolioControllerEvent : UiControllerEvent {
 
-  data class PushPage
-  internal constructor(val newPage: MainPage, val oldPage: MainPage?, val force: Boolean) :
-      MainControllerEvent()
+    object AddNewHolding: PortfolioControllerEvent()
 }

@@ -14,24 +14,6 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.ui
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-
-data class SymbolAddViewState internal constructor(val symbol: String) : UiViewState
-
-sealed class SymbolAddViewEvent : UiViewEvent {
-
-  data class UpdateSymbol(val symbol: String) : SymbolAddViewEvent()
-
-  object Close : SymbolAddViewEvent()
-
-  object CommitSymbol : SymbolAddViewEvent()
-}
-
-sealed class SymbolAddControllerEvent : UiControllerEvent {
-
-  object Close : SymbolAddControllerEvent()
-}
+object AddNew

@@ -35,4 +35,7 @@ sealed class WatchListViewEvent : UiViewEvent {
   data class Remove internal constructor(val index: Int) : WatchListViewEvent()
 }
 
-sealed class WatchListControllerEvent : UiControllerEvent
+sealed class WatchListControllerEvent : UiControllerEvent {
+
+    object AddNewSymbol: WatchListControllerEvent()
+}

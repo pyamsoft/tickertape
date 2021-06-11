@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.watchlist.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer

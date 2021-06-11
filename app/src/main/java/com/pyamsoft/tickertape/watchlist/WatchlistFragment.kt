@@ -29,9 +29,11 @@ import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.ui.applyToolbarOffset
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddDialog
 import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
@@ -44,8 +46,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   private var stateSaver: StateSaver? = null
 
   @JvmField @Inject internal var list: WatchList? = null
-
-  override fun onControllerEvent(event: WatchListControllerEvent) {}
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -82,6 +82,16 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             is WatchListViewEvent.Remove -> viewModel.handleRemove(it.index)
           }
         }
+  }
+
+  override fun onControllerEvent(event: WatchListControllerEvent) {
+    return when (event) {
+      is WatchListControllerEvent.AddNewSymbol -> handleOpenSymbolAddDialog()
+    }
+  }
+
+  private fun handleOpenSymbolAddDialog() {
+    SymbolAddDialog.newInstance().show(requireActivity(), SymbolAddDialog.TAG)
   }
 
   override fun onStart() {

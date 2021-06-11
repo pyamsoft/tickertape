@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.watchlist.add
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
@@ -35,7 +35,8 @@ internal constructor(
     private val interactor: SymbolAddInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
-        savedState, SymbolAddViewState(symbol = "")) {
+        savedState, SymbolAddViewState(symbol = "")
+    ) {
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {

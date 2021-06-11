@@ -24,6 +24,7 @@ import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +37,8 @@ class WatchlistViewModel
 internal constructor(
     private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
-    private val bottomOffsetBus: EventConsumer<BottomOffset>
+    private val bottomOffsetBus: EventConsumer<BottomOffset>,
+    private val addNewBus: EventConsumer<AddNew>
 ) :
     UiViewModel<WatchListViewState, WatchListControllerEvent>(
         initialState =
@@ -63,6 +65,10 @@ internal constructor(
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      addNewBus.onEvent { publish(WatchListControllerEvent.AddNewSymbol) }
     }
 
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -106,17 +112,17 @@ internal constructor(
 
   private fun CoroutineScope.fetchQuotes(force: Boolean) {
     launch(context = Dispatchers.Default) {
-        quoteFetcher.call(force)
+      quoteFetcher.call(force)
 
-        // After the quotes are fetched, start the tape
-        tapeLauncher.start()
+      // After the quotes are fetched, start the tape
+      tapeLauncher.start()
     }
   }
 
   fun handleRemove(index: Int) {
-      viewModelScope.launch(context = Dispatchers.Default) {
-          val quote = state.quotes[index]
-          interactor.removeQuote(quote.symbol)
-      }
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val quote = state.quotes[index]
+      interactor.removeQuote(quote.symbol)
+    }
   }
 }

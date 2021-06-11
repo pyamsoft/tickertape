@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -35,6 +36,7 @@ class MainViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
+    private val addNewBus: EventBus<AddNew>
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
         savedState, MainViewState(page = null, isFabVisible = true)) {
@@ -70,6 +72,10 @@ internal constructor(
         andThen = { newState ->
           publishNewSelection(requireNotNull(newState.page), oldPage, force)
         })
+  }
+
+  fun handleAddNewRequest() {
+    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew) }
   }
 
   private suspend inline fun publishNewSelection(

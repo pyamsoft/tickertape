@@ -32,7 +32,7 @@ class MainBarAdd @Inject internal constructor(parent: ViewGroup) :
 
   init {
     doOnInflate {
-      binding.mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddNewSymbol) }
+      binding.mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
     }
 
     doOnTeardown { binding.mainBarAdd.setOnDebouncedClickListener(null) }

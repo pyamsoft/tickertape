@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.watchlist.add
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -36,6 +36,13 @@ import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddCommit
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddControllerEvent
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewEvent
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewModel
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewState
+import com.pyamsoft.tickertape.watchlist.add.SymbolLookup
+import com.pyamsoft.tickertape.watchlist.add.SymbolToolbar
 import javax.inject.Inject
 
 internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {

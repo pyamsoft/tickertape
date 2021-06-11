@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.watchlist.add
 
 import android.app.Activity
 import android.view.ViewGroup
@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
+import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewModel
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module

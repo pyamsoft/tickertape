@@ -14,19 +14,34 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.db.position
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
-interface StockMoneyValue : StockNumberValue {
+interface DbPosition {
 
-  @CheckResult fun asMoneyValue(): String
+  @CheckResult fun id(): Id
 
-  @CheckResult fun value(): Float
-}
+  @CheckResult fun holdingId(): DbHolding.Id
 
-@CheckResult
-fun Float.asMoney(): StockMoneyValue {
-  return StockMoneyValueImpl(this)
+  @CheckResult fun price(): StockMoneyValue
+
+  @CheckResult fun shareCount(): Int
+
+  @CheckResult fun fractionalShareCount(): Float
+
+  data class Id(val id: String) {
+
+    @CheckResult
+    fun isEmpty(): Boolean {
+      return id.isBlank()
+    }
+
+    companion object {
+
+      @JvmField val EMPTY = Id("")
+    }
+  }
 }

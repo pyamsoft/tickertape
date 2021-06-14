@@ -54,7 +54,7 @@ interface StockMarketSession {
         changeAmount = "0.00"
       } else {
         percent = session.percent().percent()
-        changeAmount = session.amount().value()
+        changeAmount = session.amount().asMoneyValue()
         if (session.direction().isUp()) {
           directionSign = "+"
           color = Color.GREEN

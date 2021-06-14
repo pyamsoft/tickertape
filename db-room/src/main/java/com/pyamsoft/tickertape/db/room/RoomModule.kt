@@ -22,6 +22,12 @@ import androidx.room.Room
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbCache
 import com.pyamsoft.tickertape.db.TickerDb
+import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
+import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.position.PositionDeleteDao
+import com.pyamsoft.tickertape.db.position.PositionInsertDao
+import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -72,6 +78,48 @@ abstract class RoomModule {
     @JvmStatic
     internal fun provideRoomSymbolDeleteDao(@InternalApi db: RoomTickerDb): SymbolDeleteDao {
       return db.roomSymbolDeleteDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomHoldingQueryDao(@InternalApi db: RoomTickerDb): HoldingQueryDao {
+      return db.roomHoldingQueryDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomHoldingInsertDao(@InternalApi db: RoomTickerDb): HoldingInsertDao {
+      return db.roomHoldingInsertDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomHoldingDeleteDao(@InternalApi db: RoomTickerDb): HoldingDeleteDao {
+      return db.roomHoldingDeleteDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPositionQueryDao(@InternalApi db: RoomTickerDb): PositionQueryDao {
+      return db.roomPositionQueryDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPositionInsertDao(@InternalApi db: RoomTickerDb): PositionInsertDao {
+      return db.roomPositionInsertDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPositionDeleteDao(@InternalApi db: RoomTickerDb): PositionDeleteDao {
+      return db.roomPositionDeleteDao()
     }
   }
 }

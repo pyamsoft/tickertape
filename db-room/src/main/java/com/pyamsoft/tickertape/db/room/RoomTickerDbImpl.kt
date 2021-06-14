@@ -19,13 +19,21 @@ package com.pyamsoft.tickertape.db.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.pyamsoft.tickertape.db.room.converter.DbHoldingIdConverter
+import com.pyamsoft.tickertape.db.room.converter.DbPositionIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbSymbolIdConverter
+import com.pyamsoft.tickertape.db.room.converter.StockMoneyValueConverter
 import com.pyamsoft.tickertape.db.room.converter.StockSymbolConverter
+import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
+import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 
-@Database(version = 1, entities = [RoomDbSymbol::class])
+@Database(
+    version = 2, entities = [RoomDbSymbol::class, RoomDbHolding::class, RoomDbPosition::class])
 @TypeConverters(
     DbSymbolIdConverter::class,
+    DbHoldingIdConverter::class,
+    DbPositionIdConverter::class,
     StockSymbolConverter::class,
-)
+    StockMoneyValueConverter::class)
 internal abstract class RoomTickerDbImpl internal constructor() : RoomDatabase(), RoomTickerDb

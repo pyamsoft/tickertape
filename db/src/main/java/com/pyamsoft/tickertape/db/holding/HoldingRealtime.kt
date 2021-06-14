@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.db.holding
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
+import com.pyamsoft.tickertape.db.DbRealtime
 
-interface StockMoneyValue : StockNumberValue {
-
-  @CheckResult fun asMoneyValue(): String
-
-  @CheckResult fun value(): Float
-}
-
-@CheckResult
-fun Float.asMoney(): StockMoneyValue {
-  return StockMoneyValueImpl(this)
-}
+interface HoldingRealtime : DbRealtime<HoldingChangeEvent>

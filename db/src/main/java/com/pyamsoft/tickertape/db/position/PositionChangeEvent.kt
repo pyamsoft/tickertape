@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.db.position
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
+sealed class PositionChangeEvent {
 
-interface StockMoneyValue : StockNumberValue {
+  data class Insert(val position: DbPosition) : PositionChangeEvent()
 
-  @CheckResult fun asMoneyValue(): String
+  data class Update(val position: DbPosition) : PositionChangeEvent()
 
-  @CheckResult fun value(): Float
-}
-
-@CheckResult
-fun Float.asMoney(): StockMoneyValue {
-  return StockMoneyValueImpl(this)
+  data class Delete(
+      val position: DbPosition,
+      val offerUndo: Boolean,
+  ) : PositionChangeEvent()
 }

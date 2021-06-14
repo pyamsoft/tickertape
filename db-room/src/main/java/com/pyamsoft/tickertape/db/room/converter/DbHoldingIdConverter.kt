@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.db.holding.DbHolding
 
-interface StockMoneyValue : StockNumberValue {
+internal object DbHoldingIdConverter {
 
-  @CheckResult fun asMoneyValue(): String
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toId(id: String): DbHolding.Id {
+    return DbHolding.Id(id)
+  }
 
-  @CheckResult fun value(): Float
-}
-
-@CheckResult
-fun Float.asMoney(): StockMoneyValue {
-  return StockMoneyValueImpl(this)
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromId(id: DbHolding.Id): String {
+    return id.id
+  }
 }

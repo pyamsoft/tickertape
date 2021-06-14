@@ -77,7 +77,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             requireNotNull(list),
         ) {
           return@createComponent when (it) {
-            is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchHoldings(true)
+            is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
             is PortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
           }
         }
@@ -95,7 +95,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   override fun onStart() {
     super.onStart()
-    viewModel.handleFetchHoldings(false)
+    viewModel.handleFetchPortfolio(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

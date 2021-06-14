@@ -16,19 +16,36 @@
 package com.pyamsoft.tickertape.db.room
 
 import com.pyamsoft.tickertape.db.TickerDb
+import com.pyamsoft.tickertape.db.holding.HoldingDb
+import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class TickerDbImpl @Inject internal constructor(private val symbolDb: SymbolDb) :
-    TickerDb {
+internal class TickerDbImpl
+@Inject
+internal constructor(
+    private val symbolDb: SymbolDb,
+    private val holdingDb: HoldingDb,
+    private val positionDb: PositionDb
+) : TickerDb {
 
   override fun symbols(): SymbolDb {
     return symbolDb
   }
 
+  override fun holdings(): HoldingDb {
+    return holdingDb
+  }
+
+  override fun positions(): PositionDb {
+    return positionDb
+  }
+
   override suspend fun invalidate() {
     symbolDb.invalidate()
+    holdingDb.invalidate()
+    positionDb.invalidate()
   }
 }

@@ -21,8 +21,6 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
@@ -43,16 +41,16 @@ internal constructor(
     UiViewModel<PortfolioViewState, PortfolioControllerEvent>(
         initialState =
             PortfolioViewState(
-                error = null, isLoading = false, holdings = emptyList(), bottomOffset = 0)) {
+                error = null, isLoading = false, portfolio = emptyList(), bottomOffset = 0)) {
 
-  private val holdingFetcher =
+  private val portfolioFetcher =
       highlander<Unit, Boolean> { force ->
         setState(
             stateChange = { copy(isLoading = true) },
             andThen = {
               try {
-                val holdings = interactor.getHoldings(force)
-                setState { copy(error = null, holdings = holdings, isLoading = false) }
+                val portfolio = interactor.getPortfolio(force)
+                setState { copy(error = null, portfolio = portfolio, isLoading = false) }
               } catch (error: Throwable) {
                 error.onActualError { e ->
                   Timber.e(e, "Failed to fetch quotes")
@@ -70,49 +68,15 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       addNewBus.onEvent { publish(PortfolioControllerEvent.AddNewHolding) }
     }
-
-    viewModelScope.launch(context = Dispatchers.Default) {
-      interactor.listenForChanges { handleRealtimeEvent(it) }
-    }
   }
 
-  private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
-      when (event) {
-        is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
-        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol())
-        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
-      }
-
-  private fun CoroutineScope.handleInsertSymbol(symbol: StockSymbol) {
-    Timber.d("New symbol inserted: $symbol")
-
-    // Don't actually insert anything to the list here, but call a full refresh
-    // This will re-fetch the DB and the network and give us back quotes
-    fetchHoldings(true)
+  fun handleFetchPortfolio(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
   }
 
-  private fun CoroutineScope.handleUpdateSymbol(symbol: StockSymbol) {
-    Timber.d("Existing symbol updated: $symbol")
-
-    // Don't actually update anything in the list here, but call a full refresh
-    // This will re-fetch the DB and the network and give us back quotes
-    fetchHoldings(true)
-  }
-
-  private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
-    setState { copy(holdings = holdings.filterNot { it.symbol.symbol() == symbol.symbol() }) }
-    // TODO offer up undo ability
-
-    // On delete, we don't need to re-fetch quotes from the network
-  }
-
-  fun handleFetchHoldings(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchHoldings(force) }
-  }
-
-  private fun CoroutineScope.fetchHoldings(force: Boolean) {
+  private fun CoroutineScope.fetchPortfolio(force: Boolean) {
     launch(context = Dispatchers.Default) {
-      holdingFetcher.call(force)
+      portfolioFetcher.call(force)
 
       // After the quotes are fetched, start the tape
       tapeLauncher.start()
@@ -121,8 +85,8 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val holding = state.holdings[index]
-      interactor.removeHolding(holding.symbol)
+      val stock = state.portfolio[index]
+      interactor.removeHolding(stock.holding.id())
     }
   }
 }

@@ -17,6 +17,18 @@
 package com.pyamsoft.tickertape.db
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.holding.HoldingDb
+import com.pyamsoft.tickertape.db.holding.HoldingDbImpl
+import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
+import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.holding.HoldingRealtime
+import com.pyamsoft.tickertape.db.position.PositionDb
+import com.pyamsoft.tickertape.db.position.PositionDbImpl
+import com.pyamsoft.tickertape.db.position.PositionDeleteDao
+import com.pyamsoft.tickertape.db.position.PositionInsertDao
+import com.pyamsoft.tickertape.db.position.PositionQueryDao
+import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDbImpl
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
@@ -34,6 +46,10 @@ import javax.inject.Qualifier
 abstract class DbModule {
 
   @Binds @CheckResult internal abstract fun provideSymbolDbImpl(impl: SymbolDbImpl): SymbolDb
+
+  @Binds @CheckResult internal abstract fun provideHoldingDbImpl(impl: HoldingDbImpl): HoldingDb
+
+  @Binds @CheckResult internal abstract fun providePositionDbImpl(impl: PositionDbImpl): PositionDb
 
   @Module
   companion object {
@@ -71,6 +87,78 @@ abstract class DbModule {
     @Provides
     @CheckResult
     internal fun provideSymbolDeleteDao(@InternalApi db: SymbolDb): SymbolDeleteDao {
+      return db.deleteDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    @InternalApi
+    internal fun provideHoldingDb(db: TickerDb): HoldingDb {
+      return db.holdings()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideHoldingRealtimeDao(@InternalApi db: HoldingDb): HoldingRealtime {
+      return db.realtime()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideHoldingQueryDao(@InternalApi db: HoldingDb): HoldingQueryDao {
+      return db.queryDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideHoldingInsertDao(@InternalApi db: HoldingDb): HoldingInsertDao {
+      return db.insertDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideHoldingDeleteDao(@InternalApi db: HoldingDb): HoldingDeleteDao {
+      return db.deleteDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    @InternalApi
+    internal fun providePositionDb(db: TickerDb): PositionDb {
+      return db.positions()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePositionRealtimeDao(@InternalApi db: PositionDb): PositionRealtime {
+      return db.realtime()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePositionQueryDao(@InternalApi db: PositionDb): PositionQueryDao {
+      return db.queryDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePositionInsertDao(@InternalApi db: PositionDb): PositionInsertDao {
+      return db.insertDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePositionDeleteDao(@InternalApi db: PositionDb): PositionDeleteDao {
       return db.deleteDao()
     }
   }

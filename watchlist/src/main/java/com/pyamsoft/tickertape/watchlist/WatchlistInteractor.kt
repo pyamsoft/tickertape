@@ -23,7 +23,7 @@ import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotePair
+import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,14 +48,25 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getQuotes(force: Boolean): List<QuotePair> =
+  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
       withContext(context = Dispatchers.IO) {
-        return@withContext interactor.getQuotes(force)
+        Enforcer.assertOffMainThread()
+        return@withContext symbolQueryDao.query(force).map { it.symbol() }
+      }
+
+  @CheckResult
+  suspend fun getQuotes(force: Boolean): List<QuotedStock> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        val symbols = getSymbols(force)
+        return@withContext interactor.getQuotes(force, symbols)
       }
 
   @CheckResult
   suspend fun removeQuote(symbol: StockSymbol) =
       withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
         // TODO move this query into the DAO layer
         val dbSymbol = symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
         if (dbSymbol == null) {

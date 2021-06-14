@@ -19,5 +19,5 @@ package com.pyamsoft.tickertape.quote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class QuotePair
+data class QuotedStock
 internal constructor(val symbol: StockSymbol, val quote: StockQuote?, val error: Throwable?)

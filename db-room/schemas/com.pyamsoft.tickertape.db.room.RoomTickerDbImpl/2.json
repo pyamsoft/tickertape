@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "b3b11e8bac36869aa5bd2c29fec2706e",
+    "identityHash": "9dc93aceb4d17bde0f9c59d506c3c669",
     "entities": [
       {
         "tableName": "room_symbol_table",
@@ -97,7 +97,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_room_position_table_holding_id",
+            "unique": false,
+            "columnNames": [
+              "holding_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_room_position_table_holding_id` ON `${TABLE_NAME}` (`holding_id`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "room_holding_table",
@@ -116,7 +125,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3b11e8bac36869aa5bd2c29fec2706e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9dc93aceb4d17bde0f9c59d506c3c669')"
     ]
   }
 }

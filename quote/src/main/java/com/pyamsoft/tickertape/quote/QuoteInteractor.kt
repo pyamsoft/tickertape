@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -27,39 +26,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Singleton
-class QuoteInteractor
-@Inject
-internal constructor(
-    private val symbolQueryDao: SymbolQueryDao,
-    private val interactor: StockInteractor
-) {
+class QuoteInteractor @Inject internal constructor(private val interactor: StockInteractor) {
 
   @CheckResult
-  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
+  suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<QuotedStock> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext symbolQueryDao.query(force).map { it.symbol() }
-      }
-
-  @CheckResult
-  suspend fun getQuotes(force: Boolean): List<QuotePair> =
-      withContext(context = Dispatchers.IO) {
-        val symbols = getSymbols(force)
 
         // If we have no symbols, don't even make the trip
         if (symbols.isEmpty()) {
           return@withContext emptyList()
         }
 
-        val quotePairs = mutableListOf<QuotePair>()
+        val quotePairs = mutableListOf<QuotedStock>()
         val quotes = interactor.getQuotes(force, symbols)
         for (symbol in symbols) {
           val quote = quotes.find { it.symbol().symbol() == symbol.symbol() }
           quotePairs.add(
-              QuotePair(
+              QuotedStock(
                   symbol = symbol,
                   quote = quote,
-                  error = if (quote == null) Throwable("Missing quote for ${symbol.symbol()}") else null))
+                  error =
+                      if (quote == null) Throwable("Missing quote for ${symbol.symbol()}")
+                      else null))
         }
         return@withContext quotePairs
       }

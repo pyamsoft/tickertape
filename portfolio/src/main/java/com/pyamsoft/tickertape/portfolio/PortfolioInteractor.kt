@@ -18,16 +18,19 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
-import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
-import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
+import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotePair
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -35,34 +38,58 @@ import timber.log.Timber
 class PortfolioInteractor
 @Inject
 internal constructor(
-    private val symbolQueryDao: SymbolQueryDao,
-    private val symbolDeleteDao: SymbolDeleteDao,
-    private val symbolRealtime: SymbolRealtime,
+    private val positionQueryDao: PositionQueryDao,
+    private val holdingQueryDao: HoldingQueryDao,
+    private val holdingDeleteDao: HoldingDeleteDao,
     private val interactor: QuoteInteractor
 ) {
 
-  suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
+  suspend fun listenForHoldingChanges(onChange: suspend (event: HoldingChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) { Enforcer.assertOffMainThread() }
+
+  suspend fun listenForPositionChanges(onChange: suspend (event: PositionChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) { Enforcer.assertOffMainThread() }
+
+  @CheckResult
+  suspend fun getPortfolio(force: Boolean): List<PortfolioStock> =
+      withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext symbolRealtime.listenForChanges(onChange)
+
+        // Run both queries in parallel
+        val holdingQueryJob = async { holdingQueryDao.query(force) }
+        val positionQueryJob = async { positionQueryDao.query(force) }
+        val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
+
+        // We can cast since we know what this one is
+        @Suppress("UNCHECKED_CAST") val holdings = jobResult[0] as List<DbHolding>
+        val symbols = holdings.map { it.symbol() }
+
+        // We can cast since we know what this one is
+        @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
+        val quotes = interactor.getQuotes(force, symbols)
+
+        val result = mutableListOf<PortfolioStock>()
+        for (holding in holdings) {
+          val quote = quotes.firstOrNull { it.symbol.symbol() == holding.symbol().symbol() }
+          val holdingPositions = positions.filter { it.holdingId().id == holding.id().id }
+          result.add(PortfolioStock(holding = holding, positions = holdingPositions, quote = quote))
+        }
+
+        return@withContext result
       }
 
   @CheckResult
-  suspend fun getHoldings(force: Boolean): List<QuotePair> =
+  suspend fun removeHolding(id: DbHolding.Id) =
       withContext(context = Dispatchers.IO) {
-        return@withContext interactor.getQuotes(force)
-      }
+        Enforcer.assertOffMainThread()
 
-  @CheckResult
-  suspend fun removeHolding(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
         // TODO move this query into the DAO layer
-        val dbSymbol = symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
-        if (dbSymbol == null) {
-          Timber.d("Symbol does not exist in DB: $symbol")
+        val dbHolding = holdingQueryDao.query(true).find { it.id().id == id.id }
+        if (dbHolding == null) {
+          Timber.d("Holding does not exist in DB: $id")
           return@withContext
         }
 
-        symbolDeleteDao.delete(dbSymbol, offerUndo = true)
+        holdingDeleteDao.delete(dbHolding, offerUndo = true)
       }
 }

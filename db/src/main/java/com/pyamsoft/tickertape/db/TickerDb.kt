@@ -17,9 +17,15 @@
 package com.pyamsoft.tickertape.db
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.holding.HoldingDb
+import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
 interface TickerDb : DbCache {
 
   @CheckResult fun symbols(): SymbolDb
+
+  @CheckResult fun holdings(): HoldingDb
+
+  @CheckResult fun positions(): PositionDb
 }

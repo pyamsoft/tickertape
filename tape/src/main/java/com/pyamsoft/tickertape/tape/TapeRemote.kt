@@ -31,8 +31,9 @@ import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
 import androidx.core.app.NotificationCompat
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotePair
+import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
@@ -44,6 +45,7 @@ class TapeRemote
 @Inject
 internal constructor(
     private val context: Context,
+    private val symbolQueryDao: SymbolQueryDao,
     private val interactor: QuoteInteractor,
     private val activityClass: Class<out Activity>,
     private val serviceClass: Class<out Service>
@@ -117,7 +119,7 @@ internal constructor(
 
   private fun updateTickerInfo(
       index: Int,
-      quotes: List<QuotePair>,
+      quotes: List<QuotedStock>,
       remoteViewIdGroup: RemoteViewIds
   ) {
     val quote = quotes[index].quote
@@ -148,7 +150,7 @@ internal constructor(
     remoteViews.setTextColor(remoteViewIdGroup.percentViewId, color)
   }
 
-  private fun updateTickers(quotes: List<QuotePair>, index: Int, pageSize: Int) {
+  private fun updateTickers(quotes: List<QuotedStock>, index: Int, pageSize: Int) {
     for (loop in 0 until pageSize) {
       val adjustedIndex = correctIndex(index + loop, quotes.size)
       val remoteViewIdGroup = remoteViewIds[loop]
@@ -182,7 +184,7 @@ internal constructor(
   @CheckResult
   private fun hydrateNotification(
       notificationManager: NotificationManager,
-      quotes: List<QuotePair>,
+      quotes: List<QuotedStock>,
       index: Int
   ): Notification {
     guaranteeNotificationChannelExists(notificationManager)
@@ -199,7 +201,7 @@ internal constructor(
     return builder
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setCustomContentView(remoteViews)
-        .addAction(generateNotificationAction("Open", getActivityPendingIntent()))
+        .setContentIntent(getActivityPendingIntent())
         .addAction(
             generateNotificationAction(
                 "Next",
@@ -227,7 +229,9 @@ internal constructor(
   ): Notification =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
-        val quotePairs = interactor.getQuotes(options.forceRefresh)
+        val force = options.forceRefresh
+        val symbols = symbolQueryDao.query(force).map { it.symbol() }
+        val quotePairs = interactor.getQuotes(force, symbols)
         return@withContext hydrateNotification(notificationManager, quotePairs, options.index)
       }
 

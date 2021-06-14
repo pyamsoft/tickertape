@@ -19,12 +19,11 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.quote.QuotePair
 
 data class PortfolioViewState(
     val error: Throwable?,
     val isLoading: Boolean,
-    val holdings: List<QuotePair>,
+    val portfolio: List<PortfolioStock>,
     val bottomOffset: Int,
 ) : UiViewState
 
@@ -37,5 +36,5 @@ sealed class PortfolioViewEvent : UiViewEvent {
 
 sealed class PortfolioControllerEvent : UiControllerEvent {
 
-    object AddNewHolding: PortfolioControllerEvent()
+  object AddNewHolding : PortfolioControllerEvent()
 }

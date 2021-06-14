@@ -29,7 +29,7 @@ import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuoteAdapter
 import com.pyamsoft.tickertape.quote.QuoteComponent
-import com.pyamsoft.tickertape.quote.QuotePair
+import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -149,7 +149,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   }
 
   @CheckResult
-  private fun createQuoteData(pair: QuotePair): QuoteViewState.QuoteData {
+  private fun createQuoteData(pair: QuotedStock): QuoteViewState.QuoteData {
     return when {
       pair.quote != null -> QuoteViewState.QuoteData.Quote(requireNotNull(pair.quote))
       pair.error != null -> QuoteViewState.QuoteData.Error(requireNotNull(pair.error))
@@ -157,7 +157,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     }
   }
 
-  private fun setList(list: List<QuotePair>) {
+  private fun setList(list: List<QuotedStock>) {
     val data = list.map { QuoteViewState(symbol = it.symbol, data = createQuoteData(it)) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
@@ -171,7 +171,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     binding.watchlistSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(schedule: List<QuotePair>) {
+  private fun handleList(schedule: List<QuotedStock>) {
     if (schedule.isEmpty()) {
       clearList()
     } else {

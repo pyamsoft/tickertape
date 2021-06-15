@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.portfolio.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
-import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,11 +29,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class WatchlistAddInteractor
+class PortfolioAddInteractor
 @Inject
 internal constructor(
-    private val symbolQueryDao: SymbolQueryDao,
-    private val symbolInsertDao: SymbolInsertDao,
+    private val holdingQueryDao: HoldingQueryDao,
+    private val holdingInsertDao: HoldingInsertDao,
 ) {
 
   @CheckResult
@@ -42,15 +42,15 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         // TODO move this query into the DAO layer
-        val existingDbSymbol =
-            symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
-        if (existingDbSymbol != null) {
-          Timber.d("Symbol already exists in DB: $existingDbSymbol")
+        val existingHolding =
+            holdingQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
+        if (existingHolding != null) {
+          Timber.d("Holding already exists in DB: $existingHolding")
           return@withContext
         }
 
-        val newSymbol = JsonMappableDbSymbol.create(symbol)
-        Timber.d("Insert new symbol into DB: $newSymbol")
-        symbolInsertDao.insert(newSymbol)
+        val newHolding = JsonMappableDbHolding.create(symbol)
+        Timber.d("Insert new holding into DB: $newHolding")
+        holdingInsertDao.insert(newHolding)
       }
 }

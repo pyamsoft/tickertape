@@ -29,11 +29,12 @@ import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
 import com.pyamsoft.tickertape.ui.applyToolbarOffset
 import javax.inject.Inject
-import timber.log.Timber
 
 class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
@@ -90,7 +91,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
   }
 
   private fun handleOpenHoldingAddDialog() {
-      Timber.d("Handle add new holding")
+    PortfolioAddDialog.newInstance().show(requireActivity(), PortfolioAddDialog.TAG)
   }
 
   override fun onStart() {

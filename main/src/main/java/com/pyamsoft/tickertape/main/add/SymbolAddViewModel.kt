@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 abstract class SymbolAddViewModel
 protected constructor(
@@ -36,11 +37,15 @@ protected constructor(
     }
   }
 
-  protected suspend fun saveSymbolLookup(symbol: String) {
-    putSavedState(KEY_SYMBOL, symbol)
+  fun handleLookupSymbol(symbol: String) {
+    setState(
+        stateChange = { copy(symbol = symbol) },
+        andThen = { newState ->
+          val newSymbol = newState.symbol
+          putSavedState(KEY_SYMBOL, newSymbol)
+          Timber.d("Lookup symbol search: $newSymbol")
+        })
   }
-
-  abstract fun handleLookupSymbol(symbol: String)
 
   abstract fun handleCommitSymbol()
 

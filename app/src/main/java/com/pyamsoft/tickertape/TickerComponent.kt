@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
+import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
@@ -67,6 +68,8 @@ internal interface TickerComponent {
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 
   @CheckResult fun plusWatchlistAddComponent(): WatchlistAddComponent.Factory
+
+  @CheckResult fun plusPortfolioAddComponent(): PortfolioAddComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

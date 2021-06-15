@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.portfolio.add
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
@@ -29,11 +29,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WatchlistAddViewModel
+class PortfolioAddViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
-    private val interactor: WatchlistAddInteractor,
+    private val interactor: PortfolioAddInteractor,
 ) : SymbolAddViewModel(savedState) {
 
   override fun handleCommitSymbol() {
@@ -46,7 +46,7 @@ internal constructor(
   }
 
   @AssistedFactory
-  interface Factory : UiSavedStateViewModelProvider<WatchlistAddViewModel> {
-    override fun create(savedState: UiSavedState): WatchlistAddViewModel
+  interface Factory : UiSavedStateViewModelProvider<PortfolioAddViewModel> {
+    override fun create(savedState: UiSavedState): PortfolioAddViewModel
   }
 }

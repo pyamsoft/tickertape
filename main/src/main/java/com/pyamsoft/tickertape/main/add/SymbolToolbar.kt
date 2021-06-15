@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.main.add
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -32,7 +32,7 @@ import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.pydroid.ui.util.setUpEnabled
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.pydroid.util.tintWith
-import com.pyamsoft.tickertape.watchlist.databinding.SymbolAddToolbarBinding
+import com.pyamsoft.tickertape.main.databinding.SymbolAddToolbarBinding
 import javax.inject.Inject
 
 class SymbolToolbar

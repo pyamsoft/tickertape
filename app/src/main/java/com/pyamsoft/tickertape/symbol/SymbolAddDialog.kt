@@ -14,38 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.symbol
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.DialogFragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
-import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
-import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddCommit
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddControllerEvent
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewEvent
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewModel
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewState
-import com.pyamsoft.tickertape.watchlist.add.SymbolLookup
-import com.pyamsoft.tickertape.watchlist.add.SymbolToolbar
+import com.pyamsoft.tickertape.main.add.SymbolAddCommit
+import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
+import com.pyamsoft.tickertape.main.add.SymbolAddViewEvent
+import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
+import com.pyamsoft.tickertape.main.add.SymbolAddViewState
+import com.pyamsoft.tickertape.main.add.SymbolLookup
+import com.pyamsoft.tickertape.main.add.SymbolToolbar
 import javax.inject.Inject
 
-internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {
+internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
+    AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {
 
   @JvmField @Inject internal var lookup: SymbolLookup? = null
 
@@ -55,12 +50,9 @@ internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolA
 
   private var stateSaver: StateSaver? = null
 
-  @JvmField @Inject internal var factory: SymbolAddViewModel.Factory? = null
-  private val viewModel by fromViewModelFactory<SymbolAddViewModel> {
-    createSavedStateViewModelFactory(factory)
-  }
+  protected abstract val viewModel: V
 
-  override fun onCreateView(
+  final override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?,
@@ -68,7 +60,7 @@ internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolA
     return inflater.inflate(R.layout.layout_constraint, container, false)
   }
 
-  override fun onViewCreated(
+  final override fun onViewCreated(
       view: View,
       savedInstanceState: Bundle?,
   ) {
@@ -76,11 +68,7 @@ internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolA
     makeFullWidth()
 
     val binding = LayoutConstraintBinding.bind(view)
-
-    Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusSymbolAddComponent()
-        .create(this, requireActivity(), viewLifecycleOwner, binding.layoutConstraint)
-        .inject(this)
+    onInject(binding.layoutConstraint, savedInstanceState)
 
     val lookup = requireNotNull(lookup)
     val commit = requireNotNull(commit)
@@ -138,36 +126,30 @@ internal class SymbolAddDialog : AppCompatDialogFragment(), UiController<SymbolA
     }
   }
 
-  override fun onControllerEvent(event: SymbolAddControllerEvent) {
+  protected abstract fun onInject(view: ViewGroup, savedInstanceState: Bundle?)
+
+  protected abstract fun onTeardown()
+
+  final override fun onControllerEvent(event: SymbolAddControllerEvent) {
     return when (event) {
       is SymbolAddControllerEvent.Close -> dismiss()
     }
   }
 
-  override fun onSaveInstanceState(outState: Bundle) {
+  final override fun onSaveInstanceState(outState: Bundle) {
     stateSaver?.saveState(outState)
     super.onSaveInstanceState(outState)
   }
 
-  override fun onDestroyView() {
+  final override fun onDestroyView() {
     super.onDestroyView()
 
-    factory = null
     stateSaver = null
 
     commit = null
     lookup = null
     toolbar = null
-  }
 
-  companion object {
-
-    const val TAG = "SymbolAddDialog"
-
-    @JvmStatic
-    @CheckResult
-    fun newInstance(): DialogFragment {
-      return SymbolAddDialog().apply { arguments = Bundle().apply {} }
-    }
+    onTeardown()
   }
 }

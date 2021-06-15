@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.main.add
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
-import com.pyamsoft.tickertape.watchlist.databinding.SymbolAddCommitBinding
+import com.pyamsoft.tickertape.main.databinding.SymbolAddCommitBinding
 import javax.inject.Inject
 
 class SymbolAddCommit @Inject internal constructor(parent: ViewGroup) :

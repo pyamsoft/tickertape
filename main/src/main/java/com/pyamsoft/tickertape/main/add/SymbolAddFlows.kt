@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.main.add
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 
-data class SymbolAddViewState internal constructor(val symbol: String) : UiViewState
+data class SymbolAddViewState(val symbol: String) : UiViewState
 
 sealed class SymbolAddViewEvent : UiViewEvent {
 

@@ -18,8 +18,9 @@ package com.pyamsoft.tickertape.watchlist.add
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
+import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.stocks.api.toSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -28,34 +29,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SymbolAddViewModel
+class WatchlistAddViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
-    private val interactor: SymbolAddInteractor,
-) :
-    UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
-        savedState, SymbolAddViewState(symbol = "")
-    ) {
+    private val interactor: WatchlistAddInteractor,
+) : SymbolAddViewModel(savedState) {
 
-  init {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      val symbol = restoreSavedState(KEY_SYMBOL) { "" }
-      setState { copy(symbol = symbol) }
-    }
-  }
-
-  fun handleLookupSymbol(symbol: String) {
+  override fun handleLookupSymbol(symbol: String) {
     setState(
         stateChange = { copy(symbol = symbol) },
         andThen = { newState ->
           val newSymbol = newState.symbol
-          putSavedState(KEY_SYMBOL, newSymbol)
+          saveSymbolLookup(newSymbol)
           Timber.d("Lookup symbol search: $newSymbol")
         })
   }
 
-  fun handleCommitSymbol() {
+  override fun handleCommitSymbol() {
     val symbol = state.symbol
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
@@ -64,13 +55,8 @@ internal constructor(
     }
   }
 
-  companion object {
-
-    private const val KEY_SYMBOL = "symbol"
-  }
-
   @AssistedFactory
-  interface Factory : UiSavedStateViewModelProvider<SymbolAddViewModel> {
-    override fun create(savedState: UiSavedState): SymbolAddViewModel
+  interface Factory : UiSavedStateViewModelProvider<WatchlistAddViewModel> {
+    override fun create(savedState: UiSavedState): WatchlistAddViewModel
   }
 }

@@ -33,7 +33,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.ui.applyToolbarOffset
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddDialog
+import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
@@ -61,7 +61,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
     val binding = LayoutCoordinatorBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusWatchListComponent()
+        .plusWatchlistComponent()
         .create(
             requireToolbarActivity(),
             requireActivity(),
@@ -91,7 +91,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   }
 
   private fun handleOpenSymbolAddDialog() {
-    SymbolAddDialog.newInstance().show(requireActivity(), SymbolAddDialog.TAG)
+    WatchlistAddDialog.newInstance().show(requireActivity(), WatchlistAddDialog.TAG)
   }
 
   override fun onStart() {

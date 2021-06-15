@@ -67,6 +67,7 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger"
 
     implementation project(':db')
+    implementation project(':main')
     implementation project(':stocks')
     implementation project(':tape')
     implementation project(':quote')

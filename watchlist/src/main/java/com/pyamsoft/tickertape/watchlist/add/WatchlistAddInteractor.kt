@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class SymbolAddInteractor
+class WatchlistAddInteractor
 @Inject
 internal constructor(
     private val symbolQueryDao: SymbolQueryDao,

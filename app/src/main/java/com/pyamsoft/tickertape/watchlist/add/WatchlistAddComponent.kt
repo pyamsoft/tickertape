@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddViewModel
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -32,10 +31,10 @@ import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [SymbolAddComponent.ComponentModule::class, ThemeProviderModule::class])
-internal interface SymbolAddComponent {
+@Subcomponent(modules = [WatchlistAddComponent.ComponentModule::class, ThemeProviderModule::class])
+internal interface WatchlistAddComponent {
 
-  fun inject(dialog: SymbolAddDialog)
+  fun inject(dialog: WatchlistAddDialog)
 
   @Subcomponent.Factory
   interface Factory {
@@ -46,7 +45,7 @@ internal interface SymbolAddComponent {
         @BindsInstance activity: Activity,
         @BindsInstance owner: LifecycleOwner,
         @BindsInstance parent: ViewGroup,
-    ): SymbolAddComponent
+    ): WatchlistAddComponent
   }
 
   @Module
@@ -54,9 +53,9 @@ internal interface SymbolAddComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(SymbolAddViewModel::class)
+    @ClassKey(WatchlistAddViewModel::class)
     internal abstract fun bindViewModel(
-        impl: SymbolAddViewModel.Factory
+        impl: WatchlistAddViewModel.Factory
     ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

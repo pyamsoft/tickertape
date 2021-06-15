@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.add
+package com.pyamsoft.tickertape.main.add
 
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.watchlist.databinding.SymbolAddLookupBinding
+import com.pyamsoft.tickertape.main.databinding.SymbolAddLookupBinding
 import javax.inject.Inject
 
 class SymbolLookup @Inject internal constructor(parent: ViewGroup) :

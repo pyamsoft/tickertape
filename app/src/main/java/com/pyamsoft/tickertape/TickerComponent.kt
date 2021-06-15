@@ -36,7 +36,7 @@ import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ui.UiModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
-import com.pyamsoft.tickertape.watchlist.add.SymbolAddComponent
+import com.pyamsoft.tickertape.watchlist.add.WatchlistAddComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -66,11 +66,11 @@ internal interface TickerComponent {
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 
-  @CheckResult fun plusSymbolAddComponent(): SymbolAddComponent.Factory
+  @CheckResult fun plusWatchlistAddComponent(): WatchlistAddComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
-  @CheckResult fun plusWatchListComponent(): WatchlistComponent.Factory
+  @CheckResult fun plusWatchlistComponent(): WatchlistComponent.Factory
 
   @CheckResult fun plusPortfolioComponent(): PortfolioComponent.Factory
 

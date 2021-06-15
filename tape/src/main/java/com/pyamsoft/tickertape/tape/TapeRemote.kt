@@ -230,8 +230,14 @@ internal constructor(
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         val force = options.forceRefresh
-        val symbols = symbolQueryDao.query(force).map { it.symbol() }
-        val quotePairs = interactor.getQuotes(force, symbols)
+        val quotePairs =
+            try {
+              val symbols = symbolQueryDao.query(force).map { it.symbol() }
+              interactor.getQuotes(force, symbols)
+            } catch (e: Throwable) {
+              Timber.e(e, "Failed to fetch watchlist quotes")
+              emptyList()
+            }
         return@withContext hydrateNotification(notificationManager, quotePairs, options.index)
       }
 

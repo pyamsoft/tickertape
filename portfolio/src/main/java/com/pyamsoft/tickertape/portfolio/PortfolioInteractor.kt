@@ -22,9 +22,11 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.holding.HoldingRealtime
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
+import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,6 +40,8 @@ import timber.log.Timber
 class PortfolioInteractor
 @Inject
 internal constructor(
+    private val holdingRealtime: HoldingRealtime,
+    private val positionRealtime: PositionRealtime,
     private val positionQueryDao: PositionQueryDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingDeleteDao: HoldingDeleteDao,
@@ -45,10 +49,16 @@ internal constructor(
 ) {
 
   suspend fun listenForHoldingChanges(onChange: suspend (event: HoldingChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) { Enforcer.assertOffMainThread() }
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        holdingRealtime.listenForChanges(onChange)
+      }
 
   suspend fun listenForPositionChanges(onChange: suspend (event: PositionChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) { Enforcer.assertOffMainThread() }
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        positionRealtime.listenForChanges(onChange)
+      }
 
   @CheckResult
   suspend fun getPortfolio(force: Boolean): List<PortfolioStock> =

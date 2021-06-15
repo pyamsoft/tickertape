@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
@@ -82,6 +83,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             is PortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
           }
         }
+
+    viewModel.handleListenForAddEvents(viewLifecycleOwner.lifecycleScope)
   }
 
   override fun onControllerEvent(event: PortfolioControllerEvent) {

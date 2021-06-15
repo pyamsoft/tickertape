@@ -49,7 +49,7 @@ abstract class UiModule {
     @Singleton
     @CheckResult
     internal fun provideAddNewBus(): EventBus<AddNew> {
-      return EventBus.create(emitOnlyWhenActive = true)
+      return EventBus.create(emitOnlyWhenActive = false)
     }
   }
 }

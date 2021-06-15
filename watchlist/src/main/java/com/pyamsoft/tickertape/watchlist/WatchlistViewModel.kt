@@ -18,10 +18,10 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
+import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
@@ -38,9 +38,10 @@ internal constructor(
     private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>,
-    private val addNewBus: EventConsumer<AddNew>
+    addNewBus: EventConsumer<AddNew>
 ) :
-    UiViewModel<WatchListViewState, WatchListControllerEvent>(
+    MainAdderViewModel<WatchListViewState, WatchListControllerEvent>(
+        addNewBus = addNewBus,
         initialState =
             WatchListViewState(
                 error = null, isLoading = false, quotes = emptyList(), bottomOffset = 0)) {
@@ -68,12 +69,13 @@ internal constructor(
     }
 
     viewModelScope.launch(context = Dispatchers.Default) {
-      addNewBus.onEvent { publish(WatchListControllerEvent.AddNewSymbol) }
-    }
-
-    viewModelScope.launch(context = Dispatchers.Default) {
       interactor.listenForChanges { handleRealtimeEvent(it) }
     }
+  }
+
+  override fun CoroutineScope.onAddNewEvent() {
+    Timber.d("Watchlist add new symbol!")
+    publish(WatchListControllerEvent.AddNewSymbol)
   }
 
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
@@ -100,6 +102,7 @@ internal constructor(
   }
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
+    Timber.d("Existing symbol deleted: $symbol")
     setState { copy(quotes = quotes.filterNot { it.symbol.symbol() == symbol.symbol() }) }
     // TODO offer up undo ability
 

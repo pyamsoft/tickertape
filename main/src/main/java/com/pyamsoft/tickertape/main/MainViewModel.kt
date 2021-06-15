@@ -75,6 +75,7 @@ internal constructor(
   }
 
   fun handleAddNewRequest() {
+    Timber.d("Add New requested!")
     viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew) }
   }
 

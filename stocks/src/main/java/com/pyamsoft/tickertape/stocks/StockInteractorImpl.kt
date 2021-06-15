@@ -16,11 +16,13 @@
 
 package com.pyamsoft.tickertape.stocks
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.MemoryCacheStorage
-import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,8 +34,8 @@ internal class StockInteractorImpl
 @Inject
 internal constructor(@InternalApi private val interactor: StockInteractor) : StockInteractor {
 
-  private val quoteCache =
-      cachify<List<StockQuote>, List<StockSymbol>>(
+  private val quotesCache =
+      multiCachify<String, List<StockQuote>, List<StockSymbol>>(
           storage = { listOf(MemoryCacheStorage.create(2, TimeUnit.MINUTES)) }) { symbols ->
         interactor.getQuotes(true, symbols)
       }
@@ -42,10 +44,21 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
+        val key = getQuoteKey(symbols)
         if (force) {
-          quoteCache.clear()
+          quotesCache.key(key).clear()
         }
 
-        return@withContext quoteCache.call(symbols)
+        return@withContext quotesCache.key(key).call(symbols)
       }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun getQuoteKey(symbols: List<StockSymbol>): String {
+      val locale = Locale.getDefault()
+      return symbols.sortedBy { it.symbol().lowercase(locale) }.joinToString(",") { it.symbol() }
+    }
+  }
 }

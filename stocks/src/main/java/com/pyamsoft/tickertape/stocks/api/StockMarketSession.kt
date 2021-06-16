@@ -50,7 +50,7 @@ interface StockMarketSession {
       if (session.direction().isZero()) {
         directionSign = ""
         color = Color.WHITE
-        percent = "0.00"
+        percent = "0.00%"
         changeAmount = "0.00"
       } else {
         percent = session.percent().asPercentValue()

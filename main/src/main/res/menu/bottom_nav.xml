@@ -28,7 +28,13 @@
 
     <item
         android:id="@+id/menu_placeholder"
+        android:enabled="false"
         android:title="" />
+
+    <item
+        android:id="@+id/menu_something"
+        android:icon="@drawable/ic_close_24dp"
+        android:title="Something" />
 
     <item
         android:id="@+id/menu_settings"

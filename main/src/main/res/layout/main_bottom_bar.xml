@@ -26,8 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:fabCradleMargin="8dp"
-        app:fabCradleRoundedCornerRadius="8dp"
-        app:fabCradleVerticalOffset="8dp"
+        app:fabCradleRoundedCornerRadius="16dp"
         tools:ignore="BottomAppBar">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -169,6 +169,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     if (schedule.isEmpty()) {
       clearList()
     } else {
+      // TODO don't map this since we want a different UI
       setList(schedule.mapNotNull { it.quote })
     }
   }

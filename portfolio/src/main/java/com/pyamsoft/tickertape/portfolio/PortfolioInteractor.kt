@@ -76,7 +76,13 @@ internal constructor(
 
         // We can cast since we know what this one is
         @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-        val quotes = interactor.getQuotes(force, symbols)
+        val quotes =
+            try {
+              interactor.getQuotes(force, symbols)
+            } catch (e: Throwable) {
+              Timber.e(e, "Unable to get quotes for portfolio: $symbols")
+              emptyList()
+            }
 
         val result = mutableListOf<PortfolioStock>()
         for (holding in holdings) {

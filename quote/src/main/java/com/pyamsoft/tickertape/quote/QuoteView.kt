@@ -22,6 +22,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.quote.databinding.QuoteItemBinding
 import com.pyamsoft.tickertape.quote.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.StockCompany
@@ -46,6 +47,10 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     }
 
     doOnTeardown { binding.quoteItem.setOnLongClickListener(null) }
+
+    doOnInflate { binding.quoteItem.setOnDebouncedClickListener { publish(QuoteViewEvent.Select) } }
+
+    doOnTeardown { binding.quoteItem.setOnDebouncedClickListener(null) }
 
     doOnTeardown {
       clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)

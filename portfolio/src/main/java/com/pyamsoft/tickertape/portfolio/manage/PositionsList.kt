@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -26,47 +25,53 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.QuoteAdapter
-import com.pyamsoft.tickertape.quote.QuoteComponent
-import com.pyamsoft.tickertape.quote.QuoteViewState
-import com.pyamsoft.tickertape.quote.QuotedStock
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemAdapter
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemComponent
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
-class WatchList
+class PositionsList
 @Inject
-internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteComponent.Factory) :
-    BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
+internal constructor(
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+    factory: PositionItemComponent.Factory
+) :
+    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
-    QuoteAdapter.Callback {
+    PositionItemAdapter.Callback {
 
-  override val viewBinding = WatchlistBinding::inflate
+  override val viewBinding = PortfolioListBinding::inflate
 
-  override val layoutRoot by boundView { watchlistRoot }
+  override val layoutRoot by boundView { portfolioListRoot }
 
-  private var modelAdapter: QuoteAdapter? = null
+  private var modelAdapter: PositionItemAdapter? = null
 
   private var lastScrollPosition = 0
 
   init {
     doOnInflate {
-      binding.watchlistList.layoutManager =
-          LinearLayoutManager(binding.watchlistList.context).apply {
+      binding.portfolioListList.layoutManager =
+          LinearLayoutManager(binding.portfolioListList.context).apply {
             isItemPrefetchEnabled = true
             initialPrefetchItemCount = 3
           }
     }
 
     doOnInflate {
-      modelAdapter = QuoteAdapter.create(factory, owner, this)
-      binding.watchlistList.adapter = modelAdapter
+      modelAdapter = PositionItemAdapter.create(factory, owner, this)
+      binding.portfolioListList.adapter = modelAdapter
     }
 
-    doOnInflate { binding.watchlistSwipeRefresh.setOnRefreshListener(this) }
+    doOnInflate { binding.portfolioListSwipeRefresh.setOnRefreshListener(this) }
 
     doOnInflate { savedInstanceState ->
       val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
@@ -77,7 +82,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     }
 
     doOnSaveState { outState ->
-      val manager = binding.watchlistList.layoutManager
+      val manager = binding.portfolioListList.layoutManager
       if (manager is LinearLayoutManager) {
         val position = manager.findFirstVisibleItemPosition()
         if (position > 0) {
@@ -90,79 +95,60 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     }
 
     doOnInflate {
-      val margin = 16.asDp(binding.watchlistList.context)
+      val margin = 16.asDp(binding.portfolioListList.context)
 
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
       LinearMarginDecoration.create(margin = margin).apply {
-        binding.watchlistList.addItemDecoration(this)
+        binding.portfolioListList.addItemDecoration(this)
       }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 56.asDp(binding.watchlistList.context)
+      val bottomMargin = 56.asDp(binding.portfolioListList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.watchlistList.addItemDecoration(this)
+        binding.portfolioListList.addItemDecoration(this)
       }
     }
 
     doOnInflate {
-      FastScrollerBuilder(binding.watchlistList)
+      FastScrollerBuilder(binding.portfolioListList)
           .useMd2Style()
           .setPopupTextProvider(usingAdapter())
           .build()
     }
 
-    doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
+    doOnTeardown { binding.portfolioListList.removeAllItemDecorations() }
 
     doOnTeardown {
-      binding.watchlistList.adapter = null
+      binding.portfolioListList.adapter = null
 
-      binding.watchlistSwipeRefresh.setOnRefreshListener(null)
+      binding.portfolioListSwipeRefresh.setOnRefreshListener(null)
 
       modelAdapter = null
     }
   }
 
   @CheckResult
-  private fun usingAdapter(): QuoteAdapter {
+  private fun usingAdapter(): PositionItemAdapter {
     return requireNotNull(modelAdapter)
   }
 
-  override fun onSelect(index: Int) {
-    Timber.d("Watchlist don't do anything on select $index")
-  }
-
   override fun onRefresh() {
-    publish(WatchListViewEvent.ForceRefresh)
+    publish(ManagePortfolioViewEvent.ForceRefresh)
   }
 
   override fun onRemove(index: Int) {
-    publish(WatchListViewEvent.Remove(index))
+    publish(ManagePortfolioViewEvent.Remove(index))
   }
 
-  override fun onRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
+  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+    state.mapChanged { it.stock }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
-    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handleBottomOffset(offset: Int) {
-    layoutRoot.updatePadding(bottom = offset)
-  }
-
-  @CheckResult
-  private fun createQuoteData(pair: QuotedStock): QuoteViewState.QuoteData {
-    return when {
-      pair.quote != null -> QuoteViewState.QuoteData.Quote(requireNotNull(pair.quote))
-      pair.error != null -> QuoteViewState.QuoteData.Error(requireNotNull(pair.error))
-      else ->
-          throw IllegalStateException("Missing quote and error for symbol ${pair.symbol.symbol()}")
-    }
-  }
-
-  private fun setList(list: List<QuotedStock>) {
-    val data = list.map { QuoteViewState(symbol = it.symbol, data = createQuoteData(it)) }
+  private fun setList(holding: DbHolding, positions: List<DbPosition>) {
+    val data = positions.map { PositionItemViewState(holding = holding, position = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }
@@ -172,18 +158,23 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   }
 
   private fun handleLoading(loading: Boolean) {
-    binding.watchlistSwipeRefresh.isRefreshing = loading
+    binding.portfolioListSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(schedule: List<QuotedStock>) {
-    if (schedule.isEmpty()) {
+  private fun handleList(stock: PortfolioStock?) {
+    if (stock == null) {
       clearList()
     } else {
-      setList(schedule)
+      val positions = stock.positions
+      if (positions.isEmpty()) {
+        clearList()
+      } else {
+        setList(stock.holding, positions)
+      }
     }
   }
 
   companion object {
-    private const val LAST_SCROLL_POSITION = "watchlist_last_scroll_position"
+    private const val LAST_SCROLL_POSITION = "portfolio_last_scroll_position"
   }
 }

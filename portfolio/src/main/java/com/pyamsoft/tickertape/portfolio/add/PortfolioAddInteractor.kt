@@ -42,8 +42,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         // TODO move this query into the DAO layer
-        val existingHolding =
-            holdingQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
+        val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
         if (existingHolding != null) {
           Timber.d("Holding already exists in DB: $existingHolding")
           return@withContext

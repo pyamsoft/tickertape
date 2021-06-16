@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -24,41 +24,40 @@ import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.util.doOnDestroy
 import javax.inject.Inject
 
-class QuoteViewHolder
+class PositionItemViewHolder
 internal constructor(
     binding: ListitemFrameBinding,
-    factory: QuoteComponent.Factory,
+    factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
-    callback: QuoteAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<QuoteViewState> {
+    callback: PositionItemAdapter.Callback
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<PositionItemViewState> {
 
-  @Inject @JvmField internal var quote: QuoteView? = null
+  @Inject @JvmField internal var position: PositionItemView? = null
 
-  private val viewBinder: ViewBinder<QuoteViewState>
+  private val viewBinder: ViewBinder<PositionItemViewState>
 
   init {
     factory.create(binding.listitemFrame).inject(this)
 
-    val quote = requireNotNull(quote)
+    val position = requireNotNull(position)
 
     viewBinder =
-        createViewBinder(quote) {
+        createViewBinder(position) {
           return@createViewBinder when (it) {
-            is QuoteViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
-            is QuoteViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
+            is PositionItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
           }
         }
 
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: QuoteViewState) {
+  override fun bindState(state: PositionItemViewState) {
     viewBinder.bindState(state)
   }
 
   override fun teardown() {
     viewBinder.teardown()
 
-    quote = null
+    position = null
   }
 }

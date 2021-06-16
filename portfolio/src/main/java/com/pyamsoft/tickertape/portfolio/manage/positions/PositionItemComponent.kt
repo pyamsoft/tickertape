@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
+import android.view.ViewGroup
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.quote.QuoteViewHolder
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-data class SymbolAddViewState internal constructor(val symbol: String) : UiViewState
+@Subcomponent
+interface PositionItemComponent {
 
-sealed class SymbolAddViewEvent : UiViewEvent {
+  fun inject(holder: PositionItemViewHolder)
 
-  data class UpdateSymbol(val symbol: String) : SymbolAddViewEvent()
+  @Subcomponent.Factory
+  interface Factory {
 
-  object Close : SymbolAddViewEvent()
-
-  object CommitSymbol : SymbolAddViewEvent()
-}
-
-sealed class SymbolAddControllerEvent : UiControllerEvent {
-
-  object Close : SymbolAddControllerEvent()
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): PositionItemComponent
+  }
 }

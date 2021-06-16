@@ -14,40 +14,46 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.portfolio.manage
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.arch.UiSavedState
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.arch.onActualError
-import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
-import com.pyamsoft.tickertape.main.MainAdderViewModel
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.ui.AddNew
-import com.pyamsoft.tickertape.ui.BottomOffset
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class PortfolioViewModel
-@Inject
+class PositionManageViewModel
+@AssistedInject
 internal constructor(
+    @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
-    private val interactor: PortfolioInteractor,
-    private val bottomOffsetBus: EventConsumer<BottomOffset>,
-    addNewBus: EventConsumer<AddNew>
+    private val interactor: PositionInteractor,
+    private val thisHoldingId: DbHolding.Id,
 ) :
-    MainAdderViewModel<PortfolioViewState, PortfolioControllerEvent>(
-        addNewBus = addNewBus,
+    UiSavedStateViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
+        savedState,
         initialState =
-            PortfolioViewState(
-                error = null, isLoading = false, portfolio = emptyList(), bottomOffset = 0)) {
+            ManagePortfolioViewState(
+                isLoading = false,
+                error = null,
+                numberOfShares = 0,
+                pricePerShare = 0F.asMoney(),
+                stock = null)) {
 
   private val portfolioFetcher =
       highlander<Unit, Boolean> { force ->
@@ -55,8 +61,8 @@ internal constructor(
             stateChange = { copy(isLoading = true) },
             andThen = {
               try {
-                val portfolio = interactor.getPortfolio(force)
-                setState { copy(error = null, portfolio = portfolio, isLoading = false) }
+                val stock = interactor.getHolding(force, thisHoldingId)
+                setState { copy(error = null, stock = stock, isLoading = false) }
               } catch (error: Throwable) {
                 error.onActualError { e ->
                   Timber.e(e, "Failed to fetch quotes")
@@ -68,23 +74,9 @@ internal constructor(
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
-      bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
-    }
-
-    viewModelScope.launch(context = Dispatchers.Default) {
-      interactor.listenForHoldingChanges { handleHoldingRealtimeEvent(it) }
-    }
-
-    viewModelScope.launch(context = Dispatchers.Default) {
       interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
     }
   }
-
-  override fun CoroutineScope.onAddNewEvent() {
-    Timber.d("Portfolio add new holding!")
-    publish(PortfolioControllerEvent.AddNewHolding)
-  }
-
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
     return when (event) {
       is PositionChangeEvent.Delete -> handleDeletePosition(event.position, event.offerUndo)
@@ -98,16 +90,16 @@ internal constructor(
 
     setState {
       copy(
-          portfolio =
-              portfolio.map { stock ->
+          stock =
+              stock?.let { s ->
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
-                return@map stock.copy(
+                val existingPosition = s.positions.firstOrNull(positionMatchesCallback)
+                return@let s.copy(
                     positions =
                         if (existingPosition == null) {
-                          stock.positions + position
+                          s.positions + position
                         } else {
-                          stock.positions.map { if (positionMatchesCallback(it)) position else it }
+                          s.positions.map { if (positionMatchesCallback(it)) position else it }
                         })
               })
     }
@@ -118,16 +110,16 @@ internal constructor(
 
     setState {
       copy(
-          portfolio =
-              portfolio.map { stock ->
+          stock =
+              stock?.let { s ->
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
-                return@map stock.copy(
+                val existingPosition = s.positions.firstOrNull(positionMatchesCallback)
+                return@let s.copy(
                     positions =
                         if (existingPosition == null) {
-                          stock.positions + position
+                          s.positions + position
                         } else {
-                          stock.positions.map { if (positionMatchesCallback(it)) position else it }
+                          s.positions.map { if (positionMatchesCallback(it)) position else it }
                         })
               })
     }
@@ -138,48 +130,15 @@ internal constructor(
 
     setState {
       copy(
-          portfolio =
-              portfolio.map { stock ->
+          stock =
+              stock?.let { s ->
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                return@map if (!stock.positions.contains(positionMatchesCallback)) stock
+                return@let if (!s.positions.contains(positionMatchesCallback)) s
                 else {
-                  stock.copy(positions = stock.positions.filterNot(positionMatchesCallback))
+                  s.copy(positions = s.positions.filterNot(positionMatchesCallback))
                 }
               })
     }
-    // TODO offer up undo ability
-
-    // On delete, we don't need to re-fetch quotes from the network
-  }
-
-  private fun CoroutineScope.handleHoldingRealtimeEvent(event: HoldingChangeEvent) {
-    return when (event) {
-      is HoldingChangeEvent.Delete -> handleDeleteHolding(event.holding, event.offerUndo)
-      is HoldingChangeEvent.Insert -> handleInsertHolding(event.holding)
-      is HoldingChangeEvent.Update -> handleUpdateHolding(event.holding)
-    }
-  }
-
-  private fun CoroutineScope.handleUpdateHolding(holding: DbHolding) {
-    Timber.d("Existing holding updated: $holding")
-
-    // Don't actually update anything in the list here, but call a full refresh
-    // This will re-fetch the DB and the network and give us back quotes
-    fetchPortfolio(true)
-  }
-
-  private fun CoroutineScope.handleInsertHolding(holding: DbHolding) {
-    Timber.d("New holding inserted: $holding")
-
-    // Don't actually update anything in the list here, but call a full refresh
-    // This will re-fetch the DB and the network and give us back quotes
-    fetchPortfolio(true)
-  }
-
-  private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
-    Timber.d("Existing holding deleted: $holding")
-
-    setState { copy(portfolio = portfolio.filterNot { it.holding.id() == holding.id() }) }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network
@@ -200,15 +159,26 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val stock = state.portfolio[index]
-      interactor.removeHolding(stock.holding.id())
+      val position = state.stock?.positions?.get(index)
+      if (position == null) {
+        Timber.w("No position at index: $index")
+        return@launch
+      }
+
+      interactor.removePosition(position.id())
     }
   }
 
-  fun handleManageHolding(index: Int) {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      val stock = state.portfolio[index]
-      publish(PortfolioControllerEvent.ManageHolding(stock))
-    }
+  fun handleUpdateNumberOfShares(number: Int) {
+    setState { copy(numberOfShares = number) }
+  }
+
+  fun handleUpdateSharePrice(price: StockMoneyValue) {
+    setState { copy(pricePerShare = price) }
+  }
+
+  @AssistedFactory
+  interface Factory : UiSavedStateViewModelProvider<PositionManageViewModel> {
+    override fun create(savedState: UiSavedState): PositionManageViewModel
   }
 }

@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
@@ -79,7 +78,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
 
     doOnSaveState { outState ->
       val manager = binding.portfolioListList.layoutManager
-      if (manager is GridLayoutManager) {
+      if (manager is LinearLayoutManager) {
         val position = manager.findFirstVisibleItemPosition()
         if (position > 0) {
           outState.put(LAST_SCROLL_POSITION, position)
@@ -128,6 +127,10 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   @CheckResult
   private fun usingAdapter(): QuoteAdapter {
     return requireNotNull(modelAdapter)
+  }
+
+  override fun onSelect(index: Int) {
+      publish(PortfolioViewEvent.Manage(index))
   }
 
   override fun onRefresh() {

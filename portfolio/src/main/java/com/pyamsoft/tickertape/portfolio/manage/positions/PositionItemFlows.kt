@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 
-data class WatchListViewState internal constructor(
-    val error: Throwable?,
-    val isLoading: Boolean,
-    val quotes: List<QuotedStock>,
-    val bottomOffset: Int,
-) : UiViewState
+data class PositionItemViewState
+internal constructor(val position: DbPosition, val holding: DbHolding) : UiViewState
 
-sealed class WatchListViewEvent : UiViewEvent {
+sealed class PositionItemViewEvent : UiViewEvent {
 
-  object ForceRefresh : WatchListViewEvent()
+  object Remove : PositionItemViewEvent()
 
-  data class Remove internal constructor(val index: Int) : WatchListViewEvent()
-}
-
-sealed class WatchListControllerEvent : UiControllerEvent {
-
-    object AddNewSymbol: WatchListControllerEvent()
 }

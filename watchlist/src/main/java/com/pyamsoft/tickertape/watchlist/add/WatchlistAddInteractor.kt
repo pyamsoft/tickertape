@@ -43,7 +43,7 @@ internal constructor(
 
         // TODO move this query into the DAO layer
         val existingDbSymbol =
-            symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
+            symbolQueryDao.query(true).find { it.symbol() == symbol }
         if (existingDbSymbol != null) {
           Timber.d("Symbol already exists in DB: $existingDbSymbol")
           return@withContext

@@ -29,6 +29,8 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
+import com.pyamsoft.tickertape.portfolio.manage.PositionManageComponent
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
@@ -61,6 +63,11 @@ internal interface TickerComponent {
   @Suppress("FunctionName")
   fun `$$daggerRequiredQuoteComponent`(): QuoteComponent.Factory
 
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
+
   fun inject(receiver: BootReceiver)
 
   fun inject(receiver: ScreenReceiver)
@@ -70,6 +77,8 @@ internal interface TickerComponent {
   @CheckResult fun plusWatchlistAddComponent(): WatchlistAddComponent.Factory
 
   @CheckResult fun plusPortfolioAddComponent(): PortfolioAddComponent.Factory
+
+  @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

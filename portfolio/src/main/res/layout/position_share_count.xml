@@ -18,7 +18,7 @@
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/symbol_add_lookup_root"
+        android:id="@+id/position_number_of_shares_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
@@ -35,12 +35,13 @@
             app:boxCornerRadiusTopStart="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/symbol_add_lookup_edit"
+                android:id="@+id/position_number_of_shares_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
+                android:hint="Number of Shares"
+                android:inputType="number"
                 android:maxLines="1"
-                android:hint="Symbol Lookup"
                 android:paddingStart="8dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="8dp"

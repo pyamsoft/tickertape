@@ -54,7 +54,7 @@ buildscript {
     room = "2.3.0"
 
     // Dagger
-    dagger = "2.36"
+    dagger = "2.37"
 
     moshi = "1.12.0"
     retrofit = "2.9.0"
@@ -73,7 +73,7 @@ buildscript {
 
     // Recyclerview
     decorator = "1.3.0"
-    fastscroll = "1.1.5"
+    fastscroll = "1.1.6"
   }
 
   dependencies {
@@ -85,7 +85,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     // Spotless
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.12.5"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.13.0"
 
     //        classpath 'com.google.gms:google-services:4.3.2'
   }

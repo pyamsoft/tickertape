@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.portfolio.manage
 
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -26,20 +26,22 @@ import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.pydroid.ui.util.setUpEnabled
 import com.pyamsoft.pydroid.util.tintWith
-import com.pyamsoft.tickertape.main.databinding.SymbolAddToolbarBinding
+import com.pyamsoft.tickertape.portfolio.databinding.PositionToolbarBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemViewEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemViewState
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
 
-class SymbolToolbar
+class PositionToolbar
 @Inject
 internal constructor(
     imageLoader: ImageLoader,
     parent: ViewGroup,
-) : BaseUiView<SymbolAddViewState, SymbolAddViewEvent, SymbolAddToolbarBinding>(parent) {
+) : BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PositionToolbarBinding>(parent) {
 
-  override val viewBinding = SymbolAddToolbarBinding::inflate
+  override val viewBinding = PositionToolbarBinding::inflate
 
-  override val layoutRoot by boundView { symbolAddToolbar }
+  override val layoutRoot by boundView { positionToolbar }
 
   init {
     doOnInflate {
@@ -51,27 +53,23 @@ internal constructor(
               object : ImageTarget<Drawable> {
 
                 override fun clear() {
-                  binding.symbolAddToolbar.navigationIcon = null
+                  binding.positionToolbar.navigationIcon = null
                 }
 
                 override fun setImage(image: Drawable) {
-                  binding.symbolAddToolbar.setUpEnabled(true, image)
+                  binding.positionToolbar.setUpEnabled(true, image)
                 }
               })
           .also { loaded -> doOnTeardown { loaded.dispose() } }
     }
 
-    doOnInflate { binding.symbolAddToolbar.withRoundedBackground() }
+    doOnInflate { binding.positionToolbar.withRoundedBackground() }
 
     doOnInflate {
-      binding.symbolAddToolbar.setNavigationOnClickListener(
-          DebouncedOnClickListener.create { publish(SymbolAddViewEvent.Close) })
+      binding.positionToolbar.setNavigationOnClickListener(
+          DebouncedOnClickListener.create { publish(ManagePortfolioViewEvent.Close) })
     }
 
-    doOnTeardown { clear() }
-  }
-
-  private fun clear() {
-    binding.symbolAddToolbar.setNavigationOnClickListener(null)
+    doOnTeardown { binding.positionToolbar.setNavigationOnClickListener(null) }
   }
 }

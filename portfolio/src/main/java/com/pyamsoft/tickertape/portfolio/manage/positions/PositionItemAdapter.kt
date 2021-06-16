@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -25,34 +25,37 @@ import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class QuoteAdapter
+class PositionItemAdapter
 private constructor(
-    private val factory: QuoteComponent.Factory,
+    private val factory: PositionItemComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER), PopupTextProvider {
+) : ListAdapter<PositionItemViewState, PositionItemViewHolder>(DIFFER), PopupTextProvider {
 
   companion object {
 
     @JvmStatic
     @CheckResult
     fun create(
-        factory: QuoteComponent.Factory,
+        factory: PositionItemComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): QuoteAdapter {
-      return QuoteAdapter(factory, owner, callback)
+    ): PositionItemAdapter {
+      return PositionItemAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
-        object : DiffUtil.ItemCallback<QuoteViewState>() {
-          override fun areItemsTheSame(oldItem: QuoteViewState, newItem: QuoteViewState): Boolean {
-            return oldItem.symbol.symbol() == newItem.symbol.symbol()
+        object : DiffUtil.ItemCallback<PositionItemViewState>() {
+          override fun areItemsTheSame(
+              oldItem: PositionItemViewState,
+              newItem: PositionItemViewState
+          ): Boolean {
+            return oldItem.holding.id() == newItem.holding.id()
           }
 
           override fun areContentsTheSame(
-              oldItem: QuoteViewState,
-              newItem: QuoteViewState
+              oldItem: PositionItemViewState,
+              newItem: PositionItemViewState
           ): Boolean {
             return oldItem == newItem
           }
@@ -61,27 +64,25 @@ private constructor(
 
   override fun getPopupText(position: Int): String {
     val state = getItem(position)
-    return state.symbol.symbol()
+    return state.holding.symbol().symbol()
   }
 
   override fun getItemId(position: Int): Long {
-    return getItem(position).symbol.symbol().hashCode().toLong()
+    return getItem(position).holding.id().hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PositionItemViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ListitemFrameBinding.inflate(inflater, parent, false)
-    return QuoteViewHolder(binding, factory, owner, callback)
+    return PositionItemViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: PositionItemViewHolder, position: Int) {
     val state = getItem(position)
     holder.bindState(state)
   }
 
   interface Callback {
-
-    fun onSelect(index: Int)
 
     fun onRemove(index: Int)
   }

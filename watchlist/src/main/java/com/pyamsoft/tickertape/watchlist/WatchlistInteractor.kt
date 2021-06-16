@@ -68,7 +68,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         // TODO move this query into the DAO layer
-        val dbSymbol = symbolQueryDao.query(true).find { it.symbol().symbol() == symbol.symbol() }
+        val dbSymbol = symbolQueryDao.query(true).find { it.symbol() == symbol }
         if (dbSymbol == null) {
           Timber.d("Symbol does not exist in DB: $symbol")
           return@withContext

@@ -20,7 +20,8 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 
-data class PortfolioViewState(
+data class PortfolioViewState
+internal constructor(
     val error: Throwable?,
     val isLoading: Boolean,
     val portfolio: List<PortfolioStock>,
@@ -32,9 +33,14 @@ sealed class PortfolioViewEvent : UiViewEvent {
   object ForceRefresh : PortfolioViewEvent()
 
   data class Remove internal constructor(val index: Int) : PortfolioViewEvent()
+
+  data class Manage internal constructor(val index: Int) : PortfolioViewEvent()
 }
 
 sealed class PortfolioControllerEvent : UiControllerEvent {
 
   object AddNewHolding : PortfolioControllerEvent()
+
+  data class ManageHolding internal constructor(val stock: PortfolioStock) :
+      PortfolioControllerEvent()
 }

@@ -34,6 +34,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
+import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
 import com.pyamsoft.tickertape.ui.applyToolbarOffset
 import javax.inject.Inject
 
@@ -81,6 +82,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
           return@createComponent when (it) {
             is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
             is PortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
+            is PortfolioViewEvent.Manage -> viewModel.handleManageHolding(it.index)
           }
         }
 
@@ -90,7 +92,13 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
   override fun onControllerEvent(event: PortfolioControllerEvent) {
     return when (event) {
       is PortfolioControllerEvent.AddNewHolding -> handleOpenHoldingAddDialog()
+      is PortfolioControllerEvent.ManageHolding -> handleOpenHoldingManageDialog(event.stock)
     }
+  }
+
+  private fun handleOpenHoldingManageDialog(stock: PortfolioStock) {
+    PositionManageDialog.newInstance(stock.holding.id())
+        .show(requireActivity(), PositionManageDialog.TAG)
   }
 
   private fun handleOpenHoldingAddDialog() {

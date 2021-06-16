@@ -41,14 +41,8 @@ class QuoteInteractor @Inject internal constructor(private val interactor: Stock
         val quotePairs = mutableListOf<QuotedStock>()
         val quotes = interactor.getQuotes(force, symbols)
         for (symbol in symbols) {
-          val quote = quotes.find { it.symbol() == symbol }
-          quotePairs.add(
-              QuotedStock(
-                  symbol = symbol,
-                  quote = quote,
-                  error =
-                      if (quote == null) Throwable("Missing quote for ${symbol.symbol()}")
-                      else null))
+          val quote = quotes.firstOrNull { it.symbol() == symbol }
+          quotePairs.add(QuotedStock(symbol = symbol, quote = quote))
         }
         return@withContext quotePairs
       }

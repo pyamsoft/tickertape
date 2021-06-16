@@ -64,24 +64,27 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
   override fun onRender(state: UiRender<QuoteViewState>) {
     state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
 
-    state.mapChanged { it.data }.render(viewScope) { data ->
-      when (data) {
-        is QuoteViewState.QuoteData.Error -> handleDataMissing(data.error)
-        is QuoteViewState.QuoteData.Quote -> handleDataPresent(data.quote)
-      }
+    state.mapChanged { it.quote }.render(viewScope) { handleQuote(it) }
+  }
+
+  private fun handleQuote(quote: StockQuote?) {
+    if (quote == null) {
+      handleQuoteMissing()
+    } else {
+      handleQuotePresent(quote)
     }
   }
 
-  private fun handleDataMissing(error: Throwable) {
+  private fun handleQuoteMissing() {
     binding.quoteItemData.quoteAfterHours.isGone = true
     clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
     clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
 
     handleCompanyChanged(null)
-    handleSessionError(error, binding.quoteItemData.quoteItemNormalNumbers)
+    handleSessionError(binding.quoteItemData.quoteItemNormalNumbers)
   }
 
-  private fun handleDataPresent(quote: StockQuote) {
+  private fun handleQuotePresent(quote: StockQuote) {
     handleCompanyChanged(quote.company())
     handleRegularSessionChanged(quote.regular())
     handleAfterSessionChanged(quote.afterHours())
@@ -145,10 +148,10 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     }
 
     @JvmStatic
-    private fun handleSessionError(error: Throwable, binding: QuoteNumbersBinding) {
+    private fun handleSessionError(binding: QuoteNumbersBinding) {
       binding.apply {
         quoteError.apply {
-          text = error.message
+          text = "Could not get quote."
           setTextColor(Color.RED)
           isVisible = true
         }

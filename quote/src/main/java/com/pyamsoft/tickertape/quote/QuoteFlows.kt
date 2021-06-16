@@ -22,13 +22,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 // Public constructor, used by portfolio module and watchlist module
-data class QuoteViewState(val symbol: StockSymbol, val data: QuoteData) : UiViewState {
-
-  sealed class QuoteData {
-    data class Quote(val quote: StockQuote) : QuoteData()
-    data class Error(val error: Throwable) : QuoteData()
-  }
-}
+data class QuoteViewState(val symbol: StockSymbol, val quote: StockQuote?) : UiViewState
 
 sealed class QuoteViewEvent : UiViewEvent {
 

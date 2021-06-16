@@ -130,7 +130,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   }
 
   override fun onSelect(index: Int) {
-      publish(PortfolioViewEvent.Manage(index))
+    publish(PortfolioViewEvent.Manage(index))
   }
 
   override fun onRefresh() {
@@ -151,18 +151,8 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     layoutRoot.updatePadding(bottom = offset)
   }
 
-  @CheckResult
-  private fun createQuoteData(pair: QuotedStock): QuoteViewState.QuoteData {
-    return when {
-      pair.quote != null -> QuoteViewState.QuoteData.Quote(requireNotNull(pair.quote))
-      pair.error != null -> QuoteViewState.QuoteData.Error(requireNotNull(pair.error))
-      else ->
-          throw IllegalStateException("Missing quote and error for symbol ${pair.symbol.symbol()}")
-    }
-  }
-
   private fun setList(list: List<QuotedStock>) {
-    val data = list.map { QuoteViewState(symbol = it.symbol, data = createQuoteData(it)) }
+    val data = list.map { QuoteViewState(symbol = it.symbol, quote = it.quote) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }

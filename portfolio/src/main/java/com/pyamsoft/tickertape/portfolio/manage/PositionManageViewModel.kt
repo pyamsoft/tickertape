@@ -50,7 +50,6 @@ internal constructor(
         initialState =
             ManagePortfolioViewState(
                 isLoading = false,
-                error = null,
                 numberOfShares = 0,
                 pricePerShare = 0F.asMoney(),
                 stock = null)) {
@@ -61,12 +60,12 @@ internal constructor(
             stateChange = { copy(isLoading = true) },
             andThen = {
               try {
-                val stock = interactor.getHolding(force, thisHoldingId)
-                setState { copy(error = null, stock = stock, isLoading = false) }
+                val maybeStock = interactor.getHolding(force, thisHoldingId)
+                setState { copy(stock = maybeStock, isLoading = false) }
               } catch (error: Throwable) {
                 error.onActualError { e ->
                   Timber.e(e, "Failed to fetch quotes")
-                  setState { copy(error = e, isLoading = false) }
+                  setState { copy(stock = null, isLoading = false) }
                 }
               }
             })

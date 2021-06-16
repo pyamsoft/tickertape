@@ -54,6 +54,8 @@ internal class PositionManageDialog :
 
   @JvmField @Inject internal var commit: PositionCommit? = null
 
+  @JvmField @Inject internal var quote: PositionQuote? = null
+
   @JvmField @Inject internal var factory: PositionManageViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<PositionManageViewModel> {
     createSavedStateViewModelFactory(factory)
@@ -88,6 +90,7 @@ internal class PositionManageDialog :
     val list = requireNotNull(list)
     val toolbar = requireNotNull(toolbar)
     val holding = requireNotNull(holding)
+    val quote = requireNotNull(quote)
     val commit = requireNotNull(commit)
     val shadow =
         DropshadowView.createTyped<ManagePortfolioViewState, ManagePortfolioViewEvent>(
@@ -103,6 +106,7 @@ internal class PositionManageDialog :
             shareCount,
             holding,
             commit,
+            quote,
             list,
             toolbar,
             shadow) {
@@ -141,8 +145,16 @@ internal class PositionManageDialog :
         constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
       }
 
-      shareCount.also {
+      quote.also {
         connect(it.id(), ConstraintSet.TOP, holding.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
+
+      shareCount.also {
+        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -187,6 +199,25 @@ internal class PositionManageDialog :
   override fun onStart() {
     super.onStart()
     viewModel.handleFetchPortfolio(false)
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    stateSaver?.saveState(outState)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    stateSaver = null
+    factory = null
+
+    priceEntry = null
+    numberOfSharesEntry = null
+    list = null
+    toolbar = null
+    holding = null
+    quote = null
+    commit = null
   }
 
   companion object {

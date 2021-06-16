@@ -52,6 +52,8 @@ internal class PositionManageDialog :
 
   @JvmField @Inject internal var holding: PositionHolding? = null
 
+  @JvmField @Inject internal var commit: PositionCommit? = null
+
   @JvmField @Inject internal var factory: PositionManageViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<PositionManageViewModel> {
     createSavedStateViewModelFactory(factory)
@@ -86,6 +88,7 @@ internal class PositionManageDialog :
     val list = requireNotNull(list)
     val toolbar = requireNotNull(toolbar)
     val holding = requireNotNull(holding)
+    val commit = requireNotNull(commit)
     val shadow =
         DropshadowView.createTyped<ManagePortfolioViewState, ManagePortfolioViewEvent>(
             binding.layoutConstraint)
@@ -99,6 +102,7 @@ internal class PositionManageDialog :
             price,
             shareCount,
             holding,
+            commit,
             list,
             toolbar,
             shadow) {
@@ -110,6 +114,7 @@ internal class PositionManageDialog :
                 viewModel.handleUpdateNumberOfShares(it.number)
             is ManagePortfolioViewEvent.UpdateSharePrice ->
                 viewModel.handleUpdateSharePrice(it.price)
+            is ManagePortfolioViewEvent.Commit -> viewModel.handleCreatePosition()
           }
         }
 
@@ -154,8 +159,16 @@ internal class PositionManageDialog :
         setHorizontalWeight(it.id(), 1F)
       }
 
-      list.also {
+      commit.also {
         connect(it.id(), ConstraintSet.TOP, shareCount.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
+
+      list.also {
+        connect(it.id(), ConstraintSet.TOP, commit.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)

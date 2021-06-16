@@ -44,7 +44,7 @@ class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
             publish(SymbolAddViewEvent.UpdateSymbol(symbol))
             return@create true
           }
-              .apply { handleTeardown() }
+              .apply { handleCreate() }
     }
   }
 

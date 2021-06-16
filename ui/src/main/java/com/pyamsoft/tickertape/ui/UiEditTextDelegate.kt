@@ -22,10 +22,11 @@ import android.widget.EditText
 import androidx.annotation.CheckResult
 import timber.log.Timber
 
+
 class UiEditTextDelegate
 private constructor(
-    private var editText: EditText?,
-    private var onTextChanged: ((String) -> Boolean)?
+  private var editText: EditText?,
+  private var onTextChanged: ((String) -> Boolean)?
 ) {
 
   // NOTE(Peter): Hack because Android does not allow us to use Controlled view components like
@@ -47,7 +48,7 @@ private constructor(
   }
 
   private fun killWatcher() {
-    textWatcher?.also { getEditText().removeTextChangedListener(it) }
+    textWatcher?.also { editText?.removeTextChangedListener(it) }
     textWatcher = null
   }
 
@@ -74,15 +75,30 @@ private constructor(
     onTextChanged = null
   }
 
-  fun handleTextChanged(text: String) {
-    if (initialRenderPerformed) {
-      return
-    }
-
-    initialRenderPerformed = true
+  private fun applyText(text: String, stopIfInitialRenderPerformed: Boolean) {
     if (text.isNotBlank()) {
-      ignoreWatcher { getEditText().setTextKeepState(text) }
+      if (stopIfInitialRenderPerformed) {
+        // Don't keep setting text here as it is too slow
+        if (initialRenderPerformed) {
+          return
+        }
+      }
+
+      initialRenderPerformed = true
+      ignoreWatcher { it.setTextKeepState(text) }
+    } else {
+      // But if the state has been blanked out, clear out the editable
+      initialRenderPerformed = true
+      ignoreWatcher { it.text.clear() }
     }
+  }
+
+  fun forceSetText(text: String) {
+    applyText(text, stopIfInitialRenderPerformed = false)
+  }
+
+  fun handleTextChanged(text: String) {
+    applyText(text, stopIfInitialRenderPerformed = true)
   }
 
   companion object {
@@ -100,9 +116,9 @@ private constructor(
 
     @JvmStatic
     private inline fun ignoreTextWatcher(
-        editText: EditText,
-        textWatcher: TextWatcher,
-        block: (EditText) -> Unit
+      editText: EditText,
+      textWatcher: TextWatcher,
+      block: (EditText) -> Unit
     ) {
       editText.removeTextChangedListener(textWatcher)
       block(editText)
@@ -112,8 +128,8 @@ private constructor(
     @JvmStatic
     @CheckResult
     private inline fun createTextWatcher(
-        editText: EditText,
-        crossinline onChange: (String) -> Boolean
+      editText: EditText,
+      crossinline onChange: (String) -> Boolean
     ): TextWatcher {
       return object : TextWatcher {
 
@@ -134,17 +150,17 @@ private constructor(
         }
 
         override fun beforeTextChanged(
-            s: CharSequence,
-            start: Int,
-            count: Int,
-            after: Int,
+          s: CharSequence,
+          start: Int,
+          count: Int,
+          after: Int,
         ) {}
 
         override fun onTextChanged(
-            s: CharSequence,
-            start: Int,
-            before: Int,
-            count: Int,
+          s: CharSequence,
+          start: Int,
+          before: Int,
+          count: Int,
         ) {}
       }
     }

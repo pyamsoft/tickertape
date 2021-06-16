@@ -52,7 +52,7 @@ class PositionShareCount @Inject internal constructor(parent: ViewGroup) :
             publish(ManagePortfolioViewEvent.UpdateNumberOfShares(numberOfShares))
             return@create true
           }
-              .apply { handleTeardown() }
+              .apply { handleCreate() }
     }
   }
 
@@ -61,6 +61,7 @@ class PositionShareCount @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleNumberOfSharesChanged(numberOfShares: Int) {
-    requireNotNull(delegate).handleTextChanged(numberOfShares.toString())
+    val text = if (numberOfShares == 0) "" else numberOfShares.toString()
+    requireNotNull(delegate).handleTextChanged(text)
   }
 }

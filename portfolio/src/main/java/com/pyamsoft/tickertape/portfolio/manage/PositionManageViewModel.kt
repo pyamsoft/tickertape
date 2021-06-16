@@ -177,6 +177,23 @@ internal constructor(
     setState { copy(pricePerShare = price) }
   }
 
+  fun handleCreatePosition() {
+    val sharePrice = state.pricePerShare
+    val shareCount = state.numberOfShares
+    setState(
+        stateChange = { copy(pricePerShare = 0F.asMoney(), numberOfShares = 0) },
+        andThen = { newState ->
+          val stock = newState.stock
+          if (stock == null) {
+            Timber.w("Cannot create new position, holding is invalid")
+            return@setState
+          }
+
+          interactor.createPosition(
+              id = stock.holding.id(), numberOfShares = shareCount, pricePerShare = sharePrice)
+        })
+  }
+
   @AssistedFactory
   interface Factory : UiSavedStateViewModelProvider<PositionManageViewModel> {
     override fun create(savedState: UiSavedState): PositionManageViewModel

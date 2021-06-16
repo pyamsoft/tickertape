@@ -21,12 +21,15 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.JsonMappableDbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
+import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +45,7 @@ internal constructor(
     private val positionRealtime: PositionRealtime,
     private val positionQueryDao: PositionQueryDao,
     private val positionDeleteDao: PositionDeleteDao,
+    private val positionInsertDao: PositionInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val interactor: QuoteInteractor
 ) {
@@ -50,6 +54,33 @@ internal constructor(
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         positionRealtime.listenForChanges(onChange)
+      }
+
+  @CheckResult
+  suspend fun createPosition(
+      id: DbHolding.Id,
+      numberOfShares: Int,
+      pricePerShare: StockMoneyValue
+  ) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        val holding = holdingQueryDao.query(false).firstOrNull { it.id() == id }
+        if (holding == null) {
+          Timber.w(
+              "Cannot create position for invalid holding: $id $numberOfShares shares at ${pricePerShare.asMoneyValue()}")
+          return@withContext
+        }
+
+        val position =
+            JsonMappableDbPosition.create(
+                holdingId = id,
+                shareCount = numberOfShares,
+                fractionalShareCount = 0F,
+                price = pricePerShare)
+
+        Timber.d("Insert new position into DB: $position")
+        positionInsertDao.insert(position)
       }
 
   @CheckResult

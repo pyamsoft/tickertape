@@ -125,13 +125,13 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
         }
 
         quotePrice.apply {
-          text = "\$${session.price().asMoneyValue()}"
+          text = session.price().asMoneyValue()
           setTextColor(color)
           isVisible = true
         }
 
         quotePercent.apply {
-          text = "(${directionSign}${percent}%)"
+          text = "(${directionSign}${percent})"
           setTextColor(color)
           isVisible = true
         }

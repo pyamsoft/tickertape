@@ -20,5 +20,9 @@ import androidx.annotation.CheckResult
 
 interface StockPercent : StockNumberValue {
 
-  @CheckResult fun percent(): String
+  @CheckResult fun asPercentValue(): String
+
+  @CheckResult fun asFixedValue(): String
+
+  @CheckResult fun value(): Float
 }

@@ -134,8 +134,8 @@ internal constructor(
     val changeAmount = data.changeAmount
     val directionSign = data.directionSign
     val color = data.color
-    val priceText = "\$${session.price().asMoneyValue()}"
-    val percentText = "(${directionSign}${percent}%)"
+    val priceText = session.price().asMoneyValue()
+    val percentText = "(${directionSign}${percent})"
     val changeText = "$directionSign${changeAmount}"
 
     remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol().symbol())

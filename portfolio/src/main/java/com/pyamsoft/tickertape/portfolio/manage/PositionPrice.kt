@@ -54,7 +54,7 @@ class PositionPrice @Inject internal constructor(parent: ViewGroup) :
             publish(ManagePortfolioViewEvent.UpdateSharePrice(sharePrice.asMoney()))
             return@create true
           }
-              .apply { handleTeardown() }
+              .apply { handleCreate() }
     }
   }
 
@@ -64,6 +64,7 @@ class PositionPrice @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleSharePriceChanged(sharePrice: StockMoneyValue) {
     // Don't use asMoneyValue() here since we do not want to include the $ and stuff
-    requireNotNull(delegate).handleTextChanged(sharePrice.value().toString())
+    val text = if (sharePrice.isZero()) "" else sharePrice.value().toString()
+    requireNotNull(delegate).handleTextChanged(text)
   }
 }

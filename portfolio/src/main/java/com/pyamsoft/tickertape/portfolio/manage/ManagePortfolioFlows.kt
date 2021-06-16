@@ -32,6 +32,8 @@ data class ManagePortfolioViewState(
 
 sealed class ManagePortfolioViewEvent : UiViewEvent {
 
+  object Commit : ManagePortfolioViewEvent()
+
   object Close : ManagePortfolioViewEvent()
 
   object ForceRefresh : ManagePortfolioViewEvent()

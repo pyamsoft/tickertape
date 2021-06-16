@@ -23,6 +23,10 @@ internal data class StockMoneyValueImpl(private val value: Float) : StockMoneyVa
   private val money by lazy(LazyThreadSafetyMode.NONE) { "%.2f".format(value) }
 
   override fun asMoneyValue(): String {
+    return "\$${money}"
+  }
+
+  override fun asFixedValue(): String {
     return money
   }
 

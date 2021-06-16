@@ -23,6 +23,8 @@ interface StockMoneyValue : StockNumberValue {
 
   @CheckResult fun asMoneyValue(): String
 
+  @CheckResult fun asFixedValue(): String
+
   @CheckResult fun value(): Float
 }
 

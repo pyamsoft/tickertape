@@ -50,11 +50,11 @@ interface StockMarketSession {
       if (session.direction().isZero()) {
         directionSign = ""
         color = Color.WHITE
-        percent = "0"
+        percent = "0.00"
         changeAmount = "0.00"
       } else {
-        percent = session.percent().percent()
-        changeAmount = session.amount().asMoneyValue()
+        percent = session.percent().asPercentValue()
+        changeAmount = session.amount().asFixedValue()
         if (session.direction().isUp()) {
           directionSign = "+"
           color = Color.GREEN

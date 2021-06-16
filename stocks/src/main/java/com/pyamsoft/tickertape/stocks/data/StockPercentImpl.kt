@@ -22,8 +22,16 @@ internal data class StockPercentImpl(private val percent: Float) : StockPercent 
 
   private val stockPercent by lazy(LazyThreadSafetyMode.NONE) { "%.2f".format(percent) }
 
-  override fun percent(): String {
+  override fun asPercentValue(): String {
+    return "$stockPercent%"
+  }
+
+  override fun asFixedValue(): String {
     return stockPercent
+  }
+
+  override fun value(): Float {
+    return percent
   }
 
   override fun isZero(): Boolean {

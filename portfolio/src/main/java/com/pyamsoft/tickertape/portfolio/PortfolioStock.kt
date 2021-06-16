@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.QuotedStock
@@ -25,4 +26,20 @@ internal constructor(
     val holding: DbHolding,
     val positions: List<DbPosition>,
     val quote: QuotedStock?,
-)
+) {
+
+  @CheckResult
+  fun totalPrice(): Double {
+    return positions.sumOf { it.price().value().toDouble() }
+  }
+
+  @CheckResult
+  fun averagePrice(): Double {
+    return totalPrice() / totalShares()
+  }
+
+  @CheckResult
+  fun totalShares(): Double {
+    return positions.sumOf { it.shareCount() + it.fractionalShareCount().toDouble() }
+  }
+}

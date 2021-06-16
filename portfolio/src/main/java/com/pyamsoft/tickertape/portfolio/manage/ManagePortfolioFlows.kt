@@ -24,7 +24,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
 data class ManagePortfolioViewState(
     val isLoading: Boolean,
-    val error: Throwable?,
     val stock: PortfolioStock?,
     val numberOfShares: Int,
     val pricePerShare: StockMoneyValue,

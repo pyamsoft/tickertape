@@ -26,12 +26,9 @@ import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
-import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
-import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.db.holding.DbHolding
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -60,11 +57,10 @@ internal class PositionsFragment : Fragment(), UiController<HoldingControllerEve
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    val holdingId = DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
     val binding = LayoutFrameBinding.bind(view)
-    Injector.obtainFromApplication<TickerComponent>(view.context)
+    PositionManageDialog.getInjector(this)
         .plusPositionsComponent()
-        .create(this, requireActivity(), viewLifecycleOwner, binding.layoutFrame, holdingId)
+        .create(this, viewLifecycleOwner, binding.layoutFrame)
         .inject(this)
 
     val list = requireNotNull(list)
@@ -84,7 +80,7 @@ internal class PositionsFragment : Fragment(), UiController<HoldingControllerEve
                 viewModel.handleUpdateNumberOfShares(it.number)
             is HoldingViewEvent.UpdateSharePrice -> viewModel.handleUpdateSharePrice(it.price)
             is HoldingViewEvent.Commit -> viewModel.handleCreatePosition()
-              is HoldingViewEvent.ListPositions -> Timber.d("ASDASD")
+            is HoldingViewEvent.ListPositions -> Timber.d("ASDASD")
           }
         }
   }
@@ -94,12 +90,6 @@ internal class PositionsFragment : Fragment(), UiController<HoldingControllerEve
   override fun onStart() {
     super.onStart()
     viewModel.handleFetchPortfolio(false)
-      viewModel.handleEnterSubPage()
-  }
-
-  override fun onStop() {
-    super.onStop()
-      viewModel.handleExitSubPage()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -117,15 +107,12 @@ internal class PositionsFragment : Fragment(), UiController<HoldingControllerEve
 
   companion object {
 
-    private const val KEY_HOLDING_ID = "key_holding_id"
     const val TAG = "PositionsFragment"
 
     @JvmStatic
     @CheckResult
-    fun newInstance(holdingId: DbHolding.Id): Fragment {
-      return PositionsFragment().apply {
-        arguments = Bundle().apply { putString(KEY_HOLDING_ID, holdingId.id) }
-      }
+    fun newInstance(): Fragment {
+      return PositionsFragment().apply { arguments = Bundle().apply {} }
     }
   }
 }

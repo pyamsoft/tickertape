@@ -16,12 +16,11 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.core.FragmentScope
+import com.pyamsoft.tickertape.core.ViewModelFactoryModule
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -29,20 +28,25 @@ import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [PositionsComponent.ComponentModule::class])
-internal interface PositionsComponent {
+@FragmentScope
+@Subcomponent(
+    modules =
+        [
+            ManageComponent.ComponentModule::class,
+            ViewModelFactoryModule::class,
+        ])
+internal interface ManageComponent {
 
-  fun inject(fragment: PositionsFragment)
+  @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
+
+  @CheckResult fun plusHoldingComponent(): HoldingComponent.Factory
+
+  @CheckResult fun plusPositionsComponent(): PositionsComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
-        @BindsInstance owner: LifecycleOwner,
-        @BindsInstance parent: ViewGroup,
-    ): PositionsComponent
+    @CheckResult fun create(@BindsInstance holdingId: DbHolding.Id): ManageComponent
   }
 
   @Module
@@ -50,9 +54,7 @@ internal interface PositionsComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(HoldingViewModel::class)
-    internal abstract fun bindViewModel(
-        impl: HoldingViewModel.Factory
-    ): UiSavedStateViewModelProvider<out ViewModel>
+    @ClassKey(ManagePortfolioViewModel::class)
+    internal abstract fun bindViewModel(impl: ManagePortfolioViewModel): ViewModel
   }
 }

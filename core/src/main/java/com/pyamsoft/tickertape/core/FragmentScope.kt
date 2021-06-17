@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.core
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
+import javax.inject.Scope
 
-data class ManagePortfolioViewState internal constructor(val page: PortfolioPage) : UiViewState
-
-sealed class ManagePortfolioViewEvent : UiViewEvent {
-
-  object Close : ManagePortfolioViewEvent()
-}
-
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHolding : ManagePortfolioControllerEvent()
-
-  object PushPositions : ManagePortfolioControllerEvent()
-}
+@Scope @Retention(AnnotationRetention.RUNTIME) annotation class FragmentScope

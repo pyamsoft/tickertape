@@ -91,10 +91,16 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<ManagePortfolioViewState>) {
-    state.mapChanged { it.isClose }.render(viewScope) { handleCloseState(it) }
+    state.mapChanged { it.page }.render(viewScope) { handleCloseState(it) }
   }
 
-  private fun handleCloseState(isClose: Boolean) {
+  private fun handleCloseState(page: PortfolioPage) {
+    val isClose =
+        when (page) {
+          PortfolioPage.HOLDING -> true
+          else -> false
+        }
+
     if (isClose) {
       loadCustomImage()
     } else {

@@ -32,7 +32,7 @@ import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [HoldingComponent.ComponentModule::class, ThemeProviderModule::class])
+@Subcomponent(modules = [HoldingComponent.ComponentModule::class])
 internal interface HoldingComponent {
 
   fun inject(fragment: HoldingFragment)
@@ -43,10 +43,7 @@ internal interface HoldingComponent {
     @CheckResult
     fun create(
         @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
-        @BindsInstance activity: Activity,
-        @BindsInstance owner: LifecycleOwner,
         @BindsInstance parent: ViewGroup,
-        @BindsInstance holdingId: DbHolding.Id
     ): HoldingComponent
   }
 

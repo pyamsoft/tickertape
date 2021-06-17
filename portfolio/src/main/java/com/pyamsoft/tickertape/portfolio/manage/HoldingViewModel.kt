@@ -19,9 +19,9 @@ package com.pyamsoft.tickertape.portfolio.manage
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.arch.onActualError
-import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -41,13 +41,11 @@ class HoldingViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
-    eventBus: EventBus<IsPortfolioSubpage>,
     private val tapeLauncher: TapeLauncher,
     private val interactor: HoldingInteractor,
     private val thisHoldingId: DbHolding.Id,
 ) :
-    PortfolioSubpageViewModel<HoldingViewState, HoldingControllerEvent>(
-        eventBus,
+    UiSavedStateViewModel<HoldingViewState, HoldingControllerEvent>(
         savedState,
         initialState =
             HoldingViewState(

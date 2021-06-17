@@ -34,10 +34,9 @@ import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
-import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
-import com.pyamsoft.pydroid.ui.util.commitNow
+import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.TickerComponent
@@ -54,6 +53,8 @@ internal class PositionManageDialog :
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
   private val viewModel by fromViewModelFactory<ManagePortfolioViewModel> { factory?.create(this) }
+
+  private var component: ManageComponent? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -88,14 +89,13 @@ internal class PositionManageDialog :
     eatBackButtonPress()
 
     val binding = LayoutConstraintBinding.bind(view)
-    Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusPositionManageComponent()
-        .create(
-            requireToolbarActivity(),
-            requireActivity(),
-            viewLifecycleOwner,
-            binding.layoutConstraint)
-        .inject(this)
+    component =
+        Injector.obtainFromApplication<TickerComponent>(view.context)
+            .plusManageComponent()
+            .create(getHoldingId())
+            .also { c ->
+              c.plusPositionManageComponent().create(binding.layoutConstraint).inject(this)
+            }
 
     val container = requireNotNull(container)
     val toolbar = requireNotNull(toolbar)
@@ -151,6 +151,9 @@ internal class PositionManageDialog :
                 val fm = childFragmentManager
                 if (fm.backStackEntryCount > 0) {
                   fm.popBackStack()
+
+                  // Upon popping, we now restore the default page toolbar state
+                  viewModel.handleLoadDefaultPage()
                 } else {
                   dismiss()
                 }
@@ -159,21 +162,26 @@ internal class PositionManageDialog :
   }
 
   private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
-    childFragmentManager.commitNow(viewLifecycleOwner) {
-      if (appendBackStack) {
-        addToBackStack(null)
+    val fm = childFragmentManager
+    val containerId = requireNotNull(container).id()
+    val existing = fm.findFragmentById(containerId)
+    if (existing == null || existing.tag !== tag) {
+      fm.commit(viewLifecycleOwner) {
+        if (appendBackStack) {
+          addToBackStack(null)
+        }
+        replace(containerId, fragment, tag)
       }
-      replace(requireNotNull(container).id(), fragment, tag)
     }
   }
 
   override fun onControllerEvent(event: ManagePortfolioControllerEvent) {
     return when (event) {
-      is ManagePortfolioControllerEvent.PushHoldingFragment ->
+      is ManagePortfolioControllerEvent.PushHolding ->
+          pushFragment(HoldingFragment.newInstance(), HoldingFragment.TAG, appendBackStack = false)
+      is ManagePortfolioControllerEvent.PushPositions ->
           pushFragment(
-              HoldingFragment.newInstance(getHoldingId()),
-              HoldingFragment.TAG,
-              appendBackStack = false)
+              PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = true)
     }
   }
 
@@ -189,12 +197,26 @@ internal class PositionManageDialog :
 
     toolbar = null
     container = null
+
+    component = null
   }
 
   companion object {
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     const val TAG = "PositionManageDialog"
+
+    @JvmStatic
+    @CheckResult
+    fun getInjector(fragment: Fragment): ManageComponent {
+      val parent = fragment.parentFragment
+      if (parent is PositionManageDialog) {
+        return requireNotNull(parent.component)
+      }
+
+      throw AssertionError(
+          "Cannot call getInjector() from a fragment that does not use PositionManageDialog as it's parent.")
+    }
 
     @JvmStatic
     @CheckResult

@@ -16,4 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-data class IsPortfolioSubpage internal constructor(val isSubPage: Boolean)
+enum class PortfolioPage {
+  HOLDING,
+  POSITIONS
+}

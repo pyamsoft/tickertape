@@ -16,28 +16,37 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiViewModel
-import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.core.FragmentScope
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class ManagePortfolioViewModel
-@Inject
-internal constructor(eventConsumer: EventConsumer<IsPortfolioSubpage>) :
+// Share this single VM between the entire fragment scope, so page is always up to date
+@FragmentScope
+class ManagePortfolioViewModel @Inject internal constructor() :
     UiViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
-        initialState = ManagePortfolioViewState(isClose = true)) {
+        initialState = ManagePortfolioViewState(page = DEFAULT_PAGE)) {
 
-  init {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      eventConsumer.onEvent { event -> setState { copy(isClose = !event.isSubPage) } }
+  fun handleLoadDefaultPage() {
+    loadPage(DEFAULT_PAGE)
+  }
+
+  private fun publishPage() {
+    return when (state.page) {
+      PortfolioPage.HOLDING -> publish(ManagePortfolioControllerEvent.PushHolding)
+      PortfolioPage.POSITIONS -> publish(ManagePortfolioControllerEvent.PushPositions)
     }
   }
 
-  fun handleLoadDefaultPage() {
-    setState(
-        stateChange = { copy(isClose = true) },
-        andThen = { publish(ManagePortfolioControllerEvent.PushHoldingFragment) })
+  private fun loadPage(page: PortfolioPage) {
+    setState(stateChange = { copy(page = page) }, andThen = { publishPage() })
+  }
+
+  fun handleLoadPositionsPage() {
+    loadPage(PortfolioPage.POSITIONS)
+  }
+
+  companion object {
+
+    private val DEFAULT_PAGE = PortfolioPage.HOLDING
   }
 }

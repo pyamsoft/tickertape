@@ -30,11 +30,10 @@ import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
-import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import javax.inject.Inject
 
 internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent> {
@@ -56,12 +55,12 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
     createSavedStateViewModelFactory(factory)
   }
 
-  private var stateSaver: StateSaver? = null
-
-  @CheckResult
-  private fun getHoldingId(): DbHolding.Id {
-    return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+  @JvmField @Inject internal var manageFactory: TickerViewModelFactory? = null
+  private val manageViewModel by fromViewModelFactory<ManagePortfolioViewModel> {
+    manageFactory?.create(this)
   }
+
+  private var stateSaver: StateSaver? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -77,11 +76,11 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    val holdingId = DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
     val binding = LayoutConstraintBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
+    PositionManageDialog.getInjector(this)
         .plusHoldingComponent()
-        .create(this, requireActivity(), viewLifecycleOwner, binding.layoutConstraint, holdingId)
+        .create(this, binding.layoutConstraint)
         .inject(this)
 
     val price = requireNotNull(priceEntry)
@@ -159,10 +158,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
   }
 
   private fun pushPositionListFragment() {
-    parentFragmentManager.commit(viewLifecycleOwner) {
-      addToBackStack(null)
-      add(R.id.main_container, PositionsFragment.newInstance(getHoldingId()), PositionsFragment.TAG)
-    }
+    manageViewModel.handleLoadPositionsPage()
   }
 
   override fun onControllerEvent(event: HoldingControllerEvent) {}
@@ -170,7 +166,6 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
   override fun onStart() {
     super.onStart()
     viewModel.handleFetchPortfolio(false)
-    viewModel.handleExitSubPage()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -193,15 +188,12 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
 
   companion object {
 
-    private const val KEY_HOLDING_ID = "key_holding_id"
     const val TAG = "HoldingFragment"
 
     @JvmStatic
     @CheckResult
-    fun newInstance(holdingId: DbHolding.Id): Fragment {
-      return HoldingFragment().apply {
-        arguments = Bundle().apply { putString(KEY_HOLDING_ID, holdingId.id) }
-      }
+    fun newInstance(): Fragment {
+      return HoldingFragment().apply { arguments = Bundle().apply {} }
     }
   }
 }

@@ -29,11 +29,11 @@ import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
-import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.databinding.LayoutScrollingConstraintBinding
 import javax.inject.Inject
 
 internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent> {
@@ -44,11 +44,13 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
 
   @JvmField @Inject internal var toolbar: ManagePortfolioToolbar? = null
 
-  @JvmField @Inject internal var holding: HoldingInfo? = null
+  @JvmField @Inject internal var info: HoldingInfo? = null
 
   @JvmField @Inject internal var commit: HoldingCommit? = null
 
   @JvmField @Inject internal var quote: HoldingQuote? = null
+
+  @JvmField @Inject internal var summary: HoldingSummary? = null
 
   @JvmField @Inject internal var factory: HoldingViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<HoldingViewModel> {
@@ -67,7 +69,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_constraint, container, false)
+    return inflater.inflate(R.layout.layout_scrolling_constraint, container, false)
   }
 
   override fun onViewCreated(
@@ -76,18 +78,19 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    val binding = LayoutConstraintBinding.bind(view)
+    val binding = LayoutScrollingConstraintBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
     PositionManageDialog.getInjector(this)
         .plusHoldingComponent()
-        .create(this, binding.layoutConstraint)
+        .create(this, binding.nestedConstraint)
         .inject(this)
 
     val price = requireNotNull(priceEntry)
     val shareCount = requireNotNull(numberOfSharesEntry)
-    val holding = requireNotNull(holding)
+    val info = requireNotNull(info)
     val quote = requireNotNull(quote)
     val commit = requireNotNull(commit)
+    val summary = requireNotNull(summary)
 
     stateSaver =
         createComponent(
@@ -97,9 +100,10 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
             this,
             price,
             shareCount,
-            holding,
+            info,
             commit,
             quote,
+            summary,
         ) {
           return@createComponent when (it) {
             is HoldingViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
@@ -112,8 +116,8 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
           }
         }
 
-    binding.layoutConstraint.layout {
-      holding.also {
+    binding.nestedConstraint.layout {
+      info.also {
         connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
@@ -122,7 +126,15 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
       }
 
       quote.also {
-        connect(it.id(), ConstraintSet.TOP, holding.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, info.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
+
+      summary.also {
+        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -130,7 +142,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
       }
 
       shareCount.also {
-        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, summary.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -181,9 +193,10 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
     priceEntry = null
     numberOfSharesEntry = null
     toolbar = null
-    holding = null
+    info = null
     quote = null
     commit = null
+    summary = null
   }
 
   companion object {

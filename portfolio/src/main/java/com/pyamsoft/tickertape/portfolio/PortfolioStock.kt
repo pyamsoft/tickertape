@@ -20,6 +20,10 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShare
 
 data class PortfolioStock
 internal constructor(
@@ -29,17 +33,38 @@ internal constructor(
 ) {
 
   @CheckResult
-  fun totalPrice(): Double {
+  private fun totalPriceValue(): Double {
     return positions.sumOf { it.price().value() }
   }
 
   @CheckResult
-  fun averagePrice(): Double {
-    return totalPrice() / totalShares()
+  fun totalPrice(): StockMoneyValue {
+    return totalPriceValue().asMoney()
   }
 
   @CheckResult
-  fun totalShares(): Double {
+  fun averagePrice(): StockMoneyValue {
+    val shares = totalSharesValue()
+    if (shares.compareTo(0) == 0) {
+      return NO_PRICE
+    }
+
+    val value = totalPriceValue() / shares
+    return value.asMoney()
+  }
+
+  @CheckResult
+  private fun totalSharesValue(): Double {
     return positions.sumOf { it.shareCount().value() }
+  }
+
+  @CheckResult
+  fun totalShares(): StockShareValue {
+    return totalSharesValue().asShare()
+  }
+
+  companion object {
+
+    private val NO_PRICE = 0.0.asMoney()
   }
 }

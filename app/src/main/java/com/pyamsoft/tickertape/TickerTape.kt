@@ -22,11 +22,18 @@ import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
+import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.inject.AlertComponent
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
-import timber.log.Timber
+import javax.inject.Inject
 
 class TickerTape : Application() {
+
+  @Inject @JvmField internal var alerter: Alerter? = null
+
+  @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
 
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
@@ -51,7 +58,7 @@ class TickerTape : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    component.also { Timber.d("Component injected: $it") }
+    component.inject(this)
   }
 
   override fun getSystemService(name: String): Any? {
@@ -63,7 +70,17 @@ class TickerTape : Application() {
   private fun fallbackGetSystemService(name: String): Any? {
     return if (name == TickerComponent::class.java.name) component
     else {
-      super.getSystemService(name)
+      provideModuleDependencies(name) ?: super.getSystemService(name)
+    }
+  }
+
+  @CheckResult
+  private fun provideModuleDependencies(name: String): Any? {
+    return component.run {
+      when (name) {
+        AlertComponent::class.java.name -> plusAlertComponent()
+        else -> null
+      }
     }
   }
 
@@ -77,6 +94,14 @@ class TickerTape : Application() {
       // We are using pydroid-autopsy
       OssLibraries.usingAutopsy = true
 
+        OssLibraries.add(
+            "Room",
+            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
+            "The AndroidX Jetpack Room library. Fluent SQLite database access.")
+        OssLibraries.add(
+            "WorkManager",
+            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/work/",
+            "The AndroidX Jetpack WorkManager library. Schedule periodic work in a device friendly way.")
       OssLibraries.add(
           "Dagger",
           "https://github.com/google/dagger",

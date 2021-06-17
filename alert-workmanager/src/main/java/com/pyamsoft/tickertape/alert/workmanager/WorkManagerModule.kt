@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert
+package com.pyamsoft.tickertape.alert.workmanager
 
-import com.pyamsoft.tickertape.alert.work.Alarm
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.alert.Alerter
+import dagger.Binds
+import dagger.Module
 
-interface Alerter {
+@Module
+abstract class WorkManagerModule {
 
-    suspend fun soundTheAlarm(alarm: Alarm)
-
-    suspend fun scheduleAlarm(alarm: Alarm)
-
-    suspend fun cancelAlarm(alarm: Alarm)
-
-    suspend fun cancel()
+  @Binds @CheckResult internal abstract fun bindButler(impl: WorkManagerAlerter): Alerter
 }

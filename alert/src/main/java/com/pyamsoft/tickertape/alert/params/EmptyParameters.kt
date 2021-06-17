@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert
+package com.pyamsoft.tickertape.alert.params
 
-import com.pyamsoft.tickertape.alert.work.Alarm
-
-interface Alerter {
-
-    suspend fun soundTheAlarm(alarm: Alarm)
-
-    suspend fun scheduleAlarm(alarm: Alarm)
-
-    suspend fun cancelAlarm(alarm: Alarm)
-
-    suspend fun cancel()
-}
+object EmptyParameters : BaseParameters

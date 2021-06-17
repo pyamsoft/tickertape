@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert
+package com.pyamsoft.tickertape.alert.runner
 
-import com.pyamsoft.tickertape.alert.work.Alarm
-
-interface Alerter {
-
-    suspend fun soundTheAlarm(alarm: Alarm)
-
-    suspend fun scheduleAlarm(alarm: Alarm)
-
-    suspend fun cancelAlarm(alarm: Alarm)
-
-    suspend fun cancel()
+sealed class WorkResult(open val id: String) {
+  data class Success internal constructor(override val id: String) : WorkResult(id)
+  data class Cancel internal constructor(override val id: String) : WorkResult(id)
+  data class Failure internal constructor(override val id: String) : WorkResult(id)
 }

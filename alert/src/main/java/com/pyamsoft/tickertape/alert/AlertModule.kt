@@ -20,6 +20,9 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.work.alarm.AlarmFactoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -28,6 +31,8 @@ import javax.inject.Qualifier
 
 @Module
 abstract class AlertModule {
+
+  @Binds @CheckResult internal abstract fun bindAlarmFactory(impl: AlarmFactoryImpl): AlarmFactory
 
   @Module
   companion object {

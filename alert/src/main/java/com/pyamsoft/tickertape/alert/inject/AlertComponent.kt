@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert
+package com.pyamsoft.tickertape.alert.inject
 
-import com.pyamsoft.tickertape.alert.work.Alarm
+import dagger.Subcomponent
 
-interface Alerter {
+@Subcomponent
+interface AlertComponent {
 
-    suspend fun soundTheAlarm(alarm: Alarm)
+  fun inject(injector: RefresherInjector)
 
-    suspend fun scheduleAlarm(alarm: Alarm)
-
-    suspend fun cancelAlarm(alarm: Alarm)
-
-    suspend fun cancel()
+  fun inject(injector: BigMoverInjector)
 }

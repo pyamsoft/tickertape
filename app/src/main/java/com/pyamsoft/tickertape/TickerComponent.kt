@@ -23,6 +23,9 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.alert.AlertModule
+import com.pyamsoft.tickertape.alert.inject.AlertComponent
+import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainActivity
@@ -57,6 +60,8 @@ import javax.inject.Singleton
             DbModule::class,
             RoomModule::class,
             TapeModule::class,
+            AlertModule::class,
+            WorkManagerModule::class,
             UiModule::class])
 internal interface TickerComponent {
 
@@ -70,9 +75,19 @@ internal interface TickerComponent {
   @Suppress("FunctionName")
   fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
 
+  // ===============================================
+  // HACKY INJECTORS
+
+  /* FROM inside BigMoverInjector, RefresherInjector: See TickerTape Injector */
+  @CheckResult fun plusAlertComponent(): AlertComponent
+
+  // ===============================================
+
   fun inject(receiver: BootReceiver)
 
   fun inject(receiver: ScreenReceiver)
+
+  fun inject(application: TickerTape)
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 

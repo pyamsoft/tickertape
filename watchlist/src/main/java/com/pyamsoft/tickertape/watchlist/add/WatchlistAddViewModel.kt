@@ -16,11 +16,13 @@
 
 package com.pyamsoft.tickertape.watchlist.add
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.toSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -36,11 +38,23 @@ internal constructor(
     private val interactor: WatchlistAddInteractor,
 ) : SymbolAddViewModel(savedState) {
 
+  @CheckResult
+  private fun inputToSymbols(input: String): List<StockSymbol> {
+    return input
+        .trim()
+        .split("\\s+".toRegex())
+        .asSequence()
+        .filterNot { it.isBlank() }
+        .map { it.toSymbol() }
+        .toList()
+  }
+
   override fun handleCommitSymbol() {
     val symbol = state.symbol
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
-      interactor.commitSymbol(symbol.toSymbol())
+      val symbols = inputToSymbols(symbol)
+      interactor.commitSymbol(symbols)
       publish(SymbolAddControllerEvent.Close)
     }
   }

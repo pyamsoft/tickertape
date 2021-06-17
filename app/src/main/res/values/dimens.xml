@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <dimen name="remote_view_symbol_max_width">40dp</dimen>
+    <dimen name="remote_view_symbol_max_width">44dp</dimen>
     <dimen name="remote_view_large_text">14sp</dimen>
     <dimen name="remote_view_small_text">12sp</dimen>
 </resources>

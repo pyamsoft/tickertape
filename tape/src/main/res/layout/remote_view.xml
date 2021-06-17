@@ -47,7 +47,7 @@
             android:layout_alignTop="@id/remote_views_symbol1"
             android:layout_marginStart="8dp"
             android:layout_toEndOf="@id/remote_views_symbol1"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_large_text" />
 
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/remote_views_symbol1"
             android:layout_alignStart="@id/remote_views_symbol1"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 
@@ -70,7 +70,7 @@
             android:layout_alignTop="@id/remote_views_change1"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/remote_views_change1"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 
@@ -103,7 +103,7 @@
             android:layout_alignTop="@id/remote_views_symbol2"
             android:layout_marginStart="8dp"
             android:layout_toEndOf="@id/remote_views_symbol2"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_large_text" />
 
@@ -114,7 +114,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/remote_views_symbol2"
             android:layout_alignStart="@id/remote_views_symbol2"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 
@@ -126,7 +126,7 @@
             android:layout_alignTop="@id/remote_views_change2"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/remote_views_change2"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 
@@ -159,7 +159,7 @@
             android:layout_alignTop="@id/remote_views_symbol3"
             android:layout_marginStart="8dp"
             android:layout_toEndOf="@id/remote_views_symbol3"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_large_text" />
 
@@ -170,7 +170,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/remote_views_symbol3"
             android:layout_alignStart="@id/remote_views_symbol3"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 
@@ -182,7 +182,7 @@
             android:layout_alignTop="@id/remote_views_change3"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/remote_views_change3"
-            android:ellipsize="none"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/remote_view_small_text" />
 

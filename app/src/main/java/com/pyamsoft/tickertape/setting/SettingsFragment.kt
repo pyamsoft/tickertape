@@ -22,7 +22,7 @@ import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.ui.settings.AppSettingsFragment
 import com.pyamsoft.pydroid.ui.settings.AppSettingsPreferenceFragment
-import com.pyamsoft.tickertape.ui.applyToolbarOffset
+import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 
 internal class SettingsFragment : AppSettingsFragment() {
 

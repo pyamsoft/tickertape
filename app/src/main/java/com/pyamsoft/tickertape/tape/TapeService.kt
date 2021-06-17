@@ -16,12 +16,10 @@
 
 package com.pyamsoft.tickertape.tape
 
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import androidx.core.content.getSystemService
-import com.pyamsoft.pydroid.ui.Injector
+import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
@@ -30,15 +28,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class TapeService : Service() {
-
-  /** Create and update notificatons */
-  private val notificationManager by lazy {
-    requireNotNull(applicationContext.getSystemService<NotificationManager>())
-  }
 
   /** CoroutineScope for the Service level */
   private val serviceScope = MainScope()
@@ -61,9 +53,7 @@ class TapeService : Service() {
 
     Injector.obtainFromApplication<TickerComponent>(this).plusTapeComponent().create().inject(this)
 
-    Timber.d("Start notification in foreground: $NOTIFICATION_ID")
-    val notification = requireNotNull(tapeRemote).createNotification(notificationManager)
-    startForeground(NOTIFICATION_ID, notification)
+    requireNotNull(tapeRemote).createNotification(this)
 
     screenReceiverRegistration = ScreenReceiver.register(this)
 
@@ -84,12 +74,9 @@ class TapeService : Service() {
     val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
 
     serviceScope.launch(context = Dispatchers.Default) {
-      val options = TapeRemote.NotificationOptions(index = index, forceRefresh = forceRefresh)
-      val notification = requireNotNull(tapeRemote).updateNotification(notificationManager, options)
-      withContext(context = Dispatchers.Main) {
-        Timber.d("Update notification in foreground: $NOTIFICATION_ID $options")
-        notificationManager.notify(NOTIFICATION_ID, notification)
-      }
+      requireNotNull(tapeRemote)
+          .updateNotification(
+              TapeRemote.NotificationOptions(index = index, forceRefresh = forceRefresh))
     }
   }
 
@@ -97,7 +84,8 @@ class TapeService : Service() {
     super.onDestroy()
 
     Timber.d("Stop notification in foreground and kill service")
-    stopForeground(true)
+    requireNotNull(tapeRemote).stopNotification(this)
+
     stopSelf()
 
     screenReceiverRegistration?.unregister()
@@ -108,11 +96,12 @@ class TapeService : Service() {
     }
 
     serviceScope.cancel()
+
+    tapeRemote = null
   }
 
   companion object {
 
     private const val DEFAULT_INDEX = 0
-    private const val NOTIFICATION_ID = 42069
   }
 }

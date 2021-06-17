@@ -21,7 +21,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.DialogFragment
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
-import com.pyamsoft.pydroid.ui.Injector
+import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog

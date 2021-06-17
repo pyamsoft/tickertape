@@ -26,14 +26,14 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.ui.Injector
+import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
+import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
-import com.pyamsoft.tickertape.ui.applyToolbarOffset
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import javax.inject.Inject
 

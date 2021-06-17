@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.alert.work.alarm
 
-import android.app.Service
+import com.pyamsoft.tickertape.alert.work.Alarm
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 
-interface TapeRemote {
+@Singleton
+internal class AlarmFactoryImpl @Inject internal constructor() : AlarmFactory {
 
-  fun createNotification(service: Service)
+  override fun bigMoverAlarm(): Alarm {
+    return BigMoverAlarm()
+  }
 
-  suspend fun updateNotification(options: NotificationOptions)
-
-  fun stopNotification(service: Service)
-
-  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
-
-  companion object {
-
-    const val KEY_CURRENT_INDEX = "key_current_index"
-    const val KEY_FORCE_REFRESH = "key_force_refresh"
+  override fun refresherAlarm(): Alarm {
+    return RefresherAlarm()
   }
 }

@@ -16,21 +16,8 @@
 
 package com.pyamsoft.tickertape.tape
 
-import android.app.Service
+import com.pyamsoft.pydroid.notify.NotifyData
+import com.pyamsoft.tickertape.quote.QuotedStock
 
-interface TapeRemote {
-
-  fun createNotification(service: Service)
-
-  suspend fun updateNotification(options: NotificationOptions)
-
-  fun stopNotification(service: Service)
-
-  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
-
-  companion object {
-
-    const val KEY_CURRENT_INDEX = "key_current_index"
-    const val KEY_FORCE_REFRESH = "key_force_refresh"
-  }
-}
+data class TapeNotificationData
+internal constructor(val quotes: List<QuotedStock>, val index: Int) : NotifyData

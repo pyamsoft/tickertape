@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.alert.work.alarm
 
-import android.app.Service
+import com.pyamsoft.tickertape.alert.work.Alarm
+import com.pyamsoft.tickertape.alert.work.AlarmParameters
+import java.util.concurrent.TimeUnit
 
-interface TapeRemote {
+class RefresherAlarm internal constructor() : Alarm {
 
-  fun createNotification(service: Service)
+  override suspend fun tag(): String {
+    return "Refresher Alarm 1"
+  }
 
-  suspend fun updateNotification(options: NotificationOptions)
+  override suspend fun parameters(): AlarmParameters {
+    return AlarmParameters.empty()
+  }
 
-  fun stopNotification(service: Service)
-
-  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
-
-  companion object {
-
-    const val KEY_CURRENT_INDEX = "key_current_index"
-    const val KEY_FORCE_REFRESH = "key_force_refresh"
+  override suspend fun period(): Long {
+    return TimeUnit.MINUTES.toMillis(15)
   }
 }

@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.alert.work
 
-import android.app.Service
+import androidx.annotation.CheckResult
 
-interface TapeRemote {
+interface Alarm {
 
-  fun createNotification(service: Service)
+  @CheckResult suspend fun tag(): String
 
-  suspend fun updateNotification(options: NotificationOptions)
+  @CheckResult suspend fun parameters(): AlarmParameters
 
-  fun stopNotification(service: Service)
-
-  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
-
-  companion object {
-
-    const val KEY_CURRENT_INDEX = "key_current_index"
-    const val KEY_FORCE_REFRESH = "key_force_refresh"
-  }
+  @CheckResult suspend fun period(): Long
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "9dc93aceb4d17bde0f9c59d506c3c669",
+    "identityHash": "5ea82704377bfe59289e92b443c55664",
     "entities": [
       {
         "tableName": "room_symbol_table",
@@ -58,7 +58,7 @@
       },
       {
         "tableName": "room_position_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `price` REAL NOT NULL, `share_count` INTEGER NOT NULL, `fractional_share_count` REAL NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `price` REAL NOT NULL, `share_count` REAL NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -81,12 +81,6 @@
           {
             "fieldPath": "shareCount",
             "columnName": "share_count",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fractionalShareCount",
-            "columnName": "fractional_share_count",
             "affinity": "REAL",
             "notNull": true
           }
@@ -125,7 +119,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9dc93aceb4d17bde0f9c59d506c3c669')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5ea82704377bfe59289e92b443c55664')"
     ]
   }
 }

@@ -40,6 +40,6 @@ internal constructor(
 
   @CheckResult
   fun totalShares(): Double {
-    return positions.sumOf { it.shareCount() + it.fractionalShareCount().toDouble() }
+    return positions.sumOf { it.shareCount().toDouble() }
   }
 }

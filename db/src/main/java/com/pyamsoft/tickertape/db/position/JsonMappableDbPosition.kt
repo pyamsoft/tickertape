@@ -27,8 +27,7 @@ data class JsonMappableDbPosition
 internal constructor(
     internal val id: DbPosition.Id,
     internal val holdingId: DbHolding.Id,
-    internal val shareCount: Int,
-    internal val fractionalShareCount: Float,
+    internal val shareCount: Float,
     internal val price: StockMoneyValue
 ) : DbPosition {
 
@@ -40,12 +39,8 @@ internal constructor(
     return holdingId
   }
 
-  override fun shareCount(): Int {
+  override fun shareCount(): Float {
     return shareCount
-  }
-
-  override fun fractionalShareCount(): Float {
-    return fractionalShareCount
   }
 
   override fun price(): StockMoneyValue {
@@ -56,17 +51,11 @@ internal constructor(
 
     @JvmStatic
     @CheckResult
-    fun create(
-        holdingId: DbHolding.Id,
-        shareCount: Int,
-        fractionalShareCount: Float,
-        price: StockMoneyValue
-    ): DbPosition {
+    fun create(holdingId: DbHolding.Id, shareCount: Float, price: StockMoneyValue): DbPosition {
       return JsonMappableDbPosition(
           id = DbPosition.Id(IdGenerator.generate()),
           holdingId = holdingId,
           shareCount = shareCount,
-          fractionalShareCount = fractionalShareCount,
           price = price)
     }
 
@@ -75,12 +64,7 @@ internal constructor(
     fun from(item: DbPosition): JsonMappableDbPosition {
       return if (item is JsonMappableDbPosition) item
       else {
-        JsonMappableDbPosition(
-            item.id(),
-            item.holdingId(),
-            item.shareCount(),
-            item.fractionalShareCount(),
-            item.price())
+        JsonMappableDbPosition(item.id(), item.holdingId(), item.shareCount(), item.price())
       }
     }
   }

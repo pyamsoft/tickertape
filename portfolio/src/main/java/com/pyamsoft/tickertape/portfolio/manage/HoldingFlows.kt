@@ -25,7 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 data class HoldingViewState(
     val isLoading: Boolean,
     val stock: PortfolioStock?,
-    val numberOfShares: Int,
+    val numberOfShares: Float,
     val pricePerShare: StockMoneyValue,
 ) : UiViewState
 
@@ -39,7 +39,7 @@ sealed class HoldingViewEvent : UiViewEvent {
 
   data class Remove internal constructor(val index: Int) : HoldingViewEvent()
 
-  data class UpdateNumberOfShares internal constructor(val number: Int) : HoldingViewEvent()
+  data class UpdateNumberOfShares internal constructor(val number: Float) : HoldingViewEvent()
 
   data class UpdateSharePrice internal constructor(val price: StockMoneyValue) : HoldingViewEvent()
 }

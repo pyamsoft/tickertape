@@ -28,9 +28,7 @@ interface DbPosition {
 
   @CheckResult fun price(): StockMoneyValue
 
-  @CheckResult fun shareCount(): Int
-
-  @CheckResult fun fractionalShareCount(): Float
+  @CheckResult fun shareCount(): Float
 
   data class Id(val id: String) {
 

@@ -50,7 +50,7 @@ internal constructor(
         initialState =
             HoldingViewState(
                 isLoading = false,
-                numberOfShares = 0,
+                numberOfShares = 0F,
                 pricePerShare = 0F.asMoney(),
                 stock = null)) {
 
@@ -169,7 +169,7 @@ internal constructor(
     }
   }
 
-  fun handleUpdateNumberOfShares(number: Int) {
+  fun handleUpdateNumberOfShares(number: Float) {
     setState { copy(numberOfShares = number) }
   }
 
@@ -181,7 +181,7 @@ internal constructor(
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
     setState(
-        stateChange = { copy(pricePerShare = 0F.asMoney(), numberOfShares = 0) },
+        stateChange = { copy(pricePerShare = 0F.asMoney(), numberOfShares = 0F) },
         andThen = { newState ->
           val stock = newState.stock
           if (stock == null) {

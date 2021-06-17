@@ -40,8 +40,7 @@ internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbPosition.Id,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_PRICE) val price: StockMoneyValue,
-    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: Int,
-    @JvmField @ColumnInfo(name = COLUMN_FRACTIONAL_SHARE_COUNT) val fractionalShareCount: Float
+    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: Float,
 ) : DbPosition {
 
   @Ignore
@@ -60,13 +59,8 @@ internal constructor(
   }
 
   @Ignore
-  override fun shareCount(): Int {
+  override fun shareCount(): Float {
     return shareCount
-  }
-
-  @Ignore
-  override fun fractionalShareCount(): Float {
-    return fractionalShareCount
   }
 
   companion object {
@@ -81,8 +75,6 @@ internal constructor(
 
     @Ignore internal const val COLUMN_SHARE_COUNT = "share_count"
 
-    @Ignore internal const val COLUMN_FRACTIONAL_SHARE_COUNT = "fractional_share_count"
-
     @Ignore
     @JvmStatic
     @CheckResult
@@ -94,7 +86,7 @@ internal constructor(
             item.holdingId(),
             item.price(),
             item.shareCount(),
-            item.fractionalShareCount())
+        )
       }
     }
   }

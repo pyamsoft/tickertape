@@ -62,13 +62,12 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleTotalChanged(position: DbPosition) {
-    val totalValue =
-        (position.shareCount() + position.fractionalShareCount()) * position.price().value()
+    val totalValue = position.shareCount() * position.price().value()
     val total = totalValue.asMoney()
     binding.positionItemTotal.text = total.asMoneyValue()
   }
 
-  private fun handleShareCountChanged(shareCount: Int) {
+  private fun handleShareCountChanged(shareCount: Float) {
     binding.positionItemNumberOfShares.text = shareCount.toString()
   }
 

@@ -59,7 +59,7 @@ internal constructor(
   @CheckResult
   suspend fun createPosition(
       id: DbHolding.Id,
-      numberOfShares: Int,
+      numberOfShares: Float,
       pricePerShare: StockMoneyValue
   ) =
       withContext(context = Dispatchers.IO) {
@@ -74,10 +74,7 @@ internal constructor(
 
         val position =
             JsonMappableDbPosition.create(
-                holdingId = id,
-                shareCount = numberOfShares,
-                fractionalShareCount = 0F,
-                price = pricePerShare)
+                holdingId = id, shareCount = numberOfShares, price = pricePerShare)
 
         Timber.d("Insert new position into DB: $position")
         positionInsertDao.insert(position)

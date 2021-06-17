@@ -42,7 +42,7 @@ class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
     doOnInflate {
       delegate =
           UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
-            val numberOfShares = numberString.toIntOrNull()
+            val numberOfShares = numberString.toFloatOrNull()
             if (numberOfShares == null) {
               Timber.w("Invalid numberOfShares $numberString")
               return@create false
@@ -59,8 +59,8 @@ class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
   }
 
-  private fun handleNumberOfSharesChanged(numberOfShares: Int) {
-    val text = if (numberOfShares == 0) "" else numberOfShares.toString()
+  private fun handleNumberOfSharesChanged(numberOfShares: Float) {
+    val text = if (numberOfShares == 0F) "" else numberOfShares.toString()
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

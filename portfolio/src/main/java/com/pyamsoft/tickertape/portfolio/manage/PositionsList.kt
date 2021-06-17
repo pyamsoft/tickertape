@@ -45,7 +45,7 @@ internal constructor(
     owner: LifecycleOwner,
     factory: PositionItemComponent.Factory
 ) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PortfolioListBinding>(parent),
+    BaseUiView<HoldingViewState, HoldingViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
     PositionItemAdapter.Callback {
 
@@ -135,14 +135,14 @@ internal constructor(
   }
 
   override fun onRefresh() {
-    publish(ManagePortfolioViewEvent.ForceRefresh)
+    publish(HoldingViewEvent.ForceRefresh)
   }
 
   override fun onRemove(index: Int) {
-    publish(ManagePortfolioViewEvent.Remove(index))
+    publish(HoldingViewEvent.Remove(index))
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+  override fun onRender(state: UiRender<HoldingViewState>) {
     state.mapChanged { it.stock }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }

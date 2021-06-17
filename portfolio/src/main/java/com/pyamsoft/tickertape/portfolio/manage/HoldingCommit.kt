@@ -20,31 +20,38 @@ import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
-import com.pyamsoft.tickertape.portfolio.databinding.PositionCommitBinding
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingCommitBinding
 import javax.inject.Inject
 
-class PositionCommit @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PositionCommitBinding>(parent) {
+class HoldingCommit @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingCommitBinding>(parent) {
 
-  override val viewBinding = PositionCommitBinding::inflate
+  override val viewBinding = HoldingCommitBinding::inflate
 
   override val layoutRoot by boundView { positionCommitRoot }
 
   init {
     doOnInflate {
-      binding.positionCommit.setOnDebouncedClickListener {
-        publish(ManagePortfolioViewEvent.Commit)
+      binding.positionCommit.setOnDebouncedClickListener { publish(HoldingViewEvent.Commit) }
+    }
+
+    doOnInflate {
+      binding.positionCommit.setOnLongClickListener {
+        publish(HoldingViewEvent.ListPositions)
+        return@setOnLongClickListener true
       }
     }
+
+    doOnTeardown { binding.positionCommit.setOnLongClickListener(null) }
 
     doOnTeardown { binding.positionCommit.setOnDebouncedClickListener(null) }
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+  override fun onRender(state: UiRender<HoldingViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStateChanged(state: ManagePortfolioViewState) {
+  private fun handleStateChanged(state: HoldingViewState) {
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
     val isEntered = shareCount > 0 && sharePrice.value() > 0

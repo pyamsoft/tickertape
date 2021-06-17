@@ -29,7 +29,10 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
+import com.pyamsoft.tickertape.portfolio.manage.HoldingComponent
+import com.pyamsoft.tickertape.portfolio.manage.ManagePortfolioModule
 import com.pyamsoft.tickertape.portfolio.manage.PositionManageComponent
+import com.pyamsoft.tickertape.portfolio.manage.PositionsComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemComponent
 import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -55,7 +58,8 @@ import javax.inject.Singleton
             StockModule::class,
             DbModule::class,
             RoomModule::class,
-            UiModule::class])
+            UiModule::class,
+            ManagePortfolioModule::class])
 internal interface TickerComponent {
 
   /** Not actually used, just here so graph can compile */
@@ -79,6 +83,10 @@ internal interface TickerComponent {
   @CheckResult fun plusPortfolioAddComponent(): PortfolioAddComponent.Factory
 
   @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
+
+  @CheckResult fun plusHoldingComponent(): HoldingComponent.Factory
+
+  @CheckResult fun plusPositionsComponent(): PositionsComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

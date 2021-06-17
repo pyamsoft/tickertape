@@ -19,16 +19,15 @@ package com.pyamsoft.tickertape.portfolio.manage
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.PositionShareCountBinding
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingShareCountEntryBinding
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
 import timber.log.Timber
 
-class PositionShareCount @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PositionShareCountBinding>(
-        parent) {
+class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingShareCountEntryBinding>(parent) {
 
-  override val viewBinding = PositionShareCountBinding::inflate
+  override val viewBinding = HoldingShareCountEntryBinding::inflate
 
   override val layoutRoot by boundView { positionNumberOfSharesRoot }
 
@@ -49,14 +48,14 @@ class PositionShareCount @Inject internal constructor(parent: ViewGroup) :
               return@create false
             }
 
-            publish(ManagePortfolioViewEvent.UpdateNumberOfShares(numberOfShares))
+            publish(HoldingViewEvent.UpdateNumberOfShares(numberOfShares))
             return@create true
           }
               .apply { handleCreate() }
     }
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+  override fun onRender(state: UiRender<HoldingViewState>) {
     state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
   }
 

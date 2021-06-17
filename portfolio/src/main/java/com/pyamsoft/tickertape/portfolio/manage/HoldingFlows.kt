@@ -19,15 +19,29 @@ package com.pyamsoft.tickertape.portfolio.manage
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
-data class ManagePortfolioViewState internal constructor(val isClose: Boolean) : UiViewState
+data class HoldingViewState(
+    val isLoading: Boolean,
+    val stock: PortfolioStock?,
+    val numberOfShares: Int,
+    val pricePerShare: StockMoneyValue,
+) : UiViewState
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+sealed class HoldingViewEvent : UiViewEvent {
 
-  object Close : ManagePortfolioViewEvent()
+  object ListPositions : HoldingViewEvent()
+
+  object Commit : HoldingViewEvent()
+
+  object ForceRefresh : HoldingViewEvent()
+
+  data class Remove internal constructor(val index: Int) : HoldingViewEvent()
+
+  data class UpdateNumberOfShares internal constructor(val number: Int) : HoldingViewEvent()
+
+  data class UpdateSharePrice internal constructor(val price: StockMoneyValue) : HoldingViewEvent()
 }
 
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHoldingFragment : ManagePortfolioControllerEvent()
-}
+sealed class HoldingControllerEvent : UiControllerEvent

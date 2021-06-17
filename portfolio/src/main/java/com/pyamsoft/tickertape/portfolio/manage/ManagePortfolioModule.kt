@@ -16,18 +16,32 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
-data class ManagePortfolioViewState internal constructor(val isClose: Boolean) : UiViewState
+@Module
+abstract class ManagePortfolioModule {
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+  @Binds
+  @CheckResult
+  internal abstract fun bindIsSubPageConsumer(
+      impl: EventBus<IsPortfolioSubpage>
+  ): EventConsumer<IsPortfolioSubpage>
 
-  object Close : ManagePortfolioViewEvent()
-}
+  @Module
+  companion object {
 
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHoldingFragment : ManagePortfolioControllerEvent()
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideIsSubPageBus(): EventBus<IsPortfolioSubpage> {
+      return EventBus.create(emitOnlyWhenActive = false)
+    }
+  }
 }

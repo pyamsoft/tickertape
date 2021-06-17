@@ -19,15 +19,15 @@ package com.pyamsoft.tickertape.portfolio.manage
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.PositionHoldingBinding
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingInfoBinding
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
-class PositionHolding @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PositionHoldingBinding>(parent) {
+class HoldingInfo @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingInfoBinding>(parent) {
 
-  override val viewBinding = PositionHoldingBinding::inflate
+  override val viewBinding = HoldingInfoBinding::inflate
 
   override val layoutRoot by boundView { positionHoldingRoot }
 
@@ -35,7 +35,7 @@ class PositionHolding @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { clear() }
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+  override fun onRender(state: UiRender<HoldingViewState>) {
     state.mapChanged { it.stock }.mapChanged { it?.quote }.mapChanged { it?.symbol }.render(
         viewScope) { handleSymbolChanged(it) }
 

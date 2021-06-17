@@ -21,8 +21,9 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import com.pyamsoft.pydroid.ui.app.ToolbarActivity
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -31,27 +32,22 @@ import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            PositionManageComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
-internal interface PositionManageComponent {
+@Subcomponent(modules = [PositionsComponent.ComponentModule::class, ThemeProviderModule::class])
+internal interface PositionsComponent {
 
-  fun inject(dialog: PositionManageDialog)
+  fun inject(fragment: PositionsFragment)
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance toolbarActivity: ToolbarActivity,
+        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
         @BindsInstance activity: Activity,
         @BindsInstance owner: LifecycleOwner,
         @BindsInstance parent: ViewGroup,
-    ): PositionManageComponent
+        @BindsInstance holdingId: DbHolding.Id
+    ): PositionsComponent
   }
 
   @Module
@@ -59,7 +55,9 @@ internal interface PositionManageComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(ManagePortfolioViewModel::class)
-    internal abstract fun bindViewModel(impl: ManagePortfolioViewModel): ViewModel
+    @ClassKey(HoldingViewModel::class)
+    internal abstract fun bindViewModel(
+        impl: HoldingViewModel.Factory
+    ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

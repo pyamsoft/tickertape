@@ -22,16 +22,16 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.PositionQuoteBinding
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingQuoteBinding
 import com.pyamsoft.tickertape.quote.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 
-class PositionQuote @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, PositionQuoteBinding>(parent) {
+class HoldingQuote @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingQuoteBinding>(parent) {
 
-  override val viewBinding = PositionQuoteBinding::inflate
+  override val viewBinding = HoldingQuoteBinding::inflate
 
   override val layoutRoot by boundView { positionQuoteRoot }
 
@@ -46,7 +46,7 @@ class PositionQuote @Inject internal constructor(parent: ViewGroup) :
     clearSession(binding.positionQuoteNormalSession)
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+  override fun onRender(state: UiRender<HoldingViewState>) {
     state.mapChanged { it.stock }.mapChanged { it?.quote }.mapChanged { it?.quote }.render(
         viewScope) { handleQuoteChanged(it) }
   }

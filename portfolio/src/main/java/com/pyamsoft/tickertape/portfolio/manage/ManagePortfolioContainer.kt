@@ -16,18 +16,17 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
+import android.view.ViewGroup
+import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.tickertape.main.MainViewEvent
+import com.pyamsoft.tickertape.main.MainViewState
+import com.pyamsoft.tickertape.main.databinding.MainContainerBinding
+import javax.inject.Inject
 
-data class ManagePortfolioViewState internal constructor(val isClose: Boolean) : UiViewState
+class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, MainContainerBinding>(parent) {
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+  override val viewBinding = MainContainerBinding::inflate
 
-  object Close : ManagePortfolioViewEvent()
-}
-
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHoldingFragment : ManagePortfolioControllerEvent()
+  override val layoutRoot by boundView { mainContainer }
 }

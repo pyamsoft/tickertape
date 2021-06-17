@@ -16,18 +16,4 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-
-data class ManagePortfolioViewState internal constructor(val isClose: Boolean) : UiViewState
-
-sealed class ManagePortfolioViewEvent : UiViewEvent {
-
-  object Close : ManagePortfolioViewEvent()
-}
-
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHoldingFragment : ManagePortfolioControllerEvent()
-}
+data class IsPortfolioSubpage internal constructor(val isSubPage: Boolean)

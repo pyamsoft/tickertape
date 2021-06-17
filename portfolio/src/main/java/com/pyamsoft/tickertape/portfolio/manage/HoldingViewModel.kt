@@ -19,9 +19,9 @@ package com.pyamsoft.tickertape.portfolio.manage
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.arch.onActualError
+import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -37,18 +37,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class PositionManageViewModel
+class HoldingViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
+    eventBus: EventBus<IsPortfolioSubpage>,
     private val tapeLauncher: TapeLauncher,
-    private val interactor: PositionInteractor,
+    private val interactor: HoldingInteractor,
     private val thisHoldingId: DbHolding.Id,
 ) :
-    UiSavedStateViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
+    PortfolioSubpageViewModel<HoldingViewState, HoldingControllerEvent>(
+        eventBus,
         savedState,
         initialState =
-            ManagePortfolioViewState(
+            HoldingViewState(
                 isLoading = false,
                 numberOfShares = 0,
                 pricePerShare = 0F.asMoney(),
@@ -76,6 +78,7 @@ internal constructor(
       interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
     }
   }
+
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
     return when (event) {
       is PositionChangeEvent.Delete -> handleDeletePosition(event.position, event.offerUndo)
@@ -194,7 +197,7 @@ internal constructor(
   }
 
   @AssistedFactory
-  interface Factory : UiSavedStateViewModelProvider<PositionManageViewModel> {
-    override fun create(savedState: UiSavedState): PositionManageViewModel
+  interface Factory : UiSavedStateViewModelProvider<HoldingViewModel> {
+    override fun create(savedState: UiSavedState): HoldingViewModel
   }
 }

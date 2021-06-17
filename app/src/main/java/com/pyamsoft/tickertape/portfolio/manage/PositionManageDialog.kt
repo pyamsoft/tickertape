@@ -16,52 +16,60 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CheckResult
+import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.ui.Injector
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
+import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
+import com.pyamsoft.pydroid.ui.util.commitNow
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import javax.inject.Inject
 
 internal class PositionManageDialog :
     AppCompatDialogFragment(), UiController<ManagePortfolioControllerEvent> {
 
-  @JvmField @Inject internal var priceEntry: PositionPrice? = null
+  @JvmField @Inject internal var toolbar: ManagePortfolioToolbar? = null
 
-  @JvmField @Inject internal var numberOfSharesEntry: PositionShareCount? = null
+  @JvmField @Inject internal var container: ManagePortfolioContainer? = null
 
-  @JvmField @Inject internal var toolbar: PositionToolbar? = null
-
-  @JvmField @Inject internal var list: PositionsList? = null
-
-  @JvmField @Inject internal var holding: PositionHolding? = null
-
-  @JvmField @Inject internal var commit: PositionCommit? = null
-
-  @JvmField @Inject internal var quote: PositionQuote? = null
-
-  @JvmField @Inject internal var factory: PositionManageViewModel.Factory? = null
-  private val viewModel by fromViewModelFactory<PositionManageViewModel> {
-    createSavedStateViewModelFactory(factory)
-  }
+  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
+  private val viewModel by fromViewModelFactory<ManagePortfolioViewModel> { factory?.create(this) }
 
   private var stateSaver: StateSaver? = null
+
+  @CheckResult
+  private fun getHoldingId(): DbHolding.Id {
+    return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+  }
+
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    return object : AppCompatDialog(requireActivity(), theme) {
+
+      override fun onBackPressed() {
+        requireActivity().onBackPressed()
+      }
+    }
+  }
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -77,48 +85,29 @@ internal class PositionManageDialog :
   ) {
     super.onViewCreated(view, savedInstanceState)
     makeFullscreen()
+    eatBackButtonPress()
 
-    val holdingId = DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
     val binding = LayoutConstraintBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusPositionManageComponent()
-        .create(this, requireActivity(), viewLifecycleOwner, binding.layoutConstraint, holdingId)
+        .create(
+            requireToolbarActivity(),
+            requireActivity(),
+            viewLifecycleOwner,
+            binding.layoutConstraint)
         .inject(this)
 
-    val price = requireNotNull(priceEntry)
-    val shareCount = requireNotNull(numberOfSharesEntry)
-    val list = requireNotNull(list)
+    val container = requireNotNull(container)
     val toolbar = requireNotNull(toolbar)
-    val holding = requireNotNull(holding)
-    val quote = requireNotNull(quote)
-    val commit = requireNotNull(commit)
     val shadow =
         DropshadowView.createTyped<ManagePortfolioViewState, ManagePortfolioViewEvent>(
             binding.layoutConstraint)
 
     stateSaver =
         createComponent(
-            savedInstanceState,
-            viewLifecycleOwner,
-            viewModel,
-            this,
-            price,
-            shareCount,
-            holding,
-            commit,
-            quote,
-            list,
-            toolbar,
-            shadow) {
+            savedInstanceState, viewLifecycleOwner, viewModel, this, container, toolbar, shadow) {
           return@createComponent when (it) {
-            is ManagePortfolioViewEvent.Close -> dismiss()
-            is ManagePortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
-            is ManagePortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
-            is ManagePortfolioViewEvent.UpdateNumberOfShares ->
-                viewModel.handleUpdateNumberOfShares(it.number)
-            is ManagePortfolioViewEvent.UpdateSharePrice ->
-                viewModel.handleUpdateSharePrice(it.price)
-            is ManagePortfolioViewEvent.Commit -> viewModel.handleCreatePosition()
+            is ManagePortfolioViewEvent.Close -> requireActivity().onBackPressed()
           }
         }
 
@@ -137,50 +126,8 @@ internal class PositionManageDialog :
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
       }
 
-      holding.also {
+      container.also {
         connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
-      quote.also {
-        connect(it.id(), ConstraintSet.TOP, holding.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
-      shareCount.also {
-        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-        setHorizontalWeight(it.id(), 1F)
-      }
-
-      price.also {
-        connect(it.id(), ConstraintSet.TOP, shareCount.id(), ConstraintSet.TOP)
-        connect(it.id(), ConstraintSet.START, shareCount.id(), ConstraintSet.END)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-        setHorizontalWeight(it.id(), 1F)
-      }
-
-      commit.also {
-        connect(it.id(), ConstraintSet.TOP, shareCount.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
-      list.also {
-        connect(it.id(), ConstraintSet.TOP, commit.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
@@ -188,17 +135,46 @@ internal class PositionManageDialog :
         constrainHeight(it.id(), ConstraintSet.MATCH_CONSTRAINT)
       }
     }
+
+    if (savedInstanceState == null) {
+      viewModel.handleLoadDefaultPage()
+    }
+  }
+
+  private fun eatBackButtonPress() {
+    requireActivity()
+        .onBackPressedDispatcher
+        .addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+              override fun handleOnBackPressed() {
+                val fm = childFragmentManager
+                if (fm.backStackEntryCount > 0) {
+                  fm.popBackStack()
+                } else {
+                  dismiss()
+                }
+              }
+            })
+  }
+
+  private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
+    childFragmentManager.commitNow(viewLifecycleOwner) {
+      if (appendBackStack) {
+        addToBackStack(null)
+      }
+      replace(requireNotNull(container).id(), fragment, tag)
+    }
   }
 
   override fun onControllerEvent(event: ManagePortfolioControllerEvent) {
     return when (event) {
-      is ManagePortfolioControllerEvent.Close -> dismiss()
+      is ManagePortfolioControllerEvent.PushHoldingFragment ->
+          pushFragment(
+              HoldingFragment.newInstance(getHoldingId()),
+              HoldingFragment.TAG,
+              appendBackStack = false)
     }
-  }
-
-  override fun onStart() {
-    super.onStart()
-    viewModel.handleFetchPortfolio(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -211,13 +187,8 @@ internal class PositionManageDialog :
     stateSaver = null
     factory = null
 
-    priceEntry = null
-    numberOfSharesEntry = null
-    list = null
     toolbar = null
-    holding = null
-    quote = null
-    commit = null
+    container = null
   }
 
   companion object {

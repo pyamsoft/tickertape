@@ -30,6 +30,7 @@ import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +60,7 @@ internal constructor(
   @CheckResult
   suspend fun createPosition(
       id: DbHolding.Id,
-      numberOfShares: Float,
+      numberOfShares: StockShareValue,
       pricePerShare: StockMoneyValue
   ) =
       withContext(context = Dispatchers.IO) {

@@ -30,7 +30,7 @@ internal constructor(
 
   @CheckResult
   fun totalPrice(): Double {
-    return positions.sumOf { it.price().value().toDouble() }
+    return positions.sumOf { it.price().value() }
   }
 
   @CheckResult
@@ -40,6 +40,6 @@ internal constructor(
 
   @CheckResult
   fun totalShares(): Double {
-    return positions.sumOf { it.shareCount().toDouble() }
+    return positions.sumOf { it.shareCount().value() }
   }
 }

@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -27,7 +28,7 @@ data class JsonMappableDbPosition
 internal constructor(
     internal val id: DbPosition.Id,
     internal val holdingId: DbHolding.Id,
-    internal val shareCount: Float,
+    internal val shareCount: StockShareValue,
     internal val price: StockMoneyValue
 ) : DbPosition {
 
@@ -39,7 +40,7 @@ internal constructor(
     return holdingId
   }
 
-  override fun shareCount(): Float {
+  override fun shareCount(): StockShareValue {
     return shareCount
   }
 
@@ -51,7 +52,11 @@ internal constructor(
 
     @JvmStatic
     @CheckResult
-    fun create(holdingId: DbHolding.Id, shareCount: Float, price: StockMoneyValue): DbPosition {
+    fun create(
+        holdingId: DbHolding.Id,
+        shareCount: StockShareValue,
+        price: StockMoneyValue
+    ): DbPosition {
       return JsonMappableDbPosition(
           id = DbPosition.Id(IdGenerator.generate()),
           holdingId = holdingId,

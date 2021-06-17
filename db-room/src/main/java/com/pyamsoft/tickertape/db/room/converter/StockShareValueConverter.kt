@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asShare
 
-interface StockSymbol {
+internal object StockShareValueConverter {
 
-  @CheckResult fun symbol(): String
-}
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toShares(shares: Double): StockShareValue {
+    return shares.asShare()
+  }
 
-@CheckResult
-fun String.toSymbol(): StockSymbol {
-  return StockSymbolImpl(this)
-}
-
-@CheckResult
-fun String.toSymbols(): List<StockSymbol> {
-  return this.trim()
-      .split("\\s+".toRegex())
-      .asSequence()
-      .filterNot { it.isBlank() }
-      .map { it.toSymbol() }
-      .toList()
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromShares(shares: StockShareValue): Double {
+    return shares.value()
+  }
 }

@@ -25,10 +25,10 @@ interface StockMoneyValue : StockNumberValue {
 
   @CheckResult fun asFixedValue(): String
 
-  @CheckResult fun value(): Float
+  @CheckResult fun value(): Double
 }
 
 @CheckResult
-fun Float.asMoney(): StockMoneyValue {
+fun Double.asMoney(): StockMoneyValue {
   return StockMoneyValueImpl(this)
 }

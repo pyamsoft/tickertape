@@ -20,6 +20,8 @@ import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingShareCountEntryBinding
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asShare
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
 import timber.log.Timber
@@ -42,13 +44,13 @@ class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
     doOnInflate {
       delegate =
           UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
-            val numberOfShares = numberString.toFloatOrNull()
+            val numberOfShares = numberString.toDoubleOrNull()
             if (numberOfShares == null) {
               Timber.w("Invalid numberOfShares $numberString")
               return@create false
             }
 
-            publish(HoldingViewEvent.UpdateNumberOfShares(numberOfShares))
+            publish(HoldingViewEvent.UpdateNumberOfShares(numberOfShares.asShare()))
             return@create true
           }
               .apply { handleCreate() }
@@ -59,8 +61,8 @@ class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
   }
 
-  private fun handleNumberOfSharesChanged(numberOfShares: Float) {
-    val text = if (numberOfShares == 0F) "" else numberOfShares.toString()
+  private fun handleNumberOfSharesChanged(numberOfShares: StockShareValue) {
+    val text = if (numberOfShares.isZero()) "" else numberOfShares.asShareValue()
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

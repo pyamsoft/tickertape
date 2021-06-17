@@ -24,5 +24,5 @@ interface StockPercent : StockNumberValue {
 
   @CheckResult fun asFixedValue(): String
 
-  @CheckResult fun value(): Float
+  @CheckResult fun value(): Double
 }

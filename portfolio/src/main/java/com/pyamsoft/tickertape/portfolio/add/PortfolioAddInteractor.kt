@@ -37,19 +37,21 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbol: StockSymbol) =
+  suspend fun commitSymbol(symbols: List<StockSymbol>) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // TODO move this query into the DAO layer
-        val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
-        if (existingHolding != null) {
-          Timber.d("Holding already exists in DB: $existingHolding")
-          return@withContext
-        }
+        for (symbol in symbols) {
+          // TODO move this query into the DAO layer
+          val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
+          if (existingHolding != null) {
+            Timber.d("Holding already exists in DB: $existingHolding")
+            continue
+          }
 
-        val newHolding = JsonMappableDbHolding.create(symbol)
-        Timber.d("Insert new holding into DB: $newHolding")
-        holdingInsertDao.insert(newHolding)
+          val newHolding = JsonMappableDbHolding.create(symbol)
+          Timber.d("Insert new holding into DB: $newHolding")
+          holdingInsertDao.insert(newHolding)
+        }
       }
 }

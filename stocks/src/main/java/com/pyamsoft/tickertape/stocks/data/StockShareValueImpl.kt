@@ -16,18 +16,24 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
-internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
+internal data class StockShareValueImpl(private val value: Double) : StockShareValue {
 
-  private val money by lazy(LazyThreadSafetyMode.NONE) { "%.2f".format(value) }
-
-  override fun asMoneyValue(): String {
-    return "\$${money}"
+  private val share by lazy(LazyThreadSafetyMode.NONE) {
+    // Parse to int to remove the decimals, then back to float for comparison ability
+    val intValue = value.toInt()
+    val valueWithoutDecimal = intValue.toDouble()
+    if (valueWithoutDecimal.compareTo(value) == 0) {
+      // This is a number without any decimals, return the int value as a String
+      return@lazy intValue.toString()
+    } else {
+      return@lazy value.toString()
+    }
   }
 
-  override fun asFixedValue(): String {
-    return money
+  override fun asShareValue(): String {
+    return share
   }
 
   override fun value(): Double {

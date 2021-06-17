@@ -26,14 +26,14 @@ internal object StockMoneyValueConverter {
   @JvmStatic
   @TypeConverter
   @CheckResult
-  fun toMoney(money: Float): StockMoneyValue {
+  fun toMoney(money: Double): StockMoneyValue {
     return money.asMoney()
   }
 
   @JvmStatic
   @TypeConverter
   @CheckResult
-  fun fromMoney(money: StockMoneyValue): Float {
+  fun fromMoney(money: StockMoneyValue): Double {
     return money.value()
   }
 }

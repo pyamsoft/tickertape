@@ -54,7 +54,7 @@ class HoldingCommit @Inject internal constructor(parent: ViewGroup) :
   private fun handleStateChanged(state: HoldingViewState) {
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
-    val isEntered = shareCount > 0 && sharePrice.value() > 0
+    val isEntered = shareCount.value().compareTo(0) > 0 && sharePrice.value().compareTo(0) > 0
     binding.positionCommit.isEnabled = isEntered
   }
 }

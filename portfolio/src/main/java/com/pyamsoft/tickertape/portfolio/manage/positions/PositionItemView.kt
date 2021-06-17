@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.databinding.PositionItemBinding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import javax.inject.Inject
 
@@ -62,13 +63,13 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleTotalChanged(position: DbPosition) {
-    val totalValue = position.shareCount() * position.price().value()
+    val totalValue = position.shareCount().value() * position.price().value()
     val total = totalValue.asMoney()
     binding.positionItemTotal.text = total.asMoneyValue()
   }
 
-  private fun handleShareCountChanged(shareCount: Float) {
-    binding.positionItemNumberOfShares.text = shareCount.toString()
+  private fun handleShareCountChanged(shareCount: StockShareValue) {
+    binding.positionItemNumberOfShares.text = shareCount.asShareValue()
   }
 
   private fun handleSharePriceChanged(price: StockMoneyValue) {

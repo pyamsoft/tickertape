@@ -21,11 +21,12 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 data class HoldingViewState(
     val isLoading: Boolean,
     val stock: PortfolioStock?,
-    val numberOfShares: Float,
+    val numberOfShares: StockShareValue,
     val pricePerShare: StockMoneyValue,
 ) : UiViewState
 
@@ -39,7 +40,8 @@ sealed class HoldingViewEvent : UiViewEvent {
 
   data class Remove internal constructor(val index: Int) : HoldingViewEvent()
 
-  data class UpdateNumberOfShares internal constructor(val number: Float) : HoldingViewEvent()
+  data class UpdateNumberOfShares internal constructor(val number: StockShareValue) :
+      HoldingViewEvent()
 
   data class UpdateSharePrice internal constructor(val price: StockMoneyValue) : HoldingViewEvent()
 }

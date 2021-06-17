@@ -25,6 +25,7 @@ import androidx.room.PrimaryKey
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 @Entity(
     tableName = RoomDbPosition.TABLE_NAME,
@@ -40,7 +41,7 @@ internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbPosition.Id,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_PRICE) val price: StockMoneyValue,
-    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: Float,
+    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: StockShareValue,
 ) : DbPosition {
 
   @Ignore
@@ -59,7 +60,7 @@ internal constructor(
   }
 
   @Ignore
-  override fun shareCount(): Float {
+  override fun shareCount(): StockShareValue {
     return shareCount
   }
 

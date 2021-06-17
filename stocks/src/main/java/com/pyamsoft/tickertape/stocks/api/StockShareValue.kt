@@ -17,24 +17,17 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
+import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
+import com.pyamsoft.tickertape.stocks.data.StockShareValueImpl
 
-interface StockSymbol {
+interface StockShareValue : StockNumberValue {
 
-  @CheckResult fun symbol(): String
+  @CheckResult fun asShareValue(): String
+
+  @CheckResult fun value(): Double
 }
 
 @CheckResult
-fun String.toSymbol(): StockSymbol {
-  return StockSymbolImpl(this)
-}
-
-@CheckResult
-fun String.toSymbols(): List<StockSymbol> {
-  return this.trim()
-      .split("\\s+".toRegex())
-      .asSequence()
-      .filterNot { it.isBlank() }
-      .map { it.toSymbol() }
-      .toList()
+fun Double.asShare(): StockShareValue {
+  return StockShareValueImpl(this)
 }

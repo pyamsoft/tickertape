@@ -27,7 +27,9 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShare
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -50,8 +52,8 @@ internal constructor(
         initialState =
             HoldingViewState(
                 isLoading = false,
-                numberOfShares = 0F,
-                pricePerShare = 0F.asMoney(),
+                numberOfShares = 0.0.asShare(),
+                pricePerShare = 0.0.asMoney(),
                 stock = null)) {
 
   private val portfolioFetcher =
@@ -169,7 +171,7 @@ internal constructor(
     }
   }
 
-  fun handleUpdateNumberOfShares(number: Float) {
+  fun handleUpdateNumberOfShares(number: StockShareValue) {
     setState { copy(numberOfShares = number) }
   }
 
@@ -181,7 +183,7 @@ internal constructor(
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
     setState(
-        stateChange = { copy(pricePerShare = 0F.asMoney(), numberOfShares = 0F) },
+        stateChange = { copy(pricePerShare = 0.0.asMoney(), numberOfShares = 0.0.asShare()) },
         andThen = { newState ->
           val stock = newState.stock
           if (stock == null) {

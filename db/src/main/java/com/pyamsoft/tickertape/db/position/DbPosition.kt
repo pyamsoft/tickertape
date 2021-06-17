@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.position
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 interface DbPosition {
 
@@ -28,7 +29,7 @@ interface DbPosition {
 
   @CheckResult fun price(): StockMoneyValue
 
-  @CheckResult fun shareCount(): Float
+  @CheckResult fun shareCount(): StockShareValue
 
   data class Id(val id: String) {
 

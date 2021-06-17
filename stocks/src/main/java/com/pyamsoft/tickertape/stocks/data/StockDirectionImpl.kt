@@ -18,17 +18,17 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 
-internal data class StockDirectionImpl(private val price: Float) : StockDirection {
+internal data class StockDirectionImpl(private val price: Double) : StockDirection {
 
   override fun isUp(): Boolean {
-    return price > 0F
+    return price.compareTo(0) > 0
   }
 
   override fun isDown(): Boolean {
-    return price < 0F
+    return price.compareTo(0) < 0
   }
 
   override fun isZero(): Boolean {
-    return price == 0F
+    return price.compareTo(0) == 0
   }
 }

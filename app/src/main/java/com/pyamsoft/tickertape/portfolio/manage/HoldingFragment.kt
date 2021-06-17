@@ -28,11 +28,11 @@ import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.ui.Injector
-import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.layout
+import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import javax.inject.Inject
@@ -60,8 +60,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
 
   @CheckResult
   private fun getHoldingId(): DbHolding.Id {
-    return DbHolding.Id(
-        requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+    return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
   }
 
   override fun onCreateView(
@@ -162,7 +161,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
   private fun pushPositionListFragment() {
     parentFragmentManager.commit(viewLifecycleOwner) {
       addToBackStack(null)
-      add(PositionsFragment.newInstance(getHoldingId()), PositionsFragment.TAG)
+      add(R.id.main_container, PositionsFragment.newInstance(getHoldingId()), PositionsFragment.TAG)
     }
   }
 

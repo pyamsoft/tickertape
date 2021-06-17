@@ -51,10 +51,6 @@ internal constructor(
     private val serviceClass: Class<out Service>
 ) {
 
-  private val remoteViews by lazy {
-    RemoteViews(context.applicationContext.packageName, R.layout.remote_view)
-  }
-
   private fun guaranteeNotificationChannelExists(notificationManager: NotificationManager) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       val notificationGroup = NotificationChannelGroup(CHANNEL_ID, CHANNEL_TITLE)
@@ -118,6 +114,7 @@ internal constructor(
   }
 
   private fun updateTickerInfo(
+      remoteViews: RemoteViews,
       index: Int,
       quotes: List<QuotedStock>,
       remoteViewIdGroup: RemoteViewIds
@@ -150,11 +147,16 @@ internal constructor(
     remoteViews.setTextColor(remoteViewIdGroup.percentViewId, color)
   }
 
-  private fun updateTickers(quotes: List<QuotedStock>, index: Int, pageSize: Int) {
+  private fun updateTickers(
+      remoteViews: RemoteViews,
+      quotes: List<QuotedStock>,
+      index: Int,
+      pageSize: Int
+  ) {
     for (loop in 0 until pageSize) {
       val adjustedIndex = correctIndex(index + loop, quotes.size)
       val remoteViewIdGroup = remoteViewIds[loop]
-      updateTickerInfo(adjustedIndex, quotes, remoteViewIdGroup)
+      updateTickerInfo(remoteViews, adjustedIndex, quotes, remoteViewIdGroup)
     }
   }
 
@@ -196,7 +198,9 @@ internal constructor(
 
     val pageSize = getPageSize()
     val safeIndex = correctIndex(index, quotes.size)
-    updateTickers(quotes, safeIndex, pageSize)
+
+    val remoteViews = RemoteViews(context.applicationContext.packageName, R.layout.remote_view)
+    updateTickers(remoteViews, quotes, safeIndex, pageSize)
 
     return builder
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())

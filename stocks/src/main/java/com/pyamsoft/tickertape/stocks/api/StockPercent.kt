@@ -26,6 +26,17 @@ interface StockPercent : StockNumberValue {
   @CheckResult fun asFixedValue(): String
 
   @CheckResult fun value(): Double
+
+  companion object {
+
+    private val EMPTY = 0.0.asPercent()
+
+    @JvmStatic
+    @CheckResult
+    fun none(): StockPercent {
+      return EMPTY
+    }
+  }
 }
 
 @CheckResult

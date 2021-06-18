@@ -96,7 +96,7 @@ internal constructor(
   fun averagePrice(): StockMoneyValue {
     val shares = totalSharesNumber()
     if (shares.compareTo(0) == 0) {
-      return NO_PRICE
+      return StockMoneyValue.none()
     }
 
     val value = costNumber() / shares
@@ -111,10 +111,5 @@ internal constructor(
   @CheckResult
   fun totalShares(): StockShareValue {
     return totalSharesNumber().asShare()
-  }
-
-  companion object {
-
-    private val NO_PRICE = 0.0.asMoney()
   }
 }

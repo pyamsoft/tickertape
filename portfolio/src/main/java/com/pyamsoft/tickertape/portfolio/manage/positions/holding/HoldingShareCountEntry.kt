@@ -44,6 +44,12 @@ class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
     doOnInflate {
       delegate =
           UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
+            // Blank string reset to 0
+            if (numberString.isBlank()) {
+              publish(HoldingViewEvent.UpdateNumberOfShares(StockShareValue.none()))
+              return@create true
+            }
+
             val numberOfShares = numberString.toDoubleOrNull()
             if (numberOfShares == null) {
               Timber.w("Invalid numberOfShares $numberString")

@@ -44,6 +44,12 @@ class HoldingPriceEntry @Inject internal constructor(parent: ViewGroup) :
     doOnInflate {
       delegate =
           UiEditTextDelegate.create(binding.positionPriceEdit) { numberString ->
+            // Blank string reset to 0
+            if (numberString.isBlank()) {
+              publish(HoldingViewEvent.UpdateSharePrice(StockMoneyValue.none()))
+              return@create true
+            }
+
             val sharePrice = numberString.toDoubleOrNull()
             if (sharePrice == null) {
               Timber.w("Invalid sharePrice $numberString")

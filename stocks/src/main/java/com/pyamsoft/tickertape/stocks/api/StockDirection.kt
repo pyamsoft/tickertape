@@ -29,10 +29,13 @@ interface StockDirection : StockNumberValue {
   @ColorInt @CheckResult fun color(): Int
 
   companion object {
+
+    private val EMPTY = 0.0.asDirection()
+
     @JvmStatic
     @CheckResult
     fun none(): StockDirection {
-      return StockDirectionImpl(0.0)
+      return EMPTY
     }
   }
 }

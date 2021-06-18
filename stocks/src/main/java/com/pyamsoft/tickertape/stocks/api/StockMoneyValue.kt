@@ -26,6 +26,17 @@ interface StockMoneyValue : StockNumberValue {
   @CheckResult fun asFixedValue(): String
 
   @CheckResult fun value(): Double
+
+  companion object {
+
+    private val EMPTY = 0.0.asMoney()
+
+    @JvmStatic
+    @CheckResult
+    fun none(): StockMoneyValue {
+      return EMPTY
+    }
+  }
 }
 
 @CheckResult

@@ -25,16 +25,16 @@ interface StockSymbol {
 }
 
 @CheckResult
-fun String.toSymbol(): StockSymbol {
+fun String.asSymbol(): StockSymbol {
   return StockSymbolImpl(this)
 }
 
 @CheckResult
-fun String.toSymbols(): List<StockSymbol> {
+fun String.asSymbols(): List<StockSymbol> {
   return this.trim()
       .split("\\s+".toRegex())
       .asSequence()
       .filterNot { it.isBlank() }
-      .map { it.toSymbol() }
+      .map { it.asSymbol() }
       .toList()
 }

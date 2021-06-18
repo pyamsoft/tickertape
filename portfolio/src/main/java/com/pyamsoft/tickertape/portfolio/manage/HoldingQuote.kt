@@ -17,14 +17,13 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingQuoteBinding
-import com.pyamsoft.tickertape.quote.databinding.QuoteNumbersBinding
-import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.quote.clearSession
+import com.pyamsoft.tickertape.quote.populateSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 
@@ -63,56 +62,6 @@ class HoldingQuote @Inject internal constructor(parent: ViewGroup) :
       } else {
         binding.positonQuoteAfterHours.isVisible = true
         populateSession(binding.positionQuoteAhSession, afterHours)
-      }
-    }
-  }
-
-  companion object {
-
-    @JvmStatic
-    private fun populateSession(
-        binding: QuoteNumbersBinding,
-        session: StockMarketSession,
-    ) {
-      val data = StockMarketSession.getDataFromSession(session)
-      val percent = data.percent
-      val changeAmount = data.changeAmount
-      val directionSign = data.directionSign
-      val color = data.color
-
-      binding.apply {
-        quoteError.apply {
-          text = ""
-          isGone = true
-        }
-
-        quotePrice.apply {
-          text = session.price().asMoneyValue()
-          setTextColor(color)
-          isVisible = true
-        }
-
-        quotePercent.apply {
-          text = "(${directionSign}${percent})"
-          setTextColor(color)
-          isVisible = true
-        }
-
-        quoteChange.apply {
-          text = "$directionSign${changeAmount}"
-          setTextColor(color)
-          isVisible = true
-        }
-      }
-    }
-
-    @JvmStatic
-    private fun clearSession(binding: QuoteNumbersBinding) {
-      binding.apply {
-        quoteError.text = ""
-        quoteChange.text = ""
-        quotePercent.text = ""
-        quotePrice.text = ""
       }
     }
   }

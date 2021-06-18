@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.db.room.converter
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.toSymbol
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 internal object StockSymbolConverter {
 
@@ -27,7 +27,7 @@ internal object StockSymbolConverter {
   @TypeConverter
   @CheckResult
   fun toSymbol(symbol: String): StockSymbol {
-    return symbol.toSymbol()
+    return symbol.asSymbol()
   }
 
   @JvmStatic

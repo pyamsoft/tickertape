@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
 
 interface StockPercent : StockNumberValue {
 
@@ -25,4 +26,9 @@ interface StockPercent : StockNumberValue {
   @CheckResult fun asFixedValue(): String
 
   @CheckResult fun value(): Double
+}
+
+@CheckResult
+fun Double.asPercent(): StockPercent {
+  return StockPercentImpl(this)
 }

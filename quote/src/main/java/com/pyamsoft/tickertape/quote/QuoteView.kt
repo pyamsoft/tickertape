@@ -53,8 +53,8 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { binding.quoteItem.setOnDebouncedClickListener(null) }
 
     doOnTeardown {
-      clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
-      clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
+      clearSession(binding.quoteItemData.quoteItemAfterNumbers)
+      clearSession(binding.quoteItemData.quoteItemNormalNumbers)
 
       binding.quoteItemSymbol.text = ""
       binding.quoteItemCompany.text = ""
@@ -77,8 +77,8 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleQuoteMissing() {
     binding.quoteItemData.quoteAfterHours.isGone = true
-    clearBindingGroup(binding.quoteItemData.quoteItemNormalNumbers)
-    clearBindingGroup(binding.quoteItemData.quoteItemAfterNumbers)
+    clearSession(binding.quoteItemData.quoteItemNormalNumbers)
+    clearSession(binding.quoteItemData.quoteItemAfterNumbers)
 
     handleCompanyChanged(null)
     handleSessionError(binding.quoteItemData.quoteItemNormalNumbers)
@@ -91,14 +91,14 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleRegularSessionChanged(session: StockMarketSession) {
-    handleSessionChanged(session, binding.quoteItemData.quoteItemNormalNumbers)
+    populateSession(binding.quoteItemData.quoteItemNormalNumbers, session)
   }
 
   private fun handleAfterSessionChanged(session: StockMarketSession?) {
     if (session == null) {
       binding.quoteItemData.quoteAfterHours.isGone = true
     } else {
-      handleSessionChanged(session, binding.quoteItemData.quoteItemAfterNumbers)
+      populateSession(binding.quoteItemData.quoteItemAfterNumbers, session)
       binding.quoteItemData.quoteAfterHours.isVisible = true
     }
   }
@@ -114,72 +114,12 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
   companion object {
 
     @JvmStatic
-    private fun handleSessionChanged(session: StockMarketSession, binding: QuoteNumbersBinding) {
-      val data = StockMarketSession.getDataFromSession(session)
-      val percent = data.percent
-      val changeAmount = data.changeAmount
-      val directionSign = data.directionSign
-      val color = data.color
-
-      binding.apply {
-        quoteError.apply {
-          text = ""
-          isGone = true
-        }
-
-        quotePrice.apply {
-          text = session.price().asMoneyValue()
-          setTextColor(color)
-          isVisible = true
-        }
-
-        quotePercent.apply {
-          text = "(${directionSign}${percent})"
-          setTextColor(color)
-          isVisible = true
-        }
-
-        quoteChange.apply {
-          text = "$directionSign${changeAmount}"
-          setTextColor(color)
-          isVisible = true
-        }
-      }
-    }
-
-    @JvmStatic
     private fun handleSessionError(binding: QuoteNumbersBinding) {
-      binding.apply {
-        quoteError.apply {
-          text = "Could not get quote."
-          setTextColor(Color.RED)
-          isVisible = true
-        }
-
-        quotePrice.apply {
-          text = ""
-          isGone = true
-        }
-
-        quotePercent.apply {
-          text = ""
-          isGone = true
-        }
-
-        quoteChange.apply {
-          text = ""
-          isGone = true
-        }
-      }
-    }
-
-    @JvmStatic
-    private fun clearBindingGroup(binding: QuoteNumbersBinding) {
-      binding.apply {
-        quoteChange.text = ""
-        quotePercent.text = ""
-        quotePrice.text = ""
-        quoteError.text = ""
+      clearSession(binding)
+      binding.quoteError.apply {
+        text = "Could not get quote."
+        setTextColor(Color.RED)
+        isVisible = true
       }
     }
   }

@@ -20,13 +20,13 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.data.StockCompanyImpl
-import com.pyamsoft.tickertape.stocks.data.StockDirectionImpl
+import com.pyamsoft.tickertape.stocks.api.asCompany
+import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
-import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
-import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
@@ -59,24 +59,24 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             // Only valid tickers here, so requireNotNull should never throw
             .map {
               StockQuoteImpl(
-                  symbol = StockSymbolImpl(it.symbol),
-                  company = StockCompanyImpl(requireNotNull(it.shortName)),
+                  symbol = it.symbol.asSymbol(),
+                  company = requireNotNull(it.shortName).asCompany(),
                   regular =
                       StockMarketSessionImpl(
-                          amount = StockMoneyValueImpl(requireNotNull(it.regularMarketChange)),
-                          direction = StockDirectionImpl(requireNotNull(it.regularMarketChange)),
-                          percent = StockPercentImpl(requireNotNull(it.regularMarketChangePercent)),
-                          price = StockMoneyValueImpl(requireNotNull(it.regularMarketPrice)),
+                          amount = requireNotNull(it.regularMarketChange).asMoney(),
+                          direction = requireNotNull(it.regularMarketChange).asDirection(),
+                          percent = requireNotNull(it.regularMarketChangePercent).asPercent(),
+                          price = requireNotNull(it.regularMarketPrice).asMoney(),
                       ),
                   afterHours =
                       if (it.postMarketChange != null &&
                           it.postMarketPrice != null &&
                           it.postMarketChangePercent != null) {
                         StockMarketSessionImpl(
-                            amount = StockMoneyValueImpl(it.postMarketChange),
-                            direction = StockDirectionImpl(it.postMarketChange),
-                            percent = StockPercentImpl(it.postMarketChangePercent),
-                            price = StockMoneyValueImpl(it.postMarketPrice),
+                            amount = it.postMarketChange.asMoney(),
+                            direction = it.postMarketChange.asDirection(),
+                            percent = it.postMarketChangePercent.asPercent(),
+                            price = it.postMarketPrice.asMoney(),
                         )
                       } else {
                         null

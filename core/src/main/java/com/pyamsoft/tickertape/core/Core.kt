@@ -16,6 +16,11 @@
 
 package com.pyamsoft.tickertape.core
 
+import android.graphics.Color
+import androidx.annotation.ColorInt
+
 const val PRIVACY_POLICY_URL = "https://pyamsoft.blogspot.com/p/tickertape-privacy-policy.html"
 const val TERMS_CONDITIONS_URL =
     "https://pyamsoft.blogspot.com/p/tickertape-terms-and-conditions.html"
+
+@ColorInt const val DEFAULT_STOCK_COLOR = Color.WHITE

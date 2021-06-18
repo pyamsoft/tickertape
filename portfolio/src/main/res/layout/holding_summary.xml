@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:text="Total Share Count"
+            android:text="Shares"
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -46,8 +46,8 @@
             android:textStyle="bold"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_total_shares_label"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_total_shares_label" />
+            app:layout_constraintStart_toEndOf="@id/holding_summary_total_shares_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_total_shares_label" />
 
         <TextView
             android:id="@+id/holding_summary_avg_price_label"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginTop="8dp"
-            android:text="Average Share Price"
+            android:text="Average Price"
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -72,16 +72,16 @@
             android:textStyle="bold"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_avg_price_label"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_avg_price_label" />
+            app:layout_constraintStart_toEndOf="@id/holding_summary_avg_price_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_avg_price_label" />
 
         <TextView
-            android:id="@+id/holding_summary_total_price_label"
+            android:id="@+id/holding_summary_cost_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginTop="8dp"
-            android:text="Total Value"
+            android:text="Cost"
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -89,7 +89,7 @@
             app:layout_constraintTop_toBottomOf="@id/holding_summary_avg_price_label" />
 
         <TextView
-            android:id="@+id/holding_summary_total_price_text"
+            android:id="@+id/holding_summary_cost_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -98,8 +98,60 @@
             android:textStyle="bold"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_total_price_label"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_total_price_label" />
+            app:layout_constraintStart_toEndOf="@id/holding_summary_cost_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_cost_label" />
+
+        <TextView
+            android:id="@+id/holding_summary_gainloss_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="24dp"
+            android:text="Gain/Loss"
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="@id/holding_summary_cost_label"
+            app:layout_constraintTop_toBottomOf="@id/holding_summary_cost_label" />
+
+        <TextView
+            android:id="@+id/holding_summary_gainloss_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="8dp"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textStyle="bold"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toEndOf="@id/holding_summary_gainloss_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_gainloss_label" />
+
+        <TextView
+            android:id="@+id/holding_summary_current_value_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="8dp"
+            android:text="Current Value"
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="@id/holding_summary_gainloss_label"
+            app:layout_constraintTop_toBottomOf="@id/holding_summary_gainloss_label" />
+
+        <TextView
+            android:id="@+id/holding_summary_current_value_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="8dp"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textStyle="bold"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toEndOf="@id/holding_summary_current_value_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_current_value_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

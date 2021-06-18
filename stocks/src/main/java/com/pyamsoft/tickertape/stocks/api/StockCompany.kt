@@ -17,8 +17,14 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockCompanyImpl
 
 interface StockCompany {
 
   @CheckResult fun company(): String
+}
+
+@CheckResult
+fun String.asCompany(): StockCompany {
+  return StockCompanyImpl(this)
 }

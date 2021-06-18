@@ -17,10 +17,27 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.annotation.ColorInt
+import com.pyamsoft.tickertape.stocks.data.StockDirectionImpl
 
 interface StockDirection : StockNumberValue {
 
   @CheckResult fun isUp(): Boolean
 
   @CheckResult fun isDown(): Boolean
+
+  @ColorInt @CheckResult fun color(): Int
+
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun none(): StockDirection {
+      return StockDirectionImpl(0.0)
+    }
+  }
+}
+
+@CheckResult
+fun Double.asDirection(): StockDirection {
+  return StockDirectionImpl(this)
 }

@@ -16,6 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import android.graphics.Color
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 
 internal data class StockDirectionImpl(private val price: Double) : StockDirection {
@@ -30,5 +32,14 @@ internal data class StockDirectionImpl(private val price: Double) : StockDirecti
 
   override fun isZero(): Boolean {
     return price.compareTo(0) == 0
+  }
+
+  override fun color(): Int {
+    return when {
+      isUp() -> Color.GREEN
+      isDown() -> Color.RED
+      isZero() -> DEFAULT_STOCK_COLOR
+      else -> DEFAULT_STOCK_COLOR
+    }
   }
 }

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions.holding
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.HoldingPriceEntryBinding
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingShareCountEntryBinding
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asShare
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
 import timber.log.Timber
 
-class HoldingPriceEntry @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingPriceEntryBinding>(parent) {
+class HoldingShareCountEntry @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingShareCountEntryBinding>(parent) {
 
-  override val viewBinding = HoldingPriceEntryBinding::inflate
+  override val viewBinding = HoldingShareCountEntryBinding::inflate
 
-  override val layoutRoot by boundView { positionPriceRoot }
+  override val layoutRoot by boundView { positionNumberOfSharesRoot }
 
   private var delegate: UiEditTextDelegate? = null
 
@@ -43,14 +43,14 @@ class HoldingPriceEntry @Inject internal constructor(parent: ViewGroup) :
 
     doOnInflate {
       delegate =
-          UiEditTextDelegate.create(binding.positionPriceEdit) { numberString ->
-            val sharePrice = numberString.toDoubleOrNull()
-            if (sharePrice == null) {
-              Timber.w("Invalid sharePrice $numberString")
+          UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
+            val numberOfShares = numberString.toDoubleOrNull()
+            if (numberOfShares == null) {
+              Timber.w("Invalid numberOfShares $numberString")
               return@create false
             }
 
-            publish(HoldingViewEvent.UpdateSharePrice(sharePrice.asMoney()))
+            publish(HoldingViewEvent.UpdateNumberOfShares(numberOfShares.asShare()))
             return@create true
           }
               .apply { handleCreate() }
@@ -58,12 +58,11 @@ class HoldingPriceEntry @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<HoldingViewState>) {
-    state.mapChanged { it.pricePerShare }.render(viewScope) { handleSharePriceChanged(it) }
+    state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
   }
 
-  private fun handleSharePriceChanged(sharePrice: StockMoneyValue) {
-    // Don't use asMoneyValue() here since we do not want to include the $ and stuff
-    val text = if (sharePrice.isZero()) "" else sharePrice.value().toString()
+  private fun handleNumberOfSharesChanged(numberOfShares: StockShareValue) {
+    val text = if (numberOfShares.isZero()) "" else numberOfShares.asShareValue()
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

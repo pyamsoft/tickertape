@@ -23,9 +23,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewHolder
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class PositionItemAdapter
+class PositionsAdapter
 private constructor(
     private val factory: PositionItemComponent.Factory,
     private val owner: LifecycleOwner,
@@ -40,8 +43,8 @@ private constructor(
         factory: PositionItemComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): PositionItemAdapter {
-      return PositionItemAdapter(factory, owner, callback)
+    ): PositionsAdapter {
+      return PositionsAdapter(factory, owner, callback)
     }
 
     private val DIFFER =

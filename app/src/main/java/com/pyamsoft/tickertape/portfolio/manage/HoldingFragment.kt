@@ -34,6 +34,15 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.databinding.LayoutScrollingConstraintBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingCommit
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingControllerEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingInfo
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingPriceEntry
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingQuote
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingShareCountEntry
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingSummary
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewModel
 import javax.inject.Inject
 
 internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent> {

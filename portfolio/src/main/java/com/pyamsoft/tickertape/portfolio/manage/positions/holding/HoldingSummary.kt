@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions.holding
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult

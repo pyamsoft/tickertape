@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions
+package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
-import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.quote.QuoteViewHolder
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 
-@Subcomponent
-interface PositionItemComponent {
+data class PositionItemViewState
+internal constructor(val position: DbPosition, val holding: DbHolding) : UiViewState
 
-  fun inject(holder: PositionItemViewHolder)
+sealed class PositionItemViewEvent : UiViewEvent {
 
-  @Subcomponent.Factory
-  interface Factory {
+  object Remove : PositionItemViewEvent()
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): PositionItemComponent
-  }
 }

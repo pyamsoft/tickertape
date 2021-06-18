@@ -29,6 +29,10 @@ import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsList
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingControllerEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewModel
 import javax.inject.Inject
 import timber.log.Timber
 

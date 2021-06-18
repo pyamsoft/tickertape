@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -28,14 +28,14 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemAdapter
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemComponent
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionItemViewState
+import com.pyamsoft.tickertape.portfolio.databinding.PositionListBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewState
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
-import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
 class PositionsList
@@ -45,33 +45,33 @@ internal constructor(
     owner: LifecycleOwner,
     factory: PositionItemComponent.Factory
 ) :
-    BaseUiView<HoldingViewState, HoldingViewEvent, PortfolioListBinding>(parent),
+    BaseUiView<HoldingViewState, HoldingViewEvent, PositionListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
-    PositionItemAdapter.Callback {
+    PositionsAdapter.Callback {
 
-  override val viewBinding = PortfolioListBinding::inflate
+  override val viewBinding = PositionListBinding::inflate
 
-  override val layoutRoot by boundView { portfolioListRoot }
+  override val layoutRoot by boundView { positionListRoot }
 
-  private var modelAdapter: PositionItemAdapter? = null
+  private var modelAdapter: PositionsAdapter? = null
 
   private var lastScrollPosition = 0
 
   init {
     doOnInflate {
-      binding.portfolioListList.layoutManager =
-          LinearLayoutManager(binding.portfolioListList.context).apply {
+      binding.positionListList.layoutManager =
+          LinearLayoutManager(binding.positionListList.context).apply {
             isItemPrefetchEnabled = true
             initialPrefetchItemCount = 3
           }
     }
 
     doOnInflate {
-      modelAdapter = PositionItemAdapter.create(factory, owner, this)
-      binding.portfolioListList.adapter = modelAdapter
+      modelAdapter = PositionsAdapter.create(factory, owner, this)
+      binding.positionListList.adapter = modelAdapter
     }
 
-    doOnInflate { binding.portfolioListSwipeRefresh.setOnRefreshListener(this) }
+    doOnInflate { binding.positionListSwipeRefresh.setOnRefreshListener(this) }
 
     doOnInflate { savedInstanceState ->
       val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
@@ -82,7 +82,7 @@ internal constructor(
     }
 
     doOnSaveState { outState ->
-      val manager = binding.portfolioListList.layoutManager
+      val manager = binding.positionListList.layoutManager
       if (manager is LinearLayoutManager) {
         val position = manager.findFirstVisibleItemPosition()
         if (position > 0) {
@@ -95,42 +95,35 @@ internal constructor(
     }
 
     doOnInflate {
-      val margin = 16.asDp(binding.portfolioListList.context)
+      val margin = 16.asDp(binding.positionListList.context)
 
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
       LinearMarginDecoration.create(margin = margin).apply {
-        binding.portfolioListList.addItemDecoration(this)
+        binding.positionListList.addItemDecoration(this)
       }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 56.asDp(binding.portfolioListList.context)
+      val bottomMargin = 56.asDp(binding.positionListList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.portfolioListList.addItemDecoration(this)
+        binding.positionListList.addItemDecoration(this)
       }
     }
 
-    doOnInflate {
-      FastScrollerBuilder(binding.portfolioListList)
-          .useMd2Style()
-          .setPopupTextProvider(usingAdapter())
-          .build()
-    }
-
-    doOnTeardown { binding.portfolioListList.removeAllItemDecorations() }
+    doOnTeardown { binding.positionListList.removeAllItemDecorations() }
 
     doOnTeardown {
-      binding.portfolioListList.adapter = null
+      binding.positionListList.adapter = null
 
-      binding.portfolioListSwipeRefresh.setOnRefreshListener(null)
+      binding.positionListSwipeRefresh.setOnRefreshListener(null)
 
       modelAdapter = null
     }
   }
 
   @CheckResult
-  private fun usingAdapter(): PositionItemAdapter {
+  private fun usingAdapter(): PositionsAdapter {
     return requireNotNull(modelAdapter)
   }
 
@@ -158,7 +151,7 @@ internal constructor(
   }
 
   private fun handleLoading(loading: Boolean) {
-    binding.portfolioListSwipeRefresh.isRefreshing = loading
+    binding.positionListSwipeRefresh.isRefreshing = loading
   }
 
   private fun handleList(stock: PortfolioStock?) {

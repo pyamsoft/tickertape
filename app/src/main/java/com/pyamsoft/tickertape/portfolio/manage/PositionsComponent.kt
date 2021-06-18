@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewModel
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module

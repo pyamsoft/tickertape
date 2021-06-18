@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions
+package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.util.doOnDestroy
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsAdapter
 import javax.inject.Inject
 
 class PositionItemViewHolder
@@ -29,7 +30,7 @@ internal constructor(
     binding: ListitemFrameBinding,
     factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
-    callback: PositionItemAdapter.Callback
+    callback: PositionsAdapter.Callback
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<PositionItemViewState> {
 
   @Inject @JvmField internal var position: PositionItemView? = null

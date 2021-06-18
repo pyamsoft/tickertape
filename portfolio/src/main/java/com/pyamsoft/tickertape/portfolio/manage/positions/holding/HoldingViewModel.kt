@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions.holding
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
@@ -54,7 +54,8 @@ internal constructor(
                 isLoading = false,
                 numberOfShares = 0.0.asShare(),
                 pricePerShare = 0.0.asMoney(),
-                stock = null)) {
+                stock = null)
+    ) {
 
   private val portfolioFetcher =
       highlander<Unit, Boolean> { force ->

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions
+package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView

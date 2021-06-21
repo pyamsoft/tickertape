@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.watchlist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.quote.QuoteViewState
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
 class QuoteAdapter
@@ -30,7 +31,9 @@ private constructor(
     private val factory: QuoteComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER), PopupTextProvider {
+) :
+    ListAdapter<QuoteViewState, QuoteViewHolder>(DIFFER),
+    PopupTextProvider {
 
   companion object {
 
@@ -68,13 +71,19 @@ private constructor(
     return getItem(position).symbol.symbol().hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
+  override fun onCreateViewHolder(
+      parent: ViewGroup,
+      viewType: Int
+  ): QuoteViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ListitemFrameBinding.inflate(inflater, parent, false)
     return QuoteViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
+  override fun onBindViewHolder(
+      holder: QuoteViewHolder,
+      position: Int
+  ) {
     val state = getItem(position)
     holder.bindState(state)
   }

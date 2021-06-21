@@ -42,6 +42,8 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
 internal class PositionManageDialog :
@@ -61,6 +63,11 @@ internal class PositionManageDialog :
   @CheckResult
   private fun getHoldingId(): DbHolding.Id {
     return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+  }
+
+  @CheckResult
+  private fun getHoldingSymbol(): StockSymbol {
+    return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -92,7 +99,7 @@ internal class PositionManageDialog :
     component =
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusManageComponent()
-            .create(getHoldingId())
+            .create(getHoldingSymbol(), getHoldingId())
             .also { c ->
               c.plusPositionManageComponent().create(binding.layoutConstraint).inject(this)
             }
@@ -204,6 +211,7 @@ internal class PositionManageDialog :
   companion object {
 
     private const val KEY_HOLDING_ID = "key_holding_id"
+    private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
     const val TAG = "PositionManageDialog"
 
     @JvmStatic
@@ -220,9 +228,13 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    fun newInstance(holdingId: DbHolding.Id): DialogFragment {
+    fun newInstance(holding: DbHolding): DialogFragment {
       return PositionManageDialog().apply {
-        arguments = Bundle().apply { putString(KEY_HOLDING_ID, holdingId.id) }
+        arguments =
+            Bundle().apply {
+              putString(KEY_HOLDING_ID, holding.id().id)
+              putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
+            }
       }
     }
   }

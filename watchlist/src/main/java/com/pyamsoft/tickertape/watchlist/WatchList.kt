@@ -26,8 +26,6 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.QuoteAdapter
-import com.pyamsoft.tickertape.quote.QuoteComponent
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding

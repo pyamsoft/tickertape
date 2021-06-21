@@ -31,10 +31,11 @@ import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
+import com.pyamsoft.tickertape.portfolio.PortfolioListComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.ManageComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
-import com.pyamsoft.tickertape.quote.QuoteComponent
+import com.pyamsoft.tickertape.watchlist.QuoteComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
@@ -74,6 +75,11 @@ internal interface TickerComponent {
   @CheckResult
   @Suppress("FunctionName")
   fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
+
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredPortfolioListComponent`(): PortfolioListComponent.Factory
 
   // ===============================================
   // HACKY INJECTORS

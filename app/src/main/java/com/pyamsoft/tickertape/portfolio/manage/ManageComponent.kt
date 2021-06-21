@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -46,7 +47,11 @@ internal interface ManageComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance holdingId: DbHolding.Id): ManageComponent
+    @CheckResult
+    fun create(
+        @BindsInstance symbol: StockSymbol,
+        @BindsInstance holdingId: DbHolding.Id
+    ): ManageComponent
   }
 
   @Module

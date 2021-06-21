@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult

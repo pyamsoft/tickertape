@@ -97,7 +97,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
   }
 
   private fun handleOpenHoldingManageDialog(stock: PortfolioStock) {
-    PositionManageDialog.newInstance(stock.holding.id())
+    PositionManageDialog.newInstance(stock.holding)
         .show(requireActivity(), PositionManageDialog.TAG)
   }
 

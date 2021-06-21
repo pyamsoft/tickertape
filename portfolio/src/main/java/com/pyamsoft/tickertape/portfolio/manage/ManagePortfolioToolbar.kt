@@ -29,6 +29,7 @@ import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.pydroid.ui.util.setUpEnabled
 import com.pyamsoft.pydroid.util.tintWith
 import com.pyamsoft.tickertape.portfolio.databinding.ManagePortfolioToolbarBinding
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
 
@@ -58,6 +59,8 @@ internal constructor(
     doOnTeardown { binding.positionToolbar.setNavigationOnClickListener(null) }
 
     doOnTeardown { unloadImage() }
+
+    doOnTeardown { binding.positionToolbar.title = "" }
   }
 
   private fun loadDefaultImage() {
@@ -92,6 +95,11 @@ internal constructor(
 
   override fun onRender(state: UiRender<ManagePortfolioViewState>) {
     state.mapChanged { it.page }.render(viewScope) { handleCloseState(it) }
+    state.mapChanged { it.symbol }.render(viewScope) { handleSymbol(it) }
+  }
+
+  private fun handleSymbol(symbol: StockSymbol) {
+    binding.positionToolbar.title = symbol.symbol()
   }
 
   private fun handleCloseState(page: PortfolioPage) {

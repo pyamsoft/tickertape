@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.watchlist
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +22,8 @@ import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.util.doOnDestroy
+import com.pyamsoft.tickertape.quote.QuoteViewEvent
+import com.pyamsoft.tickertape.quote.QuoteViewState
 import javax.inject.Inject
 
 class QuoteViewHolder

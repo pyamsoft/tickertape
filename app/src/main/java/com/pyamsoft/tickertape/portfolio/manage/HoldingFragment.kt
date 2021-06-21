@@ -36,11 +36,8 @@ import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.databinding.LayoutScrollingConstraintBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingCommit
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingControllerEvent
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingInfo
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingPriceEntry
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingQuote
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingShareCountEntry
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingSummary
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewModel
 import javax.inject.Inject
@@ -53,13 +50,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
 
   @JvmField @Inject internal var toolbar: ManagePortfolioToolbar? = null
 
-  @JvmField @Inject internal var info: HoldingInfo? = null
-
   @JvmField @Inject internal var commit: HoldingCommit? = null
-
-  @JvmField @Inject internal var quote: HoldingQuote? = null
-
-  @JvmField @Inject internal var summary: HoldingSummary? = null
 
   @JvmField @Inject internal var factory: HoldingViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<HoldingViewModel> {
@@ -96,10 +87,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
 
     val price = requireNotNull(priceEntry)
     val shareCount = requireNotNull(numberOfSharesEntry)
-    val info = requireNotNull(info)
-    val quote = requireNotNull(quote)
     val commit = requireNotNull(commit)
-    val summary = requireNotNull(summary)
 
     stateSaver =
         createComponent(
@@ -109,10 +97,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
             this,
             price,
             shareCount,
-            info,
             commit,
-            quote,
-            summary,
         ) {
           return@createComponent when (it) {
             is HoldingViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
@@ -126,32 +111,8 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
         }
 
     binding.nestedConstraint.layout {
-      info.also {
-        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
-      quote.also {
-        connect(it.id(), ConstraintSet.TOP, info.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
-      summary.also {
-        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-      }
-
       shareCount.also {
-        connect(it.id(), ConstraintSet.TOP, summary.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -202,10 +163,7 @@ internal class HoldingFragment : Fragment(), UiController<HoldingControllerEvent
     priceEntry = null
     numberOfSharesEntry = null
     toolbar = null
-    info = null
-    quote = null
     commit = null
-    summary = null
   }
 
   companion object {

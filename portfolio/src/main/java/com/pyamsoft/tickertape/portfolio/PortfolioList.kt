@@ -27,10 +27,6 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
-import com.pyamsoft.tickertape.quote.QuoteAdapter
-import com.pyamsoft.tickertape.quote.QuoteComponent
-import com.pyamsoft.tickertape.quote.QuoteViewState
-import com.pyamsoft.tickertape.quote.QuotedStock
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -39,16 +35,20 @@ import timber.log.Timber
 
 class PortfolioList
 @Inject
-internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteComponent.Factory) :
+internal constructor(
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+    factory: PortfolioListComponent.Factory
+) :
     BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
-    QuoteAdapter.Callback {
+    PortfolioAdapter.Callback {
 
   override val viewBinding = PortfolioListBinding::inflate
 
   override val layoutRoot by boundView { portfolioListRoot }
 
-  private var modelAdapter: QuoteAdapter? = null
+  private var modelAdapter: PortfolioAdapter? = null
 
   private var lastScrollPosition = 0
 
@@ -62,7 +62,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     }
 
     doOnInflate {
-      modelAdapter = QuoteAdapter.create(factory, owner, this)
+      modelAdapter = PortfolioAdapter.create(factory, owner, this)
       binding.portfolioListList.adapter = modelAdapter
     }
 
@@ -125,7 +125,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   }
 
   @CheckResult
-  private fun usingAdapter(): QuoteAdapter {
+  private fun usingAdapter(): PortfolioAdapter {
     return requireNotNull(modelAdapter)
   }
 
@@ -151,8 +151,8 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     layoutRoot.updatePadding(bottom = offset)
   }
 
-  private fun setList(list: List<QuotedStock>) {
-    val data = list.map { QuoteViewState(symbol = it.symbol, quote = it.quote) }
+  private fun setList(list: List<PortfolioStock>) {
+    val data = list.map { PortfolioListViewState(stock = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }
@@ -169,8 +169,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     if (schedule.isEmpty()) {
       clearList()
     } else {
-      // TODO don't map this since we want a different UI
-      setList(schedule.mapNotNull { it.quote })
+      setList(schedule)
     }
   }
 

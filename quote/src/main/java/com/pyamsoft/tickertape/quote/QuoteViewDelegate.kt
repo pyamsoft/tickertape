@@ -17,10 +17,11 @@
 package com.pyamsoft.tickertape.quote
 
 import android.graphics.Color
+import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.CheckResult
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.quote.databinding.QuoteItemBinding
@@ -30,41 +31,55 @@ import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
-class QuoteView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<QuoteViewState, QuoteViewEvent, QuoteItemBinding>(parent) {
+class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
 
-  override val viewBinding = QuoteItemBinding::inflate
-
-  override val layoutRoot by boundView { quoteItem }
+  private var realBinding: QuoteItemBinding?
+  private val binding: QuoteItemBinding
+    get() = requireNotNull(realBinding)
 
   init {
-    doOnInflate {
-      binding.quoteItem.setOnLongClickListener {
-        publish(QuoteViewEvent.Remove)
+    val inflater = LayoutInflater.from(parent.context)
+    realBinding = QuoteItemBinding.inflate(inflater, parent)
+  }
+
+  @CheckResult
+  fun id(): Int {
+    return binding.quoteItem.id
+  }
+
+  fun inflate(onViewEvent: (QuoteViewEvent) -> Unit) {
+    binding.apply {
+      quoteItem.setOnLongClickListener {
+        onViewEvent(QuoteViewEvent.Remove)
         return@setOnLongClickListener true
       }
-    }
 
-    doOnTeardown { binding.quoteItem.setOnLongClickListener(null) }
-
-    doOnInflate { binding.quoteItem.setOnDebouncedClickListener { publish(QuoteViewEvent.Select) } }
-
-    doOnTeardown { binding.quoteItem.setOnDebouncedClickListener(null) }
-
-    doOnTeardown {
-      clearSession(binding.quoteItemData.quoteItemAfterNumbers)
-      clearSession(binding.quoteItemData.quoteItemNormalNumbers)
-
-      binding.quoteItemSymbol.text = ""
-      binding.quoteItemCompany.text = ""
+      quoteItem.setOnDebouncedClickListener { onViewEvent(QuoteViewEvent.Select) }
     }
   }
 
-  override fun onRender(state: UiRender<QuoteViewState>) {
-    state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
+  fun teardown() {
+    binding.apply {
+      quoteItem.setOnLongClickListener(null)
 
-    state.mapChanged { it.quote }.render(viewScope) { handleQuote(it) }
+      clearSession(quoteItemData.quoteItemAfterNumbers)
+      clearSession(quoteItemData.quoteItemNormalNumbers)
+
+      quoteItemSymbol.text = ""
+      quoteItemCompany.text = ""
+
+      quoteItem.setOnDebouncedClickListener(null)
+    }
+
+    realBinding = null
+  }
+
+  fun render(scope: CoroutineScope, state: UiRender<QuoteViewState>) {
+    state.mapChanged { it.symbol }.render(scope) { handleSymbolChanged(it) }
+
+    state.mapChanged { it.quote }.render(scope) { handleQuote(it) }
   }
 
   private fun handleQuote(quote: StockQuote?) {

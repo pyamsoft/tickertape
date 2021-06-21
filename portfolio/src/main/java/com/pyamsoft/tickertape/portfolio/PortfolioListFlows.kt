@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class ManagePortfolioViewState
-internal constructor(val symbol: StockSymbol, val page: PortfolioPage) : UiViewState
+data class PortfolioListViewState(val stock: PortfolioStock) : UiViewState
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+sealed class PortfolioListViewEvent : UiViewEvent {
 
-  object Close : ManagePortfolioViewEvent()
-}
+  object Select : PortfolioListViewEvent()
 
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  object PushHolding : ManagePortfolioControllerEvent()
-
-  object PushPositions : ManagePortfolioControllerEvent()
+  object Remove : PortfolioListViewEvent()
 }

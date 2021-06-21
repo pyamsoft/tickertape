@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.holding
+package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -22,14 +22,13 @@ import androidx.annotation.ColorInt
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSummaryBinding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import javax.inject.Inject
 
 class HoldingSummary @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HoldingViewState, HoldingViewEvent, HoldingSummaryBinding>(parent) {
+    BaseUiView<PortfolioListViewState, PortfolioListViewEvent, HoldingSummaryBinding>(parent) {
 
   override val viewBinding = HoldingSummaryBinding::inflate
 
@@ -39,23 +38,23 @@ class HoldingSummary @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { clear() }
   }
 
-  override fun onRender(state: UiRender<HoldingViewState>) {
-    state.mapChanged { it.stock }.mapChanged { it?.totalShares() }.render(viewScope) {
+  override fun onRender(state: UiRender<PortfolioListViewState>) {
+    state.mapChanged { it.stock }.mapChanged { it.totalShares() }.render(viewScope) {
       handleTotalSharesChanged(it)
     }
-    state.mapChanged { it.stock }.mapChanged { it?.averagePrice() }.render(viewScope) {
+    state.mapChanged { it.stock }.mapChanged { it.averagePrice() }.render(viewScope) {
       handleAveragePriceChanged(it)
     }
-    state.mapChanged { it.stock }.mapChanged { it?.cost() }.render(viewScope) {
+    state.mapChanged { it.stock }.mapChanged { it.cost() }.render(viewScope) {
       handleCostChanged(it)
     }
-    state.mapChanged { it.stock }.mapChanged { it?.gainLossDisplayString() }.render(viewScope) {
+    state.mapChanged { it.stock }.mapChanged { it.gainLossDisplayString() }.render(viewScope) {
       handleGainLossChanged(it)
     }
-    state.mapChanged { it.stock }.mapChanged { it?.current() }.render(viewScope) {
+    state.mapChanged { it.stock }.mapChanged { it.current() }.render(viewScope) {
       handleCurrentValueChanged(it)
     }
-    state.mapChanged { it.stock }.mapChanged { it?.directionColor() }.render(viewScope) {
+    state.mapChanged { it.stock }.mapChanged { it.directionColor() }.render(viewScope) {
       handleDirectionChanged(it)
     }
   }

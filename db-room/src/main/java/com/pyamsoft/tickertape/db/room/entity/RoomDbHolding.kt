@@ -56,8 +56,8 @@ internal constructor(
       return if (item is RoomDbHolding) item
       else {
         RoomDbHolding(
-          item.id(),
-          item.symbol(),
+            item.id(),
+            item.symbol(),
         )
       }
     }

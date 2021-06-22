@@ -22,11 +22,10 @@ import android.widget.EditText
 import androidx.annotation.CheckResult
 import timber.log.Timber
 
-
 class UiEditTextDelegate
 private constructor(
-  private var editText: EditText?,
-  private var onTextChanged: ((String) -> Boolean)?
+    private var editText: EditText?,
+    private var onTextChanged: ((String) -> Boolean)?
 ) {
 
   // NOTE(Peter): Hack because Android does not allow us to use Controlled view components like
@@ -116,9 +115,9 @@ private constructor(
 
     @JvmStatic
     private inline fun ignoreTextWatcher(
-      editText: EditText,
-      textWatcher: TextWatcher,
-      block: (EditText) -> Unit
+        editText: EditText,
+        textWatcher: TextWatcher,
+        block: (EditText) -> Unit
     ) {
       editText.removeTextChangedListener(textWatcher)
       block(editText)
@@ -128,8 +127,8 @@ private constructor(
     @JvmStatic
     @CheckResult
     private inline fun createTextWatcher(
-      editText: EditText,
-      crossinline onChange: (String) -> Boolean
+        editText: EditText,
+        crossinline onChange: (String) -> Boolean
     ): TextWatcher {
       return object : TextWatcher {
 
@@ -150,17 +149,17 @@ private constructor(
         }
 
         override fun beforeTextChanged(
-          s: CharSequence,
-          start: Int,
-          count: Int,
-          after: Int,
+            s: CharSequence,
+            start: Int,
+            count: Int,
+            after: Int,
         ) {}
 
         override fun onTextChanged(
-          s: CharSequence,
-          start: Int,
-          before: Int,
-          count: Int,
+            s: CharSequence,
+            start: Int,
+            before: Int,
+            count: Int,
         ) {}
       }
     }

@@ -28,8 +28,8 @@ import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
 import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
-import com.pyamsoft.tickertape.portfolio.item.PortfolioListComponent
-import com.pyamsoft.tickertape.portfolio.item.PortfolioListViewState
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class PortfolioList
 internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    factory: PortfolioListComponent.Factory
+    factory: PortfolioItemComponent.Factory
 ) :
     BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
@@ -59,9 +59,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -155,7 +155,15 @@ internal constructor(
   }
 
   private fun setList(list: List<PortfolioStock>) {
-    val data = list.map { PortfolioListViewState(stock = it) }
+    val data =
+        listOf(
+            PortfolioItemViewState.Header(
+                totalCost = list.sumCost(),
+                totalToday = list.sumToday(),
+                totalGainLoss = list.sumGainLoss(),
+                totalPercent = list.sumPercent(),
+                totalDirection = list.sumDirection())) +
+            list.map { PortfolioItemViewState.Holding(stock = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }

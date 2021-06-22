@@ -16,19 +16,23 @@
 
 package com.pyamsoft.tickertape.portfolio.item
 
-import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import com.pyamsoft.pydroid.arch.ViewBinder
 
-@Subcomponent
-interface PortfolioListComponent {
+abstract class BasePortfolioItemViewHolder<S : PortfolioItemViewState>
+protected constructor(itemView: View) : RecyclerView.ViewHolder(itemView), ViewBinder<S> {
 
-  fun inject(holder: PortfolioItemViewHolder)
+  protected abstract val viewBinder: ViewBinder<S>
 
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): PortfolioListComponent
+  final override fun bindState(state: S) {
+    viewBinder.bindState(state)
   }
+
+  final override fun teardown() {
+    viewBinder.teardown()
+    onTeardown()
+  }
+
+  protected abstract fun onTeardown()
 }

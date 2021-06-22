@@ -21,7 +21,6 @@ import android.os.Looper
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView

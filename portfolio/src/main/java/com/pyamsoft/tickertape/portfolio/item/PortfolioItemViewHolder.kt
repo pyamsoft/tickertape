@@ -16,9 +16,9 @@
 
 package com.pyamsoft.tickertape.portfolio.item
 
+import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.util.layout
@@ -28,11 +28,11 @@ import javax.inject.Inject
 
 class PortfolioItemViewHolder
 internal constructor(
-  binding: PortfolioItemBinding,
-  factory: PortfolioListComponent.Factory,
-  owner: LifecycleOwner,
-  callback: PortfolioAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<PortfolioListViewState> {
+    binding: PortfolioItemBinding,
+    factory: PortfolioItemComponent.Factory,
+    owner: LifecycleOwner,
+    callback: PortfolioAdapter.Callback
+) : BasePortfolioItemViewHolder<PortfolioItemViewState.Holding>(binding.root) {
 
   @Inject @JvmField internal var quote: PortfolioItemQuote? = null
 
@@ -40,7 +40,7 @@ internal constructor(
 
   @Inject @JvmField internal var click: PortfolioItemClick? = null
 
-  private val viewBinder: ViewBinder<PortfolioListViewState>
+  override val viewBinder: ViewBinder<PortfolioItemViewState.Holding>
 
   init {
     factory.create(binding.portfolioItemRoot).inject(this)
@@ -50,9 +50,10 @@ internal constructor(
 
     viewBinder =
         createViewBinder(quote, summary, requireNotNull(click)) {
+          val pos = modelPosition()
           return@createViewBinder when (it) {
-            is PortfolioListViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
-            is PortfolioListViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
+            is PortfolioItemViewEvent.Remove -> callback.onRemove(pos)
+            is PortfolioItemViewEvent.Select -> callback.onSelect(pos)
           }
         }
 
@@ -77,13 +78,13 @@ internal constructor(
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: PortfolioListViewState) {
-    viewBinder.bindState(state)
+  @CheckResult
+  private fun modelPosition(): Int {
+    // Subtract 1 because item 0 is the header
+    return bindingAdapterPosition - 1
   }
 
-  override fun teardown() {
-    viewBinder.teardown()
-
+  override fun onTeardown() {
     click = null
     quote = null
     summary = null

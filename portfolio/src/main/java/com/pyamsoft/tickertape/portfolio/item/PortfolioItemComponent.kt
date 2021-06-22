@@ -16,15 +16,21 @@
 
 package com.pyamsoft.tickertape.portfolio.item
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import android.view.ViewGroup
+import androidx.annotation.CheckResult
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-data class PortfolioListViewState(val stock: PortfolioStock) : UiViewState
+@Subcomponent
+interface PortfolioItemComponent {
 
-sealed class PortfolioListViewEvent : UiViewEvent {
+  fun inject(holder: PortfolioItemViewHolder)
 
-  object Select : PortfolioListViewEvent()
+  fun inject(holder: PortfolioItemViewHeader)
 
-  object Remove : PortfolioListViewEvent()
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): PortfolioItemComponent
+  }
 }

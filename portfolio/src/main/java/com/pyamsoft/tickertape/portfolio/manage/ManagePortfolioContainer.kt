@@ -18,8 +18,6 @@ package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.main.MainViewEvent
-import com.pyamsoft.tickertape.main.MainViewState
 import com.pyamsoft.tickertape.main.databinding.MainContainerBinding
 import javax.inject.Inject
 

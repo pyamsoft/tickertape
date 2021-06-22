@@ -41,7 +41,10 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
         interactor.getQuotes(true, symbols)
       }
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): ResultWrapper<List<StockQuote>> =
+  override suspend fun getQuotes(
+      force: Boolean,
+      symbols: List<StockSymbol>
+  ): ResultWrapper<List<StockQuote>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

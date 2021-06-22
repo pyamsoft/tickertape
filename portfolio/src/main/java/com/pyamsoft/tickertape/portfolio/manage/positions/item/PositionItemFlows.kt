@@ -27,5 +27,4 @@ internal constructor(val position: DbPosition, val holding: DbHolding) : UiViewS
 sealed class PositionItemViewEvent : UiViewEvent {
 
   object Remove : PositionItemViewEvent()
-
 }

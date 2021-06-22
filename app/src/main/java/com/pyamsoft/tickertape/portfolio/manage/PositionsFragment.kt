@@ -108,7 +108,7 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
 
     binding.layoutConstraint.layout {
       shareCount.also {
-          connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)

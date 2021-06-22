@@ -23,14 +23,14 @@ import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
 class PortfolioItemClick @Inject internal constructor(parent: ViewGroup) :
-    UiView<PortfolioListViewState, PortfolioListViewEvent>() {
+    UiView<PortfolioItemViewState.Holding, PortfolioItemViewEvent>() {
 
   init {
 
-    doOnInflate { parent.setOnDebouncedClickListener { publish(PortfolioListViewEvent.Select) } }
+    doOnInflate { parent.setOnDebouncedClickListener { publish(PortfolioItemViewEvent.Select) } }
 
     doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
 
-  override fun render(state: UiRender<PortfolioListViewState>) {}
+  override fun render(state: UiRender<PortfolioItemViewState.Holding>) {}
 }

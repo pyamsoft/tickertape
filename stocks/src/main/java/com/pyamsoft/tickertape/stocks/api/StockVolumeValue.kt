@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockShareValueImpl
 import com.pyamsoft.tickertape.stocks.data.StockVolumeValueImpl
 
 interface StockVolumeValue : StockNumberValue {

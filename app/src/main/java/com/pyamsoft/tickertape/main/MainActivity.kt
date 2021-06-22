@@ -111,7 +111,7 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
             is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
             is MainViewEvent.OpenPortfolio ->
-              viewModel.handleSelectPage(MainPage.Portfolio, force = false)
+                viewModel.handleSelectPage(MainPage.Portfolio, force = false)
             is MainViewEvent.OpenWatchList ->
                 viewModel.handleSelectPage(MainPage.WatchList, force = false)
             is MainViewEvent.OpenSettings ->

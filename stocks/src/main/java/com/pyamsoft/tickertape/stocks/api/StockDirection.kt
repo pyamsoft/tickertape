@@ -22,8 +22,7 @@ import com.pyamsoft.tickertape.stocks.data.StockDirectionImpl
 
 interface StockDirection : StockNumberValue {
 
-  @CheckResult
-  fun sign(): String
+  @CheckResult fun sign(): String
 
   @CheckResult fun isUp(): Boolean
 

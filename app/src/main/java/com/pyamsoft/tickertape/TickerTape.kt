@@ -94,14 +94,14 @@ class TickerTape : Application() {
       // We are using pydroid-autopsy
       OssLibraries.usingAutopsy = true
 
-        OssLibraries.add(
-            "Room",
-            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
-            "The AndroidX Jetpack Room library. Fluent SQLite database access.")
-        OssLibraries.add(
-            "WorkManager",
-            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/work/",
-            "The AndroidX Jetpack WorkManager library. Schedule periodic work in a device friendly way.")
+      OssLibraries.add(
+          "Room",
+          "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
+          "The AndroidX Jetpack Room library. Fluent SQLite database access.")
+      OssLibraries.add(
+          "WorkManager",
+          "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/work/",
+          "The AndroidX Jetpack WorkManager library. Schedule periodic work in a device friendly way.")
       OssLibraries.add(
           "Dagger",
           "https://github.com/google/dagger",

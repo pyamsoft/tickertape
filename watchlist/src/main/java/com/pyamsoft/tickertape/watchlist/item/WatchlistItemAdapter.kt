@@ -22,7 +22,6 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 import me.zhanghai.android.fastscroll.PopupTextProvider
@@ -32,9 +31,7 @@ private constructor(
     private val factory: WatchlistListComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) :
-    ListAdapter<WatchlistItemViewState, WatchlistViewHolder>(DIFFER),
-    PopupTextProvider {
+) : ListAdapter<WatchlistItemViewState, WatchlistViewHolder>(DIFFER), PopupTextProvider {
 
   companion object {
 
@@ -50,7 +47,10 @@ private constructor(
 
     private val DIFFER =
         object : DiffUtil.ItemCallback<WatchlistItemViewState>() {
-          override fun areItemsTheSame(oldItem: WatchlistItemViewState, newItem: WatchlistItemViewState): Boolean {
+          override fun areItemsTheSame(
+              oldItem: WatchlistItemViewState,
+              newItem: WatchlistItemViewState
+          ): Boolean {
             return oldItem.symbol.symbol() == newItem.symbol.symbol()
           }
 
@@ -72,19 +72,13 @@ private constructor(
     return getItem(position).symbol.symbol().hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int
-  ): WatchlistViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = WatchlistItemBinding.inflate(inflater, parent, false)
     return WatchlistViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(
-      holder: WatchlistViewHolder,
-      position: Int
-  ) {
+  override fun onBindViewHolder(holder: WatchlistViewHolder, position: Int) {
     val state = getItem(position)
     holder.bindState(state)
   }

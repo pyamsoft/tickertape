@@ -20,7 +20,6 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.UiRender

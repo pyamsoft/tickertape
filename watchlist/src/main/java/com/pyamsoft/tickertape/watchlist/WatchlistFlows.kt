@@ -21,7 +21,8 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 
-data class WatchListViewState internal constructor(
+data class WatchListViewState
+internal constructor(
     val error: Throwable?,
     val isLoading: Boolean,
     val quotes: List<QuotedStock>,
@@ -37,5 +38,5 @@ sealed class WatchListViewEvent : UiViewEvent {
 
 sealed class WatchListControllerEvent : UiControllerEvent {
 
-    object AddNewSymbol: WatchListControllerEvent()
+  object AddNewSymbol : WatchListControllerEvent()
 }

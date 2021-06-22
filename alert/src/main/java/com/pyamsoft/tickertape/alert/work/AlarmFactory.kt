@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.alert.work
 
 import androidx.annotation.CheckResult
-import javax.inject.Singleton
 
 interface AlarmFactory {
 

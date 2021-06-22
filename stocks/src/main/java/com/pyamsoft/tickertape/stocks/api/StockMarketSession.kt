@@ -38,5 +38,5 @@ interface StockMarketSession {
 
   @CheckResult fun dayLow(): StockMoneyValue
 
-  @CheckResult fun dayVolume(): Long
+  @CheckResult fun dayVolume(): StockVolumeValue
 }

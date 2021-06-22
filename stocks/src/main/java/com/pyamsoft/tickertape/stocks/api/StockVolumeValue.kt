@@ -17,27 +17,28 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
+import com.pyamsoft.tickertape.stocks.data.StockShareValueImpl
+import com.pyamsoft.tickertape.stocks.data.StockVolumeValueImpl
 
-interface StockPercent : StockNumberValue {
+interface StockVolumeValue : StockNumberValue {
 
-  @CheckResult fun asPercentValue(): String
+  @CheckResult fun asVolumeValue(): String
 
-  @CheckResult fun value(): Double
+  @CheckResult fun value(): Long
 
   companion object {
 
-    private val EMPTY = 0.0.asPercent()
+    private val EMPTY = 0L.asVolume()
 
     @JvmStatic
     @CheckResult
-    fun none(): StockPercent {
+    fun none(): StockVolumeValue {
       return EMPTY
     }
   }
 }
 
 @CheckResult
-fun Double.asPercent(): StockPercent {
-  return StockPercentImpl(this)
+fun Long.asVolume(): StockVolumeValue {
+  return StockVolumeValueImpl(this)
 }

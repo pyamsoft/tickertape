@@ -21,6 +21,7 @@ import androidx.core.view.isInvisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemSummaryBinding
 import javax.inject.Inject
 
@@ -46,14 +47,14 @@ class WatchlistItemSummary @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  private fun handleDayVolumeChanged(volume: Long?) {
+  private fun handleDayVolumeChanged(volume: StockVolumeValue?) {
     binding.apply {
       val missing = volume == null
       watchlistItemSummaryVolumeLabel.isInvisible = missing
       watchlistItemSummaryVolumeText.isInvisible = missing
 
       if (volume != null) {
-        watchlistItemSummaryVolumeText.text = volume.toString()
+        watchlistItemSummaryVolumeText.text = volume.asVolumeValue()
       }
     }
   }

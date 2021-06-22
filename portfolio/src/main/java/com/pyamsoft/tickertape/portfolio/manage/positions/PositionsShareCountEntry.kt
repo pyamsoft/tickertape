@@ -68,7 +68,8 @@ class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleNumberOfSharesChanged(numberOfShares: StockShareValue) {
-    val text = if (numberOfShares.isZero()) "" else numberOfShares.asShareValue()
+    // Don't use asShareValue() here to avoid getting a format string with commas and stuff
+    val text = if (numberOfShares.isZero()) "" else numberOfShares.value().toString()
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

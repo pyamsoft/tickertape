@@ -17,18 +17,16 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import java.text.DecimalFormat
+import java.text.NumberFormat
 
 internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
 
   private val money by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "0.00" else "%.2f".format(value)
+    if (isZero()) "0.00" else requireNotNull(FORMATTER.get()).format(value)
   }
 
   override fun asMoneyValue(): String {
-    return "\$${money}"
-  }
-
-  override fun asFixedValue(): String {
     return money
   }
 
@@ -38,5 +36,18 @@ internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyV
 
   override fun isZero(): Boolean {
     return value.compareTo(0) == 0
+  }
+
+  companion object {
+    private val FORMATTER =
+        object : ThreadLocal<NumberFormat>() {
+
+          override fun initialValue(): NumberFormat? {
+            return DecimalFormat.getCurrencyInstance().apply {
+              minimumFractionDigits = 2
+              maximumFractionDigits = 2
+            }
+          }
+        }
   }
 }

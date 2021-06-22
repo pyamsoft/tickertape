@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 import com.pyamsoft.tickertape.stocks.network.NetworkStock
@@ -70,7 +71,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                       dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
                       dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
                       dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
-                      dayVolume = requireNotNull(stock.regularMarketVolume),
+                      dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
                   ),
               afterHours =
                   if (!hasAfterHoursData(stock)) null
@@ -85,7 +86,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                         dayHigh = requireNotNull(stock.postMarketDayHigh).asMoney(),
                         dayLow = requireNotNull(stock.postMarketDayLow).asMoney(),
                         dayOpen = requireNotNull(stock.postMarketOpen).asMoney(),
-                        dayVolume = requireNotNull(stock.postMarketVolume),
+                        dayVolume = requireNotNull(stock.postMarketVolume).asVolume(),
                     )
                   })
         }

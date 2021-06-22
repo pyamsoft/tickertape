@@ -16,26 +16,26 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
-import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
-internal data class StockPercentImpl(private val percent: Double) : StockPercent {
+internal data class StockVolumeValueImpl(private val value: Long) : StockVolumeValue {
 
-  private val stockPercent by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "0.00%" else requireNotNull(FORMATTER.get()).format(percent / 100)
+  private val volume by lazy(LazyThreadSafetyMode.NONE) {
+    if (isZero()) "0" else requireNotNull(FORMATTER.get()).format(value)
   }
 
-  override fun asPercentValue(): String {
-    return stockPercent
+  override fun asVolumeValue(): String {
+    return volume
   }
 
-  override fun value(): Double {
-    return percent
+  override fun value(): Long {
+    return value
   }
 
   override fun isZero(): Boolean {
-    return percent.compareTo(0) == 0
+    return value.compareTo(0) == 0
   }
 
   companion object {
@@ -43,9 +43,10 @@ internal data class StockPercentImpl(private val percent: Double) : StockPercent
         object : ThreadLocal<NumberFormat>() {
 
           override fun initialValue(): NumberFormat {
-            return DecimalFormat.getPercentInstance().apply {
-              minimumFractionDigits = 2
-              maximumFractionDigits = 2
+            return DecimalFormat.getNumberInstance().apply {
+              isParseIntegerOnly = true
+              minimumFractionDigits = 0
+              maximumFractionDigits = 0
             }
           }
         }

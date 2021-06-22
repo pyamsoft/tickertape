@@ -126,7 +126,7 @@ internal constructor(
 
         return@withContext try {
           // TODO move this query into the DAO layer
-          val dbPosition = positionQueryDao.query(true).find { it.id() == id }
+          val dbPosition = positionQueryDao.query(true).firstOrNull { it.id() == id }
           if (dbPosition == null) {
             val err = IllegalStateException("Position does not exist in DB: $id")
             Timber.e(err)

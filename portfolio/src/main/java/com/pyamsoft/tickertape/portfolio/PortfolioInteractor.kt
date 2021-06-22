@@ -102,7 +102,7 @@ internal constructor(
 
         return@withContext try {
           // TODO move this query into the DAO layer
-          val dbHolding = holdingQueryDao.query(true).find { it.id() == id }
+          val dbHolding = holdingQueryDao.query(true).firstOrNull { it.id() == id }
           if (dbHolding == null) {
             val err = IllegalStateException("Holding does not exist in DB: $id")
             Timber.e(err)

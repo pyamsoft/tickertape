@@ -45,15 +45,22 @@ internal constructor(
         return@withContext try {
           for (symbol in symbols) {
             // TODO move this query into the DAO layer
-            val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
+            val existingHolding =
+                holdingQueryDao.query(true).firstOrNull {
+                  // Compare raw symbols for string case checking
+                  it.symbol().symbol() == symbol.symbol()
+                }
             if (existingHolding != null) {
               Timber.d("Holding already exists in DB: $existingHolding")
               continue
             }
 
             val newHolding = JsonMappableDbHolding.create(symbol)
-            Timber.d("Insert new holding into DB: $newHolding")
-            holdingInsertDao.insert(newHolding)
+            if (holdingInsertDao.insert(newHolding)) {
+              Timber.d("Insert new holding into DB: $$newHolding")
+            } else {
+              Timber.d("Update existing holding into DB: $newHolding")
+            }
           }
 
           ResultWrapper.success(Unit)

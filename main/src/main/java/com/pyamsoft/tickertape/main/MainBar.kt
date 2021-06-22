@@ -55,9 +55,9 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
             top = 0)
 
         // Make sure we are laid out before grabbing the height
-        view.doOnLayout { v ->
+        view.post {
           // Publish the measured height
-          publish(MainViewEvent.BottomBarMeasured(v.height))
+          publish(MainViewEvent.BottomBarMeasured(view.height))
         }
       }
     }

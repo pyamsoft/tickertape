@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginStart="8dp"
-            android:text="Close"
+            android:text="Previous Close"
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"

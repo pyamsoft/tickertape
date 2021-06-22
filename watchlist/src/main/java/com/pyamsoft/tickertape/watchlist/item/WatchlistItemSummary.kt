@@ -38,9 +38,9 @@ class WatchlistItemSummary @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<WatchlistItemViewState>) {
-    state.mapChanged { it.quote }.mapChanged { it?.afterHours() ?: it?.regular() }.apply {
+    state.mapChanged { it.quote }.apply {
       mapChanged { it?.dayOpen() }.render(viewScope) { handleDayOpenChanged(it) }
-      mapChanged { it?.dayClose() }.render(viewScope) { handleDayCloseChanged(it) }
+      mapChanged { it?.dayPreviousClose() }.render(viewScope) { handleDayCloseChanged(it) }
       mapChanged { it?.dayHigh() }.render(viewScope) { handleDayHighChanged(it) }
       mapChanged { it?.dayLow() }.render(viewScope) { handleDayLowChanged(it) }
       mapChanged { it?.dayVolume() }.render(viewScope) { handleDayVolumeChanged(it) }

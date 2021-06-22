@@ -60,18 +60,17 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
               symbol = stock.symbol.asSymbol(),
               company = requireNotNull(stock.shortName).asCompany(),
               dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
+              dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
+              dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
+              dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
+              dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
+              dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
               regular =
                   StockMarketSessionImpl(
                       amount = requireNotNull(stock.regularMarketChange).asMoney(),
                       direction = requireNotNull(stock.regularMarketChange).asDirection(),
                       percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
                       price = requireNotNull(stock.regularMarketPrice).asMoney(),
-                      previousClosingPrice = stock.regularMarketPreviousClose?.asMoney(),
-                      dayClose = stock.regularMarketClose?.asMoney(),
-                      dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
-                      dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
-                      dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
-                      dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
                   ),
               afterHours =
                   if (!hasAfterHoursData(stock)) null
@@ -81,12 +80,6 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                         direction = requireNotNull(stock.postMarketChange).asDirection(),
                         percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
                         price = requireNotNull(stock.postMarketPrice).asMoney(),
-                        previousClosingPrice = stock.postMarketPreviousClose?.asMoney(),
-                        dayClose = stock.postMarketClose?.asMoney(),
-                        dayHigh = requireNotNull(stock.postMarketDayHigh).asMoney(),
-                        dayLow = requireNotNull(stock.postMarketDayLow).asMoney(),
-                        dayOpen = requireNotNull(stock.postMarketOpen).asMoney(),
-                        dayVolume = requireNotNull(stock.postMarketVolume).asVolume(),
                     )
                   })
         }
@@ -119,7 +112,6 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 "regularMarketChange",
                 "regularMarketChangePercent",
                 "regularMarketOpen",
-                "regularMarketClose",
                 "regularMarketPreviousClose",
                 "regularMarketDayHigh",
                 "regularMarketDayLow",
@@ -129,13 +121,6 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 "postMarketPrice",
                 "postMarketChange",
                 "postMarketChangePercent",
-                "postMarketOpen",
-                "postMarketClose",
-                "postMarketPreviousClose",
-                "postMarketDayHigh",
-                "postMarketDayLow",
-                "postMarketDayRange",
-                "postMarketVolume",
             )
             .joinToString(",")
     private const val YF_QUOTE_FORMAT = "json"
@@ -145,13 +130,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
     @CheckResult
     private fun hasAfterHoursData(stock: NetworkStock): Boolean {
       return stock.run {
-        postMarketChange != null &&
-            postMarketPrice != null &&
-            postMarketChangePercent != null &&
-            postMarketDayHigh != null &&
-            postMarketDayLow != null &&
-            postMarketDayRange != null &&
-            postMarketVolume != null
+        postMarketChange != null && postMarketPrice != null && postMarketChangePercent != null
       }
     }
 

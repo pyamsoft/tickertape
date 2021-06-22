@@ -18,15 +18,22 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 
 internal data class StockQuoteImpl(
     private val symbol: StockSymbol,
     private val company: StockCompany,
     private val regular: StockMarketSession,
     private val afterHours: StockMarketSession?,
-    private val dataDelayBy: Long
+    private val dataDelayBy: Long,
+    private val dayPreviousClose: StockMoneyValue?,
+    private val dayHigh: StockMoneyValue,
+    private val dayLow: StockMoneyValue,
+    private val dayOpen: StockMoneyValue,
+    private val dayVolume: StockVolumeValue,
 ) : StockQuote {
 
   override fun symbol(): StockSymbol {
@@ -47,5 +54,25 @@ internal data class StockQuoteImpl(
 
   override fun afterHours(): StockMarketSession? {
     return afterHours
+  }
+
+  override fun dayPreviousClose(): StockMoneyValue? {
+    return dayPreviousClose
+  }
+
+  override fun dayVolume(): StockVolumeValue {
+    return dayVolume
+  }
+
+  override fun dayOpen(): StockMoneyValue {
+    return dayOpen
+  }
+
+  override fun dayLow(): StockMoneyValue {
+    return dayLow
+  }
+
+  override fun dayHigh(): StockMoneyValue {
+    return dayHigh
   }
 }

@@ -29,4 +29,14 @@ interface StockQuote {
   @CheckResult fun afterHours(): StockMarketSession?
 
   @CheckResult fun dataDelayBy(): Long
+
+  @CheckResult fun dayPreviousClose(): StockMoneyValue?
+
+  @CheckResult fun dayOpen(): StockMoneyValue
+
+  @CheckResult fun dayHigh(): StockMoneyValue
+
+  @CheckResult fun dayLow(): StockMoneyValue
+
+  @CheckResult fun dayVolume(): StockVolumeValue
 }

@@ -24,19 +24,7 @@ interface StockMarketSession {
 
   @CheckResult fun price(): StockMoneyValue
 
-  @CheckResult fun previousClosingPrice(): StockMoneyValue?
-
   @CheckResult fun amount(): StockMoneyValue
 
   @CheckResult fun percent(): StockPercent
-
-  @CheckResult fun dayOpen(): StockMoneyValue
-
-  @CheckResult fun dayClose(): StockMoneyValue?
-
-  @CheckResult fun dayHigh(): StockMoneyValue
-
-  @CheckResult fun dayLow(): StockMoneyValue
-
-  @CheckResult fun dayVolume(): StockVolumeValue
 }

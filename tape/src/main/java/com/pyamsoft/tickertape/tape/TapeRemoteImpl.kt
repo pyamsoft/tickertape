@@ -17,12 +17,15 @@
 package com.pyamsoft.tickertape.tape
 
 import android.app.Service
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.quote.QuotedStock
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -48,22 +51,34 @@ internal constructor(
     return
   }
 
+  @CheckResult
+  private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> {
+    return try {
+      val symbols = symbolQueryDao.query(force).map { it.symbol() }
+      interactor
+          .getQuotes(force, symbols)
+          .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
+          .recover { emptyList() }
+    } catch (e: Throwable) {
+      Timber.e(e, "Error fetching quotes")
+      ResultWrapper.failure(e)
+    }
+  }
+
   override suspend fun updateNotification(options: TapeRemote.NotificationOptions) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
+
         val force = options.forceRefresh
-        val symbols = symbolQueryDao.query(force).map { it.symbol() }
-        interactor
-            .getQuotes(force, symbols)
-            .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
-            .recover { emptyList() }
+        fetchQuotes(force)
             .onSuccess { quotes ->
               notifier.show(
-                      id = NOTIFICATION_ID,
-                      channelInfo = CHANNEL_INFO,
-                      notification = TapeNotificationData(quotes = quotes, index = options.index))
-                  .let { id -> Timber.d("Updated foreground notification $id") }
+                  id = NOTIFICATION_ID,
+                  channelInfo = CHANNEL_INFO,
+                  notification = TapeNotificationData(quotes = quotes, index = options.index))
             }
+            .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
+            .onFailure { Timber.e(it, "Unable to refresh notification") }
 
         // Unit
         return@withContext

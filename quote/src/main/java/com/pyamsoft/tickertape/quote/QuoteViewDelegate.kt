@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
@@ -91,7 +92,7 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
   }
 
   private fun handleQuoteMissing() {
-    binding.quoteItemData.quoteAfterHours.isGone = true
+    binding.quoteItemData.quoteAfterHours.isInvisible = true
     clearSession(binding.quoteItemData.quoteItemNormalNumbers)
     clearSession(binding.quoteItemData.quoteItemAfterNumbers)
 
@@ -111,7 +112,7 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
 
   private fun handleAfterSessionChanged(session: StockMarketSession?) {
     if (session == null) {
-      binding.quoteItemData.quoteAfterHours.isGone = true
+      binding.quoteItemData.quoteAfterHours.isInvisible = true
     } else {
       populateSession(binding.quoteItemData.quoteItemAfterNumbers, session)
       binding.quoteItemData.quoteAfterHours.isVisible = true

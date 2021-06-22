@@ -51,21 +51,22 @@ internal constructor(
   override suspend fun updateNotification(options: TapeRemote.NotificationOptions) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
-        val quotePairs =
-            try {
-              val force = options.forceRefresh
-              val symbols = symbolQueryDao.query(force).map { it.symbol() }
-              interactor.getQuotes(force, symbols)
-            } catch (e: Throwable) {
-              Timber.e(e, "Failed to fetch watchlist quotes")
-              emptyList()
+        val force = options.forceRefresh
+        val symbols = symbolQueryDao.query(force).map { it.symbol() }
+        interactor
+            .getQuotes(force, symbols)
+            .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
+            .recover { emptyList() }
+            .onSuccess { quotes ->
+              notifier.show(
+                      id = NOTIFICATION_ID,
+                      channelInfo = CHANNEL_INFO,
+                      notification = TapeNotificationData(quotes = quotes, index = options.index))
+                  .let { id -> Timber.d("Updated foreground notification $id") }
             }
 
-        notifier.show(
-                id = NOTIFICATION_ID,
-                channelInfo = CHANNEL_INFO,
-                notification = TapeNotificationData(quotes = quotePairs, index = options.index))
-            .let { id -> Timber.d("Updated foreground notification $id") }
+        // Unit
+        return@withContext
       }
 
   override fun stopNotification(service: Service) {

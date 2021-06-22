@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
@@ -51,15 +50,11 @@ internal constructor(
         setState(
             stateChange = { copy(isLoading = true) },
             andThen = {
-              try {
-                val quotes = interactor.getQuotes(force)
-                setState { copy(error = null, quotes = quotes, isLoading = false) }
-              } catch (error: Throwable) {
-                error.onActualError { e ->
-                  Timber.e(e, "Failed to fetch quotes")
-                  setState { copy(error = e, isLoading = false) }
-                }
-              }
+              interactor
+                  .getQuotes(force)
+                  .onSuccess { setState { copy(error = null, quotes = it, isLoading = false) } }
+                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                  .onFailure { setState { copy(error = it, isLoading = false) } }
             })
       }
 

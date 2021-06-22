@@ -16,7 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -32,57 +34,71 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class YahooFinanceSource
 @Inject
 internal constructor(@InternalApi private val service: QuoteService) : QuoteSource {
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
+  @CheckResult
+  private suspend fun fetchQuotes(symbols: List<StockSymbol>): List<StockQuote> {
+    val result =
+        service.getQuotes(
+            url = YF_QUOTE_SOURCE,
+            format = YF_QUOTE_FORMAT,
+            fields = YF_QUOTE_FIELDS,
+            symbols = symbols.joinToString(",") { it.symbol() })
+    return result
+        .quoteResponse
+        .result
+        .asSequence()
+        // If the symbol does not exist, these values will return null
+        // We need all of these values to have a valid ticker
+        .filterNot { it.shortName == null }
+        .filterNot { it.regularMarketChange == null }
+        .filterNot { it.regularMarketPrice == null }
+        .filterNot { it.regularMarketChangePercent == null }
+        // Only valid tickers here, so requireNotNull should never throw
+        .map {
+          StockQuoteImpl(
+              symbol = it.symbol.asSymbol(),
+              company = requireNotNull(it.shortName).asCompany(),
+              regular =
+                  StockMarketSessionImpl(
+                      amount = requireNotNull(it.regularMarketChange).asMoney(),
+                      direction = requireNotNull(it.regularMarketChange).asDirection(),
+                      percent = requireNotNull(it.regularMarketChangePercent).asPercent(),
+                      price = requireNotNull(it.regularMarketPrice).asMoney(),
+                  ),
+              afterHours =
+                  if (it.postMarketChange != null &&
+                      it.postMarketPrice != null &&
+                      it.postMarketChangePercent != null) {
+                    StockMarketSessionImpl(
+                        amount = it.postMarketChange.asMoney(),
+                        direction = it.postMarketChange.asDirection(),
+                        percent = it.postMarketChangePercent.asPercent(),
+                        price = it.postMarketPrice.asMoney(),
+                    )
+                  } else {
+                    null
+                  })
+        }
+        .toList()
+  }
+
+  override suspend fun getQuotes(
+      force: Boolean,
+      symbols: List<StockSymbol>
+  ): ResultWrapper<List<StockQuote>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        val result =
-            service.getQuotes(
-                url = YF_QUOTE_SOURCE,
-                format = YF_QUOTE_FORMAT,
-                fields = YF_QUOTE_FIELDS,
-                symbols = symbols.joinToString(",") { it.symbol() })
-        return@withContext result
-            .quoteResponse
-            .result
-            .asSequence()
-            // If the symbol does not exist, these values will return null
-            // We need all of these values to have a valid ticker
-            .filterNot { it.shortName == null }
-            .filterNot { it.regularMarketChange == null }
-            .filterNot { it.regularMarketPrice == null }
-            .filterNot { it.regularMarketChangePercent == null }
-            // Only valid tickers here, so requireNotNull should never throw
-            .map {
-              StockQuoteImpl(
-                  symbol = it.symbol.asSymbol(),
-                  company = requireNotNull(it.shortName).asCompany(),
-                  regular =
-                      StockMarketSessionImpl(
-                          amount = requireNotNull(it.regularMarketChange).asMoney(),
-                          direction = requireNotNull(it.regularMarketChange).asDirection(),
-                          percent = requireNotNull(it.regularMarketChangePercent).asPercent(),
-                          price = requireNotNull(it.regularMarketPrice).asMoney(),
-                      ),
-                  afterHours =
-                      if (it.postMarketChange != null &&
-                          it.postMarketPrice != null &&
-                          it.postMarketChangePercent != null) {
-                        StockMarketSessionImpl(
-                            amount = it.postMarketChange.asMoney(),
-                            direction = it.postMarketChange.asDirection(),
-                            percent = it.postMarketChangePercent.asPercent(),
-                            price = it.postMarketPrice.asMoney(),
-                        )
-                      } else {
-                        null
-                      })
-            }
-            .toList()
+        return@withContext try {
+          ResultWrapper.success(fetchQuotes(symbols))
+        } catch (e: Throwable) {
+          Timber.e(e, "Unable to fetch stock quotes from YF")
+          ResultWrapper.failure(e)
+        }
       }
 
   companion object {

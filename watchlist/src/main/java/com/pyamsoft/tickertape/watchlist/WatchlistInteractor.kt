@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -55,7 +56,7 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getQuotes(force: Boolean): List<QuotedStock> =
+  suspend fun getQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         val symbols = getSymbols(force)

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -29,21 +30,25 @@ import kotlinx.coroutines.withContext
 class QuoteInteractor @Inject internal constructor(private val interactor: StockInteractor) {
 
   @CheckResult
-  suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<QuotedStock> =
+  suspend fun getQuotes(
+      force: Boolean,
+      symbols: List<StockSymbol>
+  ): ResultWrapper<List<QuotedStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         // If we have no symbols, don't even make the trip
         if (symbols.isEmpty()) {
-          return@withContext emptyList()
+          return@withContext ResultWrapper.success(emptyList())
         }
 
-        val quotePairs = mutableListOf<QuotedStock>()
-        val quotes = interactor.getQuotes(force, symbols)
-        for (symbol in symbols) {
-          val quote = quotes.firstOrNull { it.symbol() == symbol }
-          quotePairs.add(QuotedStock(symbol = symbol, quote = quote))
+        return@withContext interactor.getQuotes(force, symbols).map { quotes ->
+          val quotePairs = mutableListOf<QuotedStock>()
+          for (symbol in symbols) {
+            val quote = quotes.firstOrNull { it.symbol() == symbol }
+            quotePairs.add(QuotedStock(symbol = symbol, quote = quote))
+          }
+          return@map quotePairs
         }
-        return@withContext quotePairs
       }
 }

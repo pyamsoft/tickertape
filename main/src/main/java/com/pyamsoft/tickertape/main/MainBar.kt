@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
@@ -47,7 +48,11 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
     doOnInflate {
       layoutRoot.doOnApplyWindowInsets(owner) { view, insets, _ ->
-        view.updatePadding(bottom = insets.systemWindowInsetBottom, left = 0, right = 0, top = 0)
+        view.updatePadding(
+            bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom,
+            left = 0,
+            right = 0,
+            top = 0)
 
         // Make sure we are laid out before grabbing the height
         view.doOnLayout { v ->

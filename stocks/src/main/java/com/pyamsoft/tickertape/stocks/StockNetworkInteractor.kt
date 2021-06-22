@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
@@ -30,7 +31,10 @@ internal constructor(
     @InternalApi private val quoteSource: QuoteSource,
 ) : StockInteractor {
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
+  override suspend fun getQuotes(
+      force: Boolean,
+      symbols: List<StockSymbol>
+  ): ResultWrapper<List<StockQuote>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext quoteSource.getQuotes(force, symbols)

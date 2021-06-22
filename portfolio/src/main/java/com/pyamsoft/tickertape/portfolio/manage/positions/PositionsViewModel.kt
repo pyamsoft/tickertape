@@ -21,7 +21,6 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -52,23 +51,18 @@ internal constructor(
                 isLoading = false,
                 numberOfShares = StockShareValue.none(),
                 pricePerShare = StockMoneyValue.none(),
-                stock = null)
-    ) {
+                stock = null)) {
 
   private val portfolioFetcher =
       highlander<Unit, Boolean> { force ->
         setState(
             stateChange = { copy(isLoading = true) },
             andThen = {
-              try {
-                val maybeStock = interactor.getHolding(force, thisHoldingId)
-                setState { copy(stock = maybeStock, isLoading = false) }
-              } catch (error: Throwable) {
-                error.onActualError { e ->
-                  Timber.e(e, "Failed to fetch quotes")
-                  setState { copy(stock = null, isLoading = false) }
-                }
-              }
+              interactor
+                  .getHolding(force, thisHoldingId)
+                  .onSuccess { setState { copy(stock = it, isLoading = false) } }
+                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                  .onFailure { setState { copy(stock = null, isLoading = false) } }
             })
       }
 

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
@@ -61,7 +62,7 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getPortfolio(force: Boolean): List<PortfolioStock> =
+  suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -76,22 +77,22 @@ internal constructor(
 
         // We can cast since we know what this one is
         @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-        val quotes =
-            try {
-              interactor.getQuotes(force, symbols)
-            } catch (e: Throwable) {
-              Timber.e(e, "Unable to get quotes for portfolio: $symbols")
-              emptyList()
+        return@withContext interactor
+            .getQuotes(force, symbols)
+            .onFailure { Timber.e(it, "Unable to get quotes for portfolio: $symbols") }
+            .recover { emptyList() }
+            .map { quotes ->
+              val result = mutableListOf<PortfolioStock>()
+              for (holding in holdings) {
+                val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
+                val holdingPositions = positions.filter { it.holdingId() == holding.id() }
+                val stock =
+                    PortfolioStock(holding = holding, positions = holdingPositions, quote = quote)
+                result.add(stock)
+              }
+
+              return@map result
             }
-
-        val result = mutableListOf<PortfolioStock>()
-        for (holding in holdings) {
-          val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
-          val holdingPositions = positions.filter { it.holdingId() == holding.id() }
-          result.add(PortfolioStock(holding = holding, positions = holdingPositions, quote = quote))
-        }
-
-        return@withContext result
       }
 
   @CheckResult

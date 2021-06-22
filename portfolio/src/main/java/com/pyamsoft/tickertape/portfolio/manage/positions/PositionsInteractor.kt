@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -82,7 +83,7 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getHolding(force: Boolean, id: DbHolding.Id): PortfolioStock? =
+  suspend fun getHolding(force: Boolean, id: DbHolding.Id): ResultWrapper<PortfolioStock> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -96,22 +97,19 @@ internal constructor(
         // We can cast since we know what this one is
         @Suppress("UNCHECKED_CAST") val holding = jobResult[0] as? DbHolding
         if (holding == null) {
-          Timber.w("Could not find holding with ID: $id")
-          return@withContext null
+          val err = IllegalStateException("Could not find holding with ID: $id")
+          Timber.w(err)
+          return@withContext ResultWrapper.failure(err)
         }
 
         // We can cast since we know what this one is
         @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-        val quotes =
-            try {
-              interactor.getQuotes(force, listOf(holding.symbol()))
-            } catch (e: Throwable) {
-              Timber.e(e, "Unable to get quotes for holding: $holding")
-              emptyList()
-            }
-
-        val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
-        return@withContext PortfolioStock(holding = holding, positions = positions, quote = quote)
+        return@withContext interactor
+            .getQuotes(force, listOf(holding.symbol()))
+            .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
+            .recover { emptyList() }
+            .map { quotes -> quotes.firstOrNull { it.symbol == holding.symbol() } }
+            .map { PortfolioStock(holding = holding, positions = positions, quote = it) }
       }
 
   @CheckResult

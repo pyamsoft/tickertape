@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.onActualError
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -54,15 +53,11 @@ internal constructor(
         setState(
             stateChange = { copy(isLoading = true) },
             andThen = {
-              try {
-                val portfolio = interactor.getPortfolio(force)
-                setState { copy(error = null, portfolio = portfolio, isLoading = false) }
-              } catch (error: Throwable) {
-                error.onActualError { e ->
-                  Timber.e(e, "Failed to fetch quotes")
-                  setState { copy(error = e, isLoading = false) }
-                }
-              }
+              interactor
+                  .getPortfolio(force)
+                  .onSuccess { setState { copy(error = null, portfolio = it, isLoading = false) } }
+                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                  .onFailure { setState { copy(error = it, isLoading = false) } }
             })
       }
 

@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.MemoryCacheStorage
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.util.Locale
@@ -35,12 +36,12 @@ internal class StockInteractorImpl
 internal constructor(@InternalApi private val interactor: StockInteractor) : StockInteractor {
 
   private val quotesCache =
-      multiCachify<String, List<StockQuote>, List<StockSymbol>>(
+      multiCachify<String, ResultWrapper<List<StockQuote>>, List<StockSymbol>>(
           storage = { listOf(MemoryCacheStorage.create(2, TimeUnit.MINUTES)) }) { symbols ->
         interactor.getQuotes(true, symbols)
       }
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
+  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): ResultWrapper<List<StockQuote>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

@@ -196,7 +196,10 @@ internal constructor(
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
       val stock = state.portfolio[index]
-      interactor.removeHolding(stock.holding.id())
+      interactor
+          .removeHolding(stock.holding.id())
+          .onSuccess { Timber.d("Removed holding $stock") }
+          .onFailure { Timber.e(it, "Error removing holding: $stock") }
     }
   }
 

@@ -40,7 +40,10 @@ internal constructor(
     val symbol = state.symbol
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
-      interactor.commitSymbol(symbol.asSymbols())
+      interactor
+          .commitSymbol(symbol.asSymbols())
+          .onSuccess { Timber.d("Committed new symbols to db: $symbol") }
+          .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol") }
       publish(SymbolAddControllerEvent.Close)
     }
   }

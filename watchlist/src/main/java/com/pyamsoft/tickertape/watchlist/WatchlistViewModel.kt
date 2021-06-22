@@ -19,8 +19,10 @@ package com.pyamsoft.tickertape.watchlist
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
+import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
@@ -46,17 +48,7 @@ internal constructor(
                 error = null, isLoading = false, quotes = emptyList(), bottomOffset = 0)) {
 
   private val quoteFetcher =
-      highlander<Unit, Boolean> { force ->
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              interactor
-                  .getQuotes(force)
-                  .onSuccess { setState { copy(error = null, quotes = it, isLoading = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(error = it, isLoading = false) } }
-            })
-      }
+      highlander<ResultWrapper<List<QuotedStock>>, Boolean> { interactor.getQuotes(it) }
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -110,7 +102,15 @@ internal constructor(
 
   private fun CoroutineScope.fetchQuotes(force: Boolean) {
     launch(context = Dispatchers.Default) {
-      quoteFetcher.call(force)
+      setState(
+          stateChange = { copy(isLoading = true) },
+          andThen = {
+            quoteFetcher
+                .call(force)
+                .onSuccess { setState { copy(error = null, quotes = it, isLoading = false) } }
+                .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                .onFailure { setState { copy(error = it, isLoading = false) } }
+          })
 
       // After the quotes are fetched, start the tape
       tapeLauncher.start()
@@ -120,7 +120,10 @@ internal constructor(
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
       val quote = state.quotes[index]
-      interactor.removeQuote(quote.symbol)
+      interactor
+          .removeQuote(quote.symbol)
+          .onSuccess { Timber.d("Removed quote $quote") }
+          .onFailure { Timber.e(it, "Error removing quote: $quote") }
     }
   }
 }

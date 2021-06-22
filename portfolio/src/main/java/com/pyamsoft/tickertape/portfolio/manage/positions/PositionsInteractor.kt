@@ -63,23 +63,30 @@ internal constructor(
       id: DbHolding.Id,
       numberOfShares: StockShareValue,
       pricePerShare: StockMoneyValue
-  ) =
+  ): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val holding = holdingQueryDao.query(false).firstOrNull { it.id() == id }
-        if (holding == null) {
-          Timber.w(
-              "Cannot create position for invalid holding: $id $numberOfShares shares at ${pricePerShare.asMoneyValue()}")
-          return@withContext
+        return@withContext try {
+          val holding = holdingQueryDao.query(false).firstOrNull { it.id() == id }
+          if (holding == null) {
+            val err =
+                IllegalStateException(
+                    "Cannot create position for invalid holding: $id $numberOfShares shares at ${pricePerShare.asMoneyValue()}")
+            Timber.e(err)
+            return@withContext ResultWrapper.failure(err)
+          }
+
+          val position =
+              JsonMappableDbPosition.create(
+                  holdingId = id, shareCount = numberOfShares, price = pricePerShare)
+
+          Timber.d("Insert new position into DB: $position")
+          ResultWrapper.success(positionInsertDao.insert(position))
+        } catch (e: Throwable) {
+          Timber.e(e, "Error creating position $id $numberOfShares $pricePerShare")
+          ResultWrapper.failure(e)
         }
-
-        val position =
-            JsonMappableDbPosition.create(
-                holdingId = id, shareCount = numberOfShares, price = pricePerShare)
-
-        Timber.d("Insert new position into DB: $position")
-        positionInsertDao.insert(position)
       }
 
   @CheckResult
@@ -113,17 +120,23 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun removePosition(id: DbPosition.Id) =
+  suspend fun removePosition(id: DbPosition.Id): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // TODO move this query into the DAO layer
-        val dbPosition = positionQueryDao.query(true).find { it.id() == id }
-        if (dbPosition == null) {
-          Timber.d("Position does not exist in DB: $id")
-          return@withContext
-        }
+        return@withContext try {
+          // TODO move this query into the DAO layer
+          val dbPosition = positionQueryDao.query(true).find { it.id() == id }
+          if (dbPosition == null) {
+            val err = IllegalStateException("Position does not exist in DB: $id")
+            Timber.e(err)
+            return@withContext ResultWrapper.failure(err)
+          }
 
-        positionDeleteDao.delete(dbPosition, offerUndo = true)
+          ResultWrapper.success(positionDeleteDao.delete(dbPosition, offerUndo = true))
+        } catch (e: Throwable) {
+          Timber.e(e, "Error removing position: $id")
+          ResultWrapper.failure(e)
+        }
       }
 }

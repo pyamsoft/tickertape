@@ -21,10 +21,12 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.tape.TapeLauncher
@@ -54,16 +56,8 @@ internal constructor(
                 stock = null)) {
 
   private val portfolioFetcher =
-      highlander<Unit, Boolean> { force ->
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              interactor
-                  .getHolding(force, thisHoldingId)
-                  .onSuccess { setState { copy(stock = it, isLoading = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(stock = null, isLoading = false) } }
-            })
+      highlander<ResultWrapper<PortfolioStock>, Boolean> {
+        interactor.getHolding(it, thisHoldingId)
       }
 
   init {
@@ -145,7 +139,15 @@ internal constructor(
 
   private fun CoroutineScope.fetchPortfolio(force: Boolean) {
     launch(context = Dispatchers.Default) {
-      portfolioFetcher.call(force)
+      setState(
+          stateChange = { copy(isLoading = true) },
+          andThen = {
+            portfolioFetcher
+                .call(force)
+                .onSuccess { setState { copy(stock = it, isLoading = false) } }
+                .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                .onFailure { setState { copy(stock = null, isLoading = false) } }
+          })
 
       // After the quotes are fetched, start the tape
       tapeLauncher.start()
@@ -160,7 +162,10 @@ internal constructor(
         return@launch
       }
 
-      interactor.removePosition(position.id())
+      interactor
+          .removePosition(position.id())
+          .onSuccess { Timber.d("Removed position $position") }
+          .onFailure { Timber.e(it, "Error removing position $position") }
     }
   }
 
@@ -186,8 +191,11 @@ internal constructor(
             return@setState
           }
 
-          interactor.createPosition(
-              id = stock.holding.id(), numberOfShares = shareCount, pricePerShare = sharePrice)
+          interactor
+              .createPosition(
+                  id = stock.holding.id(), numberOfShares = shareCount, pricePerShare = sharePrice)
+              .onSuccess { Timber.d("Created new position $stock") }
+              .onFailure { Timber.e(it, "Error creating new position $stock") }
         })
   }
 

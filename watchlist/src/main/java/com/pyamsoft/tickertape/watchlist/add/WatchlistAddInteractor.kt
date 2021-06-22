@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -37,21 +38,31 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbols: List<StockSymbol>) =
+  suspend fun commitSymbol(symbols: List<StockSymbol>): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // TODO move this query into the DAO layer
-        for (symbol in symbols) {
-          val existingDbSymbol = symbolQueryDao.query(true).find { it.symbol() == symbol }
-          if (existingDbSymbol != null) {
-            Timber.d("Symbol already exists in DB: $existingDbSymbol")
-            continue
+        return@withContext try {
+          // TODO move this query into the DAO layer
+          for (symbol in symbols) {
+            val existingDbSymbol = symbolQueryDao.query(true).find { it.symbol() == symbol }
+            if (existingDbSymbol != null) {
+              Timber.d("Symbol already exists in DB: $existingDbSymbol")
+              continue
+            }
+
+            val newSymbol = JsonMappableDbSymbol.create(symbol)
+            if (symbolInsertDao.insert(newSymbol)) {
+              Timber.d("Insert new symbol into DB: $newSymbol")
+            } else {
+              Timber.d("Update existing symbol into DB: $newSymbol")
+            }
           }
 
-          val newSymbol = JsonMappableDbSymbol.create(symbol)
-          Timber.d("Insert new symbol into DB: $newSymbol")
-          symbolInsertDao.insert(newSymbol)
+          ResultWrapper.success(Unit)
+        } catch (e: Throwable) {
+          Timber.e(e, "Error committing symbol: $symbols")
+          ResultWrapper.failure(e)
         }
       }
 }

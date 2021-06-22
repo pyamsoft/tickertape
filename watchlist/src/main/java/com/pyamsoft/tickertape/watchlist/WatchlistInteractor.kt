@@ -59,22 +59,33 @@ internal constructor(
   suspend fun getQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        val symbols = getSymbols(force)
-        return@withContext interactor.getQuotes(force, symbols)
+        return@withContext try {
+          val symbols = getSymbols(force)
+          interactor.getQuotes(force, symbols)
+        } catch (e: Throwable) {
+          Timber.e(e, "Error getting quotes")
+          ResultWrapper.failure(e)
+        }
       }
 
   @CheckResult
-  suspend fun removeQuote(symbol: StockSymbol) =
+  suspend fun removeQuote(symbol: StockSymbol): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // TODO move this query into the DAO layer
-        val dbSymbol = symbolQueryDao.query(true).find { it.symbol() == symbol }
-        if (dbSymbol == null) {
-          Timber.d("Symbol does not exist in DB: $symbol")
-          return@withContext
-        }
+        return@withContext try {
+          // TODO move this query into the DAO layer
+          val dbSymbol = symbolQueryDao.query(true).find { it.symbol() == symbol }
+          if (dbSymbol == null) {
+            val err = IllegalStateException("Symbol does not exist in DB: $symbol")
+            Timber.e(err)
+            return@withContext ResultWrapper.failure(err)
+          }
 
-        symbolDeleteDao.delete(dbSymbol, offerUndo = true)
+          ResultWrapper.success(symbolDeleteDao.delete(dbSymbol, offerUndo = true))
+        } catch (e: Throwable) {
+          Timber.e(e, "Error removing quote: $symbol")
+          ResultWrapper.failure(e)
+        }
       }
 }

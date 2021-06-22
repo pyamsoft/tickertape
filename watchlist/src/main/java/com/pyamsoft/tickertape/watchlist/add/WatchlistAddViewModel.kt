@@ -35,11 +35,15 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val interactor: WatchlistAddInteractor,
 ) : SymbolAddViewModel(savedState) {
+
   override fun handleCommitSymbol() {
     val symbol = state.symbol
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
-      interactor.commitSymbol(symbol.asSymbols())
+      interactor
+          .commitSymbol(symbol.asSymbols())
+          .onSuccess { Timber.d("Committed symbols: $symbol") }
+          .onFailure { Timber.e(it, "Error committing symbols: $symbol") }
       publish(SymbolAddControllerEvent.Close)
     }
   }

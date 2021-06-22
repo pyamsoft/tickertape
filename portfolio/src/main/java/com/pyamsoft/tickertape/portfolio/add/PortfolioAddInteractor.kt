@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
@@ -37,21 +38,28 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbols: List<StockSymbol>) =
+  suspend fun commitSymbol(symbols: List<StockSymbol>): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        for (symbol in symbols) {
-          // TODO move this query into the DAO layer
-          val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
-          if (existingHolding != null) {
-            Timber.d("Holding already exists in DB: $existingHolding")
-            continue
+        return@withContext try {
+          for (symbol in symbols) {
+            // TODO move this query into the DAO layer
+            val existingHolding = holdingQueryDao.query(true).find { it.symbol() == symbol }
+            if (existingHolding != null) {
+              Timber.d("Holding already exists in DB: $existingHolding")
+              continue
+            }
+
+            val newHolding = JsonMappableDbHolding.create(symbol)
+            Timber.d("Insert new holding into DB: $newHolding")
+            holdingInsertDao.insert(newHolding)
           }
 
-          val newHolding = JsonMappableDbHolding.create(symbol)
-          Timber.d("Insert new holding into DB: $newHolding")
-          holdingInsertDao.insert(newHolding)
+          ResultWrapper.success(Unit)
+        } catch (e: Throwable) {
+          Timber.e(e, "Error committing symbols: $symbols")
+          ResultWrapper.failure(e)
         }
       }
 }

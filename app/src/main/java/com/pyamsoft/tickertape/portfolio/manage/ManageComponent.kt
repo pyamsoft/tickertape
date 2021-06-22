@@ -40,8 +40,6 @@ internal interface ManageComponent {
 
   @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
 
-  @CheckResult fun plusHoldingComponent(): HoldingComponent.Factory
-
   @CheckResult fun plusPositionsComponent(): PositionsComponent.Factory
 
   @Subcomponent.Factory

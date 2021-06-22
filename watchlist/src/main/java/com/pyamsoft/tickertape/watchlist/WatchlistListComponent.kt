@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.watchlist.item.WatchlistViewHolder
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-interface PortfolioListComponent {
+interface WatchlistListComponent {
 
-  fun inject(holder: PortfolioViewHolder)
+  fun inject(holder: WatchlistViewHolder)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): PortfolioListComponent
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistListComponent
   }
 }

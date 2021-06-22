@@ -33,7 +33,6 @@ class ManagePortfolioViewModel @Inject internal constructor(initialSymbol: Stock
 
   private fun publishPage() {
     return when (state.page) {
-      PortfolioPage.HOLDING -> publish(ManagePortfolioControllerEvent.PushHolding)
       PortfolioPage.POSITIONS -> publish(ManagePortfolioControllerEvent.PushPositions)
     }
   }
@@ -42,12 +41,8 @@ class ManagePortfolioViewModel @Inject internal constructor(initialSymbol: Stock
     setState(stateChange = { copy(page = page) }, andThen = { publishPage() })
   }
 
-  fun handleLoadPositionsPage() {
-    loadPage(PortfolioPage.POSITIONS)
-  }
-
   companion object {
 
-    private val DEFAULT_PAGE = PortfolioPage.HOLDING
+    private val DEFAULT_PAGE = PortfolioPage.POSITIONS
   }
 }

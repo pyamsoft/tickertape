@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.portfolio.item
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -22,12 +22,13 @@ import androidx.annotation.ColorInt
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSummaryBinding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import javax.inject.Inject
 
-class HoldingSummary @Inject internal constructor(parent: ViewGroup) :
+class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<PortfolioListViewState, PortfolioListViewEvent, HoldingSummaryBinding>(parent) {
 
   override val viewBinding = HoldingSummaryBinding::inflate

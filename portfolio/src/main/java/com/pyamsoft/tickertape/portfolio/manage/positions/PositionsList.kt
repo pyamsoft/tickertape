@@ -29,8 +29,6 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.PositionListBinding
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewEvent
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewState
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -45,7 +43,7 @@ internal constructor(
     owner: LifecycleOwner,
     factory: PositionItemComponent.Factory
 ) :
-    BaseUiView<HoldingViewState, HoldingViewEvent, PositionListBinding>(parent),
+    BaseUiView<PositionsViewState, PositionsViewEvent, PositionListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
     PositionsAdapter.Callback {
 
@@ -128,14 +126,14 @@ internal constructor(
   }
 
   override fun onRefresh() {
-    publish(HoldingViewEvent.ForceRefresh)
+    publish(PositionsViewEvent.ForceRefresh)
   }
 
   override fun onRemove(index: Int) {
-    publish(HoldingViewEvent.Remove(index))
+    publish(PositionsViewEvent.Remove(index))
   }
 
-  override fun onRender(state: UiRender<HoldingViewState>) {
+  override fun onRender(state: UiRender<PositionsViewState>) {
     state.mapChanged { it.stock }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }

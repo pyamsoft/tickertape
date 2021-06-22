@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.portfolio.item
 
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.LifecycleOwner
@@ -26,19 +26,19 @@ import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
 import javax.inject.Inject
 
-class PortfolioViewHolder
+class PortfolioItemViewHolder
 internal constructor(
-    binding: PortfolioItemBinding,
-    factory: PortfolioListComponent.Factory,
-    owner: LifecycleOwner,
-    callback: PortfolioAdapter.Callback
+  binding: PortfolioItemBinding,
+  factory: PortfolioListComponent.Factory,
+  owner: LifecycleOwner,
+  callback: PortfolioAdapter.Callback
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<PortfolioListViewState> {
 
-  @Inject @JvmField internal var quote: HoldingQuote? = null
+  @Inject @JvmField internal var quote: PortfolioItemQuote? = null
 
-  @Inject @JvmField internal var summary: HoldingSummary? = null
+  @Inject @JvmField internal var summary: PortfolioItemSummary? = null
 
-  @Inject @JvmField internal var click: HoldingClick? = null
+  @Inject @JvmField internal var click: PortfolioItemClick? = null
 
   private val viewBinder: ViewBinder<PortfolioListViewState>
 

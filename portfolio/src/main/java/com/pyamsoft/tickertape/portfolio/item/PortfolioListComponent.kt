@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.portfolio.item
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
+import android.view.ViewGroup
+import androidx.annotation.CheckResult
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-data class PortfolioListViewState(val stock: PortfolioStock) : UiViewState
+@Subcomponent
+interface PortfolioListComponent {
 
-sealed class PortfolioListViewEvent : UiViewEvent {
+  fun inject(holder: PortfolioItemViewHolder)
 
-  object Select : PortfolioListViewEvent()
+  @Subcomponent.Factory
+  interface Factory {
 
-  object Remove : PortfolioListViewEvent()
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): PortfolioListComponent
+  }
 }

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.portfolio.item
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import javax.inject.Inject
 
-@Subcomponent
-interface QuoteComponent {
+class PortfolioItemClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<PortfolioListViewState, PortfolioListViewEvent>() {
 
-  fun inject(holder: QuoteViewHolder)
+  init {
 
-  @Subcomponent.Factory
-  interface Factory {
+    doOnInflate { parent.setOnDebouncedClickListener { publish(PortfolioListViewEvent.Select) } }
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): QuoteComponent
+    doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
+
+  override fun render(state: UiRender<PortfolioListViewState>) {}
 }

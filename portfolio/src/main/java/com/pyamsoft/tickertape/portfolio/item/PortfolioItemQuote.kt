@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.portfolio.item
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
@@ -26,7 +26,7 @@ import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import javax.inject.Inject
 
-class HoldingQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
+class PortfolioItemQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
     UiView<PortfolioListViewState, PortfolioListViewEvent>() {
 
   init {

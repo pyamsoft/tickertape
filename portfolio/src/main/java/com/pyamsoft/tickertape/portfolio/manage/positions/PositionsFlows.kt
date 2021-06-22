@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.holding
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -23,27 +23,26 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
-data class HoldingViewState(
+data class PositionsViewState(
     val isLoading: Boolean,
     val stock: PortfolioStock?,
     val numberOfShares: StockShareValue,
     val pricePerShare: StockMoneyValue,
 ) : UiViewState
 
-sealed class HoldingViewEvent : UiViewEvent {
+sealed class PositionsViewEvent : UiViewEvent {
 
-  object ListPositions : HoldingViewEvent()
+  object Commit : PositionsViewEvent()
 
-  object Commit : HoldingViewEvent()
+  object ForceRefresh : PositionsViewEvent()
 
-  object ForceRefresh : HoldingViewEvent()
-
-  data class Remove internal constructor(val index: Int) : HoldingViewEvent()
+  data class Remove internal constructor(val index: Int) : PositionsViewEvent()
 
   data class UpdateNumberOfShares internal constructor(val number: StockShareValue) :
-      HoldingViewEvent()
+      PositionsViewEvent()
 
-  data class UpdateSharePrice internal constructor(val price: StockMoneyValue) : HoldingViewEvent()
+  data class UpdateSharePrice internal constructor(val price: StockMoneyValue) :
+      PositionsViewEvent()
 }
 
-sealed class HoldingControllerEvent : UiControllerEvent
+sealed class PositionsControllerEvent : UiControllerEvent

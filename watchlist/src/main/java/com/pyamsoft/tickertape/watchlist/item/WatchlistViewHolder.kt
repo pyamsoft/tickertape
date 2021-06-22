@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.watchlist.item
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.tickertape.quote.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
+import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 import javax.inject.Inject
 
-class QuoteViewHolder
+class WatchlistViewHolder
 internal constructor(
-    binding: ListitemFrameBinding,
-    factory: QuoteComponent.Factory,
+    binding: WatchlistItemBinding,
+    factory: WatchlistListComponent.Factory,
     owner: LifecycleOwner,
-    callback: QuoteAdapter.Callback
+    callback: WatchlistAdapter.Callback
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<QuoteViewState> {
 
-  @Inject @JvmField internal var quote: QuoteView? = null
+  @Inject @JvmField internal var quote: WatchlistQuote? = null
 
   private val viewBinder: ViewBinder<QuoteViewState>
 
   init {
-    factory.create(binding.listitemFrame).inject(this)
+    factory.create(binding.watchlistItem).inject(this)
 
     val quote = requireNotNull(quote)
 

@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.portfolio.manage.positions.holding.HoldingViewModel
+import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsViewModel
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -51,9 +51,9 @@ internal interface PositionsComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(HoldingViewModel::class)
+    @ClassKey(PositionsViewModel::class)
     internal abstract fun bindViewModel(
-        impl: HoldingViewModel.Factory
+        impl: PositionsViewModel.Factory
     ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

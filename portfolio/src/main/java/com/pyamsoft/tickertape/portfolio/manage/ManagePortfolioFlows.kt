@@ -31,7 +31,5 @@ sealed class ManagePortfolioViewEvent : UiViewEvent {
 
 sealed class ManagePortfolioControllerEvent : UiControllerEvent {
 
-  object PushHolding : ManagePortfolioControllerEvent()
-
   object PushPositions : ManagePortfolioControllerEvent()
 }

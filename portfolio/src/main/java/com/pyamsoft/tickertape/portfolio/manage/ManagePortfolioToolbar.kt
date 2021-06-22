@@ -105,7 +105,6 @@ internal constructor(
   private fun handleCloseState(page: PortfolioPage) {
     val isClose =
         when (page) {
-          PortfolioPage.HOLDING -> true
           else -> false
         }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist.item
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,40 +22,42 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
+import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
+import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class PortfolioAdapter
+class WatchlistAdapter
 private constructor(
-    private val factory: PortfolioListComponent.Factory,
+    private val factory: WatchlistListComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<PortfolioListViewState, PortfolioViewHolder>(DIFFER), PopupTextProvider {
+) :
+    ListAdapter<QuoteViewState, WatchlistViewHolder>(DIFFER),
+    PopupTextProvider {
 
   companion object {
 
     @JvmStatic
     @CheckResult
     fun create(
-        factory: PortfolioListComponent.Factory,
+        factory: WatchlistListComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): PortfolioAdapter {
-      return PortfolioAdapter(factory, owner, callback)
+    ): WatchlistAdapter {
+      return WatchlistAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
-        object : DiffUtil.ItemCallback<PortfolioListViewState>() {
-          override fun areItemsTheSame(
-              oldItem: PortfolioListViewState,
-              newItem: PortfolioListViewState
-          ): Boolean {
-            return oldItem.stock.holding.id() == newItem.stock.holding.id()
+        object : DiffUtil.ItemCallback<QuoteViewState>() {
+          override fun areItemsTheSame(oldItem: QuoteViewState, newItem: QuoteViewState): Boolean {
+            return oldItem.symbol.symbol() == newItem.symbol.symbol()
           }
 
           override fun areContentsTheSame(
-              oldItem: PortfolioListViewState,
-              newItem: PortfolioListViewState
+              oldItem: QuoteViewState,
+              newItem: QuoteViewState
           ): Boolean {
             return oldItem == newItem
           }
@@ -64,20 +66,26 @@ private constructor(
 
   override fun getPopupText(position: Int): String {
     val state = getItem(position)
-    return state.stock.holding.symbol().symbol()
+    return state.symbol.symbol()
   }
 
   override fun getItemId(position: Int): Long {
-    return getItem(position).stock.holding.id().id.hashCode().toLong()
+    return getItem(position).symbol.symbol().hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PortfolioViewHolder {
+  override fun onCreateViewHolder(
+      parent: ViewGroup,
+      viewType: Int
+  ): WatchlistViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    val binding = PortfolioItemBinding.inflate(inflater, parent, false)
-    return PortfolioViewHolder(binding, factory, owner, callback)
+    val binding = WatchlistItemBinding.inflate(inflater, parent, false)
+    return WatchlistViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: PortfolioViewHolder, position: Int) {
+  override fun onBindViewHolder(
+      holder: WatchlistViewHolder,
+      position: Int
+  ) {
     val state = getItem(position)
     holder.bindState(state)
   }

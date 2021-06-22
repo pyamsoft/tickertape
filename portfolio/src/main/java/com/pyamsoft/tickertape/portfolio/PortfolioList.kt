@@ -27,6 +27,9 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
+import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
+import com.pyamsoft.tickertape.portfolio.item.PortfolioListComponent
+import com.pyamsoft.tickertape.portfolio.item.PortfolioListViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -95,12 +98,12 @@ internal constructor(
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
-      LinearMarginDecoration.create(margin = margin).apply {
+      LinearMarginDecoration.create(margin).apply {
         binding.portfolioListList.addItemDecoration(this)
       }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 56.asDp(binding.portfolioListList.context)
+      val bottomMargin = 28.asDp(binding.portfolioListList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.portfolioListList.addItemDecoration(this)
       }

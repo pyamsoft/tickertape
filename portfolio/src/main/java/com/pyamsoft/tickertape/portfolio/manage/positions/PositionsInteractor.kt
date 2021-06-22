@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.holding
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class HoldingInteractor
+class PositionsInteractor
 @Inject
 internal constructor(
     private val positionRealtime: PositionRealtime,

@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist.item
 
-import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import com.pyamsoft.tickertape.quote.QuoteViewDelegate
+import com.pyamsoft.tickertape.quote.QuoteViewEvent
+import com.pyamsoft.tickertape.quote.QuoteViewState
 import javax.inject.Inject
 
-class HoldingClick @Inject internal constructor(parent: ViewGroup) :
-    UiView<PortfolioListViewState, PortfolioListViewEvent>() {
+class WatchlistQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
+    UiView<QuoteViewState, QuoteViewEvent>() {
 
   init {
-
-    doOnInflate { parent.setOnDebouncedClickListener { publish(PortfolioListViewEvent.Select) } }
-
-    doOnTeardown { parent.setOnDebouncedClickListener(null) }
+    doOnInflate { delegate.inflate { publish(it) } }
+    doOnTeardown { delegate.teardown() }
   }
 
-  override fun render(state: UiRender<PortfolioListViewState>) {}
+  override fun render(state: UiRender<QuoteViewState>) {
+    delegate.render(viewScope, state)
+  }
 }

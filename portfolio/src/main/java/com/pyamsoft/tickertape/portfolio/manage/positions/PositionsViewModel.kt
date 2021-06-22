@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.holding
+package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
@@ -37,22 +37,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class HoldingViewModel
+class PositionsViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
-    private val interactor: HoldingInteractor,
+    private val interactor: PositionsInteractor,
     private val thisHoldingId: DbHolding.Id,
 ) :
-    UiSavedStateViewModel<HoldingViewState, HoldingControllerEvent>(
+    UiSavedStateViewModel<PositionsViewState, PositionsControllerEvent>(
         savedState,
         initialState =
-            HoldingViewState(
+            PositionsViewState(
                 isLoading = false,
                 numberOfShares = StockShareValue.none(),
                 pricePerShare = StockMoneyValue.none(),
-                stock = null)) {
+                stock = null)
+    ) {
 
   private val portfolioFetcher =
       highlander<Unit, Boolean> { force ->
@@ -197,7 +198,7 @@ internal constructor(
   }
 
   @AssistedFactory
-  interface Factory : UiSavedStateViewModelProvider<HoldingViewModel> {
-    override fun create(savedState: UiSavedState): HoldingViewModel
+  interface Factory : UiSavedStateViewModelProvider<PositionsViewModel> {
+    override fun create(savedState: UiSavedState): PositionsViewModel
   }
 }

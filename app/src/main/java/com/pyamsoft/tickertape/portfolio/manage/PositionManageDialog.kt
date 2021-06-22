@@ -184,11 +184,9 @@ internal class PositionManageDialog :
 
   override fun onControllerEvent(event: ManagePortfolioControllerEvent) {
     return when (event) {
-      is ManagePortfolioControllerEvent.PushHolding ->
-          pushFragment(HoldingFragment.newInstance(), HoldingFragment.TAG, appendBackStack = false)
       is ManagePortfolioControllerEvent.PushPositions ->
           pushFragment(
-              PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = true)
+              PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = false)
     }
   }
 

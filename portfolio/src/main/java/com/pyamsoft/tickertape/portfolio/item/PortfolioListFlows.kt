@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.item
 
-enum class PortfolioPage {
-  POSITIONS
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
+
+data class PortfolioListViewState(val stock: PortfolioStock) : UiViewState
+
+sealed class PortfolioListViewEvent : UiViewEvent {
+
+  object Select : PortfolioListViewEvent()
+
+  object Remove : PortfolioListViewEvent()
 }

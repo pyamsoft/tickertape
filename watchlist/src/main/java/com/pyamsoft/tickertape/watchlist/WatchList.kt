@@ -29,6 +29,7 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
+import com.pyamsoft.tickertape.watchlist.item.WatchlistAdapter
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -37,16 +38,20 @@ import timber.log.Timber
 
 class WatchList
 @Inject
-internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteComponent.Factory) :
+internal constructor(
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+    factory: WatchlistListComponent.Factory
+) :
     BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
-    QuoteAdapter.Callback {
+    WatchlistAdapter.Callback {
 
   override val viewBinding = WatchlistBinding::inflate
 
   override val layoutRoot by boundView { watchlistRoot }
 
-  private var modelAdapter: QuoteAdapter? = null
+  private var modelAdapter: WatchlistAdapter? = null
 
   private var lastScrollPosition = 0
 
@@ -60,7 +65,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
     }
 
     doOnInflate {
-      modelAdapter = QuoteAdapter.create(factory, owner, this)
+      modelAdapter = WatchlistAdapter.create(factory, owner, this)
       binding.watchlistList.adapter = modelAdapter
     }
 
@@ -93,12 +98,12 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
-      LinearMarginDecoration.create(margin = margin).apply {
+      LinearMarginDecoration.create(margin).apply {
         binding.watchlistList.addItemDecoration(this)
       }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 56.asDp(binding.watchlistList.context)
+      val bottomMargin = 28.asDp(binding.watchlistList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.watchlistList.addItemDecoration(this)
       }
@@ -123,7 +128,7 @@ internal constructor(parent: ViewGroup, owner: LifecycleOwner, factory: QuoteCom
   }
 
   @CheckResult
-  private fun usingAdapter(): QuoteAdapter {
+  private fun usingAdapter(): WatchlistAdapter {
     return requireNotNull(modelAdapter)
   }
 

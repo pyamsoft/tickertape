@@ -51,15 +51,11 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<PositionItemViewState>) {
-    state.mapChanged { it.position }.mapChanged { it.shareCount() }.render(viewScope) {
-      handleShareCountChanged(it)
+    state.mapChanged { it.position }.apply {
+      mapChanged { it.shareCount() }.render(viewScope) { handleShareCountChanged(it) }
+      mapChanged { it.price() }.render(viewScope) { handleSharePriceChanged(it) }
+      render(viewScope) { handleTotalChanged(it) }
     }
-
-    state.mapChanged { it.position }.mapChanged { it.price() }.render(viewScope) {
-      handleSharePriceChanged(it)
-    }
-
-    state.mapChanged { it.position }.render(viewScope) { handleTotalChanged(it) }
   }
 
   private fun handleTotalChanged(position: DbPosition) {

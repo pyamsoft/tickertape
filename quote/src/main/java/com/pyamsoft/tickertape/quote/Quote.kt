@@ -25,11 +25,10 @@ fun populateSession(
     binding: QuoteNumbersBinding,
     session: StockMarketSession,
 ) {
-  val data = StockMarketSession.getDataFromSession(session)
-  val percent = data.percent
-  val changeAmount = data.changeAmount
-  val directionSign = data.directionSign
-  val color = data.color
+  val percent = session.percent().asPercentValue()
+  val changeAmount = session.amount().asMoneyValue()
+  val directionSign = session.direction().sign()
+  val color = session.direction().color()
 
   binding.apply {
     quoteError.apply {

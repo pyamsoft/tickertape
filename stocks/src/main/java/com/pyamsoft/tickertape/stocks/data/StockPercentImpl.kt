@@ -20,7 +20,9 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 
 internal data class StockPercentImpl(private val percent: Double) : StockPercent {
 
-  private val stockPercent by lazy(LazyThreadSafetyMode.NONE) { "%.2f".format(percent) }
+  private val stockPercent by lazy(LazyThreadSafetyMode.NONE) {
+    if (isZero()) "0.00" else "%.2f".format(percent)
+  }
 
   override fun asPercentValue(): String {
     return "$stockPercent%"

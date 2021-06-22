@@ -24,8 +24,14 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 internal data class StockMarketSessionImpl(
     private val direction: StockDirection,
     private val price: StockMoneyValue,
+    private val previousClosingPrice: StockMoneyValue?,
     private val amount: StockMoneyValue,
     private val percent: StockPercent,
+    private val dayHigh: StockMoneyValue,
+    private val dayLow: StockMoneyValue,
+    private val dayOpen: StockMoneyValue,
+    private val dayClose: StockMoneyValue?,
+    private val dayVolume: Long,
 ) : StockMarketSession {
 
   override fun direction(): StockDirection {
@@ -36,11 +42,35 @@ internal data class StockMarketSessionImpl(
     return percent
   }
 
+  override fun previousClosingPrice(): StockMoneyValue? {
+    return previousClosingPrice
+  }
+
   override fun price(): StockMoneyValue {
     return price
   }
 
   override fun amount(): StockMoneyValue {
     return amount
+  }
+
+  override fun dayVolume(): Long {
+    return dayVolume
+  }
+
+  override fun dayOpen(): StockMoneyValue {
+    return dayOpen
+  }
+
+  override fun dayLow(): StockMoneyValue {
+    return dayLow
+  }
+
+  override fun dayHigh(): StockMoneyValue {
+    return dayHigh
+  }
+
+  override fun dayClose(): StockMoneyValue? {
+    return dayClose
   }
 }

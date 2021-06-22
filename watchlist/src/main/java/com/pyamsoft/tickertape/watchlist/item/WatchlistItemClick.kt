@@ -16,22 +16,21 @@
 
 package com.pyamsoft.tickertape.watchlist.item
 
+import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.tickertape.quote.QuoteViewDelegate
-import com.pyamsoft.tickertape.quote.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
-class WatchlistQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
-    UiView<QuoteViewState, QuoteViewEvent>() {
+class WatchlistItemClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<WatchlistItemViewState, WatchlistItemViewEvent>() {
 
   init {
-    doOnInflate { delegate.inflate { publish(it) } }
-    doOnTeardown { delegate.teardown() }
+
+    doOnInflate { parent.setOnDebouncedClickListener { publish(WatchlistItemViewEvent.Select) } }
+
+    doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
 
-  override fun render(state: UiRender<QuoteViewState>) {
-    delegate.render(viewScope, state)
-  }
+  override fun render(state: UiRender<WatchlistItemViewState>) {}
 }

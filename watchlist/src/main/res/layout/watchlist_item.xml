@@ -25,10 +25,10 @@
     app:cardElevation="2dp"
     app:cardMaxElevation="6dp">
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/watchlist_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="168dp"
         android:padding="8dp" />
 
 </com.google.android.material.card.MaterialCardView>

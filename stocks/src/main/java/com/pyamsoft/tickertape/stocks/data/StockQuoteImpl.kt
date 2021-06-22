@@ -26,10 +26,15 @@ internal data class StockQuoteImpl(
     private val company: StockCompany,
     private val regular: StockMarketSession,
     private val afterHours: StockMarketSession?,
+    private val dataDelayBy: Long
 ) : StockQuote {
 
   override fun symbol(): StockSymbol {
     return symbol
+  }
+
+  override fun dataDelayBy(): Long {
+    return dataDelayBy
   }
 
   override fun company(): StockCompany {

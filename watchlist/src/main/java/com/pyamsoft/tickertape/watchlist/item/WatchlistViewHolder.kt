@@ -16,13 +16,13 @@
 
 package com.pyamsoft.tickertape.watchlist.item
 
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.util.doOnDestroy
-import com.pyamsoft.tickertape.quote.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 import javax.inject.Inject
@@ -32,30 +32,53 @@ internal constructor(
     binding: WatchlistItemBinding,
     factory: WatchlistListComponent.Factory,
     owner: LifecycleOwner,
-    callback: WatchlistAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<QuoteViewState> {
+    callback: WatchlistItemAdapter.Callback
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistItemViewState> {
 
-  @Inject @JvmField internal var quote: WatchlistQuote? = null
+  @Inject @JvmField internal var summary: WatchlistItemSummary? = null
 
-  private val viewBinder: ViewBinder<QuoteViewState>
+  @Inject @JvmField internal var click: WatchlistItemClick? = null
+
+  @Inject @JvmField internal var quote: WatchlistItemQuote? = null
+
+  private val viewBinder: ViewBinder<WatchlistItemViewState>
 
   init {
     factory.create(binding.watchlistItem).inject(this)
 
     val quote = requireNotNull(quote)
+    val summary = requireNotNull(summary)
 
     viewBinder =
-        createViewBinder(quote) {
+        createViewBinder(quote, summary, requireNotNull(click)) {
           return@createViewBinder when (it) {
-            is QuoteViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
-            is QuoteViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
+            is WatchlistItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
+            is WatchlistItemViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
           }
         }
+
+    binding.watchlistItem.layout {
+      quote.also {
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
+
+      summary.also {
+        connect(it.id(), ConstraintSet.TOP, quote.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
+    }
 
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: QuoteViewState) {
+  override fun bindState(state: WatchlistItemViewState) {
     viewBinder.bindState(state)
   }
 
@@ -63,5 +86,7 @@ internal constructor(
     viewBinder.teardown()
 
     quote = null
+    summary = null
+    click = null
   }
 }

@@ -21,6 +21,10 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 internal data class StockShareValueImpl(private val value: Double) : StockShareValue {
 
   private val share by lazy(LazyThreadSafetyMode.NONE) {
+    if (isZero()) {
+      return@lazy "0.00"
+    }
+
     // Parse to int to remove the decimals, then back to float for comparison ability
     val intValue = value.toInt()
     val valueWithoutDecimal = intValue.toDouble()

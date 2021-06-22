@@ -40,23 +40,13 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<PortfolioListViewState>) {
-    state.mapChanged { it.stock }.mapChanged { it.totalShares() }.render(viewScope) {
-      handleTotalSharesChanged(it)
-    }
-    state.mapChanged { it.stock }.mapChanged { it.averagePrice() }.render(viewScope) {
-      handleAveragePriceChanged(it)
-    }
-    state.mapChanged { it.stock }.mapChanged { it.cost() }.render(viewScope) {
-      handleCostChanged(it)
-    }
-    state.mapChanged { it.stock }.mapChanged { it.gainLossDisplayString() }.render(viewScope) {
-      handleGainLossChanged(it)
-    }
-    state.mapChanged { it.stock }.mapChanged { it.current() }.render(viewScope) {
-      handleCurrentValueChanged(it)
-    }
-    state.mapChanged { it.stock }.mapChanged { it.directionColor() }.render(viewScope) {
-      handleDirectionChanged(it)
+    state.mapChanged { it.stock }.apply {
+      mapChanged { it.totalShares() }.render(viewScope) { handleTotalSharesChanged(it) }
+      mapChanged { it.averagePrice() }.render(viewScope) { handleAveragePriceChanged(it) }
+      mapChanged { it.cost() }.render(viewScope) { handleCostChanged(it) }
+      mapChanged { it.gainLossDisplayString() }.render(viewScope) { handleGainLossChanged(it) }
+      mapChanged { it.current() }.render(viewScope) { handleCurrentValueChanged(it) }
+      mapChanged { it.directionColor() }.render(viewScope) { handleDirectionChanged(it) }
     }
   }
 

@@ -23,10 +23,27 @@ internal data class NetworkStock
 internal constructor(
     internal val symbol: String,
     internal val shortName: String?,
+    internal val exchangeDataDelayedBy: Long?,
+    // Regular market
     internal val regularMarketPrice: Double?,
     internal val regularMarketChange: Double?,
     internal val regularMarketChangePercent: Double?,
+    internal val regularMarketPreviousClose: Double?,
+    internal val regularMarketOpen: Double?,
+    internal val regularMarketClose: Double?,
+    internal val regularMarketDayHigh: Double?,
+    internal val regularMarketDayLow: Double?,
+    internal val regularMarketDayRange: String?,
+    internal val regularMarketVolume: Long?,
+    // Post market
     internal val postMarketPrice: Double?,
     internal val postMarketChange: Double?,
     internal val postMarketChangePercent: Double?,
+    internal val postMarketPreviousClose: Double?,
+    internal val postMarketOpen: Double?,
+    internal val postMarketClose: Double?,
+    internal val postMarketDayHigh: Double?,
+    internal val postMarketDayLow: Double?,
+    internal val postMarketDayRange: String?,
+    internal val postMarketVolume: Long?,
 )

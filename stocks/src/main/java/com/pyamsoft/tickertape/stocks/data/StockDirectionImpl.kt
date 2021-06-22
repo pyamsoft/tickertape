@@ -22,6 +22,16 @@ import com.pyamsoft.tickertape.stocks.api.StockDirection
 
 internal data class StockDirectionImpl(private val price: Double) : StockDirection {
 
+  override fun sign(): String {
+    return when {
+      isUp() -> "+"
+      // Direction sign not needed for negative numbers
+      isDown() -> ""
+      isZero() -> ""
+      else -> ""
+    }
+  }
+
   override fun isUp(): Boolean {
     return price.compareTo(0) > 0
   }

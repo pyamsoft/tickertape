@@ -46,7 +46,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   private var stateSaver: StateSaver? = null
 
-  @JvmField @Inject internal var list: WatchList? = null
+  @JvmField @Inject internal var list: WatchlistList? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,

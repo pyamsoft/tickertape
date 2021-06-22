@@ -22,19 +22,18 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class WatchlistAdapter
+class WatchlistItemAdapter
 private constructor(
     private val factory: WatchlistListComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
 ) :
-    ListAdapter<QuoteViewState, WatchlistViewHolder>(DIFFER),
+    ListAdapter<WatchlistItemViewState, WatchlistViewHolder>(DIFFER),
     PopupTextProvider {
 
   companion object {
@@ -45,19 +44,19 @@ private constructor(
         factory: WatchlistListComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): WatchlistAdapter {
-      return WatchlistAdapter(factory, owner, callback)
+    ): WatchlistItemAdapter {
+      return WatchlistItemAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
-        object : DiffUtil.ItemCallback<QuoteViewState>() {
-          override fun areItemsTheSame(oldItem: QuoteViewState, newItem: QuoteViewState): Boolean {
+        object : DiffUtil.ItemCallback<WatchlistItemViewState>() {
+          override fun areItemsTheSame(oldItem: WatchlistItemViewState, newItem: WatchlistItemViewState): Boolean {
             return oldItem.symbol.symbol() == newItem.symbol.symbol()
           }
 
           override fun areContentsTheSame(
-              oldItem: QuoteViewState,
-              newItem: QuoteViewState
+              oldItem: WatchlistItemViewState,
+              newItem: WatchlistItemViewState
           ): Boolean {
             return oldItem == newItem
           }

@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.watchlist.item
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface StockMarketSession {
+data class WatchlistItemViewState(val symbol: StockSymbol, val quote: StockQuote?) : UiViewState
 
-  @CheckResult fun direction(): StockDirection
+sealed class WatchlistItemViewEvent : UiViewEvent {
 
-  @CheckResult fun price(): StockMoneyValue
+  object Select : WatchlistItemViewEvent()
 
-  @CheckResult fun previousClosingPrice(): StockMoneyValue?
-
-  @CheckResult fun amount(): StockMoneyValue
-
-  @CheckResult fun percent(): StockPercent
-
-  @CheckResult fun dayOpen(): StockMoneyValue
-
-  @CheckResult fun dayClose(): StockMoneyValue?
-
-  @CheckResult fun dayHigh(): StockMoneyValue
-
-  @CheckResult fun dayLow(): StockMoneyValue
-
-  @CheckResult fun dayVolume(): Long
+  object Remove : WatchlistItemViewEvent()
 }

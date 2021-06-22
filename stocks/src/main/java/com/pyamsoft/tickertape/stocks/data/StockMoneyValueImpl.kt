@@ -20,7 +20,9 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
 internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
 
-  private val money by lazy(LazyThreadSafetyMode.NONE) { "%.2f".format(value) }
+  private val money by lazy(LazyThreadSafetyMode.NONE) {
+    if (isZero()) "0.00" else "%.2f".format(value)
+  }
 
   override fun asMoneyValue(): String {
     return "\$${money}"

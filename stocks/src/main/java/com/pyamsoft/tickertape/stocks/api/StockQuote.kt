@@ -27,4 +27,6 @@ interface StockQuote {
   @CheckResult fun regular(): StockMarketSession
 
   @CheckResult fun afterHours(): StockMarketSession?
+
+  @CheckResult fun dataDelayBy(): Long
 }

@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
+import com.pyamsoft.tickertape.stocks.network.NetworkStock
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
@@ -52,36 +53,40 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
         .quoteResponse
         .result
         .asSequence()
-        // If the symbol does not exist, these values will return null
-        // We need all of these values to have a valid ticker
-        .filterNot { it.shortName == null }
-        .filterNot { it.regularMarketChange == null }
-        .filterNot { it.regularMarketPrice == null }
-        .filterNot { it.regularMarketChangePercent == null }
-        // Only valid tickers here, so requireNotNull should never throw
-        .map {
+        .filterOnlyValidStockData()
+        .map { stock ->
           StockQuoteImpl(
-              symbol = it.symbol.asSymbol(),
-              company = requireNotNull(it.shortName).asCompany(),
+              symbol = stock.symbol.asSymbol(),
+              company = requireNotNull(stock.shortName).asCompany(),
+              dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
               regular =
                   StockMarketSessionImpl(
-                      amount = requireNotNull(it.regularMarketChange).asMoney(),
-                      direction = requireNotNull(it.regularMarketChange).asDirection(),
-                      percent = requireNotNull(it.regularMarketChangePercent).asPercent(),
-                      price = requireNotNull(it.regularMarketPrice).asMoney(),
+                      amount = requireNotNull(stock.regularMarketChange).asMoney(),
+                      direction = requireNotNull(stock.regularMarketChange).asDirection(),
+                      percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
+                      price = requireNotNull(stock.regularMarketPrice).asMoney(),
+                      previousClosingPrice = stock.regularMarketPreviousClose?.asMoney(),
+                      dayClose = stock.regularMarketClose?.asMoney(),
+                      dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
+                      dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
+                      dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
+                      dayVolume = requireNotNull(stock.regularMarketVolume),
                   ),
               afterHours =
-                  if (it.postMarketChange != null &&
-                      it.postMarketPrice != null &&
-                      it.postMarketChangePercent != null) {
+                  if (!hasAfterHoursData(stock)) null
+                  else {
                     StockMarketSessionImpl(
-                        amount = it.postMarketChange.asMoney(),
-                        direction = it.postMarketChange.asDirection(),
-                        percent = it.postMarketChangePercent.asPercent(),
-                        price = it.postMarketPrice.asMoney(),
+                        amount = requireNotNull(stock.postMarketChange).asMoney(),
+                        direction = requireNotNull(stock.postMarketChange).asDirection(),
+                        percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
+                        price = requireNotNull(stock.postMarketPrice).asMoney(),
+                        previousClosingPrice = stock.postMarketPreviousClose?.asMoney(),
+                        dayClose = stock.postMarketClose?.asMoney(),
+                        dayHigh = requireNotNull(stock.postMarketDayHigh).asMoney(),
+                        dayLow = requireNotNull(stock.postMarketDayLow).asMoney(),
+                        dayOpen = requireNotNull(stock.postMarketOpen).asMoney(),
+                        dayVolume = requireNotNull(stock.postMarketVolume),
                     )
-                  } else {
-                    null
                   })
         }
         .toList()
@@ -107,15 +112,61 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
         listOf(
                 "symbol",
                 "shortName",
+                "exchangeDataDelayedBy",
+                // Regular market
                 "regularMarketPrice",
                 "regularMarketChange",
                 "regularMarketChangePercent",
+                "regularMarketOpen",
+                "regularMarketClose",
+                "regularMarketPreviousClose",
+                "regularMarketDayHigh",
+                "regularMarketDayLow",
+                "regularMarketDayRange",
+                "regularMarketVolume",
+                // Post Market
                 "postMarketPrice",
                 "postMarketChange",
                 "postMarketChangePercent",
+                "postMarketOpen",
+                "postMarketClose",
+                "postMarketPreviousClose",
+                "postMarketDayHigh",
+                "postMarketDayLow",
+                "postMarketDayRange",
+                "postMarketVolume",
             )
             .joinToString(",")
     private const val YF_QUOTE_FORMAT = "json"
     private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v7/finance/quote"
+
+    @JvmStatic
+    @CheckResult
+    private fun hasAfterHoursData(stock: NetworkStock): Boolean {
+      return stock.run {
+        postMarketChange != null &&
+            postMarketPrice != null &&
+            postMarketChangePercent != null &&
+            postMarketDayHigh != null &&
+            postMarketDayLow != null &&
+            postMarketDayRange != null &&
+            postMarketVolume != null
+      }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun Sequence<NetworkStock>.filterOnlyValidStockData(): Sequence<NetworkStock> {
+      // If the symbol does not exist, these values will return null
+      // We need all of these values to have a valid ticker
+      return this.filterNot { it.shortName == null }
+          .filterNot { it.regularMarketChange == null }
+          .filterNot { it.regularMarketPrice == null }
+          .filterNot { it.regularMarketChangePercent == null }
+          .filterNot { it.regularMarketDayHigh == null }
+          .filterNot { it.regularMarketDayLow == null }
+          .filterNot { it.regularMarketDayRange == null }
+          .filterNot { it.regularMarketVolume == null }
+    }
   }
 }

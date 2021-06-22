@@ -26,17 +26,17 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
-import com.pyamsoft.tickertape.watchlist.item.WatchlistAdapter
+import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
+import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
-class WatchList
+class WatchlistList
 @Inject
 internal constructor(
     parent: ViewGroup,
@@ -45,13 +45,13 @@ internal constructor(
 ) :
     BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
-    WatchlistAdapter.Callback {
+    WatchlistItemAdapter.Callback {
 
   override val viewBinding = WatchlistBinding::inflate
 
   override val layoutRoot by boundView { watchlistRoot }
 
-  private var modelAdapter: WatchlistAdapter? = null
+  private var modelAdapter: WatchlistItemAdapter? = null
 
   private var lastScrollPosition = 0
 
@@ -65,7 +65,7 @@ internal constructor(
     }
 
     doOnInflate {
-      modelAdapter = WatchlistAdapter.create(factory, owner, this)
+      modelAdapter = WatchlistItemAdapter.create(factory, owner, this)
       binding.watchlistList.adapter = modelAdapter
     }
 
@@ -98,9 +98,7 @@ internal constructor(
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
-      LinearMarginDecoration.create(margin).apply {
-        binding.watchlistList.addItemDecoration(this)
-      }
+      LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
 
       // The bottom has additional space to fit the FAB
       val bottomMargin = 28.asDp(binding.watchlistList.context)
@@ -128,7 +126,7 @@ internal constructor(
   }
 
   @CheckResult
-  private fun usingAdapter(): WatchlistAdapter {
+  private fun usingAdapter(): WatchlistItemAdapter {
     return requireNotNull(modelAdapter)
   }
 
@@ -155,7 +153,7 @@ internal constructor(
   }
 
   private fun setList(list: List<QuotedStock>) {
-    val data = list.map { QuoteViewState(symbol = it.symbol, quote = it.quote) }
+    val data = list.map { WatchlistItemViewState(symbol = it.symbol, quote = it.quote) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }

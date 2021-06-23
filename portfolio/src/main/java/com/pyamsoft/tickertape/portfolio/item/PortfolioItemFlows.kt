@@ -27,8 +27,10 @@ sealed class PortfolioItemViewState : UiViewState {
 
   data class Header
   internal constructor(
-      val totalCost: StockMoneyValue,
-      val totalToday: StockMoneyValue?,
+      val todayChange: StockMoneyValue?,
+      val todayPercent: StockPercent?,
+      val todayDirection: StockDirection,
+      val totalAmount: StockMoneyValue?,
       val totalGainLoss: StockMoneyValue?,
       val totalPercent: StockPercent?,
       val totalDirection: StockDirection,

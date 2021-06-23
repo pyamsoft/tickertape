@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
 import javax.inject.Inject
 
 class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
@@ -43,32 +44,51 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleRender(state: PortfolioItemViewState.Header) {
-    val direction = state.totalDirection
-    val color = direction.color()
-    handleToday(state.totalToday, color)
-    handleGainLoss(state.gainLossDisplayString(direction), color)
+    // Total
+    handleTotalAmount(state.totalAmount)
 
-    handleCost(state.totalCost)
+    state.totalDirection.apply {
+      val color = this.color()
+      handleGainLoss(this.gainLossDisplayString(state.totalGainLoss, state.totalPercent), color)
+    }
+
+    // Today
+    state.todayDirection.apply {
+      val color = this.color()
+      handleChangeToday(this.gainLossDisplayString(state.todayChange, state.todayPercent), color)
+    }
   }
 
   private fun clear() {
     binding.apply {
       portfolioHeaderToday.text = ""
-      portfolioHeaderCostText.text = ""
       portfolioHeaderGainloss.text = ""
+      portfolioHeaderChangeTodayText.text = ""
     }
   }
 
-  private fun handleToday(today: StockMoneyValue?, @ColorInt color: Int) {
+  private fun handleChangeToday(change: String?, @ColorInt color: Int) {
+    val isMissing = change == null
+    binding.apply {
+      portfolioHeaderChangeTodayLabel.isInvisible = isMissing
+      portfolioHeaderChangeTodayText.isInvisible = isMissing
+
+      if (change != null) {
+        portfolioHeaderChangeTodayText.apply {
+          text = change
+          setTextColor(color)
+        }
+      }
+    }
+  }
+
+  private fun handleTotalAmount(today: StockMoneyValue?) {
     val isMissing = today == null
     binding.apply {
       portfolioHeaderToday.isInvisible = isMissing
 
       if (today != null) {
-        portfolioHeaderToday.apply {
-          text = today.asMoneyValue()
-          setTextColor(color)
-        }
+        portfolioHeaderToday.apply { text = today.asMoneyValue() }
       }
     }
   }
@@ -87,21 +107,20 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  private fun handleCost(cost: StockMoneyValue) {
-    binding.portfolioHeaderCostText.text = cost.asMoneyValue()
-  }
+  companion object {
 
-  @CheckResult
-  private fun PortfolioItemViewState.Header.gainLossDisplayString(
-      direction: StockDirection
-  ): String? {
-    val gainLoss = totalGainLoss
-    val gainLossPercent = totalPercent
-    if (gainLoss == null || gainLossPercent == null) {
-      return null
+    @JvmStatic
+    @CheckResult
+    private fun StockDirection.gainLossDisplayString(
+        amount: StockMoneyValue?,
+        percent: StockPercent?
+    ): String? {
+      if (amount == null || percent == null) {
+        return null
+      }
+
+      val sign = this.sign()
+      return "${sign}${amount.asMoneyValue()} (${sign}${percent.asPercentValue()})"
     }
-
-    val sign = direction.sign()
-    return "${sign}${gainLoss.asMoneyValue()} (${sign}${gainLossPercent.asPercentValue()})"
   }
 }

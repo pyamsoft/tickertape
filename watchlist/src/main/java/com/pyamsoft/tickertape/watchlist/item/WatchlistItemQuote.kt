@@ -42,7 +42,7 @@ class WatchlistItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   @CheckResult
-  fun id(): Int {
+  internal fun id(): Int {
     return delegate.id()
   }
 

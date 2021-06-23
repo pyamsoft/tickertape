@@ -158,11 +158,13 @@ internal constructor(
     val data =
         listOf(
             PortfolioItemViewState.Header(
-                totalCost = list.sumCost(),
-                totalToday = list.sumToday(),
-                totalGainLoss = list.sumGainLoss(),
-                totalPercent = list.sumPercent(),
-                totalDirection = list.sumDirection())) +
+                todayChange = list.sumTodayChange(),
+                todayPercent = list.sumTodayPercent(),
+                todayDirection = list.sumTodayDirection(),
+                totalAmount = list.sumTotalAmount(),
+                totalGainLoss = list.sumTotalGainLoss(),
+                totalPercent = list.sumTotalPercent(),
+                totalDirection = list.sumTotalDirection())) +
             list.map { PortfolioItemViewState.Holding(stock = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)

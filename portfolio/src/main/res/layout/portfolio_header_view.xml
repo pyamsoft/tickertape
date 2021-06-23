@@ -37,7 +37,7 @@
             android:id="@+id/portfolio_header_gainloss"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:textAppearance="?attr/textAppearanceHeadline5"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -45,27 +45,27 @@
             app:layout_constraintTop_toBottomOf="@id/portfolio_header_today" />
 
         <TextView
-            android:id="@+id/portfolio_header_cost_label"
+            android:id="@+id/portfolio_header_change_today_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Total Cost"
-            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toStartOf="@id/portfolio_header_today"
+            android:text="Change Today"
+            app:layout_constraintStart_toStartOf="@id/portfolio_header_gainloss"
             app:layout_constraintTop_toBottomOf="@id/portfolio_header_gainloss" />
 
         <TextView
-            android:id="@+id/portfolio_header_cost_text"
+            android:id="@+id/portfolio_header_change_today_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:layout_marginStart="4dp"
+            android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/portfolio_header_cost_label"
-            app:layout_constraintTop_toTopOf="@id/portfolio_header_cost_label" />
+            app:layout_constraintStart_toEndOf="@id/portfolio_header_change_today_label"
+            app:layout_constraintTop_toTopOf="@id/portfolio_header_change_today_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

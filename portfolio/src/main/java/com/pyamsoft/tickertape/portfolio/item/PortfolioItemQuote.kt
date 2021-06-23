@@ -20,10 +20,10 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteViewDelegate
 import com.pyamsoft.tickertape.quote.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.QuoteViewState
-import com.pyamsoft.tickertape.quote.QuotedStock
 import javax.inject.Inject
 
 class PortfolioItemQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
@@ -43,20 +43,17 @@ class PortfolioItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   @CheckResult
-  fun id(): Int {
+  internal fun id(): Int {
     return delegate.id()
   }
 
   override fun render(state: UiRender<PortfolioItemViewState.Holding>) {
-    state.mapChanged { it.stock }.mapChanged { it.quote }.render(viewScope) {
-      handleQuoteChanged(it)
-    }
+    state.mapChanged { it.stock }.render(viewScope) { handleQuoteChanged(it) }
   }
 
-  private fun handleQuoteChanged(quote: QuotedStock?) {
-    if (quote != null) {
-      delegate.render(
-          viewScope, QuoteViewState(symbol = quote.symbol, quote = quote.quote).asUiRender())
-    }
+  private fun handleQuoteChanged(stock: PortfolioStock) {
+    delegate.render(
+        viewScope,
+        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote).asUiRender())
   }
 }

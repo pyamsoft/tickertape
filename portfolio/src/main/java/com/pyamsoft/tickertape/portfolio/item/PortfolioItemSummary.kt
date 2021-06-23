@@ -18,12 +18,11 @@ package com.pyamsoft.tickertape.portfolio.item
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.annotation.ColorInt
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSummaryBinding
+import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import javax.inject.Inject
@@ -44,21 +43,22 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.stock }.apply {
       mapChanged { it.totalShares() }.render(viewScope) { handleTotalSharesChanged(it) }
       mapChanged { it.averagePrice() }.render(viewScope) { handleAveragePriceChanged(it) }
-      mapChanged { it.cost() }.render(viewScope) { handleCostChanged(it) }
       mapChanged { it.gainLossDisplayString() }.render(viewScope) { handleGainLossChanged(it) }
       mapChanged { it.current() }.render(viewScope) { handleCurrentValueChanged(it) }
-      mapChanged { it.directionColor() }.render(viewScope) { handleDirectionChanged(it) }
+      mapChanged { it.todayDirection() }.render(viewScope) { handleDirectionChanged(it) }
     }
   }
 
-  private fun handleDirectionChanged(@ColorInt color: Int?) {
-    if (color == null) {
-      binding.holdingSummaryCurrentValueText.setTextColor(DEFAULT_STOCK_COLOR)
-      binding.holdingSummaryGainlossText.setTextColor(DEFAULT_STOCK_COLOR)
-    } else {
-      binding.holdingSummaryCurrentValueText.setTextColor(color)
-      binding.holdingSummaryGainlossText.setTextColor(color)
-    }
+  private fun handleDirectionChanged(direction: StockDirection) {
+    val color = direction.color()
+    binding.holdingSummaryCurrentValueText.setTextColor(color)
+    binding.holdingSummaryGainlossText.setTextColor(color)
+    binding.holdingSummaryGainlossLabel.text =
+        when {
+          direction.isUp() -> "Gain"
+          direction.isDown() -> "Loss"
+          else -> "Change"
+        }
   }
 
   private fun clearTotalShares() {
@@ -67,10 +67,6 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   private fun clearAveragePrice() {
     binding.holdingSummaryAvgPriceText.text = ""
-  }
-
-  private fun clearCost() {
-    binding.holdingSummaryCostText.text = ""
   }
 
   private fun clearGainLossPrice() {
@@ -83,7 +79,6 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   private fun clear() {
     clearTotalShares()
-    clearCost()
     clearAveragePrice()
     clearGainLossPrice()
     clearCurrent()
@@ -110,14 +105,6 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
       clearAveragePrice()
     } else {
       binding.holdingSummaryAvgPriceText.text = averagePrice.asMoneyValue()
-    }
-  }
-
-  private fun handleCostChanged(totalPrice: StockMoneyValue?) {
-    if (totalPrice == null) {
-      clearCost()
-    } else {
-      binding.holdingSummaryCostText.text = totalPrice.asMoneyValue()
     }
   }
 

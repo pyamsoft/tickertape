@@ -75,69 +75,17 @@
             app:layout_constraintTop_toTopOf="@id/holding_summary_avg_price_label" />
 
         <TextView
-            android:id="@+id/holding_summary_cost_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="8dp"
-            android:text="Cost"
-            android:textAppearance="?attr/textAppearanceCaption"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_avg_price_text"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_avg_price_text" />
-
-        <TextView
-            android:id="@+id/holding_summary_cost_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="4dp"
-            android:textAppearance="?attr/textAppearanceCaption"
-            android:textStyle="bold"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_cost_label"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_cost_label" />
-
-        <TextView
-            android:id="@+id/holding_summary_gainloss_label"
+            android:id="@+id/holding_summary_current_value_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginTop="8dp"
-            android:text="Gain/Loss"
+            android:text="Current"
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintStart_toStartOf="@id/holding_summary_total_shares_label"
             app:layout_constraintTop_toBottomOf="@id/holding_summary_total_shares_label" />
-
-        <TextView
-            android:id="@+id/holding_summary_gainloss_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="4dp"
-            android:textAppearance="?attr/textAppearanceCaption"
-            android:textStyle="bold"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_gainloss_label"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_gainloss_label" />
-
-        <TextView
-            android:id="@+id/holding_summary_current_value_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="8dp"
-            android:text="Current Value"
-            android:textAppearance="?attr/textAppearanceCaption"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_gainloss_text"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_gainloss_text" />
 
         <TextView
             android:id="@+id/holding_summary_current_value_text"
@@ -151,6 +99,32 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintStart_toEndOf="@id/holding_summary_current_value_label"
             app:layout_constraintTop_toTopOf="@id/holding_summary_current_value_label" />
+
+
+        <TextView
+            android:id="@+id/holding_summary_gainloss_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="8dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toEndOf="@id/holding_summary_current_value_text"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_current_value_text" />
+
+        <TextView
+            android:id="@+id/holding_summary_gainloss_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="4dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textStyle="bold"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toEndOf="@id/holding_summary_gainloss_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_gainloss_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

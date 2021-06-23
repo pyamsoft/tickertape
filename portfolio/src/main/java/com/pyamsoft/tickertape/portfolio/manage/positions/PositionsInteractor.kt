@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import java.util.Optional
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -115,8 +116,17 @@ internal constructor(
             .getQuotes(force, listOf(holding.symbol()))
             .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
             .recover { emptyList() }
-            .map { quotes -> quotes.firstOrNull { it.symbol == holding.symbol() } }
-            .map { PortfolioStock(holding = holding, positions = positions, quote = it) }
+            .map { quotes ->
+              Optional.ofNullable(
+                  quotes.firstOrNull {
+                    // Compare raw symbols for string case checking
+                    it.symbol.symbol() == holding.symbol().symbol()
+                  })
+            }
+            .map { maybeQuote ->
+              val quote = maybeQuote.orElse(null)
+              PortfolioStock(holding = holding, positions = positions, quote = quote)
+            }
       }
 
   @CheckResult

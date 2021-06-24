@@ -20,29 +20,17 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 data class PositionsViewState(
     val isLoading: Boolean,
     val stock: PortfolioStock?,
-    val numberOfShares: StockShareValue,
-    val pricePerShare: StockMoneyValue,
 ) : UiViewState
 
 sealed class PositionsViewEvent : UiViewEvent {
 
-  object Commit : PositionsViewEvent()
-
   object ForceRefresh : PositionsViewEvent()
 
   data class Remove internal constructor(val index: Int) : PositionsViewEvent()
-
-  data class UpdateNumberOfShares internal constructor(val number: StockShareValue) :
-      PositionsViewEvent()
-
-  data class UpdateSharePrice internal constructor(val price: StockMoneyValue) :
-      PositionsViewEvent()
 }
 
 sealed class PositionsControllerEvent : UiControllerEvent

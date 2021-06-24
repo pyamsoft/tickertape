@@ -14,28 +14,32 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class ManagePortfolioViewState
-internal constructor(val symbol: StockSymbol, val page: PortfolioPage) : UiViewState
+data class PositionsAddViewState(
+    val symbol: StockSymbol,
+    val numberOfShares: StockShareValue,
+    val pricePerShare: StockMoneyValue,
+) : UiViewState
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+sealed class PositionsAddViewEvent : UiViewEvent {
 
-  object Close : ManagePortfolioViewEvent()
+  object Close : PositionsAddViewEvent()
 
-  object Add : ManagePortfolioViewEvent()
+  object Commit : PositionsAddViewEvent()
+
+  data class UpdateNumberOfShares internal constructor(val number: StockShareValue) :
+      PositionsAddViewEvent()
+
+  data class UpdateSharePrice internal constructor(val price: StockMoneyValue) :
+      PositionsAddViewEvent()
 }
 
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
-
-  data class OpenAdd internal constructor(val id: DbHolding.Id, val symbol: StockSymbol) :
-      ManagePortfolioControllerEvent()
-
-  object PushPositions : ManagePortfolioControllerEvent()
-}
+sealed class PositionsAddControllerEvent : UiControllerEvent

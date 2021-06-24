@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.add
 
 import android.app.Dialog
 import android.os.Bundle
@@ -27,38 +27,46 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.makeFullscreen
+import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
-import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.layout
-import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddDialog
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionAddToolbar
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddControllerEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewEvent
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewModel
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewState
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsCommit
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsPriceEntry
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsShareCountEntry
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class PositionManageDialog :
-    AppCompatDialogFragment(), UiController<ManagePortfolioControllerEvent> {
+internal class PositionsAddDialog :
+    AppCompatDialogFragment(), UiController<PositionsAddControllerEvent> {
 
-  @JvmField @Inject internal var toolbar: ManagePortfolioToolbar? = null
+  @JvmField @Inject internal var priceEntry: PositionsPriceEntry? = null
 
-  @JvmField @Inject internal var container: ManagePortfolioContainer? = null
+  @JvmField @Inject internal var numberOfSharesEntry: PositionsShareCountEntry? = null
 
-  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<ManagePortfolioViewModel> { factory?.create(this) }
+  @JvmField @Inject internal var commit: PositionsCommit? = null
 
-  private var component: ManageComponent? = null
+  @JvmField @Inject internal var toolbar: PositionAddToolbar? = null
+
+  @JvmField @Inject internal var factory: PositionsAddViewModel.Factory? = null
+  private val viewModel by fromViewModelFactory<PositionsAddViewModel> {
+    createSavedStateViewModelFactory(factory)
+  }
 
   private var stateSaver: StateSaver? = null
 
@@ -94,30 +102,40 @@ internal class PositionManageDialog :
       savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
-    makeFullscreen()
+    makeFullWidth()
     eatBackButtonPress()
 
     val binding = LayoutConstraintBinding.bind(view)
-    component =
-        Injector.obtainFromApplication<TickerComponent>(view.context)
-            .plusManageComponent()
-            .create(getHoldingSymbol(), getHoldingId())
-            .also { c ->
-              c.plusPositionManageComponent().create(binding.layoutConstraint).inject(this)
-            }
+    Injector.obtainFromApplication<TickerComponent>(view.context)
+        .plusPositionAddComponent()
+        .create(this, binding.layoutConstraint, getHoldingId(), getHoldingSymbol())
+        .inject(this)
 
-    val container = requireNotNull(container)
     val toolbar = requireNotNull(toolbar)
+    val shareCount = requireNotNull(numberOfSharesEntry)
+    val price = requireNotNull(priceEntry)
+    val commit = requireNotNull(commit)
     val shadow =
-        DropshadowView.createTyped<ManagePortfolioViewState, ManagePortfolioViewEvent>(
+        DropshadowView.createTyped<PositionsAddViewState, PositionsAddViewEvent>(
             binding.layoutConstraint)
 
     stateSaver =
         createComponent(
-            savedInstanceState, viewLifecycleOwner, viewModel, this, container, toolbar, shadow) {
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            shareCount,
+            price,
+            commit,
+            toolbar,
+            shadow) {
           return@createComponent when (it) {
-            is ManagePortfolioViewEvent.Close -> requireActivity().onBackPressed()
-            is ManagePortfolioViewEvent.Add -> viewModel.handleOpenAddDialog()
+            is PositionsAddViewEvent.UpdateNumberOfShares ->
+                viewModel.handleUpdateNumberOfShares(it.number)
+            is PositionsAddViewEvent.UpdateSharePrice -> viewModel.handleUpdateSharePrice(it.price)
+            is PositionsAddViewEvent.Commit -> viewModel.handleCreatePosition()
+            is PositionsAddViewEvent.Close -> requireActivity().onBackPressed()
           }
         }
 
@@ -134,16 +152,31 @@ internal class PositionManageDialog :
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
       }
 
-      container.also {
+      shareCount.also {
         connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.END, price.id(), ConstraintSet.START)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+        setHorizontalWeight(it.id(), 1F)
       }
-    }
 
-    if (savedInstanceState == null) {
-      viewModel.handleLoadDefaultPage()
+      price.also {
+        connect(it.id(), ConstraintSet.TOP, shareCount.id(), ConstraintSet.TOP)
+        connect(it.id(), ConstraintSet.START, shareCount.id(), ConstraintSet.END)
+        connect(it.id(), ConstraintSet.END, commit.id(), ConstraintSet.START)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+        setHorizontalWeight(it.id(), 1F)
+      }
+
+      commit.also {
+        connect(it.id(), ConstraintSet.TOP, shareCount.id(), ConstraintSet.TOP)
+        connect(it.id(), ConstraintSet.START, price.id(), ConstraintSet.END)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.WRAP_CONTENT)
+        constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
+      }
     }
   }
 
@@ -154,43 +187,12 @@ internal class PositionManageDialog :
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
               override fun handleOnBackPressed() {
-                val fm = childFragmentManager
-                if (fm.backStackEntryCount > 0) {
-                  fm.popBackStack()
-
-                  // Upon popping, we now restore the default page toolbar state
-                  viewModel.handleLoadDefaultPage()
-                } else {
-                  dismiss()
-                }
+                dismiss()
               }
             })
   }
 
-  private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
-    val fm = childFragmentManager
-    val containerId = requireNotNull(container).id()
-    val existing = fm.findFragmentById(containerId)
-    if (existing == null || existing.tag !== tag) {
-      fm.commit(viewLifecycleOwner) {
-        if (appendBackStack) {
-          addToBackStack(null)
-        }
-        replace(containerId, fragment, tag)
-      }
-    }
-  }
-
-  override fun onControllerEvent(event: ManagePortfolioControllerEvent) {
-    return when (event) {
-      is ManagePortfolioControllerEvent.PushPositions ->
-          pushFragment(
-              PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = false)
-      is ManagePortfolioControllerEvent.OpenAdd ->
-          PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol)
-              .show(requireActivity(), PositionsAddDialog.TAG)
-    }
-  }
+  override fun onControllerEvent(event: PositionsAddControllerEvent) {}
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
@@ -202,38 +204,26 @@ internal class PositionManageDialog :
     stateSaver = null
     factory = null
 
+    priceEntry = null
+    numberOfSharesEntry = null
+    commit = null
     toolbar = null
-    container = null
-
-    component = null
   }
 
   companion object {
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
-    const val TAG = "PositionManageDialog"
+    const val TAG = "PositionAddDialog"
 
     @JvmStatic
     @CheckResult
-    fun getInjector(fragment: Fragment): ManageComponent {
-      val parent = fragment.parentFragment
-      if (parent is PositionManageDialog) {
-        return requireNotNull(parent.component)
-      }
-
-      throw AssertionError(
-          "Cannot call getInjector() from a fragment that does not use PositionManageDialog as it's parent.")
-    }
-
-    @JvmStatic
-    @CheckResult
-    fun newInstance(holding: DbHolding): DialogFragment {
-      return PositionManageDialog().apply {
+    fun newInstance(id: DbHolding.Id, symbol: StockSymbol): DialogFragment {
+      return PositionsAddDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_HOLDING_ID, holding.id().id)
-              putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
+              putString(KEY_HOLDING_ID, id.id)
+              putString(KEY_HOLDING_SYMBOL, symbol.symbol())
             }
       }
     }

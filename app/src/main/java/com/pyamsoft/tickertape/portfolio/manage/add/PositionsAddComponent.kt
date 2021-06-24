@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.add
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsViewModel
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewModel
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -29,19 +31,21 @@ import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [PositionsComponent.ComponentModule::class, ViewModelFactoryModule::class])
-internal interface PositionsComponent {
+@Subcomponent(modules = [PositionsAddComponent.ComponentModule::class])
+internal interface PositionsAddComponent {
 
-  fun inject(fragment: PositionsFragment)
+  fun inject(fragment: PositionsAddDialog)
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance owner: LifecycleOwner,
+        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
         @BindsInstance parent: ViewGroup,
-    ): PositionsComponent
+        @BindsInstance holdingId: DbHolding.Id,
+        @BindsInstance symbol: StockSymbol,
+    ): PositionsAddComponent
   }
 
   @Module
@@ -49,7 +53,9 @@ internal interface PositionsComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(PositionsViewModel::class)
-    internal abstract fun bindViewModel(impl: PositionsViewModel): ViewModel
+    @ClassKey(PositionsAddViewModel::class)
+    internal abstract fun bindViewModel(
+        impl: PositionsAddViewModel.Factory
+    ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

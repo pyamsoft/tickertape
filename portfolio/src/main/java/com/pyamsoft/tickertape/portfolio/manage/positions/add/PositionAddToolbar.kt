@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -28,19 +28,18 @@ import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.pydroid.ui.util.setUpEnabled
 import com.pyamsoft.pydroid.util.tintWith
-import com.pyamsoft.tickertape.portfolio.R as R2
 import com.pyamsoft.tickertape.portfolio.databinding.ManagePortfolioToolbarBinding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
 
-class ManagePortfolioToolbar
+class PositionAddToolbar
 @Inject
 internal constructor(
     private val imageLoader: ImageLoader,
     parent: ViewGroup,
 ) :
-    BaseUiView<ManagePortfolioViewState, ManagePortfolioViewEvent, ManagePortfolioToolbarBinding>(
+    BaseUiView<PositionsAddViewState, PositionsAddViewEvent, ManagePortfolioToolbarBinding>(
         parent) {
 
   override val viewBinding = ManagePortfolioToolbarBinding::inflate
@@ -54,32 +53,15 @@ internal constructor(
 
     doOnInflate {
       binding.positionToolbar.setNavigationOnClickListener(
-          DebouncedOnClickListener.create { publish(ManagePortfolioViewEvent.Close) })
+          DebouncedOnClickListener.create { publish(PositionsAddViewEvent.Close) })
     }
 
     doOnTeardown { binding.positionToolbar.setNavigationOnClickListener(null) }
 
+    doOnInflate { loadCustomImage() }
     doOnTeardown { unloadImage() }
 
     doOnTeardown { binding.positionToolbar.title = "" }
-
-    doOnInflate { binding.positionToolbar.inflateMenu(R2.menu.manage_toolbar) }
-
-    doOnInflate {
-      binding.positionToolbar.setOnMenuItemClickListener { item ->
-        when (item.itemId) {
-          R2.id.menu_manage_toolbar_add -> publish(ManagePortfolioViewEvent.Add)
-        }
-        return@setOnMenuItemClickListener true
-      }
-    }
-
-    doOnTeardown { binding.positionToolbar.setOnMenuItemClickListener(null) }
-  }
-
-  private fun loadDefaultImage() {
-    unloadImage()
-    binding.positionToolbar.setUpEnabled(true)
   }
 
   private fun loadCustomImage() {
@@ -107,35 +89,11 @@ internal constructor(
     customImageLoaded = null
   }
 
-  override fun onRender(state: UiRender<ManagePortfolioViewState>) {
-    state.mapChanged { it.page }.render(viewScope) { handleCloseState(it) }
-    state.mapChanged { it.page }.render(viewScope) { handleMenuState(it) }
+  override fun onRender(state: UiRender<PositionsAddViewState>) {
     state.mapChanged { it.symbol }.render(viewScope) { handleSymbol(it) }
-  }
-
-  private fun handleMenuState(page: PortfolioPage) {
-    val isAddEnabled =
-        when (page) {
-          PortfolioPage.POSITIONS -> true
-        }
-
-    binding.positionToolbar.menu.findItem(R2.id.menu_manage_toolbar_add)?.isEnabled = isAddEnabled
   }
 
   private fun handleSymbol(symbol: StockSymbol) {
     binding.positionToolbar.title = symbol.symbol()
-  }
-
-  private fun handleCloseState(page: PortfolioPage) {
-    val isClose =
-        when (page) {
-          PortfolioPage.POSITIONS -> true
-        }
-
-    if (isClose) {
-      loadCustomImage()
-    } else {
-      loadDefaultImage()
-    }
   }
 }

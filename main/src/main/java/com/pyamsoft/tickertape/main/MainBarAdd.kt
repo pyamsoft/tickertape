@@ -19,11 +19,15 @@ package com.pyamsoft.tickertape.main
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
+import com.pyamsoft.tickertape.ui.R
 import javax.inject.Inject
 
-class MainBarAdd @Inject internal constructor(parent: ViewGroup) :
+class MainBarAdd
+@Inject
+internal constructor(private val imageLoader: ImageLoader, parent: ViewGroup) :
     BaseUiView<MainViewState, MainViewEvent, MainAddBinding>(parent) {
 
   override val viewBinding = MainAddBinding::inflate
@@ -33,6 +37,12 @@ class MainBarAdd @Inject internal constructor(parent: ViewGroup) :
   init {
     doOnInflate {
       binding.mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
+    }
+
+    doOnInflate {
+      imageLoader.asDrawable().load(R.drawable.ic_add_24dp).into(binding.mainBarAdd).also { l ->
+        doOnTeardown { l.dispose() }
+      }
     }
 
     doOnTeardown { binding.mainBarAdd.setOnDebouncedClickListener(null) }

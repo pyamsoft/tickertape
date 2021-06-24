@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions
+package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
@@ -27,7 +27,8 @@ import javax.inject.Inject
 import timber.log.Timber
 
 class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionsViewState, PositionsViewEvent, HoldingShareCountEntryBinding>(parent) {
+    BaseUiView<PositionsAddViewState, PositionsAddViewEvent, HoldingShareCountEntryBinding>(
+        parent) {
 
   override val viewBinding = HoldingShareCountEntryBinding::inflate
 
@@ -46,7 +47,7 @@ class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
           UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
             // Blank string reset to 0
             if (numberString.isBlank()) {
-              publish(PositionsViewEvent.UpdateNumberOfShares(StockShareValue.none()))
+              publish(PositionsAddViewEvent.UpdateNumberOfShares(StockShareValue.none()))
               return@create true
             }
 
@@ -56,14 +57,14 @@ class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
               return@create false
             }
 
-            publish(PositionsViewEvent.UpdateNumberOfShares(numberOfShares.asShare()))
+            publish(PositionsAddViewEvent.UpdateNumberOfShares(numberOfShares.asShare()))
             return@create true
           }
               .apply { handleCreate() }
     }
   }
 
-  override fun onRender(state: UiRender<PositionsViewState>) {
+  override fun onRender(state: UiRender<PositionsAddViewState>) {
     state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
   }
 

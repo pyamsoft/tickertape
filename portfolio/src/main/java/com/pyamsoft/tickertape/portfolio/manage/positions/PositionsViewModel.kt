@@ -18,42 +18,29 @@ package com.pyamsoft.tickertape.portfolio.manage.positions
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.UiSavedState
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PositionsViewModel
-@AssistedInject
+@Inject
 internal constructor(
-    @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
     private val interactor: PositionsInteractor,
     private val thisHoldingId: DbHolding.Id,
 ) :
-    UiSavedStateViewModel<PositionsViewState, PositionsControllerEvent>(
-        savedState,
-        initialState =
-            PositionsViewState(
-                isLoading = false,
-                numberOfShares = StockShareValue.none(),
-                pricePerShare = StockMoneyValue.none(),
-                stock = null)) {
+    UiViewModel<PositionsViewState, PositionsControllerEvent>(
+        initialState = PositionsViewState(isLoading = false, stock = null)) {
 
   private val portfolioFetcher =
       highlander<ResultWrapper<PortfolioStock>, Boolean> {
@@ -167,40 +154,5 @@ internal constructor(
           .onSuccess { Timber.d("Removed position $position") }
           .onFailure { Timber.e(it, "Error removing position $position") }
     }
-  }
-
-  fun handleUpdateNumberOfShares(number: StockShareValue) {
-    setState { copy(numberOfShares = number) }
-  }
-
-  fun handleUpdateSharePrice(price: StockMoneyValue) {
-    setState { copy(pricePerShare = price) }
-  }
-
-  fun handleCreatePosition() {
-    val sharePrice = state.pricePerShare
-    val shareCount = state.numberOfShares
-    setState(
-        stateChange = {
-          copy(pricePerShare = StockMoneyValue.none(), numberOfShares = StockShareValue.none())
-        },
-        andThen = { newState ->
-          val stock = newState.stock
-          if (stock == null) {
-            Timber.w("Cannot create new position, holding is invalid")
-            return@setState
-          }
-
-          interactor
-              .createPosition(
-                  id = stock.holding.id(), numberOfShares = shareCount, pricePerShare = sharePrice)
-              .onSuccess { Timber.d("Created new position $stock") }
-              .onFailure { Timber.e(it, "Error creating new position $stock") }
-        })
-  }
-
-  @AssistedFactory
-  interface Factory : UiSavedStateViewModelProvider<PositionsViewModel> {
-    override fun create(savedState: UiSavedState): PositionsViewModel
   }
 }

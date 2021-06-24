@@ -18,14 +18,17 @@ package com.pyamsoft.tickertape.portfolio.manage
 
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 // Share this single VM between the entire fragment scope, so page is always up to date
 @FragmentScope
-class ManagePortfolioViewModel @Inject internal constructor(initialSymbol: StockSymbol) :
+class ManagePortfolioViewModel
+@Inject
+internal constructor(private val thisHoldingId: DbHolding.Id, private val thisSymbol: StockSymbol) :
     UiViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
-        initialState = ManagePortfolioViewState(symbol = initialSymbol, page = DEFAULT_PAGE)) {
+        initialState = ManagePortfolioViewState(symbol = thisSymbol, page = DEFAULT_PAGE)) {
 
   fun handleLoadDefaultPage() {
     loadPage(DEFAULT_PAGE)
@@ -39,6 +42,10 @@ class ManagePortfolioViewModel @Inject internal constructor(initialSymbol: Stock
 
   private fun loadPage(page: PortfolioPage) {
     setState(stateChange = { copy(page = page) }, andThen = { publishPage() })
+  }
+
+  fun handleOpenAddDialog() {
+    publish(ManagePortfolioControllerEvent.OpenAdd(id = thisHoldingId, symbol = thisSymbol))
   }
 
   companion object {

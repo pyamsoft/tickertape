@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions
+package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.HoldingCommitBinding
 import javax.inject.Inject
 
 class PositionsCommit @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionsViewState, PositionsViewEvent, HoldingCommitBinding>(parent) {
+    BaseUiView<PositionsAddViewState, PositionsAddViewEvent, HoldingCommitBinding>(parent) {
 
   override val viewBinding = HoldingCommitBinding::inflate
 
@@ -32,17 +32,17 @@ class PositionsCommit @Inject internal constructor(parent: ViewGroup) :
 
   init {
     doOnInflate {
-      binding.positionCommit.setOnDebouncedClickListener { publish(PositionsViewEvent.Commit) }
+      binding.positionCommit.setOnDebouncedClickListener { publish(PositionsAddViewEvent.Commit) }
     }
 
     doOnTeardown { binding.positionCommit.setOnDebouncedClickListener(null) }
   }
 
-  override fun onRender(state: UiRender<PositionsViewState>) {
+  override fun onRender(state: UiRender<PositionsAddViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStateChanged(state: PositionsViewState) {
+  private fun handleStateChanged(state: PositionsAddViewState) {
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
     val isEntered = shareCount.value().compareTo(0) > 0 && sharePrice.value().compareTo(0) > 0

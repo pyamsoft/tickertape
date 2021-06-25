@@ -16,15 +16,21 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
+import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 
-class RefresherAlarm internal constructor() : PeriodicAlarm() {
+class RefresherAlarm internal constructor(private val params: RefreshParameters) : PeriodicAlarm() {
 
   override suspend fun tag(): String {
     return "Refresher Alarm 1"
   }
 
   override suspend fun parameters(): AlarmParameters {
-    return AlarmParameters.empty()
+    return AlarmParameters { putBoolean(FORCE_REFRESH, params.forceRefresh) }
+  }
+
+  companion object {
+
+    const val FORCE_REFRESH = "force_refresh_v1"
   }
 }

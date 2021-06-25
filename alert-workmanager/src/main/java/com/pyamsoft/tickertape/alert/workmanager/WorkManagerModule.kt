@@ -24,5 +24,5 @@ import dagger.Module
 @Module
 abstract class WorkManagerModule {
 
-  @Binds @CheckResult internal abstract fun bindButler(impl: WorkManagerAlerter): Alerter
+  @Binds @CheckResult internal abstract fun bindAlerter(impl: WorkManagerAlerter): Alerter
 }

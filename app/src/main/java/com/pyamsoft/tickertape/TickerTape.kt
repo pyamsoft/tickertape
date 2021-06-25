@@ -17,6 +17,8 @@
 package com.pyamsoft.tickertape
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.ui.ModuleProvider
@@ -28,12 +30,17 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class TickerTape : Application() {
 
   @Inject @JvmField internal var alerter: Alerter? = null
 
   @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
+
+  private val applicationScope by lazy(LazyThreadSafetyMode.NONE) { MainScope() }
 
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
@@ -59,6 +66,17 @@ class TickerTape : Application() {
   override fun onCreate() {
     super.onCreate()
     component.inject(this)
+    beginWork()
+  }
+
+  private fun beginWork() {
+    // Coroutine start up is slow. What we can do instead is create a handler, which is cheap, and
+    // post to the main thread to defer this work until after start up is done
+    Handler(Looper.getMainLooper()).post {
+      applicationScope.launch(context = Dispatchers.Default) {
+        requireNotNull(alerter).initOnAppStart(requireNotNull(alarmFactory))
+      }
+    }
   }
 
   override fun getSystemService(name: String): Any? {

@@ -18,8 +18,11 @@ package com.pyamsoft.tickertape.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
@@ -35,11 +38,16 @@ import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEvent> {
 
@@ -74,6 +82,9 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
   @JvmField @Inject internal var bottomBar: MainBar? = null
 
   @JvmField @Inject internal var addNew: MainBarAdd? = null
+
+  @JvmField @Inject internal var alerter: Alerter? = null
+  @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     setTheme(R.style.Theme_TickerTape)
@@ -124,11 +135,19 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
     if (savedInstanceState == null || existingFragment == null) {
       viewModel.handleLoadDefaultPage()
     }
+
+    beginWork()
   }
 
   override fun onStart() {
     super.onStart()
     requireNotNull(tapeLauncher).start()
+  }
+
+  private fun beginWork() {
+    lifecycleScope.launch(context = Dispatchers.Default) {
+      requireNotNull(alerter).initOnAppStart(requireNotNull(alarmFactory))
+    }
   }
 
   override fun onControllerEvent(event: MainControllerEvent) {

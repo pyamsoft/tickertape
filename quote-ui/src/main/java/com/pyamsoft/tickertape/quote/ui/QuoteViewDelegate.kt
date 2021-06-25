@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.ui
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
-import com.pyamsoft.tickertape.quote.databinding.QuoteItemBinding
-import com.pyamsoft.tickertape.quote.databinding.QuoteNumbersBinding
+import com.pyamsoft.tickertape.quote.QuoteViewEvent
+import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.databinding.QuoteItemBinding
+import com.pyamsoft.tickertape.quote.ui.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -127,6 +130,52 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
   }
 
   companion object {
+
+    @JvmStatic
+    private fun populateSession(
+        binding: QuoteNumbersBinding,
+        session: StockMarketSession,
+    ) {
+      val percent = session.percent().asPercentValue()
+      val changeAmount = session.amount().asMoneyValue()
+      val directionSign = session.direction().sign()
+      val color = session.direction().color()
+
+      binding.apply {
+        quoteError.apply {
+          text = ""
+          isGone = true
+        }
+
+        quotePrice.apply {
+          text = session.price().asMoneyValue()
+          setTextColor(color)
+          isVisible = true
+        }
+
+        quotePercent.apply {
+          text = "(${directionSign}${percent})"
+          setTextColor(color)
+          isVisible = true
+        }
+
+        quoteChange.apply {
+          text = "$directionSign${changeAmount}"
+          setTextColor(color)
+          isVisible = true
+        }
+      }
+    }
+
+    @JvmStatic
+    private fun clearSession(binding: QuoteNumbersBinding) {
+      binding.apply {
+        quoteError.text = ""
+        quoteChange.text = ""
+        quotePercent.text = ""
+        quotePrice.text = ""
+      }
+    }
 
     @JvmStatic
     private fun handleSessionError(binding: QuoteNumbersBinding) {

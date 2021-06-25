@@ -21,7 +21,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.QuoteViewDelegate
+import com.pyamsoft.tickertape.quote.ui.QuoteViewDelegate
 import com.pyamsoft.tickertape.quote.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import javax.inject.Inject
@@ -40,6 +40,8 @@ class PortfolioItemQuote @Inject internal constructor(private val delegate: Quot
         publish(viewEvent)
       }
     }
+
+    doOnTeardown { delegate.teardown() }
   }
 
   @CheckResult

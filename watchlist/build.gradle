@@ -70,6 +70,6 @@ dependencies {
   implementation project(':main')
   implementation project(':stocks')
   implementation project(':tape')
-  implementation project(':quote')
+  implementation project(':quote-ui')
   api project(':ui')
 }

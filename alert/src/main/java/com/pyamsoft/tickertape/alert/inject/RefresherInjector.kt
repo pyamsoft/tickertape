@@ -18,13 +18,13 @@ package com.pyamsoft.tickertape.alert.inject
 
 import android.content.Context
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.alert.params.EmptyParameters
+import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.runner.RefresherRunner
 import com.pyamsoft.tickertape.alert.runner.WorkResult
 import java.util.UUID
 import javax.inject.Inject
 
-class RefresherInjector(context: Context) : BaseInjector<EmptyParameters>(context) {
+class RefresherInjector(context: Context) : BaseInjector<RefreshParameters>(context) {
 
   @JvmField @Inject internal var runner: RefresherRunner? = null
 
@@ -32,7 +32,7 @@ class RefresherInjector(context: Context) : BaseInjector<EmptyParameters>(contex
       context: Context,
       id: UUID,
       tags: Set<String>,
-      params: EmptyParameters
+      params: RefreshParameters
   ): WorkResult {
     Injector.obtainFromApplication<AlertComponent>(context).inject(this)
 

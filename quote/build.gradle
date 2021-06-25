@@ -68,5 +68,5 @@ dependencies {
 
   implementation project(':db')
   implementation project(':stocks')
-  api project(':ui')
+  api project(':core')
 }

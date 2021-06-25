@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.work
+package com.pyamsoft.tickertape
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
 
-interface AlarmFactory {
+suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
+  cancel()
 
-  @CheckResult fun bigMoverAlarm(): Alarm
-
-  @CheckResult fun refresherAlarm(params: RefreshParameters): Alarm
+  scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
 }

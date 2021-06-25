@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
+import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import javax.inject.Inject
@@ -28,7 +29,7 @@ internal class AlarmFactoryImpl @Inject internal constructor() : AlarmFactory {
     return BigMoverAlarm()
   }
 
-  override fun refresherAlarm(): Alarm {
-    return RefresherAlarm()
+  override fun refresherAlarm(params: RefreshParameters): Alarm {
+    return RefresherAlarm(params)
   }
 }

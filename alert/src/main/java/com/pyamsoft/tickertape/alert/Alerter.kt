@@ -20,8 +20,6 @@ import com.pyamsoft.tickertape.alert.work.Alarm
 
 interface Alerter {
 
-  suspend fun soundTheAlarm(alarm: Alarm)
-
   suspend fun scheduleAlarm(alarm: Alarm)
 
   suspend fun cancelAlarm(alarm: Alarm)

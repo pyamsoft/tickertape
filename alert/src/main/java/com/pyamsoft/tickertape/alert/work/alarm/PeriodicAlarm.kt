@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.work.alarm
 
-import com.pyamsoft.tickertape.alert.params.EmptyParameters
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlinx.coroutines.coroutineScope
+import com.pyamsoft.tickertape.alert.work.Alarm
+import java.util.concurrent.TimeUnit
 
-@Singleton
-internal class BigMoverRunner @Inject internal constructor() : BaseRunner<EmptyParameters>() {
+abstract class PeriodicAlarm protected constructor() : Alarm {
 
-  override suspend fun performWork(params: EmptyParameters) = coroutineScope {}
+  final override suspend fun period(): Long {
+    return PERIOD
+  }
+
+  companion object {
+    private val PERIOD = TimeUnit.MILLISECONDS.toMillis(15L)
+  }
 }

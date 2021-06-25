@@ -36,8 +36,6 @@ class RefresherInjector(context: Context) : BaseInjector<EmptyParameters>(contex
   ): WorkResult {
     Injector.obtainFromApplication<AlertComponent>(context).inject(this)
 
-    return requireNotNull(runner).doWork(id, tags, params) {
-      requireNotNull(alarmFactory).bigMoverAlarm()
-    }
+    return requireNotNull(runner).doWork(id, tags, params)
   }
 }

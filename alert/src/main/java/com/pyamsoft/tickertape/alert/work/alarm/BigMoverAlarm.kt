@@ -16,11 +16,9 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
-import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
-import java.util.concurrent.TimeUnit
 
-class BigMoverAlarm internal constructor() : Alarm {
+class BigMoverAlarm internal constructor() : PeriodicAlarm() {
 
   override suspend fun tag(): String {
     return "Big Mover Alarm 1"
@@ -28,9 +26,5 @@ class BigMoverAlarm internal constructor() : Alarm {
 
   override suspend fun parameters(): AlarmParameters {
     return AlarmParameters.empty()
-  }
-
-  override suspend fun period(): Long {
-    return TimeUnit.MINUTES.toMillis(15)
   }
 }

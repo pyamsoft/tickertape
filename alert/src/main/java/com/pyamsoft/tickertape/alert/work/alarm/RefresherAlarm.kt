@@ -16,11 +16,9 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
-import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
-import java.util.concurrent.TimeUnit
 
-class RefresherAlarm internal constructor() : Alarm {
+class RefresherAlarm internal constructor() : PeriodicAlarm() {
 
   override suspend fun tag(): String {
     return "Refresher Alarm 1"
@@ -28,9 +26,5 @@ class RefresherAlarm internal constructor() : Alarm {
 
   override suspend fun parameters(): AlarmParameters {
     return AlarmParameters.empty()
-  }
-
-  override suspend fun period(): Long {
-    return TimeUnit.MINUTES.toMillis(15)
   }
 }

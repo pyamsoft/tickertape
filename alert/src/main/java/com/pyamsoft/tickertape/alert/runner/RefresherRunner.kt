@@ -16,22 +16,13 @@
 
 package com.pyamsoft.tickertape.alert.runner
 
-import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.params.EmptyParameters
-import com.pyamsoft.tickertape.alert.work.Alarm
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.coroutineScope
-import timber.log.Timber
 
 @Singleton
-internal class RefresherRunner @Inject internal constructor(private val alerter: Alerter) :
-    BaseRunner<EmptyParameters>() {
-
-  override suspend fun onReschedule(alarm: Alarm) {
-    Timber.d("Rescheduling alarm: $alarm")
-    alerter.scheduleAlarm(alarm)
-  }
+internal class RefresherRunner @Inject internal constructor() : BaseRunner<EmptyParameters>() {
 
   override suspend fun performWork(params: EmptyParameters) = coroutineScope {}
 }

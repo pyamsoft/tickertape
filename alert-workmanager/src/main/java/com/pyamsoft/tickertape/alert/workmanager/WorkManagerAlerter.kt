@@ -22,7 +22,9 @@ import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.Operation
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import androidx.work.Worker
 import com.google.common.util.concurrent.ListenableFuture
 import com.pyamsoft.pydroid.core.Enforcer
@@ -30,6 +32,7 @@ import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm
+import com.pyamsoft.tickertape.alert.work.alarm.PeriodicAlarm
 import com.pyamsoft.tickertape.alert.work.alarm.RefresherAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.RefresherWorker
@@ -52,35 +55,11 @@ internal class WorkManagerAlerter
 internal constructor(
     private val context: Context,
 ) : Alerter {
+
   @CheckResult
   private fun workManager(): WorkManager {
     Enforcer.assertOffMainThread()
     return WorkManager.getInstance(context)
-  }
-
-  @CheckResult
-  private fun generateConstraints(): Constraints {
-    Enforcer.assertOffMainThread()
-    return Constraints.Builder().setRequiresBatteryNotLow(true).build()
-  }
-
-  private fun schedule(work: Class<out Worker>, tag: String, type: WorkType, inputData: Data) {
-    Enforcer.assertOffMainThread()
-    val request =
-        OneTimeWorkRequest.Builder(work)
-            .addTag(tag)
-            .setConstraints(generateConstraints())
-            .apply {
-              // We must manually reschedule since PeriodicWork jobs do not repeat on Samsung...
-              if (type is WorkType.Periodic) {
-                setInitialDelay(type.time, TimeUnit.MILLISECONDS)
-              }
-              setInputData(inputData)
-            }
-            .build()
-
-    workManager().enqueue(request)
-    Timber.d("Queue work [$tag]: ${request.id}")
   }
 
   @CheckResult
@@ -89,7 +68,7 @@ internal constructor(
         when (this) {
           is BigMoverAlarm -> BigMoverWorker::class.java
           is RefresherAlarm -> RefresherWorker::class.java
-          else -> null
+          else -> throw AssertionError("Alarm must be work class $this")
         }
 
     // Basically, this is shit, but hey its Android!
@@ -97,20 +76,25 @@ internal constructor(
     @Suppress("UNCHECKED_CAST") return workClass as Class<out Worker>
   }
 
-  private suspend fun queueAlarm(alarm: Alarm, workType: WorkType) {
+  private suspend fun queueAlarm(alarm: Alarm) {
     Enforcer.assertOffMainThread()
     cancelAlarm(alarm)
 
-    schedule(alarm.asWork(), alarm.tag(), workType, alarm.parameters().toInputData())
+    val tag = alarm.tag()
+    val request =
+        createWork(
+            work = alarm.asWork(),
+            tag = tag,
+            period = alarm.period(),
+            isPeriodicWork = alarm is PeriodicAlarm,
+            inputData = alarm.parameters().toInputData())
+
+    workManager().enqueue(request)
+    Timber.d("Queue work [$tag]: ${request.id}")
   }
 
-  override suspend fun soundTheAlarm(alarm: Alarm) =
-      withContext(context = Dispatchers.Default) { queueAlarm(alarm, WorkType.Instant) }
-
   override suspend fun scheduleAlarm(alarm: Alarm) =
-      withContext(context = Dispatchers.Default) {
-        queueAlarm(alarm, WorkType.Periodic(alarm.period()))
-      }
+      withContext(context = Dispatchers.Default) { queueAlarm(alarm) }
 
   override suspend fun cancelAlarm(alarm: Alarm) =
       withContext(context = Dispatchers.Default) {
@@ -123,65 +107,95 @@ internal constructor(
         Enforcer.assertOffMainThread()
         workManager().cancelAllWork().await()
       }
-}
 
-private suspend fun Operation.await() {
-  Enforcer.assertOffMainThread()
-  this.result.await()
-}
+  companion object {
 
-// Copied out of androidx.work.ListenableFuture
-// since this extension is library private otherwise...
-@Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun <R> ListenableFuture<R>.await(): R {
-  Enforcer.assertOffMainThread()
+    private val ALARM_UNIT = TimeUnit.MINUTES
 
-  // Fast path
-  if (this.isDone) {
-    try {
-      return this.get()
-    } catch (e: ExecutionException) {
-      throw e.cause ?: e
+    private val alerterExecutor = Executor { it.run() }
+
+    private suspend fun Operation.await() {
+      Enforcer.assertOffMainThread()
+      this.result.await()
+    }
+
+    // Copied out of androidx.work.ListenableFuture
+    // since this extension is library private otherwise...
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun <R> ListenableFuture<R>.await(): R {
+      Enforcer.assertOffMainThread()
+
+      // Fast path
+      if (this.isDone) {
+        try {
+          return this.get()
+        } catch (e: ExecutionException) {
+          throw e.cause ?: e
+        }
+      }
+
+      return suspendCancellableCoroutine { continuation ->
+        Enforcer.assertOffMainThread()
+        this.addListener(
+            {
+              Enforcer.assertOffMainThread()
+              try {
+                continuation.resume(this.get())
+              } catch (throwable: Throwable) {
+                val cause = throwable.cause ?: throwable
+                when (throwable) {
+                  is CancellationException -> continuation.cancel(cause)
+                  else -> continuation.resumeWithException(cause)
+                }
+              }
+            },
+            alerterExecutor)
+      }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun AlarmParameters.toInputData(): Data {
+      var builder = Data.Builder()
+      val booleans = this.getBooleanParameters()
+      for (entry in booleans) {
+        builder = builder.putBoolean(entry.key, entry.value)
+      }
+      return builder.build()
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun generateConstraints(): Constraints {
+      Enforcer.assertOffMainThread()
+      return Constraints.Builder().setRequiresBatteryNotLow(true).build()
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun createWork(
+        work: Class<out Worker>,
+        tag: String,
+        period: Long,
+        isPeriodicWork: Boolean,
+        inputData: Data
+    ): WorkRequest {
+      Enforcer.assertOffMainThread()
+
+      return if (isPeriodicWork) {
+        PeriodicWorkRequest.Builder(work, period, ALARM_UNIT)
+            .addTag(tag)
+            .setConstraints(generateConstraints())
+            .setInputData(inputData)
+            .build()
+      } else {
+        OneTimeWorkRequest.Builder(work)
+            .setInitialDelay(period, ALARM_UNIT)
+            .addTag(tag)
+            .setConstraints(generateConstraints())
+            .setInputData(inputData)
+            .build()
+      }
     }
   }
-
-  return suspendCancellableCoroutine { continuation ->
-    Enforcer.assertOffMainThread()
-    this.addListener(
-        {
-          Enforcer.assertOffMainThread()
-          try {
-            continuation.resume(this.get())
-          } catch (throwable: Throwable) {
-            val cause = throwable.cause ?: throwable
-            when (throwable) {
-              is CancellationException -> continuation.cancel(cause)
-              else -> continuation.resumeWithException(cause)
-            }
-          }
-        },
-        AlerterExecutor)
-  }
-}
-
-@CheckResult
-private fun AlarmParameters.toInputData(): Data {
-  var builder = Data.Builder()
-  val booleans = this.getBooleanParameters()
-  for (entry in booleans) {
-    builder = builder.putBoolean(entry.key, entry.value)
-  }
-  return builder.build()
-}
-
-private object AlerterExecutor : Executor {
-
-  override fun execute(command: Runnable) {
-    command.run()
-  }
-}
-
-private sealed class WorkType {
-  object Instant : WorkType()
-  data class Periodic(val time: Long) : WorkType()
 }

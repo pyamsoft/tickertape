@@ -20,16 +20,12 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.alert.params.BaseParameters
 import com.pyamsoft.tickertape.alert.runner.WorkResult
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 abstract class BaseInjector<P : BaseParameters>
 protected constructor(private val context: Context) {
-
-  @JvmField @Inject protected var alarmFactory: AlarmFactory? = null
 
   @CheckResult
   suspend fun execute(id: UUID, tags: Set<String>, params: P): WorkResult =

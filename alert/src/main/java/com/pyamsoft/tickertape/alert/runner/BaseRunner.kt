@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.alert.runner
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.params.BaseParameters
-import com.pyamsoft.tickertape.alert.work.Alarm
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +26,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 internal abstract class BaseRunner<P : BaseParameters> protected constructor() {
-
-  protected open suspend fun onReschedule(alarm: Alarm) {}
 
   @CheckResult
   protected suspend inline fun notification(crossinline func: suspend () -> Boolean): Boolean {
@@ -41,14 +38,13 @@ internal abstract class BaseRunner<P : BaseParameters> protected constructor() {
       id: UUID,
       tags: Set<String>,
       params: P,
-      alarm: () -> Alarm?,
   ): WorkResult =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         val identifier = identifier(id, tags)
         try {
           performWork(params)
-          success(identifier).also { alarm()?.also { onReschedule(it) } }
+          success(identifier)
         } catch (e: Throwable) {
           if (e is CancellationException) {
             cancelled(identifier, e)

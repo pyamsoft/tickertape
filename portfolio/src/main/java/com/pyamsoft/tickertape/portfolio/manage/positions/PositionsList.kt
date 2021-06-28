@@ -49,7 +49,7 @@ internal constructor(
 
   override val viewBinding = PositionListBinding::inflate
 
-  override val layoutRoot by boundView { positionListRoot }
+  override val layoutRoot by boundView { positionListSwipeRefresh }
 
   private var modelAdapter: PositionsAdapter? = null
 

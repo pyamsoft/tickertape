@@ -49,7 +49,7 @@ internal constructor(
 
   override val viewBinding = WatchlistBinding::inflate
 
-  override val layoutRoot by boundView { watchlistRoot }
+  override val layoutRoot by boundView { watchlistSwipeRefresh }
 
   private var modelAdapter: WatchlistItemAdapter? = null
 

@@ -49,7 +49,7 @@ internal constructor(
 
   override val viewBinding = PortfolioListBinding::inflate
 
-  override val layoutRoot by boundView { portfolioListRoot }
+  override val layoutRoot by boundView { portfolioListSwipeRefresh }
 
   private var modelAdapter: PortfolioAdapter? = null
 

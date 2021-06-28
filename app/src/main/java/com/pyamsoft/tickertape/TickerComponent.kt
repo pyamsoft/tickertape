@@ -38,6 +38,7 @@ import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
+import com.pyamsoft.tickertape.setting.SettingsComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
@@ -95,6 +96,8 @@ internal interface TickerComponent {
   fun inject(receiver: ScreenReceiver)
 
   fun inject(application: TickerTape)
+
+  @CheckResult fun plusSettingsComponent(): SettingsComponent.Factory
 
   @CheckResult fun plusPositionAddComponent(): PositionsAddComponent.Factory
 

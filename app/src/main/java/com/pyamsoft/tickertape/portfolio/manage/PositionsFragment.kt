@@ -28,6 +28,7 @@ import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
+import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -61,7 +62,6 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
     super.onViewCreated(view, savedInstanceState)
 
     val binding = LayoutFrameBinding.bind(view)
-    Injector.obtainFromApplication<TickerComponent>(view.context)
     PositionManageDialog.getInjector(this)
         .plusPositionsComponent()
         .create(viewLifecycleOwner, binding.layoutFrame)

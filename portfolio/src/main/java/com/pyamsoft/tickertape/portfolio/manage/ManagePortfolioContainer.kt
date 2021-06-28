@@ -17,8 +17,11 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
+import androidx.core.content.withStyledAttributes
+import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.tickertape.main.databinding.MainContainerBinding
+import com.pyamsoft.tickertape.portfolio.R
 import javax.inject.Inject
 
 class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
@@ -27,4 +30,15 @@ class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
   override val viewBinding = MainContainerBinding::inflate
 
   override val layoutRoot by boundView { mainContainer }
+
+  init {
+    doOnInflate {
+      layoutRoot.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
+        val height = getDimensionPixelSize(0, 0)
+        if (height > 0) {
+          layoutRoot.updatePadding(top = height)
+        }
+      }
+    }
+  }
 }

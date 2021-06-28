@@ -87,7 +87,7 @@ internal constructor(
         .filter { quote ->
           val session = quote.afterHours() ?: quote.regular()
           val value = session.percent().value()
-          value.compareTo(10.0) > 0 || value.compareTo(-10.0) < 1
+          return@filter value.compareTo(10.0) > 0 || value.compareTo(-10.0) < 1
         }
         .toList()
   }

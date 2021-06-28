@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape
 
 import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 
@@ -24,4 +25,5 @@ suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
   cancel()
 
   scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
+  scheduleAlarm(factory.bigMoverAlarm(BigMoverParameters(forceRefresh = false)))
 }

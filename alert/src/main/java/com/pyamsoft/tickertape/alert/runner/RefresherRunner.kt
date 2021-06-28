@@ -48,15 +48,12 @@ internal constructor(
       }
 
   override suspend fun performWork(params: RefreshParameters) = coroutineScope {
-    Timber.d("Running refresh work!")
-
     val force = params.forceRefresh
 
     val symbols = getSymbols(force)
-    quoteInteractor.getQuotes(force, symbols).also { Timber.d("Work refreshed quotes") }
-
-    Timber.d("Work launch Tape service")
-    tapeLauncher.start()
+    quoteInteractor.getQuotes(force, symbols).onSuccess { tapeLauncher.start() }.onFailure {
+      Timber.e(it, "Error refreshing quotes")
+    }
 
     return@coroutineScope
   }

@@ -185,8 +185,9 @@ internal constructor(
         .setShowWhen(false)
         .setAutoCancel(false)
         .setOngoing(true)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
         .setSilent(true)
+        .setContentIntent(getActivityPendingIntent())
   }
 
   @CheckResult
@@ -211,7 +212,6 @@ internal constructor(
     return builder
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setCustomContentView(remoteViews)
-        .setContentIntent(getActivityPendingIntent())
         .addAction(
             generateNotificationAction(
                 "Next",

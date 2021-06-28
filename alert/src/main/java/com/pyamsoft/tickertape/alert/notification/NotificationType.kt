@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.work
+package com.pyamsoft.tickertape.alert.notification
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-
-interface AlarmFactory {
-
-  @CheckResult fun bigMoverAlarm(params: BigMoverParameters): Alarm
-
-  @CheckResult fun refresherAlarm(params: RefreshParameters): Alarm
+enum class NotificationType {
+    BIG_MOVER
 }

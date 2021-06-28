@@ -18,13 +18,14 @@ package com.pyamsoft.tickertape.alert.inject
 
 import android.content.Context
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.params.EmptyParameters
 import com.pyamsoft.tickertape.alert.runner.BigMoverRunner
 import com.pyamsoft.tickertape.alert.runner.WorkResult
 import java.util.UUID
 import javax.inject.Inject
 
-class BigMoverInjector(context: Context) : BaseInjector<EmptyParameters>(context) {
+class BigMoverInjector(context: Context) : BaseInjector<BigMoverParameters>(context) {
 
   @JvmField @Inject internal var runner: BigMoverRunner? = null
 
@@ -32,7 +33,7 @@ class BigMoverInjector(context: Context) : BaseInjector<EmptyParameters>(context
       context: Context,
       id: UUID,
       tags: Set<String>,
-      params: EmptyParameters
+      params: BigMoverParameters
   ): WorkResult {
     Injector.obtainFromApplication<AlertComponent>(context).inject(this)
 

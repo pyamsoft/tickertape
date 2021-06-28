@@ -21,16 +21,17 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.pyamsoft.tickertape.alert.inject.BaseInjector
 import com.pyamsoft.tickertape.alert.inject.BigMoverInjector
-import com.pyamsoft.tickertape.alert.params.EmptyParameters
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm
 
 internal class BigMoverWorker internal constructor(context: Context, params: WorkerParameters) :
-    BaseWorker<EmptyParameters>(context.applicationContext, params) {
+    BaseWorker<BigMoverParameters>(context.applicationContext, params) {
 
-  override fun getInjector(context: Context): BaseInjector<EmptyParameters> {
+  override fun getInjector(context: Context): BaseInjector<BigMoverParameters> {
     return BigMoverInjector(context.applicationContext)
   }
 
-  override fun getParams(data: Data): EmptyParameters {
-    return EmptyParameters
+  override fun getParams(data: Data): BigMoverParameters {
+    return BigMoverParameters(forceRefresh = data.getBoolean(BigMoverAlarm.FORCE_REFRESH, false))
   }
 }

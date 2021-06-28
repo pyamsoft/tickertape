@@ -20,17 +20,26 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
+import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationDispatcher
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.alert.work.alarm.AlarmFactoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import javax.inject.Qualifier
 
 @Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class AlertInternalApi
 
 @Module
 abstract class AlertModule {
+
+  @Binds
+  @IntoSet
+  @AlertInternalApi
+  internal abstract fun bindTapeDispatcher(
+      impl: BigMoverNotificationDispatcher
+  ): NotifyDispatcher<*>
 
   @Binds @CheckResult internal abstract fun bindAlarmFactory(impl: AlarmFactoryImpl): AlarmFactory
 

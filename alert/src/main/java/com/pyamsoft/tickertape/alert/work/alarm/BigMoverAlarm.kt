@@ -16,15 +16,21 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 
-class BigMoverAlarm internal constructor() : PeriodicAlarm() {
+class BigMoverAlarm internal constructor(private val params: BigMoverParameters) : PeriodicAlarm() {
 
   override suspend fun tag(): String {
     return "Big Mover Alarm 1"
   }
 
   override suspend fun parameters(): AlarmParameters {
-    return AlarmParameters.empty()
+    return AlarmParameters { putBoolean(FORCE_REFRESH, params.forceRefresh) }
+  }
+
+  companion object {
+
+    const val FORCE_REFRESH = "force_refresh_v1"
   }
 }

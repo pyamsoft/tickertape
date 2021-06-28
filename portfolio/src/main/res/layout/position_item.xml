@@ -19,7 +19,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/position_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:baselineAligned="false"
         android:orientation="horizontal">
 
@@ -27,12 +27,14 @@
             android:id="@+id/position_item_number_of_shares"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
             android:textAppearance="?attr/textAppearanceBody1" />
 
         <TextView
             android:id="@+id/position_item_share_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
             android:layout_marginStart="8dp"
             android:textAppearance="?attr/textAppearanceBody1" />
 
@@ -40,6 +42,7 @@
             android:id="@+id/position_item_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
             android:layout_marginStart="8dp"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textStyle="bold" />

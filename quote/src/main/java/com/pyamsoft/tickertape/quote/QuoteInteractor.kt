@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -27,7 +28,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Singleton
-class QuoteInteractor @Inject internal constructor(private val interactor: StockInteractor) {
+class QuoteInteractor
+@Inject
+internal constructor(
+    private val symbolQueryDao: SymbolQueryDao,
+    private val interactor: StockInteractor
+) {
+
+  // TODO Same code as in WatchlistInteractor, common somehow?
+  @CheckResult
+  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext symbolQueryDao.query(force).map { it.symbol() }
+      }
+
+  @CheckResult
+  suspend fun getWatchlistQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> =
+      withContext(context = Dispatchers.IO) {
+        val symbols = getSymbols(force)
+        return@withContext getQuotes(force, symbols)
+      }
 
   @CheckResult
   suspend fun getQuotes(

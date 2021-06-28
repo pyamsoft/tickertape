@@ -23,7 +23,6 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedStock
 import javax.inject.Inject
@@ -36,7 +35,6 @@ import timber.log.Timber
 internal class TapeRemoteImpl
 @Inject
 internal constructor(
-    private val symbolQueryDao: SymbolQueryDao,
     private val interactor: QuoteInteractor,
     @TapeInternalApi private val notifier: Notifier,
 ) : TapeRemote {
@@ -54,9 +52,8 @@ internal constructor(
   @CheckResult
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> {
     return try {
-      val symbols = symbolQueryDao.query(force).map { it.symbol() }
       interactor
-          .getQuotes(force, symbols)
+          .getWatchlistQuotes(force)
           .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
           .recover { emptyList() }
     } catch (e: Throwable) {

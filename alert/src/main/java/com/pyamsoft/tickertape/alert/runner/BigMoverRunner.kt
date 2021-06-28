@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.alert.runner
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.tickertape.alert.AlertInternalApi
@@ -25,16 +24,12 @@ import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
 import com.pyamsoft.tickertape.alert.notification.NotificationType
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
@@ -43,24 +38,13 @@ internal class BigMoverRunner
 internal constructor(
     @param:AlertInternalApi private val notifier: Notifier,
     private val idMap: NotificationIdMap,
-    private val symbolQueryDao: SymbolQueryDao,
     private val quoteInteractor: QuoteInteractor,
 ) : BaseRunner<BigMoverParameters>() {
 
-  // TODO Same code as in WatchlistInteractor, common somehow?
-  @CheckResult
-  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext symbolQueryDao.query(force).map { it.symbol() }
-      }
-
   override suspend fun performWork(params: BigMoverParameters) = coroutineScope {
     val force = params.forceRefresh
-
-    val symbols = getSymbols(force)
     quoteInteractor
-        .getQuotes(force, symbols)
+        .getWatchlistQuotes(force)
         .onFailure { Timber.e(it, "Error refreshing quotes") }
         .recover { emptyList() }
         .map { it.filterBigMovers() }

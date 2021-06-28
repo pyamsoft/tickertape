@@ -49,19 +49,11 @@ internal constructor(
       }
 
   @CheckResult
-  private suspend fun getSymbols(force: Boolean): List<StockSymbol> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext symbolQueryDao.query(force).map { it.symbol() }
-      }
-
-  @CheckResult
   suspend fun getQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          val symbols = getSymbols(force)
-          interactor.getQuotes(force, symbols)
+          interactor.getWatchlistQuotes(force)
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quotes")
           ResultWrapper.failure(e)

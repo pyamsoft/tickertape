@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
@@ -48,6 +49,9 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
     doOnInflate {
       layoutRoot.doOnApplyWindowInsets(owner) { view, _, _ ->
+        // Set all padding to zero or bar is too puffy with nav buttons
+        view.updatePadding(left = 0, right = 0, top = 0, bottom = 0)
+
         // Make sure we are laid out before grabbing the height
         view.post {
           // Publish the measured height

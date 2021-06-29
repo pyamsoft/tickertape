@@ -59,9 +59,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -155,17 +155,7 @@ internal constructor(
   }
 
   private fun setList(list: List<PortfolioStock>) {
-    val data =
-        listOf(
-            PortfolioItemViewState.Header(
-                todayChange = list.sumTodayChange(),
-                todayPercent = list.sumTodayPercent(),
-                todayDirection = list.sumTodayDirection(),
-                totalAmount = list.sumTotalAmount(),
-                totalGainLoss = list.sumTotalGainLoss(),
-                totalPercent = list.sumTotalPercent(),
-                totalDirection = list.sumTotalDirection())) +
-            list.map { PortfolioItemViewState.Holding(stock = it) }
+    val data = list.map { PortfolioItemViewState(stock = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }

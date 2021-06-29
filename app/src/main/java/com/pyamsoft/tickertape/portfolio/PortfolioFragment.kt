@@ -47,6 +47,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   private var stateSaver: StateSaver? = null
 
+  @JvmField @Inject internal var header: PortfolioHeader? = null
+
   @JvmField @Inject internal var list: PortfolioList? = null
 
   override fun onCreateView(
@@ -77,6 +79,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
+            requireNotNull(header),
             requireNotNull(list),
         ) {
           return@createComponent when (it) {
@@ -121,6 +124,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
     factory = null
 
     list = null
+    header = null
   }
 
   companion object {

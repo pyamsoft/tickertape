@@ -22,7 +22,6 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderBinding
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
 import me.zhanghai.android.fastscroll.PopupTextProvider
 
@@ -31,16 +30,13 @@ private constructor(
     private val factory: PortfolioItemComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<PortfolioItemViewState, BasePortfolioItemViewHolder<*>>(DIFFER), PopupTextProvider {
+) : ListAdapter<PortfolioItemViewState, PortfolioItemViewHolder>(DIFFER), PopupTextProvider {
 
   init {
     setHasStableIds(true)
   }
 
   companion object {
-
-    private const val TYPE_HEADER = 0
-    private const val TYPE_HOLDING = 1
 
     @JvmStatic
     @CheckResult
@@ -59,17 +55,7 @@ private constructor(
               oldItem: PortfolioItemViewState,
               newItem: PortfolioItemViewState
           ): Boolean {
-            if (oldItem is PortfolioItemViewState.Header) {
-              return newItem is PortfolioItemViewState.Header
-            }
-
-            if (oldItem is PortfolioItemViewState.Holding) {
-              if (newItem is PortfolioItemViewState.Holding) {
-                return oldItem.stock.holding.id() == newItem.stock.holding.id()
-              }
-            }
-
-            return false
+            return oldItem.stock.holding.id() == newItem.stock.holding.id()
           }
 
           override fun areContentsTheSame(
@@ -82,53 +68,22 @@ private constructor(
   }
 
   override fun getPopupText(position: Int): String {
-    return when (val state = getItem(position)) {
-      is PortfolioItemViewState.Header -> "TOP"
-      is PortfolioItemViewState.Holding -> state.stock.holding.symbol().symbol()
-    }
-  }
-
-  override fun getItemViewType(position: Int): Int {
-    return when (getItem(position)) {
-      is PortfolioItemViewState.Header -> TYPE_HEADER
-      is PortfolioItemViewState.Holding -> TYPE_HOLDING
-    }
+    return getItem(position).stock.holding.symbol().symbol()
   }
 
   override fun getItemId(position: Int): Long {
-    return when (val state = getItem(position)) {
-      is PortfolioItemViewState.Header -> 0
-      is PortfolioItemViewState.Holding -> state.stock.holding.id().hashCode().toLong()
-    }
+    return getItem(position).stock.holding.id().hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int
-  ): BasePortfolioItemViewHolder<*> {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PortfolioItemViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    return when (viewType) {
-      TYPE_HOLDING -> {
-        val binding = PortfolioItemBinding.inflate(inflater, parent, false)
-        PortfolioItemViewHolder(binding, factory, owner, callback)
-      }
-      TYPE_HEADER -> {
-        val binding = PortfolioHeaderBinding.inflate(inflater, parent, false)
-        PortfolioItemViewHeader(binding, factory)
-      }
-      else ->
-          throw IllegalArgumentException(
-              "Cannot create ViewHolder with invalid viewType: $viewType")
-    }
+    val binding = PortfolioItemBinding.inflate(inflater, parent, false)
+    return PortfolioItemViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: BasePortfolioItemViewHolder<*>, position: Int) {
+  override fun onBindViewHolder(holder: PortfolioItemViewHolder, position: Int) {
     val state = getItem(position)
-    when (holder) {
-      is PortfolioItemViewHolder -> holder.bindState(state as PortfolioItemViewState.Holding)
-      is PortfolioItemViewHeader -> holder.bindState(state as PortfolioItemViewState.Header)
-      else -> throw IllegalArgumentException("Cannot bind ViewHolder with invalid viewType $holder")
-    }
+    holder.bindState(state)
   }
 
   interface Callback {

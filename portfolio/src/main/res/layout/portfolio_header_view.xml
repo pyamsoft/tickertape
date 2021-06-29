@@ -16,57 +16,75 @@
 
 <merge>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/portfolio_header_root"
+        android:id="@+id/portfolio_header_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="?android:attr/windowBackground"
+        android:padding="16dp">
 
-        <com.robinhood.ticker.TickerView
-            android:id="@+id/portfolio_header_today"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/portfolio_header_collapse"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceHeadline3"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:paddingBottom="8dp"
+            app:contentScrim="?android:attr/windowBackground"
+            app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
 
-        <com.robinhood.ticker.TickerView
-            android:id="@+id/portfolio_header_gainloss"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toStartOf="@id/portfolio_header_today"
-            app:layout_constraintTop_toBottomOf="@id/portfolio_header_today" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/portfolio_header_change_today_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAppearance="?attr/textAppearanceBody1"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            android:text="Change Today"
-            app:layout_constraintStart_toStartOf="@id/portfolio_header_gainloss"
-            app:layout_constraintTop_toBottomOf="@id/portfolio_header_gainloss" />
+                <com.robinhood.ticker.TickerView
+                    android:id="@+id/portfolio_header_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceHeadline3"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <com.robinhood.ticker.TickerView
-            android:id="@+id/portfolio_header_change_today_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:textAppearance="?attr/textAppearanceBody1"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/portfolio_header_change_today_label"
-            app:layout_constraintTop_toTopOf="@id/portfolio_header_change_today_label" />
+                <com.robinhood.ticker.TickerView
+                    android:id="@+id/portfolio_header_gainloss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceHeadline5"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toStartOf="@id/portfolio_header_today"
+                    app:layout_constraintTop_toBottomOf="@id/portfolio_header_today" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/portfolio_header_change_today_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Change Today"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toStartOf="@id/portfolio_header_gainloss"
+                    app:layout_constraintTop_toBottomOf="@id/portfolio_header_gainloss" />
+
+                <com.robinhood.ticker.TickerView
+                    android:id="@+id/portfolio_header_change_today_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toEndOf="@id/portfolio_header_change_today_label"
+                    app:layout_constraintTop_toTopOf="@id/portfolio_header_change_today_label" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 </merge>

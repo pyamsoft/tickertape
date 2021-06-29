@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.item
+package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -30,11 +30,11 @@ import com.robinhood.ticker.TickerUtils
 import javax.inject.Inject
 
 class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PortfolioItemViewState.Header, Nothing, PortfolioHeaderViewBinding>(parent) {
+    BaseUiView<PortfolioViewState, Nothing, PortfolioHeaderViewBinding>(parent) {
 
   override val viewBinding = PortfolioHeaderViewBinding::inflate
 
-  override val layoutRoot by boundView { portfolioHeaderRoot }
+  override val layoutRoot by boundView { portfolioHeaderAppbar }
 
   init {
     doOnInflate {
@@ -48,23 +48,30 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { clear() }
   }
 
-  override fun onRender(state: UiRender<PortfolioItemViewState.Header>) {
-    state.render(viewScope) { handleRender(it) }
+  override fun onRender(state: UiRender<PortfolioViewState>) {
+    state.mapChanged { it.portfolio }.render(viewScope) { handleRender(it) }
   }
 
-  private fun handleRender(state: PortfolioItemViewState.Header) {
+  private fun handleRender(list: List<PortfolioStock>) {
     // Total
-    handleTotalAmount(state.totalAmount)
+    val totalAmount = list.sumTotalAmount()
+    handleTotalAmount(totalAmount)
 
-    state.totalDirection.apply {
+    list.sumTotalDirection().apply {
+      val totalGainLoss = list.sumTotalGainLoss()
+      val totalPercent = list.sumTotalPercent()
       val color = this.color()
-      handleGainLoss(this.gainLossDisplayString(state.totalGainLoss, state.totalPercent), color)
+
+      handleGainLoss(this.gainLossDisplayString(totalGainLoss, totalPercent), color)
     }
 
     // Today
-    state.todayDirection.apply {
+    list.sumTodayDirection().apply {
+      val todayChange = list.sumTodayChange()
+      val todayPercent = list.sumTodayPercent()
       val color = this.color()
-      handleChangeToday(this.gainLossDisplayString(state.todayChange, state.todayPercent), color)
+
+      handleChangeToday(this.gainLossDisplayString(todayChange, todayPercent), color)
     }
   }
 

@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.item
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.util.layout
@@ -32,7 +33,7 @@ internal constructor(
     factory: PortfolioItemComponent.Factory,
     owner: LifecycleOwner,
     callback: PortfolioAdapter.Callback
-) : BasePortfolioItemViewHolder<PortfolioItemViewState.Holding>(binding.root) {
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<PortfolioItemViewState> {
 
   @Inject @JvmField internal var quote: PortfolioItemQuote? = null
 
@@ -40,7 +41,7 @@ internal constructor(
 
   @Inject @JvmField internal var click: PortfolioItemClick? = null
 
-  override val viewBinder: ViewBinder<PortfolioItemViewState.Holding>
+  private val viewBinder: ViewBinder<PortfolioItemViewState>
 
   init {
     factory.create(binding.portfolioItemRoot).inject(this)
@@ -84,7 +85,13 @@ internal constructor(
     return bindingAdapterPosition - 1
   }
 
-  override fun onTeardown() {
+  override fun bindState(state: PortfolioItemViewState) {
+    viewBinder.bindState(state)
+  }
+
+  override fun teardown() {
+    viewBinder.teardown()
+
     click = null
     quote = null
     summary = null

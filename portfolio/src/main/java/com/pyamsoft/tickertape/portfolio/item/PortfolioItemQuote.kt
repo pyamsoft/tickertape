@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.quote.QuoteViewState
 import javax.inject.Inject
 
 class PortfolioItemQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
-    UiView<PortfolioItemViewState.Holding, PortfolioItemViewEvent>() {
+    UiView<PortfolioItemViewState, PortfolioItemViewEvent>() {
 
   init {
     doOnInflate {
@@ -49,7 +49,7 @@ class PortfolioItemQuote @Inject internal constructor(private val delegate: Quot
     return delegate.id()
   }
 
-  override fun render(state: UiRender<PortfolioItemViewState.Holding>) {
+  override fun render(state: UiRender<PortfolioItemViewState>) {
     state.mapChanged { it.stock }.render(viewScope) { handleQuoteChanged(it) }
   }
 

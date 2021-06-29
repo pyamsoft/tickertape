@@ -19,25 +19,8 @@ package com.pyamsoft.tickertape.portfolio.item
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockPercent
 
-sealed class PortfolioItemViewState : UiViewState {
-
-  data class Header
-  internal constructor(
-      val todayChange: StockMoneyValue?,
-      val todayPercent: StockPercent?,
-      val todayDirection: StockDirection,
-      val totalAmount: StockMoneyValue?,
-      val totalGainLoss: StockMoneyValue?,
-      val totalPercent: StockPercent?,
-      val totalDirection: StockDirection,
-  ) : PortfolioItemViewState()
-
-  data class Holding internal constructor(val stock: PortfolioStock) : PortfolioItemViewState()
-}
+data class PortfolioItemViewState internal constructor(val stock: PortfolioStock) : UiViewState
 
 sealed class PortfolioItemViewEvent : UiViewEvent {
 

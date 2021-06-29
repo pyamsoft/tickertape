@@ -51,10 +51,9 @@ internal constructor(
 
     viewBinder =
         createViewBinder(quote, summary, requireNotNull(click)) {
-          val pos = modelPosition()
           return@createViewBinder when (it) {
-            is PortfolioItemViewEvent.Remove -> callback.onRemove(pos)
-            is PortfolioItemViewEvent.Select -> callback.onSelect(pos)
+            is PortfolioItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
+            is PortfolioItemViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
           }
         }
 
@@ -77,12 +76,6 @@ internal constructor(
     }
 
     owner.doOnDestroy { teardown() }
-  }
-
-  @CheckResult
-  private fun modelPosition(): Int {
-    // Subtract 1 because item 0 is the header
-    return bindingAdapterPosition - 1
   }
 
   override fun bindState(state: PortfolioItemViewState) {

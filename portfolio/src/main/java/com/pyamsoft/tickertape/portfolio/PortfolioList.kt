@@ -103,7 +103,7 @@ internal constructor(
       }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 28.asDp(binding.portfolioListList.context)
+      val bottomMargin = 24.asDp(binding.portfolioListList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.portfolioListList.addItemDecoration(this)
       }

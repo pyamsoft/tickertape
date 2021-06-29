@@ -25,7 +25,7 @@ data class MainViewState
 internal constructor(
     @StringRes val appNameRes: Int,
     val page: MainPage?,
-    val isFabVisible: Boolean
+    val isFabVisible: Boolean,
 ) : UiViewState
 
 sealed class MainViewEvent : UiViewEvent {

@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.ViewOutlineProvider
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
@@ -61,6 +62,8 @@ internal constructor(
   override val layoutRoot by boundView { mainAppbar }
 
   init {
+    doOnInflate { binding.mainAppbar.outlineProvider = ViewOutlineProvider.BACKGROUND }
+
     doOnInflate {
       binding.mainAppbar.apply {
         appBarProvider.setAppBar(this)

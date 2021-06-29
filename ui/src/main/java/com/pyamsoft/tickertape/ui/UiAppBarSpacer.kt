@@ -38,6 +38,11 @@ protected constructor(
   final override val layoutRoot by boundView { uiAppbarRoot }
 
   init {
+    doOnInflate {
+      // Remove outline provider to stop shadow
+      binding.uiAppbarRoot.outlineProvider = null
+    }
+
     doOnInflate { binding.uiAppbarSpace.applyAppBarOffset(appBarActivity, owner) }
   }
 

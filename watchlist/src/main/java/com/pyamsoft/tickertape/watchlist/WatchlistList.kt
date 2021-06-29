@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -101,7 +102,7 @@ internal constructor(
       LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
 
       // The bottom has additional space to fit the FAB
-      val bottomMargin = 28.asDp(binding.watchlistList.context)
+      val bottomMargin = 24.asDp(binding.watchlistList.context)
       LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.watchlistList.addItemDecoration(this)
       }

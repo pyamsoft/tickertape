@@ -21,19 +21,23 @@
         android:id="@+id/ui_appbar_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground">
+        android:background="@color/transparent"
+        android:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/ui_appbar_space"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:elevation="0dp"
             android:paddingBottom="8dp"
-            app:contentScrim="?android:attr/windowBackground"
-            app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
+            app:contentScrim="@color/transparent"
+            app:layout_scrollFlags="scroll">
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="0dp" />
+                android:layout_height="0dp"
+                android:elevation="0dp" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

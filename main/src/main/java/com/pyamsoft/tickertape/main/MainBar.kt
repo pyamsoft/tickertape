@@ -20,8 +20,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
@@ -40,19 +38,16 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
   private val handler = Handler(Looper.getMainLooper())
 
   init {
+
     doOnInflate {
+      // Remove background shadow from nav
       binding.mainBarNav.background = null
-      binding.mainBarNav.menu.findItem(R.id.menu_placeholder)?.isEnabled = false
     }
 
-    doOnInflate {
-      layoutRoot.doOnApplyWindowInsets(owner) { view, insets, _ ->
-        view.updatePadding(
-            bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom,
-            left = 0,
-            right = 0,
-            top = 0)
+    doOnInflate { binding.mainBarNav.menu.findItem(R.id.menu_placeholder)?.isEnabled = false }
 
+    doOnInflate {
+      layoutRoot.doOnApplyWindowInsets(owner) { view, _, _ ->
         // Make sure we are laid out before grabbing the height
         view.post {
           // Publish the measured height

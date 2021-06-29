@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.robinhood.ticker.TickerUtils
 import javax.inject.Inject
 
 class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
@@ -36,6 +37,14 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
   override val layoutRoot by boundView { portfolioHeaderRoot }
 
   init {
+    doOnInflate {
+      binding.apply {
+        portfolioHeaderChangeTodayText.setCharacterLists(TICKER_CHARACTERS)
+        portfolioHeaderGainloss.setCharacterLists(TICKER_CHARACTERS)
+        portfolioHeaderToday.setCharacterLists(TICKER_CHARACTERS)
+      }
+    }
+
     doOnTeardown { clear() }
   }
 
@@ -76,7 +85,7 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
       if (change != null) {
         portfolioHeaderChangeTodayText.apply {
           text = change
-          setTextColor(color)
+          textColor = color
         }
       }
     }
@@ -101,13 +110,15 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
       if (gainLoss != null) {
         portfolioHeaderGainloss.apply {
           text = gainLoss
-          setTextColor(color)
+          textColor = color
         }
       }
     }
   }
 
   companion object {
+
+    private val TICKER_CHARACTERS = "($+-${TickerUtils.provideNumberList()}%)"
 
     @JvmStatic
     @CheckResult

@@ -19,9 +19,14 @@ package com.pyamsoft.tickertape.stocks
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.service.QuoteService
+import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.yf.YahooChartSource
+import com.pyamsoft.tickertape.stocks.sources.yf.YahooFinanceApi
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooFinanceSource
+import com.pyamsoft.tickertape.stocks.sources.yf.YahooQuoteSource
 import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
@@ -77,10 +82,29 @@ private class OkHttpClientLazyCallFactory(debug: Boolean) : Call.Factory {
 @Module
 abstract class StockModule {
 
+  // The actual quote source is YF
   @Binds
   @CheckResult
   @InternalApi
-  internal abstract fun bindYFSource(impl: YahooFinanceSource): QuoteSource
+  internal abstract fun bindQuoteSource(impl: YahooFinanceSource): QuoteSource
+
+  // The actual chart source is YF
+  @Binds
+  @CheckResult
+  @InternalApi
+  internal abstract fun bindChartSource(impl: YahooFinanceSource): ChartSource
+
+  // The YFSource uses an internal YF quote source
+  @Binds
+  @CheckResult
+  @YahooFinanceApi
+  internal abstract fun bindYFQuoteSource(impl: YahooQuoteSource): QuoteSource
+
+  // The YFSource uses an internal YF chart source
+  @Binds
+  @CheckResult
+  @YahooFinanceApi
+  internal abstract fun bindYFChartSource(impl: YahooChartSource): ChartSource
 
   @Binds
   @CheckResult
@@ -133,6 +157,14 @@ abstract class StockModule {
     @CheckResult
     internal fun provideQuotes(@InternalApi serviceCreator: NetworkServiceCreator): QuoteService {
       return serviceCreator.create(QuoteService::class)
+    }
+
+    @Provides
+    @JvmStatic
+    @InternalApi
+    @CheckResult
+    internal fun provideCharts(@InternalApi serviceCreator: NetworkServiceCreator): ChartService {
+      return serviceCreator.create(ChartService::class)
     }
   }
 }

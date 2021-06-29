@@ -16,75 +16,23 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.stocks.InternalApi
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asCompany
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
-import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.asVolume
-import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
-import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkStock
-import com.pyamsoft.tickertape.stocks.service.QuoteService
+import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 internal class YahooFinanceSource
 @Inject
-internal constructor(@InternalApi private val service: QuoteService) : QuoteSource {
-
-  @CheckResult
-  private suspend fun fetchQuotes(symbols: List<StockSymbol>): List<StockQuote> {
-    val result =
-        service.getQuotes(
-            url = YF_QUOTE_SOURCE,
-            format = YF_QUOTE_FORMAT,
-            fields = YF_QUOTE_FIELDS,
-            symbols = symbols.joinToString(",") { it.symbol() })
-    return result
-        .quoteResponse
-        .result
-        .asSequence()
-        .filterOnlyValidStockData()
-        .map { stock ->
-          StockQuoteImpl(
-              symbol = stock.symbol.asSymbol(),
-              company = requireNotNull(stock.shortName).asCompany(),
-              dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
-              dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
-              dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
-              dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
-              dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
-              dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
-              regular =
-                  StockMarketSessionImpl(
-                      amount = requireNotNull(stock.regularMarketChange).asMoney(),
-                      direction = requireNotNull(stock.regularMarketChange).asDirection(),
-                      percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
-                      price = requireNotNull(stock.regularMarketPrice).asMoney(),
-                  ),
-              afterHours =
-                  if (!hasAfterHoursData(stock)) null
-                  else {
-                    StockMarketSessionImpl(
-                        amount = requireNotNull(stock.postMarketChange).asMoney(),
-                        direction = requireNotNull(stock.postMarketChange).asDirection(),
-                        percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
-                        price = requireNotNull(stock.postMarketPrice).asMoney(),
-                    )
-                  })
-        }
-        .toList()
-  }
+internal constructor(
+    @YahooFinanceApi private val quotes: QuoteSource,
+    @YahooFinanceApi private val charts: ChartSource
+) : QuoteSource, ChartSource {
 
   override suspend fun getQuotes(
       force: Boolean,
@@ -92,61 +40,17 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
   ): ResultWrapper<List<StockQuote>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext try {
-          ResultWrapper.success(fetchQuotes(symbols))
-        } catch (e: Throwable) {
-          Timber.e(e, "Unable to fetch stock quotes from YF")
-          ResultWrapper.failure(e)
-        }
+        return@withContext quotes.getQuotes(force, symbols)
       }
 
-  companion object {
-
-    private val YF_QUOTE_FIELDS =
-        listOf(
-                "symbol",
-                "shortName",
-                "exchangeDataDelayedBy",
-                // Regular market
-                "regularMarketPrice",
-                "regularMarketChange",
-                "regularMarketChangePercent",
-                "regularMarketOpen",
-                "regularMarketPreviousClose",
-                "regularMarketDayHigh",
-                "regularMarketDayLow",
-                "regularMarketDayRange",
-                "regularMarketVolume",
-                // Post Market
-                "postMarketPrice",
-                "postMarketChange",
-                "postMarketChangePercent",
-            )
-            .joinToString(",")
-    private const val YF_QUOTE_FORMAT = "json"
-    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v7/finance/quote"
-
-    @JvmStatic
-    @CheckResult
-    private fun hasAfterHoursData(stock: NetworkStock): Boolean {
-      return stock.run {
-        postMarketChange != null && postMarketPrice != null && postMarketChangePercent != null
+  override suspend fun getCharts(
+      force: Boolean,
+      symbol: StockSymbol,
+      includePrePost: Boolean,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<StockChart>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext charts.getCharts(force, symbol, includePrePost, range)
       }
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun Sequence<NetworkStock>.filterOnlyValidStockData(): Sequence<NetworkStock> {
-      // If the symbol does not exist, these values will return null
-      // We need all of these values to have a valid ticker
-      return this.filterNot { it.shortName == null }
-          .filterNot { it.regularMarketChange == null }
-          .filterNot { it.regularMarketPrice == null }
-          .filterNot { it.regularMarketChangePercent == null }
-          .filterNot { it.regularMarketDayHigh == null }
-          .filterNot { it.regularMarketDayLow == null }
-          .filterNot { it.regularMarketDayRange == null }
-          .filterNot { it.regularMarketVolume == null }
-    }
-  }
 }

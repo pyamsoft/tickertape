@@ -35,6 +35,10 @@ private constructor(
     private val callback: Callback
 ) : ListAdapter<PositionItemViewState, PositionItemViewHolder>(DIFFER), PopupTextProvider {
 
+  init {
+    setHasStableIds(true)
+  }
+
   companion object {
 
     @JvmStatic

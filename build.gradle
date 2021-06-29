@@ -77,6 +77,10 @@ buildscript {
     // Recyclerview
     decorator = "1.3.0"
     fastscroll = "1.1.6"
+
+    // Robinhood
+    ticker = "2.0.2"
+    spark = "1.2.0"
   }
 
   dependencies {

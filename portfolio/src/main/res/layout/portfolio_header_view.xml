@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <com.robinhood.ticker.TickerView
             android:id="@+id/portfolio_header_today"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.robinhood.ticker.TickerView
             android:id="@+id/portfolio_header_gainloss"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
             app:layout_constraintStart_toStartOf="@id/portfolio_header_gainloss"
             app:layout_constraintTop_toBottomOf="@id/portfolio_header_gainloss" />
 
-        <TextView
+        <com.robinhood.ticker.TickerView
             android:id="@+id/portfolio_header_change_today_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

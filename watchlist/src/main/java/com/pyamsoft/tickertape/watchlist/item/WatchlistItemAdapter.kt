@@ -33,6 +33,10 @@ private constructor(
     private val callback: Callback
 ) : ListAdapter<WatchlistItemViewState, WatchlistViewHolder>(DIFFER), PopupTextProvider {
 
+  init {
+    setHasStableIds(true)
+  }
+
   companion object {
 
     @JvmStatic

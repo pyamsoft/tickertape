@@ -33,6 +33,10 @@ private constructor(
     private val callback: Callback
 ) : ListAdapter<PortfolioItemViewState, BasePortfolioItemViewHolder<*>>(DIFFER), PopupTextProvider {
 
+  init {
+    setHasStableIds(true)
+  }
+
   companion object {
 
     private const val TYPE_HEADER = 0

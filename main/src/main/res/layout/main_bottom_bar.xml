@@ -34,6 +34,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
+            android:backgroundTint="@color/transparent"
+            android:elevation="0dp"
+            app:backgroundTint="@color/transparent"
             app:elevation="0dp"
             app:menu="@menu/bottom_nav" />
 

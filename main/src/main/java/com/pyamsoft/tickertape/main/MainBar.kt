@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import androidx.annotation.CheckResult
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
@@ -40,10 +41,9 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
   init {
 
-    doOnInflate {
-      // Remove background shadow from nav
-      binding.mainBarNav.background = null
-    }
+    doOnInflate { layoutRoot.outlineProvider = ViewOutlineProvider.BACKGROUND }
+
+    doOnInflate { binding.mainBarNav.outlineProvider = null }
 
     doOnInflate { binding.mainBarNav.menu.findItem(R.id.menu_placeholder)?.isEnabled = false }
 

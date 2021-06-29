@@ -62,7 +62,9 @@ internal constructor(
   override val layoutRoot by boundView { mainAppbar }
 
   init {
-    doOnInflate { binding.mainAppbar.outlineProvider = ViewOutlineProvider.BACKGROUND }
+    doOnInflate { layoutRoot.outlineProvider = ViewOutlineProvider.BACKGROUND }
+
+    doOnInflate { binding.mainToolbar.outlineProvider = null }
 
     doOnInflate {
       binding.mainAppbar.apply {

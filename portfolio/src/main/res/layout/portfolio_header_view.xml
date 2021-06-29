@@ -22,13 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/windowBackground"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/portfolio_header_collapse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
             app:contentScrim="?android:attr/windowBackground"
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
 

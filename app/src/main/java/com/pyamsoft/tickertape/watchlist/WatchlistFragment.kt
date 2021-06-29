@@ -26,11 +26,12 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -46,6 +47,8 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   private var stateSaver: StateSaver? = null
 
+  @JvmField @Inject internal var spacer: WatchlistSpacer? = null
+
   @JvmField @Inject internal var list: WatchlistList? = null
 
   override fun onCreateView(
@@ -58,12 +61,12 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    view.applyToolbarOffset(viewLifecycleOwner)
 
     val binding = LayoutCoordinatorBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusWatchlistComponent()
         .create(
+            requireAppBarActivity(),
             requireToolbarActivity(),
             requireActivity(),
             viewLifecycleOwner,
@@ -76,8 +79,8 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
-            requireNotNull(list),
-        ) {
+            spacer.requireNotNull(),
+            list.requireNotNull()) {
           return@createComponent when (it) {
             is WatchListViewEvent.ForceRefresh -> viewModel.handleFetchQuotes(true)
             is WatchListViewEvent.Remove -> viewModel.handleRemove(it.index)
@@ -112,6 +115,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     stateSaver = null
     factory = null
 
+    spacer = null
     list = null
   }
 

@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.alert.inject
 import android.content.Context
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.EmptyParameters
 import com.pyamsoft.tickertape.alert.runner.BigMoverRunner
 import com.pyamsoft.tickertape.alert.runner.WorkResult
 import java.util.UUID

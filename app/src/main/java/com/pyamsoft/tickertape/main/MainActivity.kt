@@ -21,11 +21,15 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.appbar.AppBarLayout
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
@@ -47,7 +51,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEvent> {
+internal class MainActivity :
+    ChangeLogActivity(), UiController<MainControllerEvent>, AppBarActivity, AppBarActivityProvider {
 
   override val checkForUpdates = false
 
@@ -81,8 +86,25 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
 
   @JvmField @Inject internal var addNew: MainBarAdd? = null
 
+  @JvmField @Inject internal var toolbar: MainToolbar? = null
+
   @JvmField @Inject internal var alerter: Alerter? = null
+
   @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
+
+  private var capturedAppBar: AppBarLayout? = null
+
+  override fun setAppBar(bar: AppBarLayout?) {
+    capturedAppBar = bar
+  }
+
+  override fun requireAppBar(func: (AppBarLayout) -> Unit) {
+    requireNotNull(capturedAppBar).let(func)
+  }
+
+  override fun withAppBar(func: (AppBarLayout) -> Unit) {
+    capturedAppBar?.let(func)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     setTheme(R.style.Theme_TickerTape)
@@ -92,7 +114,7 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
 
     Injector.obtainFromApplication<TickerComponent>(this)
         .plusMainComponent()
-        .create(this, this, this, binding.layoutCoordinator, this)
+        .create(this, this, this, binding.layoutCoordinator, this, this)
         .inject(this)
 
     stableLayoutHideNavigation()
@@ -101,20 +123,16 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
   }
 
   private fun inflateComponents(savedInstanceState: Bundle?) {
-    val container = requireNotNull(container)
-    val bottomBar = requireNotNull(bottomBar)
-    val addNew = requireNotNull(addNew)
-
     stateSaver =
         createComponent(
             savedInstanceState,
             this,
             viewModel,
             this,
-            container,
-            bottomBar,
-            addNew,
-        ) {
+            container.requireNotNull(),
+            bottomBar.requireNotNull(),
+            addNew.requireNotNull(),
+            toolbar.requireNotNull()) {
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
             is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
@@ -198,10 +216,12 @@ internal class MainActivity : ChangeLogActivity(), UiController<MainControllerEv
     super.onDestroy()
     stateSaver = null
     factory = null
+    capturedAppBar = null
 
     rootBinding = null
     container = null
     bottomBar = null
     addNew = null
+    toolbar = null
   }
 }

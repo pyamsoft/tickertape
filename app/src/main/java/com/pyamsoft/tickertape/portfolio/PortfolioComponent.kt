@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
@@ -48,6 +49,7 @@ internal interface PortfolioComponent {
     @CheckResult
     fun create(
         @BindsInstance toolbarActivity: ToolbarActivity,
+        @BindsInstance appBarActivity: AppBarActivity,
         @BindsInstance activity: Activity,
         @BindsInstance owner: LifecycleOwner,
         @BindsInstance parent: ViewGroup,

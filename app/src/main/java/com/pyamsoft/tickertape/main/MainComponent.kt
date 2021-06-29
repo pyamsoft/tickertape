@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
 import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.BindsInstance
@@ -41,6 +42,7 @@ internal interface MainComponent {
         @BindsInstance owner: LifecycleOwner,
         @BindsInstance parent: ViewGroup,
         @BindsInstance toolbarProvider: ToolbarActivityProvider,
+        @BindsInstance appBarActivityProvider: AppBarActivityProvider,
     ): MainComponent
   }
 }

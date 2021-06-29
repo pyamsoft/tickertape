@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
@@ -47,6 +48,7 @@ internal interface WatchlistComponent {
 
     @CheckResult
     fun create(
+        @BindsInstance appBarActivity: AppBarActivity,
         @BindsInstance toolbarActivity: ToolbarActivity,
         @BindsInstance activity: Activity,
         @BindsInstance owner: LifecycleOwner,

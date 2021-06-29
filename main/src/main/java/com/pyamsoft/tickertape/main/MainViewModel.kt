@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import javax.inject.Named
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -36,10 +37,11 @@ class MainViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
-    private val addNewBus: EventBus<AddNew>
+    private val addNewBus: EventBus<AddNew>,
+    @Named("app_name") appNameRes: Int,
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
-        savedState, MainViewState(page = null, isFabVisible = true)) {
+        savedState, MainViewState(appNameRes = appNameRes, page = null, isFabVisible = true)) {
 
   fun handleLoadDefaultPage() {
     viewModelScope.launch(context = Dispatchers.Default) {

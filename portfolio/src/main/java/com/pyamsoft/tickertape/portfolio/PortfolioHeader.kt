@@ -20,8 +20,11 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.annotation.ColorInt
 import androidx.core.view.isInvisible
+import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.pydroid.ui.util.applyAppBarOffset
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -29,7 +32,9 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.robinhood.ticker.TickerUtils
 import javax.inject.Inject
 
-class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
+class PortfolioHeader
+@Inject
+internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
     BaseUiView<PortfolioViewState, Nothing, PortfolioHeaderViewBinding>(parent) {
 
   override val viewBinding = PortfolioHeaderViewBinding::inflate
@@ -37,6 +42,7 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
   override val layoutRoot by boundView { portfolioHeaderAppbar }
 
   init {
+    doOnInflate { binding.portfolioHeaderCollapse.applyAppBarOffset(appBarActivity, owner) }
     doOnInflate {
       binding.apply {
         portfolioHeaderChangeTodayText.setCharacterLists(TICKER_CHARACTERS)

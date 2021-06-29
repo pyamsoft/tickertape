@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.portfolio.item
 
-import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView

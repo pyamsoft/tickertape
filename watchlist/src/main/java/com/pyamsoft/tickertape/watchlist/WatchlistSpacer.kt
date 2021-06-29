@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.watchlist
 
-enum class NotificationType {
-  BIG_MOVER
-}
+import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.tickertape.ui.UiAppBarSpacer
+import javax.inject.Inject
+
+class WatchlistSpacer
+@Inject
+internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
+    UiAppBarSpacer<WatchListViewState, WatchListViewEvent>(parent, owner, appBarActivity)

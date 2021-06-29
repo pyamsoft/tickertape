@@ -28,8 +28,7 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import javax.inject.Inject
 
 class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PortfolioItemViewState, PortfolioItemViewEvent, HoldingSummaryBinding>(
-        parent) {
+    BaseUiView<PortfolioItemViewState, PortfolioItemViewEvent, HoldingSummaryBinding>(parent) {
 
   override val viewBinding = HoldingSummaryBinding::inflate
 

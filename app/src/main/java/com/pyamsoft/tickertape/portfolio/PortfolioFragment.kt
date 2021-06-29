@@ -27,10 +27,10 @@ import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -61,13 +61,13 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    view.applyToolbarOffset(viewLifecycleOwner)
 
     val binding = LayoutCoordinatorBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusPortfolioComponent()
         .create(
             requireToolbarActivity(),
+            requireAppBarActivity(),
             requireActivity(),
             viewLifecycleOwner,
             binding.layoutCoordinator)

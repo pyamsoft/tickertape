@@ -25,12 +25,9 @@ import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
-import com.pyamsoft.pydroid.ui.util.applyToolbarOffset
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsControllerEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsList

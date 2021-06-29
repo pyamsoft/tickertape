@@ -41,7 +41,9 @@ internal constructor(
     @Named("app_name") appNameRes: Int,
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
-        savedState, MainViewState(appNameRes = appNameRes, page = null, isFabVisible = true)) {
+        savedState,
+        MainViewState(
+            appNameRes = appNameRes, page = null, isFabVisible = true, bottomBarHeight = 0)) {
 
   fun handleLoadDefaultPage() {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -53,7 +55,9 @@ internal constructor(
 
   fun handleConsumeBottomBarHeight(height: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      bottomOffsetBus.send(BottomOffset(height))
+      setState(
+          stateChange = { copy(bottomBarHeight = height) },
+          andThen = { bottomOffsetBus.send(BottomOffset(it.bottomBarHeight)) })
     }
   }
 

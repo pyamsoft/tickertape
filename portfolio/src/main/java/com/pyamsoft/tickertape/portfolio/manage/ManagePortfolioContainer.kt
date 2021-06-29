@@ -34,10 +34,9 @@ class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
   init {
     doOnInflate {
       layoutRoot.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
+        // Offset the container by the action bar size
         val height = getDimensionPixelSize(0, 0)
-        if (height > 0) {
-          layoutRoot.updatePadding(top = height)
-        }
+        layoutRoot.updatePadding(top = height)
       }
     }
   }

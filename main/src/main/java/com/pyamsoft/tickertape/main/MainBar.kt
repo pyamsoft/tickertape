@@ -49,13 +49,17 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
     doOnInflate {
       layoutRoot.doOnApplyWindowInsets(owner) { view, _, _ ->
-        // Set all padding to zero or bar is too puffy with nav buttons
-        view.updatePadding(left = 0, right = 0, top = 0, bottom = 0)
 
-        // Make sure we are laid out before grabbing the height
+        // Ensure this happens last
         view.post {
-          // Publish the measured height
-          publish(MainViewEvent.BottomBarMeasured(view.height))
+          // Set all padding to zero or bar is too puffy with nav buttons
+          view.updatePadding(left = 0, right = 0, top = 0, bottom = 0)
+
+          // Make sure we are laid out before grabbing the height
+          view.post {
+            // Publish the measured height
+            publish(MainViewEvent.BottomBarMeasured(view.height))
+          }
         }
       }
     }

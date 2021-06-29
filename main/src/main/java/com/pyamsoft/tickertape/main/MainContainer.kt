@@ -17,7 +17,9 @@
 package com.pyamsoft.tickertape.main
 
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.main.databinding.MainContainerBinding
 import javax.inject.Inject
 
@@ -27,4 +29,21 @@ class MainContainer @Inject internal constructor(parent: ViewGroup) :
   override val viewBinding = MainContainerBinding::inflate
 
   override val layoutRoot by boundView { mainContainer }
+
+  private var initialHeight: Int? = null
+
+  init {
+    doOnInflate { layoutRoot.also { v -> v.post { initialHeight = v.height } } }
+  }
+
+  override fun onRender(state: UiRender<MainViewState>) {
+    state.mapChanged { it.bottomBarHeight }.render(viewScope) { handleBottomBarHeight(it) }
+  }
+
+  private fun handleBottomBarHeight(height: Int) {
+    // Add additional height to the main container so that when it scrolls as a result of the
+    // coordinator layout,
+    // we avoid the blank strip on the bottom.
+    initialHeight?.also { ih -> layoutRoot.updateLayoutParams { this.height = ih + height } }
+  }
 }

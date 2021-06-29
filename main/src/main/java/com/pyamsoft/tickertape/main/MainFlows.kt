@@ -26,6 +26,7 @@ internal constructor(
     @StringRes val appNameRes: Int,
     val page: MainPage?,
     val isFabVisible: Boolean,
+    val bottomBarHeight: Int,
 ) : UiViewState
 
 sealed class MainViewEvent : UiViewEvent {

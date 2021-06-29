@@ -34,8 +34,8 @@ internal constructor(
     space?.let { preference -> parent.removePreference(preference) }
     space =
         PreferenceBottomSpace(height, parent.context).also { preference ->
-          parent.addPreference(preference)
-        }
+      parent.addPreference(preference)
+    }
   }
 
   override fun onRender(state: UiRender<SettingsViewState>) {
@@ -43,8 +43,6 @@ internal constructor(
   }
 
   private fun handleBottomMargin(height: Int) {
-    if (height > 0) {
-      addSpacer(height)
-    }
+    addSpacer(height)
   }
 }

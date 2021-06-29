@@ -76,7 +76,7 @@ buildscript {
 
     // Recyclerview
     decorator = "1.3.0"
-    fastscroll = "1.1.6"
+    fastscroll = "1.1.7"
 
     // Robinhood
     ticker = "2.0.2"

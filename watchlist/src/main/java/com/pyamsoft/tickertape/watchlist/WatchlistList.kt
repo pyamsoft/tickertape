@@ -18,10 +18,9 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
@@ -54,15 +53,16 @@ internal constructor(
 
   private var modelAdapter: WatchlistItemAdapter? = null
 
+  private var bottomDecoration: RecyclerView.ItemDecoration? = null
   private var lastScrollPosition = 0
 
   init {
     doOnInflate {
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -115,7 +115,10 @@ internal constructor(
           .build()
     }
 
-    doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
+    doOnTeardown {
+      binding.watchlistList.removeAllItemDecorations()
+      bottomDecoration = null
+    }
 
     doOnTeardown {
       binding.watchlistList.adapter = null
@@ -149,8 +152,13 @@ internal constructor(
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handleBottomOffset(offset: Int) {
-    layoutRoot.updatePadding(bottom = offset)
+  private fun handleBottomOffset(height: Int) {
+    // Add additional padding to the list bottom to account for the height change in MainContainer
+    bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
+    bottomDecoration =
+        LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
+      binding.watchlistList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<QuotedStock>) {

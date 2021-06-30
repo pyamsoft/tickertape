@@ -40,15 +40,12 @@ internal constructor(
 ) {
 
   @CheckResult
-  private suspend fun fetchQuote(force: Boolean, symbol: StockSymbol): QuotedStock {
+  private suspend fun fetchQuote(force: Boolean, symbol: StockSymbol): QuotedStock? {
     return interactor
         .getWatchlistQuotes(force)
-        .onFailure { Timber.e(it, "Error getting watchlist quotes") }
-        .recover { emptyList() }
         .map { quotes -> quotes.first { it.symbol == symbol } }
-        .onFailure { Timber.e(it, "Error getting quote ${symbol.symbol()}") }
-        .recover { QuotedStock.empty(symbol) }
-        .getOrThrow()
+        .onFailure { Timber.e(it, "Error getting watchlist quotes $symbol") }
+        .getOrNull()
   }
 
   @CheckResult
@@ -56,12 +53,11 @@ internal constructor(
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange
-  ): QuotedChart {
+  ): QuotedChart? {
     return interactor
         .getChart(force, symbol, range, includePrePost = false)
-        .onFailure { Timber.e(it, "Error getting chart ${symbol.symbol()}") }
-        .recover { QuotedChart.empty(symbol) }
-        .getOrThrow()
+        .onFailure { Timber.e(it, "Error getting chart $symbol") }
+        .getOrNull()
   }
 
   @CheckResult
@@ -80,10 +76,12 @@ internal constructor(
           val jobs = awaitAll(quoteJob, chartJob)
 
           // Pull these out since we know what types they should be
-          val quote = jobs[0] as QuotedStock
-          val chart = jobs[1] as QuotedChart
+          // as instead of as? since we need the cast to succeed
+          // but the type it casts to can be nullable
+          val quote = jobs[0] as QuotedStock?
+          val chart = jobs[1] as QuotedChart?
 
-          ResultWrapper.success(QuoteWithChart(quote, chart))
+          ResultWrapper.success(QuoteWithChart(symbol, quote?.quote, chart?.chart))
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote with chart ${symbol.symbol()}")
           ResultWrapper.failure(e)

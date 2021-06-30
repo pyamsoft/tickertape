@@ -16,12 +16,14 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.util.Optional
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +35,7 @@ class WatchlistDigViewModel
 internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol) :
     UiViewModel<WatchListDigViewState, WatchListDigControllerEvent>(
         initialState =
-            WatchListDigViewState(
-                symbol = thisSymbol, isLoading = false, quote = null, chart = null)) {
+            WatchListDigViewState(symbol = thisSymbol, isLoading = false, stock = null)) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<QuoteWithChart>, Boolean, StockChart.IntervalRange> { force, range ->
@@ -52,12 +53,19 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
           andThen = {
             quoteFetcher
                 .call(force, range)
-                .onSuccess {
-                  setState { copy(quote = it.quote, chart = it.chart, isLoading = false) }
-                }
+                .onSuccess { setState { copy(stock = it.asOptional(), isLoading = false) } }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
-                .onFailure { setState { copy(quote = null, chart = null, isLoading = false) } }
+                .onFailure { setState { copy(stock = null.asOptional(), isLoading = false) } }
           })
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun <T : Any> T?.asOptional(): Optional<T> {
+      return Optional.ofNullable(this)
     }
   }
 }

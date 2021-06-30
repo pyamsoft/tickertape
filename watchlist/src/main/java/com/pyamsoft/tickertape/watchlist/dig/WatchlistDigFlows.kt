@@ -22,13 +22,13 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.util.Optional
 
 data class WatchListDigViewState
 internal constructor(
     val symbol: StockSymbol,
     val isLoading: Boolean,
-    val quote: QuotedStock?,
-    val chart: QuotedChart?
+    val stock: Optional<QuoteWithChart>?,
 ) : UiViewState
 
 sealed class WatchListDigViewEvent : UiViewEvent {

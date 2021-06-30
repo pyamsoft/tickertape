@@ -65,12 +65,9 @@ internal constructor(
         }
 
         return@withContext interactor.getQuotes(force, symbols).map { quotes ->
-          val quotePairs = mutableListOf<QuotedStock>()
-          for (symbol in symbols) {
-            val quote = quotes.firstOrNull { it.symbol() == symbol }
-            quotePairs.add(QuotedStock(symbol = symbol, quote = quote))
+          symbols.map { s ->
+            QuotedStock(symbol = s, quote = quotes.firstOrNull { it.symbol() == s })
           }
-          return@map quotePairs
         }
       }
 

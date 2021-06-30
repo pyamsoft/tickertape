@@ -106,13 +106,38 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleChartChanged(state: WatchListDigViewState) {
     clearAdapter()
-    val chart = state.chart
-    val quote = state.quote
-    if (chart != null && quote != null) {
-      val c = chart.chart
-      val q = quote.quote
-      if (c != null && q != null) {
-        adapter = ChartAdapter(c, q).also { binding.watchlistDigChartSpark.adapter = it }
+
+    // This is an Optional. If it is present, then it means the load was at least attempted
+    // If the load was attempted, we should not show an empty state, but either a loaded or error
+    // state
+    val maybeStock = state.stock
+    if (maybeStock == null) {
+      // Show empty state
+    } else {
+      // Load was attempted
+      val stock: QuoteWithChart? = maybeStock.orElse(null)
+      if (stock == null) {
+        // Full error state, load attempted but missing data
+        Timber.w("Failed to load stock info ${state.symbol}")
+      } else {
+        // Load success, but is data present
+        val chart = stock.chart
+        val quote = stock.quote
+
+        if (chart == null) {
+          // Chart error
+          Timber.w("Failed to load chart ${state.symbol}")
+        }
+
+        if (quote == null) {
+          // Quote error
+          Timber.w("Failed to load quote ${state.symbol}")
+        }
+
+        // Load was successful, we have required data
+        if (chart != null && quote != null) {
+          adapter = ChartAdapter(chart, quote).also { binding.watchlistDigChartSpark.adapter = it }
+        }
       }
     }
   }
@@ -120,7 +145,7 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   private class ChartAdapter(chart: StockChart, quote: StockQuote) : SparkAdapter() {
 
     private val chartData: List<ChartData>
-    private val baselineValue = quote.dayOpen().value().toFloat()
+    private val baselineValue = (quote.dayPreviousClose() ?: quote.dayOpen()).value().toFloat()
 
     init {
       val dates = chart.dates()
@@ -147,7 +172,7 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
 
     @CheckResult
     private fun getValue(item: ChartData): Double {
-      return item.open.value()
+      return item.close.value()
     }
 
     override fun getCount(): Int {
@@ -159,7 +184,8 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     }
 
     override fun getY(index: Int): Float {
-      return getValue(getItem(index)).toFloat()
+      // Offset the Y based on the baseline value which is either previous close or day's open
+      return getValue(getItem(index)).toFloat() - baselineValue
     }
 
     override fun hasBaseLine(): Boolean {
@@ -167,7 +193,8 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     }
 
     override fun getBaseLine(): Float {
-      return baselineValue
+      // Baseline of 0 to show the chart dipping below zero
+      return 0F
     }
   }
 

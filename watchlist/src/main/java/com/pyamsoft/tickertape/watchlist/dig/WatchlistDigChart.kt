@@ -16,22 +16,25 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import android.graphics.Color
 import android.view.ViewGroup
+import androidx.annotation.CheckResult
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
-import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.watchlist.R
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigChartBinding
 import com.robinhood.spark.SparkAdapter
 import com.robinhood.spark.SparkView
+import com.robinhood.spark.animation.MorphSparkAnimator
 import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -72,10 +75,16 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
       binding.watchlistDigChartSpark.apply {
         isScrubEnabled = true
         fillType = SparkView.FillType.TOWARD_ZERO
-        isFill
-        scrubLineColor = DEFAULT_STOCK_UP_COLOR
-        lineColor = DEFAULT_STOCK_UP_COLOR
-        baseLineColor = DEFAULT_STOCK_UP_COLOR
+        lineColor =
+            Color.argb(
+                (0.6 * 255).toInt(),
+                Color.red(DEFAULT_STOCK_UP_COLOR),
+                Color.green(DEFAULT_STOCK_UP_COLOR),
+                Color.blue(DEFAULT_STOCK_UP_COLOR))
+        scrubLineColor = DEFAULT_STOCK_COLOR
+        baseLineColor = DEFAULT_STOCK_COLOR
+
+        sparkAnimator = MorphSparkAnimator()
       }
     }
   }
@@ -92,23 +101,26 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<WatchListDigViewState>) {
-    state.mapChanged { it.chart }.render(viewScope) { handleChartChanged(it) }
+    state.render(viewScope) { handleChartChanged(it) }
   }
 
-  private fun handleChartChanged(chart: QuotedChart?) {
+  private fun handleChartChanged(state: WatchListDigViewState) {
     clearAdapter()
-    if (chart != null) {
+    val chart = state.chart
+    val quote = state.quote
+    if (chart != null && quote != null) {
       val c = chart.chart
-      if (c != null) {
-        adapter = ChartAdapter(c).also { binding.watchlistDigChartSpark.adapter = it }
+      val q = quote.quote
+      if (c != null && q != null) {
+        adapter = ChartAdapter(c, q).also { binding.watchlistDigChartSpark.adapter = it }
       }
     }
   }
 
-  private class ChartAdapter(chart: StockChart) : SparkAdapter() {
+  private class ChartAdapter(chart: StockChart, quote: StockQuote) : SparkAdapter() {
 
     private val chartData: List<ChartData>
-    private val offset = OffsetDateTime.now().offset
+    private val baselineValue = quote.dayOpen().value().toFloat()
 
     init {
       val dates = chart.dates()
@@ -133,6 +145,11 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
       chartData = data
     }
 
+    @CheckResult
+    private fun getValue(item: ChartData): Double {
+      return item.open.value()
+    }
+
     override fun getCount(): Int {
       return chartData.size
     }
@@ -142,7 +159,15 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     }
 
     override fun getY(index: Int): Float {
-      return getItem(index).open.value().toFloat()
+      return getValue(getItem(index)).toFloat()
+    }
+
+    override fun hasBaseLine(): Boolean {
+      return true
+    }
+
+    override fun getBaseLine(): Float {
+      return baselineValue
     }
   }
 

@@ -34,6 +34,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -66,33 +67,41 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // Run both queries in parallel
-        val holdingQueryJob = async { holdingQueryDao.query(force) }
-        val positionQueryJob = async { positionQueryDao.query(force) }
-        val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
+        return@withContext try {
+          coroutineScope {
+            // Run both queries in parallel
+            val holdingQueryJob = async { holdingQueryDao.query(force) }
+            val positionQueryJob = async { positionQueryDao.query(force) }
+            val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
 
-        // We can cast since we know what this one is
-        @Suppress("UNCHECKED_CAST") val holdings = jobResult[0] as List<DbHolding>
-        val symbols = holdings.map { it.symbol() }
+            // We can cast since we know what this one is
+            @Suppress("UNCHECKED_CAST") val holdings = jobResult[0] as List<DbHolding>
+            val symbols = holdings.map { it.symbol() }
 
-        // We can cast since we know what this one is
-        @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-        return@withContext interactor
-            .getQuotes(force, symbols)
-            .onFailure { Timber.e(it, "Unable to get quotes for portfolio: $symbols") }
-            .recover { emptyList() }
-            .map { quotes ->
-              val result = mutableListOf<PortfolioStock>()
-              for (holding in holdings) {
-                val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
-                val holdingPositions = positions.filter { it.holdingId() == holding.id() }
-                val stock =
-                    PortfolioStock(holding = holding, positions = holdingPositions, quote = quote)
-                result.add(stock)
-              }
+            // We can cast since we know what this one is
+            @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
+            return@coroutineScope interactor
+                .getQuotes(force, symbols)
+                .onFailure { Timber.e(it, "Unable to get quotes for portfolio: $symbols") }
+                .recover { emptyList() }
+                .map { quotes ->
+                  val result = mutableListOf<PortfolioStock>()
+                  for (holding in holdings) {
+                    val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
+                    val holdingPositions = positions.filter { it.holdingId() == holding.id() }
+                    val stock =
+                        PortfolioStock(
+                            holding = holding, positions = holdingPositions, quote = quote)
+                    result.add(stock)
+                  }
 
-              return@map result
-            }
+                  return@map result
+                }
+          }
+        } catch (e: Throwable) {
+          Timber.e(e, "Failed to get quotes for portfolio")
+          return@withContext ResultWrapper.failure(e)
+        }
       }
 
   @CheckResult

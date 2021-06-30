@@ -29,6 +29,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -68,23 +69,27 @@ internal constructor(
   ): ResultWrapper<QuoteWithChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+
         return@withContext try {
-          val quoteJob = async { fetchQuote(force, symbol) }
-          val chartJob = async { fetchChart(force, symbol, range) }
+          coroutineScope {
+            val quoteJob = async { fetchQuote(force, symbol) }
+            val chartJob = async { fetchChart(force, symbol, range) }
 
-          // Run in parallel
-          val jobs = awaitAll(quoteJob, chartJob)
+            // Run in parallel
+            val jobs = awaitAll(quoteJob, chartJob)
 
-          // Pull these out since we know what types they should be
-          // as instead of as? since we need the cast to succeed
-          // but the type it casts to can be nullable
-          val quote = jobs[0] as QuotedStock?
-          val chart = jobs[1] as QuotedChart?
+            // Pull these out since we know what types they should be
+            // as instead of as? since we need the cast to succeed
+            // but the type it casts to can be nullable
+            val quote = jobs[0] as QuotedStock?
+            val chart = jobs[1] as QuotedChart?
 
-          ResultWrapper.success(QuoteWithChart(symbol, quote?.quote, chart?.chart))
+            return@coroutineScope ResultWrapper.success(
+                QuoteWithChart(symbol, quote?.quote, chart?.chart))
+          }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote with chart ${symbol.symbol()}")
-          ResultWrapper.failure(e)
+          return@withContext ResultWrapper.failure(e)
         }
       }
 }

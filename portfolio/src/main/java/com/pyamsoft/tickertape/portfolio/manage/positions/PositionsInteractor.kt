@@ -38,6 +38,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -95,34 +96,43 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // Run both queries in parallel
-        val holdingQueryJob = async { holdingQueryDao.query(force).firstOrNull { it.id() == id } }
-        val positionQueryJob = async {
-          positionQueryDao.query(force).filter { it.holdingId() == id }
-        }
-        val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
-
-        // We can cast since we know what this one is
-        @Suppress("UNCHECKED_CAST") val holding = jobResult[0] as? DbHolding
-        if (holding == null) {
-          val err = IllegalStateException("Could not find holding with ID: $id")
-          Timber.w(err)
-          return@withContext ResultWrapper.failure(err)
-        }
-
-        // We can cast since we know what this one is
-        @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-        return@withContext interactor
-            .getQuotes(force, listOf(holding.symbol()))
-            .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
-            .recover { emptyList() }
-            .map { quotes ->
-              Optional.ofNullable(quotes.firstOrNull { it.symbol == holding.symbol() })
+        return@withContext try {
+          coroutineScope {
+            // Run both queries in parallel
+            val holdingQueryJob = async {
+              holdingQueryDao.query(force).firstOrNull { it.id() == id }
             }
-            .map { maybeQuote ->
-              val quote = maybeQuote.orElse(null)
-              PortfolioStock(holding = holding, positions = positions, quote = quote)
+            val positionQueryJob = async {
+              positionQueryDao.query(force).filter { it.holdingId() == id }
             }
+            val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
+
+            // We can cast since we know what this one is
+            @Suppress("UNCHECKED_CAST") val holding = jobResult[0] as? DbHolding
+            if (holding == null) {
+              val err = IllegalStateException("Could not find holding with ID: $id")
+              Timber.w(err)
+              return@coroutineScope ResultWrapper.failure(err)
+            }
+
+            // We can cast since we know what this one is
+            @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
+            return@coroutineScope interactor
+                .getQuotes(force, listOf(holding.symbol()))
+                .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
+                .recover { emptyList() }
+                .map { quotes ->
+                  Optional.ofNullable(quotes.firstOrNull { it.symbol == holding.symbol() })
+                }
+                .map { maybeQuote ->
+                  val quote = maybeQuote.orElse(null)
+                  PortfolioStock(holding = holding, positions = positions, quote = quote)
+                }
+          }
+        } catch (e: Throwable) {
+          Timber.e(e, "Failed to fetch holding")
+          return@withContext ResultWrapper.failure(e)
+        }
       }
 
   @CheckResult

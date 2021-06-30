@@ -34,6 +34,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class YahooChartSource
 @Inject
@@ -41,14 +42,18 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
 
   override suspend fun getCharts(
       force: Boolean,
-      symbol: StockSymbol,
+      symbols: List<StockSymbol>,
       includePrePost: Boolean,
       range: StockChart.IntervalRange
   ): ResultWrapper<List<StockChart>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          ResultWrapper.success(fetchCharts(symbol, includePrePost, range))
+          val result = mutableListOf<StockChart>()
+          for (symbol in symbols) {
+            fetchCharts(symbol, includePrePost, range)?.also { chart -> result.add(chart) }
+          }
+          ResultWrapper.success(result)
         } catch (e: Throwable) {
           ResultWrapper.failure(e)
         }
@@ -59,37 +64,42 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
       symbol: StockSymbol,
       includePrePost: Boolean,
       range: StockChart.IntervalRange
-  ): List<StockChart> {
-    val interval = getIntervalForRange(range)
-    val result =
-        service.getQuotes(
-            url = YF_QUOTE_SOURCE,
-            symbol = symbol.symbol(),
-            includePrePost = includePrePost,
-            range = range.apiValue,
-            interval = interval.apiValue)
+  ): StockChart? {
+    try {
+      val interval = getIntervalForRange(range)
+      val result =
+          service.getQuotes(
+              url = YF_QUOTE_SOURCE,
+              symbol = symbol.symbol(),
+              includePrePost = includePrePost,
+              range = range.apiValue,
+              interval = interval.apiValue)
 
-    return result
-        .chart
-        .result
-        .asSequence()
-        .filterOnlyValidStockData()
-        .map { chart ->
-          val timestamps = chart.timestamp.requireNotNull()
-          val quote = chart.indicators.requireNotNull().first().quote.requireNotNull()
-          StockChartImpl(
-              symbol = symbol,
-              range = range,
-              interval = interval,
-              dates = timestamps.map { LocalDateTime.from(Instant.ofEpochMilli(it)) },
-              volume = quote.volume.requireNotNull().map { it.asVolume() },
-              open = quote.open.requireNotNull().map { it.asMoney() },
-              close = quote.close.requireNotNull().map { it.asMoney() },
-              low = quote.low.requireNotNull().map { it.asMoney() },
-              high = quote.high.requireNotNull().map { it.asMoney() },
-          )
-        }
-        .toList()
+      return result
+          .chart
+          .result
+          .asSequence()
+          .filterOnlyValidStockData()
+          .map { chart ->
+            val timestamps = chart.timestamp.requireNotNull()
+            val quote = chart.indicators.requireNotNull().first().quote.requireNotNull()
+            StockChartImpl(
+                symbol = symbol,
+                range = range,
+                interval = interval,
+                dates = timestamps.map { LocalDateTime.from(Instant.ofEpochMilli(it)) },
+                volume = quote.volume.requireNotNull().map { it.asVolume() },
+                open = quote.open.requireNotNull().map { it.asMoney() },
+                close = quote.close.requireNotNull().map { it.asMoney() },
+                low = quote.low.requireNotNull().map { it.asMoney() },
+                high = quote.high.requireNotNull().map { it.asMoney() },
+            )
+          }
+          .first()
+    } catch (e: Throwable) {
+      Timber.e(e, "Error fetching chart: ${symbol.symbol()}")
+      return null
+    }
   }
 
   companion object {

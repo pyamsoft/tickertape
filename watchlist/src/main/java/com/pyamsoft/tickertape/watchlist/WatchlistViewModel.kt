@@ -90,7 +90,7 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
     Timber.d("Existing symbol deleted: $symbol")
-    setState { copy(quotes = quotes.filterNot { it.symbol.symbol() == symbol.symbol() }) }
+    setState { copy(quotes = quotes.filterNot { it.symbol == symbol }) }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network

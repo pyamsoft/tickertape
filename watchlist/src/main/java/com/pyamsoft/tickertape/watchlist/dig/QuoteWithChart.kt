@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.watchlist.dig
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.QuotedStock
 
-interface StockInteractor : QuoteSource, ChartSource
+internal data class QuoteWithChart
+internal constructor(val quote: QuotedStock, val chart: QuotedChart)

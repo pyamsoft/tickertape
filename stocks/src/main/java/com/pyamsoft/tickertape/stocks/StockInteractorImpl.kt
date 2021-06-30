@@ -21,6 +21,7 @@ import com.pyamsoft.cachify.MemoryCacheStorage
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.util.concurrent.TimeUnit
@@ -40,6 +41,20 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
         interactor.getQuotes(true, symbols)
       }
 
+  private val chartsCache =
+      multiCachify<
+          String,
+          ResultWrapper<List<StockChart>>,
+          List<StockSymbol>,
+          Boolean,
+          StockChart.IntervalRange>(
+          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
+          symbols,
+          includePrePost,
+          range ->
+        interactor.getCharts(true, symbols, includePrePost, range)
+      }
+
   override suspend fun getQuotes(
       force: Boolean,
       symbols: List<StockSymbol>
@@ -55,7 +70,34 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
         return@withContext quotesCache.key(key).call(symbols)
       }
 
+  override suspend fun getCharts(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+      includePrePost: Boolean,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<StockChart>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        val key = getChartKey(symbols, includePrePost, range)
+        if (force) {
+          chartsCache.key(key).clear()
+        }
+
+        return@withContext chartsCache.key(key).call(symbols, includePrePost, range)
+      }
+
   companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun getChartKey(
+        symbols: List<StockSymbol>,
+        includePrePost: Boolean,
+        range: StockChart.IntervalRange
+    ): String {
+      return "${getQuoteKey(symbols)}-${includePrePost}-${range.apiValue}"
+    }
 
     @JvmStatic
     @CheckResult

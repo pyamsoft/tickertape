@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.watchlist.dig
 
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.pydroid.arch.UiControllerEvent
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.QuotedStock
 
-data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?)
+data class WatchListDigViewState
+internal constructor(val isLoading: Boolean, val quote: QuotedStock?, val chart: QuotedChart?) :
+    UiViewState
+
+sealed class WatchListDigViewEvent : UiViewEvent {
+
+  object ForceRefresh : WatchListDigViewEvent()
+}
+
+sealed class WatchListDigControllerEvent : UiControllerEvent

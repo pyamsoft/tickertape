@@ -55,7 +55,7 @@ private constructor(
               oldItem: WatchlistItemViewState,
               newItem: WatchlistItemViewState
           ): Boolean {
-            return oldItem.symbol.symbol() == newItem.symbol.symbol()
+            return oldItem.symbol == newItem.symbol
           }
 
           override fun areContentsTheSame(

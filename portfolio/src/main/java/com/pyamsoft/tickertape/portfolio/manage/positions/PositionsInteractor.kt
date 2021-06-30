@@ -42,7 +42,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class PositionsInteractor
+internal class PositionsInteractor
 @Inject
 internal constructor(
     private val positionRealtime: PositionRealtime,
@@ -117,11 +117,7 @@ internal constructor(
             .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
             .recover { emptyList() }
             .map { quotes ->
-              Optional.ofNullable(
-                  quotes.firstOrNull {
-                    // Compare raw symbols for string case checking
-                    it.symbol.symbol() == holding.symbol().symbol()
-                  })
+              Optional.ofNullable(quotes.firstOrNull { it.symbol == holding.symbol() })
             }
             .map { maybeQuote ->
               val quote = maybeQuote.orElse(null)

@@ -18,8 +18,10 @@ package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ internal class StockNetworkInteractor
 @Inject
 internal constructor(
     @InternalApi private val quoteSource: QuoteSource,
+    @InternalApi private val chartSource: ChartSource,
 ) : StockInteractor {
 
   override suspend fun getQuotes(
@@ -38,5 +41,16 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext quoteSource.getQuotes(force, symbols)
+      }
+
+  override suspend fun getCharts(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+      includePrePost: Boolean,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<StockChart>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext chartSource.getCharts(force, symbols, includePrePost, range)
       }
 }

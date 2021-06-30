@@ -26,7 +26,7 @@ interface ChartSource {
   @CheckResult
   suspend fun getCharts(
       force: Boolean,
-      symbol: StockSymbol,
+      symbols: List<StockSymbol>,
       includePrePost: Boolean,
       range: StockChart.IntervalRange
   ): ResultWrapper<List<StockChart>>

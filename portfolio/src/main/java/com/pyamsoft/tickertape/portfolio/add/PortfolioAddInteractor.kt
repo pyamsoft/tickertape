@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class PortfolioAddInteractor
+internal class PortfolioAddInteractor
 @Inject
 internal constructor(
     private val holdingQueryDao: HoldingQueryDao,
@@ -45,11 +45,7 @@ internal constructor(
         return@withContext try {
           for (symbol in symbols) {
             // TODO move this query into the DAO layer
-            val existingHolding =
-                holdingQueryDao.query(true).firstOrNull {
-                  // Compare raw symbols for string case checking
-                  it.symbol().symbol() == symbol.symbol()
-                }
+            val existingHolding = holdingQueryDao.query(true).firstOrNull { it.symbol() == symbol }
             if (existingHolding != null) {
               Timber.d("Holding already exists in DB: $existingHolding")
               continue

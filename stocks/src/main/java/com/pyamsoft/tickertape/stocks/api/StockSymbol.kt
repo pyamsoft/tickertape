@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
+import java.util.Locale
 
 interface StockSymbol {
 
@@ -25,16 +26,22 @@ interface StockSymbol {
 }
 
 @CheckResult
+private fun String.asSymbol(locale: Locale): StockSymbol {
+  return StockSymbolImpl(this.uppercase(locale))
+}
+
+@CheckResult
 fun String.asSymbol(): StockSymbol {
-  return StockSymbolImpl(this)
+  return this.asSymbol(Locale.getDefault())
 }
 
 @CheckResult
 fun String.asSymbols(): List<StockSymbol> {
+  val locale = Locale.getDefault()
   return this.trim()
       .split("\\s+".toRegex())
       .asSequence()
       .filterNot { it.isBlank() }
-      .map { it.asSymbol() }
+      .map { it.asSymbol(locale) }
       .toList()
 }

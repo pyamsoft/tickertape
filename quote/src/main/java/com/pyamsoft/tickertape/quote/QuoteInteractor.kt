@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,6 +69,43 @@ internal constructor(
           for (symbol in symbols) {
             val quote = quotes.firstOrNull { it.symbol() == symbol }
             quotePairs.add(QuotedStock(symbol = symbol, quote = quote))
+          }
+          return@map quotePairs
+        }
+      }
+
+  @CheckResult
+  suspend fun getWatchlistCharts(
+      force: Boolean,
+      includePrePost: Boolean,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<QuotedChart>> =
+      withContext(context = Dispatchers.IO) {
+        val symbols = getSymbols(force)
+        return@withContext getCharts(force, symbols, includePrePost, range)
+      }
+
+  @CheckResult
+  suspend fun getCharts(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+      includePrePost: Boolean,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<QuotedChart>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        // If we have no symbols, don't even make the trip
+        if (symbols.isEmpty()) {
+          return@withContext ResultWrapper.success(emptyList())
+        }
+
+        return@withContext interactor.getCharts(force, symbols, includePrePost, range).map { charts
+          ->
+          val quotePairs = mutableListOf<QuotedChart>()
+          for (symbol in symbols) {
+            val chart = charts.firstOrNull { it.symbol() == symbol }
+            quotePairs.add(QuotedChart(symbol = symbol, chart = chart))
           }
           return@map quotePairs
         }

@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-class WatchlistInteractor
+internal class WatchlistInteractor
 @Inject
 internal constructor(
     private val symbolQueryDao: SymbolQueryDao,
@@ -67,11 +67,7 @@ internal constructor(
 
         return@withContext try {
           // TODO move this query into the DAO layer
-          val dbSymbol =
-              symbolQueryDao.query(true).firstOrNull {
-                // Compare raw symbol for string case
-                it.symbol().symbol() == symbol.symbol()
-              }
+          val dbSymbol = symbolQueryDao.query(true).firstOrNull { it.symbol() == symbol }
           if (dbSymbol == null) {
             val err = IllegalStateException("Symbol does not exist in DB: $symbol")
             Timber.e(err)

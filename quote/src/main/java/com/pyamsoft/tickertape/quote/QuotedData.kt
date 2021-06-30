@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.quote
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface StockInteractor : QuoteSource, ChartSource
+data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?)
+data class QuotedChart internal constructor(val symbol: StockSymbol, val chart: StockChart?)
+

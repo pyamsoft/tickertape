@@ -75,39 +75,17 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getWatchlistCharts(
+  suspend fun getChart(
       force: Boolean,
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
       includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<QuotedChart>> =
-      withContext(context = Dispatchers.IO) {
-        val symbols = getSymbols(force)
-        return@withContext getCharts(force, symbols, includePrePost, range)
-      }
-
-  @CheckResult
-  suspend fun getCharts(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<QuotedChart>> =
+  ): ResultWrapper<QuotedChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        // If we have no symbols, don't even make the trip
-        if (symbols.isEmpty()) {
-          return@withContext ResultWrapper.success(emptyList())
-        }
-
-        return@withContext interactor.getCharts(force, symbols, includePrePost, range).map { charts
-          ->
-          val quotePairs = mutableListOf<QuotedChart>()
-          for (symbol in symbols) {
-            val chart = charts.firstOrNull { it.symbol() == symbol }
-            quotePairs.add(QuotedChart(symbol = symbol, chart = chart))
-          }
-          return@map quotePairs
+        return@withContext interactor.getChart(force, symbol, range, includePrePost).map {
+          QuotedChart(symbol = symbol, chart = it)
         }
       }
 }

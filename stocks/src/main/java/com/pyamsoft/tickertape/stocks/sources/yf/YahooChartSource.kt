@@ -22,7 +22,9 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
@@ -31,97 +33,147 @@ import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 internal class YahooChartSource
 @Inject
 internal constructor(@InternalApi private val service: ChartService) : ChartSource {
 
-  override suspend fun getCharts(
+  override suspend fun getChart(
       force: Boolean,
-      symbols: List<StockSymbol>,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<StockChart>> =
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+      includePrePost: Boolean
+  ): ResultWrapper<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          val result = mutableListOf<StockChart>()
-          for (symbol in symbols) {
-            fetchCharts(symbol, includePrePost, range)?.also { chart -> result.add(chart) }
-          }
-          ResultWrapper.success(result)
+          ResultWrapper.success(fetchChart(symbol, includePrePost, range))
         } catch (e: Throwable) {
           ResultWrapper.failure(e)
         }
       }
 
   @CheckResult
-  private suspend fun fetchCharts(
+  private suspend fun fetchChart(
       symbol: StockSymbol,
       includePrePost: Boolean,
       range: StockChart.IntervalRange
-  ): StockChart? {
-    try {
-      val interval = getIntervalForRange(range)
-      val result =
-          service.getQuotes(
-              url = YF_QUOTE_SOURCE,
-              symbol = symbol.symbol(),
-              includePrePost = includePrePost,
-              range = range.apiValue,
-              interval = interval.apiValue)
+  ): StockChart {
+    val interval = getIntervalForRange(range)
+    val result =
+        service.getQuotes(
+            url = getChartUrl(symbol),
+            includePrePost = includePrePost,
+            range = range.apiValue,
+            interval = interval.apiValue)
 
-      return result
-          .chart
-          .result
-          .asSequence()
-          .filterOnlyValidStockData()
-          .map { chart ->
-            val timestamps = chart.timestamp.requireNotNull()
-            val quote = chart.indicators.requireNotNull().first().quote.requireNotNull()
-            StockChartImpl(
-                symbol = symbol,
-                range = range,
-                interval = interval,
-                dates = timestamps.map { LocalDateTime.from(Instant.ofEpochMilli(it)) },
-                volume = quote.volume.requireNotNull().map { it.asVolume() },
-                open = quote.open.requireNotNull().map { it.asMoney() },
-                close = quote.close.requireNotNull().map { it.asMoney() },
-                low = quote.low.requireNotNull().map { it.asMoney() },
-                high = quote.high.requireNotNull().map { it.asMoney() },
-            )
+    val zoneId = ZoneId.systemDefault()
+    return result
+        .chart
+        .result
+        .asSequence()
+        .filterOnlyValidStockData()
+        .map { chart ->
+          val timestamps = chart.timestamp.requireNotNull()
+          val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
+
+          val dates = timestamps.map { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), zoneId) }
+          val volumes = quote.volume.requireNotNull()
+          val opens = quote.open.requireNotNull()
+          val closes = quote.close.requireNotNull()
+          val highs = quote.high.requireNotNull()
+          val lows = quote.low.requireNotNull()
+
+          val validDates = mutableListOf<LocalDateTime>()
+          val validVolume = mutableListOf<StockVolumeValue>()
+          val validOpen = mutableListOf<StockMoneyValue>()
+          val validClose = mutableListOf<StockMoneyValue>()
+          val validHigh = mutableListOf<StockMoneyValue>()
+          val validLow = mutableListOf<StockMoneyValue>()
+
+          // Some cryptocurrencies have nulls in the open, close, high, low
+          // filter those points out
+          for (i in dates.indices) {
+            val date = dates[i]
+            val volume = volumes[i] ?: continue
+            val open = opens[i] ?: continue
+            val close = closes[i] ?: continue
+            val high = highs[i] ?: continue
+            val low = lows[i] ?: continue
+
+            validDates.add(date)
+            validVolume.add(volume.asVolume())
+            validOpen.add(open.asMoney())
+            validClose.add(close.asMoney())
+            validHigh.add(high.asMoney())
+            validLow.add(low.asMoney())
           }
-          .first()
-    } catch (e: Throwable) {
-      Timber.e(e, "Error fetching chart: ${symbol.symbol()}")
-      return null
-    }
+
+          StockChartImpl(
+              symbol = symbol,
+              range = range,
+              interval = interval,
+              dates = validDates,
+              volume = validVolume,
+              open = validOpen,
+              close = validClose,
+              low = validLow,
+              high = validHigh,
+          )
+        }
+        .first()
   }
 
   companion object {
 
-    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v8/finance/chart/"
+
+    @JvmStatic
+    @CheckResult
+    private fun getChartUrl(symbol: StockSymbol): String {
+      return "$YF_QUOTE_SOURCE/${symbol.symbol()}"
+    }
 
     @JvmStatic
     @CheckResult
     private fun Sequence<NetworkChart>.filterOnlyValidStockData(): Sequence<NetworkChart> {
+      return this.filter { it.isValidStockData() }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun NetworkChart.isValidStockData(): Boolean {
       // We need indicators and timestamps that are not empty
       // We need all of these values to have a valid ticker
-      return this.filterNot { it.timestamp == null }
-          .filterNot { it.indicators == null }
-          .filterNot { it.timestamp.requireNotNull().isEmpty() }
-          .filterNot { it.indicators.requireNotNull().isEmpty() }
-          .filterNot { it.indicators.requireNotNull().firstOrNull() == null }
-          .filterNot { it.indicators.requireNotNull().first().quote == null }
-          .filterNot { it.indicators.requireNotNull().first().quote?.open == null }
-          .filterNot { it.indicators.requireNotNull().first().quote?.close == null }
-          .filterNot { it.indicators.requireNotNull().first().quote?.high == null }
-          .filterNot { it.indicators.requireNotNull().first().quote?.low == null }
-          .filterNot { it.indicators.requireNotNull().first().quote?.volume == null }
+      val time = timestamp ?: return false
+      val ind = indicators ?: return false
+
+      if (time.isEmpty()) {
+        return false
+      }
+
+      val quote = ind.quote ?: return false
+      val actuallyQuote = quote.firstOrNull() ?: return false
+
+      val open = actuallyQuote.open ?: return false
+      val close = actuallyQuote.close ?: return false
+      val high = actuallyQuote.high ?: return false
+      val low = actuallyQuote.low ?: return false
+      val volume = actuallyQuote.volume ?: return false
+
+      if (open.isEmpty() ||
+          close.isEmpty() ||
+          high.isEmpty() ||
+          low.isEmpty() ||
+          volume.isEmpty()) {
+        return false
+      }
+
+      return true
     }
 
     @JvmStatic

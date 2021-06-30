@@ -17,15 +17,21 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
 import android.view.ViewGroup
+import androidx.core.content.withStyledAttributes
+import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
+import com.pyamsoft.tickertape.watchlist.R
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigChartBinding
 import com.robinhood.spark.SparkAdapter
+import com.robinhood.spark.SparkView
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -39,9 +45,15 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   private var adapter: ChartAdapter? = null
 
   init {
-    doOnTeardown { clearAdapter() }
+    doOnInflate {
+      layoutRoot.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
+        // Offset the container by the action bar size
+        val height = getDimensionPixelSize(0, 0)
+        layoutRoot.updatePadding(top = layoutRoot.paddingTop + height)
+      }
+    }
 
-    doOnInflate { binding.watchlistDigChartSpark.isScrubEnabled = true }
+    doOnTeardown { clearAdapter() }
 
     doOnInflate {
       binding.watchlistDigChartSpark.setScrubListener { raw ->
@@ -55,6 +67,17 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     }
 
     doOnTeardown { binding.watchlistDigChartSpark.scrubListener = null }
+
+    doOnInflate {
+      binding.watchlistDigChartSpark.apply {
+        isScrubEnabled = true
+        fillType = SparkView.FillType.TOWARD_ZERO
+        isFill
+        scrubLineColor = DEFAULT_STOCK_UP_COLOR
+        lineColor = DEFAULT_STOCK_UP_COLOR
+        baseLineColor = DEFAULT_STOCK_UP_COLOR
+      }
+    }
   }
 
   private fun handleScrubbedView(data: ChartData) {
@@ -77,7 +100,7 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     if (chart != null) {
       val c = chart.chart
       if (c != null) {
-        adapter = ChartAdapter(c).also { a -> binding.watchlistDigChartSpark.adapter = a }
+        adapter = ChartAdapter(c).also { binding.watchlistDigChartSpark.adapter = it }
       }
     }
   }
@@ -85,6 +108,7 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   private class ChartAdapter(chart: StockChart) : SparkAdapter() {
 
     private val chartData: List<ChartData>
+    private val offset = OffsetDateTime.now().offset
 
     init {
       val dates = chart.dates()

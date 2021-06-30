@@ -28,7 +28,7 @@ internal constructor(val isLoading: Boolean, val quote: QuotedStock?, val chart:
 
 sealed class WatchListDigViewEvent : UiViewEvent {
 
-  object ForceRefresh : WatchListDigViewEvent()
+  object Close : WatchListDigViewEvent()
 }
 
 sealed class WatchListDigControllerEvent : UiControllerEvent

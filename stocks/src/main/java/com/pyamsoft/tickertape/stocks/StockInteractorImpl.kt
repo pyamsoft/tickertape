@@ -44,15 +44,15 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
   private val chartsCache =
       multiCachify<
           String,
-          ResultWrapper<List<StockChart>>,
-          List<StockSymbol>,
+          ResultWrapper<StockChart>,
+          StockSymbol,
           Boolean,
           StockChart.IntervalRange>(
           storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
-          symbols,
+          symbol,
           includePrePost,
           range ->
-        interactor.getCharts(true, symbols, includePrePost, range)
+        interactor.getChart(true, symbol, range, includePrePost)
       }
 
   override suspend fun getQuotes(
@@ -70,21 +70,21 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
         return@withContext quotesCache.key(key).call(symbols)
       }
 
-  override suspend fun getCharts(
+  override suspend fun getChart(
       force: Boolean,
-      symbols: List<StockSymbol>,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<StockChart>> =
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+      includePrePost: Boolean
+  ): ResultWrapper<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val key = getChartKey(symbols, includePrePost, range)
+        val key = getChartKey(symbol, includePrePost, range)
         if (force) {
           chartsCache.key(key).clear()
         }
 
-        return@withContext chartsCache.key(key).call(symbols, includePrePost, range)
+        return@withContext chartsCache.key(key).call(symbol, includePrePost, range)
       }
 
   companion object {
@@ -92,11 +92,11 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
     @JvmStatic
     @CheckResult
     private fun getChartKey(
-        symbols: List<StockSymbol>,
+        symbol: StockSymbol,
         includePrePost: Boolean,
         range: StockChart.IntervalRange
     ): String {
-      return "${getQuoteKey(symbols)}-${includePrePost}-${range.apiValue}"
+      return "${symbol.symbol()}-${includePrePost}-${range.apiValue}"
     }
 
     @JvmStatic

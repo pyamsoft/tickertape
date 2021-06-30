@@ -43,14 +43,14 @@ internal constructor(
         return@withContext quotes.getQuotes(force, symbols)
       }
 
-  override suspend fun getCharts(
+  override suspend fun getChart(
       force: Boolean,
       symbol: StockSymbol,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<StockChart>> =
+      range: StockChart.IntervalRange,
+      includePrePost: Boolean
+  ): ResultWrapper<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext charts.getCharts(force, symbol, includePrePost, range)
+        return@withContext charts.getChart(force, symbol, range, includePrePost)
       }
 }

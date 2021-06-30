@@ -16,10 +16,31 @@
 
 package com.pyamsoft.tickertape.quote
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?)
-data class QuotedChart internal constructor(val symbol: StockSymbol, val chart: StockChart?)
+data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?) {
 
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun empty(symbol: StockSymbol): QuotedStock {
+      return QuotedStock(symbol, null)
+    }
+  }
+}
+
+data class QuotedChart internal constructor(val symbol: StockSymbol, val chart: StockChart?) {
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun empty(symbol: StockSymbol): QuotedChart {
+      return QuotedChart(symbol, null)
+    }
+  }
+}

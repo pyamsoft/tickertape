@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,7 +35,9 @@ import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
@@ -85,6 +86,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
           return@createComponent when (it) {
             is WatchListViewEvent.ForceRefresh -> viewModel.handleFetchQuotes(true)
             is WatchListViewEvent.Remove -> viewModel.handleRemove(it.index)
+            is WatchListViewEvent.Select -> viewModel.handleDigSymbol(it.index)
           }
         }
 
@@ -94,8 +96,13 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   override fun onControllerEvent(event: WatchListControllerEvent) {
     return when (event) {
       is WatchListControllerEvent.AddNewSymbol -> handleOpenSymbolAddDialog()
+      is WatchListControllerEvent.ManageSymbol -> handleOpenDigDialog(event.quote.symbol)
     }
   }
+
+  private fun handleOpenDigDialog(symbol: StockSymbol) {
+      WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
+    }
 
   private fun handleOpenSymbolAddDialog() {
     WatchlistAddDialog.newInstance().show(requireActivity(), WatchlistAddDialog.TAG)

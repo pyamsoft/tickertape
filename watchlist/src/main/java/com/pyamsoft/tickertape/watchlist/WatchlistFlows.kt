@@ -33,10 +33,14 @@ sealed class WatchListViewEvent : UiViewEvent {
 
   object ForceRefresh : WatchListViewEvent()
 
+  data class Select internal constructor(val index: Int) : WatchListViewEvent()
+
   data class Remove internal constructor(val index: Int) : WatchListViewEvent()
 }
 
 sealed class WatchListControllerEvent : UiControllerEvent {
+
+  data class ManageSymbol internal constructor(val quote: QuotedStock) : WatchListControllerEvent()
 
   object AddNewSymbol : WatchListControllerEvent()
 }

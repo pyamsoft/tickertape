@@ -135,7 +135,7 @@ internal constructor(
   }
 
   override fun onSelect(index: Int) {
-    Timber.d("Watchlist don't do anything on select $index")
+    publish(WatchListViewEvent.Select(index))
   }
 
   override fun onRefresh() {

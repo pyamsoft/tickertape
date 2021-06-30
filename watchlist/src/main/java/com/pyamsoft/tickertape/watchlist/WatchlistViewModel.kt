@@ -131,6 +131,13 @@ internal constructor(
     }
   }
 
+  fun handleDigSymbol(index: Int) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val quote = state.quotes[index]
+      publish(WatchListControllerEvent.ManageSymbol(quote))
+    }
+  }
+
   companion object {
 
     // Descending sort

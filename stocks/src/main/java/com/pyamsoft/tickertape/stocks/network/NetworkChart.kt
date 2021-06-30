@@ -21,20 +21,20 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 internal data class NetworkChart
 internal constructor(
-    internal val timestamp: Array<Long>?,
-    internal val indicators: Array<Indicator>?
+    internal val timestamp: List<Long>?,
+    internal val indicators: Indicator?
 ) {
 
   @JsonClass(generateAdapter = true)
-  internal data class Indicator(internal val quote: Quote?) {
+  internal data class Indicator(internal val quote: List<Quote>?) {
 
     @JsonClass(generateAdapter = true)
     internal data class Quote(
-        internal val volume: Array<Long>?,
-        internal val high: Array<Double>?,
-        internal val low: Array<Double>?,
-        internal val close: Array<Double>?,
-        internal val open: Array<Double>?,
+        internal val volume: List<Long?>?,
+        internal val high: List<Double?>?,
+        internal val low: List<Double?>?,
+        internal val close: List<Double?>?,
+        internal val open: List<Double?>?,
     )
   }
 }

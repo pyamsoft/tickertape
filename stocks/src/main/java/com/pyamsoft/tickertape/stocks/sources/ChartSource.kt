@@ -24,10 +24,10 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 interface ChartSource {
 
   @CheckResult
-  suspend fun getCharts(
+  suspend fun getChart(
       force: Boolean,
-      symbols: List<StockSymbol>,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): ResultWrapper<List<StockChart>>
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+      includePrePost: Boolean
+  ): ResultWrapper<StockChart>
 }

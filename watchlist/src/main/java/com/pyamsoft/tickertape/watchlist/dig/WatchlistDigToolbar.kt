@@ -20,6 +20,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.loader.ImageTarget
 import com.pyamsoft.pydroid.ui.R
@@ -27,6 +28,7 @@ import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.pydroid.ui.util.setUpEnabled
 import com.pyamsoft.pydroid.util.tintWith
 import com.pyamsoft.tickertape.main.databinding.SymbolAddToolbarBinding
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
 
@@ -73,5 +75,13 @@ internal constructor(
 
   private fun clear() {
     binding.symbolAddToolbar.setNavigationOnClickListener(null)
+  }
+
+  override fun onRender(state: UiRender<WatchListDigViewState>) {
+    state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
+  }
+
+  private fun handleSymbolChanged(symbol: StockSymbol) {
+    binding.symbolAddToolbar.title = symbol.symbol()
   }
 }

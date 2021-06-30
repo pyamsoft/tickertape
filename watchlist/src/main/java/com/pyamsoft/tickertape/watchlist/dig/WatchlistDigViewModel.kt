@@ -32,7 +32,9 @@ class WatchlistDigViewModel
 @Inject
 internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol) :
     UiViewModel<WatchListDigViewState, WatchListDigControllerEvent>(
-        initialState = WatchListDigViewState(isLoading = false, quote = null, chart = null)) {
+        initialState =
+            WatchListDigViewState(
+                symbol = thisSymbol, isLoading = false, quote = null, chart = null)) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<QuoteWithChart>, Boolean, StockChart.IntervalRange> { force, range ->
@@ -50,7 +52,9 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
           andThen = {
             quoteFetcher
                 .call(force, range)
-                .onSuccess { setState { copy(quote = it.quote, chart = it.chart, isLoading = false) } }
+                .onSuccess {
+                  setState { copy(quote = it.quote, chart = it.chart, isLoading = false) }
+                }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
                 .onFailure { setState { copy(quote = null, chart = null, isLoading = false) } }
           })

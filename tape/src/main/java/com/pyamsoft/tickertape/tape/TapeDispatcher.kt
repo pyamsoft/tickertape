@@ -29,7 +29,9 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
@@ -39,6 +41,7 @@ import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import timber.log.Timber
 
@@ -47,6 +50,7 @@ internal class TapeDispatcher
 @Inject
 internal constructor(
     private val context: Context,
+    @StringRes @Named("app_name") private val appNameRes: Int,
     private val activityClass: Class<out Activity>,
     private val serviceClass: Class<out Service>
 ) : NotifyDispatcher<TapeNotificationData> {
@@ -211,7 +215,10 @@ internal constructor(
         }
 
     if (quotes.isEmpty()) {
-      return builder.build()
+      return builder
+          .setContentTitle(context.getString(appNameRes))
+          .setContentText("No quotes. Refresh the notification to view your watchlist.")
+          .build()
     }
 
     val pageSize = getPageSize()

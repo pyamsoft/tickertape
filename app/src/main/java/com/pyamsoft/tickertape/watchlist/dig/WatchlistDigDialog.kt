@@ -76,7 +76,14 @@ internal class WatchlistDigDialog :
     val binding = LayoutConstraintBinding.bind(view)
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusWatchlistDigComponent()
-            .create(getSymbol(), binding.layoutConstraint).inject(this)
+            .create(
+              this,
+              viewLifecycleOwner,
+              viewModelStore,
+              getSymbol(),
+              binding.layoutConstraint
+            )
+          .inject(this)
 
     val chart = requireNotNull(chart)
     val toolbar = requireNotNull(toolbar)

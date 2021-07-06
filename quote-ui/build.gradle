@@ -66,6 +66,8 @@ dependencies {
 
   kapt "com.google.dagger:dagger-compiler:$dagger"
 
+  implementation "com.robinhood.spark:spark:$spark"
+
   api project(':quote')
   implementation project(':stocks')
   api project(':ui')

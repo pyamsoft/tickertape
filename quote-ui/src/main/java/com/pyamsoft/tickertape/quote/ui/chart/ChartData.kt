@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.quote.ui.chart
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
+import java.time.LocalDateTime
 
-data class WatchListDigViewState
+internal data class ChartData
 internal constructor(
-    val symbol: StockSymbol,
-    val isLoading: Boolean,
-    val stock: QuoteWithChart?,
-) : UiViewState
-
-sealed class WatchListDigViewEvent : UiViewEvent {
-
-  object Close : WatchListDigViewEvent()
-}
-
-sealed class WatchListDigControllerEvent : UiControllerEvent
+    val date: LocalDateTime,
+    val volume: StockVolumeValue,
+    val open: StockMoneyValue,
+    val close: StockMoneyValue,
+    val high: StockMoneyValue,
+    val low: StockMoneyValue
+)

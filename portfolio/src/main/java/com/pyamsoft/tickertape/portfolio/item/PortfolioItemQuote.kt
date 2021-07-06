@@ -50,12 +50,13 @@ class PortfolioItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   override fun render(state: UiRender<PortfolioItemViewState>) {
-    state.mapChanged { it.stock }.render(viewScope) { handleQuoteChanged(it) }
+    state.mapChanged { it.stock }.render(viewScope) { handleStockChanged(it) }
   }
 
-  private fun handleQuoteChanged(stock: PortfolioStock) {
+  private fun handleStockChanged(stock: PortfolioStock) {
     delegate.render(
         viewScope,
-        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote).asUiRender())
+        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null)
+            .asUiRender())
   }
 }

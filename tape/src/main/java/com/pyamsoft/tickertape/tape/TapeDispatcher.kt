@@ -198,13 +198,23 @@ internal constructor(
   ): Notification {
     guaranteeNotificationChannelExists(channelInfo)
 
-    val builder = createNotificationBuilder(channelInfo)
+    val safeIndex: Int
+    val builder =
+        createNotificationBuilder(channelInfo).apply {
+          safeIndex = if (quotes.isEmpty()) index else correctIndex(index, quotes.size)
+          addAction(
+              generateNotificationAction(
+                  "Refresh",
+                  getServicePendingIntent(
+                      REQUEST_CODE_REFRESH,
+                      PendingIntentOptions(index = safeIndex, forceRefresh = true))))
+        }
+
     if (quotes.isEmpty()) {
       return builder.build()
     }
 
     val pageSize = getPageSize()
-    val safeIndex = correctIndex(index, quotes.size)
 
     val remoteViews = RemoteViews(context.applicationContext.packageName, R.layout.remote_view)
     updateTickers(remoteViews, quotes, safeIndex, pageSize)
@@ -218,12 +228,6 @@ internal constructor(
                 getServicePendingIntent(
                     REQUEST_CODE_NEXT,
                     PendingIntentOptions(index = safeIndex + pageSize, forceRefresh = false))))
-        .addAction(
-            generateNotificationAction(
-                "Refresh",
-                getServicePendingIntent(
-                    REQUEST_CODE_REFRESH,
-                    PendingIntentOptions(index = safeIndex, forceRefresh = true))))
         .build()
   }
 

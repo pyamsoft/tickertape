@@ -24,3 +24,4 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?)
 
 data class QuotedChart internal constructor(val symbol: StockSymbol, val chart: StockChart?)
+

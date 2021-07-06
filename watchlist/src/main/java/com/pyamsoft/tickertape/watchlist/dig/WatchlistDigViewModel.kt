@@ -16,14 +16,12 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.util.Optional
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,19 +51,10 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
           andThen = {
             quoteFetcher
                 .call(force, range)
-                .onSuccess { setState { copy(stock = it.asOptional(), isLoading = false) } }
+                .onSuccess { setState { copy(stock = it, isLoading = false) } }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
-                .onFailure { setState { copy(stock = null.asOptional(), isLoading = false) } }
+                .onFailure { setState { copy(stock = null, isLoading = false) } }
           })
-    }
-  }
-
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun <T : Any> T?.asOptional(): Optional<T> {
-      return Optional.ofNullable(this)
     }
   }
 }

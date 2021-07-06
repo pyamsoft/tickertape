@@ -16,194 +16,50 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import android.graphics.Color
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.updatePadding
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
+import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.arch.ViewBinder
+import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChart
 import com.pyamsoft.tickertape.watchlist.R
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigChartBinding
-import com.robinhood.spark.SparkAdapter
-import com.robinhood.spark.SparkView
-import com.robinhood.spark.animation.MorphSparkAnimator
-import java.time.LocalDateTime
 import javax.inject.Inject
-import timber.log.Timber
 
-class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<WatchListDigViewState, WatchListDigViewEvent, WatchlistDigChartBinding>(parent) {
+class WatchlistDigChart @Inject internal constructor(private val delegate: QuoteChart) :
+    UiView<WatchListDigViewState, WatchListDigViewEvent>() {
 
-  override val layoutRoot by boundView { watchlistDigChartRoot }
-
-  override val viewBinding = WatchlistDigChartBinding::inflate
-
-  private var adapter: ChartAdapter? = null
+  // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
+  private val viewBinder: ViewBinder<QuoteViewState> = createViewBinder(delegate) {}
 
   init {
     doOnInflate {
-      layoutRoot.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
+      val rootView = delegate.rootView()
+      rootView.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
         // Offset the container by the action bar size
         val height = getDimensionPixelSize(0, 0)
-        layoutRoot.updatePadding(top = layoutRoot.paddingTop + height)
+        rootView.updatePadding(top = rootView.paddingTop + height)
       }
     }
 
-    doOnTeardown { clearAdapter() }
-
-    doOnInflate {
-      binding.watchlistDigChartSpark.setScrubListener { raw ->
-        val data = raw as? ChartData
-        if (data == null) {
-          clearScrubView()
-        } else {
-          handleScrubbedView(data)
-        }
-      }
-    }
-
-    doOnTeardown { binding.watchlistDigChartSpark.scrubListener = null }
-
-    doOnInflate {
-      binding.watchlistDigChartSpark.apply {
-        isScrubEnabled = true
-        fillType = SparkView.FillType.TOWARD_ZERO
-        lineColor =
-            Color.argb(
-                (0.6 * 255).toInt(),
-                Color.red(DEFAULT_STOCK_UP_COLOR),
-                Color.green(DEFAULT_STOCK_UP_COLOR),
-                Color.blue(DEFAULT_STOCK_UP_COLOR))
-        scrubLineColor = DEFAULT_STOCK_COLOR
-        baseLineColor = DEFAULT_STOCK_COLOR
-
-        sparkAnimator = MorphSparkAnimator()
-      }
-    }
+    doOnTeardown { viewBinder.teardown() }
   }
 
-  private fun handleScrubbedView(data: ChartData) {
-    Timber.d("Chart scrubbed: $data")
+  @CheckResult
+  fun id(): Int {
+    return delegate.id()
   }
 
-  private fun clearScrubView() {}
-
-  private fun clearAdapter() {
-    binding.watchlistDigChartSpark.adapter = null
-    adapter = null
+  override fun render(state: UiRender<WatchListDigViewState>) {
+    state.render(viewScope) { handleStateChanged(it) }
   }
 
-  override fun onRender(state: UiRender<WatchListDigViewState>) {
-    state.render(viewScope) { handleChartChanged(it) }
+  private fun handleStateChanged(state: WatchListDigViewState) {
+    val symbol = state.symbol
+    val stock = state.stock
+    viewBinder.bindState(
+        QuoteViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart))
   }
-
-  private fun handleChartChanged(state: WatchListDigViewState) {
-    clearAdapter()
-
-    // This is an Optional. If it is present, then it means the load was at least attempted
-    // If the load was attempted, we should not show an empty state, but either a loaded or error
-    // state
-    val maybeStock = state.stock
-    if (maybeStock == null) {
-      // Show empty state
-    } else {
-      // Load was attempted
-      val stock: QuoteWithChart? = maybeStock.orElse(null)
-      if (stock == null) {
-        // Full error state, load attempted but missing data
-        Timber.w("Failed to load stock info ${state.symbol}")
-      } else {
-        // Load success, but is data present
-        val chart = stock.chart
-        val quote = stock.quote
-
-        if (chart == null) {
-          // Chart error
-          Timber.w("Failed to load chart ${state.symbol}")
-        }
-
-        if (quote == null) {
-          // Quote error
-          Timber.w("Failed to load quote ${state.symbol}")
-        }
-
-        // Load was successful, we have required data
-        if (chart != null && quote != null) {
-          adapter = ChartAdapter(chart, quote).also { binding.watchlistDigChartSpark.adapter = it }
-        }
-      }
-    }
-  }
-
-  private class ChartAdapter(chart: StockChart, quote: StockQuote) : SparkAdapter() {
-
-    private val chartData: List<ChartData>
-    private val baselineValue = (quote.dayPreviousClose() ?: quote.dayOpen()).value().toFloat()
-
-    init {
-      val dates = chart.dates()
-      val opens = chart.open()
-      val closes = chart.close()
-      val highs = chart.high()
-      val lows = chart.low()
-      val volumes = chart.volume()
-
-      val data = mutableListOf<ChartData>()
-      for (i in dates.indices) {
-        val date = dates[i]
-        val open = opens[i]
-        val close = closes[i]
-        val high = highs[i]
-        val low = lows[i]
-        val volume = volumes[i]
-        data.add(
-            ChartData(
-                date = date, open = open, close = close, high = high, low = low, volume = volume))
-      }
-      chartData = data
-    }
-
-    @CheckResult
-    private fun getValue(item: ChartData): Double {
-      return item.close.value()
-    }
-
-    override fun getCount(): Int {
-      return chartData.size
-    }
-
-    override fun getItem(index: Int): ChartData {
-      return chartData[index]
-    }
-
-    override fun getY(index: Int): Float {
-      // Offset the Y based on the baseline value which is either previous close or day's open
-      return getValue(getItem(index)).toFloat() - baselineValue
-    }
-
-    override fun hasBaseLine(): Boolean {
-      return true
-    }
-
-    override fun getBaseLine(): Float {
-      // Baseline of 0 to show the chart dipping below zero
-      return 0F
-    }
-  }
-
-  private data class ChartData(
-      val date: LocalDateTime,
-      val volume: StockVolumeValue,
-      val open: StockMoneyValue,
-      val close: StockMoneyValue,
-      val high: StockMoneyValue,
-      val low: StockMoneyValue
-  )
 }

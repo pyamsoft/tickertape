@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.quote.ui.chart
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import androidx.lifecycle.ViewModel
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.ClassKey
+import dagger.multibindings.IntoMap
 
-data class WatchListDigViewState
-internal constructor(
-    val symbol: StockSymbol,
-    val isLoading: Boolean,
-    val stock: QuoteWithChart?,
-) : UiViewState
+@Module
+abstract class QuoteChartModule {
 
-sealed class WatchListDigViewEvent : UiViewEvent {
-
-  object Close : WatchListDigViewEvent()
+  @Binds
+  @IntoMap
+  @ClassKey(QuoteChartViewModel::class)
+  internal abstract fun bindViewModel(
+      impl: QuoteChartViewModel.Factory
+  ): UiSavedStateViewModelProvider<out ViewModel>
 }
-
-sealed class WatchListDigControllerEvent : UiControllerEvent

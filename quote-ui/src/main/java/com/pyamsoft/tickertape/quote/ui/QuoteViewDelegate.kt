@@ -18,8 +18,8 @@ package com.pyamsoft.tickertape.quote.ui
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -36,10 +36,12 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 
-class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
+class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) :
+    QuoteDelegate<QuoteViewState, QuoteViewEvent, QuoteItemBinding>() {
 
   private var realBinding: QuoteItemBinding?
-  private val binding: QuoteItemBinding
+
+  override val binding: QuoteItemBinding
     get() = requireNotNull(realBinding)
 
   init {
@@ -47,12 +49,11 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
     realBinding = QuoteItemBinding.inflate(inflater, parent)
   }
 
-  @CheckResult
-  fun id(): Int {
-    return binding.quoteItem.id
+  override fun root(): View {
+    return binding.quoteItem
   }
 
-  fun inflate(onViewEvent: (QuoteViewEvent) -> Unit) {
+  override fun onInflate(onViewEvent: (QuoteViewEvent) -> Unit) {
     binding.apply {
       quoteItem.setOnLongClickListener {
         onViewEvent(QuoteViewEvent.Remove)
@@ -63,7 +64,7 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
     }
   }
 
-  fun teardown() {
+  override fun onTeardown() {
     binding.apply {
       quoteItem.setOnLongClickListener(null)
 
@@ -79,9 +80,8 @@ class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) {
     realBinding = null
   }
 
-  fun render(scope: CoroutineScope, state: UiRender<QuoteViewState>) {
+  override fun render(scope: CoroutineScope, state: UiRender<QuoteViewState>) {
     state.mapChanged { it.symbol }.render(scope) { handleSymbolChanged(it) }
-
     state.mapChanged { it.quote }.render(scope) { handleQuote(it) }
   }
 

@@ -49,11 +49,12 @@ class WatchlistItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   override fun render(state: UiRender<WatchlistItemViewState>) {
-    state.render(viewScope) { handleQuoteChanged(it) }
+    state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleQuoteChanged(state: WatchlistItemViewState) {
+  private fun handleStateChanged(state: WatchlistItemViewState) {
     delegate.render(
-        viewScope, QuoteViewState(symbol = state.symbol, quote = state.quote).asUiRender())
+        viewScope,
+        QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender())
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.ui.chart
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -23,13 +23,21 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-// Public constructor, used by portfolio module and watchlist module
-data class QuoteViewState(val symbol: StockSymbol, val quote: StockQuote?, val chart: StockChart?) :
-    UiViewState
+internal data class QuoteChartViewState
+internal constructor(
+    val currentScrub: ChartData?,
+    val range: StockChart.IntervalRange,
+    val symbol: StockSymbol,
+    val quote: StockQuote?,
+    val chart: StockChart?
+) : UiViewState
 
-sealed class QuoteViewEvent : UiViewEvent {
+internal sealed class QuoteChartViewEvent : UiViewEvent {
 
-  object Select : QuoteViewEvent()
+  data class Scrub internal constructor(val data: ChartData) : QuoteChartViewEvent()
 
-  object Remove : QuoteViewEvent()
+  data class RangeUpdated internal constructor(val range: StockChart.IntervalRange) :
+      QuoteChartViewEvent()
 }
+
+internal sealed class QuoteChartControllerEvent : UiControllerEvent

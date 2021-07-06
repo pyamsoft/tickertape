@@ -85,7 +85,8 @@ internal constructor(
             val chart = jobs[1] as QuotedChart?
 
             return@coroutineScope ResultWrapper.success(
-                QuoteWithChart(symbol, quote?.quote, chart?.chart))
+                QuoteWithChart(symbol, quote?.quote, chart?.chart)
+            )
           }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote with chart ${symbol.symbol()}")

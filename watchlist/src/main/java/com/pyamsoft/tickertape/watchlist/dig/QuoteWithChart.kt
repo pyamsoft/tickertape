@@ -16,8 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import com.pyamsoft.tickertape.quote.QuotedChart
-import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol

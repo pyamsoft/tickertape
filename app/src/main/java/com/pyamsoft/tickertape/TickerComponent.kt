@@ -32,10 +32,8 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
-import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
 import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddComponent
-import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.setting.SettingsComponent
@@ -67,11 +65,6 @@ import javax.inject.Singleton
             WorkManagerModule::class,
             UiModule::class])
 internal interface TickerComponent {
-
-  /** Not actually used, just here so graph can compile */
-  @CheckResult
-  @Suppress("FunctionName")
-  fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
 
   // ===============================================
   // HACKY INJECTORS

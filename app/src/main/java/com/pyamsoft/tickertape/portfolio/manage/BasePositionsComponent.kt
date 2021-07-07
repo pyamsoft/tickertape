@@ -17,27 +17,24 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.core.FragmentScope
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import androidx.lifecycle.LifecycleOwner
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
-@FragmentScope
 @Subcomponent
-internal interface BaseManageComponent {
+internal interface BasePositionsComponent {
 
-  @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
+  @CheckResult fun plusPositionComponent(): PositionsComponent.Factory
 
-  @CheckResult fun plusPositionsComponent(): BasePositionsComponent.Factory
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance holdingId: DbHolding.Id
-    ): BaseManageComponent
+    @CheckResult fun create(@BindsInstance owner: LifecycleOwner): BasePositionsComponent
   }
 }

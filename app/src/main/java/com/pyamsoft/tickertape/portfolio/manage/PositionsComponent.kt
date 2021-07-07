@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsViewModel
@@ -37,11 +36,7 @@ internal interface PositionsComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance owner: LifecycleOwner,
-        @BindsInstance parent: ViewGroup,
-    ): PositionsComponent
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): PositionsComponent
   }
 
   @Module

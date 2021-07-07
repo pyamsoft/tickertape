@@ -61,7 +61,9 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
     val binding = LayoutFrameBinding.bind(view)
     PositionManageDialog.getInjector(this)
         .plusPositionsComponent()
-        .create(viewLifecycleOwner, binding.layoutFrame)
+        .create(viewLifecycleOwner)
+        .plusPositionComponent()
+        .create(binding.layoutFrame)
         .inject(this)
 
     val list = requireNotNull(list)

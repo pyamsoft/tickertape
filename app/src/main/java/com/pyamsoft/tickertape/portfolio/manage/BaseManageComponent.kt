@@ -17,26 +17,15 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import dagger.Binds
 import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
 @FragmentScope
-@Subcomponent(
-    modules =
-        [
-            ManageComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-        ])
-internal interface ManageComponent {
+@Subcomponent
+internal interface BaseManageComponent {
 
   @CheckResult fun plusPositionManageComponent(): PositionManageComponent.Factory
 
@@ -49,15 +38,6 @@ internal interface ManageComponent {
     fun create(
         @BindsInstance symbol: StockSymbol,
         @BindsInstance holdingId: DbHolding.Id
-    ): ManageComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(ManagePortfolioViewModel::class)
-    internal abstract fun bindViewModel(impl: ManagePortfolioViewModel): ViewModel
+    ): BaseManageComponent
   }
 }

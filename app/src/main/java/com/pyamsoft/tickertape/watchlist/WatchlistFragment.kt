@@ -71,8 +71,9 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             requireAppBarActivity(),
             requireToolbarActivity(),
             requireActivity(),
-            viewLifecycleOwner,
-            binding.layoutCoordinator)
+            viewLifecycleOwner)
+        .plusWatchlistComponent()
+        .create(binding.layoutCoordinator)
         .inject(this)
 
     stateSaver =

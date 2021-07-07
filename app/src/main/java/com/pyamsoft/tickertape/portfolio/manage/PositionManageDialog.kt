@@ -58,7 +58,7 @@ internal class PositionManageDialog :
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
   private val viewModel by fromViewModelFactory<ManagePortfolioViewModel> { factory?.create(this) }
 
-  private var component: ManageComponent? = null
+  private var component: BaseManageComponent? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -216,7 +216,7 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    fun getInjector(fragment: Fragment): ManageComponent {
+    fun getInjector(fragment: Fragment): BaseManageComponent {
       val parent = fragment.parentFragment
       if (parent is PositionManageDialog) {
         return requireNotNull(parent.component)

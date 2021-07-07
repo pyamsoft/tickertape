@@ -30,10 +30,10 @@ import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
-import com.pyamsoft.tickertape.portfolio.PortfolioComponent
+import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
-import com.pyamsoft.tickertape.portfolio.manage.ManageComponent
+import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
 import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -44,8 +44,7 @@ import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ui.UiModule
-import com.pyamsoft.tickertape.watchlist.WatchlistComponent
-import com.pyamsoft.tickertape.watchlist.WatchlistListComponent
+import com.pyamsoft.tickertape.watchlist.BaseWatchlistComponent
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddComponent
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.BindsInstance
@@ -72,17 +71,7 @@ internal interface TickerComponent {
   /** Not actually used, just here so graph can compile */
   @CheckResult
   @Suppress("FunctionName")
-  fun `$$daggerRequiredWatchlistListComponent`(): WatchlistListComponent.Factory
-
-  /** Not actually used, just here so graph can compile */
-  @CheckResult
-  @Suppress("FunctionName")
   fun `$$daggerRequiredPositionItemComponent`(): PositionItemComponent.Factory
-
-  /** Not actually used, just here so graph can compile */
-  @CheckResult
-  @Suppress("FunctionName")
-  fun `$$daggerRequiredPortfolioItemComponent`(): PortfolioItemComponent.Factory
 
   // ===============================================
   // HACKY INJECTORS
@@ -108,15 +97,15 @@ internal interface TickerComponent {
 
   @CheckResult fun plusPortfolioAddComponent(): PortfolioAddComponent.Factory
 
-  @CheckResult fun plusManageComponent(): ManageComponent.Factory
+  @CheckResult fun plusManageComponent(): BaseManageComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
-  @CheckResult fun plusWatchlistComponent(): WatchlistComponent.Factory
+  @CheckResult fun plusWatchlistComponent(): BaseWatchlistComponent.Factory
 
   @CheckResult fun plusWatchlistDigComponent(): WatchlistDigComponent.Factory
 
-  @CheckResult fun plusPortfolioComponent(): PortfolioComponent.Factory
+  @CheckResult fun plusPortfolioComponent(): BasePortfolioComponent.Factory
 
   @Component.Factory
   interface Factory {

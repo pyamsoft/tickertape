@@ -18,10 +18,21 @@ package com.pyamsoft.tickertape.portfolio.manage
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.lifecycle.ViewModel
+import com.pyamsoft.tickertape.core.ViewModelFactoryModule
+import dagger.Binds
 import dagger.BindsInstance
+import dagger.Module
 import dagger.Subcomponent
+import dagger.multibindings.ClassKey
+import dagger.multibindings.IntoMap
 
-@Subcomponent
+@Subcomponent(
+    modules =
+        [
+            PositionManageComponent.ComponentModule::class,
+            ViewModelFactoryModule::class,
+        ])
 internal interface PositionManageComponent {
 
   fun inject(dialog: PositionManageDialog)
@@ -33,5 +44,14 @@ internal interface PositionManageComponent {
     fun create(
         @BindsInstance parent: ViewGroup,
     ): PositionManageComponent
+  }
+
+  @Module
+  abstract class ComponentModule {
+
+    @Binds
+    @IntoMap
+    @ClassKey(ManagePortfolioViewModel::class)
+    internal abstract fun bindViewModel(impl: ManagePortfolioViewModel): ViewModel
   }
 }

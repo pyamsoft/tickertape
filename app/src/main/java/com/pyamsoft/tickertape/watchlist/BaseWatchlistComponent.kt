@@ -16,44 +16,34 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.view.ViewGroup
+import android.app.Activity
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.Binds
+import androidx.lifecycle.LifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            WatchlistComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
-internal interface WatchlistComponent {
+@Subcomponent
+internal interface BaseWatchlistComponent {
 
-  fun inject(fragment: WatchlistFragment)
+  @CheckResult fun plusWatchlistComponent(): WatchlistComponent.Factory
+
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredWatchlistListComponent`(): WatchlistListComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance parent: ViewGroup,
-    ): WatchlistComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(WatchlistViewModel::class)
-    internal abstract fun bindViewModel(impl: WatchlistViewModel): ViewModel
+        @BindsInstance appBarActivity: AppBarActivity,
+        @BindsInstance toolbarActivity: ToolbarActivity,
+        @BindsInstance activity: Activity,
+        @BindsInstance owner: LifecycleOwner,
+    ): BaseWatchlistComponent
   }
 }

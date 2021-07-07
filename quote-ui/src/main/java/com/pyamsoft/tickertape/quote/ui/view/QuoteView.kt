@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote.ui
+package com.pyamsoft.tickertape.quote.ui.view
 
 import android.graphics.Color
 import android.view.ViewGroup
@@ -32,7 +32,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
-class QuoteViewDelegate @Inject internal constructor(parent: ViewGroup) :
+class QuoteView @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<QuoteViewState, QuoteViewEvent, QuoteItemBinding>(parent) {
 
   override val layoutRoot by boundView { quoteItem }

@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote.ui
+package com.pyamsoft.tickertape.quote.ui.view
 
-import android.view.View
-import androidx.annotation.CheckResult
-import androidx.annotation.IdRes
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface QuoteDelegateView {
+// Public constructor, used by portfolio module and watchlist module
+data class QuoteViewState(val symbol: StockSymbol, val quote: StockQuote?, val chart: StockChart?) :
+    UiViewState
 
-  @IdRes @CheckResult fun id(): Int
+sealed class QuoteViewEvent : UiViewEvent {
 
-  @CheckResult fun rootView(): View
+  object Select : QuoteViewEvent()
+
+  object Remove : QuoteViewEvent()
 }

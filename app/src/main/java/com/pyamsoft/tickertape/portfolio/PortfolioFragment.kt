@@ -69,8 +69,9 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             requireToolbarActivity(),
             requireAppBarActivity(),
             requireActivity(),
-            viewLifecycleOwner,
-            binding.layoutCoordinator)
+            viewLifecycleOwner)
+        .plusPortfolioComponent()
+        .create(binding.layoutCoordinator)
         .inject(this)
 
     stateSaver =

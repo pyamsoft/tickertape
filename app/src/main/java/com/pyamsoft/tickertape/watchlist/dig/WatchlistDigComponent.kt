@@ -23,13 +23,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartModule
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
@@ -40,7 +38,6 @@ import dagger.multibindings.IntoMap
             WatchlistDigComponent.ComponentModule::class,
             ViewModelFactoryModule::class,
             ThemeProviderModule::class,
-            QuoteChartModule::class,
         ])
 internal interface WatchlistDigComponent {
 
@@ -66,6 +63,5 @@ internal interface WatchlistDigComponent {
     @IntoMap
     @ClassKey(WatchlistDigViewModel::class)
     internal abstract fun bindViewModel(impl: WatchlistDigViewModel): ViewModel
-
   }
 }

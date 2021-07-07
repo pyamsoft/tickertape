@@ -17,31 +17,30 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.annotation.CheckResult
-import androidx.core.content.withStyledAttributes
-import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.quote.ui.QuoteViewState
-import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartDelegate
-import com.pyamsoft.tickertape.watchlist.R
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
 
-class WatchlistDigChart @Inject internal constructor(private val delegate: QuoteChartDelegate) :
+class WatchlistDigChart @Inject internal constructor(delegate: QuoteChartView) :
     UiView<WatchListDigViewState, WatchListDigViewEvent>() {
 
+  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
+
   // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
-  private val viewBinder: ViewBinder<QuoteViewState> = createViewBinder(delegate) {}
+  private val viewBinder: ViewBinder<QuoteChartViewState> = createViewBinder(delegate) {}
 
   init {
     doOnInflate {
-      val rootView = delegate.rootView()
-      rootView.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
-        // Offset the container by the action bar size
-        val height = getDimensionPixelSize(0, 0)
-        rootView.updatePadding(top = rootView.paddingTop + height)
-      }
+      //      val rootView = delegate.rootView()
+      //      rootView.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
+      //        // Offset the container by the action bar size
+      //        val height = getDimensionPixelSize(0, 0)
+      //        rootView.updatePadding(top = rootView.paddingTop + height)
+      //      }
     }
 
     doOnTeardown { viewBinder.teardown() }
@@ -49,7 +48,7 @@ class WatchlistDigChart @Inject internal constructor(private val delegate: Quote
 
   @CheckResult
   fun id(): Int {
-    return delegate.id()
+    return id
   }
 
   override fun render(state: UiRender<WatchListDigViewState>) {
@@ -60,6 +59,6 @@ class WatchlistDigChart @Inject internal constructor(private val delegate: Quote
     val symbol = state.symbol
     val stock = state.stock
     viewBinder.bindState(
-        QuoteViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart))
+        QuoteChartViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart))
   }
 }

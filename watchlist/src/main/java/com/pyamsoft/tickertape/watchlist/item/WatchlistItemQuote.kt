@@ -20,12 +20,12 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.quote.ui.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.ui.QuoteViewState
-import com.pyamsoft.tickertape.quote.ui.QuoteViewDelegate
+import com.pyamsoft.tickertape.quote.ui.view.QuoteView
+import com.pyamsoft.tickertape.quote.ui.view.QuoteViewEvent
+import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
 import javax.inject.Inject
 
-class WatchlistItemQuote @Inject internal constructor(delegate: QuoteViewDelegate) :
+class WatchlistItemQuote @Inject internal constructor(delegate: QuoteView) :
     UiView<WatchlistItemViewState, WatchlistItemViewEvent>() {
 
   private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }

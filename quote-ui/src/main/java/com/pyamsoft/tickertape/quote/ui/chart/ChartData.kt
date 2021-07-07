@@ -20,7 +20,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import java.time.LocalDateTime
 
-internal data class ChartData
+data class ChartData
 internal constructor(
     val date: LocalDateTime,
     val volume: StockVolumeValue,

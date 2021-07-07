@@ -17,14 +17,12 @@
 package com.pyamsoft.tickertape.quote.ui.chart
 
 import android.graphics.Color
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
-import com.pyamsoft.tickertape.quote.ui.QuoteDelegateView
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -34,11 +32,10 @@ import com.robinhood.spark.animation.MorphSparkAnimator
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<QuoteChartViewState, QuoteChartViewEvent, QuoteChartBinding>(parent),
-    QuoteDelegateView {
+class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<QuoteChartViewState, QuoteChartViewEvent, QuoteChartBinding>(parent) {
 
-  override val layoutRoot by boundView { watchlistDigChartRoot }
+  override val layoutRoot by boundView { watchlistDigChart }
 
   override val viewBinding = QuoteChartBinding::inflate
 
@@ -50,20 +47,16 @@ internal class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
     doOnInflate { inflateRanges() }
 
     doOnTeardown {
-      binding.watchlistDigChartSpark.scrubListener = null
+      binding.watchlistDigChart.scrubListener = null
       clearAdapter()
     }
-  }
-
-  override fun rootView(): View {
-    return binding.watchlistDigChartRoot
   }
 
   private fun inflateRanges() {}
 
   private fun inflateChart() {
     // Setup scrub listener
-    binding.watchlistDigChartSpark.setScrubListener { raw ->
+    binding.watchlistDigChart.setScrubListener { raw ->
       val data = raw as? ChartData
       if (data == null) {
         clearScrubView()
@@ -73,7 +66,7 @@ internal class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
     }
 
     // Setup Chart visual
-    binding.watchlistDigChartSpark.apply {
+    binding.watchlistDigChart.apply {
       isScrubEnabled = true
       fillType = SparkView.FillType.TOWARD_ZERO
       lineColor =
@@ -96,7 +89,7 @@ internal class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
   private fun clearScrubView() {}
 
   private fun clearAdapter() {
-    binding.watchlistDigChartSpark.adapter = null
+    binding.watchlistDigChart.adapter = null
     adapter = null
   }
 
@@ -122,7 +115,7 @@ internal class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
 
     // Load was successful, we have required data
     if (chart != null && quote != null) {
-      adapter = ChartAdapter(chart, quote).also { binding.watchlistDigChartSpark.adapter = it }
+      adapter = ChartAdapter(chart, quote).also { binding.watchlistDigChart.adapter = it }
     }
   }
 

@@ -16,30 +16,10 @@
 
 <merge>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/watchlist_dig_chart_root"
+    <com.robinhood.spark.SparkView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/watchlist_dig_chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
-
-        <com.robinhood.spark.SparkView
-            android:id="@+id/watchlist_dig_chart_spark"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/watchlist_dig_chart_ranges"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/watchlist_dig_chart_spark" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="160dp"
+        android:layout_margin="16dp" />
 
 </merge>

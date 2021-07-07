@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.position
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,6 +29,7 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsControllerEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsList
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsViewEvent

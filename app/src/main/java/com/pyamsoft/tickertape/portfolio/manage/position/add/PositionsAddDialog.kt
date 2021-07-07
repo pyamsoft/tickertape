@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.add
+package com.pyamsoft.tickertape.portfolio.manage.position.add
 
 import android.app.Dialog
 import android.os.Bundle

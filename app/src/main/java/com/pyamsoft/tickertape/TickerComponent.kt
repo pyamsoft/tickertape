@@ -33,7 +33,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
-import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddComponent
+import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.setting.SettingsComponent

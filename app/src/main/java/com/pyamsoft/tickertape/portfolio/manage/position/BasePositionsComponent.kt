@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.portfolio.manage.position
 
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner

@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.manage
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.portfolio.manage.position.BasePositionsComponent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.BindsInstance
 import dagger.Subcomponent

@@ -43,7 +43,8 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.portfolio.manage.add.PositionsAddDialog
+import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
+import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject

@@ -120,6 +120,7 @@ dependencies {
   implementation project(':core')
   implementation project(':db')
   implementation project(':db-room')
+  implementation project(':home')
   implementation project(':main')
   implementation project(':portfolio')
   implementation project(':quote')

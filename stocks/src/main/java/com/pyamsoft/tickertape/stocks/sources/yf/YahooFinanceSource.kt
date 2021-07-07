@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -34,10 +33,7 @@ internal constructor(
     @YahooFinanceApi private val charts: ChartSource
 ) : QuoteSource, ChartSource {
 
-  override suspend fun getQuotes(
-      force: Boolean,
-      symbols: List<StockSymbol>
-  ): ResultWrapper<List<StockQuote>> =
+  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext quotes.getQuotes(force, symbols)
@@ -48,7 +44,7 @@ internal constructor(
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
       includePrePost: Boolean
-  ): ResultWrapper<StockChart> =
+  ): StockChart =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext charts.getChart(force, symbol, range, includePrePost)

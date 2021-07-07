@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-internal class PortfolioInteractor
+class PortfolioInteractor
 @Inject
 internal constructor(
     private val holdingRealtime: HoldingRealtime,

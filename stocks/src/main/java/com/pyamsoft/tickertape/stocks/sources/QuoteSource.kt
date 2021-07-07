@@ -17,12 +17,10 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface QuoteSource {
 
-  @CheckResult
-  suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): ResultWrapper<List<StockQuote>>
+  @CheckResult suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote>
 }

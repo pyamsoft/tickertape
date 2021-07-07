@@ -21,15 +21,11 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedChart
-import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -41,53 +37,17 @@ internal constructor(
 ) {
 
   @CheckResult
-  private suspend fun fetchQuote(force: Boolean, symbol: StockSymbol): QuotedStock? {
-    return interactor
-        .getWatchlistQuotes(force)
-        .map { quotes -> quotes.first { it.symbol == symbol } }
-        .onFailure { Timber.e(it, "Error getting watchlist quotes $symbol") }
-        .getOrNull()
-  }
-
-  @CheckResult
-  private suspend fun fetchChart(
-      force: Boolean,
-      symbol: StockSymbol,
-      range: StockChart.IntervalRange
-  ): QuotedChart? {
-    return interactor
-        .getChart(force, symbol, range, includePrePost = false)
-        .onFailure { Timber.e(it, "Error getting chart $symbol") }
-        .getOrNull()
-  }
-
-  @CheckResult
   suspend fun getQuoteWithChart(
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange
-  ): ResultWrapper<QuoteWithChart> =
+  ): ResultWrapper<QuotedChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          coroutineScope {
-            val quoteJob = async { fetchQuote(force, symbol) }
-            val chartJob = async { fetchChart(force, symbol, range) }
-
-            // Run in parallel
-            val jobs = awaitAll(quoteJob, chartJob)
-
-            // Pull these out since we know what types they should be
-            // as instead of as? since we need the cast to succeed
-            // but the type it casts to can be nullable
-            val quote = jobs[0] as QuotedStock?
-            val chart = jobs[1] as QuotedChart?
-
-            return@coroutineScope ResultWrapper.success(
-                QuoteWithChart(symbol, quote?.quote, chart?.chart)
-            )
-          }
+          interactor.getChart(force, symbol, range, includePrePost = false, includeQuote = true)
+              .onFailure { Timber.e(it, "Error getting chart $symbol") }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote with chart ${symbol.symbol()}")
           return@withContext ResultWrapper.failure(e)

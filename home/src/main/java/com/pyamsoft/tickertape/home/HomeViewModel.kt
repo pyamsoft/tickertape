@@ -1,0 +1,150 @@
+/*
+ * Copyright 2021 Peter Kenji Yamanaka
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.pyamsoft.tickertape.home
+
+import androidx.lifecycle.viewModelScope
+import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.arch.UiViewModel
+import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
+import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+
+class HomeViewModel
+@Inject
+internal constructor(
+    private val portfolioInteractor: PortfolioInteractor,
+    private val watchlistInteractor: WatchlistInteractor,
+    private val quoteInteractor: QuoteInteractor,
+    private val bottomOffsetBus: EventConsumer<BottomOffset>,
+) :
+    UiViewModel<HomeViewState, HomeControllerEvent>(
+        initialState =
+            HomeViewState(
+                portfolioError = null,
+                portfolio = emptyList(),
+                isLoadingPortfolio = false,
+                watchlistError = null,
+                watchlist = emptyList(),
+                isLoadingWatchlist = false,
+                indexesError = null,
+                indexes = emptyList(),
+                isLoadingIndexes = false,
+                bottomOffset = 0)) {
+
+  private val portfolioFetcher =
+      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> {
+        portfolioInteractor.getPortfolio(it)
+      }
+
+  private val watchlistFetcher =
+      highlander<ResultWrapper<List<QuotedStock>>, Boolean> { watchlistInteractor.getQuotes(it) }
+
+  private val indexesFetcher =
+      highlander<ResultWrapper<List<QuotedChart>>, Boolean> { force ->
+        quoteInteractor.getCharts(
+            force = force,
+            symbols = INDEXES,
+            range = StockChart.IntervalRange.ONE_DAY,
+            includePrePost = false,
+            includeQuote = true)
+      }
+
+  init {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+    }
+  }
+
+  private suspend fun fetchWatchlist(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingWatchlist = true) },
+            andThen = {
+              watchlistFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState {
+                      copy(watchlistError = null, watchlist = it, isLoadingWatchlist = false)
+                    }
+                  }
+                  .onFailure { Timber.e(it, "Failed to fetch watchlist") }
+                  .onFailure { setState { copy(watchlistError = it, isLoadingWatchlist = false) } }
+            })
+      }
+
+  private suspend fun fetchPortfolio(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingPortfolio = true) },
+            andThen = {
+              portfolioFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState {
+                      copy(portfolioError = null, portfolio = it, isLoadingPortfolio = false)
+                    }
+                  }
+                  .onFailure { Timber.e(it, "Failed to fetch portfolio") }
+                  .onFailure { setState { copy(portfolioError = it, isLoadingPortfolio = false) } }
+            })
+      }
+
+  private suspend fun fetchIndexes(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingIndexes = true) },
+            andThen = {
+              indexesFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState { copy(indexesError = null, indexes = it, isLoadingIndexes = false) }
+                  }
+                  .onFailure { Timber.e(it, "Failed to fetch indexes") }
+                  .onFailure { setState { copy(indexesError = it, isLoadingIndexes = false) } }
+            })
+      }
+
+  fun handleFetchPortfolio(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
+  }
+
+  fun handleFetchWatchlist(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchWatchlist(force) }
+  }
+
+  fun handleFetchIndexes(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchIndexes(force) }
+  }
+
+  companion object {
+
+    private val INDEXES = listOf("^GSPC", "^DJI", "^IXIC", "^RUT").map { it.asSymbol() }
+  }
+}

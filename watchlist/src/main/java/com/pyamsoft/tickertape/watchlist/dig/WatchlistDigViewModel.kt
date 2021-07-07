@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -42,7 +43,7 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
                 ranges = emptyList())) {
 
   private val quoteFetcher =
-      highlander<ResultWrapper<QuoteWithChart>, Boolean, StockChart.IntervalRange> { force, range ->
+      highlander<ResultWrapper<QuotedChart>, Boolean, StockChart.IntervalRange> { force, range ->
         interactor.getQuoteWithChart(force, thisSymbol, range)
       }
 
@@ -51,23 +52,6 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
       val ranges = loadAllRanges()
       setState { copy(ranges = ranges) }
     }
-  }
-
-  @CheckResult
-  private fun loadAllRanges(): List<StockChart.IntervalRange> {
-    return listOf(
-        StockChart.IntervalRange.ONE_DAY,
-        StockChart.IntervalRange.FIVE_DAY,
-        StockChart.IntervalRange.ONE_MONTH,
-        StockChart.IntervalRange.THREE_MONTH,
-        StockChart.IntervalRange.SIX_MONTH,
-        StockChart.IntervalRange.ONE_YEAR,
-        StockChart.IntervalRange.TWO_YEAR,
-        StockChart.IntervalRange.FIVE_YEAR,
-        StockChart.IntervalRange.TEN_YEAR,
-        StockChart.IntervalRange.YTD,
-        StockChart.IntervalRange.MAX,
-    )
   }
 
   fun handleFetchQuote(force: Boolean) {
@@ -91,5 +75,26 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
   fun handleRangeUpdated(index: Int) {
     val range = state.ranges[index]
     setState(stateChange = { copy(currentRange = range) }, andThen = { fetchQuote(false) })
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun loadAllRanges(): List<StockChart.IntervalRange> {
+      return listOf(
+          StockChart.IntervalRange.ONE_DAY,
+          StockChart.IntervalRange.FIVE_DAY,
+          StockChart.IntervalRange.ONE_MONTH,
+          StockChart.IntervalRange.THREE_MONTH,
+          StockChart.IntervalRange.SIX_MONTH,
+          StockChart.IntervalRange.ONE_YEAR,
+          StockChart.IntervalRange.TWO_YEAR,
+          StockChart.IntervalRange.FIVE_YEAR,
+          StockChart.IntervalRange.TEN_YEAR,
+          StockChart.IntervalRange.YTD,
+          StockChart.IntervalRange.MAX,
+      )
+    }
   }
 }

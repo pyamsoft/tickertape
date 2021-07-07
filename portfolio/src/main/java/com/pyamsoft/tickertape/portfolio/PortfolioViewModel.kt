@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
@@ -32,6 +33,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class PortfolioViewModel
@@ -49,17 +51,7 @@ internal constructor(
                 error = null, isLoading = false, portfolio = emptyList(), bottomOffset = 0)) {
 
   private val portfolioFetcher =
-      highlander<Unit, Boolean> { force ->
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              interactor
-                  .getPortfolio(force)
-                  .onSuccess { setState { copy(error = null, portfolio = it, isLoading = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(error = it, isLoading = false) } }
-            })
-      }
+      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { interactor.getPortfolio(it) }
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -160,7 +152,7 @@ internal constructor(
 
     // Don't actually update anything in the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    fetchPortfolio(true)
+    launch(context = Dispatchers.Default) { fetchPortfolio(true) }
   }
 
   private fun CoroutineScope.handleInsertHolding(holding: DbHolding) {
@@ -168,7 +160,7 @@ internal constructor(
 
     // Don't actually update anything in the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    fetchPortfolio(true)
+    launch(context = Dispatchers.Default) { fetchPortfolio(true) }
   }
 
   private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
@@ -184,14 +176,21 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
   }
 
-  private fun CoroutineScope.fetchPortfolio(force: Boolean) {
-    launch(context = Dispatchers.Default) {
-      portfolioFetcher.call(force)
+  private suspend fun fetchPortfolio(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoading = true) },
+            andThen = {
+              portfolioFetcher
+                  .call(force)
+                  .onSuccess { setState { copy(error = null, portfolio = it, isLoading = false) } }
+                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                  .onFailure { setState { copy(error = it, isLoading = false) } }
 
-      // After the quotes are fetched, start the tape
-      tapeLauncher.start()
-    }
-  }
+              // After the quotes are fetched, start the tape
+              tapeLauncher.start()
+            })
+      }
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {

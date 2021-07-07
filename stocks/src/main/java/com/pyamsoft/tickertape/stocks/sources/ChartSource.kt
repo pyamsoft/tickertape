@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
@@ -29,5 +28,5 @@ interface ChartSource {
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
       includePrePost: Boolean
-  ): ResultWrapper<StockChart>
+  ): StockChart
 }

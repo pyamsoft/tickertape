@@ -31,6 +31,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class WatchlistViewModel
@@ -77,7 +78,7 @@ internal constructor(
 
     // Don't actually insert anything to the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    fetchQuotes(true)
+    launch(context = Dispatchers.Default) { fetchQuotes(true) }
   }
 
   private fun CoroutineScope.handleUpdateSymbol(symbol: StockSymbol) {
@@ -85,7 +86,7 @@ internal constructor(
 
     // Don't actually update anything in the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    fetchQuotes(true)
+    launch(context = Dispatchers.Default) { fetchQuotes(true) }
   }
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
@@ -100,26 +101,26 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchQuotes(force) }
   }
 
-  private fun CoroutineScope.fetchQuotes(force: Boolean) {
-    launch(context = Dispatchers.Default) {
-      setState(
-          stateChange = { copy(isLoading = true) },
-          andThen = {
-            quoteFetcher
-                .call(force)
-                .onSuccess {
-                  setState {
-                    copy(error = null, quotes = it.sortedWith(STOCK_COMPARATOR), isLoading = false)
+  private suspend fun fetchQuotes(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoading = true) },
+            andThen = {
+              quoteFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState {
+                      copy(
+                          error = null, quotes = it.sortedWith(STOCK_COMPARATOR), isLoading = false)
+                    }
                   }
-                }
-                .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                .onFailure { setState { copy(error = it, isLoading = false) } }
-          })
+                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
+                  .onFailure { setState { copy(error = it, isLoading = false) } }
+            })
 
-      // After the quotes are fetched, start the tape
-      tapeLauncher.start()
-    }
-  }
+        // After the quotes are fetched, start the tape
+        tapeLauncher.start()
+      }
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {

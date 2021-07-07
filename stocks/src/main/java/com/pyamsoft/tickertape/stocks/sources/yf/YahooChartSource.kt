@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -47,89 +46,77 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
       includePrePost: Boolean
-  ): ResultWrapper<StockChart> =
+  ): StockChart =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext try {
-          ResultWrapper.success(fetchChart(symbol, includePrePost, range))
-        } catch (e: Throwable) {
-          ResultWrapper.failure(e)
-        }
+        val interval = getIntervalForRange(range)
+        val result =
+            service.getQuotes(
+                url = getChartUrl(symbol),
+                includePrePost = includePrePost,
+                range = range.apiValue,
+                interval = interval.apiValue)
+
+        val zoneId = ZoneId.systemDefault()
+        return@withContext result
+            .chart
+            .result
+            .asSequence()
+            .filterOnlyValidStockData()
+            .map { chart ->
+              val startingPrice =
+                  chart.meta.requireNotNull().chartPreviousClose.requireNotNull().asMoney()
+              val timestamps = chart.timestamp.requireNotNull()
+              val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
+
+              val dates =
+                  timestamps.map { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), zoneId) }
+              val volumes = quote.volume.requireNotNull()
+              val opens = quote.open.requireNotNull()
+              val closes = quote.close.requireNotNull()
+              val highs = quote.high.requireNotNull()
+              val lows = quote.low.requireNotNull()
+
+              val validDates = mutableListOf<LocalDateTime>()
+              val validVolume = mutableListOf<StockVolumeValue>()
+              val validOpen = mutableListOf<StockMoneyValue>()
+              val validClose = mutableListOf<StockMoneyValue>()
+              val validHigh = mutableListOf<StockMoneyValue>()
+              val validLow = mutableListOf<StockMoneyValue>()
+
+              // Some cryptocurrencies have nulls in the open, close, high, low
+              // filter those points out
+              for (i in dates.indices) {
+                val date = dates[i]
+                val volume = volumes[i] ?: continue
+                val open = opens[i] ?: continue
+                val close = closes[i] ?: continue
+                val high = highs[i] ?: continue
+                val low = lows[i] ?: continue
+
+                validDates.add(date)
+                validVolume.add(volume.asVolume())
+                validOpen.add(open.asMoney())
+                validClose.add(close.asMoney())
+                validHigh.add(high.asMoney())
+                validLow.add(low.asMoney())
+              }
+
+              StockChartImpl(
+                  symbol = symbol,
+                  range = range,
+                  interval = interval,
+                  startingPrice = startingPrice,
+                  dates = validDates,
+                  volume = validVolume,
+                  open = validOpen,
+                  close = validClose,
+                  low = validLow,
+                  high = validHigh,
+              )
+            }
+            .first()
       }
-
-  @CheckResult
-  private suspend fun fetchChart(
-      symbol: StockSymbol,
-      includePrePost: Boolean,
-      range: StockChart.IntervalRange
-  ): StockChart {
-    val interval = getIntervalForRange(range)
-    val result =
-        service.getQuotes(
-            url = getChartUrl(symbol),
-            includePrePost = includePrePost,
-            range = range.apiValue,
-            interval = interval.apiValue)
-
-    val zoneId = ZoneId.systemDefault()
-    return result
-        .chart
-        .result
-        .asSequence()
-        .filterOnlyValidStockData()
-        .map { chart ->
-          val startingPrice =
-              chart.meta.requireNotNull().chartPreviousClose.requireNotNull().asMoney()
-          val timestamps = chart.timestamp.requireNotNull()
-          val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
-
-          val dates = timestamps.map { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), zoneId) }
-          val volumes = quote.volume.requireNotNull()
-          val opens = quote.open.requireNotNull()
-          val closes = quote.close.requireNotNull()
-          val highs = quote.high.requireNotNull()
-          val lows = quote.low.requireNotNull()
-
-          val validDates = mutableListOf<LocalDateTime>()
-          val validVolume = mutableListOf<StockVolumeValue>()
-          val validOpen = mutableListOf<StockMoneyValue>()
-          val validClose = mutableListOf<StockMoneyValue>()
-          val validHigh = mutableListOf<StockMoneyValue>()
-          val validLow = mutableListOf<StockMoneyValue>()
-
-          // Some cryptocurrencies have nulls in the open, close, high, low
-          // filter those points out
-          for (i in dates.indices) {
-            val date = dates[i]
-            val volume = volumes[i] ?: continue
-            val open = opens[i] ?: continue
-            val close = closes[i] ?: continue
-            val high = highs[i] ?: continue
-            val low = lows[i] ?: continue
-
-            validDates.add(date)
-            validVolume.add(volume.asVolume())
-            validOpen.add(open.asMoney())
-            validClose.add(close.asMoney())
-            validHigh.add(high.asMoney())
-            validLow.add(low.asMoney())
-          }
-
-          StockChartImpl(
-              symbol = symbol,
-              range = range,
-              interval = interval,
-              startingPrice = startingPrice,
-              dates = validDates,
-              volume = validVolume,
-              open = validOpen,
-              close = validClose,
-              low = validLow,
-              high = validHigh,
-          )
-        }
-        .first()
-  }
 
   companion object {
 

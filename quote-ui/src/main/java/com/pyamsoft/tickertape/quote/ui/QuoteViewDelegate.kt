@@ -24,8 +24,6 @@ import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
-import com.pyamsoft.tickertape.quote.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteItemBinding
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.StockCompany

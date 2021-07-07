@@ -25,7 +25,7 @@ import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.arch.newUiController
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
-import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.QuoteBaseController
 import com.pyamsoft.tickertape.quote.ui.QuoteDelegateView
 import javax.inject.Inject

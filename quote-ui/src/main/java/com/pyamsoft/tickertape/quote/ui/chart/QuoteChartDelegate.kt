@@ -18,11 +18,11 @@ package com.pyamsoft.tickertape.quote.ui.chart
 
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.QuoteDelegateView
 import javax.inject.Inject
 
-class QuoteChart @Inject internal constructor(private val controller: QuoteChartController) :
+class QuoteChartDelegate @Inject internal constructor(private val controller: QuoteChartController) :
     UiView<QuoteViewState, Nothing>(), QuoteDelegateView by controller {
 
   init {

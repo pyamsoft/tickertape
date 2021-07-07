@@ -16,37 +16,19 @@
 
 package com.pyamsoft.tickertape.quote.ui
 
-import android.view.View
-import androidx.annotation.CheckResult
-import androidx.viewbinding.ViewBinding
-import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import kotlinx.coroutines.CoroutineScope
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-abstract class QuoteDelegate<S : UiViewState, V : UiViewEvent, B : ViewBinding>
-protected constructor() {
+// Public constructor, used by portfolio module and watchlist module
+data class QuoteViewState(val symbol: StockSymbol, val quote: StockQuote?, val chart: StockChart?) :
+    UiViewState
 
-  protected abstract val binding: B
+sealed class QuoteViewEvent : UiViewEvent {
 
-  @CheckResult
-  fun id(): Int {
-    return root().id
-  }
+  object Select : QuoteViewEvent()
 
-  fun inflate(onViewEvent: (V) -> Unit) {
-    onInflate(onViewEvent)
-  }
-
-  fun teardown() {
-    onTeardown()
-  }
-
-  @CheckResult abstract fun root(): View
-
-  abstract fun render(scope: CoroutineScope, state: UiRender<S>)
-
-  protected abstract fun onInflate(onViewEvent: (V) -> Unit)
-
-  protected abstract fun onTeardown()
+  object Remove : QuoteViewEvent()
 }

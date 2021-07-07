@@ -23,12 +23,12 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.quote.QuoteViewState
-import com.pyamsoft.tickertape.quote.ui.chart.QuoteChart
+import com.pyamsoft.tickertape.quote.ui.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartDelegate
 import com.pyamsoft.tickertape.watchlist.R
 import javax.inject.Inject
 
-class WatchlistDigChart @Inject internal constructor(private val delegate: QuoteChart) :
+class WatchlistDigChart @Inject internal constructor(private val delegate: QuoteChartDelegate) :
     UiView<WatchListDigViewState, WatchListDigViewEvent>() {
 
   // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.

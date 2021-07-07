@@ -21,7 +21,7 @@ import androidx.annotation.CheckResult
 import androidx.core.os.bundleOf
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
-import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.QuoteViewState
 
 abstract class QuoteBaseController protected constructor() : QuoteDelegateView {
 

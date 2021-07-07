@@ -21,8 +21,8 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.QuoteViewEvent
+import com.pyamsoft.tickertape.quote.ui.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.QuoteViewDelegate
 import javax.inject.Inject
 

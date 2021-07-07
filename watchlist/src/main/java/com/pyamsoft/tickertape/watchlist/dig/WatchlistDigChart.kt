@@ -24,6 +24,7 @@ import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
+import timber.log.Timber
 
 class WatchlistDigChart @Inject internal constructor(delegate: QuoteChartView) :
     UiView<WatchListDigViewState, WatchListDigViewEvent>() {
@@ -34,15 +35,6 @@ class WatchlistDigChart @Inject internal constructor(delegate: QuoteChartView) :
   private val viewBinder: ViewBinder<QuoteChartViewState> = createViewBinder(delegate) {}
 
   init {
-    doOnInflate {
-      //      val rootView = delegate.rootView()
-      //      rootView.context.withStyledAttributes(attrs = intArrayOf(R.attr.actionBarSize)) {
-      //        // Offset the container by the action bar size
-      //        val height = getDimensionPixelSize(0, 0)
-      //        rootView.updatePadding(top = rootView.paddingTop + height)
-      //      }
-    }
-
     doOnTeardown { viewBinder.teardown() }
   }
 

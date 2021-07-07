@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.watchlist.dig.range
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.watchlist.item.WatchlistViewHolder
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import javax.inject.Inject
 
-@Subcomponent
-interface WatchlistListComponent {
+class WatchlistDigRangeClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<WatchlistDigRangeViewState, WatchlistDigRangeViewEvent>() {
 
-  fun inject(holder: WatchlistViewHolder)
+  init {
 
-  @Subcomponent.Factory
-  interface Factory {
+    doOnInflate {
+      parent.setOnDebouncedClickListener { publish(WatchlistDigRangeViewEvent.Select) }
+    }
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistListComponent
+    doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
+
+  override fun render(state: UiRender<WatchlistDigRangeViewState>) {}
 }

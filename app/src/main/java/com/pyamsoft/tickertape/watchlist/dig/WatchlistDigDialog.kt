@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,21 +31,23 @@ import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
-import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
-import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.databinding.WatchlistDigContainerBinding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class WatchlistDigDialog :
     AppCompatDialogFragment(), UiController<WatchListDigControllerEvent> {
 
   @JvmField @Inject internal var chart: WatchlistDigChart? = null
+
+  @JvmField @Inject internal var ranges: WatchlistDigRanges? = null
 
   @JvmField @Inject internal var toolbar: WatchlistDigToolbar? = null
 
@@ -63,7 +66,7 @@ internal class WatchlistDigDialog :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_constraint, container, false)
+    return inflater.inflate(R.layout.watchlist_dig_container, container, false)
   }
 
   override fun onViewCreated(
@@ -73,7 +76,7 @@ internal class WatchlistDigDialog :
     super.onViewCreated(view, savedInstanceState)
     makeFullscreen()
 
-    val binding = LayoutConstraintBinding.bind(view)
+    val binding = WatchlistDigContainerBinding.bind(view)
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusWatchlistDigComponent()
             .create(
@@ -81,25 +84,28 @@ internal class WatchlistDigDialog :
               viewLifecycleOwner,
               viewModelStore,
               getSymbol(),
-              binding.layoutConstraint
             )
-          .inject(this)
+          .plusDigComponent()
+          .create(binding.watchlistDigContainer, binding.watchlistDigLayout)
+      .inject(this)
 
     val chart = requireNotNull(chart)
+    val ranges = requireNotNull(ranges)
     val toolbar = requireNotNull(toolbar)
     val shadow =
         DropshadowView.createTyped<WatchListDigViewState, WatchListDigViewEvent>(
-            binding.layoutConstraint)
+            binding.watchlistDigContainer)
 
     stateSaver =
         createComponent(
-            savedInstanceState, viewLifecycleOwner, viewModel, this, chart, toolbar, shadow) {
+            savedInstanceState, viewLifecycleOwner, viewModel, this, chart, ranges, toolbar, shadow) {
           return@createComponent when (it) {
             is WatchListDigViewEvent.Close -> dismiss()
+            is WatchListDigViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
           }
         }
 
-    binding.layoutConstraint.layout {
+    binding.watchlistDigContainer.layout {
       toolbar.also {
         connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
@@ -112,16 +118,30 @@ internal class WatchlistDigDialog :
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
       }
 
+      binding.watchlistDigContent.also {
+        connect(it.id, ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
+        connect(it.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        connect(it.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+      }
+    }
+
+    binding.watchlistDigLayout.layout {
       chart.also {
-        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+      }
+
+      ranges.also {
+        connect(it.id(), ConstraintSet.TOP, chart.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
       }
     }
 
     if (savedInstanceState == null) {
-      viewModel.handleFetchQuote(false, StockChart.IntervalRange.ONE_DAY)
+      viewModel.handleFetchQuote(false)
     }
   }
   override fun onControllerEvent(event: WatchListDigControllerEvent) {

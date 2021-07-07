@@ -18,12 +18,8 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelStore
-import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -31,6 +27,7 @@ import dagger.Module
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
+import javax.inject.Named
 
 @Subcomponent(
     modules =
@@ -48,11 +45,8 @@ internal interface WatchlistDigComponent {
 
     @CheckResult
     fun create(
-        @BindsInstance owner: SavedStateRegistryOwner,
-        @BindsInstance lifecycleOwner: LifecycleOwner,
-        @BindsInstance viewModelStore: ViewModelStore,
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance parent: ViewGroup,
+        @BindsInstance @Named("toolbar_parent") toolbarParent: ViewGroup,
+        @BindsInstance contentParent: ViewGroup,
     ): WatchlistDigComponent
   }
 

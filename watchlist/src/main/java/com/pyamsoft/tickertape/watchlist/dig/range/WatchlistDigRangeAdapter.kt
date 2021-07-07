@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.item
+package com.pyamsoft.tickertape.watchlist.dig.range
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,15 +22,15 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangeItemBinding
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
-import me.zhanghai.android.fastscroll.PopupTextProvider
 
-class WatchlistItemAdapter
+class WatchlistDigRangeAdapter
 private constructor(
-    private val factory: WatchlistItemComponent.Factory,
+    private val factory: WatchlistDigRangeComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<WatchlistItemViewState, WatchlistViewHolder>(DIFFER), PopupTextProvider {
+) : ListAdapter<WatchlistDigRangeViewState, WatchlistDigRangeViewHolder>(DIFFER) {
 
   init {
     setHasStableIds(true)
@@ -41,47 +41,42 @@ private constructor(
     @JvmStatic
     @CheckResult
     fun create(
-        factory: WatchlistItemComponent.Factory,
+        factory: WatchlistDigRangeComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): WatchlistItemAdapter {
-      return WatchlistItemAdapter(factory, owner, callback)
+    ): WatchlistDigRangeAdapter {
+      return WatchlistDigRangeAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
-        object : DiffUtil.ItemCallback<WatchlistItemViewState>() {
+        object : DiffUtil.ItemCallback<WatchlistDigRangeViewState>() {
           override fun areItemsTheSame(
-              oldItem: WatchlistItemViewState,
-              newItem: WatchlistItemViewState
+              oldItem: WatchlistDigRangeViewState,
+              newItem: WatchlistDigRangeViewState
           ): Boolean {
-            return oldItem.symbol == newItem.symbol
+            return oldItem.range == newItem.range
           }
 
           override fun areContentsTheSame(
-              oldItem: WatchlistItemViewState,
-              newItem: WatchlistItemViewState
+              oldItem: WatchlistDigRangeViewState,
+              newItem: WatchlistDigRangeViewState
           ): Boolean {
             return oldItem == newItem
           }
         }
   }
 
-  override fun getPopupText(position: Int): String {
-    val state = getItem(position)
-    return state.symbol.symbol()
-  }
-
   override fun getItemId(position: Int): Long {
-    return getItem(position).symbol.symbol().hashCode().toLong()
+    return getItem(position).range.hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistDigRangeViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    val binding = WatchlistItemBinding.inflate(inflater, parent, false)
-    return WatchlistViewHolder(binding, factory, owner, callback)
+    val binding = WatchlistDigRangeItemBinding.inflate(inflater, parent, false)
+    return WatchlistDigRangeViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: WatchlistViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: WatchlistDigRangeViewHolder, position: Int) {
     val state = getItem(position)
     holder.bindState(state)
   }
@@ -89,7 +84,5 @@ private constructor(
   interface Callback {
 
     fun onSelect(index: Int)
-
-    fun onRemove(index: Int)
   }
 }

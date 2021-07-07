@@ -29,6 +29,7 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
+import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
@@ -41,7 +42,7 @@ class WatchlistList
 internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    factory: WatchlistListComponent.Factory
+    factory: WatchlistItemComponent.Factory
 ) :
     BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,

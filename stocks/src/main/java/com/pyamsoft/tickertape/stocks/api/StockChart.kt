@@ -27,6 +27,8 @@ interface StockChart {
 
   @CheckResult fun interval(): IntervalTime
 
+  @CheckResult fun startingPrice(): StockMoneyValue
+
   @CheckResult fun dates(): List<LocalDateTime>
 
   @CheckResult fun volume(): List<StockVolumeValue>

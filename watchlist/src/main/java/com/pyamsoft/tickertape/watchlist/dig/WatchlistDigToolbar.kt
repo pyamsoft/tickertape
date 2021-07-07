@@ -31,12 +31,13 @@ import com.pyamsoft.tickertape.main.databinding.SymbolAddToolbarBinding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
+import javax.inject.Named
 
 class WatchlistDigToolbar
 @Inject
 internal constructor(
     imageLoader: ImageLoader,
-    parent: ViewGroup,
+    @Named("toolbar_parent") parent: ViewGroup,
 ) : BaseUiView<WatchListDigViewState, WatchListDigViewEvent, SymbolAddToolbarBinding>(parent) {
 
   override val viewBinding = SymbolAddToolbarBinding::inflate

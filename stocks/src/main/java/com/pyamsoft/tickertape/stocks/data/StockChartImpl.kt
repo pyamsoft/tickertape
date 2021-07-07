@@ -27,6 +27,7 @@ internal data class StockChartImpl(
     private val range: StockChart.IntervalRange,
     private val interval: StockChart.IntervalTime,
     private val dates: List<LocalDateTime>,
+    private val startingPrice: StockMoneyValue,
     private val volume: List<StockVolumeValue>,
     private val open: List<StockMoneyValue>,
     private val close: List<StockMoneyValue>,
@@ -48,6 +49,10 @@ internal data class StockChartImpl(
 
   override fun dates(): List<LocalDateTime> {
     return dates
+  }
+
+  override fun startingPrice(): StockMoneyValue {
+    return startingPrice
   }
 
   override fun volume(): List<StockVolumeValue> {

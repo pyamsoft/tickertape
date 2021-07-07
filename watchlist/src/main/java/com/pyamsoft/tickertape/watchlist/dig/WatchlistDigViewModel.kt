@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
@@ -33,28 +34,62 @@ class WatchlistDigViewModel
 internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol) :
     UiViewModel<WatchListDigViewState, WatchListDigControllerEvent>(
         initialState =
-            WatchListDigViewState(symbol = thisSymbol, isLoading = false, stock = null)) {
+            WatchListDigViewState(
+                symbol = thisSymbol,
+                isLoading = false,
+                stock = null,
+                currentRange = StockChart.IntervalRange.ONE_DAY,
+                ranges = emptyList())) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<QuoteWithChart>, Boolean, StockChart.IntervalRange> { force, range ->
         interactor.getQuoteWithChart(force, thisSymbol, range)
       }
 
-  fun handleFetchQuote(force: Boolean, range: StockChart.IntervalRange) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchQuote(force, range) }
+  init {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val ranges = loadAllRanges()
+      setState { copy(ranges = ranges) }
+    }
   }
 
-  private fun CoroutineScope.fetchQuote(force: Boolean, range: StockChart.IntervalRange) {
+  @CheckResult
+  private fun loadAllRanges(): List<StockChart.IntervalRange> {
+    return listOf(
+        StockChart.IntervalRange.ONE_DAY,
+        StockChart.IntervalRange.FIVE_DAY,
+        StockChart.IntervalRange.ONE_MONTH,
+        StockChart.IntervalRange.THREE_MONTH,
+        StockChart.IntervalRange.SIX_MONTH,
+        StockChart.IntervalRange.ONE_YEAR,
+        StockChart.IntervalRange.TWO_YEAR,
+        StockChart.IntervalRange.FIVE_YEAR,
+        StockChart.IntervalRange.TEN_YEAR,
+        StockChart.IntervalRange.YTD,
+        StockChart.IntervalRange.MAX,
+    )
+  }
+
+  fun handleFetchQuote(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchQuote(force) }
+  }
+
+  private fun CoroutineScope.fetchQuote(force: Boolean) {
     launch(context = Dispatchers.Default) {
       setState(
           stateChange = { copy(isLoading = true) },
-          andThen = {
+          andThen = { newState ->
             quoteFetcher
-                .call(force, range)
+                .call(force, newState.currentRange)
                 .onSuccess { setState { copy(stock = it, isLoading = false) } }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
                 .onFailure { setState { copy(stock = null, isLoading = false) } }
           })
     }
+  }
+
+  fun handleRangeUpdated(index: Int) {
+    val range = state.ranges[index]
+    setState(stateChange = { copy(currentRange = range) }, andThen = { fetchQuote(false) })
   }
 }

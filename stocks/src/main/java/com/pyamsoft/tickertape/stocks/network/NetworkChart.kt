@@ -20,7 +20,14 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 internal data class NetworkChart
-internal constructor(internal val timestamp: List<Long>?, internal val indicators: Indicator?) {
+internal constructor(
+    internal val meta: Meta?,
+    internal val timestamp: List<Long>?,
+    internal val indicators: Indicator?
+) {
+
+  @JsonClass(generateAdapter = true)
+  internal data class Meta(internal val symbol: String?, internal val chartPreviousClose: Double?)
 
   @JsonClass(generateAdapter = true)
   internal data class Indicator(internal val quote: List<Quote>?) {

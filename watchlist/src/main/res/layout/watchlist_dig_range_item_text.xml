@@ -16,9 +16,12 @@
 
 <merge>
 
-    <com.robinhood.spark.SparkView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/watchlist_dig_chart"
-        android:layout_width="match_parent"
-        android:layout_height="160dp" />
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/watchlist_dig_range_item_text"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
 </merge>

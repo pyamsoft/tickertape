@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.watchlist.dig
 
-import android.app.Activity
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.pydroid.ui.app.ToolbarActivity
-import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
+import androidx.lifecycle.ViewModelStore
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface BaseWatchlistComponent {
+internal interface BaseWatchlistDigComponent {
 
-  @CheckResult fun plusWatchlistComponent(): WatchlistComponent.Factory
+  @CheckResult fun plusDigComponent(): WatchlistDigComponent.Factory
 
   /** Not actually used, just here so graph can compile */
   @CheckResult
   @Suppress("FunctionName")
-  fun `$$daggerRequiredWatchlistItemComponent`(): WatchlistItemComponent.Factory
+  fun `$$daggerRequiredWatchlistDigRangeComponent`(): WatchlistDigRangeComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance appBarActivity: AppBarActivity,
-        @BindsInstance toolbarActivity: ToolbarActivity,
-        @BindsInstance activity: Activity,
-        @BindsInstance owner: LifecycleOwner,
-    ): BaseWatchlistComponent
+        @BindsInstance owner: SavedStateRegistryOwner,
+        @BindsInstance lifecycleOwner: LifecycleOwner,
+        @BindsInstance viewModelStore: ViewModelStore,
+        @BindsInstance symbol: StockSymbol,
+    ): BaseWatchlistDigComponent
   }
 }

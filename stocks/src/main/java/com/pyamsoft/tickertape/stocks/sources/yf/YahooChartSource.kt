@@ -78,6 +78,8 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
         .asSequence()
         .filterOnlyValidStockData()
         .map { chart ->
+          val startingPrice =
+              chart.meta.requireNotNull().chartPreviousClose.requireNotNull().asMoney()
           val timestamps = chart.timestamp.requireNotNull()
           val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
 
@@ -117,6 +119,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
               symbol = symbol,
               range = range,
               interval = interval,
+              startingPrice = startingPrice,
               dates = validDates,
               volume = validVolume,
               open = validOpen,
@@ -147,8 +150,12 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
     @JvmStatic
     @CheckResult
     private fun NetworkChart.isValidStockData(): Boolean {
-      // We need indicators and timestamps that are not empty
       // We need all of these values to have a valid ticker
+      if (meta?.chartPreviousClose == null) {
+        return false
+      }
+
+      // We need indicators and timestamps that are not empty
       val time = timestamp ?: return false
       val ind = indicators ?: return false
 

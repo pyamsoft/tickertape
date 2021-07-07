@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.range
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class WatchListDigViewState
-internal constructor(
-    val symbol: StockSymbol,
-    val isLoading: Boolean,
-    val stock: QuoteWithChart?,
-    val currentRange: StockChart.IntervalRange,
-    val ranges: List<StockChart.IntervalRange>
+data class WatchlistDigRangeViewState(
+    val isSelected: Boolean,
+    val range: StockChart.IntervalRange
 ) : UiViewState
 
-sealed class WatchListDigViewEvent : UiViewEvent {
+sealed class WatchlistDigRangeViewEvent : UiViewEvent {
 
-  data class RangeUpdated internal constructor(val index: Int) : WatchListDigViewEvent()
-
-  object Close : WatchListDigViewEvent()
+  object Select : WatchlistDigRangeViewEvent()
 }
-
-sealed class WatchListDigControllerEvent : UiControllerEvent

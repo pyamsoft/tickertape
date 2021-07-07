@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.robinhood.spark.SparkAdapter
 import com.robinhood.spark.SparkView
 import com.robinhood.spark.animation.MorphSparkAnimator
@@ -94,35 +93,25 @@ class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<QuoteChartViewState>) {
-    state.render(viewScope) { handleChartChanged(it) }
+    state.mapChanged { it.chart }.render(viewScope) { handleChartChanged(it) }
   }
 
-  private fun handleChartChanged(state: QuoteChartViewState) {
+  private fun handleChartChanged(chart: StockChart?) {
     clearAdapter()
-
-    val chart = state.chart
-    val quote = state.quote
 
     if (chart == null) {
       // Chart error
-      Timber.w("Failed to load chart ${state.symbol}")
-    }
-
-    if (quote == null) {
-      // Quote error
-      Timber.w("Failed to load quote ${state.symbol}")
-    }
-
-    // Load was successful, we have required data
-    if (chart != null && quote != null) {
-      adapter = ChartAdapter(chart, quote).also { binding.watchlistDigChart.adapter = it }
+      Timber.w("Failed to load chart")
+    } else {
+      // Load was successful, we have required data
+      adapter = ChartAdapter(chart).also { binding.watchlistDigChart.adapter = it }
     }
   }
 
-  private class ChartAdapter(chart: StockChart, quote: StockQuote) : SparkAdapter() {
+  private class ChartAdapter(chart: StockChart) : SparkAdapter() {
 
     private val chartData: List<ChartData>
-    private val baselineValue = (quote.dayPreviousClose() ?: quote.dayOpen()).value().toFloat()
+    private val baselineValue: Float = chart.startingPrice().value().toFloat()
 
     init {
       val dates = chart.dates()
@@ -133,6 +122,7 @@ class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
       val volumes = chart.volume()
 
       val data = mutableListOf<ChartData>()
+
       for (i in dates.indices) {
         val date = dates[i]
         val open = opens[i]
@@ -144,6 +134,7 @@ class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
             ChartData(
                 date = date, open = open, close = close, high = high, low = low, volume = volume))
       }
+
       chartData = data
     }
 

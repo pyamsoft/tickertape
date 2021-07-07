@@ -70,7 +70,7 @@ internal constructor(
   private fun totalGainLossPercentNumber(): Double? {
     val gainLoss = totalGainLossNumber() ?: return null
     val totalCost = costNumber()
-    return gainLoss / totalCost * 100
+    return if (totalCost.compareTo(0) == 0) 0.0 else gainLoss / totalCost * 100
   }
 
   @CheckResult
@@ -96,12 +96,11 @@ internal constructor(
   @CheckResult
   fun averagePrice(): StockMoneyValue {
     val shares = totalSharesNumber()
-    if (shares.compareTo(0) == 0) {
-      return StockMoneyValue.none()
+    return if (shares.compareTo(0) == 0) StockMoneyValue.none()
+    else {
+      val value = costNumber() / shares
+      value.asMoney()
     }
-
-    val value = costNumber() / shares
-    return value.asMoney()
   }
 
   @CheckResult
@@ -149,7 +148,7 @@ internal fun List<PortfolioStock>.sumTotalGainLoss(): StockMoneyValue? {
 private fun List<PortfolioStock>.sumTotalPercentNumber(): Double? {
   val gainLoss = this.sumTotalGainLossNumber() ?: return null
   val cost = this.sumCostNumber()
-  return gainLoss / cost * 100
+  return if (cost.compareTo(0) == 0) 0.0 else gainLoss / cost * 100
 }
 
 @CheckResult
@@ -182,7 +181,7 @@ internal fun List<PortfolioStock>.sumTodayChange(): StockMoneyValue? {
 private fun List<PortfolioStock>.sumTodayPercentNumber(): Double? {
   val change = this.sumTodayChangeNumber() ?: return null
   val total = this.sumTotalAmountNumber() ?: return null
-  return change / total * 100
+  return if (total.compareTo(0) == 0) 0.0 else change / total * 100
 }
 
 @CheckResult

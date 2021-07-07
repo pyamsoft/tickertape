@@ -19,33 +19,32 @@ package com.pyamsoft.tickertape.watchlist.item
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.quote.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.QuoteViewDelegate
 import javax.inject.Inject
 
-class WatchlistItemQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
+class WatchlistItemQuote @Inject internal constructor(delegate: QuoteViewDelegate) :
     UiView<WatchlistItemViewState, WatchlistItemViewEvent>() {
 
-  init {
-    doOnInflate {
-      delegate.inflate { event ->
-        val viewEvent =
-            when (event) {
-              is QuoteViewEvent.Remove -> WatchlistItemViewEvent.Remove
-              is QuoteViewEvent.Select -> WatchlistItemViewEvent.Select
-            }
-        publish(viewEvent)
-      }
-    }
+  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
 
-    doOnTeardown { delegate.teardown() }
+  private val viewBinder =
+      createViewBinder(delegate) {
+        return@createViewBinder when (it) {
+          is QuoteViewEvent.Remove -> publish(WatchlistItemViewEvent.Remove)
+          is QuoteViewEvent.Select -> publish(WatchlistItemViewEvent.Select)
+        }
+      }
+
+  init {
+    doOnTeardown { viewBinder.teardown() }
   }
 
   @CheckResult
   internal fun id(): Int {
-    return delegate.id()
+    return id
   }
 
   override fun render(state: UiRender<WatchlistItemViewState>) {
@@ -53,8 +52,6 @@ class WatchlistItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   private fun handleStateChanged(state: WatchlistItemViewState) {
-    delegate.render(
-        viewScope,
-        QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender())
+    viewBinder.bindState(QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null))
   }
 }

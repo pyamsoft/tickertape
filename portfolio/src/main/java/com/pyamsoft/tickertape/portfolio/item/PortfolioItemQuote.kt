@@ -19,34 +19,33 @@ package com.pyamsoft.tickertape.portfolio.item
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.QuoteViewState
 import com.pyamsoft.tickertape.quote.ui.QuoteViewDelegate
 import javax.inject.Inject
 
-class PortfolioItemQuote @Inject internal constructor(private val delegate: QuoteViewDelegate) :
+class PortfolioItemQuote @Inject internal constructor(delegate: QuoteViewDelegate) :
     UiView<PortfolioItemViewState, PortfolioItemViewEvent>() {
 
-  init {
-    doOnInflate {
-      delegate.inflate { event ->
-        val viewEvent =
-            when (event) {
-              is QuoteViewEvent.Remove -> PortfolioItemViewEvent.Remove
-              is QuoteViewEvent.Select -> PortfolioItemViewEvent.Select
-            }
-        publish(viewEvent)
-      }
-    }
+  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
 
-    doOnTeardown { delegate.teardown() }
+  private val viewBinder =
+      createViewBinder(delegate) {
+        return@createViewBinder when (it) {
+          is QuoteViewEvent.Remove -> publish(PortfolioItemViewEvent.Remove)
+          is QuoteViewEvent.Select -> publish(PortfolioItemViewEvent.Select)
+        }
+      }
+
+  init {
+    doOnTeardown { viewBinder.teardown() }
   }
 
   @CheckResult
   internal fun id(): Int {
-    return delegate.id()
+    return id
   }
 
   override fun render(state: UiRender<PortfolioItemViewState>) {
@@ -54,9 +53,7 @@ class PortfolioItemQuote @Inject internal constructor(private val delegate: Quot
   }
 
   private fun handleStockChanged(stock: PortfolioStock) {
-    delegate.render(
-        viewScope,
-        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null)
-            .asUiRender())
+    viewBinder.bindState(
+        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null))
   }
 }

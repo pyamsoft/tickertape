@@ -22,7 +22,6 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
-import com.pyamsoft.tickertape.stocks.api.StockChart
 
 data class HomeViewState
 internal constructor(
@@ -38,6 +37,11 @@ internal constructor(
     val bottomOffset: Int,
 ) : UiViewState
 
-sealed class HomeViewEvent : UiViewEvent
+sealed class HomeViewEvent : UiViewEvent {
+
+  object OpenWatchlist : HomeViewEvent()
+
+  object OpenPortfolio : HomeViewEvent()
+}
 
 sealed class HomeControllerEvent : UiControllerEvent

@@ -31,6 +31,8 @@ internal constructor(
 
 sealed class MainViewEvent : UiViewEvent {
 
+  object OpenHome : MainViewEvent()
+
   object OpenWatchList : MainViewEvent()
 
   object OpenPortfolio : MainViewEvent()

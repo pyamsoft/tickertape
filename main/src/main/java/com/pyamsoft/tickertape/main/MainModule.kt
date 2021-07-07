@@ -16,9 +16,30 @@
 
 package com.pyamsoft.tickertape.main
 
-sealed class MainPage {
-  object Home : MainPage()
-  object WatchList : MainPage()
-  object Portfolio : MainPage()
-  object Settings : MainPage()
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
+
+@Module
+abstract class MainModule {
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindMainPageConsumer(impl: EventBus<MainPage>): EventConsumer<MainPage>
+
+  @Module
+  companion object {
+
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideMainPageBus(): EventBus<MainPage> {
+      return EventBus.create(emitOnlyWhenActive = false)
+    }
+  }
 }

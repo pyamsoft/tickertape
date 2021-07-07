@@ -17,14 +17,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/ic_close_24dp"
+        android:title="Home" />
+
+    <item
         android:id="@+id/menu_watchlist"
         android:icon="@drawable/ic_library_add_24dp"
         android:title="Watchlist" />
-
-    <item
-        android:id="@+id/menu_portfolio"
-        android:icon="@drawable/ic_library_add_24dp"
-        android:title="Portfolio" />
 
     <item
         android:id="@+id/menu_placeholder"
@@ -32,9 +32,9 @@
         android:title="" />
 
     <item
-        android:id="@+id/menu_something"
-        android:icon="@drawable/ic_close_24dp"
-        android:title="Something" />
+        android:id="@+id/menu_portfolio"
+        android:icon="@drawable/ic_library_add_24dp"
+        android:title="Portfolio" />
 
     <item
         android:id="@+id/menu_settings"

@@ -42,6 +42,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsFragment
@@ -136,6 +137,8 @@ internal class MainActivity :
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
             is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
+            is MainViewEvent.OpenHome ->
+              viewModel.handleSelectPage(MainPage.Home, force = false)
             is MainViewEvent.OpenPortfolio ->
                 viewModel.handleSelectPage(MainPage.Portfolio, force = false)
             is MainViewEvent.OpenWatchList ->
@@ -175,6 +178,10 @@ internal class MainActivity :
     val fragment: Fragment
     val tag: String
     when (newPage) {
+      is MainPage.Home -> {
+        fragment = HomeFragment.newInstance()
+        tag = HomeFragment.TAG
+      }
       is MainPage.Settings -> {
         fragment = SettingsFragment.newInstance()
         tag = SettingsFragment.TAG
@@ -187,7 +194,7 @@ internal class MainActivity :
         fragment = PortfolioFragment.newInstance()
         tag = PortfolioFragment.TAG
       }
-    }
+    }.requireNotNull()
 
     supportFragmentManager.commitNow(this) { replace(fragmentContainerId, fragment, tag) }
   }

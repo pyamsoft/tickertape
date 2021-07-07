@@ -120,7 +120,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
 
   companion object {
 
-    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v8/finance/chart/"
+    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v8/finance/chart"
 
     @JvmStatic
     @CheckResult

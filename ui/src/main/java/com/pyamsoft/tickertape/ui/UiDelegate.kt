@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.ui
 
-sealed class MainPage {
-  object Home : MainPage()
-  object WatchList : MainPage()
-  object Portfolio : MainPage()
-  object Settings : MainPage()
+import androidx.annotation.CheckResult
+import androidx.annotation.IdRes
+
+interface UiDelegate {
+
+  @IdRes @CheckResult fun id(): Int
 }

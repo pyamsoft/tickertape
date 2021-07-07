@@ -28,8 +28,10 @@ import com.pyamsoft.tickertape.alert.inject.AlertComponent
 import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
+import com.pyamsoft.tickertape.home.BaseHomeComponent
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainModule
 import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
@@ -62,6 +64,7 @@ import javax.inject.Singleton
             RoomModule::class,
             TapeModule::class,
             AlertModule::class,
+            MainModule::class,
             WorkManagerModule::class,
             UiModule::class])
 internal interface TickerComponent {
@@ -93,6 +96,8 @@ internal interface TickerComponent {
   @CheckResult fun plusManageComponent(): BaseManageComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
+
+  @CheckResult fun plusHomeComponent(): BaseHomeComponent.Factory
 
   @CheckResult fun plusWatchlistComponent(): BaseWatchlistComponent.Factory
 

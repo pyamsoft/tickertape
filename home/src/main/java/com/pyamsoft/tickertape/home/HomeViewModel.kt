@@ -19,8 +19,10 @@ package com.pyamsoft.tickertape.home
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
+import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
@@ -43,6 +45,7 @@ internal constructor(
     private val watchlistInteractor: WatchlistInteractor,
     private val quoteInteractor: QuoteInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>,
+    private val mainPageBus: EventBus<MainPage>,
 ) :
     UiViewModel<HomeViewState, HomeControllerEvent>(
         initialState =
@@ -64,7 +67,12 @@ internal constructor(
       }
 
   private val watchlistFetcher =
-      highlander<ResultWrapper<List<QuotedStock>>, Boolean> { watchlistInteractor.getQuotes(it) }
+      highlander<ResultWrapper<List<QuotedStock>>, Boolean> {
+        watchlistInteractor
+            .getQuotes(it)
+            .map { quotes -> quotes.sortedWith(QuotedStock.COMPARATOR) }
+            .map { quotes -> quotes.take(WATCHLIST_COUNT) }
+      }
 
   private val indexesFetcher =
       highlander<ResultWrapper<List<QuotedChart>>, Boolean> { force ->
@@ -143,8 +151,13 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchIndexes(force) }
   }
 
+  fun handleOpenPage(page: MainPage) {
+    viewModelScope.launch(context = Dispatchers.Default) { mainPageBus.send(page) }
+  }
+
   companion object {
 
+    private const val WATCHLIST_COUNT = 5
     private val INDEXES = listOf("^GSPC", "^DJI", "^IXIC", "^RUT").map { it.asSymbol() }
   }
 }

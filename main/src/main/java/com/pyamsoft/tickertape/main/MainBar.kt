@@ -71,6 +71,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
           R.id.menu_watchlist -> select(MainViewEvent.OpenWatchList)
           R.id.menu_settings -> select(MainViewEvent.OpenSettings)
           R.id.menu_portfolio -> select(MainViewEvent.OpenPortfolio)
+          R.id.menu_home -> select(MainViewEvent.OpenHome)
           else -> false
         }
       }
@@ -103,7 +104,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
   private fun publishFabVisibility(viewEvent: MainViewEvent) {
     val isVisible =
         when (viewEvent) {
-          is MainViewEvent.OpenSettings -> false
+          is MainViewEvent.OpenHome, MainViewEvent.OpenSettings -> false
           is MainViewEvent.OpenWatchList, is MainViewEvent.OpenPortfolio -> true
           is MainViewEvent.AddRequest,
           is MainViewEvent.BottomBarMeasured,
@@ -131,6 +132,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
       return if (page == null) 0
       else {
         when (page) {
+          is MainPage.Home -> R.id.menu_home
           is MainPage.WatchList -> R.id.menu_watchlist
           is MainPage.Settings -> R.id.menu_settings
           is MainPage.Portfolio -> R.id.menu_portfolio

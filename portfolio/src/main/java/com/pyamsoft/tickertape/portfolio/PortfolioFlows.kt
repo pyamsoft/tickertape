@@ -20,8 +20,8 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 
-data class PortfolioViewState
-internal constructor(
+// Public constructor, used in home module
+data class PortfolioViewState(
     val error: Throwable?,
     val isLoading: Boolean,
     val portfolio: List<PortfolioStock>,

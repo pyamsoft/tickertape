@@ -130,6 +130,11 @@ internal constructor(
     }
   }
 
+  fun setEmbedded() {
+    binding.watchlistSwipeRefresh.isNestedScrollingEnabled = false
+    binding.watchlistSwipeRefresh.isEnabled = false
+  }
+
   @CheckResult
   private fun usingAdapter(): WatchlistItemAdapter {
     return requireNotNull(modelAdapter)

@@ -111,7 +111,9 @@ internal constructor(
                   .onSuccess {
                     setState {
                       copy(
-                          error = null, quotes = it.sortedWith(STOCK_COMPARATOR), isLoading = false)
+                          error = null,
+                          quotes = it.sortedWith(QuotedStock.COMPARATOR),
+                          isLoading = false)
                     }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch quotes") }
@@ -137,33 +139,5 @@ internal constructor(
       val quote = state.quotes[index]
       publish(WatchListControllerEvent.ManageSymbol(quote))
     }
-  }
-
-  companion object {
-
-    // Descending sort
-    private val STOCK_COMPARATOR =
-        Comparator<QuotedStock> { s1, s2 ->
-          val q1 = s1.quote
-          val q2 = s2.quote
-
-          // If no quote, sort by symbol
-          if (q1 == null && q2 == null) {
-            return@Comparator s2.symbol.symbol().compareTo(s1.symbol.symbol(), ignoreCase = true)
-          }
-
-          // If either has a quote, it goes first
-          if (q1 == null) {
-            return@Comparator -1
-          }
-
-          // If either has a quote, it goes first
-          if (q2 == null) {
-            return@Comparator 1
-          }
-
-          // Sort by the change percent
-          return@Comparator q2.regular().percent().value().compareTo(q1.regular().percent().value())
-        }
   }
 }

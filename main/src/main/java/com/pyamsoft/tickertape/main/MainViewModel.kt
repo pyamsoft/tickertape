@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
@@ -38,6 +39,7 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
     private val addNewBus: EventBus<AddNew>,
+    private val pageBus: EventConsumer<MainPage>,
     @Named("app_name") appNameRes: Int,
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
@@ -45,9 +47,15 @@ internal constructor(
         MainViewState(
             appNameRes = appNameRes, page = null, isFabVisible = true, bottomBarHeight = 0)) {
 
+  init {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      pageBus.onEvent { handleSelectPage(it, force = true) }
+    }
+  }
+
   fun handleLoadDefaultPage() {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val page = restoreSavedState(KEY_PAGE) { MainPage.WatchList.asString() }.asPage()
+      val page = restoreSavedState(KEY_PAGE) { MainPage.Home.asString() }.asPage()
       Timber.d("Loading initial page: $page")
       handleSelectPage(page, force = true)
     }
@@ -107,6 +115,7 @@ internal constructor(
         when (this) {
           MainPage.WatchList::class.java.name -> MainPage.WatchList
           MainPage.Settings::class.java.name -> MainPage.Settings
+          MainPage.Home::class.java.name -> MainPage.Home
           MainPage.Portfolio::class.java.name -> MainPage.Portfolio
           else -> throw IllegalStateException("Cannot convert to MainPage: $this")
         }

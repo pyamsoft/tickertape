@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.item
+package com.pyamsoft.tickertape.home
 
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.ui.view.QuoteView
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
+import com.pyamsoft.tickertape.portfolio.PortfolioHeader
+import com.pyamsoft.tickertape.portfolio.PortfolioViewState
 import com.pyamsoft.tickertape.ui.UiDelegate
 import javax.inject.Inject
 
-class PortfolioItemQuote @Inject internal constructor(delegate: QuoteView) :
-    UiView<PortfolioItemViewState, PortfolioItemViewEvent>(), UiDelegate {
+class HomePortfolio @Inject internal constructor(delegate: PortfolioHeader) :
+    UiView<HomeViewState, HomeViewEvent>(), UiDelegate {
 
   private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
 
-  private val viewBinder =
-      createViewBinder(delegate) {
-        return@createViewBinder when (it) {
-          is QuoteViewEvent.Remove -> publish(PortfolioItemViewEvent.Remove)
-          is QuoteViewEvent.Select -> publish(PortfolioItemViewEvent.Select)
-        }
-      }
+  // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
+  private val viewBinder: ViewBinder<PortfolioViewState> = createViewBinder(delegate) {}
 
   init {
     doOnTeardown { viewBinder.teardown() }
@@ -47,12 +41,17 @@ class PortfolioItemQuote @Inject internal constructor(delegate: QuoteView) :
     return id
   }
 
-  override fun render(state: UiRender<PortfolioItemViewState>) {
-    state.mapChanged { it.stock }.render(viewScope) { handleStockChanged(it) }
+  override fun render(state: UiRender<HomeViewState>) {
+    state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStockChanged(stock: PortfolioStock) {
+  private fun handleStateChanged(state: HomeViewState) {
     viewBinder.bindState(
-        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null))
+        PortfolioViewState(
+            error = state.portfolioError,
+            isLoading = state.isLoadingPortfolio,
+            portfolio = state.portfolio,
+            // Bottom offset is always 0 because the bottom offset is handled by the Home screens
+            bottomOffset = 0))
   }
 }

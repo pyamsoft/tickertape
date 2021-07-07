@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.item
+package com.pyamsoft.tickertape.home
 
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.ui.view.QuoteView
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewEvent
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
 import com.pyamsoft.tickertape.ui.UiDelegate
+import com.pyamsoft.tickertape.watchlist.WatchListViewState
+import com.pyamsoft.tickertape.watchlist.WatchlistList
 import javax.inject.Inject
 
-class PortfolioItemQuote @Inject internal constructor(delegate: QuoteView) :
-    UiView<PortfolioItemViewState, PortfolioItemViewEvent>(), UiDelegate {
+class HomeWatchlist @Inject internal constructor(delegate: WatchlistList) :
+    UiView<HomeViewState, HomeViewEvent>(), UiDelegate {
 
   private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
 
-  private val viewBinder =
-      createViewBinder(delegate) {
-        return@createViewBinder when (it) {
-          is QuoteViewEvent.Remove -> publish(PortfolioItemViewEvent.Remove)
-          is QuoteViewEvent.Select -> publish(PortfolioItemViewEvent.Select)
-        }
-      }
+  // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
+  private val viewBinder: ViewBinder<WatchListViewState> = createViewBinder(delegate) {}
 
   init {
+    delegate.setEmbedded()
+
     doOnTeardown { viewBinder.teardown() }
   }
 
@@ -47,12 +43,16 @@ class PortfolioItemQuote @Inject internal constructor(delegate: QuoteView) :
     return id
   }
 
-  override fun render(state: UiRender<PortfolioItemViewState>) {
-    state.mapChanged { it.stock }.render(viewScope) { handleStockChanged(it) }
+  override fun render(state: UiRender<HomeViewState>) {
+    state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStockChanged(stock: PortfolioStock) {
+  private fun handleStateChanged(state: HomeViewState) {
     viewBinder.bindState(
-        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null))
+        WatchListViewState(
+            error = state.watchlistError,
+            isLoading = state.isLoadingWatchlist,
+            quotes = state.watchlist,
+            bottomOffset = state.bottomOffset))
   }
 }

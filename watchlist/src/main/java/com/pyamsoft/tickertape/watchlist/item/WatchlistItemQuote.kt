@@ -16,17 +16,17 @@
 
 package com.pyamsoft.tickertape.watchlist.item
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.quote.ui.view.QuoteView
 import com.pyamsoft.tickertape.quote.ui.view.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
+import com.pyamsoft.tickertape.ui.UiDelegate
 import javax.inject.Inject
 
 class WatchlistItemQuote @Inject internal constructor(delegate: QuoteView) :
-    UiView<WatchlistItemViewState, WatchlistItemViewEvent>() {
+    UiView<WatchlistItemViewState, WatchlistItemViewEvent>(), UiDelegate {
 
   private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
 
@@ -42,8 +42,7 @@ class WatchlistItemQuote @Inject internal constructor(delegate: QuoteView) :
     doOnTeardown { viewBinder.teardown() }
   }
 
-  @CheckResult
-  internal fun id(): Int {
+  override fun id(): Int {
     return id
   }
 

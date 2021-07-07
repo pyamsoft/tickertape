@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,7 +39,6 @@ import com.pyamsoft.tickertape.databinding.WatchlistDigContainerBinding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class WatchlistDigDialog :
     AppCompatDialogFragment(), UiController<WatchListDigControllerEvent> {
@@ -77,17 +75,17 @@ internal class WatchlistDigDialog :
     makeFullscreen()
 
     val binding = WatchlistDigContainerBinding.bind(view)
-        Injector.obtainFromApplication<TickerComponent>(view.context)
-            .plusWatchlistDigComponent()
-            .create(
-              this,
-              viewLifecycleOwner,
-              viewModelStore,
-              getSymbol(),
-            )
-          .plusDigComponent()
-          .create(binding.watchlistDigContainer, binding.watchlistDigLayout)
-      .inject(this)
+    Injector.obtainFromApplication<TickerComponent>(view.context)
+        .plusWatchlistDigComponent()
+        .create(
+            this,
+            viewLifecycleOwner,
+            viewModelStore,
+            getSymbol(),
+        )
+        .plusDigComponent()
+        .create(binding.watchlistDigContainer, binding.watchlistDigLayout)
+        .inject(this)
 
     val chart = requireNotNull(chart)
     val ranges = requireNotNull(ranges)
@@ -98,7 +96,14 @@ internal class WatchlistDigDialog :
 
     stateSaver =
         createComponent(
-            savedInstanceState, viewLifecycleOwner, viewModel, this, chart, ranges, toolbar, shadow) {
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            chart,
+            ranges,
+            toolbar,
+            shadow) {
           return@createComponent when (it) {
             is WatchListDigViewEvent.Close -> dismiss()
             is WatchListDigViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
@@ -145,7 +150,7 @@ internal class WatchlistDigDialog :
     }
   }
   override fun onControllerEvent(event: WatchListDigControllerEvent) {
-      // TODO
+    // TODO
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -171,10 +176,7 @@ internal class WatchlistDigDialog :
     @CheckResult
     fun newInstance(symbol: StockSymbol): DialogFragment {
       return WatchlistDigDialog().apply {
-        arguments =
-            Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
-            }
+        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
       }
     }
   }

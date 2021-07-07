@@ -33,9 +33,9 @@ internal constructor(
     callback: WatchlistDigRangeAdapter.Callback
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistDigRangeViewState> {
 
-  @Inject @JvmField internal var click: WatchlistDigRangeClick ? = null
+  @Inject @JvmField internal var click: WatchlistDigRangeClick? = null
 
-  @Inject @JvmField internal var text: WatchlistDigRangeText ? = null
+  @Inject @JvmField internal var text: WatchlistDigRangeText? = null
 
   private val viewBinder: ViewBinder<WatchlistDigRangeViewState>
 

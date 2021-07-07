@@ -54,10 +54,10 @@ internal constructor(
     doOnInflate {
       binding.watchlistDigRanges.layoutManager =
           LinearLayoutManager(binding.watchlistDigRanges.context).apply {
-        orientation = RecyclerView.HORIZONTAL
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            orientation = RecyclerView.HORIZONTAL
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {

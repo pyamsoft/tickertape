@@ -24,7 +24,6 @@ import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
-import timber.log.Timber
 
 class WatchlistDigChart @Inject internal constructor(delegate: QuoteChartView) :
     UiView<WatchListDigViewState, WatchListDigViewEvent>() {

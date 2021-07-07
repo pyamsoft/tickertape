@@ -23,7 +23,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangeItemBinding
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
 
 class WatchlistDigRangeAdapter
 private constructor(

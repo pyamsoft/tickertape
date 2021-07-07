@@ -28,10 +28,10 @@ import javax.inject.Inject
 
 class WatchlistViewHolder
 internal constructor(
-  binding: WatchlistItemBinding,
-  factory: WatchlistItemComponent.Factory,
-  owner: LifecycleOwner,
-  callback: WatchlistItemAdapter.Callback
+    binding: WatchlistItemBinding,
+    factory: WatchlistItemComponent.Factory,
+    owner: LifecycleOwner,
+    callback: WatchlistItemAdapter.Callback
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistItemViewState> {
 
   @Inject @JvmField internal var summary: WatchlistItemSummary? = null

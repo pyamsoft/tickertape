@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio
 import android.app.Activity
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
-import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent

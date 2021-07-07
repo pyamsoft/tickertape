@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
-import android.graphics.Color
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR

@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.stocks.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.network.NetworkStockCharts
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 

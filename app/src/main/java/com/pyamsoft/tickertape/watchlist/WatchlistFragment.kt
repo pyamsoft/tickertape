@@ -102,8 +102,8 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   }
 
   private fun handleOpenDigDialog(symbol: StockSymbol) {
-      WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
-    }
+    WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
+  }
 
   private fun handleOpenSymbolAddDialog() {
     WatchlistAddDialog.newInstance().show(requireActivity(), WatchlistAddDialog.TAG)

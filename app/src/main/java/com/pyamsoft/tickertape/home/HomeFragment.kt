@@ -43,14 +43,11 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     factory?.create(requireActivity())
   }
 
-  @Inject @JvmField
-  internal var container: HomeContainer? = null
+  @Inject @JvmField internal var container: HomeContainer? = null
 
-  @Inject @JvmField
-  internal var nestedPortfolio: HomePortfolio? = null
+  @Inject @JvmField internal var nestedPortfolio: HomePortfolio? = null
 
-  @Inject @JvmField
-  internal var nestedWatchlist: HomeWatchlist? = null
+  @Inject @JvmField internal var nestedWatchlist: HomeWatchlist? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -78,28 +75,18 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         .inject(this)
 
     val container = container.requireNotNull()
-    container.nest(
-      nestedPortfolio.requireNotNull(),
-      nestedWatchlist.requireNotNull()
-    )
+    container.nest(nestedPortfolio.requireNotNull(), nestedWatchlist.requireNotNull())
 
     stateSaver =
-        createComponent(
-            savedInstanceState,
-            viewLifecycleOwner,
-            viewModel,
-            this,
-            container
-        ) {
+        createComponent(savedInstanceState, viewLifecycleOwner, viewModel, this, container) {
           return@createComponent when (it) {
-              is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
-              is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
+            is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
+            is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
           }
         }
   }
 
-  override fun onControllerEvent(event: HomeControllerEvent) {
-  }
+  override fun onControllerEvent(event: HomeControllerEvent) {}
 
   override fun onStart() {
     super.onStart()
@@ -118,7 +105,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     stateSaver = null
     factory = null
 
-      container = null
+    container = null
     nestedPortfolio = null
     nestedWatchlist = null
   }

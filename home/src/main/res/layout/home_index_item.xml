@@ -16,7 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/home_index_item"
-    android:layout_width="200dp"
-    android:layout_height="120dp"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp" />

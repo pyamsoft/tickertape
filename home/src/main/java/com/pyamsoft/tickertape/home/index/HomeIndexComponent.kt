@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.home
+package com.pyamsoft.tickertape.home.index
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.home.databinding.HomeContainerBinding
-import javax.inject.Inject
+import androidx.annotation.CheckResult
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-class HomeContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, HomeContainerBinding>(parent) {
+@Subcomponent
+interface HomeIndexComponent {
 
-  override val layoutRoot by boundView { homeContainer }
+  fun inject(holder: HomeIndexViewHolder)
 
-  override val viewBinding = HomeContainerBinding::inflate
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): HomeIndexComponent
+  }
 }

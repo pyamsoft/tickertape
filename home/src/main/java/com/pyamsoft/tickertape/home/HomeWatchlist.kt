@@ -16,43 +16,63 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.arch.ViewBinder
-import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.tickertape.ui.UiDelegate
+import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.util.asDp
+import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
 import com.pyamsoft.tickertape.watchlist.WatchListViewState
-import com.pyamsoft.tickertape.watchlist.WatchlistList
+import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import javax.inject.Inject
 
-class HomeWatchlist @Inject internal constructor(delegate: WatchlistList) :
-    UiView<HomeViewState, HomeViewEvent>(), UiDelegate {
-
-  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
-
-  // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
-  private val viewBinder: ViewBinder<WatchListViewState> = createViewBinder(delegate) {}
+class HomeWatchlist
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+    factory: WatchlistItemComponent.Factory
+) : BaseWatchlistList<HomeViewState, Nothing>(parent, owner, factory) {
 
   init {
-    delegate.setEmbedded()
+    doOnInflate {
+      layoutRoot.post {
+        layoutRoot.updateLayoutParams { this.height = 800.asDp(layoutRoot.context) }
+      }
+    }
 
-    doOnTeardown { viewBinder.teardown() }
+    doOnInflate {
+      binding.watchlistList.isNestedScrollingEnabled = false
+      binding.watchlistSwipeRefresh.isNestedScrollingEnabled = false
+      binding.watchlistSwipeRefresh.isEnabled = false
+    }
   }
 
-  override fun id(): Int {
-    return id
-  }
+  override fun onRemove(index: Int) {}
 
-  override fun render(state: UiRender<HomeViewState>) {
+  override fun onSelect(index: Int) {}
+
+  override fun onRefresh() {}
+
+  override fun onRender(state: UiRender<HomeViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
+    state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlistChanged(it) }
+  }
+
+  private fun handleWatchlistChanged(stocks: List<QuotedStock>) {
+    val size = 96.asDp(layoutRoot.context)
+    layoutRoot.updateLayoutParams { this.height = stocks.size * size * 2 }
   }
 
   private fun handleStateChanged(state: HomeViewState) {
-    viewBinder.bindState(
+    handleRender(
         WatchListViewState(
-            error = state.watchlistError,
-            isLoading = state.isLoadingWatchlist,
-            quotes = state.watchlist,
-            bottomOffset = state.bottomOffset))
+                error = state.watchlistError,
+                isLoading = state.isLoadingWatchlist,
+                quotes = state.watchlist,
+                bottomOffset = 0)
+            .asUiRender())
   }
 }

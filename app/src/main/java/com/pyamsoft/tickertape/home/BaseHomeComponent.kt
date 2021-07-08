@@ -21,6 +21,7 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.ToolbarActivity
+import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
@@ -29,11 +30,11 @@ import dagger.Subcomponent
 internal interface BaseHomeComponent {
 
   @CheckResult fun plusHomeComponent(): HomeComponent.Factory
-  //
-  //  /** Not actually used, just here so graph can compile */
-  //  @CheckResult
-  //  @Suppress("FunctionName")
-  //  fun `$$daggerRequiredWatchlistItemComponent`(): WatchlistItemComponent.Factory
+
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredHomeIndexComponent`(): HomeIndexComponent.Factory
 
   /** Not actually used, just here so graph can compile */
   @CheckResult

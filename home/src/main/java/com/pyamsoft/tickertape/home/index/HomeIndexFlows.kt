@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.home
+package com.pyamsoft.tickertape.home.index
 
-import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.home.databinding.HomeContainerBinding
-import javax.inject.Inject
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-class HomeContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, HomeContainerBinding>(parent) {
-
-  override val layoutRoot by boundView { homeContainer }
-
-  override val viewBinding = HomeContainerBinding::inflate
-}
+data class HomeIndexViewState(
+    val symbol: StockSymbol,
+    val quote: StockQuote?,
+    val chart: StockChart?
+) : UiViewState

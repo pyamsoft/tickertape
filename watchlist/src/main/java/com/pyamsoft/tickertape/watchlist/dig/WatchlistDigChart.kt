@@ -16,40 +16,28 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import androidx.annotation.CheckResult
+import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.arch.ViewBinder
-import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
 
-class WatchlistDigChart @Inject internal constructor(delegate: QuoteChartView) :
-    UiView<WatchListDigViewState, WatchListDigViewEvent>() {
+class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
+    QuoteChartView<WatchListDigViewState, WatchListDigViewEvent>(parent) {
 
-  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
+  override fun handleScrubbedView(data: ChartData) {}
 
-  // This is a weird "kind-of-view-kind-of-delegate". I wonder if this is kosher.
-  private val viewBinder: ViewBinder<QuoteChartViewState> = createViewBinder(delegate) {}
-
-  init {
-    doOnTeardown { viewBinder.teardown() }
-  }
-
-  @CheckResult
-  fun id(): Int {
-    return id
-  }
-
-  override fun render(state: UiRender<WatchListDigViewState>) {
+  override fun onRender(state: UiRender<WatchListDigViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
   private fun handleStateChanged(state: WatchListDigViewState) {
     val symbol = state.symbol
     val stock = state.stock
-    viewBinder.bindState(
-        QuoteChartViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart))
+    handleRender(
+        (QuoteChartViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart)
+            .asUiRender()))
   }
 }

@@ -17,25 +17,10 @@
 package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
-import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.QuotedStock
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
-import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
-import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
-import io.cabriole.decorator.LinearBoundsMarginDecoration
-import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
-import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import timber.log.Timber
 
 class WatchlistList
 @Inject
@@ -43,102 +28,7 @@ internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
     factory: WatchlistItemComponent.Factory
-) :
-    BaseUiView<WatchListViewState, WatchListViewEvent, WatchlistBinding>(parent),
-    SwipeRefreshLayout.OnRefreshListener,
-    WatchlistItemAdapter.Callback {
-
-  override val viewBinding = WatchlistBinding::inflate
-
-  override val layoutRoot by boundView { watchlistSwipeRefresh }
-
-  private var modelAdapter: WatchlistItemAdapter? = null
-
-  private var bottomDecoration: RecyclerView.ItemDecoration? = null
-  private var lastScrollPosition = 0
-
-  init {
-    doOnInflate {
-      binding.watchlistList.layoutManager =
-          LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
-    }
-
-    doOnInflate {
-      modelAdapter = WatchlistItemAdapter.create(factory, owner, this)
-      binding.watchlistList.adapter = modelAdapter
-    }
-
-    doOnInflate { binding.watchlistSwipeRefresh.setOnRefreshListener(this) }
-
-    doOnInflate { savedInstanceState ->
-      val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
-      if (position >= 0) {
-        Timber.d("Last scroll position saved at: $position")
-        lastScrollPosition = position
-      }
-    }
-
-    doOnSaveState { outState ->
-      val manager = binding.watchlistList.layoutManager
-      if (manager is LinearLayoutManager) {
-        val position = manager.findFirstVisibleItemPosition()
-        if (position > 0) {
-          outState.put(LAST_SCROLL_POSITION, position)
-          return@doOnSaveState
-        }
-      }
-
-      outState.remove<Nothing>(LAST_SCROLL_POSITION)
-    }
-
-    doOnInflate {
-      val margin = 16.asDp(binding.watchlistList.context)
-
-      // Standard margin on all items
-      // For some reason, the margin registers only half as large as it needs to
-      // be, so we must double it.
-      LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
-
-      // The bottom has additional space to fit the FAB
-      val bottomMargin = 24.asDp(binding.watchlistList.context)
-      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.watchlistList.addItemDecoration(this)
-      }
-    }
-
-    doOnInflate {
-      FastScrollerBuilder(binding.watchlistList)
-          .useMd2Style()
-          .setPopupTextProvider(usingAdapter())
-          .build()
-    }
-
-    doOnTeardown {
-      binding.watchlistList.removeAllItemDecorations()
-      bottomDecoration = null
-    }
-
-    doOnTeardown {
-      binding.watchlistList.adapter = null
-
-      binding.watchlistSwipeRefresh.setOnRefreshListener(null)
-
-      modelAdapter = null
-    }
-  }
-
-  fun setEmbedded() {
-    binding.watchlistSwipeRefresh.isNestedScrollingEnabled = false
-    binding.watchlistSwipeRefresh.isEnabled = false
-  }
-
-  @CheckResult
-  private fun usingAdapter(): WatchlistItemAdapter {
-    return requireNotNull(modelAdapter)
-  }
+) : BaseWatchlistList<WatchListViewState, WatchListViewEvent>(parent, owner, factory) {
 
   override fun onSelect(index: Int) {
     publish(WatchListViewEvent.Select(index))
@@ -153,43 +43,6 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
-    state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
-    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
-  }
-
-  private fun handleBottomOffset(height: Int) {
-    // Add additional padding to the list bottom to account for the height change in MainContainer
-    bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
-    bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.watchlistList.addItemDecoration(this)
-        }
-  }
-
-  private fun setList(list: List<QuotedStock>) {
-    val data = list.map { WatchlistItemViewState(symbol = it.symbol, quote = it.quote) }
-    Timber.d("Submit data list: $data")
-    usingAdapter().submitList(data)
-  }
-
-  private fun clearList() {
-    usingAdapter().submitList(null)
-  }
-
-  private fun handleLoading(loading: Boolean) {
-    binding.watchlistSwipeRefresh.isRefreshing = loading
-  }
-
-  private fun handleList(schedule: List<QuotedStock>) {
-    if (schedule.isEmpty()) {
-      clearList()
-    } else {
-      setList(schedule)
-    }
-  }
-
-  companion object {
-    private const val LAST_SCROLL_POSITION = "watchlist_last_scroll_position"
+    handleRender(state)
   }
 }

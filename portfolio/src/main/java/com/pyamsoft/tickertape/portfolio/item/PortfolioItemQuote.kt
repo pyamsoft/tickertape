@@ -16,43 +16,33 @@
 
 package com.pyamsoft.tickertape.portfolio.item
 
+import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.arch.UiView
-import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.ui.view.QuoteView
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewEvent
 import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
 import com.pyamsoft.tickertape.ui.UiDelegate
 import javax.inject.Inject
 
-class PortfolioItemQuote @Inject internal constructor(delegate: QuoteView) :
-    UiView<PortfolioItemViewState, PortfolioItemViewEvent>(), UiDelegate {
+class PortfolioItemQuote @Inject internal constructor(parent: ViewGroup) :
+    QuoteView<PortfolioItemViewState, PortfolioItemViewEvent>(parent), UiDelegate {
 
-  private val id by lazy(LazyThreadSafetyMode.NONE) { delegate.id() }
-
-  private val viewBinder =
-      createViewBinder(delegate) {
-        return@createViewBinder when (it) {
-          is QuoteViewEvent.Remove -> publish(PortfolioItemViewEvent.Remove)
-          is QuoteViewEvent.Select -> publish(PortfolioItemViewEvent.Select)
-        }
-      }
-
-  init {
-    doOnTeardown { viewBinder.teardown() }
+  override fun handleRemove() {
+    publish(PortfolioItemViewEvent.Remove)
   }
 
-  override fun id(): Int {
-    return id
+  override fun handleSelect() {
+    publish(PortfolioItemViewEvent.Select)
   }
 
-  override fun render(state: UiRender<PortfolioItemViewState>) {
+  override fun onRender(state: UiRender<PortfolioItemViewState>) {
     state.mapChanged { it.stock }.render(viewScope) { handleStockChanged(it) }
   }
 
   private fun handleStockChanged(stock: PortfolioStock) {
-    viewBinder.bindState(
-        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null))
+    handleRender(
+        QuoteViewState(symbol = stock.holding.symbol(), quote = stock.quote?.quote, chart = null)
+            .asUiRender())
   }
 }

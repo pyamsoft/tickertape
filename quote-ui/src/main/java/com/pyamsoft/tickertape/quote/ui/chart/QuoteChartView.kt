@@ -21,6 +21,8 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
@@ -28,15 +30,14 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.robinhood.spark.SparkAdapter
 import com.robinhood.spark.SparkView
 import com.robinhood.spark.animation.MorphSparkAnimator
-import javax.inject.Inject
 import timber.log.Timber
 
-class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<QuoteChartViewState, QuoteChartViewEvent, QuoteChartBinding>(parent) {
+abstract class QuoteChartView<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(parent) {
 
-  override val layoutRoot by boundView { watchlistDigChart }
+  final override val layoutRoot by boundView { watchlistDigChart }
 
-  override val viewBinding = QuoteChartBinding::inflate
+  final override val viewBinding = QuoteChartBinding::inflate
 
   private var adapter: ChartAdapter? = null
 
@@ -81,9 +82,7 @@ class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  private fun handleScrubbedView(data: ChartData) {
-    publish(QuoteChartViewEvent.Scrub(data))
-  }
+  protected abstract fun handleScrubbedView(data: ChartData)
 
   private fun clearScrubView() {}
 
@@ -92,7 +91,7 @@ class QuoteChartView @Inject internal constructor(parent: ViewGroup) :
     adapter = null
   }
 
-  override fun onRender(state: UiRender<QuoteChartViewState>) {
+  protected fun handleRender(state: UiRender<QuoteChartViewState>) {
     state.mapChanged { it.chart }.render(viewScope) { handleChartChanged(it) }
   }
 

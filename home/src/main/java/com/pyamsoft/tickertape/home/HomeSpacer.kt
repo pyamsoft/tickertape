@@ -17,28 +17,25 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
+import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.arch.asUiRender
-import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
-import com.pyamsoft.tickertape.portfolio.PortfolioViewState
+import com.pyamsoft.tickertape.home.databinding.HomeSpacerBinding
 import javax.inject.Inject
 
-class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
-    BasePortfolioHeader<HomeViewState>(parent) {
+class HomeSpacer @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HomeViewState, HomeViewEvent, HomeSpacerBinding>(parent) {
+
+  override val layoutRoot by boundView { homeSpacer }
+
+  override val viewBinding = HomeSpacerBinding::inflate
 
   override fun onRender(state: UiRender<HomeViewState>) {
-    state.render(viewScope) { handleStateChanged(it) }
+    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handleStateChanged(state: HomeViewState) {
-    handleRender(
-        PortfolioViewState(
-                error = state.portfolioError,
-                isLoading = state.isLoadingPortfolio,
-                portfolio = state.portfolio,
-                // Bottom offset is always 0 because the bottom offset is handled by the Home
-                // screens
-                bottomOffset = 0)
-            .asUiRender())
+  private fun handleBottomOffset(height: Int) {
+    // Multiply by 2 to account for the bar offset and the height change in MainContainer
+    layoutRoot.updateLayoutParams { this.height = height * 2 }
   }
 }

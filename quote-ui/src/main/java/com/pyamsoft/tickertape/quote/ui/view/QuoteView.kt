@@ -23,6 +23,8 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteItemBinding
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteNumbersBinding
@@ -30,24 +32,23 @@ import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
 
-class QuoteView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<QuoteViewState, QuoteViewEvent, QuoteItemBinding>(parent) {
+abstract class QuoteView<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(parent) {
 
-  override val layoutRoot by boundView { quoteItem }
+  final override val layoutRoot by boundView { quoteItem }
 
-  override val viewBinding = QuoteItemBinding::inflate
+  final override val viewBinding = QuoteItemBinding::inflate
 
   init {
     doOnInflate {
       binding.quoteItem.setOnLongClickListener {
-        publish(QuoteViewEvent.Remove)
+        handleRemove()
         return@setOnLongClickListener true
       }
     }
 
-    doOnInflate { binding.quoteItem.setOnDebouncedClickListener { publish(QuoteViewEvent.Select) } }
+    doOnInflate { binding.quoteItem.setOnDebouncedClickListener { handleSelect() } }
 
     doOnTeardown {
       binding.apply {
@@ -64,7 +65,11 @@ class QuoteView @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  override fun onRender(state: UiRender<QuoteViewState>) {
+  protected abstract fun handleRemove()
+
+  protected abstract fun handleSelect()
+
+  protected fun handleRender(state: UiRender<QuoteViewState>) {
     state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
     state.mapChanged { it.quote }.render(viewScope) { handleQuote(it) }
   }

@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.item
+package com.pyamsoft.tickertape.home.index
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
-import com.pyamsoft.tickertape.quote.ui.view.QuoteView
-import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
+import com.pyamsoft.tickertape.quote.ui.chart.ChartData
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
+import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
 
-class WatchlistItemQuote @Inject internal constructor(parent: ViewGroup) :
-    QuoteView<WatchlistItemViewState, WatchlistItemViewEvent>(parent) {
+class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
+    QuoteChartView<HomeIndexViewState, Nothing>(parent) {
 
-  override fun handleRemove() {
-    publish(WatchlistItemViewEvent.Remove)
-  }
+  override fun handleScrubbedView(data: ChartData) {}
 
-  override fun handleSelect() {
-    publish(WatchlistItemViewEvent.Select)
-  }
-
-  override fun onRender(state: UiRender<WatchlistItemViewState>) {
+  override fun onRender(state: UiRender<HomeIndexViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStateChanged(state: WatchlistItemViewState) {
+  private fun handleStateChanged(state: HomeIndexViewState) {
     handleRender(
-        (QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender()))
+        (QuoteChartViewState(symbol = state.symbol, quote = state.quote, chart = state.chart)
+            .asUiRender()))
   }
 }

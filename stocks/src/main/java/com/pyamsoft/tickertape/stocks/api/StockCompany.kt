@@ -26,5 +26,8 @@ interface StockCompany {
 
 @CheckResult
 fun String.asCompany(): StockCompany {
-  return StockCompanyImpl(this)
+  return StockCompanyImpl(
+      this.replace("s&p", "S&P", ignoreCase = true)
+          .replace("spdr", "SPDR", ignoreCase = true)
+          .replace("etf", "ETF", ignoreCase = true))
 }

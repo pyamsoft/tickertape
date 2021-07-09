@@ -17,29 +17,10 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockCompany
-import java.util.Locale
 
 internal data class StockCompanyImpl(private val company: String) : StockCompany {
 
-  private val stockCompany by lazy(LazyThreadSafetyMode.NONE) {
-    val locale = Locale.getDefault()
-    return@lazy company
-        .split("\\s+".toRegex())
-        .asSequence()
-        .map { it.lowercase(locale) }
-        .map { word ->
-          return@map word.replaceFirstChar { c ->
-            return@replaceFirstChar if (c.isLowerCase()) {
-              c.titlecase(locale)
-            } else {
-              c.toString()
-            }
-          }
-        }
-        .joinToString(" ")
-  }
-
   override fun company(): String {
-    return stockCompany
+    return company
   }
 }

@@ -17,12 +17,10 @@
 package com.pyamsoft.tickertape.home.index
 
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
 import javax.inject.Inject
@@ -32,13 +30,9 @@ class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
 
   init {
     doOnInflate {
-      binding.watchlistDigChart.updateLayoutParams<LinearLayout.LayoutParams> {
-        this.height = 120.asDp(layoutRoot.context)
-      }
+      binding.watchlistDigChart.updateLayoutParams { this.height = 120.asDp(layoutRoot.context) }
     }
   }
-
-  override fun handleScrubbedView(data: ChartData) {}
 
   override fun onRender(state: UiRender<HomeIndexViewState>) {
     state.render(viewScope) { handleStateChanged(it) }

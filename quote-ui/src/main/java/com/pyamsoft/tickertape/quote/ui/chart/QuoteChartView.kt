@@ -55,19 +55,8 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
   private fun inflateRanges() {}
 
   private fun inflateChart() {
-    // Setup scrub listener
-    binding.watchlistDigChart.setScrubListener { raw ->
-      val data = raw as? ChartData
-      if (data == null) {
-        clearScrubView()
-      } else {
-        handleScrubbedView(data)
-      }
-    }
-
     // Setup Chart visual
     binding.watchlistDigChart.apply {
-      isScrubEnabled = true
       fillType = SparkView.FillType.TOWARD_ZERO
       lineColor =
           Color.argb(
@@ -81,10 +70,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
       sparkAnimator = MorphSparkAnimator()
     }
   }
-
-  protected abstract fun handleScrubbedView(data: ChartData)
-
-  private fun clearScrubView() {}
 
   private fun clearAdapter() {
     binding.watchlistDigChart.adapter = null

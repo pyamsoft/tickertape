@@ -27,7 +27,25 @@ import javax.inject.Inject
 class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     QuoteChartView<WatchListDigViewState, WatchListDigViewEvent>(parent) {
 
-  override fun handleScrubbedView(data: ChartData) {}
+  init {
+    doOnInflate { binding.watchlistDigChart.apply { isScrubEnabled = true } }
+
+    doOnInflate {
+      // Setup scrub listener
+      binding.watchlistDigChart.setScrubListener { raw ->
+        val data = raw as? ChartData
+        if (data == null) {
+          clearScrubView()
+        } else {
+          handleScrubbedView(data)
+        }
+      }
+    }
+  }
+
+  private fun clearScrubView() {}
+
+  private fun handleScrubbedView(data: ChartData) {}
 
   override fun onRender(state: UiRender<WatchListDigViewState>) {
     state.render(viewScope) { handleStateChanged(it) }

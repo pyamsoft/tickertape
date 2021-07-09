@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.stocks.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkStockCharts
+import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.Url
@@ -31,5 +31,5 @@ internal interface ChartService {
       @Query("includePrePost") includePrePost: Boolean,
       @Query("range") range: String,
       @Query("interval") interval: String,
-  ): NetworkStockCharts
+  ): NetworkChartResponse
 }

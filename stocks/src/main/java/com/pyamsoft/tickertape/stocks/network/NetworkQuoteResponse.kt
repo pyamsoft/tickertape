@@ -19,5 +19,32 @@ package com.pyamsoft.tickertape.stocks.network
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-internal data class NetworkQuoteResponse
-internal constructor(internal val result: List<NetworkStock>)
+internal data class NetworkQuoteResponse internal constructor(val quoteResponse: Resp) {
+
+  @JsonClass(generateAdapter = true)
+  internal data class Resp internal constructor(val result: List<Quote>) {
+
+    @JsonClass(generateAdapter = true)
+    internal data class Quote
+    internal constructor(
+        val symbol: String,
+        val shortName: String?,
+        val exchangeDataDelayedBy: Long?,
+        // Regular market
+        val regularMarketPrice: Double?,
+        val regularMarketChange: Double?,
+        val regularMarketChangePercent: Double?,
+        val regularMarketPreviousClose: Double?,
+        val regularMarketOpen: Double?,
+        val regularMarketDayHigh: Double?,
+        val regularMarketDayLow: Double?,
+        val regularMarketDayRange: String?,
+        val regularMarketVolume: Long?,
+        // Post market
+        val postMarketPrice: Double?,
+        val postMarketChange: Double?,
+        val postMarketChangePercent: Double?,
+        val postMarketPreviousClose: Double?,
+    )
+  }
+}

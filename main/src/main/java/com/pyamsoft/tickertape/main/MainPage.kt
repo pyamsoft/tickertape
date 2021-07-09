@@ -16,9 +16,16 @@
 
 package com.pyamsoft.tickertape.main
 
+import androidx.annotation.CheckResult
+
 sealed class MainPage {
   object Home : MainPage()
   object WatchList : MainPage()
   object Portfolio : MainPage()
   object Settings : MainPage()
+
+  @CheckResult
+  fun isFabVisible(): Boolean {
+    return this == WatchList || this == Portfolio
+  }
 }

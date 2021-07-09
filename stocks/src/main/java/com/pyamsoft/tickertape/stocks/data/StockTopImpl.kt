@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.service
+package com.pyamsoft.tickertape.stocks.data
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
-import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.http.Url
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockTop
 
-internal interface QuoteService {
+internal data class StockTopImpl(
+    private val title: String,
+    private val description: String,
+    private val quotes: List<StockQuote>
+) : StockTop {
 
-  @GET
-  @CheckResult
-  suspend fun getQuotes(
-      @Url url: String,
-      @Query("format") format: String,
-      @Query("fields", encoded = true) fields: String,
-      @Query("symbols", encoded = true) symbols: String
-  ): NetworkQuoteResponse
+  override fun title(): String {
+    return title
+  }
+
+  override fun description(): String {
+    return description
+  }
+
+  override fun quotes(): List<StockQuote> {
+    return quotes
+  }
 }

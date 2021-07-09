@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.network
+package com.pyamsoft.tickertape.stocks.api
 
-import com.squareup.moshi.JsonClass
+import androidx.annotation.CheckResult
 
-@JsonClass(generateAdapter = true)
-internal data class NetworkStockCharts
-internal constructor(internal val chart: NetworkChartResponse)
+interface StockTop {
+
+  @CheckResult fun title(): String
+
+  @CheckResult fun description(): String
+
+  @CheckResult fun quotes(): List<StockQuote>
+}

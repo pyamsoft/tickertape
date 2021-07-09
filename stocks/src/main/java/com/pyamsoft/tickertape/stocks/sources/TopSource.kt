@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.network
+package com.pyamsoft.tickertape.stocks.sources
 
-import com.squareup.moshi.JsonClass
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockTop
 
-@JsonClass(generateAdapter = true)
-internal data class NetworkStockQuotes
-internal constructor(internal val quoteResponse: NetworkQuoteResponse)
+interface TopSource {
+
+  @CheckResult suspend fun getDayGainers(force: Boolean, count: Int): List<StockTop>
+
+  @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): List<StockTop>
+}

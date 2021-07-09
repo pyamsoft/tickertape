@@ -19,26 +19,18 @@ package com.pyamsoft.tickertape.stocks.network
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-internal data class NetworkChart
-internal constructor(
-    internal val meta: Meta?,
-    internal val timestamp: List<Long>?,
-    internal val indicators: Indicator?
-) {
+internal data class NetworkTopResponse internal constructor(val finance: Resp) {
 
   @JsonClass(generateAdapter = true)
-  internal data class Meta(internal val symbol: String?, internal val chartPreviousClose: Double?)
-
-  @JsonClass(generateAdapter = true)
-  internal data class Indicator(internal val quote: List<Quote>?) {
+  internal data class Resp internal constructor(val result: List<Top>) {
 
     @JsonClass(generateAdapter = true)
-    internal data class Quote(
-        internal val volume: List<Long?>?,
-        internal val high: List<Double?>?,
-        internal val low: List<Double?>?,
-        internal val close: List<Double?>?,
-        internal val open: List<Double?>?,
+    internal data class Top
+    internal constructor(
+        val id: String?,
+        val title: String?,
+        val description: String?,
+        val quotes: List<NetworkQuoteResponse.Resp.Quote>?
     )
   }
 }

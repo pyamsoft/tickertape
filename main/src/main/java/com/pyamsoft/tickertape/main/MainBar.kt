@@ -86,7 +86,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
     state.mapChanged { it.page }.render(viewScope) { handlePage(it) }
   }
 
-  private fun handlePage(page: MainPage?) {
+  private fun handlePage(page: MainPage) {
     Timber.d("Handle page: $page")
     val pageId = getIdForPage(page)
     if (pageId != 0) {
@@ -101,26 +101,9 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
     }
   }
 
-  private fun publishFabVisibility(viewEvent: MainViewEvent) {
-    val isVisible =
-        when (viewEvent) {
-          is MainViewEvent.OpenHome, MainViewEvent.OpenSettings -> false
-          is MainViewEvent.OpenWatchList, is MainViewEvent.OpenPortfolio -> true
-          is MainViewEvent.AddRequest,
-          is MainViewEvent.BottomBarMeasured,
-          is MainViewEvent.FabCradleVisibility -> {
-            Timber.d("ViewEvent does not affect FAB visibility: $viewEvent")
-            return
-          }
-        }
-
-    publish(MainViewEvent.FabCradleVisibility(isVisible))
-  }
-
   @CheckResult
   private fun select(viewEvent: MainViewEvent): Boolean {
     publish(viewEvent)
-    publishFabVisibility(viewEvent)
     return false
   }
 
@@ -128,15 +111,12 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
     @JvmStatic
     @CheckResult
-    private fun getIdForPage(page: MainPage?): Int {
-      return if (page == null) 0
-      else {
-        when (page) {
-          is MainPage.Home -> R.id.menu_home
-          is MainPage.WatchList -> R.id.menu_watchlist
-          is MainPage.Settings -> R.id.menu_settings
-          is MainPage.Portfolio -> R.id.menu_portfolio
-        }
+    private fun getIdForPage(page: MainPage): Int {
+      return when (page) {
+        is MainPage.Home -> R.id.menu_home
+        is MainPage.WatchList -> R.id.menu_watchlist
+        is MainPage.Settings -> R.id.menu_settings
+        is MainPage.Portfolio -> R.id.menu_portfolio
       }
     }
   }

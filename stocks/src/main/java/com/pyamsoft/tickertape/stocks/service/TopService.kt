@@ -17,19 +17,19 @@
 package com.pyamsoft.tickertape.stocks.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
+import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
-import retrofit2.http.Url
 
-internal interface QuoteService {
+internal interface TopService {
 
-  @GET
+  @GET(
+      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_gainers")
   @CheckResult
-  suspend fun getQuotes(
-      @Url url: String,
-      @Query("format") format: String,
-      @Query("fields", encoded = true) fields: String,
-      @Query("symbols", encoded = true) symbols: String
-  ): NetworkQuoteResponse
+  suspend fun getDayGainers(@Query("count") count: Int): NetworkTopResponse
+
+  @GET(
+      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_losers")
+  @CheckResult
+  suspend fun getDayLosers(@Query("count") count: Int): NetworkTopResponse
 }

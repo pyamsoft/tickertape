@@ -24,8 +24,7 @@ import com.pyamsoft.pydroid.arch.UiViewState
 data class MainViewState
 internal constructor(
     @StringRes val appNameRes: Int,
-    val page: MainPage?,
-    val isFabVisible: Boolean,
+    val page: MainPage,
     val bottomBarHeight: Int,
 ) : UiViewState
 
@@ -40,8 +39,6 @@ sealed class MainViewEvent : UiViewEvent {
   object OpenSettings : MainViewEvent()
 
   data class BottomBarMeasured internal constructor(val height: Int) : MainViewEvent()
-
-  data class FabCradleVisibility internal constructor(val visible: Boolean) : MainViewEvent()
 
   object AddRequest : MainViewEvent()
 }

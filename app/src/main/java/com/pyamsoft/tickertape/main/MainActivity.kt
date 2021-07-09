@@ -136,7 +136,6 @@ internal class MainActivity :
             toolbar.requireNotNull()) {
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
-            is MainViewEvent.FabCradleVisibility -> viewModel.handlePublishFabVisibility(it.visible)
             is MainViewEvent.OpenHome -> viewModel.handleSelectPage(MainPage.Home, force = false)
             is MainViewEvent.OpenPortfolio ->
                 viewModel.handleSelectPage(MainPage.Portfolio, force = false)

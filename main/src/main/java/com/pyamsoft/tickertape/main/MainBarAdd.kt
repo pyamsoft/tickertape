@@ -49,7 +49,9 @@ internal constructor(private val imageLoader: ImageLoader, parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<MainViewState>) {
-    state.mapChanged { it.isFabVisible }.render(viewScope) { handleFabVisible(it) }
+    state.mapChanged { it.page }.mapChanged { it.isFabVisible() }.render(viewScope) {
+      handleFabVisible(it)
+    }
   }
 
   private fun handleFabVisible(visible: Boolean) {

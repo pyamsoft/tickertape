@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkChart
+import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import java.time.Instant
@@ -62,7 +62,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
             .chart
             .result
             .asSequence()
-            .filterOnlyValidStockData()
+            .filterOnlyValidCharts()
             .map { chart ->
               val startingPrice =
                   chart.meta.requireNotNull().chartPreviousClose.requireNotNull().asMoney()
@@ -126,48 +126,6 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
     @CheckResult
     private fun getChartUrl(symbol: StockSymbol): String {
       return "$YF_QUOTE_SOURCE/${symbol.symbol()}"
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun Sequence<NetworkChart>.filterOnlyValidStockData(): Sequence<NetworkChart> {
-      return this.filter { it.isValidStockData() }
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun NetworkChart.isValidStockData(): Boolean {
-      // We need all of these values to have a valid ticker
-      if (meta?.chartPreviousClose == null) {
-        return false
-      }
-
-      // We need indicators and timestamps that are not empty
-      val time = timestamp ?: return false
-      val ind = indicators ?: return false
-
-      if (time.isEmpty()) {
-        return false
-      }
-
-      val quote = ind.quote ?: return false
-      val actuallyQuote = quote.firstOrNull() ?: return false
-
-      val open = actuallyQuote.open ?: return false
-      val close = actuallyQuote.close ?: return false
-      val high = actuallyQuote.high ?: return false
-      val low = actuallyQuote.low ?: return false
-      val volume = actuallyQuote.volume ?: return false
-
-      if (open.isEmpty() ||
-          close.isEmpty() ||
-          high.isEmpty() ||
-          low.isEmpty() ||
-          volume.isEmpty()) {
-        return false
-      }
-
-      return true
     }
 
     @JvmStatic

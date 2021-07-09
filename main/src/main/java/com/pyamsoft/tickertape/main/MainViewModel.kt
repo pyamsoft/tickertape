@@ -44,8 +44,7 @@ internal constructor(
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
         savedState,
-        MainViewState(
-            appNameRes = appNameRes, page = null, isFabVisible = true, bottomBarHeight = 0)) {
+        MainViewState(appNameRes = appNameRes, page = DEFAULT_PAGE, bottomBarHeight = 0)) {
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -55,7 +54,7 @@ internal constructor(
 
   fun handleLoadDefaultPage() {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val page = restoreSavedState(KEY_PAGE) { MainPage.Home.asString() }.asPage()
+      val page = restoreSavedState(KEY_PAGE) { DEFAULT_PAGE.asString() }.asPage()
       Timber.d("Loading initial page: $page")
       handleSelectPage(page, force = true)
     }
@@ -67,10 +66,6 @@ internal constructor(
           stateChange = { copy(bottomBarHeight = height) },
           andThen = { bottomOffsetBus.send(BottomOffset(it.bottomBarHeight)) })
     }
-  }
-
-  fun handlePublishFabVisibility(isVisible: Boolean) {
-    setState { copy(isFabVisible = isVisible) }
   }
 
   fun handleSelectPage(
@@ -104,6 +99,8 @@ internal constructor(
   }
 
   companion object {
+
+    private val DEFAULT_PAGE = MainPage.Home
 
     @CheckResult
     private fun MainPage.asString(): String {

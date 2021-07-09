@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -29,7 +28,6 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkStock
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
@@ -54,7 +52,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .quoteResponse
             .result
             .asSequence()
-            .filterOnlyValidStockData()
+            .filterOnlyValidQuotes()
             .map { stock ->
               StockQuoteImpl(
                   symbol = stock.symbol.asSymbol(),
@@ -111,28 +109,5 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .joinToString(",")
     private const val YF_QUOTE_FORMAT = "json"
     private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v7/finance/quote"
-
-    @JvmStatic
-    @CheckResult
-    private fun hasAfterHoursData(stock: NetworkStock): Boolean {
-      return stock.run {
-        postMarketChange != null && postMarketPrice != null && postMarketChangePercent != null
-      }
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun Sequence<NetworkStock>.filterOnlyValidStockData(): Sequence<NetworkStock> {
-      // If the symbol does not exist, these values will return null
-      // We need all of these values to have a valid ticker
-      return this.filterNot { it.shortName == null }
-          .filterNot { it.regularMarketChange == null }
-          .filterNot { it.regularMarketPrice == null }
-          .filterNot { it.regularMarketChangePercent == null }
-          .filterNot { it.regularMarketDayHigh == null }
-          .filterNot { it.regularMarketDayLow == null }
-          .filterNot { it.regularMarketDayRange == null }
-          .filterNot { it.regularMarketVolume == null }
-    }
   }
 }

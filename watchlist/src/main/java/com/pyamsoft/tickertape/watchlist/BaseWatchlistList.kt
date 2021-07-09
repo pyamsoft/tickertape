@@ -35,7 +35,6 @@ import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
-import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
 abstract class BaseWatchlistList<S : UiViewState, V : UiViewEvent>
@@ -94,28 +93,6 @@ protected constructor(
       outState.remove<Nothing>(LAST_SCROLL_POSITION)
     }
 
-    doOnInflate {
-      val margin = 16.asDp(binding.watchlistList.context)
-
-      // Standard margin on all items
-      // For some reason, the margin registers only half as large as it needs to
-      // be, so we must double it.
-      LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
-
-      // The bottom has additional space to fit the FAB
-      val bottomMargin = 24.asDp(binding.watchlistList.context)
-      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.watchlistList.addItemDecoration(this)
-      }
-    }
-
-    doOnInflate {
-      FastScrollerBuilder(binding.watchlistList)
-          .useMd2Style()
-          .setPopupTextProvider(usingAdapter())
-          .build()
-    }
-
     doOnTeardown {
       binding.watchlistList.removeAllItemDecorations()
       bottomDecoration = null
@@ -131,7 +108,7 @@ protected constructor(
   }
 
   @CheckResult
-  private fun usingAdapter(): WatchlistItemAdapter {
+  protected fun usingAdapter(): WatchlistItemAdapter {
     return requireNotNull(modelAdapter)
   }
 

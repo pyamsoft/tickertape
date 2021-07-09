@@ -24,11 +24,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.home.databinding.HomeIndexesBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexAdapter
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.home.index.HomeIndexViewState
 import com.pyamsoft.tickertape.quote.QuotedChart
+import io.cabriole.decorator.DecorationLookup
+import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -82,6 +85,42 @@ internal constructor(
       }
 
       outState.remove<Nothing>(LAST_SCROLL_POSITION)
+    }
+
+    doOnInflate {
+      val margin = 16.asDp(binding.homeIndexes.context)
+
+      // Standard margin on all items
+      // For some reason, the margin registers only half as large as it needs to
+      // be, so we must double it.
+      //
+      // First item is weird.
+      LinearMarginDecoration(
+              leftMargin = margin * 2,
+              rightMargin = margin,
+              orientation = RecyclerView.HORIZONTAL,
+              decorationLookup =
+                  object : DecorationLookup {
+                    override fun shouldApplyDecoration(position: Int, itemCount: Int): Boolean {
+                      return position == 0
+                    }
+                  })
+          .apply { binding.homeIndexes.addItemDecoration(this) }
+
+      LinearMarginDecoration.createHorizontal(
+              margin,
+              orientation = RecyclerView.HORIZONTAL,
+              decorationLookup =
+                  object : DecorationLookup {
+                    override fun shouldApplyDecoration(position: Int, itemCount: Int): Boolean {
+                      return position > 0
+                    }
+                  })
+          .apply { binding.homeIndexes.addItemDecoration(this) }
+
+      LinearMarginDecoration.createVertical(margin, orientation = RecyclerView.HORIZONTAL).apply {
+        binding.homeIndexes.addItemDecoration(this)
+      }
     }
 
     doOnTeardown { binding.homeIndexes.removeAllItemDecorations() }

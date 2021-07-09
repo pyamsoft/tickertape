@@ -19,8 +19,12 @@ package com.pyamsoft.tickertape.watchlist
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
+import io.cabriole.decorator.LinearBoundsMarginDecoration
+import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class WatchlistList
 @Inject
@@ -29,6 +33,30 @@ internal constructor(
     owner: LifecycleOwner,
     factory: WatchlistItemComponent.Factory
 ) : BaseWatchlistList<WatchListViewState, WatchListViewEvent>(parent, owner, factory) {
+
+  init {
+    doOnInflate {
+      FastScrollerBuilder(binding.watchlistList)
+          .useMd2Style()
+          .setPopupTextProvider(usingAdapter())
+          .build()
+    }
+
+    doOnInflate {
+      val margin = 16.asDp(binding.watchlistList.context)
+
+      // Standard margin on all items
+      // For some reason, the margin registers only half as large as it needs to
+      // be, so we must double it.
+      LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
+
+      // The bottom has additional space to fit the FAB
+      val bottomMargin = 24.asDp(binding.watchlistList.context)
+      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
+        binding.watchlistList.addItemDecoration(this)
+      }
+    }
+  }
 
   override fun onSelect(index: Int) {
     publish(WatchListViewEvent.Select(index))

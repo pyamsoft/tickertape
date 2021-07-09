@@ -32,6 +32,8 @@ internal constructor(
     owner: LifecycleOwner,
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<HomeIndexViewState> {
 
+  @Inject @JvmField internal var symbol: HomeIndexSymbol? = null
+
   @Inject @JvmField internal var chart: HomeIndexChart? = null
 
   private val viewBinder: ViewBinder<HomeIndexViewState>
@@ -39,7 +41,7 @@ internal constructor(
   init {
     factory.create(binding.homeIndexItem).inject(this)
 
-    viewBinder = createViewBinder(chart.requireNotNull()) {}
+    viewBinder = createViewBinder(symbol.requireNotNull(), chart.requireNotNull()) {}
 
     owner.doOnDestroy { teardown() }
   }
@@ -50,6 +52,8 @@ internal constructor(
 
   override fun teardown() {
     viewBinder.teardown()
+
+    symbol = null
     chart = null
   }
 }

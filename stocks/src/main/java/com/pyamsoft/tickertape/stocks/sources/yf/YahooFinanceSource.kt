@@ -20,7 +20,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.StockTop
+import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
@@ -36,13 +36,13 @@ internal constructor(
     @YahooFinanceApi private val tops: TopSource,
 ) : QuoteSource, ChartSource, TopSource {
 
-  override suspend fun getDayGainers(force: Boolean, count: Int): List<StockTop> =
+  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext tops.getDayGainers(force, count)
       }
 
-  override suspend fun getDayLosers(force: Boolean, count: Int): List<StockTop> =
+  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext tops.getDayLosers(force, count)

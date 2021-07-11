@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.api
+package com.pyamsoft.tickertape.home
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-interface StockTop {
-
-  @CheckResult fun title(): String
-
-  @CheckResult fun description(): String
-
-  @CheckResult fun quotes(): List<StockQuote>
-}
+data class TopDataWithChart
+internal constructor(
+    val title: String,
+    val description: String,
+    val quote: StockQuote,
+    val chart: StockChart?
+)

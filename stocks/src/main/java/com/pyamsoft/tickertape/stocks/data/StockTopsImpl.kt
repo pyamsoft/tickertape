@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.data
 
-import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockTops
 
-interface TopSource {
+internal data class StockTopsImpl(
+    private val title: String,
+    private val description: String,
+    private val quotes: List<StockQuote>
+) : StockTops {
 
-  @CheckResult suspend fun getDayGainers(force: Boolean, count: Int): StockTops
+  override fun title(): String {
+    return title
+  }
 
-  @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): StockTops
+  override fun description(): String {
+    return description
+  }
+
+  override fun quotes(): List<StockQuote> {
+    return quotes
+  }
 }

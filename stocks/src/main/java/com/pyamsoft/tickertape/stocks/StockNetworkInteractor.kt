@@ -20,8 +20,10 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.TopSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,7 +33,20 @@ internal class StockNetworkInteractor
 internal constructor(
     @InternalApi private val quoteSource: QuoteSource,
     @InternalApi private val chartSource: ChartSource,
+    @InternalApi private val topSource: TopSource,
 ) : StockInteractor {
+
+  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext topSource.getDayGainers(force, count)
+      }
+
+  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext topSource.getDayLosers(force, count)
+      }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {

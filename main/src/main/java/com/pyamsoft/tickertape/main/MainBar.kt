@@ -65,9 +65,9 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
     }
 
     doOnInflate {
-      binding.mainBarNav.setOnNavigationItemSelectedListener { item ->
+      binding.mainBarNav.setOnItemSelectedListener { item ->
         Timber.d("Click nav item: $item")
-        return@setOnNavigationItemSelectedListener when (item.itemId) {
+        return@setOnItemSelectedListener when (item.itemId) {
           R.id.menu_watchlist -> select(MainViewEvent.OpenWatchList)
           R.id.menu_settings -> select(MainViewEvent.OpenSettings)
           R.id.menu_portfolio -> select(MainViewEvent.OpenPortfolio)
@@ -77,7 +77,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
       }
     }
 
-    doOnTeardown { binding.mainBarNav.setOnNavigationItemSelectedListener(null) }
+    doOnTeardown { binding.mainBarNav.setOnItemSelectedListener(null) }
 
     doOnTeardown { handler.removeCallbacksAndMessages(null) }
   }

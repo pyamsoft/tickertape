@@ -85,8 +85,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         nestedPortfolio.requireNotNull(),
         nestedIndexes.requireNotNull(),
         nestedWatchlist.requireNotNull(),
-        spacer.requireNotNull()
-    )
+        spacer.requireNotNull())
 
     val scrollContainer = scrollContainer.requireNotNull()
     scrollContainer.nest(container)
@@ -107,6 +106,8 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     viewModel.handleFetchIndexes(false)
     viewModel.handleFetchPortfolio(false)
     viewModel.handleFetchWatchlist(false)
+    viewModel.handleFetchGainers(false)
+    viewModel.handleFetchLosers(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

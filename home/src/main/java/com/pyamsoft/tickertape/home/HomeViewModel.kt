@@ -41,6 +41,7 @@ import timber.log.Timber
 class HomeViewModel
 @Inject
 internal constructor(
+    private val interactor: HomeInteractor,
     private val portfolioInteractor: PortfolioInteractor,
     private val watchlistInteractor: WatchlistInteractor,
     private val quoteInteractor: QuoteInteractor,
@@ -59,6 +60,12 @@ internal constructor(
                 indexesError = null,
                 indexes = emptyList(),
                 isLoadingIndexes = false,
+                gainError = null,
+                gainers = emptyList(),
+                isLoadingGainers = false,
+                loseError = null,
+                losers = emptyList(),
+                isLoadingLosers = false,
                 bottomOffset = 0)) {
 
   private val portfolioFetcher =
@@ -82,6 +89,16 @@ internal constructor(
             range = StockChart.IntervalRange.ONE_DAY,
             includePrePost = false,
             includeQuote = true)
+      }
+
+  private val gainersFetcher =
+      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
+        interactor.getDayGainers(it, WATCHLIST_COUNT)
+      }
+
+  private val losersFetcher =
+      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
+        interactor.getDayLosers(it, WATCHLIST_COUNT)
       }
 
   init {
@@ -139,6 +156,36 @@ internal constructor(
             })
       }
 
+  private suspend fun fetchGainers(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingGainers = true) },
+            andThen = {
+              gainersFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState { copy(gainError = null, gainers = it, isLoadingGainers = false) }
+                  }
+                  .onFailure { Timber.e(it, "Failed to fetch gainers") }
+                  .onFailure { setState { copy(gainError = it, isLoadingGainers = false) } }
+            })
+      }
+
+  private suspend fun fetchLosers(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingLosers = true) },
+            andThen = {
+              losersFetcher
+                  .call(force)
+                  .onSuccess {
+                    setState { copy(loseError = null, losers = it, isLoadingLosers = false) }
+                  }
+                  .onFailure { Timber.e(it, "Failed to fetch losers") }
+                  .onFailure { setState { copy(loseError = it, isLoadingLosers = false) } }
+            })
+      }
+
   fun handleFetchPortfolio(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
   }
@@ -149,6 +196,14 @@ internal constructor(
 
   fun handleFetchIndexes(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchIndexes(force) }
+  }
+
+  fun handleFetchGainers(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchGainers(force) }
+  }
+
+  fun handleFetchLosers(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchLosers(force) }
   }
 
   fun handleOpenPage(page: MainPage) {

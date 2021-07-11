@@ -20,7 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
-import com.pyamsoft.tickertape.stocks.api.StockTop
+import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -29,7 +29,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.data.StockTopImpl
+import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
 import com.pyamsoft.tickertape.stocks.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import javax.inject.Inject
@@ -40,16 +40,16 @@ internal class YahooTopSource
 @Inject
 internal constructor(@InternalApi private val service: TopService) : TopSource {
 
-  override suspend fun getDayGainers(force: Boolean, count: Int): List<StockTop> {
+  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops {
     return getTops(TopType.GAINERS, count)
   }
 
-  override suspend fun getDayLosers(force: Boolean, count: Int): List<StockTop> {
+  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops {
     return getTops(TopType.LOSERS, count)
   }
 
   @CheckResult
-  private suspend fun getTops(type: TopType, count: Int): List<StockTop> =
+  private suspend fun getTops(type: TopType, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -64,7 +64,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
             .asSequence()
             .filterOnlyValidTops()
             .map { top ->
-              StockTopImpl(
+              StockTopsImpl(
                   title = top.title.requireNotNull(),
                   description = top.description.requireNotNull(),
                   quotes =
@@ -109,7 +109,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                           }
                           .toList())
             }
-            .toList()
+            .first()
       }
 
   private enum class TopType {

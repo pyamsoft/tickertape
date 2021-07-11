@@ -18,11 +18,13 @@ package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.MemoryCacheStorage
+import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockTops
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,6 +49,40 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
           includePrePost,
           range ->
         interactor.getChart(true, symbol, range, includePrePost)
+      }
+
+  private val gainerCache =
+      cachify<StockTops, Int>(
+          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
+        interactor.getDayGainers(true, it)
+      }
+
+  private val loserCache =
+      cachify<StockTops, Int>(
+          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
+        interactor.getDayLosers(true, it)
+      }
+
+  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          gainerCache.clear()
+        }
+
+        return@withContext gainerCache.call(count)
+      }
+
+  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          loserCache.clear()
+        }
+
+        return@withContext loserCache.call(count)
       }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =

@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.data
+package com.pyamsoft.tickertape.stocks.api
 
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockTop
+import androidx.annotation.CheckResult
 
-internal data class StockTopImpl(
-    private val title: String,
-    private val description: String,
-    private val quotes: List<StockQuote>
-) : StockTop {
+interface StockTops {
 
-  override fun title(): String {
-    return title
-  }
+  @CheckResult fun title(): String
 
-  override fun description(): String {
-    return description
-  }
+  @CheckResult fun description(): String
 
-  override fun quotes(): List<StockQuote> {
-    return quotes
-  }
+  @CheckResult fun quotes(): List<StockQuote>
 }

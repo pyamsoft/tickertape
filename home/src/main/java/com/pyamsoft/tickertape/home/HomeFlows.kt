@@ -34,6 +34,12 @@ internal constructor(
     val indexes: List<QuotedChart>,
     val isLoadingIndexes: Boolean,
     val indexesError: Throwable?,
+    val gainers: List<TopDataWithChart>,
+    val isLoadingGainers: Boolean,
+    val gainError: Throwable?,
+    val losers: List<TopDataWithChart>,
+    val isLoadingLosers: Boolean,
+    val loseError: Throwable?,
     val bottomOffset: Int,
 ) : UiViewState
 

@@ -20,30 +20,32 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.home.databinding.HomeIndexesBinding
+import com.pyamsoft.tickertape.home.databinding.HomeGainersBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.quote.QuotedChart
 import javax.inject.Inject
 
-class HomeIndexList
+class HomeGainerList
 @Inject
 internal constructor(
     parent: ViewGroup,
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
-) : BaseHomeChartList<HomeIndexesBinding>(parent, factory, owner) {
+) : BaseHomeChartList<HomeGainersBinding>(parent, factory, owner) {
 
-  override val viewBinding = HomeIndexesBinding::inflate
+  override val viewBinding = HomeGainersBinding::inflate
 
   override fun provideList(): RecyclerView {
-    return binding.homeIndexes
+    return binding.homeGainers
   }
 
   override fun onRender(state: UiRender<HomeViewState>) {
-    state.mapChanged { it.indexes }.render(viewScope) { handleIndexesChanged(it) }
+    state.mapChanged { it.gainers }.render(viewScope) { handleGainersChanged(it) }
   }
 
-  private fun handleIndexesChanged(list: List<QuotedChart>) {
+  private fun handleGainersChanged(gainers: List<TopDataWithChart>) {
+    val list =
+        gainers.map { QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart) }
     handleList(list)
   }
 }

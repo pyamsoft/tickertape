@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.applyAppBarOffset
 import com.pyamsoft.tickertape.home.databinding.HomeScrollContainerBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 class HomeScrollContainer
 @Inject

@@ -31,6 +31,7 @@ import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
+import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.main.MainPage
@@ -54,6 +55,10 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
   @Inject @JvmField internal var nestedPortfolio: HomePortfolio? = null
 
   @Inject @JvmField internal var nestedWatchlist: HomeWatchlist? = null
+
+  @Inject @JvmField internal var nestedGainers: HomeGainerList? = null
+
+  @Inject @JvmField internal var nestedLosers: HomeLoserList? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -85,6 +90,8 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         nestedPortfolio.requireNotNull(),
         nestedIndexes.requireNotNull(),
         nestedWatchlist.requireNotNull(),
+        nestedGainers.requireNotNull(),
+        nestedLosers.requireNotNull(),
         spacer.requireNotNull())
 
     val scrollContainer = scrollContainer.requireNotNull()
@@ -124,6 +131,8 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     nestedIndexes = null
     nestedPortfolio = null
     nestedWatchlist = null
+    nestedGainers = null
+    nestedLosers = null
   }
 
   companion object {

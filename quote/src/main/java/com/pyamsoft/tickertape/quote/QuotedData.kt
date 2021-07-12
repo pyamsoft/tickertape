@@ -20,7 +20,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: StockQuote?) {
+data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
 
   companion object {
 
@@ -51,5 +51,4 @@ data class QuotedStock internal constructor(val symbol: StockSymbol, val quote: 
   }
 }
 
-data class QuotedChart
-internal constructor(val symbol: StockSymbol, val chart: StockChart?, val quote: StockQuote?)
+data class QuotedChart(val symbol: StockSymbol, val chart: StockChart?, val quote: StockQuote?)

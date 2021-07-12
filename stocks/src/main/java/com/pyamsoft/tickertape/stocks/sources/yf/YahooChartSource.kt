@@ -27,7 +27,6 @@ import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import java.time.Instant
@@ -135,7 +134,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
         StockChart.IntervalRange.ONE_DAY -> StockChart.IntervalTime.ONE_MINUTE
         StockChart.IntervalRange.FIVE_DAY -> StockChart.IntervalTime.FIFTEEN_MINUTES
         StockChart.IntervalRange.ONE_MONTH -> StockChart.IntervalTime.SIXTY_MINUTES
-        StockChart.IntervalRange.THREE_MONTH -> StockChart.IntervalTime.NINETY_MINUTES
+        StockChart.IntervalRange.THREE_MONTH -> StockChart.IntervalTime.ONE_DAY
         StockChart.IntervalRange.SIX_MONTH -> StockChart.IntervalTime.ONE_DAY
         StockChart.IntervalRange.ONE_YEAR -> StockChart.IntervalTime.ONE_DAY
         StockChart.IntervalRange.TWO_YEAR -> StockChart.IntervalTime.FIVE_DAYS

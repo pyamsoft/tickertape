@@ -41,33 +41,28 @@ interface StockChart {
 
   @CheckResult fun low(): List<StockMoneyValue>
 
-  enum class IntervalTime(val apiValue: String) {
-    ONE_MINUTE("1m"),
-    TWO_MINUTES("2m"),
-    FIVE_MINUTES("5m"),
-    FIFTEEN_MINUTES("15m"),
-    THIRY_MINUTES("30m"),
-    SIXTY_MINUTES("60m"),
-    NINETY_MINUTES("90m"),
-    ONE_HOUR("1h"),
-    ONE_DAY("1d"),
-    FIVE_DAYS("5d"),
-    ONE_WEEK("1wk"),
-    ONE_MONTH("1mo"),
-    THREE_MONTH("3mo")
+  enum class IntervalTime(internal val apiValue: String, val display: String) {
+    ONE_MINUTE("1m", "1 Minute"),
+    TWO_MINUTES("2m", "2 Minutes"),
+    FIFTEEN_MINUTES("15m", "15 Minutes"),
+    SIXTY_MINUTES("60m", "1 Hour"),
+    ONE_DAY("1d", "1 Day"),
+    FIVE_DAYS("5d", "5 Days"),
+    ONE_WEEK("1wk", "1 Week"),
+    ONE_MONTH("1mo", "1 Month"),
   }
 
-  enum class IntervalRange(val apiValue: String) {
-    ONE_DAY("1d"),
-    FIVE_DAY("5d"),
-    ONE_MONTH("1mo"),
-    THREE_MONTH("3mo"),
-    SIX_MONTH("6mo"),
-    ONE_YEAR("1y"),
-    TWO_YEAR("2y"),
-    FIVE_YEAR("5y"),
-    TEN_YEAR("10y"),
-    YTD("ytd"),
-    MAX("max")
+  enum class IntervalRange(internal val apiValue: String, val display: String) {
+    ONE_DAY("1d", "1 Day"),
+    FIVE_DAY("5d", "5 Days"),
+    ONE_MONTH("1mo", "1 Month"),
+    THREE_MONTH("3mo", "3 Months"),
+    SIX_MONTH("6mo", "6 Months"),
+    ONE_YEAR("1y", "1 Year"),
+    TWO_YEAR("2y", "2 Years"),
+    FIVE_YEAR("5y", "5 Years"),
+    TEN_YEAR("10y", "10 Years"),
+    YTD("ytd", "Year to Date"),
+    MAX("max", "Max")
   }
 }

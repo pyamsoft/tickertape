@@ -41,22 +41,33 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
   override fun onRender(state: UiRender<PortfolioItemViewState>) {
     state.mapChanged { it.stock }.apply {
       mapChanged { it.totalShares() }.render(viewScope) { handleTotalSharesChanged(it) }
-      mapChanged { it.averagePrice() }.render(viewScope) { handleAveragePriceChanged(it) }
       mapChanged { it.gainLossDisplayString() }.render(viewScope) { handleGainLossChanged(it) }
       mapChanged { it.current() }.render(viewScope) { handleCurrentValueChanged(it) }
-      mapChanged { it.todayDirection() }.render(viewScope) { handleDirectionChanged(it) }
+      mapChanged { it.todayDirection() }.render(viewScope) { handleTodayDirectionChanged(it) }
+      mapChanged { it.totalDirection() }.render(viewScope) { handleTotalDirectionChanged(it) }
+      mapChanged { it.changeTodayDisplayString() }.render(viewScope) { handleTodayChanged(it) }
     }
   }
 
-  private fun handleDirectionChanged(direction: StockDirection) {
+  private fun handleTotalDirectionChanged(direction: StockDirection) {
     val color = direction.color()
-    binding.holdingSummaryCurrentValueText.setTextColor(color)
     binding.holdingSummaryGainlossText.setTextColor(color)
     binding.holdingSummaryGainlossLabel.text =
         when {
-          direction.isUp() -> "Gain"
-          direction.isDown() -> "Loss"
-          else -> "Change"
+          direction.isUp() -> "Total Gain"
+          direction.isDown() -> "Total Loss"
+          else -> "Total Change"
+        }
+  }
+
+  private fun handleTodayDirectionChanged(direction: StockDirection) {
+    val color = direction.color()
+    binding.holdingSummaryChangeText.setTextColor(color)
+    binding.holdingSummaryChangeLabel.text =
+        when {
+          direction.isUp() -> "Gain Today"
+          direction.isDown() -> "Loss Today"
+          else -> "Change Today"
         }
   }
 
@@ -64,8 +75,8 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
     binding.holdingSummaryTotalSharesText.text = ""
   }
 
-  private fun clearAveragePrice() {
-    binding.holdingSummaryAvgPriceText.text = ""
+  private fun clearTodayChangePrice() {
+    binding.holdingSummaryChangeText.text = ""
   }
 
   private fun clearGainLossPrice() {
@@ -78,7 +89,7 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   private fun clear() {
     clearTotalShares()
-    clearAveragePrice()
+    clearTodayChangePrice()
     clearGainLossPrice()
     clearCurrent()
   }
@@ -99,11 +110,11 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
     }
   }
 
-  private fun handleAveragePriceChanged(averagePrice: StockMoneyValue?) {
-    if (averagePrice == null) {
-      clearAveragePrice()
+  private fun handleTodayChanged(today: String?) {
+    if (today == null) {
+      clearTodayChangePrice()
     } else {
-      binding.holdingSummaryAvgPriceText.text = averagePrice.asMoneyValue()
+      binding.holdingSummaryChangeText.text = today
     }
   }
 
@@ -117,12 +128,23 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   @CheckResult
   private fun PortfolioStock.gainLossDisplayString(): String? {
+    val direction = totalDirection()
     val gainLoss = totalGainLoss()
     val gainLossPercent = totalGainLossPercent()
     if (gainLoss == null || gainLossPercent == null) {
       return null
     }
 
-    return "${gainLoss.asMoneyValue()} (${gainLossPercent.asPercentValue()})"
+    val sign = direction.sign()
+    return "${sign}${gainLoss.asMoneyValue()} (${sign}${gainLossPercent.asPercentValue()})"
+  }
+
+  @CheckResult
+  private fun PortfolioStock.changeTodayDisplayString(): String? {
+    val direction = todayDirection()
+    val change = todayChange() ?: return null
+
+    val sign = direction.sign()
+    return "${sign}${change.asMoneyValue()}"
   }
 }

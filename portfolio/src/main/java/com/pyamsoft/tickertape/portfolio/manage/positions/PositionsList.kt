@@ -20,18 +20,16 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.PositionListBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
-import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
@@ -59,9 +57,9 @@ internal constructor(
     doOnInflate {
       binding.positionListList.layoutManager =
           LinearLayoutManager(binding.positionListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -98,15 +96,9 @@ internal constructor(
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
-      LinearMarginDecoration.create(margin = margin).apply {
-        binding.positionListList.addItemDecoration(this)
-      }
-
-      // The bottom has additional space to fit the FAB
-      val bottomMargin = 56.asDp(binding.positionListList.context)
-      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.positionListList.addItemDecoration(this)
-      }
+      LinearMarginDecoration.createHorizontal(
+              horizontalMargin = margin, orientation = RecyclerView.VERTICAL)
+          .apply { binding.positionListList.addItemDecoration(this) }
     }
 
     doOnTeardown { binding.positionListList.removeAllItemDecorations() }
@@ -138,8 +130,23 @@ internal constructor(
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 
-  private fun setList(holding: DbHolding, positions: List<DbPosition>) {
-    val data = positions.map { PositionItemViewState(holding = holding, position = it) }
+  private fun setList(
+      holding: DbHolding,
+      positions: List<PositionsViewState.PositionStock.MaybePosition>
+  ) {
+    val data =
+        positions.map {
+          when (it) {
+            is PositionsViewState.PositionStock.MaybePosition.Header -> PositionItemViewState.Header
+            is PositionsViewState.PositionStock.MaybePosition.Footer ->
+                PositionItemViewState.Footer(
+                    totalShares = it.totalShares,
+                    totalCost = it.totalCost,
+                    averageCost = it.averageCost)
+            is PositionsViewState.PositionStock.MaybePosition.Position ->
+                PositionItemViewState.Position(holding = holding, position = it.position)
+          }
+        }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }
@@ -152,7 +159,7 @@ internal constructor(
     binding.positionListSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(stock: PortfolioStock?) {
+  private fun handleList(stock: PositionsViewState.PositionStock?) {
     if (stock == null) {
       clearList()
     } else {

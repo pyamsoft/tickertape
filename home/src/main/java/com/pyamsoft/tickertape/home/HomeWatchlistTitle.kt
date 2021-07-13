@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.item
+package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.tickertape.home.databinding.HomeWatchlistTitleBinding
+import javax.inject.Inject
 
-@Subcomponent
-interface PositionItemComponent {
+class HomeWatchlistTitle
+@Inject
+internal constructor(
+    parent: ViewGroup,
+) : BaseUiView<HomeViewState, Nothing, HomeWatchlistTitleBinding>(parent) {
 
-  fun inject(holder: PositionItemViewHolder)
+  override val layoutRoot by boundView { homeWatchlistTitle }
 
-  fun inject(holder: PositionHeaderViewHolder)
+  override val viewBinding = HomeWatchlistTitleBinding::inflate
 
-  fun inject(holder: PositionFooterViewHolder)
+  init {
+    doOnInflate { binding.homeWatchlistTitle.text = "My Watchlist Top 5" }
 
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): PositionItemComponent
+    doOnTeardown { binding.homeWatchlistTitle.text = null }
   }
 }

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.positions
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
@@ -25,6 +26,8 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -69,14 +72,18 @@ internal constructor(
           stock =
               stock?.let { s ->
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = s.positions.firstOrNull(positionMatchesCallback)
+                val onlyPositions = s.onlyPositions()
+                val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
                 return@let s.copy(
                     positions =
-                        if (existingPosition == null) {
-                          s.positions + position
-                        } else {
-                          s.positions.map { if (positionMatchesCallback(it)) position else it }
-                        })
+                        createPositionsList(
+                            if (existingPosition == null) {
+                              onlyPositions + position
+                            } else {
+                              onlyPositions.map {
+                                if (positionMatchesCallback(it)) position else it
+                              }
+                            }))
               })
     }
   }
@@ -89,14 +96,18 @@ internal constructor(
           stock =
               stock?.let { s ->
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = s.positions.firstOrNull(positionMatchesCallback)
+                val onlyPositions = s.onlyPositions()
+                val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
                 return@let s.copy(
                     positions =
-                        if (existingPosition == null) {
-                          s.positions + position
-                        } else {
-                          s.positions.map { if (positionMatchesCallback(it)) position else it }
-                        })
+                        createPositionsList(
+                            if (existingPosition == null) {
+                              onlyPositions + position
+                            } else {
+                              onlyPositions.map {
+                                if (positionMatchesCallback(it)) position else it
+                              }
+                            }))
               })
     }
   }
@@ -108,10 +119,13 @@ internal constructor(
       copy(
           stock =
               stock?.let { s ->
+                val onlyPositions = s.onlyPositions()
                 val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                return@let if (!s.positions.contains(positionMatchesCallback)) s
+                return@let if (!onlyPositions.contains(positionMatchesCallback)) s
                 else {
-                  s.copy(positions = s.positions.filterNot(positionMatchesCallback))
+                  s.copy(
+                      positions =
+                          createPositionsList(onlyPositions.filterNot(positionMatchesCallback)))
                 }
               })
     }
@@ -131,7 +145,17 @@ internal constructor(
           andThen = {
             portfolioFetcher
                 .call(force)
-                .onSuccess { setState { copy(stock = it, isLoading = false) } }
+                .onSuccess { s ->
+                  setState {
+                    copy(
+                        stock =
+                            PositionsViewState.PositionStock(
+                                quote = s.quote,
+                                holding = s.holding,
+                                positions = createPositionsList(s.positions)),
+                        isLoading = false)
+                  }
+                }
                 .onFailure { Timber.e(it, "Failed to fetch quotes") }
                 .onFailure { setState { copy(stock = null, isLoading = false) } }
           })
@@ -145,14 +169,48 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       val position = state.stock?.positions?.get(index)
       if (position == null) {
-        Timber.w("No position at index: $index")
+        Timber.w("NULL stock, cannot remove position at index: $index")
+        return@launch
+      }
+
+      if (position !is PositionsViewState.PositionStock.MaybePosition.Position) {
+        Timber.w("Not a position at index: $index $position")
         return@launch
       }
 
       interactor
-          .removePosition(position.id())
+          .removePosition(position.position.id())
           .onSuccess { Timber.d("Removed position $position") }
           .onFailure { Timber.e(it, "Error removing position $position") }
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun createPositionsList(
+        positions: List<DbPosition>
+    ): List<PositionsViewState.PositionStock.MaybePosition> {
+      val totalShares = positions.sumOf { it.shareCount().value() }
+      val totalCost = positions.sumOf { it.price().value() * it.shareCount().value() }
+
+      return listOf(PositionsViewState.PositionStock.MaybePosition.Header) +
+          positions.map { PositionsViewState.PositionStock.MaybePosition.Position(it) } +
+          listOf(
+              PositionsViewState.PositionStock.MaybePosition.Footer(
+                  totalShares = totalShares.asShares(),
+                  totalCost = totalCost.asMoney(),
+                  averageCost = (totalCost / totalShares).asMoney()))
+    }
+
+    @CheckResult
+    private fun PositionsViewState.PositionStock.onlyPositions(): List<DbPosition> {
+      return this.positions
+          .asSequence()
+          .filterIsInstance<PositionsViewState.PositionStock.MaybePosition.Position>()
+          .map { it.position }
+          .toList()
     }
   }
 }

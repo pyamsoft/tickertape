@@ -17,38 +17,31 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
-import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsAdapter
-import javax.inject.Inject
+import com.pyamsoft.pydroid.util.doOnDestroy
 
-class PositionItemViewHolder
-internal constructor(
+abstract class BasePositionItemViewHolder<S : PositionItemViewState>
+protected constructor(
     binding: ListitemFrameBinding,
-    factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
-    callback: PositionsAdapter.Callback
-) : BasePositionItemViewHolder<PositionItemViewState.Position>(binding, owner) {
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<S> {
 
-  @Inject @JvmField internal var position: PositionItemView? = null
-
-  override val viewBinder: ViewBinder<PositionItemViewState.Position>
+  protected abstract val viewBinder: ViewBinder<S>
 
   init {
-    factory.create(binding.listitemFrame).inject(this)
-
-    val position = requireNotNull(position)
-
-    viewBinder =
-        createViewBinder(position) {
-          return@createViewBinder when (it) {
-            is PositionItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
-          }
-        }
+    owner.doOnDestroy { teardown() }
   }
 
-    override fun onTeardown() {
-        position = null
-    }
+  final override fun bindState(state: S) {
+    viewBinder.bindState(state)
+  }
+
+  final override fun teardown() {
+    viewBinder.teardown()
+    onTeardown()
+  }
+
+  protected abstract fun onTeardown()
 }

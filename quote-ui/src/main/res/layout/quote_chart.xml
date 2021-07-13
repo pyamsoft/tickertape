@@ -16,7 +16,7 @@
 
 <merge>
 
-    <com.robinhood.spark.SparkView xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.pyamsoft.spark.SparkView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/watchlist_dig_chart"
         android:layout_width="match_parent"
         android:layout_height="160dp" />

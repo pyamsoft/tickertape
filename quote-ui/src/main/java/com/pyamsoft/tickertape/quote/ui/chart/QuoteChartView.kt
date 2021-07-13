@@ -23,13 +23,13 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.util.asDp
+import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.robinhood.spark.SparkAdapter
-import com.robinhood.spark.SparkView
-import com.robinhood.spark.animation.MorphSparkAnimator
 import timber.log.Timber
 
 abstract class QuoteChartView<S : UiViewState, V : UiViewEvent>
@@ -38,8 +38,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
   final override val layoutRoot by boundView { watchlistDigChart }
 
   final override val viewBinding = QuoteChartBinding::inflate
-
-  private var adapter: ChartAdapter? = null
 
   init {
     doOnInflate { inflateChart() }
@@ -57,23 +55,44 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
   private fun inflateChart() {
     // Setup Chart visual
     binding.watchlistDigChart.apply {
-      fillType = SparkView.FillType.TOWARD_ZERO
-      lineColor =
+      isFilled = true
+
+      positiveLineColor =
           Color.argb(
-              (0.6 * 255).toInt(),
+              255,
               Color.red(DEFAULT_STOCK_UP_COLOR),
               Color.green(DEFAULT_STOCK_UP_COLOR),
               Color.blue(DEFAULT_STOCK_UP_COLOR))
+
+      positiveFillColor =
+          Color.argb(
+              (0.5 * 255).toInt(),
+              Color.red(DEFAULT_STOCK_UP_COLOR),
+              Color.green(DEFAULT_STOCK_UP_COLOR),
+              Color.blue(DEFAULT_STOCK_UP_COLOR))
+
+      negativeLineColor =
+          Color.argb(
+              255,
+              Color.red(DEFAULT_STOCK_DOWN_COLOR),
+              Color.green(DEFAULT_STOCK_DOWN_COLOR),
+              Color.blue(DEFAULT_STOCK_DOWN_COLOR))
+
+      negativeFillColor =
+          Color.argb(
+              (0.5 * 255).toInt(),
+              Color.red(DEFAULT_STOCK_DOWN_COLOR),
+              Color.green(DEFAULT_STOCK_DOWN_COLOR),
+              Color.blue(DEFAULT_STOCK_DOWN_COLOR))
+
       scrubLineColor = DEFAULT_STOCK_COLOR
       baseLineColor = DEFAULT_STOCK_COLOR
-
-      sparkAnimator = MorphSparkAnimator()
+      baseLineWidth = 2.asDp(layoutRoot.context).toFloat()
     }
   }
 
   private fun clearAdapter() {
     binding.watchlistDigChart.adapter = null
-    adapter = null
   }
 
   protected fun handleRender(state: UiRender<QuoteChartViewState>) {
@@ -88,7 +107,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
       Timber.w("Failed to load chart")
     } else {
       // Load was successful, we have required data
-      adapter = ChartAdapter(chart).also { binding.watchlistDigChart.adapter = it }
+      binding.watchlistDigChart.adapter = ChartAdapter(chart)
     }
   }
 
@@ -138,10 +157,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
     override fun getY(index: Int): Float {
       // Offset the Y based on the baseline value which is either previous close or day's open
       return getValue(getItem(index)).toFloat() - baselineValue
-    }
-
-    override fun hasBaseLine(): Boolean {
-      return true
     }
 
     override fun getBaseLine(): Float {

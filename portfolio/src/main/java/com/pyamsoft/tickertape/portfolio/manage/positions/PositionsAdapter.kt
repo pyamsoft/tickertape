@@ -23,6 +23,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.BasePositionItemViewHolder
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionFooterViewHolder
+import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionHeaderViewHolder
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewHolder
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
@@ -33,13 +36,17 @@ private constructor(
     private val factory: PositionItemComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<PositionItemViewState, PositionItemViewHolder>(DIFFER), PopupTextProvider {
+) : ListAdapter<PositionItemViewState, BasePositionItemViewHolder<*>>(DIFFER), PopupTextProvider {
 
   init {
     setHasStableIds(true)
   }
 
   companion object {
+
+    private const val TYPE_POSITION = 1
+    private const val TYPE_HEADER = 2
+    private const val TYPE_FOOTER = 3
 
     @JvmStatic
     @CheckResult
@@ -57,7 +64,7 @@ private constructor(
               oldItem: PositionItemViewState,
               newItem: PositionItemViewState
           ): Boolean {
-            return oldItem.holding.id() == newItem.holding.id()
+            return oldItem::class.java == newItem::class.java
           }
 
           override fun areContentsTheSame(
@@ -70,23 +77,55 @@ private constructor(
   }
 
   override fun getPopupText(position: Int): String {
-    val state = getItem(position)
-    return state.holding.symbol().symbol()
+    return when (val state = getItem(position)) {
+      is PositionItemViewState.Footer -> "Total"
+      is PositionItemViewState.Header -> "Top"
+      is PositionItemViewState.Position -> state.holding.symbol().symbol()
+    }
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    return when (getItem(position)) {
+      is PositionItemViewState.Footer -> TYPE_FOOTER
+      is PositionItemViewState.Header -> TYPE_HEADER
+      is PositionItemViewState.Position -> TYPE_POSITION
+    }
   }
 
   override fun getItemId(position: Int): Long {
-    return getItem(position).holding.id().hashCode().toLong()
+    return when (val state = getItem(position)) {
+      is PositionItemViewState.Footer -> Long.MIN_VALUE
+      is PositionItemViewState.Header -> Long.MAX_VALUE
+      is PositionItemViewState.Position -> state.position.id().hashCode().toLong()
+    }
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PositionItemViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePositionItemViewHolder<*> {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ListitemFrameBinding.inflate(inflater, parent, false)
-    return PositionItemViewHolder(binding, factory, owner, callback)
+    return when (viewType) {
+      TYPE_POSITION -> PositionItemViewHolder(binding, factory, owner, callback)
+      TYPE_HEADER -> PositionHeaderViewHolder(binding, factory, owner)
+      TYPE_FOOTER -> PositionFooterViewHolder(binding, factory, owner)
+      else -> throw AssertionError("View Type must be one of the supported. $viewType")
+    }
   }
 
-  override fun onBindViewHolder(holder: PositionItemViewHolder, position: Int) {
-    val state = getItem(position)
-    holder.bindState(state)
+  override fun onBindViewHolder(holder: BasePositionItemViewHolder<*>, position: Int) {
+    return when (val state = getItem(position)) {
+      is PositionItemViewState.Footer -> {
+        val viewHolder = holder as PositionFooterViewHolder
+        viewHolder.bindState(state)
+      }
+      is PositionItemViewState.Header -> {
+        val viewHolder = holder as PositionHeaderViewHolder
+        viewHolder.bindState(state)
+      }
+      is PositionItemViewState.Position -> {
+        val viewHolder = holder as PositionItemViewHolder
+        viewHolder.bindState(state)
+      }
+    }
   }
 
   interface Callback {

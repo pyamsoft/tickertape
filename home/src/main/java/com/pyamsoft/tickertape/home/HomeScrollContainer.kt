@@ -17,24 +17,14 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.pydroid.ui.util.applyAppBarOffset
 import com.pyamsoft.tickertape.home.databinding.HomeScrollContainerBinding
 import javax.inject.Inject
-import timber.log.Timber
 
-class HomeScrollContainer
-@Inject
-internal constructor(parent: ViewGroup, appBarActivity: AppBarActivity, owner: LifecycleOwner) :
+class HomeScrollContainer @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<HomeViewState, HomeViewEvent, HomeScrollContainerBinding>(parent) {
 
   override val layoutRoot by boundView { homeScrollContainer }
 
   override val viewBinding = HomeScrollContainerBinding::inflate
-
-  init {
-    doOnInflate { binding.homeScrollContainer.applyAppBarOffset(appBarActivity, owner) }
-  }
 }

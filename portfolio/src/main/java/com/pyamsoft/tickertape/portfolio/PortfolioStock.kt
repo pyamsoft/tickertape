@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
-import com.pyamsoft.tickertape.stocks.api.asShare
+import com.pyamsoft.tickertape.stocks.api.asShares
 
 data class PortfolioStock
 internal constructor(
@@ -38,9 +38,8 @@ internal constructor(
 
   @CheckResult
   fun todayDirection(): StockDirection {
-    val today = todayNumber() ?: return StockDirection.none()
-    val total = costNumber()
-    return (today - total).asDirection()
+    val today = todayChangeNumber() ?: return StockDirection.none()
+    return today.asDirection()
   }
 
   @CheckResult
@@ -64,6 +63,12 @@ internal constructor(
   private fun totalGainLossNumber(): Double? {
     val today = todayNumber() ?: return null
     return today - costNumber()
+  }
+
+  @CheckResult
+  fun totalDirection(): StockDirection {
+    val total = totalGainLossNumber() ?: return StockDirection.none()
+    return total.asDirection()
   }
 
   @CheckResult
@@ -94,23 +99,13 @@ internal constructor(
   }
 
   @CheckResult
-  fun averagePrice(): StockMoneyValue {
-    val shares = totalSharesNumber()
-    return if (shares.compareTo(0) == 0) StockMoneyValue.none()
-    else {
-      val value = costNumber() / shares
-      value.asMoney()
-    }
-  }
-
-  @CheckResult
   private fun totalSharesNumber(): Double {
     return positions.sumOf { it.shareCount().value() }
   }
 
   @CheckResult
   fun totalShares(): StockShareValue {
-    return totalSharesNumber().asShare()
+    return totalSharesNumber().asShares()
   }
 }
 

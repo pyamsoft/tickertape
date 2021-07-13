@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
@@ -33,19 +34,28 @@ internal constructor(
     owner: LifecycleOwner,
 ) : BaseHomeChartList<HomeLosersBinding>(parent, factory, owner) {
 
+  override val layoutRoot by boundView { homeLosersRoot }
+
   override val viewBinding = HomeLosersBinding::inflate
 
   override fun provideList(): RecyclerView {
     return binding.homeLosers
   }
 
-  override fun onRender(state: UiRender<HomeViewState>) {
-    state.mapChanged { it.losers }.render(viewScope) { handleGainersChanged(it) }
+  override fun provideTitle(): TextView {
+    return binding.homeLosersTitle
   }
 
-  private fun handleGainersChanged(gainers: List<TopDataWithChart>) {
+  override fun onRender(state: UiRender<HomeViewState>) {
+    state.mapChanged { it.losers }.render(viewScope) { handleLosersChanged(it) }
+  }
+
+  private fun handleLosersChanged(losers: List<TopDataWithChart>) {
     val list =
-        gainers.map { QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart) }
+        losers.map { QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart) }
     handleList(list)
+
+    val title = losers.firstOrNull()?.title.orEmpty()
+    handleTitle(title)
   }
 }

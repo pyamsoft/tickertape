@@ -27,7 +27,7 @@ interface StockShareValue : StockNumberValue {
 
   companion object {
 
-    private val EMPTY = 0.0.asShare()
+    private val EMPTY = 0.0.asShares()
 
     @JvmStatic
     @CheckResult
@@ -38,6 +38,6 @@ interface StockShareValue : StockNumberValue {
 }
 
 @CheckResult
-fun Double.asShare(): StockShareValue {
+fun Double.asShares(): StockShareValue {
   return StockShareValueImpl(this)
 }

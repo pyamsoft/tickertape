@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,8 +40,6 @@ protected constructor(
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
 ) : BaseUiView<HomeViewState, HomeViewEvent, B>(parent) {
-
-  final override val layoutRoot by boundView { provideList() }
 
   private var modelAdapter: HomeIndexAdapter? = null
 
@@ -124,6 +123,7 @@ protected constructor(
 
     doOnTeardown {
       provideList().adapter = null
+      provideTitle().text = null
 
       modelAdapter = null
     }
@@ -152,12 +152,19 @@ protected constructor(
     }
   }
 
+  protected fun handleTitle(title: String) {
+    provideTitle().text = title
+  }
+
   // We must provide the list here and use a unique ViewBinding, even though
   // the layout files are all the same. We need different layout files with different view IDs
   // because of the way view_binding works when adding multiple views with the same ID to the same
   // parent view. Since viewBinding internally calls findViewById, the find call will always resolve
   // to the "first" child, even if it is not actually contained within the current binding.
   @CheckResult protected abstract fun provideList(): RecyclerView
+
+  // Same goes for the title text view
+  @CheckResult protected abstract fun provideTitle(): TextView
 
   companion object {
 

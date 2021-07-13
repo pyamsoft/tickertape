@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import javax.inject.Inject
 
 class PositionItemView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionItemViewState, PositionItemViewEvent, PositionItemBinding>(parent) {
+    BaseUiView<PositionItemViewState.Position, PositionItemViewEvent, PositionItemBinding>(parent) {
 
   override val viewBinding = PositionItemBinding::inflate
 
@@ -44,13 +44,15 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { binding.positionItem.setOnLongClickListener(null) }
 
     doOnTeardown {
-      binding.positionItemSharePrice.text = ""
-      binding.positionItemNumberOfShares.text = ""
-      binding.positionItemTotal.text = ""
+      binding.apply {
+        positionItemSharePrice.text = ""
+        positionItemNumberOfShares.text = ""
+        positionItemTotal.text = ""
+      }
     }
   }
 
-  override fun onRender(state: UiRender<PositionItemViewState>) {
+  override fun onRender(state: UiRender<PositionItemViewState.Position>) {
     state.mapChanged { it.position }.apply {
       mapChanged { it.shareCount() }.render(viewScope) { handleShareCountChanged(it) }
       mapChanged { it.price() }.render(viewScope) { handleSharePriceChanged(it) }

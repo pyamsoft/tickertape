@@ -19,12 +19,40 @@ package com.pyamsoft.tickertape.portfolio.manage.positions
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 data class PositionsViewState(
     val isLoading: Boolean,
-    val stock: PortfolioStock?,
-) : UiViewState
+    val stock: PositionStock?,
+) : UiViewState {
+
+  data class PositionStock
+  internal constructor(
+      val holding: DbHolding,
+      val positions: List<MaybePosition>,
+      val quote: QuotedStock?
+  ) {
+
+    sealed class MaybePosition {
+      data class Position internal constructor(val position: DbPosition) : MaybePosition()
+
+      object Header : MaybePosition()
+
+      data class Footer
+      internal constructor(
+          val totalShares: StockShareValue,
+          val averageCost: StockMoneyValue,
+          val totalCost: StockMoneyValue
+      ) : MaybePosition()
+    }
+  }
+}
 
 sealed class PositionsViewEvent : UiViewEvent {
 

@@ -21,7 +21,7 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingShareCountEntryBinding
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.asShare
+import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
 import timber.log.Timber
@@ -57,7 +57,7 @@ class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
               return@create false
             }
 
-            publish(PositionsAddViewEvent.UpdateNumberOfShares(numberOfShares.asShare()))
+            publish(PositionsAddViewEvent.UpdateNumberOfShares(numberOfShares.asShares()))
             return@create true
           }
               .apply { handleCreate() }

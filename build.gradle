@@ -43,6 +43,7 @@ buildscript {
     pydroid = "23.1.0"
     cachify = "0.0.23"
     highlander = "0.0.18"
+    spark = "2.0.0"
 
     // Jobs
     workmanager = "2.5.0"
@@ -80,7 +81,6 @@ buildscript {
 
     // Robinhood
     ticker = "2.0.2"
-    spark = "1.2.0"
   }
 
   dependencies {

@@ -19,36 +19,27 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.item
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsAdapter
 import javax.inject.Inject
 
-class PositionItemViewHolder
+class PositionHeaderViewHolder
+
 internal constructor(
     binding: ListitemFrameBinding,
     factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
-    callback: PositionsAdapter.Callback
-) : BasePositionItemViewHolder<PositionItemViewState.Position>(binding, owner) {
+) : BasePositionItemViewHolder<PositionItemViewState.Header>(binding, owner) {
 
-  @Inject @JvmField internal var position: PositionItemView? = null
+    override val viewBinder: ViewBinder<PositionItemViewState.Header>
 
-  override val viewBinder: ViewBinder<PositionItemViewState.Position>
+    @Inject @JvmField internal var header: PositionHeaderView? = null
 
-  init {
-    factory.create(binding.listitemFrame).inject(this)
+    init {
+        factory.create(binding.listitemFrame).inject(this)
 
-    val position = requireNotNull(position)
-
-    viewBinder =
-        createViewBinder(position) {
-          return@createViewBinder when (it) {
-            is PositionItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
-          }
-        }
-  }
-
-    override fun onTeardown() {
-        position = null
+        viewBinder = createViewBinder(header.requireNotNull()) {}
     }
+
+    override fun onTeardown() {}
 }

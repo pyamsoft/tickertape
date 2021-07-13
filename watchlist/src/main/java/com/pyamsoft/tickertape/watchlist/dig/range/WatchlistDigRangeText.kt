@@ -48,6 +48,6 @@ class WatchlistDigRangeText @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleRangeChanged(range: StockChart.IntervalRange) {
-    binding.watchlistDigRangeItemText.text = range.apiValue.uppercase(Locale.getDefault())
+    binding.watchlistDigRangeItemText.text = range.display.uppercase(Locale.getDefault())
   }
 }

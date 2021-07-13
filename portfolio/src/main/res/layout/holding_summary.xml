@@ -49,12 +49,12 @@
             app:layout_constraintTop_toTopOf="@id/holding_summary_total_shares_label" />
 
         <TextView
-            android:id="@+id/holding_summary_avg_price_label"
+            android:id="@+id/holding_summary_change_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginStart="8dp"
-            android:text="Average Price"
+            android:text="Change Today"
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -62,7 +62,7 @@
             app:layout_constraintTop_toTopOf="@id/holding_summary_total_shares_text" />
 
         <TextView
-            android:id="@+id/holding_summary_avg_price_text"
+            android:id="@+id/holding_summary_change_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -71,8 +71,8 @@
             android:textStyle="bold"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/holding_summary_avg_price_label"
-            app:layout_constraintTop_toTopOf="@id/holding_summary_avg_price_label" />
+            app:layout_constraintStart_toEndOf="@id/holding_summary_change_label"
+            app:layout_constraintTop_toTopOf="@id/holding_summary_change_label" />
 
         <TextView
             android:id="@+id/holding_summary_current_value_label"

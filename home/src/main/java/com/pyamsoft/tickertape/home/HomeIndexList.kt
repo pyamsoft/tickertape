@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
@@ -33,10 +34,20 @@ internal constructor(
     owner: LifecycleOwner,
 ) : BaseHomeChartList<HomeIndexesBinding>(parent, factory, owner) {
 
+  override val layoutRoot by boundView { homeIndexesRoot }
+
   override val viewBinding = HomeIndexesBinding::inflate
+
+  init {
+    doOnInflate { handleTitle("Market Indexes") }
+  }
 
   override fun provideList(): RecyclerView {
     return binding.homeIndexes
+  }
+
+  override fun provideTitle(): TextView {
+    return binding.homeIndexesTitle
   }
 
   override fun onRender(state: UiRender<HomeViewState>) {

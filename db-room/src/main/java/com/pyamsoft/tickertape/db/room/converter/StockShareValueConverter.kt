@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.db.room.converter
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.asShare
+import com.pyamsoft.tickertape.stocks.api.asShares
 
 internal object StockShareValueConverter {
 
@@ -27,7 +27,7 @@ internal object StockShareValueConverter {
   @TypeConverter
   @CheckResult
   fun toShares(shares: Double): StockShareValue {
-    return shares.asShare()
+    return shares.asShares()
   }
 
   @JvmStatic

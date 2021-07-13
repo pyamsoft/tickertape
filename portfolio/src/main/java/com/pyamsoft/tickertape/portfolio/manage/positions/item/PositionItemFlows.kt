@@ -20,9 +20,23 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
-data class PositionItemViewState
-internal constructor(val position: DbPosition, val holding: DbHolding) : UiViewState
+sealed class PositionItemViewState : UiViewState {
+
+  data class Position internal constructor(val holding: DbHolding, val position: DbPosition) :
+      PositionItemViewState()
+
+  object Header : PositionItemViewState()
+
+  data class Footer
+  internal constructor(
+      val totalShares: StockShareValue,
+      val averageCost: StockMoneyValue,
+      val totalCost: StockMoneyValue
+  ) : PositionItemViewState()
+}
 
 sealed class PositionItemViewEvent : UiViewEvent {
 

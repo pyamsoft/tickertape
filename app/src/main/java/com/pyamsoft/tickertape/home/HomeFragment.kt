@@ -31,7 +31,6 @@ import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.main.MainPage
@@ -46,13 +45,17 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   @Inject @JvmField internal var scrollContainer: HomeScrollContainer? = null
 
-  @Inject @JvmField internal var container: HomeContainer? = null
+  @Inject @JvmField internal var nestedContainer: HomeContainer? = null
 
   @Inject @JvmField internal var spacer: HomeSpacer? = null
+
+  @Inject @JvmField internal var nestedBottomSpacer: HomeBottomSpacer? = null
 
   @Inject @JvmField internal var nestedIndexes: HomeIndexList? = null
 
   @Inject @JvmField internal var nestedPortfolio: HomePortfolio? = null
+
+  @Inject @JvmField internal var nestedWatchlistTitle: HomeWatchlistTitle? = null
 
   @Inject @JvmField internal var nestedWatchlist: HomeWatchlist? = null
 
@@ -85,20 +88,28 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         .create(binding.layoutCoordinator)
         .inject(this)
 
-    val container = container.requireNotNull()
+    val container = nestedContainer.requireNotNull()
     container.nest(
         nestedPortfolio.requireNotNull(),
-        nestedIndexes.requireNotNull(),
+        nestedWatchlistTitle.requireNotNull(),
         nestedWatchlist.requireNotNull(),
+        nestedIndexes.requireNotNull(),
         nestedGainers.requireNotNull(),
         nestedLosers.requireNotNull(),
-        spacer.requireNotNull())
+        nestedBottomSpacer.requireNotNull())
 
     val scrollContainer = scrollContainer.requireNotNull()
     scrollContainer.nest(container)
 
     stateSaver =
-        createComponent(savedInstanceState, viewLifecycleOwner, viewModel, this, scrollContainer) {
+        createComponent(
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            spacer.requireNotNull(),
+            scrollContainer
+        ) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
@@ -127,12 +138,16 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     stateSaver = null
     factory = null
 
-    container = null
+    scrollContainer = null
+    nestedContainer = null
     nestedIndexes = null
     nestedPortfolio = null
     nestedWatchlist = null
+    nestedWatchlistTitle = null
     nestedGainers = null
     nestedLosers = null
+    nestedBottomSpacer = null
+    spacer = null
   }
 
   companion object {

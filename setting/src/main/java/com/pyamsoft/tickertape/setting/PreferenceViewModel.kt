@@ -25,11 +25,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SettingsViewModel
+class PreferenceViewModel
 @Inject
 internal constructor(
     bottomOffsetBus: EventConsumer<BottomOffset>,
-) : UiViewModel<SettingsViewState, UnitControllerEvent>(SettingsViewState(bottomOffset = 0)) {
+) :
+    UiViewModel<SettingsViewState, UnitControllerEvent>(
+        initialState = SettingsViewState(bottomOffset = 0)) {
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {

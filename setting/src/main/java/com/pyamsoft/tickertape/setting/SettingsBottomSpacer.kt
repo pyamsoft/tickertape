@@ -22,7 +22,7 @@ import com.pyamsoft.pydroid.arch.UnitViewEvent
 import com.pyamsoft.pydroid.ui.arch.PrefUiView
 import javax.inject.Inject
 
-class SettingsSpacer
+class SettingsBottomSpacer
 @Inject
 internal constructor(
     private val parent: PreferenceScreen,

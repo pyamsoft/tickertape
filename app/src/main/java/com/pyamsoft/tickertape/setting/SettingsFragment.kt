@@ -68,24 +68,24 @@ internal class SettingsFragment : AppSettingsFragment() {
     override val hideUpgradeInformation = true
 
     @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-    private val viewModel by fromViewModelFactory<SettingsViewModel>(activity = true) {
+    private val viewModel by fromViewModelFactory<PreferenceViewModel>(activity = true) {
       factory?.create(requireActivity())
     }
 
-    @JvmField @Inject internal var spacer: SettingsSpacer? = null
+    @JvmField @Inject internal var bottomSpacer: SettingsBottomSpacer? = null
 
     private var stateSaver: StateSaver? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
       super.onViewCreated(view, savedInstanceState)
       Injector.obtainFromApplication<TickerComponent>(view.context)
-          .plusSettingsComponent()
+          .plusPreferenceComponent()
           .create(preferenceScreen)
           .inject(this)
 
       stateSaver =
           createComponent(
-              savedInstanceState, viewLifecycleOwner, viewModel, this, requireNotNull(spacer)) {}
+              savedInstanceState, viewLifecycleOwner, viewModel, this, requireNotNull(bottomSpacer)) {}
     }
 
     override fun onControllerEvent(event: UnitControllerEvent) {}

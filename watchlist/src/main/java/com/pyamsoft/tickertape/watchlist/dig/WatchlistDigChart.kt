@@ -58,7 +58,8 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     val symbol = state.symbol
     val stock = state.stock
     handleRender(
-        (QuoteChartViewState(symbol = symbol, quote = stock?.quote, chart = stock?.chart)
+        (QuoteChartViewState(
+                symbol = symbol, quote = stock?.quote, chart = stock?.chart, error = state.error)
             .asUiRender()))
   }
 }

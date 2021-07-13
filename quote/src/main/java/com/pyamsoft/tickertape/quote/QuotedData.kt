@@ -51,4 +51,8 @@ data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
   }
 }
 
-data class QuotedChart(val symbol: StockSymbol, val chart: StockChart?, val quote: StockQuote?)
+data class QuotedChart(
+    val symbol: StockSymbol,
+    val chart: StockChart?,
+    val quote: StockQuote?,
+)

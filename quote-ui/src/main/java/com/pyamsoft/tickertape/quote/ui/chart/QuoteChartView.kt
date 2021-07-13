@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.quote.ui.chart
 import android.graphics.Color
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -32,6 +34,7 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.ui.getUserMessage
 import timber.log.Timber
 
 abstract class QuoteChartView<S : UiViewState, V : UiViewEvent>
@@ -103,6 +106,18 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
 
   protected fun handleRender(state: UiRender<QuoteChartViewState>) {
     state.mapChanged { it.chart }.render(viewScope) { handleChartChanged(it) }
+    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
+  }
+
+  private fun handleError(throwable: Throwable?) {
+    if (throwable == null) {
+      binding.quoteChartError.isGone = true
+      binding.quoteChartData.isVisible = true
+    } else {
+      binding.quoteChartError.text = throwable.getUserMessage()
+      binding.quoteChartError.isVisible = true
+      binding.quoteChartData.isGone = true
+    }
   }
 
   private fun handleChartChanged(chart: StockChart?) {

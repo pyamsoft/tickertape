@@ -46,8 +46,13 @@ internal constructor(
     return binding.homeLosersTitle
   }
 
+  override fun provideError(): TextView {
+    return binding.homeLosersError
+  }
+
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.losers }.render(viewScope) { handleLosersChanged(it) }
+    state.mapChanged { it.loseError }.render(viewScope) { handleError(it) }
   }
 
   private fun handleLosersChanged(losers: List<TopDataWithChart>) {

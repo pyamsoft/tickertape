@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote.ui.chart
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -26,10 +25,6 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 data class QuoteChartViewState(
     val symbol: StockSymbol,
     val quote: StockQuote?,
-    val chart: StockChart?
+    val chart: StockChart?,
+    val error: Throwable?
 ) : UiViewState
-
-sealed class QuoteChartViewEvent : UiViewEvent {
-
-  data class Scrub internal constructor(val data: ChartData) : QuoteChartViewEvent()
-}

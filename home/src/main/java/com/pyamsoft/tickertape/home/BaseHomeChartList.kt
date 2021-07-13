@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.home
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +32,7 @@ import com.pyamsoft.tickertape.home.index.HomeIndexAdapter
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.home.index.HomeIndexViewState
 import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.DecorationLookup
 import io.cabriole.decorator.LinearMarginDecoration
 import timber.log.Timber
@@ -152,6 +155,19 @@ protected constructor(
     }
   }
 
+  protected fun handleError(throwable: Throwable?) {
+    val list = provideList()
+    val error = provideError()
+    if (throwable == null) {
+      error.isGone = true
+      list.isVisible = true
+    } else {
+      error.text = throwable.getUserMessage()
+      error.isVisible = true
+      list.isGone = true
+    }
+  }
+
   protected fun handleTitle(title: String) {
     provideTitle().text = title
   }
@@ -165,6 +181,9 @@ protected constructor(
 
   // Same goes for the title text view
   @CheckResult protected abstract fun provideTitle(): TextView
+
+  // Same goes for the error text view
+  @CheckResult protected abstract fun provideError(): TextView
 
   companion object {
 

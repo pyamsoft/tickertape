@@ -50,8 +50,13 @@ internal constructor(
     return binding.homeIndexesTitle
   }
 
+  override fun provideError(): TextView {
+    return binding.homeIndexesError
+  }
+
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.indexes }.render(viewScope) { handleIndexesChanged(it) }
+    state.mapChanged { it.indexesError }.render(viewScope) { handleError(it) }
   }
 
   private fun handleIndexesChanged(list: List<QuotedChart>) {

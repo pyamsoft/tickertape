@@ -24,5 +24,5 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 data class HomeIndexViewState(
     val symbol: StockSymbol,
     val quote: StockQuote?,
-    val chart: StockChart?
+    val chart: StockChart?,
 ) : UiViewState

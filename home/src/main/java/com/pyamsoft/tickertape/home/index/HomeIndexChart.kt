@@ -40,7 +40,8 @@ class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleStateChanged(state: HomeIndexViewState) {
     handleRender(
-        (QuoteChartViewState(symbol = state.symbol, quote = state.quote, chart = state.chart)
+        (QuoteChartViewState(
+                symbol = state.symbol, quote = state.quote, chart = state.chart, error = null)
             .asUiRender()))
   }
 }

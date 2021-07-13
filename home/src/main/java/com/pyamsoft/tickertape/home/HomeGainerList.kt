@@ -46,8 +46,13 @@ internal constructor(
     return binding.homeGainersTitle
   }
 
+  override fun provideError(): TextView {
+    return binding.homeGainersError
+  }
+
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.gainers }.render(viewScope) { handleGainersChanged(it) }
+    state.mapChanged { it.gainError }.render(viewScope) { handleError(it) }
   }
 
   private fun handleGainersChanged(gainers: List<TopDataWithChart>) {

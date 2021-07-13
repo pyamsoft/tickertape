@@ -28,6 +28,7 @@ internal constructor(
     val symbol: StockSymbol,
     val isLoading: Boolean,
     val stock: QuotedChart?,
+    val error: Throwable?,
     val currentRange: StockChart.IntervalRange,
     val ranges: List<StockChart.IntervalRange>
 ) : UiViewState

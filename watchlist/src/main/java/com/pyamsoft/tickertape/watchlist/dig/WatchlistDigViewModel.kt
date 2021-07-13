@@ -40,7 +40,8 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
                 isLoading = false,
                 stock = null,
                 currentRange = StockChart.IntervalRange.ONE_DAY,
-                ranges = emptyList())) {
+                ranges = emptyList(),
+                error = null)) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<QuotedChart>, Boolean, StockChart.IntervalRange> { force, range ->
@@ -65,9 +66,9 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
           andThen = { newState ->
             quoteFetcher
                 .call(force, newState.currentRange)
-                .onSuccess { setState { copy(stock = it, isLoading = false) } }
+                .onSuccess { setState { copy(stock = it, error = null, isLoading = false) } }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
-                .onFailure { setState { copy(stock = null, isLoading = false) } }
+                .onFailure { setState { copy(stock = null, error = it, isLoading = false) } }
           })
     }
   }

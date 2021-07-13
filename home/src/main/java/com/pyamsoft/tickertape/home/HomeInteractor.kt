@@ -76,8 +76,13 @@ internal constructor(private val interactor: StockInteractor) {
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val top = interactor.getDayGainers(force, count)
-        return@withContext pairWithChart(force, top)
+        return@withContext try {
+          val top = interactor.getDayGainers(force, count)
+          pairWithChart(force, top)
+        } catch (e: Throwable) {
+          Timber.e(e, "Error getting day gainers")
+          ResultWrapper.failure(e)
+        }
       }
 
   @CheckResult
@@ -85,7 +90,12 @@ internal constructor(private val interactor: StockInteractor) {
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val top = interactor.getDayLosers(force, count)
-        return@withContext pairWithChart(force, top)
+        return@withContext try {
+          val top = interactor.getDayLosers(force, count)
+          pairWithChart(force, top)
+        } catch (e: Throwable) {
+          Timber.e(e, "Error getting day losers")
+          ResultWrapper.failure(e)
+        }
       }
 }

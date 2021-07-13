@@ -71,78 +71,44 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
         }
   }
 
-  private fun clearTotalShares() {
-    binding.holdingSummaryTotalSharesText.text = ""
-  }
-
-  private fun clearTodayChangePrice() {
-    binding.holdingSummaryChangeText.text = ""
-  }
-
-  private fun clearGainLossPrice() {
-    binding.holdingSummaryGainlossText.text = ""
-  }
-
-  private fun clearCurrent() {
-    binding.holdingSummaryCurrentValueText.text = ""
-  }
-
   private fun clear() {
-    clearTotalShares()
-    clearTodayChangePrice()
-    clearGainLossPrice()
-    clearCurrent()
-  }
-
-  private fun handleGainLossChanged(gainLoss: String?) {
-    if (gainLoss == null) {
-      clearGainLossPrice()
-    } else {
-      binding.holdingSummaryGainlossText.text = gainLoss
+    binding.apply {
+      holdingSummaryTotalSharesText.text = ""
+      holdingSummaryChangeText.text = ""
+      holdingSummaryGainlossText.text = ""
+      holdingSummaryCurrentValueText.text = ""
     }
   }
 
-  private fun handleTotalSharesChanged(totalShares: StockShareValue?) {
-    if (totalShares == null) {
-      clearTotalShares()
-    } else {
-      binding.holdingSummaryTotalSharesText.text = totalShares.asShareValue()
-    }
+  private fun handleGainLossChanged(gainLoss: String) {
+    binding.holdingSummaryGainlossText.text = gainLoss
   }
 
-  private fun handleTodayChanged(today: String?) {
-    if (today == null) {
-      clearTodayChangePrice()
-    } else {
-      binding.holdingSummaryChangeText.text = today
-    }
+  private fun handleTotalSharesChanged(totalShares: StockShareValue) {
+    binding.holdingSummaryTotalSharesText.text = totalShares.asShareValue()
   }
 
-  private fun handleCurrentValueChanged(current: StockMoneyValue?) {
-    if (current == null) {
-      clearCurrent()
-    } else {
-      binding.holdingSummaryCurrentValueText.text = current.asMoneyValue()
-    }
+  private fun handleTodayChanged(today: String) {
+    binding.holdingSummaryChangeText.text = today
+  }
+
+  private fun handleCurrentValueChanged(current: StockMoneyValue) {
+    binding.holdingSummaryCurrentValueText.text = current.asMoneyValue()
   }
 
   @CheckResult
-  private fun PortfolioStock.gainLossDisplayString(): String? {
+  private fun PortfolioStock.gainLossDisplayString(): String {
     val direction = totalDirection()
     val gainLoss = totalGainLoss()
     val gainLossPercent = totalGainLossPercent()
-    if (gainLoss == null || gainLossPercent == null) {
-      return null
-    }
-
     val sign = direction.sign()
     return "${sign}${gainLoss.asMoneyValue()} (${sign}${gainLossPercent.asPercentValue()})"
   }
 
   @CheckResult
-  private fun PortfolioStock.changeTodayDisplayString(): String? {
+  private fun PortfolioStock.changeTodayDisplayString(): String {
     val direction = todayDirection()
-    val change = todayChange() ?: return null
+    val change = todayChange()
 
     val sign = direction.sign()
     return "${sign}${change.asMoneyValue()}"

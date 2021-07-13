@@ -19,8 +19,8 @@ package com.pyamsoft.tickertape.quote.ui.view
 import android.graphics.Color
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.isInvisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -169,10 +169,27 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
     @JvmStatic
     private fun handleSessionError(binding: QuoteNumbersBinding) {
       clearSession(binding)
-      binding.quoteError.apply {
-        text = "Could not get quote."
-        setTextColor(Color.RED)
-        isVisible = true
+      binding.apply {
+        quoteError.apply {
+          text = "Could not get quote."
+          setTextColor(Color.RED)
+          isVisible = true
+        }
+
+        quotePrice.apply {
+          text = null
+          isGone = true
+        }
+
+        quotePercent.apply {
+          text = null
+          isGone = true
+        }
+
+        quoteChange.apply {
+          text = null
+          isGone = true
+        }
       }
     }
   }

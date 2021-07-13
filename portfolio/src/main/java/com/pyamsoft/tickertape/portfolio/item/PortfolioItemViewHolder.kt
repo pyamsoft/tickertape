@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 class PortfolioItemViewHolder
 internal constructor(

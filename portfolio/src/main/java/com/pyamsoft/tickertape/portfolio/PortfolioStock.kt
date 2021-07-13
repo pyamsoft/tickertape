@@ -49,8 +49,8 @@ internal constructor(
   }
 
   @CheckResult
-  fun todayChange(): StockMoneyValue? {
-    return todayChangeNumber()?.asMoney()
+  fun todayChange(): StockMoneyValue {
+    return todayChangeNumber()?.asMoney() ?: StockMoneyValue.none()
   }
 
   @CheckResult
@@ -79,18 +79,18 @@ internal constructor(
   }
 
   @CheckResult
-  fun totalGainLossPercent(): StockPercent? {
-    return totalGainLossPercentNumber()?.asPercent()
+  fun totalGainLossPercent(): StockPercent {
+    return totalGainLossPercentNumber()?.asPercent() ?: StockPercent.none()
   }
 
   @CheckResult
-  fun totalGainLoss(): StockMoneyValue? {
-    return totalGainLossNumber()?.asMoney()
+  fun totalGainLoss(): StockMoneyValue {
+    return totalGainLossNumber()?.asMoney() ?: StockMoneyValue.none()
   }
 
   @CheckResult
-  fun current(): StockMoneyValue? {
-    return todayNumber()?.asMoney()
+  fun current(): StockMoneyValue {
+    return todayNumber()?.asMoney() ?: StockMoneyValue.none()
   }
 
   @CheckResult
@@ -117,15 +117,12 @@ private fun List<PortfolioStock>.sumCostNumber(): Double {
 @CheckResult
 private fun List<PortfolioStock>.sumTotalAmountNumber(): Double? {
   val todays = this.map { it.todayNumber() }
-  return if (todays.any { it == null }) null
-  else {
-    todays.filterNotNull().sum()
-  }
+  return if (todays.any { it == null }) null else todays.filterNotNull().sum()
 }
 
 @CheckResult
-internal fun List<PortfolioStock>.sumTotalAmount(): StockMoneyValue? {
-  return this.sumTotalAmountNumber()?.asMoney()
+internal fun List<PortfolioStock>.sumTotalAmount(): StockMoneyValue {
+  return this.sumTotalAmountNumber()?.asMoney() ?: StockMoneyValue.none()
 }
 
 @CheckResult
@@ -135,8 +132,8 @@ private fun List<PortfolioStock>.sumTotalGainLossNumber(): Double? {
 }
 
 @CheckResult
-internal fun List<PortfolioStock>.sumTotalGainLoss(): StockMoneyValue? {
-  return this.sumTotalGainLossNumber()?.asMoney()
+internal fun List<PortfolioStock>.sumTotalGainLoss(): StockMoneyValue {
+  return this.sumTotalGainLossNumber()?.asMoney() ?: StockMoneyValue.none()
 }
 
 @CheckResult
@@ -147,8 +144,8 @@ private fun List<PortfolioStock>.sumTotalPercentNumber(): Double? {
 }
 
 @CheckResult
-internal fun List<PortfolioStock>.sumTotalPercent(): StockPercent? {
-  return this.sumTotalPercentNumber()?.asPercent()
+internal fun List<PortfolioStock>.sumTotalPercent(): StockPercent {
+  return this.sumTotalPercentNumber()?.asPercent() ?: StockPercent.none()
 }
 
 @CheckResult
@@ -168,8 +165,8 @@ private fun List<PortfolioStock>.sumTodayChangeNumber(): Double? {
 }
 
 @CheckResult
-internal fun List<PortfolioStock>.sumTodayChange(): StockMoneyValue? {
-  return this.sumTodayChangeNumber()?.asMoney()
+internal fun List<PortfolioStock>.sumTodayChange(): StockMoneyValue {
+  return this.sumTodayChangeNumber()?.asMoney() ?: StockMoneyValue.none()
 }
 
 @CheckResult
@@ -180,11 +177,11 @@ private fun List<PortfolioStock>.sumTodayPercentNumber(): Double? {
 }
 
 @CheckResult
-internal fun List<PortfolioStock>.sumTodayPercent(): StockPercent? {
-  return this.sumTodayPercentNumber()?.asPercent()
+internal fun List<PortfolioStock>.sumTodayPercent(): StockPercent {
+  return this.sumTodayPercentNumber()?.asPercent() ?: StockPercent.none()
 }
 
 @CheckResult
 internal fun List<PortfolioStock>.sumTodayDirection(): StockDirection {
-  return this.sumTodayChangeNumber()?.asDirection() ?: return StockDirection.none()
+  return this.sumTodayChangeNumber()?.asDirection() ?: StockDirection.none()
 }

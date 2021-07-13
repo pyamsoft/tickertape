@@ -24,11 +24,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangesBinding
 import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeAdapter
 import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeComponent
 import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeViewState
+import io.cabriole.decorator.DecorationLookup
+import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -54,10 +57,10 @@ internal constructor(
     doOnInflate {
       binding.watchlistDigRanges.layoutManager =
           LinearLayoutManager(binding.watchlistDigRanges.context).apply {
-            orientation = RecyclerView.HORIZONTAL
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        orientation = RecyclerView.HORIZONTAL
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -83,6 +86,37 @@ internal constructor(
       }
 
       outState.remove<Nothing>(LAST_SCROLL_POSITION)
+    }
+
+    doOnInflate {
+      val margin = 16.asDp(layoutRoot.context)
+
+      // Standard margin on all items
+      // For some reason, the margin registers only half as large as it needs to
+      // be, so we must double it.
+      //
+      // First item is weird.
+      LinearMarginDecoration(
+              rightMargin = margin,
+              orientation = RecyclerView.HORIZONTAL,
+              decorationLookup =
+                  object : DecorationLookup {
+                    override fun shouldApplyDecoration(position: Int, itemCount: Int): Boolean {
+                      return position == 0
+                    }
+                  })
+          .apply { binding.watchlistDigRanges.addItemDecoration(this) }
+
+      LinearMarginDecoration.createHorizontal(
+              margin,
+              orientation = RecyclerView.HORIZONTAL,
+              decorationLookup =
+                  object : DecorationLookup {
+                    override fun shouldApplyDecoration(position: Int, itemCount: Int): Boolean {
+                      return position > 0 && position < itemCount - 1
+                    }
+                  })
+          .apply { binding.watchlistDigRanges.addItemDecoration(this) }
     }
 
     doOnTeardown { binding.watchlistDigRanges.removeAllItemDecorations() }

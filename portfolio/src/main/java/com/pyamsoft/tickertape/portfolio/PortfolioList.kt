@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +32,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
 import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
+import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -126,6 +129,7 @@ internal constructor(
       binding.portfolioListList.adapter = null
 
       binding.portfolioListSwipeRefresh.setOnRefreshListener(null)
+      binding.portfolioListError.text = null
 
       modelAdapter = null
     }
@@ -149,9 +153,21 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
+    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
     state.mapChanged { it.portfolio }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+  }
+
+  private fun handleError(throwable: Throwable?) {
+    if (throwable == null) {
+      binding.portfolioListError.isGone = true
+      binding.portfolioListList.isVisible = true
+    } else {
+      binding.portfolioListError.text = throwable.getUserMessage()
+      binding.portfolioListError.isVisible = true
+      binding.portfolioListList.isGone = true
+    }
   }
 
   private fun handleBottomOffset(height: Int) {

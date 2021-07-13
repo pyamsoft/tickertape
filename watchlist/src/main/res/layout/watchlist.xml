@@ -48,7 +48,6 @@
 
         </FrameLayout>
 
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </merge>

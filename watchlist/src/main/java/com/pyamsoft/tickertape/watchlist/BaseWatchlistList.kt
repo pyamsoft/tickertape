@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,14 +29,13 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
-import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.ui.getUserMessage
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
 import io.cabriole.decorator.LinearBoundsMarginDecoration
-import io.cabriole.decorator.LinearMarginDecoration
 import timber.log.Timber
 
 abstract class BaseWatchlistList<S : UiViewState, V : UiViewEvent>
@@ -102,6 +103,7 @@ protected constructor(
       binding.watchlistList.adapter = null
 
       binding.watchlistSwipeRefresh.setOnRefreshListener(null)
+      binding.watchlistError.text = ""
 
       modelAdapter = null
     }
@@ -113,9 +115,21 @@ protected constructor(
   }
 
   protected fun handleRender(state: UiRender<WatchListViewState>) {
+    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
     state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+  }
+
+  private fun handleError(throwable: Throwable?) {
+    if (throwable == null) {
+      binding.watchlistError.isGone = true
+      binding.watchlistList.isVisible = true
+    } else {
+      binding.watchlistError.text = throwable.getUserMessage()
+      binding.watchlistError.isVisible = true
+      binding.watchlistList.isGone = true
+    }
   }
 
   private fun handleBottomOffset(height: Int) {
@@ -138,7 +152,11 @@ protected constructor(
   }
 
   private fun handleLoading(loading: Boolean) {
-    binding.watchlistSwipeRefresh.isRefreshing = loading
+    binding.watchlistSwipeRefresh.apply {
+      if (isEnabled) {
+        isRefreshing = loading
+      }
+    }
   }
 
   private fun handleList(schedule: List<QuotedStock>) {

@@ -29,10 +29,8 @@ import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import java.util.Optional
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +49,6 @@ internal constructor(
     private val positionDeleteDao: PositionDeleteDao,
     private val positionInsertDao: PositionInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
-    private val interactor: QuoteInteractor
 ) {
 
   suspend fun listenForPositionChanges(onChange: suspend (event: PositionChangeEvent) -> Unit) =
@@ -117,17 +114,8 @@ internal constructor(
 
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
-            return@coroutineScope interactor
-                .getQuotes(force, listOf(holding.symbol()))
-                .onFailure { Timber.e(it, "Unable to get quotes for holding: $holding") }
-                .recover { emptyList() }
-                .map { quotes ->
-                  Optional.ofNullable(quotes.firstOrNull { it.symbol == holding.symbol() })
-                }
-                .map { maybeQuote ->
-                  val quote = maybeQuote.orElse(null)
-                  PortfolioStock(holding = holding, positions = positions, quote = quote)
-                }
+            return@coroutineScope ResultWrapper.success(
+                PortfolioStock(holding = holding, positions = positions, quote = null))
           }
         } catch (e: Throwable) {
           Timber.e(e, "Failed to fetch holding")

@@ -21,11 +21,8 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 data class PositionsViewState(
     val isLoading: Boolean,
@@ -36,7 +33,6 @@ data class PositionsViewState(
   internal constructor(
       val holding: DbHolding,
       val positions: List<MaybePosition>,
-      val quote: QuotedStock?
   ) {
 
     sealed class MaybePosition {

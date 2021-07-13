@@ -150,7 +150,6 @@ internal constructor(
                     copy(
                         stock =
                             PositionsViewState.PositionStock(
-                                quote = s.quote,
                                 holding = s.holding,
                                 positions = createPositionsList(s.positions)),
                         isLoading = false)

@@ -18,10 +18,11 @@ package com.pyamsoft.tickertape.ui
 
 import androidx.annotation.CheckResult
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 @CheckResult
 fun Throwable.isNoNetworkException(): Boolean {
-  return this is SocketTimeoutException
+  return this is SocketTimeoutException || this is UnknownHostException
 }
 
 @CheckResult

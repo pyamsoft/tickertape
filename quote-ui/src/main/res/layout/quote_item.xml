@@ -16,39 +16,44 @@
 
 <merge>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/quote_item"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/quote_item_symbol"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/quote_item_data"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/quote_item_symbol"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadline6" />
-
-            <TextView
-                android:id="@+id/quote_item_company"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBody2" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/quote_item_company"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="@id/quote_item_symbol"
+            app:layout_constraintStart_toStartOf="@id/quote_item_symbol"
+            app:layout_constraintTop_toBottomOf="@id/quote_item_symbol" />
 
         <include
             android:id="@+id/quote_item_data"
             layout="@layout/quote_data"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </merge>

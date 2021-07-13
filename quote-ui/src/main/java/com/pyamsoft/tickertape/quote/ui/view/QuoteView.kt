@@ -19,8 +19,8 @@ package com.pyamsoft.tickertape.quote.ui.view
 import android.graphics.Color
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -54,8 +54,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
       binding.apply {
         quoteItem.setOnLongClickListener(null)
 
-        clearSession(quoteItemData.quoteItemAfterNumbers)
-        clearSession(quoteItemData.quoteItemNormalNumbers)
+        clearSession(quoteItemData.quoteNumbers)
 
         quoteItemSymbol.text = ""
         quoteItemCompany.text = ""
@@ -83,30 +82,32 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
   }
 
   private fun handleQuoteMissing() {
-    binding.quoteItemData.quoteAfterHours.isInvisible = true
-    clearSession(binding.quoteItemData.quoteItemNormalNumbers)
-    clearSession(binding.quoteItemData.quoteItemAfterNumbers)
+    binding.quoteItemData.quoteSession.isInvisible = true
+    clearSession(binding.quoteItemData.quoteNumbers)
 
     handleCompanyChanged(null)
-    handleSessionError(binding.quoteItemData.quoteItemNormalNumbers)
+    handleSessionError(binding.quoteItemData.quoteNumbers)
   }
 
   private fun handleQuotePresent(quote: StockQuote) {
     handleCompanyChanged(quote.company())
-    handleRegularSessionChanged(quote.regular())
-    handleAfterSessionChanged(quote.afterHours())
-  }
 
-  private fun handleRegularSessionChanged(session: StockMarketSession) {
-    populateSession(binding.quoteItemData.quoteItemNormalNumbers, session)
-  }
-
-  private fun handleAfterSessionChanged(session: StockMarketSession?) {
-    if (session == null) {
-      binding.quoteItemData.quoteAfterHours.isInvisible = true
+    val afterHours = quote.afterHours()
+    if (afterHours == null) {
+      handleSessionChanged("Normal Market", quote.regular())
     } else {
-      populateSession(binding.quoteItemData.quoteItemAfterNumbers, session)
-      binding.quoteItemData.quoteAfterHours.isVisible = true
+      handleSessionChanged("After Hours", afterHours)
+    }
+  }
+
+  private fun handleSessionChanged(name: String, session: StockMarketSession) {
+    binding.apply {
+      quoteItemData.apply {
+        quoteSession.isVisible = true
+        quoteSession.text = name
+
+        populateSession(binding.quoteItemData.quoteNumbers, session)
+      }
     }
   }
 

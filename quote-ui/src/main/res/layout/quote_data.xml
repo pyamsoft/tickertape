@@ -21,29 +21,15 @@
     android:gravity="end"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/quote_item_normal_numbers"
-        layout="@layout/quote_numbers" />
-
-    <LinearLayout
-        android:id="@+id/quote_after_hours"
+    <TextView
+        android:id="@+id/quote_session"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:layout_gravity="end"
+        android:textAppearance="?attr/textAppearanceCaption" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="After Hours"
-            android:textAppearance="?attr/textAppearanceCaption" />
-
-        <include
-            android:id="@+id/quote_item_after_numbers"
-            layout="@layout/quote_numbers" />
-
-    </LinearLayout>
+    <include
+        android:id="@+id/quote_numbers"
+        layout="@layout/quote_numbers" />
 
 </LinearLayout>

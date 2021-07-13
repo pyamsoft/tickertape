@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
@@ -30,12 +31,13 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import timber.log.Timber
 
 abstract class QuoteChartView<S : UiViewState, V : UiViewEvent>
 protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(parent) {
 
-  final override val layoutRoot by boundView { watchlistDigChart }
+  final override val layoutRoot by boundView { quoteChartRoot }
 
   final override val viewBinding = QuoteChartBinding::inflate
 
@@ -44,17 +46,21 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
 
     doOnInflate { inflateRanges() }
 
-    doOnTeardown {
-      binding.watchlistDigChart.scrubListener = null
-      clearAdapter()
-    }
+    doOnTeardown { clearAdapter() }
+
+    doOnTeardown { clearBounds() }
+  }
+
+  private fun clearBounds() {
+    binding.quoteChartTop.text = null
+    binding.quoteChartBottom.text = null
   }
 
   private fun inflateRanges() {}
 
   private fun inflateChart() {
     // Setup Chart visual
-    binding.watchlistDigChart.apply {
+    binding.quoteChart.apply {
       isFilled = true
 
       positiveLineColor =
@@ -92,7 +98,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
   }
 
   private fun clearAdapter() {
-    binding.watchlistDigChart.adapter = null
+    binding.quoteChart.adapter = null
   }
 
   protected fun handleRender(state: UiRender<QuoteChartViewState>) {
@@ -105,13 +111,46 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
     if (chart == null) {
       // Chart error
       Timber.w("Failed to load chart")
+      clearBounds()
     } else {
       // Load was successful, we have required data
-      binding.watchlistDigChart.adapter = ChartAdapter(chart)
+      binding.apply {
+        quoteChart.adapter = ChartAdapter(chart, CHART_TYPE)
+        val bounds = getBounds(chart, CHART_TYPE)
+        quoteChartTop.text = bounds.high.asMoneyValue()
+        quoteChartBottom.text = bounds.low.asMoneyValue()
+      }
     }
   }
 
-  private class ChartAdapter(chart: StockChart) : SparkAdapter() {
+  private enum class ChartType {
+    OPEN,
+    CLOSE,
+  }
+
+  companion object {
+
+    private val CHART_TYPE = ChartType.CLOSE
+
+    @JvmStatic
+    @CheckResult
+    private fun getBounds(chart: StockChart, type: ChartType): ChartBounds {
+      val values =
+          when (type) {
+            ChartType.OPEN -> chart.open()
+            ChartType.CLOSE -> chart.close()
+          }
+
+      val high = values.maxByOrNull { it.value() }.requireNotNull()
+      val low = values.minByOrNull { it.value() }.requireNotNull()
+
+      return ChartBounds(high, low)
+    }
+  }
+
+  private data class ChartBounds(val high: StockMoneyValue, val low: StockMoneyValue)
+
+  private class ChartAdapter(chart: StockChart, private val type: ChartType) : SparkAdapter() {
 
     private val chartData: List<ChartData>
     private val baselineValue: Float = chart.startingPrice().value().toFloat()
@@ -143,7 +182,10 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
 
     @CheckResult
     private fun getValue(item: ChartData): Double {
-      return item.close.value()
+      return when (type) {
+        ChartType.OPEN -> item.open.value()
+        ChartType.CLOSE -> item.close.value()
+      }
     }
 
     override fun getCount(): Int {

@@ -16,9 +16,48 @@
 
 <merge>
 
-    <com.pyamsoft.spark.SparkView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/watchlist_dig_chart"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/quote_chart_root"
         android:layout_width="match_parent"
-        android:layout_height="160dp" />
+        android:layout_height="160dp">
+
+        <com.pyamsoft.spark.SparkView
+            android:id="@+id/quote_chart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/quote_chart_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/floater_background"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/quote_chart_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/floater_background"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/quote_chart_top" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </merge>

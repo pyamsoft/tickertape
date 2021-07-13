@@ -28,16 +28,19 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     QuoteChartView<WatchListDigViewState, WatchListDigViewEvent>(parent) {
 
   init {
-    doOnInflate { binding.watchlistDigChart.apply { isScrubEnabled = true } }
-
+    doOnTeardown { binding.quoteChart.scrubListener = null }
     doOnInflate {
-      // Setup scrub listener
-      binding.watchlistDigChart.setScrubListener { raw ->
-        val data = raw as? ChartData
-        if (data == null) {
-          clearScrubView()
-        } else {
-          handleScrubbedView(data)
+      binding.quoteChart.apply {
+        isScrubEnabled = true
+
+        // Setup scrub listener
+        setScrubListener { raw ->
+          val data = raw as? ChartData
+          if (data == null) {
+            clearScrubView()
+          } else {
+            handleScrubbedView(data)
+          }
         }
       }
     }

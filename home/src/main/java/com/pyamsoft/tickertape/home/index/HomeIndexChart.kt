@@ -30,7 +30,7 @@ class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
 
   init {
     doOnInflate {
-      binding.watchlistDigChart.updateLayoutParams { this.height = 120.asDp(layoutRoot.context) }
+      binding.quoteChartRoot.updateLayoutParams { this.height = 120.asDp(layoutRoot.context) }
     }
   }
 

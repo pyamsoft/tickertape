@@ -16,9 +16,32 @@
 
 <merge>
 
-    <com.google.android.material.appbar.MaterialToolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/position_toolbar"
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/position_appbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/position_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/transparent" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/position_switcher"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@color/transparent"
+            app:tabBackground="@color/transparent"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorFullWidth="false"
+            app:tabMode="scrollable"
+            app:tabPadding="4dp"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/grey500" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 </merge>

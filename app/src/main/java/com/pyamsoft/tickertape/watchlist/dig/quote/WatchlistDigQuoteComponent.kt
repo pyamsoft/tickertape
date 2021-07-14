@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
+import com.pyamsoft.tickertape.portfolio.manage.quote.PositionQuoteFragment
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -31,18 +32,20 @@ import dagger.multibindings.IntoMap
 @Subcomponent(
     modules =
         [
-            WatchlistDigComponent.ComponentModule::class,
+            WatchlistDigQuoteComponent.ComponentModule::class,
             ViewModelFactoryModule::class,
             ThemeProviderModule::class,
         ])
-internal interface WatchlistDigComponent {
+internal interface WatchlistDigQuoteComponent {
 
-  fun inject(dialog: WatchlistDigDialog)
+  fun inject(dialog: WatchlistQuoteFragment)
+
+  fun inject(dialog: PositionQuoteFragment)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigComponent
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigQuoteComponent
   }
 
   @Module
@@ -50,7 +53,7 @@ internal interface WatchlistDigComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(BaseWatchlistDigViewModel::class)
-    internal abstract fun bindViewModel(impl: BaseWatchlistDigViewModel): ViewModel
+    @ClassKey(WatchlistDigViewModel::class)
+    internal abstract fun bindViewModel(impl: WatchlistDigViewModel): ViewModel
   }
 }

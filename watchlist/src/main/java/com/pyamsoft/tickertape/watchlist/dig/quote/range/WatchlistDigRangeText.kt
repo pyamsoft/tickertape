@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.range
+package com.pyamsoft.tickertape.watchlist.dig.quote.range
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView

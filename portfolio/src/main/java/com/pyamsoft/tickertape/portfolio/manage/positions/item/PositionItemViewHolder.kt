@@ -48,7 +48,7 @@ internal constructor(
         }
   }
 
-    override fun onTeardown() {
-        position = null
-    }
+  override fun onTeardown() {
+    position = null
+  }
 }

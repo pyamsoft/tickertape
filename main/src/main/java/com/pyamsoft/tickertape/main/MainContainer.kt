@@ -18,17 +18,12 @@ package com.pyamsoft.tickertape.main
 
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.main.databinding.MainContainerBinding
+import com.pyamsoft.tickertape.ui.UiFragmentContainer
 import javax.inject.Inject
 
 class MainContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<MainViewState, MainViewEvent, MainContainerBinding>(parent) {
-
-  override val viewBinding = MainContainerBinding::inflate
-
-  override val layoutRoot by boundView { mainContainer }
+    UiFragmentContainer<MainViewState, MainViewEvent>(parent) {
 
   private var initialHeight: Int? = null
 

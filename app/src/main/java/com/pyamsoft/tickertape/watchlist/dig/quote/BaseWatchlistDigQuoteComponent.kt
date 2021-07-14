@@ -14,24 +14,30 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.watchlist.dig.quote.BaseWatchlistDigQuoteComponent
+import androidx.lifecycle.LifecycleOwner
+import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface BaseWatchlistDigComponent {
+internal interface BaseWatchlistDigQuoteComponent {
 
-  @CheckResult fun plusDigComponent(): WatchlistDigComponent.Factory
+  @CheckResult fun plusWatchlistComponent(): WatchlistDigQuoteComponent.Factory
 
-  @CheckResult fun plusQuoteComponent(): BaseWatchlistDigQuoteComponent.Factory
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredWatchlistDigRangeComponent`(): WatchlistDigRangeComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance symbol: StockSymbol): BaseWatchlistDigComponent
+    @CheckResult
+    fun create(
+        @BindsInstance lifecycleOwner: LifecycleOwner,
+    ): BaseWatchlistDigQuoteComponent
   }
 }

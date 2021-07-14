@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.range
+package com.pyamsoft.tickertape.watchlist
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockChart
-
-data class WatchlistDigRangeViewState(
-    val isSelected: Boolean,
-    val range: StockChart.IntervalRange
-) : UiViewState
-
-sealed class WatchlistDigRangeViewEvent : UiViewEvent {
-
-  object Select : WatchlistDigRangeViewEvent()
+enum class WatchlistPages {
+  QUOTE
 }

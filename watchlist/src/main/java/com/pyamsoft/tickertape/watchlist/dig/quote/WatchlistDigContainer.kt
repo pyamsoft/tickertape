@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
+import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.tickertape.ui.databinding.ContainerLinearVBinding
 import javax.inject.Inject
 
-class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<ManagePortfolioViewState, ManagePortfolioViewEvent>(parent)
+class WatchlistDigContainer @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<WatchListDigViewState, WatchListDigViewEvent, ContainerLinearVBinding>(parent) {
+
+  override val layoutRoot by boundView { containerLinearV }
+
+  override val viewBinding = ContainerLinearVBinding::inflate
+}

@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.watchlist.dig.quote.range
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
-import javax.inject.Inject
+import androidx.annotation.CheckResult
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<ManagePortfolioViewState, ManagePortfolioViewEvent>(parent)
+@Subcomponent
+interface WatchlistDigRangeComponent {
+
+  fun inject(holder: WatchlistDigRangeViewHolder)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigRangeComponent
+  }
+}

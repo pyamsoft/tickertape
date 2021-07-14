@@ -14,34 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.watchlist.WatchlistPages
 
-data class ManagePortfolioViewState
-internal constructor(val symbol: StockSymbol, val page: PortfolioPage) : UiViewState
+data class BaseWatchListDigViewState
+internal constructor(
+    val page: WatchlistPages,
+    val symbol: StockSymbol,
+) : UiViewState
 
-sealed class ManagePortfolioViewEvent : UiViewEvent {
+sealed class BaseWatchListDigViewEvent : UiViewEvent {
 
-  object Close : ManagePortfolioViewEvent()
-
-  object Add : ManagePortfolioViewEvent()
-
-  object OpenPositions : ManagePortfolioViewEvent()
-
-  object OpenQuote : ManagePortfolioViewEvent()
+  object Close : BaseWatchListDigViewEvent()
 }
 
-sealed class ManagePortfolioControllerEvent : UiControllerEvent {
+sealed class BaseWatchListDigControllerEvent : UiControllerEvent {
 
-  data class OpenAdd internal constructor(val id: DbHolding.Id, val symbol: StockSymbol) :
-      ManagePortfolioControllerEvent()
-
-  object PushPositions : ManagePortfolioControllerEvent()
-
-  object PushQuote : ManagePortfolioControllerEvent()
+  object PushQuote : BaseWatchListDigControllerEvent()
 }

@@ -85,7 +85,11 @@ internal class SettingsFragment : AppSettingsFragment() {
 
       stateSaver =
           createComponent(
-              savedInstanceState, viewLifecycleOwner, viewModel, this, requireNotNull(bottomSpacer)) {}
+              savedInstanceState,
+              viewLifecycleOwner,
+              viewModel,
+              this,
+              requireNotNull(bottomSpacer)) {}
     }
 
     override fun onControllerEvent(event: UnitControllerEvent) {}

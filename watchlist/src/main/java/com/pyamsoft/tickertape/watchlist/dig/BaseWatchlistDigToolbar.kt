@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.watchlist.dig
 
 import android.view.ViewGroup
+import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.UiDialogToolbar
 import javax.inject.Inject
 
-class SymbolToolbar
+class BaseWatchlistDigToolbar
 @Inject
 internal constructor(
     imageLoader: ImageLoader,
     parent: ViewGroup,
-) : UiDialogToolbar<SymbolAddViewState, SymbolAddViewEvent>(imageLoader, parent) {
+) : UiDialogToolbar<BaseWatchListDigViewState, BaseWatchListDigViewEvent>(imageLoader, parent) {
 
   init {
-
     doOnInflate {
       binding.uiToolbar.setNavigationOnClickListener(
-          DebouncedOnClickListener.create { publish(SymbolAddViewEvent.Close) })
+          DebouncedOnClickListener.create { publish(BaseWatchListDigViewEvent.Close) })
     }
 
     doOnTeardown { clear() }
@@ -41,5 +42,13 @@ internal constructor(
 
   private fun clear() {
     binding.uiToolbar.setNavigationOnClickListener(null)
+  }
+
+  override fun onRender(state: UiRender<BaseWatchListDigViewState>) {
+    state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
+  }
+
+  private fun handleSymbolChanged(symbol: StockSymbol) {
+    binding.uiToolbar.title = symbol.symbol()
   }
 }

@@ -18,13 +18,13 @@ package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.home.databinding.HomeContainerBinding
+import com.pyamsoft.tickertape.ui.databinding.ContainerLinearVBinding
 import javax.inject.Inject
 
 class HomeContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, HomeContainerBinding>(parent) {
+    BaseUiView<HomeViewState, HomeViewEvent, ContainerLinearVBinding>(parent) {
 
-  override val layoutRoot by boundView { homeContainer }
+  override val layoutRoot by boundView { containerLinearV }
 
-  override val viewBinding = HomeContainerBinding::inflate
+  override val viewBinding = ContainerLinearVBinding::inflate
 }

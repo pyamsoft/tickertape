@@ -25,26 +25,25 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
-import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
+import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
-import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
+import com.pyamsoft.tickertape.portfolio.manage.quote.PositionQuoteFragment
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
@@ -87,7 +86,7 @@ internal class PositionManageDialog :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_constraint, container, false)
+    return inflater.inflate(R.layout.layout_linear_vertical, container, false)
   }
 
   override fun onViewCreated(
@@ -98,50 +97,33 @@ internal class PositionManageDialog :
     makeFullscreen()
     eatBackButtonPress()
 
-    val binding = LayoutConstraintBinding.bind(view)
+    val binding = LayoutLinearVerticalBinding.bind(view)
     component =
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusManageComponent()
             .create(getHoldingSymbol(), getHoldingId())
             .also { c ->
-              c.plusPositionManageComponent().create(binding.layoutConstraint).inject(this)
+              c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
             }
 
     val container = requireNotNull(container)
     val toolbar = requireNotNull(toolbar)
-    val shadow =
-        DropshadowView.createTyped<ManagePortfolioViewState, ManagePortfolioViewEvent>(
-            binding.layoutConstraint)
 
     stateSaver =
         createComponent(
-            savedInstanceState, viewLifecycleOwner, viewModel, this, container, toolbar, shadow) {
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            toolbar.requireNotNull(),
+            container.requireNotNull()) {
           return@createComponent when (it) {
             is ManagePortfolioViewEvent.Close -> requireActivity().onBackPressed()
             is ManagePortfolioViewEvent.Add -> viewModel.handleOpenAddDialog()
+            is ManagePortfolioViewEvent.OpenPositions -> viewModel.handleLoadPositions()
+            is ManagePortfolioViewEvent.OpenQuote -> viewModel.handleLoadQuote()
           }
         }
-
-    binding.layoutConstraint.layout {
-      toolbar.also {
-        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-      }
-
-      shadow.also {
-        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-      }
-
-      container.also {
-        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-      }
-    }
 
     if (savedInstanceState == null) {
       viewModel.handleLoadDefaultPage()
@@ -187,6 +169,11 @@ internal class PositionManageDialog :
       is ManagePortfolioControllerEvent.PushPositions ->
           pushFragment(
               PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = false)
+      is ManagePortfolioControllerEvent.PushQuote ->
+          pushFragment(
+              PositionQuoteFragment.newInstance(),
+              PositionQuoteFragment.TAG,
+              appendBackStack = false)
       is ManagePortfolioControllerEvent.OpenAdd ->
           PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol)
               .show(requireActivity(), PositionsAddDialog.TAG)

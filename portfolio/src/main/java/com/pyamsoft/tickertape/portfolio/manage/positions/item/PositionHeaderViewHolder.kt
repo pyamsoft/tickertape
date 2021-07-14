@@ -24,22 +24,21 @@ import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import javax.inject.Inject
 
 class PositionHeaderViewHolder
-
 internal constructor(
     binding: ListitemFrameBinding,
     factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
 ) : BasePositionItemViewHolder<PositionItemViewState.Header>(binding, owner) {
 
-    override val viewBinder: ViewBinder<PositionItemViewState.Header>
+  override val viewBinder: ViewBinder<PositionItemViewState.Header>
 
-    @Inject @JvmField internal var header: PositionHeaderView? = null
+  @Inject @JvmField internal var header: PositionHeaderView? = null
 
-    init {
-        factory.create(binding.listitemFrame).inject(this)
+  init {
+    factory.create(binding.listitemFrame).inject(this)
 
-        viewBinder = createViewBinder(header.requireNotNull()) {}
-    }
+    viewBinder = createViewBinder(header.requireNotNull()) {}
+  }
 
-    override fun onTeardown() {}
+  override fun onTeardown() {}
 }

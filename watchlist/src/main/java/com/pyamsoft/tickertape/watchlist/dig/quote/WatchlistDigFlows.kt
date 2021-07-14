@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -40,8 +40,6 @@ sealed class WatchListDigViewEvent : UiViewEvent {
   data class RangeUpdated internal constructor(val index: Int) : WatchListDigViewEvent()
 
   data class Scrub internal constructor(val data: ChartData) : WatchListDigViewEvent()
-
-  object Close : WatchListDigViewEvent()
 }
 
 sealed class WatchListDigControllerEvent : UiControllerEvent

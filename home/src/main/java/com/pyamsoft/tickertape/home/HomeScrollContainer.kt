@@ -18,13 +18,13 @@ package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.home.databinding.HomeScrollContainerBinding
+import com.pyamsoft.tickertape.ui.databinding.ContainerNestedScrollBinding
 import javax.inject.Inject
 
 class HomeScrollContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, HomeScrollContainerBinding>(parent) {
+    BaseUiView<HomeViewState, HomeViewEvent, ContainerNestedScrollBinding>(parent) {
 
-  override val layoutRoot by boundView { homeScrollContainer }
+  override val layoutRoot by boundView { containerNestedScroll }
 
-  override val viewBinding = HomeScrollContainerBinding::inflate
+  override val viewBinding = ContainerNestedScrollBinding::inflate
 }

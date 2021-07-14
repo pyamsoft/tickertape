@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.range
+package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.ui.databinding.ContainerFragmentBinding
 
-@Subcomponent
-interface WatchlistDigRangeComponent {
+abstract class UiFragmentContainer<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerFragmentBinding>(parent) {
 
-  fun inject(holder: WatchlistDigRangeViewHolder)
+  final override val viewBinding = ContainerFragmentBinding::inflate
 
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigRangeComponent
-  }
+  final override val layoutRoot by boundView { containerFragment }
 }

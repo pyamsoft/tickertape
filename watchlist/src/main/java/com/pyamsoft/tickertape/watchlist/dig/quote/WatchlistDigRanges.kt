@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -27,9 +27,9 @@ import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangesBinding
-import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeAdapter
-import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeComponent
-import com.pyamsoft.tickertape.watchlist.dig.range.WatchlistDigRangeViewState
+import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeAdapter
+import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeComponent
+import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeViewState
 import io.cabriole.decorator.DecorationLookup
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -57,10 +57,10 @@ internal constructor(
     doOnInflate {
       binding.watchlistDigRanges.layoutManager =
           LinearLayoutManager(binding.watchlistDigRanges.context).apply {
-        orientation = RecyclerView.HORIZONTAL
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            orientation = RecyclerView.HORIZONTAL
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {

@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.portfolio.manage
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
+import androidx.annotation.CheckResult
+import com.google.android.material.tabs.TabLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
@@ -33,6 +35,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.ManagePortfolioToolbarBindi
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
+import timber.log.Timber
 
 class ManagePortfolioToolbar
 @Inject
@@ -45,12 +48,12 @@ internal constructor(
 
   override val viewBinding = ManagePortfolioToolbarBinding::inflate
 
-  override val layoutRoot by boundView { positionToolbar }
+  override val layoutRoot by boundView { positionAppbar }
 
   private var customImageLoaded: Loaded? = null
 
   init {
-    doOnInflate { binding.positionToolbar.withRoundedBackground() }
+    doOnInflate { binding.positionAppbar.withRoundedBackground() }
 
     doOnInflate {
       binding.positionToolbar.setNavigationOnClickListener(
@@ -75,6 +78,42 @@ internal constructor(
     }
 
     doOnTeardown { binding.positionToolbar.setOnMenuItemClickListener(null) }
+
+    doOnInflate {
+      addTabs()
+      attachListener()
+    }
+  }
+
+  private fun addTabs() {
+    binding.positionSwitcher.apply {
+      for (e in PortfolioPage.values()) {
+        addTab(newTab().setText(e.display).setTag(e))
+      }
+    }
+  }
+
+  private fun attachListener() {
+    val listener =
+        object : TabLayout.OnTabSelectedListener {
+
+          override fun onTabSelected(tab: TabLayout.Tab) {
+            val page = getTabPage(tab) ?: return
+            return when (page) {
+              PortfolioPage.POSITIONS -> publish(ManagePortfolioViewEvent.OpenPositions)
+              PortfolioPage.QUOTE -> publish(ManagePortfolioViewEvent.OpenQuote)
+            }
+          }
+
+          override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+          override fun onTabReselected(tab: TabLayout.Tab) {}
+        }
+
+    binding.positionSwitcher.apply {
+      addOnTabSelectedListener(listener)
+      doOnTeardown { removeOnTabSelectedListener(listener) }
+    }
   }
 
   private fun loadDefaultImage() {
@@ -108,15 +147,34 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<ManagePortfolioViewState>) {
+    state.mapChanged { it.page }.render(viewScope) { handlePage(it) }
     state.mapChanged { it.page }.render(viewScope) { handleCloseState(it) }
     state.mapChanged { it.page }.render(viewScope) { handleMenuState(it) }
     state.mapChanged { it.symbol }.render(viewScope) { handleSymbol(it) }
+  }
+
+  private fun handlePage(page: PortfolioPage) {
+    val tabs = binding.positionSwitcher
+    for (i in 0 until tabs.tabCount) {
+      val tab = tabs.getTabAt(i)
+      if (tab == null) {
+        Timber.w("No tab found at index: $i")
+        continue
+      }
+
+      val tag = getTabPage(tab)
+      if (tag == page) {
+        tabs.selectTab(tab, true)
+        break
+      }
+    }
   }
 
   private fun handleMenuState(page: PortfolioPage) {
     val isAddEnabled =
         when (page) {
           PortfolioPage.POSITIONS -> true
+          PortfolioPage.QUOTE -> false
         }
 
     binding.positionToolbar.menu.findItem(R2.id.menu_manage_toolbar_add)?.isEnabled = isAddEnabled
@@ -129,13 +187,33 @@ internal constructor(
   private fun handleCloseState(page: PortfolioPage) {
     val isClose =
         when (page) {
-          PortfolioPage.POSITIONS -> true
+          PortfolioPage.POSITIONS, PortfolioPage.QUOTE -> true
         }
 
     if (isClose) {
       loadCustomImage()
     } else {
       loadDefaultImage()
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun getTabPage(tab: TabLayout.Tab): PortfolioPage? {
+      val tag = tab.tag
+      if (tag == null) {
+        Timber.w("No tag found on tab: $tab")
+        return null
+      }
+
+      if (tag !is PortfolioPage) {
+        Timber.w("Tag is not PortfolioPage model: $tag")
+        return null
+      }
+
+      return tag
     }
   }
 }

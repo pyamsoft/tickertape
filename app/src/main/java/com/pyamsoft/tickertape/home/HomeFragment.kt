@@ -108,8 +108,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             viewModel,
             this,
             spacer.requireNotNull(),
-            scrollContainer
-        ) {
+            scrollContainer) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)

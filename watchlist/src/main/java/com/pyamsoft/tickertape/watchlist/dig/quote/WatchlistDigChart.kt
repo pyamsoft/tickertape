@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
@@ -28,6 +30,11 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
     QuoteChartView<WatchListDigViewState, WatchListDigViewEvent>(parent) {
 
   init {
+    doOnInflate {
+      val padding = 16.asDp(layoutRoot.context)
+      layoutRoot.updatePadding(left = padding, top = padding, right = padding, bottom = padding)
+    }
+
     doOnTeardown { binding.quoteChart.scrubListener = null }
     doOnInflate {
       binding.quoteChart.apply {

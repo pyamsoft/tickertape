@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.manage
 
-enum class PortfolioPage {
-  POSITIONS
+enum class PortfolioPage(val display: String) {
+  POSITIONS("Positions"),
+  QUOTE("Quote")
 }

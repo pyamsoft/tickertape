@@ -34,9 +34,18 @@ internal constructor(private val thisHoldingId: DbHolding.Id, private val thisSy
     loadPage(DEFAULT_PAGE)
   }
 
+  fun handleLoadPositions() {
+    loadPage(PortfolioPage.POSITIONS)
+  }
+
+  fun handleLoadQuote() {
+    loadPage(PortfolioPage.QUOTE)
+  }
+
   private fun publishPage() {
     return when (state.page) {
       PortfolioPage.POSITIONS -> publish(ManagePortfolioControllerEvent.PushPositions)
+      PortfolioPage.QUOTE -> publish(ManagePortfolioControllerEvent.PushQuote)
     }
   }
 

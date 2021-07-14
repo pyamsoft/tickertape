@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.watchlist.dig.quote.range
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
-class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<ManagePortfolioViewState, ManagePortfolioViewEvent>(parent)
+class WatchlistDigRangeClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<WatchlistDigRangeViewState, WatchlistDigRangeViewEvent>() {
+
+  init {
+
+    doOnInflate {
+      parent.setOnDebouncedClickListener { publish(WatchlistDigRangeViewEvent.Select) }
+    }
+
+    doOnTeardown { parent.setOnDebouncedClickListener(null) }
+  }
+
+  override fun render(state: UiRender<WatchlistDigRangeViewState>) {}
+}

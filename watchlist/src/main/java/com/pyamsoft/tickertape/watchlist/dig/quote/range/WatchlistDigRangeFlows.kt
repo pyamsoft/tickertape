@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage
+package com.pyamsoft.tickertape.watchlist.dig.quote.range
 
-import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
-import javax.inject.Inject
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.StockChart
 
-class ManagePortfolioContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<ManagePortfolioViewState, ManagePortfolioViewEvent>(parent)
+data class WatchlistDigRangeViewState(
+    val isSelected: Boolean,
+    val range: StockChart.IntervalRange
+) : UiViewState
+
+sealed class WatchlistDigRangeViewEvent : UiViewEvent {
+
+  object Select : WatchlistDigRangeViewEvent()
+}

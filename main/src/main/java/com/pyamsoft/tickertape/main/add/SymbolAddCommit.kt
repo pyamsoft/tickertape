@@ -19,11 +19,13 @@ package com.pyamsoft.tickertape.main.add
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.SymbolAddCommitBinding
+import com.pyamsoft.tickertape.ui.R
 import javax.inject.Inject
 
-class SymbolAddCommit @Inject internal constructor(parent: ViewGroup) :
+class SymbolAddCommit @Inject internal constructor(imageLoader: ImageLoader, parent: ViewGroup) :
     BaseUiView<SymbolAddViewState, SymbolAddViewEvent, SymbolAddCommitBinding>(parent) {
 
   override val viewBinding = SymbolAddCommitBinding::inflate
@@ -35,6 +37,14 @@ class SymbolAddCommit @Inject internal constructor(parent: ViewGroup) :
       binding.symbolAddCommitButton.setOnDebouncedClickListener {
         publish(SymbolAddViewEvent.CommitSymbol)
       }
+    }
+
+    doOnInflate {
+      imageLoader
+          .asDrawable()
+          .load(R.drawable.ic_add_24dp)
+          .into(binding.symbolAddCommitButton)
+          .also { l -> doOnTeardown { l.dispose() } }
     }
 
     doOnTeardown { binding.symbolAddCommitButton.setOnDebouncedClickListener(null) }

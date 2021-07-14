@@ -134,7 +134,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     return NotificationCompat.Builder(context.applicationContext, channelInfo.id)
-        .setSmallIcon(R.drawable.ic_code_24dp)
+        .setSmallIcon(R.drawable.ic_chart_24)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setShowWhen(false)
         .setAutoCancel(false)

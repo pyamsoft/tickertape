@@ -25,10 +25,18 @@ import javax.inject.Inject
 class MainContainer @Inject internal constructor(parent: ViewGroup) :
     UiFragmentContainer<MainViewState, MainViewEvent>(parent) {
 
-  private var initialHeight: Int? = null
+  private var initialHeight = 0
+  private var lastBottomBarHeight = 0
 
   init {
-    doOnInflate { layoutRoot.also { v -> v.post { initialHeight = v.height } } }
+    doOnInflate {
+      layoutRoot.also { v ->
+        v.post {
+          initialHeight = v.height
+          updateHeight()
+        }
+      }
+    }
   }
 
   override fun onRender(state: UiRender<MainViewState>) {
@@ -36,9 +44,14 @@ class MainContainer @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleBottomBarHeight(height: Int) {
+    lastBottomBarHeight = height
+    updateHeight()
+  }
+
+  private fun updateHeight() {
     // Add additional height to the main container so that when it scrolls as a result of the
     // coordinator layout,
     // we avoid the blank strip on the bottom.
-    initialHeight?.also { ih -> layoutRoot.updateLayoutParams { this.height = ih + height } }
+    layoutRoot.updateLayoutParams { this.height = initialHeight + lastBottomBarHeight }
   }
 }

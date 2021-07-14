@@ -22,7 +22,7 @@ internal data class StockShareValueImpl(private val value: Double) : StockShareV
 
   private val share by lazy(LazyThreadSafetyMode.NONE) {
     if (isZero()) {
-      return@lazy "0.00"
+      return@lazy "0"
     }
 
     // Parse to int to remove the decimals, then back to float for comparison ability

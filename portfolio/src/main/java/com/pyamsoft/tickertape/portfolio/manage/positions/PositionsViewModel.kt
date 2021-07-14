@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.tape.TapeLauncher
@@ -199,7 +200,9 @@ internal constructor(
               PositionsViewState.PositionStock.MaybePosition.Footer(
                   totalShares = totalShares.asShares(),
                   totalCost = totalCost.asMoney(),
-                  averageCost = (totalCost / totalShares).asMoney()))
+                  averageCost =
+                      if (totalShares.compareTo(0) == 0) StockMoneyValue.none()
+                      else (totalCost / totalShares).asMoney()))
     }
 
     @CheckResult

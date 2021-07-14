@@ -23,7 +23,7 @@ import java.text.NumberFormat
 internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
 
   private val money by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "0.00" else requireNotNull(FORMATTER.get()).format(value)
+    if (isZero()) "$0.00" else requireNotNull(FORMATTER.get()).format(value)
   }
 
   override fun asMoneyValue(): String {

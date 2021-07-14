@@ -48,7 +48,9 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
 
   private fun clearScrubView() {}
 
-  private fun handleScrubbedView(data: ChartData) {}
+  private fun handleScrubbedView(data: ChartData) {
+    publish(WatchListDigViewEvent.Scrub(data))
+  }
 
   override fun onRender(state: UiRender<WatchListDigViewState>) {
     state.render(viewScope) { handleStateChanged(it) }

@@ -27,6 +27,7 @@ import androidx.fragment.app.DialogFragment
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
@@ -44,6 +45,8 @@ internal class WatchlistDigDialog :
     AppCompatDialogFragment(), UiController<WatchListDigControllerEvent> {
 
   @JvmField @Inject internal var chart: WatchlistDigChart? = null
+
+  @JvmField @Inject internal var current: WatchlistDigCurrent? = null
 
   @JvmField @Inject internal var ranges: WatchlistDigRanges? = null
 
@@ -90,6 +93,7 @@ internal class WatchlistDigDialog :
     val chart = requireNotNull(chart)
     val ranges = requireNotNull(ranges)
     val toolbar = requireNotNull(toolbar)
+    val current = current.requireNotNull()
     val shadow =
         DropshadowView.createTyped<WatchListDigViewState, WatchListDigViewEvent>(
             binding.watchlistDigContainer)
@@ -102,11 +106,13 @@ internal class WatchlistDigDialog :
             this,
             chart,
             ranges,
+            current,
             toolbar,
             shadow) {
           return@createComponent when (it) {
             is WatchListDigViewEvent.Close -> dismiss()
             is WatchListDigViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
+            is WatchListDigViewEvent.Scrub -> viewModel.handleScrub(it.data)
           }
         }
 
@@ -138,8 +144,14 @@ internal class WatchlistDigDialog :
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
       }
 
+      current.also {
+          connect(it.id(), ConstraintSet.TOP, chart.id(), ConstraintSet.BOTTOM)
+          connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+          connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+      }
+
       ranges.also {
-        connect(it.id(), ConstraintSet.TOP, chart.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, current.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
       }

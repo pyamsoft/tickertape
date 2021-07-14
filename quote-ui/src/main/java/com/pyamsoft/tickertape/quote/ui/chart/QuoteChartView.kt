@@ -25,7 +25,6 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
@@ -34,6 +33,8 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteChartBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.periodHigh
+import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.getUserMessage
 import timber.log.Timber
 
@@ -130,53 +131,48 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
     } else {
       // Load was successful, we have required data
       binding.apply {
-        quoteChart.adapter = ChartAdapter(chart)
-        val (high, low) = getBounds(chart)
+        val high = chart.periodHigh()
+        val low = chart.periodLow()
+        quoteChart.adapter = ChartAdapter(chart, high, low)
         quoteChartTop.text = high.asMoneyValue()
         quoteChartBottom.text = low.asMoneyValue()
       }
     }
   }
 
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun getBounds(
-        chart: StockChart,
-    ): Pair<StockMoneyValue, StockMoneyValue> {
-      val values = chart.close()
-
-      val high = values.maxByOrNull { it.value() }.requireNotNull()
-      val low = values.minByOrNull { it.value() }.requireNotNull()
-
-      return high to low
-    }
-  }
-
-  private class ChartAdapter(chart: StockChart) : SparkAdapter() {
+  private class ChartAdapter(chart: StockChart, high: StockMoneyValue, low: StockMoneyValue) :
+      SparkAdapter() {
 
     private val chartData: List<ChartData>
-    private val baselineValue: Float = chart.startingPrice().value().toFloat()
+    private val baselineValue: Float
 
     init {
       val dates = chart.dates()
       val closes = chart.close()
 
       val data = mutableListOf<ChartData>()
+      val baseline = chart.startingPrice()
 
       for (i in dates.indices) {
         val date = dates[i]
         val close = closes[i]
-        data.add(ChartData(date = date, close = close))
+        data.add(
+            ChartData(
+                high = high,
+                low = low,
+                baseline = baseline,
+                range = chart.range(),
+                date = date,
+                price = close))
       }
 
+      baselineValue = baseline.value().toFloat()
       chartData = data
     }
 
     @CheckResult
     private fun getValue(item: ChartData): Double {
-      return item.close.value()
+      return item.price.value()
     }
 
     override fun getCount(): Int {

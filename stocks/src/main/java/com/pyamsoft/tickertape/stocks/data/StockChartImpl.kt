@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.stocks.data
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import java.time.LocalDateTime
 
 internal data class StockChartImpl(
@@ -27,7 +26,9 @@ internal data class StockChartImpl(
     private val range: StockChart.IntervalRange,
     private val interval: StockChart.IntervalTime,
     private val dates: List<LocalDateTime>,
+    private val currentPrice: StockMoneyValue,
     private val startingPrice: StockMoneyValue,
+    private val currentDate: LocalDateTime,
     private val close: List<StockMoneyValue>,
 ) : StockChart {
 
@@ -49,6 +50,14 @@ internal data class StockChartImpl(
 
   override fun startingPrice(): StockMoneyValue {
     return startingPrice
+  }
+
+  override fun currentPrice(): StockMoneyValue {
+    return currentPrice
+  }
+
+  override fun currentDate(): LocalDateTime {
+    return currentDate
   }
 
   override fun close(): List<StockMoneyValue> {

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.requireNotNull
 import java.time.LocalDateTime
 
 interface StockChart {
@@ -28,6 +29,10 @@ interface StockChart {
   @CheckResult fun interval(): IntervalTime
 
   @CheckResult fun startingPrice(): StockMoneyValue
+
+  @CheckResult fun currentPrice(): StockMoneyValue
+
+  @CheckResult fun currentDate(): LocalDateTime
 
   @CheckResult fun dates(): List<LocalDateTime>
 
@@ -57,4 +62,14 @@ interface StockChart {
     YTD("ytd", "Year to Date"),
     MAX("max", "Max")
   }
+}
+
+@CheckResult
+fun StockChart.periodHigh(): StockMoneyValue {
+  return close().maxByOrNull { it.value() }.requireNotNull()
+}
+
+@CheckResult
+fun StockChart.periodLow(): StockMoneyValue {
+  return close().minByOrNull { it.value() }.requireNotNull()
 }

@@ -37,7 +37,11 @@ internal data class NetworkChartResponse internal constructor(val spark: Resp) {
       ) {
 
         @JsonClass(generateAdapter = true)
-        internal data class Meta(val chartPreviousClose: Double?)
+        internal data class Meta(
+            val regularMarketTime: Long?,
+            val regularMarketPrice: Double?,
+            val chartPreviousClose: Double?
+        )
 
         @JsonClass(generateAdapter = true)
         internal data class Indicator(val quote: List<Quote>?) {

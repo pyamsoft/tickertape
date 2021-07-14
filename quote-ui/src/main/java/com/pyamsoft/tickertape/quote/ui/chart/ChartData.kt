@@ -16,11 +16,15 @@
 
 package com.pyamsoft.tickertape.quote.ui.chart
 
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import java.time.LocalDateTime
 
-data class ChartData
-internal constructor(
+data class ChartData(
+    val high: StockMoneyValue,
+    val low: StockMoneyValue,
+    val baseline: StockMoneyValue,
+    val range: StockChart.IntervalRange,
     val date: LocalDateTime,
-    val close: StockMoneyValue,
+    val price: StockMoneyValue,
 )

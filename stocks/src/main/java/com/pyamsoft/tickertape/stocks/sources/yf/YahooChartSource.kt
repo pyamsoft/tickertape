@@ -63,13 +63,14 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
             .filterOnlyValidCharts()
             .map { resp ->
               val chart = resp.response.first()
-              val startingPrice =
-                  chart.meta.requireNotNull().chartPreviousClose.requireNotNull().asMoney()
+              val meta = chart.meta.requireNotNull()
+              val currentDate = timestampToTime(meta.regularMarketTime.requireNotNull(), zoneId)
+              val currentPrice = meta.regularMarketPrice.requireNotNull().asMoney()
+              val startingPrice = meta.chartPreviousClose.requireNotNull().asMoney()
               val timestamps = chart.timestamp.requireNotNull()
               val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
 
-              val dates =
-                  timestamps.map { LocalDateTime.ofInstant(Instant.ofEpochSecond(it), zoneId) }
+              val dates = timestamps.map { timestampToTime(it, zoneId) }
               val closes = quote.close.requireNotNull()
 
               val validDates = mutableListOf<LocalDateTime>()
@@ -89,9 +90,11 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
                   symbol = resp.symbol.asSymbol(),
                   range = range,
                   interval = interval,
+                  currentPrice = currentPrice,
                   startingPrice = startingPrice,
                   dates = validDates,
                   close = validClose,
+                  currentDate = currentDate,
               )
             }
             .toList()
@@ -100,6 +103,12 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
   companion object {
 
     private const val YF_CHART_SOURCE = "https://query1.finance.yahoo.com/v7/finance/spark"
+
+    @JvmStatic
+    @CheckResult
+    private fun timestampToTime(stamp: Long, zoneId: ZoneId): LocalDateTime {
+      return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), zoneId)
+    }
 
     @JvmStatic
     @CheckResult

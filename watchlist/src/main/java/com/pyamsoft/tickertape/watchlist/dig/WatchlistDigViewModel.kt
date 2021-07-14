@@ -22,8 +22,11 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.periodHigh
+import com.pyamsoft.tickertape.stocks.api.periodLow
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +44,8 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
                 stock = null,
                 currentRange = StockChart.IntervalRange.ONE_DAY,
                 ranges = emptyList(),
-                error = null)) {
+                error = null,
+                scrub = null)) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<QuotedChart>, Boolean, StockChart.IntervalRange> { force, range ->
@@ -66,9 +70,19 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
           andThen = { newState ->
             quoteFetcher
                 .call(force, newState.currentRange)
-                .onSuccess { setState { copy(stock = it, error = null, isLoading = false) } }
+                .onSuccess {
+                  setState {
+                    copy(
+                        stock = it,
+                        scrub = latestChartDataFromQuote(it, currentRange),
+                        error = null,
+                        isLoading = false)
+                  }
+                }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
-                .onFailure { setState { copy(stock = null, error = it, isLoading = false) } }
+                .onFailure {
+                  setState { copy(stock = null, error = it, scrub = null, isLoading = false) }
+                }
           })
     }
   }
@@ -78,7 +92,27 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
     setState(stateChange = { copy(currentRange = range) }, andThen = { fetchQuote(false) })
   }
 
+  fun handleScrub(data: ChartData) {
+    setState { copy(scrub = data) }
+  }
+
   companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun latestChartDataFromQuote(
+        chart: QuotedChart,
+        range: StockChart.IntervalRange
+    ): ChartData? {
+      val c = chart.chart ?: return null
+      return ChartData(
+          high = c.periodHigh(),
+          low = c.periodLow(),
+          baseline = c.startingPrice(),
+          range = range,
+          date = c.currentDate(),
+          price = c.currentPrice())
+    }
 
     @JvmStatic
     @CheckResult

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.CheckResult
@@ -53,10 +54,10 @@ protected constructor(
       val list = provideList()
       list.layoutManager =
           LinearLayoutManager(list.context).apply {
-            orientation = RecyclerView.HORIZONTAL
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        orientation = RecyclerView.HORIZONTAL
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -126,8 +127,6 @@ protected constructor(
 
     doOnTeardown {
       provideList().adapter = null
-      provideTitle().text = null
-
       modelAdapter = null
     }
   }
@@ -141,10 +140,18 @@ protected constructor(
     val data =
         list.map { HomeIndexViewState(symbol = it.symbol, chart = it.chart, quote = it.quote) }
     usingAdapter().submitList(data)
+
+    provideEmpty().isGone = true
+    provideError().isGone = true
+    provideList().isVisible = true
   }
 
   private fun clearList() {
     usingAdapter().submitList(null)
+
+    provideList().isGone = true
+    provideError().isGone = true
+    provideEmpty().isVisible = true
   }
 
   protected fun handleList(list: List<QuotedChart>) {
@@ -155,21 +162,13 @@ protected constructor(
     }
   }
 
-  protected fun handleError(throwable: Throwable?) {
-    val list = provideList()
-    val error = provideError()
-    if (throwable == null) {
-      error.isGone = true
-      list.isVisible = true
-    } else {
-      error.text = throwable.getUserMessage()
-      error.isVisible = true
-      list.isGone = true
+  protected fun handleError(throwable: Throwable) {
+    provideList().isGone = true
+    provideEmpty().isGone = true
+    provideError().apply {
+      isVisible = true
+      text = throwable.getUserMessage()
     }
-  }
-
-  protected fun handleTitle(title: String) {
-    provideTitle().text = title
   }
 
   // We must provide the list here and use a unique ViewBinding, even though
@@ -179,11 +178,11 @@ protected constructor(
   // to the "first" child, even if it is not actually contained within the current binding.
   @CheckResult protected abstract fun provideList(): RecyclerView
 
-  // Same goes for the title text view
-  @CheckResult protected abstract fun provideTitle(): TextView
-
   // Same goes for the error text view
   @CheckResult protected abstract fun provideError(): TextView
+
+  // Same goes for the empty state view
+  @CheckResult protected abstract fun provideEmpty(): View
 
   companion object {
 

@@ -112,10 +112,7 @@ internal constructor(
   private fun handleStateChanged(state: HomeViewState) {
     handleRender(
         WatchListViewState(
-                error = state.watchlistError,
-                isLoading = state.isLoadingWatchlist,
-                quotes = state.watchlist,
-                bottomOffset = 0)
+                isLoading = state.isLoadingWatchlist, watchlist = state.watchlist, bottomOffset = 0)
             .asUiRender())
   }
 }

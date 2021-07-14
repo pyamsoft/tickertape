@@ -19,12 +19,12 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.ui.PackedData
 
 // Public constructor, used in home module
 data class PortfolioViewState(
-    val error: Throwable?,
     val isLoading: Boolean,
-    val portfolio: List<PortfolioStock>,
+    val portfolio: PackedData<List<PortfolioStock>>,
     val bottomOffset: Int,
 ) : UiViewState
 

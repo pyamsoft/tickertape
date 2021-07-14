@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.home.databinding.HomeGainersBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.ui.PackedData
 import javax.inject.Inject
 
 class HomeGainerList
@@ -38,12 +40,18 @@ internal constructor(
 
   override val viewBinding = HomeGainersBinding::inflate
 
+  init {
+    doOnInflate { binding.homeGainersTitle.text = "Day Gainers" }
+
+    doOnTeardown { binding.homeGainersTitle.text = null }
+  }
+
   override fun provideList(): RecyclerView {
     return binding.homeGainers
   }
 
-  override fun provideTitle(): TextView {
-    return binding.homeGainersTitle
+  override fun provideEmpty(): View {
+    return binding.homeGainersEmptyState
   }
 
   override fun provideError(): TextView {
@@ -52,15 +60,18 @@ internal constructor(
 
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.gainers }.render(viewScope) { handleGainersChanged(it) }
-    state.mapChanged { it.gainError }.render(viewScope) { handleError(it) }
   }
 
-  private fun handleGainersChanged(gainers: List<TopDataWithChart>) {
-    val list =
-        gainers.map { QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart) }
-    handleList(list)
-
-    val title = gainers.firstOrNull()?.title.orEmpty()
-    handleTitle(title)
+  private fun handleGainersChanged(gainers: PackedData<List<TopDataWithChart>>) {
+    return when (gainers) {
+      is PackedData.Data -> {
+        val list =
+            gainers.value.map {
+              QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart)
+            }
+        handleList(list)
+      }
+      is PackedData.Error -> handleError(gainers.throwable)
+    }
   }
 }

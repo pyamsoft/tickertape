@@ -40,6 +40,6 @@ class WatchlistItemQuote @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleStateChanged(state: WatchlistItemViewState) {
     handleRender(
-        (QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender()))
+        QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender())
   }
 }

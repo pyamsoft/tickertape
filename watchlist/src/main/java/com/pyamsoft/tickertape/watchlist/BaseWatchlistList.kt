@@ -30,6 +30,7 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
@@ -61,9 +62,9 @@ protected constructor(
     doOnInflate {
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -115,20 +116,25 @@ protected constructor(
   }
 
   protected fun handleRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
-    state.mapChanged { it.quotes }.render(viewScope) { handleList(it) }
+    state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlist(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handleError(throwable: Throwable?) {
-    if (throwable == null) {
-      binding.watchlistError.isGone = true
-      binding.watchlistList.isVisible = true
-    } else {
-      binding.watchlistError.text = throwable.getUserMessage()
-      binding.watchlistError.isVisible = true
-      binding.watchlistList.isGone = true
+  private fun handleWatchlist(watchlist: PackedData<List<QuotedStock>>) {
+    return when (watchlist) {
+      is PackedData.Data -> handleList(watchlist.value)
+      is PackedData.Error -> handleError(watchlist.throwable)
+    }
+  }
+
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      watchlistList.isGone = true
+      watchlistEmpty.isGone = true
+      watchlistError.isVisible = true
+
+      watchlistError.text = throwable.getUserMessage()
     }
   }
 
@@ -137,18 +143,31 @@ protected constructor(
     bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.watchlistList.addItemDecoration(this)
-        }
+      binding.watchlistList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<QuotedStock>) {
     val data = list.map { WatchlistItemViewState(symbol = it.symbol, quote = it.quote) }
     Timber.d("Submit data list: $data")
+
     usingAdapter().submitList(data)
+
+    binding.apply {
+      watchlistError.isGone = true
+      watchlistEmpty.isGone = true
+      watchlistList.isVisible = true
+    }
   }
 
   private fun clearList() {
     usingAdapter().submitList(null)
+
+    binding.apply {
+      watchlistError.isGone = true
+      watchlistList.isGone = true
+      watchlistEmpty.isVisible = true
+    }
   }
 
   private fun handleLoading(loading: Boolean) {

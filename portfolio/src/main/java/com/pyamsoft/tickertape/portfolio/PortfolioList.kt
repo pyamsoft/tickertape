@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
 import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
+import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearBoundsMarginDecoration
 import io.cabriole.decorator.LinearMarginDecoration
@@ -63,9 +64,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -153,20 +154,25 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
-    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
-    state.mapChanged { it.portfolio }.render(viewScope) { handleList(it) }
+    state.mapChanged { it.portfolio }.render(viewScope) { handlePortfolio(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handleError(throwable: Throwable?) {
-    if (throwable == null) {
-      binding.portfolioListError.isGone = true
-      binding.portfolioListList.isVisible = true
-    } else {
-      binding.portfolioListError.text = throwable.getUserMessage()
-      binding.portfolioListError.isVisible = true
-      binding.portfolioListList.isGone = true
+  private fun handlePortfolio(portfolio: PackedData<List<PortfolioStock>>) {
+    return when (portfolio) {
+      is PackedData.Data -> handleList(portfolio.value)
+      is PackedData.Error -> handleError(portfolio.throwable)
+    }
+  }
+
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      portfolioListList.isGone = true
+      portfolioListEmptyState.isGone = true
+      portfolioListError.isVisible = true
+
+      portfolioListError.text = throwable.getUserMessage()
     }
   }
 
@@ -175,18 +181,30 @@ internal constructor(
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.portfolioListList.addItemDecoration(this)
-        }
+      binding.portfolioListList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<PortfolioStock>) {
     val data = list.map { PortfolioItemViewState(stock = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
+
+    binding.apply {
+      portfolioListError.isGone = true
+      portfolioListEmptyState.isGone = true
+      portfolioListList.isVisible = true
+    }
   }
 
   private fun clearList() {
     usingAdapter().submitList(null)
+
+    binding.apply {
+      portfolioListError.isGone = true
+      portfolioListList.isGone = true
+      portfolioListEmptyState.isVisible = true
+    }
   }
 
   private fun handleLoading(loading: Boolean) {

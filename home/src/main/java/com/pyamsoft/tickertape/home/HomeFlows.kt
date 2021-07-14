@@ -22,24 +22,20 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.ui.PackedData
 
 data class HomeViewState
 internal constructor(
-    val portfolio: List<PortfolioStock>,
+    val portfolio: PackedData<List<PortfolioStock>>,
     val isLoadingPortfolio: Boolean,
-    val portfolioError: Throwable?,
-    val watchlist: List<QuotedStock>,
+    val watchlist: PackedData<List<QuotedStock>>,
     val isLoadingWatchlist: Boolean,
-    val watchlistError: Throwable?,
-    val indexes: List<QuotedChart>,
+    val indexes: PackedData<List<QuotedChart>>,
     val isLoadingIndexes: Boolean,
-    val indexesError: Throwable?,
-    val gainers: List<TopDataWithChart>,
+    val gainers: PackedData<List<TopDataWithChart>>,
     val isLoadingGainers: Boolean,
-    val gainError: Throwable?,
-    val losers: List<TopDataWithChart>,
+    val losers: PackedData<List<TopDataWithChart>>,
     val isLoadingLosers: Boolean,
-    val loseError: Throwable?,
     val bottomOffset: Int,
 ) : UiViewState
 

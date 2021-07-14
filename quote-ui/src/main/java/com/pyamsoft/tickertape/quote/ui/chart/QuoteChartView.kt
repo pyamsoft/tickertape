@@ -112,12 +112,16 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
 
   private fun handleError(throwable: Throwable?) {
     if (throwable == null) {
-      binding.quoteChartError.isGone = true
-      binding.quoteChartData.isVisible = true
+      binding.apply {
+        quoteChartError.isGone = true
+        quoteChartData.isVisible = true
+      }
     } else {
-      binding.quoteChartError.text = throwable.getUserMessage()
-      binding.quoteChartError.isVisible = true
-      binding.quoteChartData.isGone = true
+      binding.apply {
+        quoteChartData.isGone = true
+        quoteChartError.isVisible = true
+        quoteChartError.text = throwable.getUserMessage()
+      }
     }
   }
 

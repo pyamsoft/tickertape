@@ -33,7 +33,6 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
   private fun handleStateChanged(state: HomeViewState) {
     handleRender(
         PortfolioViewState(
-                error = state.portfolioError,
                 isLoading = state.isLoadingPortfolio,
                 portfolio = state.portfolio,
                 // Bottom offset is always 0 because the bottom offset is handled by the Home

@@ -29,6 +29,10 @@ import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
+import com.pyamsoft.tickertape.ui.transformData
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +52,9 @@ internal constructor(
         addNewBus = addNewBus,
         initialState =
             PortfolioViewState(
-                error = null, isLoading = false, portfolio = emptyList(), bottomOffset = 0)) {
+                isLoading = false,
+                portfolio = emptyList<PortfolioStock>().pack(),
+                bottomOffset = 0)) {
 
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { interactor.getPortfolio(it) }
@@ -86,16 +92,20 @@ internal constructor(
     setState {
       copy(
           portfolio =
-              portfolio.map { stock ->
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
-                return@map stock.copy(
-                    positions =
-                        if (existingPosition == null) {
-                          stock.positions + position
-                        } else {
-                          stock.positions.map { if (positionMatchesCallback(it)) position else it }
-                        })
+              portfolio.transformData { p ->
+                p.map { stock ->
+                  val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                  val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
+                  return@map stock.copy(
+                      positions =
+                          if (existingPosition == null) {
+                            stock.positions + position
+                          } else {
+                            stock.positions.map {
+                              if (positionMatchesCallback(it)) position else it
+                            }
+                          })
+                }
               })
     }
   }
@@ -106,16 +116,20 @@ internal constructor(
     setState {
       copy(
           portfolio =
-              portfolio.map { stock ->
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
-                return@map stock.copy(
-                    positions =
-                        if (existingPosition == null) {
-                          stock.positions + position
-                        } else {
-                          stock.positions.map { if (positionMatchesCallback(it)) position else it }
-                        })
+              portfolio.transformData { p ->
+                p.map { stock ->
+                  val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                  val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
+                  return@map stock.copy(
+                      positions =
+                          if (existingPosition == null) {
+                            stock.positions + position
+                          } else {
+                            stock.positions.map {
+                              if (positionMatchesCallback(it)) position else it
+                            }
+                          })
+                }
               })
     }
   }
@@ -126,11 +140,13 @@ internal constructor(
     setState {
       copy(
           portfolio =
-              portfolio.map { stock ->
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                return@map if (!stock.positions.contains(positionMatchesCallback)) stock
-                else {
-                  stock.copy(positions = stock.positions.filterNot(positionMatchesCallback))
+              portfolio.transformData { p ->
+                p.map { stock ->
+                  val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                  return@map if (!stock.positions.contains(positionMatchesCallback)) stock
+                  else {
+                    stock.copy(positions = stock.positions.filterNot(positionMatchesCallback))
+                  }
                 }
               })
     }
@@ -166,7 +182,11 @@ internal constructor(
   private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
     Timber.d("Existing holding deleted: $holding")
 
-    setState { copy(portfolio = portfolio.filterNot { it.holding.id() == holding.id() }) }
+    setState {
+      copy(
+          portfolio =
+              portfolio.transformData { p -> p.filterNot { it.holding.id() == holding.id() } })
+    }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network
@@ -183,9 +203,9 @@ internal constructor(
             andThen = {
               portfolioFetcher
                   .call(force)
-                  .onSuccess { setState { copy(error = null, portfolio = it, isLoading = false) } }
+                  .onSuccess { setState { copy(portfolio = it.pack(), isLoading = false) } }
                   .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(error = it, isLoading = false) } }
+                  .onFailure { setState { copy(portfolio = it.packError(), isLoading = false) } }
 
               // After the quotes are fetched, start the tape
               tapeLauncher.start()
@@ -194,7 +214,13 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val stock = state.portfolio[index]
+      val data = state.portfolio
+      if (data !is PackedData.Data<List<PortfolioStock>>) {
+        Timber.w("Cannot remove symbol in error state: $data")
+        return@launch
+      }
+
+      val stock = data.value[index]
       interactor
           .removeHolding(stock.holding.id())
           .onSuccess { Timber.d("Removed holding $stock") }
@@ -204,7 +230,13 @@ internal constructor(
 
   fun handleManageHolding(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val stock = state.portfolio[index]
+      val data = state.portfolio
+      if (data !is PackedData.Data<List<PortfolioStock>>) {
+        Timber.w("Cannot manage symbol in error state: $data")
+        return@launch
+      }
+
+      val stock = data.value[index]
       publish(PortfolioControllerEvent.ManageHolding(stock))
     }
   }

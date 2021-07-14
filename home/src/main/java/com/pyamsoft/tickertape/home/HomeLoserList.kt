@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.home.databinding.HomeLosersBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.ui.PackedData
 import javax.inject.Inject
 
 class HomeLoserList
@@ -38,29 +40,38 @@ internal constructor(
 
   override val viewBinding = HomeLosersBinding::inflate
 
-  override fun provideList(): RecyclerView {
-    return binding.homeLosers
+  init {
+    doOnInflate { binding.homeLosersTitle.text = "Day Losers" }
+
+    doOnTeardown { binding.homeLosersTitle.text = null }
   }
 
-  override fun provideTitle(): TextView {
-    return binding.homeLosersTitle
+  override fun provideList(): RecyclerView {
+    return binding.homeLosers
   }
 
   override fun provideError(): TextView {
     return binding.homeLosersError
   }
 
-  override fun onRender(state: UiRender<HomeViewState>) {
-    state.mapChanged { it.losers }.render(viewScope) { handleLosersChanged(it) }
-    state.mapChanged { it.loseError }.render(viewScope) { handleError(it) }
+  override fun provideEmpty(): View {
+    return binding.homeLosersEmptyState
   }
 
-  private fun handleLosersChanged(losers: List<TopDataWithChart>) {
-    val list =
-        losers.map { QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart) }
-    handleList(list)
+  override fun onRender(state: UiRender<HomeViewState>) {
+    state.mapChanged { it.losers }.render(viewScope) { handleLosersChanged(it) }
+  }
 
-    val title = losers.firstOrNull()?.title.orEmpty()
-    handleTitle(title)
+  private fun handleLosersChanged(losers: PackedData<List<TopDataWithChart>>) {
+    return when (losers) {
+      is PackedData.Data -> {
+        val list =
+            losers.value.map {
+              QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart)
+            }
+        handleList(list)
+      }
+      is PackedData.Error -> handleError(losers.throwable)
+    }
   }
 }

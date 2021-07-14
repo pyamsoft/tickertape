@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.home.databinding.HomeIndexesBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.ui.PackedData
 import javax.inject.Inject
 
 class HomeIndexList
@@ -39,15 +41,17 @@ internal constructor(
   override val viewBinding = HomeIndexesBinding::inflate
 
   init {
-    doOnInflate { handleTitle("Market Indexes") }
+    doOnInflate { binding.homeIndexesTitle.text = "Market Indexes" }
+
+    doOnTeardown { binding.homeIndexesTitle.text = null }
   }
 
   override fun provideList(): RecyclerView {
     return binding.homeIndexes
   }
 
-  override fun provideTitle(): TextView {
-    return binding.homeIndexesTitle
+  override fun provideEmpty(): View {
+    return binding.homeIndexesEmptyState
   }
 
   override fun provideError(): TextView {
@@ -56,10 +60,14 @@ internal constructor(
 
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.indexes }.render(viewScope) { handleIndexesChanged(it) }
-    state.mapChanged { it.indexesError }.render(viewScope) { handleError(it) }
   }
 
-  private fun handleIndexesChanged(list: List<QuotedChart>) {
-    handleList(list)
+  private fun handleIndexesChanged(indexes: PackedData<List<QuotedChart>>) {
+    return when (indexes) {
+      is PackedData.Data -> {
+        handleList(indexes.value)
+      }
+      is PackedData.Error -> handleError(indexes.throwable)
+    }
   }
 }

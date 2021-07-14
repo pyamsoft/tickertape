@@ -31,6 +31,8 @@ import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -51,20 +53,15 @@ internal constructor(
     UiViewModel<HomeViewState, HomeControllerEvent>(
         initialState =
             HomeViewState(
-                portfolioError = null,
-                portfolio = emptyList(),
+                portfolio = emptyList<PortfolioStock>().pack(),
                 isLoadingPortfolio = false,
-                watchlistError = null,
-                watchlist = emptyList(),
+                watchlist = emptyList<QuotedStock>().pack(),
                 isLoadingWatchlist = false,
-                indexesError = null,
-                indexes = emptyList(),
+                indexes = emptyList<QuotedChart>().pack(),
                 isLoadingIndexes = false,
-                gainError = null,
-                gainers = emptyList(),
+                gainers = emptyList<TopDataWithChart>().pack(),
                 isLoadingGainers = false,
-                loseError = null,
-                losers = emptyList(),
+                losers = emptyList<TopDataWithChart>().pack(),
                 isLoadingLosers = false,
                 bottomOffset = 0)) {
 
@@ -114,12 +111,12 @@ internal constructor(
               watchlistFetcher
                   .call(force)
                   .onSuccess {
-                    setState {
-                      copy(watchlistError = null, watchlist = it, isLoadingWatchlist = false)
-                    }
+                    setState { copy(watchlist = it.pack(), isLoadingWatchlist = false) }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch watchlist") }
-                  .onFailure { setState { copy(watchlistError = it, isLoadingWatchlist = false) } }
+                  .onFailure {
+                    setState { copy(watchlist = it.packError(), isLoadingWatchlist = false) }
+                  }
             })
       }
 
@@ -131,12 +128,12 @@ internal constructor(
               portfolioFetcher
                   .call(force)
                   .onSuccess {
-                    setState {
-                      copy(portfolioError = null, portfolio = it, isLoadingPortfolio = false)
-                    }
+                    setState { copy(portfolio = it.pack(), isLoadingPortfolio = false) }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch portfolio") }
-                  .onFailure { setState { copy(portfolioError = it, isLoadingPortfolio = false) } }
+                  .onFailure {
+                    setState { copy(portfolio = it.packError(), isLoadingPortfolio = false) }
+                  }
             })
       }
 
@@ -147,11 +144,11 @@ internal constructor(
             andThen = {
               indexesFetcher
                   .call(force)
-                  .onSuccess {
-                    setState { copy(indexesError = null, indexes = it, isLoadingIndexes = false) }
-                  }
+                  .onSuccess { setState { copy(indexes = it.pack(), isLoadingIndexes = false) } }
                   .onFailure { Timber.e(it, "Failed to fetch indexes") }
-                  .onFailure { setState { copy(indexesError = it, isLoadingIndexes = false) } }
+                  .onFailure {
+                    setState { copy(indexes = it.packError(), isLoadingIndexes = false) }
+                  }
             })
       }
 
@@ -162,11 +159,11 @@ internal constructor(
             andThen = {
               gainersFetcher
                   .call(force)
-                  .onSuccess {
-                    setState { copy(gainError = null, gainers = it, isLoadingGainers = false) }
-                  }
+                  .onSuccess { setState { copy(gainers = it.pack(), isLoadingGainers = false) } }
                   .onFailure { Timber.e(it, "Failed to fetch gainers") }
-                  .onFailure { setState { copy(gainError = it, isLoadingGainers = false) } }
+                  .onFailure {
+                    setState { copy(gainers = it.packError(), isLoadingGainers = false) }
+                  }
             })
       }
 
@@ -177,11 +174,9 @@ internal constructor(
             andThen = {
               losersFetcher
                   .call(force)
-                  .onSuccess {
-                    setState { copy(loseError = null, losers = it, isLoadingLosers = false) }
-                  }
+                  .onSuccess { setState { copy(losers = it.pack(), isLoadingLosers = false) } }
                   .onFailure { Timber.e(it, "Failed to fetch losers") }
-                  .onFailure { setState { copy(loseError = it, isLoadingLosers = false) } }
+                  .onFailure { setState { copy(losers = it.packError(), isLoadingLosers = false) } }
             })
       }
 

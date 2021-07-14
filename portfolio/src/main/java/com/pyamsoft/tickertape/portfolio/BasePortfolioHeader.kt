@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import com.robinhood.ticker.TickerUtils
 
@@ -51,22 +52,31 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
   }
 
   protected fun handleRender(state: UiRender<PortfolioViewState>) {
-    state.mapChanged { it.portfolio }.render(viewScope) { handleStocks(it) }
-    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
+    state.mapChanged { it.portfolio }.render(viewScope) { handlePortfolio(it) }
   }
 
-  private fun handleError(throwable: Throwable?) {
-    if (throwable == null) {
-      binding.portfolioHeaderError.isGone = true
-      binding.portfolioHeader.isVisible = true
-    } else {
-      binding.portfolioHeaderError.text = throwable.getUserMessage()
-      binding.portfolioHeaderError.isVisible = true
-      binding.portfolioHeader.isGone = true
+  private fun handlePortfolio(portfolio: PackedData<List<PortfolioStock>>) {
+    return when (portfolio) {
+      is PackedData.Data -> handleStocks(portfolio.value)
+      is PackedData.Error -> handleError(portfolio.throwable)
+    }
+  }
+
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      portfolioHeader.isGone = true
+      portfolioHeaderError.isVisible = true
+
+      portfolioHeaderError.text = throwable.getUserMessage()
     }
   }
 
   private fun handleStocks(list: List<PortfolioStock>) {
+    binding.apply {
+      portfolioHeaderError.isGone = true
+      portfolioHeader.isVisible = true
+    }
+
     // Total
     val totalAmount = list.sumTotalAmount()
     handleTotalAmount(totalAmount)

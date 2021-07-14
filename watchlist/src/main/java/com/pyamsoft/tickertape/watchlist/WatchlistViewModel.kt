@@ -27,6 +27,10 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
+import com.pyamsoft.tickertape.ui.transformData
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +50,7 @@ internal constructor(
         addNewBus = addNewBus,
         initialState =
             WatchListViewState(
-                error = null, isLoading = false, quotes = emptyList(), bottomOffset = 0)) {
+                isLoading = false, watchlist = emptyList<QuotedStock>().pack(), bottomOffset = 0)) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<List<QuotedStock>>, Boolean> { interactor.getQuotes(it) }
@@ -91,7 +95,7 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
     Timber.d("Existing symbol deleted: $symbol")
-    setState { copy(quotes = quotes.filterNot { it.symbol == symbol }) }
+    setState { copy(watchlist = watchlist.transformData { q -> q.filterNot { it.symbol == symbol } }) }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network
@@ -110,14 +114,11 @@ internal constructor(
                   .call(force)
                   .onSuccess {
                     setState {
-                      copy(
-                          error = null,
-                          quotes = it.sortedWith(QuotedStock.COMPARATOR),
-                          isLoading = false)
+                      copy(watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(), isLoading = false)
                     }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(error = it, isLoading = false) } }
+                  .onFailure { setState { copy(watchlist = it.packError(), isLoading = false) } }
             })
 
         // After the quotes are fetched, start the tape
@@ -126,7 +127,13 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val quote = state.quotes[index]
+      val data = state.watchlist
+      if (data !is PackedData.Data<List<QuotedStock>>) {
+        Timber.w("Cannot remove symbol in error state: $data")
+        return@launch
+      }
+
+      val quote = data.value[index]
       interactor
           .removeQuote(quote.symbol)
           .onSuccess { Timber.d("Removed quote $quote") }
@@ -136,7 +143,13 @@ internal constructor(
 
   fun handleDigSymbol(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val quote = state.quotes[index]
+      val data = state.watchlist
+      if (data !is PackedData.Data<List<QuotedStock>>) {
+        Timber.w("Cannot dig symbol in error state: $data")
+        return@launch
+      }
+
+      val quote = data.value[index]
       publish(WatchListControllerEvent.ManageSymbol(quote))
     }
   }

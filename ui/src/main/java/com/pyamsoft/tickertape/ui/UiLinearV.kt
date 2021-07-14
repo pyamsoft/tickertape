@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.home
+package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.ui.databinding.ContainerLinearVBinding
-import javax.inject.Inject
 
-class HomeContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, ContainerLinearVBinding>(parent) {
+abstract class UiLinearV<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerLinearVBinding>(parent) {
 
-  override val layoutRoot by boundView { containerLinearV }
+  final override val layoutRoot by boundView { containerLinearV }
 
-  override val viewBinding = ContainerLinearVBinding::inflate
+  final override val viewBinding = ContainerLinearVBinding::inflate
 }

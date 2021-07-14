@@ -37,6 +37,8 @@ internal constructor(
 
 sealed class WatchListDigViewEvent : UiViewEvent {
 
+  object Refresh : WatchListDigViewEvent()
+
   data class RangeUpdated internal constructor(val index: Int) : WatchListDigViewEvent()
 
   data class Scrub internal constructor(val data: ChartData) : WatchListDigViewEvent()

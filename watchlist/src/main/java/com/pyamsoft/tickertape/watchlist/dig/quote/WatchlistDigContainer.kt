@@ -17,14 +17,26 @@
 package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.ui.databinding.ContainerLinearVBinding
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.ui.UiSwipeRefreshContainer
 import javax.inject.Inject
 
 class WatchlistDigContainer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<WatchListDigViewState, WatchListDigViewEvent, ContainerLinearVBinding>(parent) {
+    UiSwipeRefreshContainer<WatchListDigViewState, WatchListDigViewEvent>(parent),
+    SwipeRefreshLayout.OnRefreshListener {
 
-  override val layoutRoot by boundView { containerLinearV }
+  init {
+    doOnInflate { binding.containerSwipeRefresh.setOnRefreshListener(this) }
 
-  override val viewBinding = ContainerLinearVBinding::inflate
+    doOnTeardown { binding.containerSwipeRefresh.setOnRefreshListener(null) }
+  }
+
+  override fun onRefresh() {
+    publish(WatchListDigViewEvent.Refresh)
+  }
+
+  override fun onRender(state: UiRender<WatchListDigViewState>) {
+    state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
+  }
 }

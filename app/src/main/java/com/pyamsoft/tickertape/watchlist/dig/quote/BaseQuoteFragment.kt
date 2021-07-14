@@ -26,9 +26,9 @@ import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
+import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
-import com.pyamsoft.tickertape.ui.databinding.LayoutNestedScrollBinding
 import javax.inject.Inject
 
 abstract class BaseQuoteFragment protected constructor() :
@@ -52,7 +52,7 @@ abstract class BaseQuoteFragment protected constructor() :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_nested_scroll, container, false)
+    return inflater.inflate(R.layout.layout_frame, container, false)
   }
 
   final override fun onViewCreated(
@@ -61,8 +61,8 @@ abstract class BaseQuoteFragment protected constructor() :
   ) {
     super.onViewCreated(view, savedInstanceState)
 
-    val binding = LayoutNestedScrollBinding.bind(view)
-    injectComponent(binding)
+    val binding = LayoutFrameBinding.bind(view)
+    injectComponent(binding.layoutFrame)
 
     val container = container.requireNotNull()
     container.nest(
@@ -73,10 +73,11 @@ abstract class BaseQuoteFragment protected constructor() :
           return@createComponent when (it) {
             is WatchListDigViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
             is WatchListDigViewEvent.Scrub -> viewModel.handleScrub(it.data)
+            is WatchListDigViewEvent.Refresh -> viewModel.handleRefresh(true)
           }
         }
 
-    viewModel.handleFetchQuote(false)
+    viewModel.handleRefresh(false)
   }
 
   final override fun onControllerEvent(event: WatchListDigControllerEvent) {
@@ -99,5 +100,5 @@ abstract class BaseQuoteFragment protected constructor() :
     nestedRanges = null
   }
 
-  protected abstract fun injectComponent(binding: LayoutNestedScrollBinding)
+  protected abstract fun injectComponent(root: ViewGroup)
 }

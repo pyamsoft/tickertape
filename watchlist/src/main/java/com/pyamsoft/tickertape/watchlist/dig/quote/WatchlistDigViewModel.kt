@@ -59,7 +59,7 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
     }
   }
 
-  fun handleFetchQuote(force: Boolean) {
+  fun handleRefresh(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchQuote(force) }
   }
 

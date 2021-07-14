@@ -43,9 +43,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     factory?.create(requireActivity())
   }
 
-  @Inject @JvmField internal var scrollContainer: HomeScrollContainer? = null
-
-  @Inject @JvmField internal var nestedContainer: HomeContainer? = null
+  @Inject @JvmField internal var container: HomeScrollContainer? = null
 
   @Inject @JvmField internal var spacer: HomeSpacer? = null
 
@@ -88,7 +86,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         .create(binding.layoutCoordinator)
         .inject(this)
 
-    val container = nestedContainer.requireNotNull()
+    val container = container.requireNotNull()
     container.nest(
         nestedPortfolio.requireNotNull(),
         nestedWatchlistTitle.requireNotNull(),
@@ -98,9 +96,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         nestedLosers.requireNotNull(),
         nestedBottomSpacer.requireNotNull())
 
-    val scrollContainer = scrollContainer.requireNotNull()
-    scrollContainer.nest(container)
-
     stateSaver =
         createComponent(
             savedInstanceState,
@@ -108,7 +103,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             viewModel,
             this,
             spacer.requireNotNull(),
-            scrollContainer) {
+            container) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
@@ -137,8 +132,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     stateSaver = null
     factory = null
 
-    scrollContainer = null
-    nestedContainer = null
+    container = null
     nestedIndexes = null
     nestedPortfolio = null
     nestedWatchlist = null

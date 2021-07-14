@@ -17,19 +17,19 @@
 package com.pyamsoft.tickertape.watchlist.dig.quote
 
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
-import com.pyamsoft.tickertape.ui.databinding.LayoutNestedScrollBinding
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 
 internal class WatchlistQuoteFragment : BaseQuoteFragment() {
 
-  override fun injectComponent(binding: LayoutNestedScrollBinding) {
+  override fun injectComponent(root: ViewGroup) {
     WatchlistDigDialog.getInjector(this)
         .plusQuoteComponent()
         .create(viewLifecycleOwner)
         .plusWatchlistComponent()
-        .create(binding.layoutNestedScroll)
+        .create(root)
         .inject(this)
   }
 

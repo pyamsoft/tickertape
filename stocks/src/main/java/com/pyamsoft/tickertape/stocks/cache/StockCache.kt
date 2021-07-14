@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.cache
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface ChartSource {
+interface StockCache {
+
+  suspend fun removeQuote(symbol: StockSymbol)
+
+  @CheckResult
+  suspend fun getQuotes(
+      symbols: List<StockSymbol>,
+      resolve: suspend (List<StockSymbol>) -> List<StockQuote>
+  ): List<StockQuote>
+
+  suspend fun removeChart(symbol: StockSymbol, range: StockChart.IntervalRange)
 
   @CheckResult
   suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
+      resolve: suspend (List<StockSymbol>, StockChart.IntervalRange) -> List<StockChart>
   ): List<StockChart>
 }

@@ -31,15 +31,7 @@ interface StockChart {
 
   @CheckResult fun dates(): List<LocalDateTime>
 
-  @CheckResult fun volume(): List<StockVolumeValue>
-
-  @CheckResult fun open(): List<StockMoneyValue>
-
   @CheckResult fun close(): List<StockMoneyValue>
-
-  @CheckResult fun high(): List<StockMoneyValue>
-
-  @CheckResult fun low(): List<StockMoneyValue>
 
   enum class IntervalTime(internal val apiValue: String, val display: String) {
     ONE_MINUTE("1m", "1 Minute"),

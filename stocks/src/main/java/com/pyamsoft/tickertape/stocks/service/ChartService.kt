@@ -26,8 +26,9 @@ internal interface ChartService {
 
   @GET
   @CheckResult
-  suspend fun getQuotes(
+  suspend fun getCharts(
       @Url url: String,
+      @Query("symbols", encoded = true) symbols: String,
       @Query("includePrePost") includePrePost: Boolean,
       @Query("range") range: String,
       @Query("interval") interval: String,

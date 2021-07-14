@@ -22,21 +22,26 @@ import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
 
 @CheckResult
-internal fun Sequence<NetworkChartResponse.Resp.Chart>.filterOnlyValidCharts():
-    Sequence<NetworkChartResponse.Resp.Chart> {
+internal fun Sequence<NetworkChartResponse.Resp.SymbolChart>.filterOnlyValidCharts():
+    Sequence<NetworkChartResponse.Resp.SymbolChart> {
   return this.filter { it.isValidStockData() }
 }
 
 @CheckResult
-private fun NetworkChartResponse.Resp.Chart.isValidStockData(): Boolean {
+private fun NetworkChartResponse.Resp.SymbolChart.isValidStockData(): Boolean {
   // We need all of these values to have a valid ticker
-  if (meta?.chartPreviousClose == null) {
+  if (response.isEmpty()) {
+    return false
+  }
+
+  val chart = response.first()
+  if (chart.meta?.chartPreviousClose == null) {
     return false
   }
 
   // We need indicators and timestamps that are not empty
-  val time = timestamp ?: return false
-  val ind = indicators ?: return false
+  val time = chart.timestamp ?: return false
+  val ind = chart.indicators ?: return false
 
   if (time.isEmpty()) {
     return false
@@ -45,13 +50,9 @@ private fun NetworkChartResponse.Resp.Chart.isValidStockData(): Boolean {
   val quote = ind.quote ?: return false
   val actuallyQuote = quote.firstOrNull() ?: return false
 
-  val open = actuallyQuote.open ?: return false
   val close = actuallyQuote.close ?: return false
-  val high = actuallyQuote.high ?: return false
-  val low = actuallyQuote.low ?: return false
-  val volume = actuallyQuote.volume ?: return false
 
-  if (open.isEmpty() || close.isEmpty() || high.isEmpty() || low.isEmpty() || volume.isEmpty()) {
+  if (close.isEmpty()) {
     return false
   }
 

@@ -87,7 +87,6 @@ internal constructor(
             force = force,
             symbols = INDEXES,
             range = StockChart.IntervalRange.ONE_DAY,
-            includePrePost = false,
             includeQuote = true)
       }
 

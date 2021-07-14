@@ -24,10 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -42,19 +39,13 @@ internal constructor(private val interactor: StockInteractor) {
       force: Boolean,
       top: StockTops
   ): ResultWrapper<List<TopDataWithChart>> {
-    val chartRequests = mutableListOf<Deferred<StockChart>>()
     return try {
       coroutineScope {
         val quotes = top.quotes()
-        for (quote in quotes) {
-          chartRequests.add(
-              async {
-                interactor.getChart(
-                    force, quote.symbol(), StockChart.IntervalRange.ONE_DAY, includePrePost = false)
-              })
-        }
 
-        val charts = awaitAll(*chartRequests.toTypedArray())
+        val charts =
+            interactor.getCharts(
+                force, quotes.map { it.symbol() }, StockChart.IntervalRange.ONE_DAY)
         return@coroutineScope ResultWrapper.success(
             quotes.map { quote ->
               val chart = charts.firstOrNull { it.symbol() == quote.symbol() }

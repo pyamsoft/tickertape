@@ -130,66 +130,45 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
     } else {
       // Load was successful, we have required data
       binding.apply {
-        quoteChart.adapter = ChartAdapter(chart, CHART_TYPE)
-        val bounds = getBounds(chart, CHART_TYPE)
-        quoteChartTop.text = bounds.high.asMoneyValue()
-        quoteChartBottom.text = bounds.low.asMoneyValue()
+        quoteChart.adapter = ChartAdapter(chart)
+        val (high, low) = getBounds(chart)
+        quoteChartTop.text = high.asMoneyValue()
+        quoteChartBottom.text = low.asMoneyValue()
       }
     }
   }
 
-  private enum class ChartType {
-    OPEN,
-    CLOSE,
-  }
-
   companion object {
-
-    private val CHART_TYPE = ChartType.CLOSE
 
     @JvmStatic
     @CheckResult
-    private fun getBounds(chart: StockChart, type: ChartType): ChartBounds {
-      val values =
-          when (type) {
-            ChartType.OPEN -> chart.open()
-            ChartType.CLOSE -> chart.close()
-          }
+    private fun getBounds(
+        chart: StockChart,
+    ): Pair<StockMoneyValue, StockMoneyValue> {
+      val values = chart.close()
 
       val high = values.maxByOrNull { it.value() }.requireNotNull()
       val low = values.minByOrNull { it.value() }.requireNotNull()
 
-      return ChartBounds(high, low)
+      return high to low
     }
   }
 
-  private data class ChartBounds(val high: StockMoneyValue, val low: StockMoneyValue)
-
-  private class ChartAdapter(chart: StockChart, private val type: ChartType) : SparkAdapter() {
+  private class ChartAdapter(chart: StockChart) : SparkAdapter() {
 
     private val chartData: List<ChartData>
     private val baselineValue: Float = chart.startingPrice().value().toFloat()
 
     init {
       val dates = chart.dates()
-      val opens = chart.open()
       val closes = chart.close()
-      val highs = chart.high()
-      val lows = chart.low()
-      val volumes = chart.volume()
 
       val data = mutableListOf<ChartData>()
 
       for (i in dates.indices) {
         val date = dates[i]
-        val open = opens[i]
         val close = closes[i]
-        val high = highs[i]
-        val low = lows[i]
-        val volume = volumes[i]
-        data.add(
-            ChartData(
-                date = date, open = open, close = close, high = high, low = low, volume = volume))
+        data.add(ChartData(date = date, close = close))
       }
 
       chartData = data
@@ -197,10 +176,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
 
     @CheckResult
     private fun getValue(item: ChartData): Double {
-      return when (type) {
-        ChartType.OPEN -> item.open.value()
-        ChartType.CLOSE -> item.close.value()
-      }
+      return item.close.value()
     }
 
     override fun getCount(): Int {

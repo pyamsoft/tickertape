@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.cache
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.cachify.CacheStorage
+import com.pyamsoft.cachify.MemoryCacheStorage
+import java.util.concurrent.TimeUnit
 
-interface ChartSource {
-
-  @CheckResult
-  suspend fun getCharts(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-      range: StockChart.IntervalRange,
-  ): List<StockChart>
+@CheckResult
+fun <T : Any> createNewMemoryCacheStorage(): CacheStorage<T> {
+  return MemoryCacheStorage.create(5, TimeUnit.MINUTES)
 }

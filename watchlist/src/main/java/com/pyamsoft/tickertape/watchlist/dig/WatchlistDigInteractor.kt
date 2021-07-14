@@ -46,8 +46,10 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          interactor.getChart(force, symbol, range, includePrePost = false, includeQuote = true)
+          interactor
+              .getCharts(force, listOf(symbol), range, includeQuote = true)
               .onFailure { Timber.e(it, "Error getting chart $symbol") }
+              .map { it.first() }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote with chart ${symbol.symbol()}")
           return@withContext ResultWrapper.failure(e)

@@ -83,34 +83,10 @@ internal constructor(
       }
 
   @CheckResult
-  private suspend fun fetchChart(
-      force: Boolean,
-      symbol: StockSymbol,
-      range: StockChart.IntervalRange,
-      includePrePost: Boolean,
-      includeQuote: Boolean
-  ): QuotedChart = coroutineScope {
-    val deferred = mutableListOf<Deferred<*>>()
-    deferred.add(async { interactor.getChart(force, symbol, range, includePrePost) })
-
-    if (includeQuote) {
-      deferred.add(async { interactor.getQuotes(force, listOf(symbol)).first() })
-    }
-
-    val results = awaitAll(*deferred.toTypedArray())
-
-    val chart = results[0] as StockChart?
-    val quote = if (includeQuote) results[1] as StockQuote? else null
-
-    return@coroutineScope QuotedChart(symbol = symbol, chart = chart, quote = quote)
-  }
-
-  @CheckResult
   suspend fun getCharts(
       force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-      includePrePost: Boolean,
       includeQuote: Boolean
   ): ResultWrapper<List<QuotedChart>> =
       withContext(context = Dispatchers.IO) {
@@ -118,14 +94,22 @@ internal constructor(
 
         return@withContext try {
           coroutineScope {
-            val deferreds = mutableListOf<Deferred<QuotedChart>>()
-            for (symbol in symbols) {
-              deferreds.add(
-                  async { fetchChart(force, symbol, range, includePrePost, includeQuote) })
+            val deferreds = mutableListOf<Deferred<Any>>()
+
+            deferreds.add(async { interactor.getCharts(force, symbols, range) })
+
+            if (includeQuote) {
+              deferreds.add(async { interactor.getQuotes(force, symbols) })
             }
 
-            val charts = awaitAll(*deferreds.toTypedArray())
-            return@coroutineScope ResultWrapper.success(charts)
+            val result = deferreds.awaitAll()
+            val (charts, quotes) = parseResult(result, includeQuote)
+            return@coroutineScope ResultWrapper.success(
+                symbols.map { symbol ->
+                  val chart = charts.firstOrNull { it.symbol() == symbol }
+                  val quote = quotes.firstOrNull { it.symbol() == symbol }
+                  return@map QuotedChart(symbol, chart, quote)
+                })
           }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting charts")
@@ -134,17 +118,26 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getChart(
-      force: Boolean,
-      symbol: StockSymbol,
-      range: StockChart.IntervalRange,
-      includePrePost: Boolean,
-      includeQuote: Boolean,
-  ): ResultWrapper<QuotedChart> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
+  @Suppress("UNCHECKED_CAST")
+  private fun parseResult(
+      result: List<Any>,
+      includeQuote: Boolean
+  ): Pair<List<StockChart>, List<StockQuote>> {
+    val charts: List<StockChart>
+    val quotes: List<StockQuote>
+    if (includeQuote) {
+      // We can expect this first item to be the list of charts
+      charts = result.first() as List<StockChart>
 
-        return@withContext getCharts(force, listOf(symbol), range, includePrePost, includeQuote)
-            .map { it.first() }
-      }
+      // We can expect this last item to be the list of quotes
+      quotes = result.last() as List<StockQuote>
+    } else {
+      // We can expect this first item to be the list of charts
+      charts = result.first() as List<StockChart>
+
+      quotes = emptyList()
+    }
+
+    return charts to quotes
+  }
 }

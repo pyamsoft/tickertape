@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.stocks
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.cache.MemoryStockCacheImpl
+import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.service.TopService
@@ -125,6 +127,11 @@ abstract class StockModule {
   @CheckResult
   @InternalApi
   internal abstract fun bindNetworkInteractor(impl: StockNetworkInteractor): StockInteractor
+
+  @Binds
+  @CheckResult
+  @InternalApi
+  internal abstract fun bindStockCache(impl: MemoryStockCacheImpl): StockCache
 
   @Binds
   @CheckResult

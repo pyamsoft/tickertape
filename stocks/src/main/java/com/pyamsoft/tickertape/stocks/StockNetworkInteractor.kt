@@ -25,9 +25,11 @@ import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@Singleton
 internal class StockNetworkInteractor
 @Inject
 internal constructor(
@@ -54,14 +56,13 @@ internal constructor(
         return@withContext quoteSource.getQuotes(force, symbols)
       }
 
-  override suspend fun getChart(
+  override suspend fun getCharts(
       force: Boolean,
-      symbol: StockSymbol,
+      symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-      includePrePost: Boolean
-  ): StockChart =
+  ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext chartSource.getChart(force, symbol, range, includePrePost)
+        return@withContext chartSource.getCharts(force, symbols, range)
       }
 }

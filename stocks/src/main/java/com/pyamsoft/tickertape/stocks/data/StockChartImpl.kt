@@ -28,11 +28,7 @@ internal data class StockChartImpl(
     private val interval: StockChart.IntervalTime,
     private val dates: List<LocalDateTime>,
     private val startingPrice: StockMoneyValue,
-    private val volume: List<StockVolumeValue>,
-    private val open: List<StockMoneyValue>,
     private val close: List<StockMoneyValue>,
-    private val high: List<StockMoneyValue>,
-    private val low: List<StockMoneyValue>,
 ) : StockChart {
 
   override fun symbol(): StockSymbol {
@@ -55,23 +51,7 @@ internal data class StockChartImpl(
     return startingPrice
   }
 
-  override fun volume(): List<StockVolumeValue> {
-    return volume
-  }
-
-  override fun open(): List<StockMoneyValue> {
-    return open
-  }
-
   override fun close(): List<StockMoneyValue> {
     return close
-  }
-
-  override fun high(): List<StockMoneyValue> {
-    return high
-  }
-
-  override fun low(): List<StockMoneyValue> {
-    return low
   }
 }

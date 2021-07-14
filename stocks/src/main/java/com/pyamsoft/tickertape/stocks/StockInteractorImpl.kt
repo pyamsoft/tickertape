@@ -16,16 +16,14 @@
 
 package com.pyamsoft.tickertape.stocks
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.cachify.MemoryCacheStorage
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
-import java.util.concurrent.TimeUnit
+import com.pyamsoft.tickertape.stocks.cache.StockCache
+import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -34,32 +32,18 @@ import kotlinx.coroutines.withContext
 @Singleton
 internal class StockInteractorImpl
 @Inject
-internal constructor(@InternalApi private val interactor: StockInteractor) : StockInteractor {
-
-  private val quotesCache =
-      multiCachify<String, List<StockQuote>, List<StockSymbol>>(
-          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) { symbols ->
-        interactor.getQuotes(true, symbols)
-      }
-
-  private val chartsCache =
-      multiCachify<String, StockChart, StockSymbol, Boolean, StockChart.IntervalRange>(
-          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
-          symbol,
-          includePrePost,
-          range ->
-        interactor.getChart(true, symbol, range, includePrePost)
-      }
+internal constructor(
+    @InternalApi private val stockCache: StockCache,
+    @InternalApi private val interactor: StockInteractor,
+) : StockInteractor {
 
   private val gainerCache =
-      cachify<StockTops, Int>(
-          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
+      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
         interactor.getDayGainers(true, it)
       }
 
   private val loserCache =
-      cachify<StockTops, Int>(
-          storage = { listOf(MemoryCacheStorage.create(5, TimeUnit.MINUTES)) }) {
+      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
         interactor.getDayLosers(true, it)
       }
 
@@ -89,47 +73,27 @@ internal constructor(@InternalApi private val interactor: StockInteractor) : Sto
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val key = getQuoteKey(symbols)
         if (force) {
-          quotesCache.key(key).clear()
+          symbols.forEach { stockCache.removeQuote(it) }
         }
 
-        return@withContext quotesCache.key(key).call(symbols)
+        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(force, it) }
       }
 
-  override suspend fun getChart(
+  override suspend fun getCharts(
       force: Boolean,
-      symbol: StockSymbol,
+      symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-      includePrePost: Boolean
-  ): StockChart =
+  ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val key = getChartKey(symbol, includePrePost, range)
         if (force) {
-          chartsCache.key(key).clear()
+          symbols.forEach { stockCache.removeChart(it, range) }
         }
 
-        return@withContext chartsCache.key(key).call(symbol, includePrePost, range)
+        return@withContext stockCache.getCharts(symbols, range) { s, r ->
+          interactor.getCharts(force, s, r)
+        }
       }
-
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun getChartKey(
-        symbol: StockSymbol,
-        includePrePost: Boolean,
-        range: StockChart.IntervalRange
-    ): String {
-      return "${symbol.symbol()}-${includePrePost}-${range.apiValue}"
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun getQuoteKey(symbols: List<StockSymbol>): String {
-      return symbols.map { it.symbol() }.sortedBy { it }.joinToString(",")
-    }
-  }
 }

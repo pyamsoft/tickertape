@@ -105,18 +105,25 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val percent = session.percent()
     val direction = session.direction()
     val afterHoursString = if (isAfterHours) "after hours" else "so far today"
-    val directionString =
-        when {
-          direction.isUp() -> "up"
-          direction.isDown() -> "down"
-          else ->
-              throw AssertionError(
-                  "BigMover notification dispatched without a big move: $notification")
-        }
+    val movingString: String
+    val directionString: String
+
+    when {
+      direction.isUp() -> {
+        movingString = "rising"
+        directionString = "up"
+      }
+      direction.isDown() -> {
+        movingString = "dropping"
+        directionString = "down"
+      }
+      else ->
+          throw AssertionError("BigMover notification dispatched without a big move: $notification")
+    }
 
     val title = buildSpannedString {
       bold { append(quote.symbol().symbol()) }
-      append(" is moving today!")
+      append(" is $movingString today!")
     }
 
     val description = buildSpannedString {

@@ -18,13 +18,9 @@ package com.pyamsoft.tickertape.quote.ui.chart
 
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.ui.PackedData
 
 // Public constructor, used by watchlist module
-data class QuoteChartViewState(
-    val symbol: StockSymbol,
-    val quote: StockQuote?,
-    val chart: StockChart?,
-    val error: Throwable?
-) : UiViewState
+data class QuoteChartViewState(val symbol: StockSymbol, val chart: PackedData<StockChart>?) :
+    UiViewState

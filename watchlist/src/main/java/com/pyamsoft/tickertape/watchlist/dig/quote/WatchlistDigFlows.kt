@@ -23,13 +23,13 @@ import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.ui.PackedData
 
 data class WatchListDigViewState
 internal constructor(
     val symbol: StockSymbol,
     val isLoading: Boolean,
-    val stock: QuotedChart?,
-    val error: Throwable?,
+    val stock: PackedData<QuotedChart>?,
     val currentRange: StockChart.IntervalRange,
     val ranges: List<StockChart.IntervalRange>,
     val scrub: ChartData?

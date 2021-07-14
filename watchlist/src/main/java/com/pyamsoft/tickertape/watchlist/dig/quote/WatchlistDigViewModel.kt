@@ -27,6 +27,8 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +46,6 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
                 stock = null,
                 currentRange = StockChart.IntervalRange.ONE_DAY,
                 ranges = emptyList(),
-                error = null,
                 scrub = null)) {
 
   private val quoteFetcher =
@@ -73,15 +74,14 @@ internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol
                 .onSuccess {
                   setState {
                     copy(
-                        stock = it,
+                        stock = it.pack(),
                         scrub = latestChartDataFromQuote(it, currentRange),
-                        error = null,
                         isLoading = false)
                   }
                 }
                 .onFailure { Timber.e(it, "Failed to fetch quote with stock") }
                 .onFailure {
-                  setState { copy(stock = null, error = it, scrub = null, isLoading = false) }
+                  setState { copy(stock = it.packError(), scrub = null, isLoading = false) }
                 }
           })
     }

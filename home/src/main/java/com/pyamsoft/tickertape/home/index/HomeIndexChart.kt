@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
+import com.pyamsoft.tickertape.ui.pack
 import javax.inject.Inject
 
 class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
@@ -40,8 +41,6 @@ class HomeIndexChart @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleStateChanged(state: HomeIndexViewState) {
     handleRender(
-        QuoteChartViewState(
-                symbol = state.symbol, quote = state.quote, chart = state.chart, error = null)
-            .asUiRender())
+        QuoteChartViewState(symbol = state.symbol, chart = state.chart?.pack()).asUiRender())
   }
 }

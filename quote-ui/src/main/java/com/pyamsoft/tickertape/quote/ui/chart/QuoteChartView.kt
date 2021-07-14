@@ -35,6 +35,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
+import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import timber.log.Timber
 
@@ -106,41 +107,49 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteChartBinding>(p
   }
 
   protected fun handleRender(state: UiRender<QuoteChartViewState>) {
-    state.mapChanged { it.chart }.render(viewScope) { handleChartChanged(it) }
-    state.mapChanged { it.error }.render(viewScope) { handleError(it) }
+    state.mapChanged { it.chart }.render(viewScope) { handleChart(it) }
   }
 
-  private fun handleError(throwable: Throwable?) {
-    if (throwable == null) {
-      binding.apply {
-        quoteChartError.isGone = true
-        quoteChartData.isVisible = true
-      }
+  private fun handleChart(data: PackedData<StockChart>?) {
+    if (data == null) {
+      // Chart error
+      Timber.w("Failed to load chart")
+      clearBounds()
+      clearError()
     } else {
-      binding.apply {
-        quoteChartData.isGone = true
-        quoteChartError.isVisible = true
-        quoteChartError.text = throwable.getUserMessage()
+      return when (data) {
+        is PackedData.Data -> handleChartChanged(data.value)
+        is PackedData.Error -> handleError(data.throwable)
       }
     }
   }
 
-  private fun handleChartChanged(chart: StockChart?) {
-    clearAdapter()
+  private fun clearError() {
+    binding.apply {
+      quoteChartError.isGone = true
+      quoteChartData.isVisible = true
+    }
+  }
 
-    if (chart == null) {
-      // Chart error
-      Timber.w("Failed to load chart")
-      clearBounds()
-    } else {
-      // Load was successful, we have required data
-      binding.apply {
-        val high = chart.periodHigh()
-        val low = chart.periodLow()
-        quoteChart.adapter = ChartAdapter(chart, high, low)
-        quoteChartTop.text = high.asMoneyValue()
-        quoteChartBottom.text = low.asMoneyValue()
-      }
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      quoteChartData.isGone = true
+      quoteChartError.isVisible = true
+      quoteChartError.text = throwable.getUserMessage()
+    }
+  }
+
+  private fun handleChartChanged(chart: StockChart) {
+    clearAdapter()
+    clearError()
+
+    // Load was successful, we have required data
+    binding.apply {
+      val high = chart.periodHigh()
+      val low = chart.periodLow()
+      quoteChart.adapter = ChartAdapter(chart, high, low)
+      quoteChartTop.text = high.asMoneyValue()
+      quoteChartBottom.text = low.asMoneyValue()
     }
   }
 

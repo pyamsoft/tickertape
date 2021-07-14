@@ -24,6 +24,9 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartView
 import com.pyamsoft.tickertape.quote.ui.chart.QuoteChartViewState
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 import javax.inject.Inject
 
 class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
@@ -66,9 +69,14 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   private fun handleStateChanged(state: WatchListDigViewState) {
     val symbol = state.symbol
     val stock = state.stock
-    handleRender(
-        (QuoteChartViewState(
-                symbol = symbol, quote = stock?.quote, chart = stock?.chart, error = state.error)
-            .asUiRender()))
+    val chart =
+        if (stock == null) null
+        else
+            when (stock) {
+              is PackedData.Data -> stock.value.chart?.pack()
+              is PackedData.Error -> stock.throwable.packError()
+            }
+
+    handleRender(QuoteChartViewState(symbol = symbol, chart = chart).asUiRender())
   }
 }

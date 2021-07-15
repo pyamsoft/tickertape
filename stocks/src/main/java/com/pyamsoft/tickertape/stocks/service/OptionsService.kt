@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.stocks.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.ui.chart.BaseChartComponent
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-@Subcomponent
-internal interface BaseWatchlistDigComponent {
+internal interface OptionsService {
 
-  @CheckResult fun plusDigComponent(): WatchlistDigComponent.Factory
+  @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
+  suspend fun getOptions(@Path("symbol") symbol: String): NetworkOptionResponse
 
-  @CheckResult fun plusChartComponent(): BaseChartComponent.Factory
-
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance symbol: StockSymbol): BaseWatchlistDigComponent
-  }
+  @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
+  suspend fun getOptions(
+      @Path("symbol") symbol: String,
+      @Query("date") date: Long
+  ): NetworkOptionResponse
 }

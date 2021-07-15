@@ -17,7 +17,7 @@
 <merge>
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/watchlist_dig_range_item_text"
+        android:id="@+id/component_chart_range_item_text"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"

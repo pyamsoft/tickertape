@@ -41,7 +41,7 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.watchlist.dig.quote.WatchlistQuoteFragment
+import com.pyamsoft.tickertape.watchlist.dig.chart.WatchlistDigChartFragment
 import javax.inject.Inject
 
 internal class WatchlistDigDialog :
@@ -152,8 +152,8 @@ internal class WatchlistDigDialog :
     return when (event) {
       is BaseWatchListDigControllerEvent.PushQuote ->
           pushFragment(
-              fragment = WatchlistQuoteFragment.newInstance(),
-              tag = WatchlistQuoteFragment.TAG,
+              fragment = WatchlistDigChartFragment.newInstance(),
+              tag = WatchlistDigChartFragment.TAG,
               appendBackStack = false)
     }
   }

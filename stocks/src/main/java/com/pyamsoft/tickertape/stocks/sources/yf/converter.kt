@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.stocks.sources.yf
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.ui.chart.BaseChartComponent
-import dagger.BindsInstance
-import dagger.Subcomponent
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
-@Subcomponent
-internal interface BaseWatchlistDigComponent {
-
-  @CheckResult fun plusDigComponent(): WatchlistDigComponent.Factory
-
-  @CheckResult fun plusChartComponent(): BaseChartComponent.Factory
-
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance symbol: StockSymbol): BaseWatchlistDigComponent
-  }
+@CheckResult
+internal fun timestampToTime(stamp: Long, zoneId: ZoneId): LocalDateTime {
+  return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), zoneId)
 }

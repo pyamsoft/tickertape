@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import android.view.ViewGroup
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSwipeRefreshContainer
 import javax.inject.Inject
 
-class WatchlistDigContainer @Inject internal constructor(parent: ViewGroup) :
-    UiSwipeRefreshContainer<WatchListDigViewState, WatchListDigViewEvent>(parent),
-    SwipeRefreshLayout.OnRefreshListener {
+class StockChartContainer
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    nestedChart: StockChartView,
+    nestedCurrent: StockChartCurrent,
+    nestedRanges: StockChartRanges
+) : UiSwipeRefreshContainer<StockChartViewState, StockChartViewEvent>(parent) {
 
   init {
-    doOnInflate { binding.containerSwipeRefresh.setOnRefreshListener(this) }
+    nest(nestedChart, nestedCurrent, nestedRanges)
+
+    doOnInflate {
+      binding.containerSwipeRefresh.setOnRefreshListener { publish(StockChartViewEvent.Refresh) }
+    }
 
     doOnTeardown { binding.containerSwipeRefresh.setOnRefreshListener(null) }
   }
 
-  override fun onRefresh() {
-    publish(WatchListDigViewEvent.Refresh)
-  }
-
-  override fun onRender(state: UiRender<WatchListDigViewState>) {
+  override fun onRender(state: UiRender<StockChartViewState>) {
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 }

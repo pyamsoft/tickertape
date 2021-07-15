@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote.range
+package com.pyamsoft.tickertape.quote.ui.component.chart.range
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -22,37 +22,37 @@ import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.doOnDestroy
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangeItemBinding
+import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangeItemBinding
 import javax.inject.Inject
 
-class WatchlistDigRangeViewHolder
+class ChartRangeViewHolder
 internal constructor(
-    binding: WatchlistDigRangeItemBinding,
-    factory: WatchlistDigRangeComponent.Factory,
+    binding: ComponentChartRangeItemBinding,
+    factory: ChartRangeComponent.Factory,
     owner: LifecycleOwner,
-    callback: WatchlistDigRangeAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistDigRangeViewState> {
+    callback: ChartRangeAdapter.Callback
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<ChartRangeViewState> {
 
-  @Inject @JvmField internal var click: WatchlistDigRangeClick? = null
+  @Inject @JvmField internal var click: ChartRangeClick? = null
 
-  @Inject @JvmField internal var text: WatchlistDigRangeText? = null
+  @Inject @JvmField internal var text: ChartRangeText? = null
 
-  private val viewBinder: ViewBinder<WatchlistDigRangeViewState>
+  private val viewBinder: ViewBinder<ChartRangeViewState>
 
   init {
-    factory.create(binding.watchlistDigRangeItem).inject(this)
+    factory.create(binding.componentChartRangeItem).inject(this)
 
     viewBinder =
         createViewBinder(text.requireNotNull(), click.requireNotNull()) {
           return@createViewBinder when (it) {
-            is WatchlistDigRangeViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
+            is ChartRangeViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
           }
         }
 
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: WatchlistDigRangeViewState) {
+  override fun bindState(state: ChartRangeViewState) {
     viewBinder.bindState(state)
   }
 

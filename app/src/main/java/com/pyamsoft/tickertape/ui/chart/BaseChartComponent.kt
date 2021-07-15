@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.ui.chart
 
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
-import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeComponent
+import com.pyamsoft.tickertape.quote.ui.component.chart.range.ChartRangeComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface BaseWatchlistDigQuoteComponent {
+internal interface BaseChartComponent {
 
-  @CheckResult fun plusWatchlistComponent(): WatchlistDigQuoteComponent.Factory
+  @CheckResult fun plusChartComponent(): ChartComponent.Factory
 
   /** Not actually used, just here so graph can compile */
   @CheckResult
   @Suppress("FunctionName")
-  fun `$$daggerRequiredWatchlistDigRangeComponent`(): WatchlistDigRangeComponent.Factory
+  fun `$$daggerRequiredChartRangeComponent`(): ChartRangeComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
@@ -38,6 +38,6 @@ internal interface BaseWatchlistDigQuoteComponent {
     @CheckResult
     fun create(
         @BindsInstance lifecycleOwner: LifecycleOwner,
-    ): BaseWatchlistDigQuoteComponent
+    ): BaseChartComponent
   }
 }

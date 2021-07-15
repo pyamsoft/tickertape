@@ -17,7 +17,8 @@
 package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
+import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 
-interface StockInteractor : QuoteSource, ChartSource, TopSource
+interface StockInteractor : QuoteSource, ChartSource, TopSource, OptionsSource

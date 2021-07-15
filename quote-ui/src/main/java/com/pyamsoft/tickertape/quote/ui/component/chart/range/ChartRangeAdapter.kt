@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote.range
+package com.pyamsoft.tickertape.quote.ui.component.chart.range
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,14 +22,14 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangeItemBinding
+import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangeItemBinding
 
-class WatchlistDigRangeAdapter
+internal class ChartRangeAdapter
 private constructor(
-    private val factory: WatchlistDigRangeComponent.Factory,
+    private val factory: ChartRangeComponent.Factory,
     private val owner: LifecycleOwner,
     private val callback: Callback
-) : ListAdapter<WatchlistDigRangeViewState, WatchlistDigRangeViewHolder>(DIFFER) {
+) : ListAdapter<ChartRangeViewState, ChartRangeViewHolder>(DIFFER) {
 
   init {
     setHasStableIds(true)
@@ -40,25 +40,25 @@ private constructor(
     @JvmStatic
     @CheckResult
     fun create(
-        factory: WatchlistDigRangeComponent.Factory,
+        factory: ChartRangeComponent.Factory,
         owner: LifecycleOwner,
         callback: Callback
-    ): WatchlistDigRangeAdapter {
-      return WatchlistDigRangeAdapter(factory, owner, callback)
+    ): ChartRangeAdapter {
+      return ChartRangeAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
-        object : DiffUtil.ItemCallback<WatchlistDigRangeViewState>() {
+        object : DiffUtil.ItemCallback<ChartRangeViewState>() {
           override fun areItemsTheSame(
-              oldItem: WatchlistDigRangeViewState,
-              newItem: WatchlistDigRangeViewState
+              oldItem: ChartRangeViewState,
+              newItem: ChartRangeViewState
           ): Boolean {
             return oldItem.range == newItem.range
           }
 
           override fun areContentsTheSame(
-              oldItem: WatchlistDigRangeViewState,
-              newItem: WatchlistDigRangeViewState
+              oldItem: ChartRangeViewState,
+              newItem: ChartRangeViewState
           ): Boolean {
             return oldItem == newItem
           }
@@ -69,13 +69,13 @@ private constructor(
     return getItem(position).range.hashCode().toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchlistDigRangeViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartRangeViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    val binding = WatchlistDigRangeItemBinding.inflate(inflater, parent, false)
-    return WatchlistDigRangeViewHolder(binding, factory, owner, callback)
+    val binding = ComponentChartRangeItemBinding.inflate(inflater, parent, false)
+    return ChartRangeViewHolder(binding, factory, owner, callback)
   }
 
-  override fun onBindViewHolder(holder: WatchlistDigRangeViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: ChartRangeViewHolder, position: Int) {
     val state = getItem(position)
     holder.bindState(state)
   }

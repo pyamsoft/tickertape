@@ -14,38 +14,38 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
+import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartCurrentBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigCurrentBinding
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import javax.inject.Inject
 
-class WatchlistDigCurrent @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<WatchListDigViewState, WatchListDigViewEvent, WatchlistDigCurrentBinding>(parent) {
+internal class StockChartCurrent @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<StockChartViewState, StockChartViewEvent, ComponentChartCurrentBinding>(parent) {
 
-  override val layoutRoot by boundView { watchlistDigCurrent }
+  override val layoutRoot by boundView { componentChartCurrent }
 
-  override val viewBinding = WatchlistDigCurrentBinding::inflate
+  override val viewBinding = ComponentChartCurrentBinding::inflate
 
   init {
     doOnTeardown { clear() }
   }
 
-  override fun onRender(state: UiRender<WatchListDigViewState>) {
+  override fun onRender(state: UiRender<StockChartViewState>) {
     state.mapChanged { it.scrub }.render(viewScope) { handleScrubChanged(it) }
   }
 
   private fun clear() {
     binding.apply {
-      watchlistDigCurrentDate.text = null
-      watchlistDigCurrentPrice.text = null
+      componentChartCurrentDate.text = null
+      componentChartCurrentPrice.text = null
     }
   }
 
@@ -57,8 +57,8 @@ class WatchlistDigCurrent @Inject internal constructor(parent: ViewGroup) :
         val formatter =
             if (data.range < StockChart.IntervalRange.THREE_MONTH) FORMATTER_WITH_TIME
             else FORMATTER
-        watchlistDigCurrentDate.text = formatter.get().requireNotNull().format(data.date)
-        watchlistDigCurrentPrice.text = data.price.asMoneyValue()
+        componentChartCurrentDate.text = formatter.get().requireNotNull().format(data.date)
+        componentChartCurrentPrice.text = data.price.asMoneyValue()
       }
     }
   }

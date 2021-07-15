@@ -28,7 +28,6 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
 import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.inject.Inject
@@ -103,12 +102,6 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
   companion object {
 
     private const val YF_CHART_SOURCE = "https://query1.finance.yahoo.com/v7/finance/spark"
-
-    @JvmStatic
-    @CheckResult
-    private fun timestampToTime(stamp: Long, zoneId: ZoneId): LocalDateTime {
-      return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), zoneId)
-    }
 
     @JvmStatic
     @CheckResult

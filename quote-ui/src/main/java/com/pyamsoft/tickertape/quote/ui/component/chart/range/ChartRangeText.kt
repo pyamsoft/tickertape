@@ -14,40 +14,39 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote.range
+package com.pyamsoft.tickertape.quote.ui.component.chart.range
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangeItemTextBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.ui.R
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangeItemTextBinding
 import java.util.Locale
 import javax.inject.Inject
 
-class WatchlistDigRangeText @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<
-        WatchlistDigRangeViewState, WatchlistDigRangeViewEvent, WatchlistDigRangeItemTextBinding>(
+internal class ChartRangeText @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<ChartRangeViewState, ChartRangeViewEvent, ComponentChartRangeItemTextBinding>(
         parent) {
 
-  override val layoutRoot by boundView { watchlistDigRangeItemText }
+  override val layoutRoot by boundView { componentChartRangeItemText }
 
-  override val viewBinding = WatchlistDigRangeItemTextBinding::inflate
+  override val viewBinding = ComponentChartRangeItemTextBinding::inflate
 
   init {
-    doOnTeardown { binding.watchlistDigRangeItemText.text = "" }
+    doOnTeardown { binding.componentChartRangeItemText.text = "" }
   }
 
-  override fun onRender(state: UiRender<WatchlistDigRangeViewState>) {
+  override fun onRender(state: UiRender<ChartRangeViewState>) {
     state.mapChanged { it.range }.render(viewScope) { handleRangeChanged(it) }
     state.mapChanged { it.isSelected }.render(viewScope) { handleSelectedChanged(it) }
   }
 
   private fun handleSelectedChanged(selected: Boolean) {
-    binding.watchlistDigRangeItemText.setBackgroundResource(if (selected) R.color.blue500 else 0)
+    binding.componentChartRangeItemText.setBackgroundResource(if (selected) R.color.blue500 else 0)
   }
 
   private fun handleRangeChanged(range: StockChart.IntervalRange) {
-    binding.watchlistDigRangeItemText.text = range.display.uppercase(Locale.getDefault())
+    binding.componentChartRangeItemText.text = range.display.uppercase(Locale.getDefault())
   }
 }

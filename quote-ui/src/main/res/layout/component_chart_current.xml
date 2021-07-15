@@ -18,12 +18,12 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/watchlist_dig_current"
+        android:id="@+id/component_chart_current"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/watchlist_dig_current_date"
+            android:id="@+id/component_chart_current_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -35,15 +35,15 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/watchlist_dig_current_price"
+            android:id="@+id/component_chart_current_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="?attr/textAppearanceHeadline5"
             app:layout_constrainedHeight="true"
-            app:layout_constraintEnd_toEndOf="@id/watchlist_dig_current_date"
-            app:layout_constraintStart_toStartOf="@id/watchlist_dig_current_date"
-            app:layout_constraintTop_toBottomOf="@id/watchlist_dig_current_date" />
+            app:layout_constraintEnd_toEndOf="@id/component_chart_current_date"
+            app:layout_constraintStart_toStartOf="@id/component_chart_current_date"
+            app:layout_constraintTop_toBottomOf="@id/component_chart_current_date" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

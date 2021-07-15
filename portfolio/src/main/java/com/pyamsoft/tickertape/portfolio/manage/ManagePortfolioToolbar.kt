@@ -101,7 +101,7 @@ internal constructor(
             val page = getTabPage(tab) ?: return
             return when (page) {
               PortfolioPage.POSITIONS -> publish(ManagePortfolioViewEvent.OpenPositions)
-              PortfolioPage.QUOTE -> publish(ManagePortfolioViewEvent.OpenQuote)
+              PortfolioPage.CHART -> publish(ManagePortfolioViewEvent.OpenQuote)
             }
           }
 
@@ -174,7 +174,7 @@ internal constructor(
     val isAddEnabled =
         when (page) {
           PortfolioPage.POSITIONS -> true
-          PortfolioPage.QUOTE -> false
+          PortfolioPage.CHART -> false
         }
 
     binding.positionToolbar.menu.findItem(R2.id.menu_manage_toolbar_add)?.isEnabled = isAddEnabled
@@ -187,7 +187,7 @@ internal constructor(
   private fun handleCloseState(page: PortfolioPage) {
     val isClose =
         when (page) {
-          PortfolioPage.POSITIONS, PortfolioPage.QUOTE -> true
+          PortfolioPage.POSITIONS, PortfolioPage.CHART -> true
         }
 
     if (isClose) {

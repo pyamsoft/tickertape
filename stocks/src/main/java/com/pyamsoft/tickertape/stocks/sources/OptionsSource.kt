@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote.range
+package com.pyamsoft.tickertape.stocks.sources
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.tickertape.stocks.api.StockOptions
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDateTime
 
-@Subcomponent
-interface WatchlistDigRangeComponent {
+interface OptionsSource {
 
-  fun inject(holder: WatchlistDigRangeViewHolder)
-
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigRangeComponent
-  }
+  @CheckResult
+  suspend fun getOptions(
+      force: Boolean,
+      symbol: StockSymbol,
+      date: LocalDateTime? = null
+  ): StockOptions
 }

@@ -18,11 +18,9 @@ package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.ui.databinding.ContainerNestedScrollBinding
-import timber.log.Timber
 
 abstract class UiScrollingContainer<S : UiViewState, V : UiViewEvent>
 protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerNestedScrollBinding>(parent) {

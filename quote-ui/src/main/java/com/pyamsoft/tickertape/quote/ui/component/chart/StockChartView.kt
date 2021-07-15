@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import android.view.ViewGroup
 import androidx.core.view.updatePadding
@@ -29,8 +29,8 @@ import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import javax.inject.Inject
 
-class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
-    QuoteChartView<WatchListDigViewState, WatchListDigViewEvent>(parent) {
+internal class StockChartView @Inject internal constructor(parent: ViewGroup) :
+    QuoteChartView<StockChartViewState, StockChartViewEvent>(parent) {
 
   init {
     doOnInflate {
@@ -59,14 +59,14 @@ class WatchlistDigChart @Inject internal constructor(parent: ViewGroup) :
   private fun clearScrubView() {}
 
   private fun handleScrubbedView(data: ChartData) {
-    publish(WatchListDigViewEvent.Scrub(data))
+    publish(StockChartViewEvent.Scrub(data))
   }
 
-  override fun onRender(state: UiRender<WatchListDigViewState>) {
+  override fun onRender(state: UiRender<StockChartViewState>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStateChanged(state: WatchListDigViewState) {
+  private fun handleStateChanged(state: StockChartViewState) {
     val symbol = state.symbol
     val stock = state.stock
     val chart =

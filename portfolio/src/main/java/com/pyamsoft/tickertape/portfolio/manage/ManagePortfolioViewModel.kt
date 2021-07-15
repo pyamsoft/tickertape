@@ -39,13 +39,13 @@ internal constructor(private val thisHoldingId: DbHolding.Id, private val thisSy
   }
 
   fun handleLoadQuote() {
-    loadPage(PortfolioPage.QUOTE)
+    loadPage(PortfolioPage.CHART)
   }
 
   private fun publishPage() {
     return when (state.page) {
       PortfolioPage.POSITIONS -> publish(ManagePortfolioControllerEvent.PushPositions)
-      PortfolioPage.QUOTE -> publish(ManagePortfolioControllerEvent.PushQuote)
+      PortfolioPage.CHART -> publish(ManagePortfolioControllerEvent.PushQuote)
     }
   }
 

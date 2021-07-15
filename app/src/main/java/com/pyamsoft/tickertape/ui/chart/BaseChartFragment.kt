@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.ui.chart
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,21 +29,19 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.quote.ui.component.chart.StockChartContainer
+import com.pyamsoft.tickertape.quote.ui.component.chart.StockChartControllerEvent
+import com.pyamsoft.tickertape.quote.ui.component.chart.StockChartViewEvent
+import com.pyamsoft.tickertape.quote.ui.component.chart.StockChartViewModel
 import javax.inject.Inject
 
-abstract class BaseQuoteFragment protected constructor() :
-    Fragment(), UiController<WatchListDigControllerEvent> {
+abstract class BaseChartFragment protected constructor() :
+    Fragment(), UiController<StockChartControllerEvent> {
 
-  @JvmField @Inject internal var container: WatchlistDigContainer? = null
-
-  @JvmField @Inject internal var nestedChart: WatchlistDigChart? = null
-
-  @JvmField @Inject internal var nestedCurrent: WatchlistDigCurrent? = null
-
-  @JvmField @Inject internal var nestedRanges: WatchlistDigRanges? = null
+  @JvmField @Inject internal var container: StockChartContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<WatchlistDigViewModel> { factory?.create(this) }
+  private val viewModel by fromViewModelFactory<StockChartViewModel> { factory?.create(this) }
 
   private var stateSaver: StateSaver? = null
 
@@ -64,23 +62,20 @@ abstract class BaseQuoteFragment protected constructor() :
     val binding = LayoutFrameBinding.bind(view)
     injectComponent(binding.layoutFrame)
 
-    val container = container.requireNotNull()
-    container.nest(
-        nestedChart.requireNotNull(), nestedCurrent.requireNotNull(), nestedRanges.requireNotNull())
-
     stateSaver =
-        createComponent(savedInstanceState, viewLifecycleOwner, viewModel, this, container) {
+        createComponent(
+            savedInstanceState, viewLifecycleOwner, viewModel, this, container.requireNotNull()) {
           return@createComponent when (it) {
-            is WatchListDigViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
-            is WatchListDigViewEvent.Scrub -> viewModel.handleScrub(it.data)
-            is WatchListDigViewEvent.Refresh -> viewModel.handleRefresh(true)
+            is StockChartViewEvent.RangeUpdated -> viewModel.handleRangeUpdated(it.index)
+            is StockChartViewEvent.Scrub -> viewModel.handleScrub(it.data)
+            is StockChartViewEvent.Refresh -> viewModel.handleRefresh(true)
           }
         }
 
     viewModel.handleRefresh(false)
   }
 
-  final override fun onControllerEvent(event: WatchListDigControllerEvent) {
+  final override fun onControllerEvent(event: StockChartControllerEvent) {
     // TODO
   }
 
@@ -95,9 +90,6 @@ abstract class BaseQuoteFragment protected constructor() :
     factory = null
 
     container = null
-    nestedChart = null
-    nestedCurrent = null
-    nestedRanges = null
   }
 
   protected abstract fun injectComponent(root: ViewGroup)

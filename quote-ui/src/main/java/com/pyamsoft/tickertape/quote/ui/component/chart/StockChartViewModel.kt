@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
@@ -35,12 +35,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WatchlistDigViewModel
+class StockChartViewModel
 @Inject
-internal constructor(interactor: WatchlistDigInteractor, thisSymbol: StockSymbol) :
-    UiViewModel<WatchListDigViewState, WatchListDigControllerEvent>(
+internal constructor(interactor: StockChartInteractor, thisSymbol: StockSymbol) :
+    UiViewModel<StockChartViewState, StockChartControllerEvent>(
         initialState =
-            WatchListDigViewState(
+            StockChartViewState(
                 symbol = thisSymbol,
                 isLoading = false,
                 stock = null,

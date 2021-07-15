@@ -21,7 +21,7 @@ import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.position.BasePositionsComponent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.watchlist.dig.quote.BaseWatchlistDigQuoteComponent
+import com.pyamsoft.tickertape.ui.chart.BaseChartComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
@@ -33,7 +33,7 @@ internal interface BaseManageComponent {
 
   @CheckResult fun plusPositionsComponent(): BasePositionsComponent.Factory
 
-  @CheckResult fun plusQuoteComponent(): BaseWatchlistDigQuoteComponent.Factory
+  @CheckResult fun plusQuoteComponent(): BaseChartComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {

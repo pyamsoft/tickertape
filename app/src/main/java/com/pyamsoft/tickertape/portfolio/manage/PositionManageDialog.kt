@@ -41,9 +41,9 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
-import com.pyamsoft.tickertape.portfolio.manage.quote.PositionQuoteFragment
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
@@ -171,8 +171,8 @@ internal class PositionManageDialog :
               PositionsFragment.newInstance(), PositionsFragment.TAG, appendBackStack = false)
       is ManagePortfolioControllerEvent.PushQuote ->
           pushFragment(
-              PositionQuoteFragment.newInstance(),
-              PositionQuoteFragment.TAG,
+              PositionChartFragment.newInstance(),
+              PositionChartFragment.TAG,
               appendBackStack = false)
       is ManagePortfolioControllerEvent.OpenAdd ->
           PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol)

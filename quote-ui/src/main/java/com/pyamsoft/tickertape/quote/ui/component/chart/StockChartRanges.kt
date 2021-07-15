@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
@@ -25,38 +25,38 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
+import com.pyamsoft.tickertape.quote.ui.component.chart.range.ChartRangeAdapter
+import com.pyamsoft.tickertape.quote.ui.component.chart.range.ChartRangeComponent
+import com.pyamsoft.tickertape.quote.ui.component.chart.range.ChartRangeViewState
+import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangesBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.watchlist.databinding.WatchlistDigRangesBinding
-import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeAdapter
-import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeComponent
-import com.pyamsoft.tickertape.watchlist.dig.quote.range.WatchlistDigRangeViewState
 import io.cabriole.decorator.DecorationLookup
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
 
-class WatchlistDigRanges
+internal class StockChartRanges
 @Inject
 internal constructor(
-    factory: WatchlistDigRangeComponent.Factory,
+    factory: ChartRangeComponent.Factory,
     owner: LifecycleOwner,
     parent: ViewGroup
 ) :
-    BaseUiView<WatchListDigViewState, WatchListDigViewEvent, WatchlistDigRangesBinding>(parent),
-    WatchlistDigRangeAdapter.Callback {
+    BaseUiView<StockChartViewState, StockChartViewEvent, ComponentChartRangesBinding>(parent),
+    ChartRangeAdapter.Callback {
 
-  override val layoutRoot by boundView { watchlistDigRanges }
+  override val layoutRoot by boundView { componentChartRanges }
 
-  override val viewBinding = WatchlistDigRangesBinding::inflate
+  override val viewBinding = ComponentChartRangesBinding::inflate
 
-  private var modelAdapter: WatchlistDigRangeAdapter? = null
+  private var modelAdapter: ChartRangeAdapter? = null
 
   private var lastScrollPosition = 0
 
   init {
     doOnInflate {
-      binding.watchlistDigRanges.layoutManager =
-          LinearLayoutManager(binding.watchlistDigRanges.context).apply {
+      binding.componentChartRanges.layoutManager =
+          LinearLayoutManager(binding.componentChartRanges.context).apply {
             orientation = RecyclerView.HORIZONTAL
             isItemPrefetchEnabled = true
             initialPrefetchItemCount = 3
@@ -64,8 +64,8 @@ internal constructor(
     }
 
     doOnInflate {
-      modelAdapter = WatchlistDigRangeAdapter.create(factory, owner, this)
-      binding.watchlistDigRanges.adapter = modelAdapter
+      modelAdapter = ChartRangeAdapter.create(factory, owner, this)
+      binding.componentChartRanges.adapter = modelAdapter
     }
     doOnInflate { savedInstanceState ->
       val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
@@ -76,7 +76,7 @@ internal constructor(
     }
 
     doOnSaveState { outState ->
-      val manager = binding.watchlistDigRanges.layoutManager
+      val manager = binding.componentChartRanges.layoutManager
       if (manager is LinearLayoutManager) {
         val position = manager.findFirstVisibleItemPosition()
         if (position > 0) {
@@ -105,7 +105,7 @@ internal constructor(
                       return position == 0
                     }
                   })
-          .apply { binding.watchlistDigRanges.addItemDecoration(this) }
+          .apply { binding.componentChartRanges.addItemDecoration(this) }
 
       LinearMarginDecoration.createHorizontal(
               margin,
@@ -116,33 +116,33 @@ internal constructor(
                       return position > 0 && position < itemCount - 1
                     }
                   })
-          .apply { binding.watchlistDigRanges.addItemDecoration(this) }
+          .apply { binding.componentChartRanges.addItemDecoration(this) }
     }
 
-    doOnTeardown { binding.watchlistDigRanges.removeAllItemDecorations() }
+    doOnTeardown { binding.componentChartRanges.removeAllItemDecorations() }
 
     doOnTeardown {
-      binding.watchlistDigRanges.adapter = null
+      binding.componentChartRanges.adapter = null
 
       modelAdapter = null
     }
   }
 
   @CheckResult
-  private fun usingAdapter(): WatchlistDigRangeAdapter {
+  private fun usingAdapter(): ChartRangeAdapter {
     return requireNotNull(modelAdapter)
   }
 
   override fun onSelect(index: Int) {
-    publish(WatchListDigViewEvent.RangeUpdated(index))
+    publish(StockChartViewEvent.RangeUpdated(index))
   }
 
-  override fun onRender(state: UiRender<WatchListDigViewState>) {
+  override fun onRender(state: UiRender<StockChartViewState>) {
     state.render(viewScope) { handleList(it) }
   }
 
   private fun setList(current: StockChart.IntervalRange, ranges: List<StockChart.IntervalRange>) {
-    val data = ranges.map { WatchlistDigRangeViewState(isSelected = it == current, range = it) }
+    val data = ranges.map { ChartRangeViewState(isSelected = it == current, range = it) }
     Timber.d("Submit data list: $data")
     usingAdapter().submitList(data)
   }
@@ -151,7 +151,7 @@ internal constructor(
     usingAdapter().submitList(null)
   }
 
-  private fun handleList(state: WatchListDigViewState) {
+  private fun handleList(state: StockChartViewState) {
     val current = state.currentRange
     val ranges = state.ranges
 

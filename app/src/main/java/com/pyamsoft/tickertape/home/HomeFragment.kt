@@ -31,9 +31,12 @@ import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
 class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
@@ -46,20 +49,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
   @Inject @JvmField internal var container: HomeScrollContainer? = null
 
   @Inject @JvmField internal var spacer: HomeSpacer? = null
-
-  @Inject @JvmField internal var nestedBottomSpacer: HomeBottomSpacer? = null
-
-  @Inject @JvmField internal var nestedIndexes: HomeIndexList? = null
-
-  @Inject @JvmField internal var nestedPortfolio: HomePortfolio? = null
-
-  @Inject @JvmField internal var nestedWatchlistTitle: HomeWatchlistTitle? = null
-
-  @Inject @JvmField internal var nestedWatchlist: HomeWatchlist? = null
-
-  @Inject @JvmField internal var nestedGainers: HomeGainerList? = null
-
-  @Inject @JvmField internal var nestedLosers: HomeLoserList? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -86,16 +75,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
         .create(binding.layoutCoordinator)
         .inject(this)
 
-    val container = container.requireNotNull()
-    container.nest(
-        nestedPortfolio.requireNotNull(),
-        nestedWatchlistTitle.requireNotNull(),
-        nestedWatchlist.requireNotNull(),
-        nestedIndexes.requireNotNull(),
-        nestedGainers.requireNotNull(),
-        nestedLosers.requireNotNull(),
-        nestedBottomSpacer.requireNotNull())
-
     stateSaver =
         createComponent(
             savedInstanceState,
@@ -103,15 +82,24 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             viewModel,
             this,
             spacer.requireNotNull(),
-            container) {
+            container.requireNotNull()) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
+            is HomeViewEvent.DigDeeperWatchlist -> viewModel.handleDigWatchlistSymbol(it.index)
           }
         }
   }
 
-  override fun onControllerEvent(event: HomeControllerEvent) {}
+  override fun onControllerEvent(event: HomeControllerEvent) {
+    return when (event) {
+      is HomeControllerEvent.ManageWatchlistSymbol -> handleOpenDigDialog(event.quote.symbol)
+    }
+  }
+
+  private fun handleOpenDigDialog(symbol: StockSymbol) {
+    WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
+  }
 
   override fun onStart() {
     super.onStart()
@@ -133,13 +121,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     factory = null
 
     container = null
-    nestedIndexes = null
-    nestedPortfolio = null
-    nestedWatchlist = null
-    nestedWatchlistTitle = null
-    nestedGainers = null
-    nestedLosers = null
-    nestedBottomSpacer = null
     spacer = null
   }
 

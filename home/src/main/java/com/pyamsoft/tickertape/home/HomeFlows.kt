@@ -41,9 +41,15 @@ internal constructor(
 
 sealed class HomeViewEvent : UiViewEvent {
 
+  data class DigDeeperWatchlist internal constructor(val index: Int) : HomeViewEvent()
+
   object OpenWatchlist : HomeViewEvent()
 
   object OpenPortfolio : HomeViewEvent()
 }
 
-sealed class HomeControllerEvent : UiControllerEvent
+sealed class HomeControllerEvent : UiControllerEvent {
+
+  data class ManageWatchlistSymbol internal constructor(val quote: QuotedStock) :
+      HomeControllerEvent()
+}

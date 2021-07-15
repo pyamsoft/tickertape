@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-internal class WatchlistDigInteractor
+internal class StockChartInteractor
 @Inject
 internal constructor(
     private val interactor: QuoteInteractor,

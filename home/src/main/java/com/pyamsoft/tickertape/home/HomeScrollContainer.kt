@@ -20,5 +20,27 @@ import android.view.ViewGroup
 import com.pyamsoft.tickertape.ui.UiScrollingContainer
 import javax.inject.Inject
 
-class HomeScrollContainer @Inject internal constructor(parent: ViewGroup) :
-    UiScrollingContainer<HomeViewState, HomeViewEvent>(parent)
+class HomeScrollContainer
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    nestedPortfolio: HomePortfolio,
+    nestedWatchlistTitle: HomeWatchlistTitle,
+    nestedWatchlist: HomeWatchlist,
+    nestedIndexes: HomeIndexList,
+    nestedGainers: HomeGainerList,
+    nestedLosers: HomeLoserList,
+    nestedBottomSpacer: HomeBottomSpacer
+) : UiScrollingContainer<HomeViewState, HomeViewEvent>(parent) {
+
+  init {
+    nest(
+        nestedPortfolio,
+        nestedWatchlistTitle,
+        nestedWatchlist,
+        nestedIndexes,
+        nestedGainers,
+        nestedLosers,
+        nestedBottomSpacer)
+  }
+}

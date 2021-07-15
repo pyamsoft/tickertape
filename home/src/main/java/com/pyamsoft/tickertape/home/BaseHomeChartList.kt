@@ -54,10 +54,10 @@ protected constructor(
       val list = provideList()
       list.layoutManager =
           LinearLayoutManager(list.context).apply {
-        orientation = RecyclerView.HORIZONTAL
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            orientation = RecyclerView.HORIZONTAL
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {

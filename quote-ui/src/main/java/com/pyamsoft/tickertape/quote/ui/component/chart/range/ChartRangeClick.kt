@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote.range
+package com.pyamsoft.tickertape.quote.ui.component.chart.range
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
@@ -22,17 +22,15 @@ import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
-class WatchlistDigRangeClick @Inject internal constructor(parent: ViewGroup) :
-    UiView<WatchlistDigRangeViewState, WatchlistDigRangeViewEvent>() {
+internal class ChartRangeClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<ChartRangeViewState, ChartRangeViewEvent>() {
 
   init {
 
-    doOnInflate {
-      parent.setOnDebouncedClickListener { publish(WatchlistDigRangeViewEvent.Select) }
-    }
+    doOnInflate { parent.setOnDebouncedClickListener { publish(ChartRangeViewEvent.Select) } }
 
     doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
 
-  override fun render(state: UiRender<WatchlistDigRangeViewState>) {}
+  override fun render(state: UiRender<ChartRangeViewState>) {}
 }

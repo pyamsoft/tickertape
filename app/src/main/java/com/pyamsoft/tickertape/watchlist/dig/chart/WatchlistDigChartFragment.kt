@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.quote
+package com.pyamsoft.tickertape.watchlist.dig.chart
 
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
-import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
-import com.pyamsoft.tickertape.watchlist.dig.quote.BaseQuoteFragment
+import com.pyamsoft.tickertape.ui.chart.BaseChartFragment
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 
-class PositionQuoteFragment : BaseQuoteFragment() {
+internal class WatchlistDigChartFragment : BaseChartFragment() {
 
   override fun injectComponent(root: ViewGroup) {
-    PositionManageDialog.getInjector(this)
-        .plusQuoteComponent()
+    WatchlistDigDialog.getInjector(this)
+        .plusChartComponent()
         .create(viewLifecycleOwner)
-        .plusWatchlistComponent()
+        .plusChartComponent()
         .create(root)
         .inject(this)
   }
 
   companion object {
 
-    const val TAG = "PositionQuoteFragment"
+    const val TAG = "WatchlistQuoteFragment"
 
     @JvmStatic
     @CheckResult
     fun newInstance(): Fragment {
-      return PositionQuoteFragment().apply { arguments = Bundle().apply {} }
+      return WatchlistDigChartFragment().apply { arguments = Bundle().apply {} }
     }
   }
 }

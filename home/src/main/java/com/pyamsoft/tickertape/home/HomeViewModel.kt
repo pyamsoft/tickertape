@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
@@ -202,6 +203,19 @@ internal constructor(
 
   fun handleOpenPage(page: MainPage) {
     viewModelScope.launch(context = Dispatchers.Default) { mainPageBus.send(page) }
+  }
+
+  fun handleDigWatchlistSymbol(index: Int) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val data = state.watchlist
+      if (data !is PackedData.Data<List<QuotedStock>>) {
+        Timber.w("Cannot dig symbol in error state: $data")
+        return@launch
+      }
+
+      val quote = data.value[index]
+      publish(HomeControllerEvent.ManageWatchlistSymbol(quote))
+    }
   }
 
   companion object {

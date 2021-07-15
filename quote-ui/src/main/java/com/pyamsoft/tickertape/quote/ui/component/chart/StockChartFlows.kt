@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig.quote
+package com.pyamsoft.tickertape.quote.ui.component.chart
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -25,7 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.PackedData
 
-data class WatchListDigViewState
+data class StockChartViewState
 internal constructor(
     val symbol: StockSymbol,
     val isLoading: Boolean,
@@ -35,13 +35,13 @@ internal constructor(
     val scrub: ChartData?
 ) : UiViewState
 
-sealed class WatchListDigViewEvent : UiViewEvent {
+sealed class StockChartViewEvent : UiViewEvent {
 
-  object Refresh : WatchListDigViewEvent()
+  object Refresh : StockChartViewEvent()
 
-  data class RangeUpdated internal constructor(val index: Int) : WatchListDigViewEvent()
+  data class RangeUpdated internal constructor(val index: Int) : StockChartViewEvent()
 
-  data class Scrub internal constructor(val data: ChartData) : WatchListDigViewEvent()
+  data class Scrub internal constructor(val data: ChartData) : StockChartViewEvent()
 }
 
-sealed class WatchListDigControllerEvent : UiControllerEvent
+sealed class StockChartControllerEvent : UiControllerEvent

@@ -62,9 +62,9 @@ protected constructor(
     doOnInflate {
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {
@@ -143,8 +143,8 @@ protected constructor(
     bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-      binding.watchlistList.addItemDecoration(this)
-    }
+          binding.watchlistList.addItemDecoration(this)
+        }
   }
 
   private fun setList(list: List<QuotedStock>) {

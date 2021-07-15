@@ -17,13 +17,16 @@
 package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +39,11 @@ internal constructor(
     @InternalApi private val stockCache: StockCache,
     @InternalApi private val interactor: StockInteractor,
 ) : StockInteractor {
+
+  private val optionsCache =
+      multiCachify<OptionsKey, StockOptions, StockSymbol, LocalDateTime?> { symbol, date ->
+        interactor.getOptions(true, symbol, date)
+      }
 
   private val gainerCache =
       cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
@@ -69,6 +77,22 @@ internal constructor(
         return@withContext loserCache.call(count)
       }
 
+  override suspend fun getOptions(
+      force: Boolean,
+      symbol: StockSymbol,
+      date: LocalDateTime?
+  ): StockOptions =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        val key = OptionsKey(symbol, date)
+        if (force) {
+          optionsCache.key(key).clear()
+        }
+
+        return@withContext optionsCache.key(key).call(symbol, date)
+      }
+
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -96,4 +120,6 @@ internal constructor(
           interactor.getCharts(force, s, r)
         }
       }
+
+  private data class OptionsKey(val symbol: StockSymbol, val date: LocalDateTime?)
 }

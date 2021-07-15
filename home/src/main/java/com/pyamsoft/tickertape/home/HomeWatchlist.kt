@@ -37,7 +37,7 @@ internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
     factory: WatchlistItemComponent.Factory
-) : BaseWatchlistList<HomeViewState, Nothing>(parent, owner, factory) {
+) : BaseWatchlistList<HomeViewState, HomeViewEvent>(parent, owner, factory) {
 
   init {
     doOnInflate {
@@ -101,7 +101,9 @@ internal constructor(
 
   override fun onRemove(index: Int) {}
 
-  override fun onSelect(index: Int) {}
+  override fun onSelect(index: Int) {
+    publish(HomeViewEvent.DigDeeperWatchlist(index))
+  }
 
   override fun onRefresh() {}
 

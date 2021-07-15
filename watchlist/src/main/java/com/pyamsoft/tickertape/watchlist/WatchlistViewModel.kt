@@ -95,7 +95,9 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
     Timber.d("Existing symbol deleted: $symbol")
-    setState { copy(watchlist = watchlist.transformData { q -> q.filterNot { it.symbol == symbol } }) }
+    setState {
+      copy(watchlist = watchlist.transformData { q -> q.filterNot { it.symbol == symbol } })
+    }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network
@@ -114,7 +116,9 @@ internal constructor(
                   .call(force)
                   .onSuccess {
                     setState {
-                      copy(watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(), isLoading = false)
+                      copy(
+                          watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(),
+                          isLoading = false)
                     }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch quotes") }

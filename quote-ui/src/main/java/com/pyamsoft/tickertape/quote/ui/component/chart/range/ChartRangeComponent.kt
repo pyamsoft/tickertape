@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.quote.ui.component.chart.range
 
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.ui.chart.BaseChartComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface BaseWatchlistDigComponent {
+interface ChartRangeComponent {
 
-  @CheckResult fun plusDigComponent(): WatchlistDigComponent.Factory
-
-  @CheckResult fun plusChartComponent(): BaseChartComponent.Factory
+  fun inject(holder: ChartRangeViewHolder)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance symbol: StockSymbol): BaseWatchlistDigComponent
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): ChartRangeComponent
   }
 }

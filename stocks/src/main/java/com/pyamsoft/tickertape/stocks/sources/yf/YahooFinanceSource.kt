@@ -18,12 +18,15 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
+import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,7 +37,18 @@ internal constructor(
     @YahooFinanceApi private val quotes: QuoteSource,
     @YahooFinanceApi private val charts: ChartSource,
     @YahooFinanceApi private val tops: TopSource,
-) : QuoteSource, ChartSource, TopSource {
+    @YahooFinanceApi private val options: OptionsSource,
+) : QuoteSource, ChartSource, TopSource, OptionsSource {
+
+  override suspend fun getOptions(
+      force: Boolean,
+      symbol: StockSymbol,
+      date: LocalDateTime?
+  ): StockOptions =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext options.getOptions(force, symbol, date)
+      }
 
   override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {

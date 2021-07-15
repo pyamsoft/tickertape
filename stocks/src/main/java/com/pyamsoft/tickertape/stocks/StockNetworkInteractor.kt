@@ -18,12 +18,15 @@ package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
+import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +39,18 @@ internal constructor(
     @InternalApi private val quoteSource: QuoteSource,
     @InternalApi private val chartSource: ChartSource,
     @InternalApi private val topSource: TopSource,
+    @InternalApi private val optionsSource: OptionsSource,
 ) : StockInteractor {
+
+  override suspend fun getOptions(
+      force: Boolean,
+      symbol: StockSymbol,
+      date: LocalDateTime?
+  ): StockOptions =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext optionsSource.getOptions(force, symbol, date)
+      }
 
   override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {

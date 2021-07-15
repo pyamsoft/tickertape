@@ -36,7 +36,7 @@ class PositionChartFragment : BaseChartFragment() {
 
   companion object {
 
-    const val TAG = "PositionQuoteFragment"
+    const val TAG = "PositionChartFragment"
 
     @JvmStatic
     @CheckResult

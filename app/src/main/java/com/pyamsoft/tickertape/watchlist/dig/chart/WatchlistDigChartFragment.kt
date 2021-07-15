@@ -36,7 +36,7 @@ internal class WatchlistDigChartFragment : BaseChartFragment() {
 
   companion object {
 
-    const val TAG = "WatchlistQuoteFragment"
+    const val TAG = "WatchlistDigChartFragment"
 
     @JvmStatic
     @CheckResult

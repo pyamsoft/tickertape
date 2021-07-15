@@ -17,10 +17,8 @@
 package com.pyamsoft.tickertape.portfolio.item
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSummaryBinding
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -40,12 +38,12 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   override fun onRender(state: UiRender<PortfolioItemViewState>) {
     state.mapChanged { it.stock }.apply {
-      mapChanged { it.totalShares() }.render(viewScope) { handleTotalSharesChanged(it) }
-      mapChanged { it.gainLossDisplayString() }.render(viewScope) { handleGainLossChanged(it) }
-      mapChanged { it.current() }.render(viewScope) { handleCurrentValueChanged(it) }
-      mapChanged { it.todayDirection() }.render(viewScope) { handleTodayDirectionChanged(it) }
-      mapChanged { it.totalDirection() }.render(viewScope) { handleTotalDirectionChanged(it) }
-      mapChanged { it.changeTodayDisplayString() }.render(viewScope) { handleTodayChanged(it) }
+      mapChanged { it.totalShares }.render(viewScope) { handleTotalSharesChanged(it) }
+      mapChanged { it.gainLossDisplayString }.render(viewScope) { handleGainLossChanged(it) }
+      mapChanged { it.current }.render(viewScope) { handleCurrentValueChanged(it) }
+      mapChanged { it.todayDirection }.render(viewScope) { handleTodayDirectionChanged(it) }
+      mapChanged { it.totalDirection }.render(viewScope) { handleTotalDirectionChanged(it) }
+      mapChanged { it.changeTodayDisplayString }.render(viewScope) { handleTodayChanged(it) }
     }
   }
 
@@ -94,23 +92,5 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleCurrentValueChanged(current: StockMoneyValue) {
     binding.holdingSummaryCurrentValueText.text = current.asMoneyValue()
-  }
-
-  @CheckResult
-  private fun PortfolioStock.gainLossDisplayString(): String {
-    val direction = totalDirection()
-    val gainLoss = totalGainLoss()
-    val gainLossPercent = totalGainLossPercent()
-    val sign = direction.sign()
-    return "${sign}${gainLoss.asMoneyValue()} (${sign}${gainLossPercent.asPercentValue()})"
-  }
-
-  @CheckResult
-  private fun PortfolioStock.changeTodayDisplayString(): String {
-    val direction = todayDirection()
-    val change = todayChange()
-
-    val sign = direction.sign()
-    return "${sign}${change.asMoneyValue()}"
   }
 }

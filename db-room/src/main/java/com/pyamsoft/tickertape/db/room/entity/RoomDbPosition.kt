@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import java.time.LocalDateTime
 
 @Entity(
     tableName = RoomDbPosition.TABLE_NAME,
@@ -42,6 +43,7 @@ internal constructor(
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_PRICE) val price: StockMoneyValue,
     @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: StockShareValue,
+    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val purchaseDate: LocalDateTime,
 ) : DbPosition {
 
   @Ignore
@@ -64,6 +66,11 @@ internal constructor(
     return shareCount
   }
 
+  @Ignore
+  override fun purchaseDate(): LocalDateTime {
+    return purchaseDate
+  }
+
   companion object {
 
     @Ignore internal const val TABLE_NAME = "room_position_table"
@@ -76,6 +83,8 @@ internal constructor(
 
     @Ignore internal const val COLUMN_SHARE_COUNT = "share_count"
 
+    @Ignore internal const val COLUMN_PURCHASE_DATE = "purchase_date"
+
     @Ignore
     @JvmStatic
     @CheckResult
@@ -87,6 +96,7 @@ internal constructor(
             item.holdingId(),
             item.price(),
             item.shareCount(),
+            item.purchaseDate(),
         )
       }
     }

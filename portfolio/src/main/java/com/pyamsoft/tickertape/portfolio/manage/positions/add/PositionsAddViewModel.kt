@@ -43,7 +43,9 @@ internal constructor(
             PositionsAddViewState(
                 symbol = thisSymbol,
                 numberOfShares = StockShareValue.none(),
-                pricePerShare = StockMoneyValue.none())) {
+                pricePerShare = StockMoneyValue.none(),
+                purchaseDate = null,
+            )) {
 
   fun handleUpdateNumberOfShares(number: StockShareValue) {
     setState { copy(numberOfShares = number) }
@@ -56,14 +58,39 @@ internal constructor(
   fun handleCreatePosition() {
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
+    val purchaseDate = state.purchaseDate
+
+    if (shareCount.value().compareTo(0) <= 0) {
+      Timber.w("Cannot create position, invalid shareCount: ${shareCount.value()}")
+      return
+    }
+
+    if (sharePrice.value().compareTo(0) <= 0) {
+      Timber.w("Cannot create position, invalid sharePrice: ${sharePrice.value()}")
+      return
+    }
+
+    if (purchaseDate == null) {
+      Timber.w("Cannot create position, invalid purchaseDate: $purchaseDate")
+      return
+    }
+
     setState(
         stateChange = {
-          copy(pricePerShare = StockMoneyValue.none(), numberOfShares = StockShareValue.none())
+          copy(
+              pricePerShare = StockMoneyValue.none(),
+              numberOfShares = StockShareValue.none(),
+              purchaseDate = null,
+          )
         },
         andThen = {
           val id = thisHoldingId
           interactor
-              .createPosition(id = id, numberOfShares = shareCount, pricePerShare = sharePrice)
+              .createPosition(
+                  id = id,
+                  numberOfShares = shareCount,
+                  pricePerShare = sharePrice,
+                  purchaseDate = purchaseDate)
               .onSuccess { Timber.d("Created new position $id") }
               .onFailure { Timber.e(it, "Error creating new position $id") }
         })

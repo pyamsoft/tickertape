@@ -39,13 +39,10 @@ class PositionsCommit @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<PositionsAddViewState>) {
-    state.render(viewScope) { handleStateChanged(it) }
+    state.mapChanged { it.isValidPosition }.render(viewScope) { handleValidPosition(it) }
   }
 
-  private fun handleStateChanged(state: PositionsAddViewState) {
-    val sharePrice = state.pricePerShare
-    val shareCount = state.numberOfShares
-    val isEntered = shareCount.value().compareTo(0) > 0 && sharePrice.value().compareTo(0) > 0
-    binding.positionCommit.isEnabled = isEntered
+  private fun handleValidPosition(isValid: Boolean) {
+    binding.positionCommit.isEnabled = isValid
   }
 }

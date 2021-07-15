@@ -14,36 +14,30 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.position
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
-interface DbPosition {
+internal object LocalDateTimeConverter {
 
-  @CheckResult fun id(): Id
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toLocalDateTime(date: Long): LocalDateTime {
+    val zoneId = ZoneId.systemDefault()
+    return LocalDateTime.ofInstant(Instant.ofEpochSecond(date), zoneId)
+  }
 
-  @CheckResult fun holdingId(): DbHolding.Id
-
-  @CheckResult fun price(): StockMoneyValue
-
-  @CheckResult fun shareCount(): StockShareValue
-
-  @CheckResult fun purchaseDate(): LocalDateTime
-
-  data class Id(val id: String) {
-
-    @CheckResult
-    fun isEmpty(): Boolean {
-      return id.isBlank()
-    }
-
-    companion object {
-
-      @JvmField val EMPTY = Id("")
-    }
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromLocalDateTime(date: LocalDateTime): Long {
+    val offset = ZoneOffset.from(date)
+    return date.toEpochSecond(offset)
   }
 }

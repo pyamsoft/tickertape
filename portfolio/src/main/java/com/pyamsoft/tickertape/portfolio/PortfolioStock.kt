@@ -23,7 +23,6 @@ import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
@@ -36,87 +35,52 @@ internal constructor(
     val quote: QuotedStock?,
 ) {
 
-  @CheckResult
-  fun todayDirection(): StockDirection {
-    val today = todayChangeNumber() ?: return StockDirection.none()
-    return today.asDirection()
-  }
+  private val totalGainLossPercentNumber: Double?
+  internal val costNumber = positions.sumOf { it.price().value() * it.shareCount().value() }
+  private val totalSharesNumber = positions.sumOf { it.shareCount().value() }
+  internal val todayChangeNumber =
+      quote?.quote?.regular()?.amount()?.value()?.times(totalSharesNumber)
+  val todayDirection = todayChangeNumber?.asDirection() ?: StockDirection.none()
+  val todayChange = todayChangeNumber?.asMoney() ?: StockMoneyValue.none()
+  internal val todayNumber = quote?.quote?.regular()?.price()?.value()?.times(totalSharesNumber)
+  private val totalGainLossNumber = todayNumber?.minus(costNumber)
+  val totalDirection = totalGainLossNumber?.asDirection() ?: StockDirection.none()
+  val totalGainLossPercent: StockPercent
+  val totalGainLoss: StockMoneyValue
+  val current = todayNumber?.asMoney() ?: StockMoneyValue.none()
+  val totalShares = totalSharesNumber.asShares()
 
-  @CheckResult
-  internal fun todayChangeNumber(): Double? {
-    val q = quote?.quote ?: return null
-    return q.regular().amount().value() * totalSharesNumber()
-  }
+  val gainLossDisplayString: String
+  val changeTodayDisplayString: String
 
-  @CheckResult
-  fun todayChange(): StockMoneyValue {
-    return todayChangeNumber()?.asMoney() ?: StockMoneyValue.none()
-  }
+  init {
+    val totalCost = costNumber
+    totalGainLossPercentNumber =
+        totalGainLossNumber?.let { if (totalCost.compareTo(0) == 0) 0.0 else it / totalCost * 100 }
 
-  @CheckResult
-  internal fun todayNumber(): Double? {
-    val q = quote?.quote ?: return null
-    return q.regular().price().value() * totalSharesNumber()
-  }
+    totalGainLossPercent = totalGainLossPercentNumber?.asPercent() ?: StockPercent.none()
+    totalGainLoss = totalGainLossNumber?.asMoney() ?: StockMoneyValue.none()
 
-  @CheckResult
-  private fun totalGainLossNumber(): Double? {
-    val today = todayNumber() ?: return null
-    return today - costNumber()
-  }
+    val direction = totalDirection
+    val gainLoss = totalGainLoss
+    val gainLossPercent = totalGainLossPercent
+    val sign = direction.sign()
+    gainLossDisplayString =
+        "${sign}${gainLoss.asMoneyValue()} (${sign}${gainLossPercent.asPercentValue()})"
 
-  @CheckResult
-  fun totalDirection(): StockDirection {
-    val total = totalGainLossNumber() ?: return StockDirection.none()
-    return total.asDirection()
-  }
-
-  @CheckResult
-  private fun totalGainLossPercentNumber(): Double? {
-    val gainLoss = totalGainLossNumber() ?: return null
-    val totalCost = costNumber()
-    return if (totalCost.compareTo(0) == 0) 0.0 else gainLoss / totalCost * 100
-  }
-
-  @CheckResult
-  fun totalGainLossPercent(): StockPercent {
-    return totalGainLossPercentNumber()?.asPercent() ?: StockPercent.none()
-  }
-
-  @CheckResult
-  fun totalGainLoss(): StockMoneyValue {
-    return totalGainLossNumber()?.asMoney() ?: StockMoneyValue.none()
-  }
-
-  @CheckResult
-  fun current(): StockMoneyValue {
-    return todayNumber()?.asMoney() ?: StockMoneyValue.none()
-  }
-
-  @CheckResult
-  internal fun costNumber(): Double {
-    return positions.sumOf { it.price().value() * it.shareCount().value() }
-  }
-
-  @CheckResult
-  private fun totalSharesNumber(): Double {
-    return positions.sumOf { it.shareCount().value() }
-  }
-
-  @CheckResult
-  fun totalShares(): StockShareValue {
-    return totalSharesNumber().asShares()
+    val change = todayChange
+    changeTodayDisplayString = "${sign}${change.asMoneyValue()}"
   }
 }
 
 @CheckResult
 private fun List<PortfolioStock>.sumCostNumber(): Double {
-  return this.map { it.costNumber() }.sum()
+  return this.map { it.costNumber }.sum()
 }
 
 @CheckResult
 private fun List<PortfolioStock>.sumTotalAmountNumber(): Double? {
-  val todays = this.map { it.todayNumber() }
+  val todays = this.map { it.todayNumber }
   return if (todays.any { it == null }) null else todays.filterNotNull().sum()
 }
 
@@ -157,7 +121,7 @@ internal fun List<PortfolioStock>.sumTotalDirection(): StockDirection {
 
 @CheckResult
 private fun List<PortfolioStock>.sumTodayChangeNumber(): Double? {
-  val todays = this.map { it.todayChangeNumber() }
+  val todays = this.map { it.todayChangeNumber }
   return if (todays.any { it == null }) null
   else {
     todays.filterNotNull().sum()

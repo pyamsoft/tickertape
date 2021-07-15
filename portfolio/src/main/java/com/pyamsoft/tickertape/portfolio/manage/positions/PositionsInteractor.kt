@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +62,8 @@ internal constructor(
   suspend fun createPosition(
       id: DbHolding.Id,
       numberOfShares: StockShareValue,
-      pricePerShare: StockMoneyValue
+      pricePerShare: StockMoneyValue,
+      purchaseDate: LocalDateTime,
   ): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -78,7 +80,10 @@ internal constructor(
 
           val position =
               JsonMappableDbPosition.create(
-                  holdingId = id, shareCount = numberOfShares, price = pricePerShare)
+                  holdingId = id,
+                  shareCount = numberOfShares,
+                  price = pricePerShare,
+                  purchaseDate = purchaseDate)
 
           Timber.d("Insert new position into DB: $position")
           ResultWrapper.success(positionInsertDao.insert(position))

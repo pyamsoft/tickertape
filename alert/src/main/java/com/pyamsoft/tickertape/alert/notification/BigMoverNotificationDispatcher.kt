@@ -26,6 +26,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.CheckResult
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.core.text.bold
@@ -105,15 +106,19 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val percent = session.percent()
     val direction = session.direction()
     val afterHoursString = if (isAfterHours) "after hours" else "so far today"
+
+    @DrawableRes val icon: Int
     val movingString: String
     val directionString: String
 
     when {
       direction.isUp() -> {
+        icon = R.drawable.ic_chart_up_24dp
         movingString = "rising"
         directionString = "up"
       }
       direction.isDown() -> {
+        icon = R.drawable.ic_chart_down_24dp
         movingString = "dropping"
         directionString = "down"
       }
@@ -134,7 +139,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     return NotificationCompat.Builder(context.applicationContext, channelInfo.id)
-        .setSmallIcon(R.drawable.ic_chart_24)
+        .setSmallIcon(icon)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setShowWhen(false)
         .setAutoCancel(false)

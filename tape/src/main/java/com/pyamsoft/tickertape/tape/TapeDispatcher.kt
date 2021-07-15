@@ -184,7 +184,7 @@ internal constructor(
       channelInfo: NotifyChannelInfo
   ): NotificationCompat.Builder {
     return NotificationCompat.Builder(context.applicationContext, channelInfo.id)
-        .setSmallIcon(R.drawable.ic_portfolio_24)
+        .setSmallIcon(R.drawable.ic_watchlist_24dp)
         .setShowWhen(false)
         .setAutoCancel(false)
         .setOngoing(true)

@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -25,9 +24,7 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
-import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import com.robinhood.ticker.TickerUtils
@@ -55,7 +52,7 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
     state.mapChanged { it.portfolio }.render(viewScope) { handlePortfolio(it) }
   }
 
-  private fun handlePortfolio(portfolio: PackedData<List<PortfolioStock>>) {
+  private fun handlePortfolio(portfolio: PackedData<PortfolioStockList>) {
     return when (portfolio) {
       is PackedData.Data -> handleStocks(portfolio.value)
       is PackedData.Error -> handleError(portfolio.throwable)
@@ -71,32 +68,15 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
     }
   }
 
-  private fun handleStocks(list: List<PortfolioStock>) {
+  private fun handleStocks(list: PortfolioStockList) {
     binding.apply {
       portfolioHeaderError.isGone = true
       portfolioHeader.isVisible = true
     }
 
-    // Total
-    val totalAmount = list.sumTotalAmount()
-    handleTotalAmount(totalAmount)
-
-    list.sumTotalDirection().apply {
-      val totalGainLoss = list.sumTotalGainLoss()
-      val totalPercent = list.sumTotalPercent()
-      val color = this.color()
-
-      handleGainLoss(this.gainLossDisplayString(totalGainLoss, totalPercent), color)
-    }
-
-    // Today
-    list.sumTodayDirection().apply {
-      val todayChange = list.sumTodayChange()
-      val todayPercent = list.sumTodayPercent()
-      val color = this.color()
-
-      handleChangeToday(this.gainLossDisplayString(todayChange, todayPercent), color)
-    }
+    handleTotalAmount(list.sumTotalAmount)
+    handleGainLoss(list.gainLossDisplayString, list.sumTotalDirection.color())
+    handleChangeToday(list.changeTodayDisplayString, list.sumTodayDirection.color())
   }
 
   private fun clear() {
@@ -128,15 +108,5 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
   companion object {
 
     private val TICKER_CHARACTERS = "($+-${TickerUtils.provideNumberList()}%)"
-
-    @JvmStatic
-    @CheckResult
-    private fun StockDirection.gainLossDisplayString(
-        amount: StockMoneyValue,
-        percent: StockPercent
-    ): String {
-      val sign = this.sign()
-      return "${sign}${amount.asMoneyValue()} (${sign}${percent.asPercentValue()})"
-    }
   }
 }

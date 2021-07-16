@@ -19,14 +19,14 @@ package com.pyamsoft.tickertape.home
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.ui.PackedData
 
 data class HomeViewState
 internal constructor(
-    val portfolio: PackedData<List<PortfolioStock>>,
+    val portfolio: PackedData<PortfolioStockList>,
     val isLoadingPortfolio: Boolean,
     val watchlist: PackedData<List<QuotedStock>>,
     val isLoadingWatchlist: Boolean,

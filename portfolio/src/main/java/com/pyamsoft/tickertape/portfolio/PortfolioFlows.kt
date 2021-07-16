@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.ui.PackedData
 // Public constructor, used in home module
 data class PortfolioViewState(
     val isLoading: Boolean,
-    val portfolio: PackedData<List<PortfolioStock>>,
+    val portfolio: PackedData<PortfolioStockList>,
     val bottomOffset: Int,
 ) : UiViewState
 

@@ -64,9 +64,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -159,7 +159,7 @@ internal constructor(
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handlePortfolio(portfolio: PackedData<List<PortfolioStock>>) {
+  private fun handlePortfolio(portfolio: PackedData<PortfolioStockList>) {
     return when (portfolio) {
       is PackedData.Data -> handleList(portfolio.value)
       is PackedData.Error -> handleError(portfolio.throwable)
@@ -181,8 +181,8 @@ internal constructor(
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.portfolioListList.addItemDecoration(this)
-        }
+      binding.portfolioListList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<PortfolioStock>) {
@@ -211,11 +211,12 @@ internal constructor(
     binding.portfolioListSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(schedule: List<PortfolioStock>) {
-    if (schedule.isEmpty()) {
+  private fun handleList(list: PortfolioStockList) {
+    val portfolio = list.list
+    if (portfolio.isEmpty()) {
       clearList()
     } else {
-      setList(schedule)
+      setList(portfolio)
     }
   }
 

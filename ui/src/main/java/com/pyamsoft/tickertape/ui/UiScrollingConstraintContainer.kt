@@ -17,20 +17,21 @@
 package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.ui.databinding.ContainerNestedScrollBinding
+import com.pyamsoft.tickertape.ui.databinding.ContainerNestedScrollConstaintBinding
 
-abstract class UiScrollingContainer<S : UiViewState, V : UiViewEvent>
-protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerNestedScrollBinding>(parent) {
+abstract class UiScrollingConstraintContainer<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) :
+    BaseUiView<S, V, ContainerNestedScrollConstaintBinding>(parent) {
 
   final override val layoutRoot by boundView { containerNestedScroll }
 
-  final override val viewBinding = ContainerNestedScrollBinding::inflate
+  final override val viewBinding = ContainerNestedScrollConstaintBinding::inflate
 
-  final override fun adoptionParent(): LinearLayout {
+  final override fun adoptionParent(): ConstraintLayout {
     return binding.containerNestedScrollContent
   }
 }

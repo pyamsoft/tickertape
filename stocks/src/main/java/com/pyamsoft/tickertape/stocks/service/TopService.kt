@@ -18,18 +18,23 @@ package com.pyamsoft.tickertape.stocks.service
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
+import com.pyamsoft.tickertape.stocks.network.NetworkTrendingResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 internal interface TopService {
 
+  @CheckResult
   @GET(
       "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_gainers")
-  @CheckResult
   suspend fun getDayGainers(@Query("count") count: Int): NetworkTopResponse
 
+  @CheckResult
   @GET(
       "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_losers")
-  @CheckResult
   suspend fun getDayLosers(@Query("count") count: Int): NetworkTopResponse
+
+  @CheckResult
+  @GET("https://query1.finance.yahoo.com/v1/finance/trending/US")
+  suspend fun getTrending(@Query("count") count: Int): NetworkTrendingResponse
 }

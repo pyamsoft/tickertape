@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockTops
+import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -30,6 +31,7 @@ import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
+import com.pyamsoft.tickertape.stocks.data.StockTrendsImpl
 import com.pyamsoft.tickertape.stocks.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import javax.inject.Inject
@@ -39,6 +41,31 @@ import kotlinx.coroutines.withContext
 internal class YahooTopSource
 @Inject
 internal constructor(@InternalApi private val service: TopService) : TopSource {
+
+  override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        val result = service.getTrending(count)
+        return@withContext result
+            .finance
+            .result
+            .asSequence()
+            .filterOnlyValidTrending()
+            .map { trend ->
+              StockTrendsImpl(
+                  symbols =
+                      trend
+                          .quotes
+                          .requireNotNull()
+                          .asSequence()
+                          .filterOnlyValidTrends()
+                          .map { it.symbol.requireNotNull().asSymbol() }
+                          .toList(),
+              )
+            }
+            .first()
+      }
 
   override suspend fun getDayGainers(force: Boolean, count: Int): StockTops {
     return getTops(TopType.GAINERS, count)

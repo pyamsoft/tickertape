@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
+import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import java.time.LocalDateTime
@@ -45,6 +46,11 @@ internal constructor(
         interactor.getOptions(true, symbol, date)
       }
 
+  private val trendingCache =
+      cachify<StockTrends, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
+        interactor.getTrending(true, it)
+      }
+
   private val gainerCache =
       cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
         interactor.getDayGainers(true, it)
@@ -53,6 +59,17 @@ internal constructor(
   private val loserCache =
       cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
         interactor.getDayLosers(true, it)
+      }
+
+  override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          trendingCache.clear()
+        }
+
+        return@withContext trendingCache.call(count)
       }
 
   override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =

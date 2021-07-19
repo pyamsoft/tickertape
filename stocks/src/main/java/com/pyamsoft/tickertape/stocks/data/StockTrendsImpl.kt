@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.data
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockTops
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 
-interface TopSource {
+internal data class StockTrendsImpl(private val symbols: List<StockSymbol>) : StockTrends {
 
-  @CheckResult suspend fun getDayGainers(force: Boolean, count: Int): StockTops
-
-  @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): StockTops
-
-  @CheckResult suspend fun getTrending(force: Boolean, count: Int): StockTrends
+  override fun symbols(): List<StockSymbol> {
+    return symbols
+  }
 }

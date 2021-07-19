@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.network
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockTops
-import com.pyamsoft.tickertape.stocks.api.StockTrends
+import com.squareup.moshi.JsonClass
 
-interface TopSource {
+@JsonClass(generateAdapter = true)
+internal data class NetworkTrendingResponse internal constructor(val finance: Resp) {
 
-  @CheckResult suspend fun getDayGainers(force: Boolean, count: Int): StockTops
+  @JsonClass(generateAdapter = true)
+  internal data class Resp internal constructor(val result: List<Trending>) {
 
-  @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): StockTops
+    @JsonClass(generateAdapter = true)
+    internal data class Trending internal constructor(val quotes: List<Quote>?) {
 
-  @CheckResult suspend fun getTrending(force: Boolean, count: Int): StockTrends
+      @JsonClass(generateAdapter = true)
+      internal data class Quote internal constructor(val symbol: String?)
+    }
+  }
 }

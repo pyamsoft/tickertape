@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
+import com.pyamsoft.tickertape.stocks.network.NetworkTrendingResponse
 
 @CheckResult
 internal fun Sequence<NetworkChartResponse.Resp.SymbolChart>.filterOnlyValidCharts():
@@ -67,6 +68,13 @@ internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean 
 }
 
 @CheckResult
+internal fun Sequence<NetworkTrendingResponse.Resp.Trending>.filterOnlyValidTrending():
+    Sequence<NetworkTrendingResponse.Resp.Trending> {
+  // We need all of these values to have a valid trender
+  return this.filterNot { it.quotes == null }
+}
+
+@CheckResult
 internal fun Sequence<NetworkTopResponse.Resp.Top>.filterOnlyValidTops():
     Sequence<NetworkTopResponse.Resp.Top> {
   // We need all of these values to have a valid top mover
@@ -74,6 +82,12 @@ internal fun Sequence<NetworkTopResponse.Resp.Top>.filterOnlyValidTops():
       .filterNot { it.title == null }
       .filterNot { it.description == null }
       .filterNot { it.quotes == null }
+}
+
+@CheckResult
+internal fun Sequence<NetworkTrendingResponse.Resp.Trending.Quote>.filterOnlyValidTrends():
+    Sequence<NetworkTrendingResponse.Resp.Trending.Quote> {
+  return this.filterNot { it.symbol == null }
 }
 
 @CheckResult

@@ -16,9 +16,11 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
+import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -27,13 +29,15 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import java.time.LocalDateTime
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PositionsAddViewModel
 @AssistedInject
 internal constructor(
     @Assisted savedState: UiSavedState,
+    @InternalApi dateBus: EventConsumer<DateSelectPayload>,
     private val interactor: PositionsInteractor,
     private val thisHoldingId: DbHolding.Id,
     thisSymbol: StockSymbol,
@@ -47,6 +51,12 @@ internal constructor(
                 pricePerShare = StockMoneyValue.none(),
                 purchaseDate = null,
             )) {
+
+  init {
+    viewModelScope.launch(context = Dispatchers.IO) {
+      dateBus.onEvent { setState { copy(purchaseDate = it.date) } }
+    }
+  }
 
   fun handleUpdateNumberOfShares(number: StockShareValue) {
     setState { copy(numberOfShares = number) }
@@ -100,10 +110,6 @@ internal constructor(
   fun handleDatePicker() {
     val date = state.purchaseDate
     publish(PositionsAddControllerEvent.OpenDatePicker(date))
-  }
-
-  fun handleDateSelected(date: LocalDateTime) {
-    setState { copy(purchaseDate = date) }
   }
 
   @AssistedFactory

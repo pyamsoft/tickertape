@@ -26,8 +26,6 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
@@ -39,7 +37,6 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionAddToolbar
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddContainer
@@ -48,9 +45,7 @@ import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewEv
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewModel
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 internal class PositionsAddDialog :
@@ -103,8 +98,8 @@ internal class PositionsAddDialog :
     eatBackButtonPress()
 
     val binding = LayoutLinearVerticalBinding.bind(view)
-    Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusPositionAddComponent()
+    Injector.obtainFromActivity<BasePositionsAddComponent>(requireActivity())
+        .plusAddComponent()
         .create(this, binding.layoutLinearV, getHoldingId(), getHoldingSymbol())
         .inject(this)
 
@@ -123,7 +118,7 @@ internal class PositionsAddDialog :
             is PositionsAddViewEvent.UpdateSharePrice -> viewModel.handleUpdateSharePrice(it.price)
             is PositionsAddViewEvent.Commit -> viewModel.handleCreatePosition()
             is PositionsAddViewEvent.Close -> requireActivity().onBackPressed()
-              is PositionsAddViewEvent.OpenDatePicker -> viewModel.handleDatePicker()
+            is PositionsAddViewEvent.OpenDatePicker -> viewModel.handleDatePicker()
           }
         }
   }
@@ -147,27 +142,7 @@ internal class PositionsAddDialog :
   }
 
     private fun handleOpenDatePickerDialog(selectedDate: LocalDateTime?) {
-        MaterialDatePicker.Builder.datePicker()
-            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setTitleText("Purchase Date")
-            .apply {
-                val constraints = CalendarConstraints.Builder()
-                    .setEnd(Instant.now().toEpochMilli())
-                if (selectedDate != null) {
-                    val time = selectedDate.toEpochSecond(ZoneOffset.UTC) * 1000
-                    setSelection(time)
-                    constraints.setOpenAt(time)
-                }
-
-                setCalendarConstraints(constraints.build())
-            }.build()
-            .apply {
-              addOnPositiveButtonClickListener {  time ->
-                val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC)
-                viewModel.handleDateSelected(date)
-              }
-            }
-            .show(requireActivity(), DATE_PICKER_TAG)
+        PurchaseDatePickerDialog.newInstance(selectedDate).show(requireActivity(), PurchaseDatePickerDialog.TAG)
     }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -186,7 +161,6 @@ internal class PositionsAddDialog :
 
   companion object {
 
-    private const val DATE_PICKER_TAG = "POSITIONS_ADD_DIALOG_DATE_PICKER"
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
     const val TAG = "PositionAddDialog"

@@ -45,6 +45,7 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
+import com.pyamsoft.tickertape.portfolio.manage.position.add.BasePositionsAddComponent
 import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
@@ -70,6 +71,8 @@ internal class MainActivity :
     get() {
       return requireNotNull(rootBinding).layoutCoordinator
     }
+
+  private var basePositionsAddComponent: BasePositionsAddComponent? = null
 
   private var rootBinding: LayoutCoordinatorBinding? = null
   private var stateSaver: StateSaver? = null
@@ -114,9 +117,13 @@ internal class MainActivity :
     setContentView(binding.root)
 
     Injector.obtainFromApplication<TickerComponent>(this)
-        .plusMainComponent()
+      .also {  component ->
+        basePositionsAddComponent = component.plusPositionAddComponent().create()
+
+        component.plusMainComponent()
         .create(this, this, this, binding.layoutCoordinator, this, this)
         .inject(this)
+      }
 
     stableLayoutHideNavigation()
 
@@ -163,6 +170,13 @@ internal class MainActivity :
   private fun beginWork() {
     lifecycleScope.launch(context = Dispatchers.Default) {
       requireNotNull(alerter).initOnAppStart(requireNotNull(alarmFactory))
+    }
+  }
+
+  override fun getSystemService(name: String): Any? {
+    return when (name) {
+      BasePositionsAddComponent::class.java.name -> basePositionsAddComponent.requireNotNull()
+      else -> super.getSystemService(name)
     }
   }
 

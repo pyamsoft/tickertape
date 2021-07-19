@@ -56,3 +56,8 @@ sealed class PositionsAddControllerEvent : UiControllerEvent {
 
   data class OpenDatePicker(val selectedDate: LocalDateTime?) : PositionsAddControllerEvent()
 }
+
+sealed class PositionsDateControllerEvent : UiControllerEvent {
+
+  object Close : PositionsDateControllerEvent()
+}

@@ -50,7 +50,8 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
 
   private var stateSaver: StateSaver? = null
 
-  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
     Injector.obtainFromActivity<BasePositionsAddComponent>(requireActivity())
       .plusDateComponent()
       .create()
@@ -59,7 +60,9 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
     stateSaver =
       createComponent<UnitViewState, UnitViewEvent, PositionsDateControllerEvent>(
         savedInstanceState, this, viewModel, this) {}
+  }
 
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val listener =
       DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
         viewModel.handleDateSelected(LocalDateTime.of(year, month, dayOfMonth, 0 ,0 ))

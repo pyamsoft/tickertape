@@ -18,10 +18,13 @@
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/position_number_of_shares_root"
+        android:id="@+id/position_shares_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="0dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -35,7 +38,7 @@
             app:boxCornerRadiusTopStart="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/position_number_of_shares_edit"
+                android:id="@+id/position_shares_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"

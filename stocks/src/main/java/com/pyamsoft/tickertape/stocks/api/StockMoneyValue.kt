@@ -19,11 +19,9 @@ package com.pyamsoft.tickertape.stocks.api
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
 
-interface StockMoneyValue : StockNumberValue {
+interface StockMoneyValue : StockDoubleValue {
 
   @CheckResult fun asMoneyValue(): String
-
-  @CheckResult fun value(): Double
 
   companion object {
 

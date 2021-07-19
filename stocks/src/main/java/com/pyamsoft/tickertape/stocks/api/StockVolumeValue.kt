@@ -19,11 +19,9 @@ package com.pyamsoft.tickertape.stocks.api
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockVolumeValueImpl
 
-interface StockVolumeValue : StockNumberValue {
+interface StockVolumeValue : StockLongValue {
 
   @CheckResult fun asVolumeValue(): String
-
-  @CheckResult fun value(): Long
 
   companion object {
 

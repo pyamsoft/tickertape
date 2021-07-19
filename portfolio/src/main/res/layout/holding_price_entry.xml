@@ -21,10 +21,10 @@
         android:id="@+id/position_price_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="0dp"
+        android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="0dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -42,8 +42,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
-                android:hint="Share Price"
                 android:inputType="numberDecimal"
+                android:hint="Price per Share"
                 android:maxLines="1"
                 android:paddingStart="8dp"
                 android:paddingTop="16dp"

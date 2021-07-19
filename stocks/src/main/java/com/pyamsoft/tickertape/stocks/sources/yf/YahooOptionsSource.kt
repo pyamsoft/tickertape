@@ -29,7 +29,6 @@ import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +62,6 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
 
   @CheckResult
   private fun parseOptionsResponse(resp: NetworkOptionResponse): StockOptions {
-    val zoneId = ZoneId.systemDefault()
     val option = resp.optionChain.result.first()
     val chain = option.options.first()
     val symbol = option.underlyingSymbol.asSymbol()
@@ -71,9 +69,9 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
     val puts = chain.puts.map { it.asContract(symbol) }
     return StockOptionsImpl(
         symbol = symbol,
-        expirationDates = option.expirationDates.map { timestampToTime(it, zoneId) },
+        expirationDates = option.expirationDates.map { timestampToTime(it) },
         strikes = option.strikes.map { it.asMoney() },
-        date = timestampToTime(chain.expirationDate, zoneId),
+        date = timestampToTime(chain.expirationDate),
         calls = calls,
         puts = puts)
   }
@@ -85,10 +83,9 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
   ): StockOptions =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        val zoneOffset = ZoneOffset.from(date)
         val resp =
             if (date == null) service.getOptions(symbol.symbol())
-            else service.getOptions(symbol.symbol(), date.toEpochSecond(zoneOffset))
+            else service.getOptions(symbol.symbol(), date.toEpochSecond(ZoneOffset.UTC))
         return@withContext parseOptionsResponse(resp)
       }
 }

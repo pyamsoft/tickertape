@@ -17,60 +17,28 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
+import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.HoldingShareCountEntryBinding
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.portfolio.databinding.HoldingSharesEntryBinding
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
-import timber.log.Timber
 
 class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionsAddViewState, PositionsAddViewEvent, HoldingShareCountEntryBinding>(
-        parent) {
+    BasePositionsEditable<HoldingSharesEntryBinding>(parent) {
 
-  override val viewBinding = HoldingShareCountEntryBinding::inflate
+  override val viewBinding = HoldingSharesEntryBinding::inflate
 
-  override val layoutRoot by boundView { positionNumberOfSharesRoot }
+  override val layoutRoot by boundView { positionSharesRoot }
 
-  private var delegate: UiEditTextDelegate? = null
+  override fun provideEditText(): TextInputEditText {
+    return binding.positionSharesEdit
+  }
 
-  init {
-    doOnTeardown {
-      delegate?.handleTeardown()
-      delegate = null
-    }
-
-    doOnInflate {
-      delegate =
-          UiEditTextDelegate.create(binding.positionNumberOfSharesEdit) { numberString ->
-            // Blank string reset to 0
-            if (numberString.isBlank()) {
-              publish(PositionsAddViewEvent.UpdateNumberOfShares(StockShareValue.none()))
-              return@create true
-            }
-
-            val numberOfShares = numberString.toDoubleOrNull()
-            if (numberOfShares == null) {
-              Timber.w("Invalid numberOfShares $numberString")
-              return@create false
-            }
-
-            publish(PositionsAddViewEvent.UpdateNumberOfShares(numberOfShares.asShares()))
-            return@create true
-          }
-              .apply { handleCreate() }
-    }
+  override fun provideEvent(value: Double): PositionsAddViewEvent {
+    return PositionsAddViewEvent.UpdateNumberOfShares(value.asShares())
   }
 
   override fun onRender(state: UiRender<PositionsAddViewState>) {
-    state.mapChanged { it.numberOfShares }.render(viewScope) { handleNumberOfSharesChanged(it) }
-  }
-
-  private fun handleNumberOfSharesChanged(numberOfShares: StockShareValue) {
-    // Don't use asShareValue() here to avoid getting a format string with commas and stuff
-    val text = if (numberOfShares.isZero()) "" else numberOfShares.value().toString()
-    requireNotNull(delegate).handleTextChanged(text)
+    state.mapChanged { it.numberOfShares }.render(viewScope) { handleValueChanged(it) }
   }
 }

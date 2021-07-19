@@ -17,25 +17,8 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.data.StockShareValueImpl
 
-interface StockShareValue : StockDoubleValue {
+interface StockLongValue : StockNumberValue {
 
-  @CheckResult fun asShareValue(): String
-
-  companion object {
-
-    private val EMPTY = 0.0.asShares()
-
-    @JvmStatic
-    @CheckResult
-    fun none(): StockShareValue {
-      return EMPTY
-    }
-  }
-}
-
-@CheckResult
-fun Double.asShares(): StockShareValue {
-  return StockShareValueImpl(this)
+  @CheckResult fun value(): Long
 }

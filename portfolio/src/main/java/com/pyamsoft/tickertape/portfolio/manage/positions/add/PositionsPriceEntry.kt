@@ -17,59 +17,28 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
+import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingPriceEntryBinding
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
-import timber.log.Timber
 
 class PositionsPriceEntry @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionsAddViewState, PositionsAddViewEvent, HoldingPriceEntryBinding>(parent) {
+    BasePositionsEditable<HoldingPriceEntryBinding>(parent) {
 
   override val viewBinding = HoldingPriceEntryBinding::inflate
 
   override val layoutRoot by boundView { positionPriceRoot }
 
-  private var delegate: UiEditTextDelegate? = null
+  override fun provideEditText(): TextInputEditText {
+    return binding.positionPriceEdit
+  }
 
-  init {
-    doOnTeardown {
-      delegate?.handleTeardown()
-      delegate = null
-    }
-
-    doOnInflate {
-      delegate =
-          UiEditTextDelegate.create(binding.positionPriceEdit) { numberString ->
-            // Blank string reset to 0
-            if (numberString.isBlank()) {
-              publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
-              return@create true
-            }
-
-            val sharePrice = numberString.toDoubleOrNull()
-            if (sharePrice == null) {
-              Timber.w("Invalid sharePrice $numberString")
-              return@create false
-            }
-
-            publish(PositionsAddViewEvent.UpdateSharePrice(sharePrice.asMoney()))
-            return@create true
-          }
-              .apply { handleCreate() }
-    }
+  override fun provideEvent(value: Double): PositionsAddViewEvent {
+    return PositionsAddViewEvent.UpdateSharePrice(value.asMoney())
   }
 
   override fun onRender(state: UiRender<PositionsAddViewState>) {
-    state.mapChanged { it.pricePerShare }.render(viewScope) { handleSharePriceChanged(it) }
-  }
-
-  private fun handleSharePriceChanged(sharePrice: StockMoneyValue) {
-    // Don't use asMoneyValue() here since we do not want to include the $ and stuff
-    val text = if (sharePrice.isZero()) "" else sharePrice.value().toString()
-    requireNotNull(delegate).handleTextChanged(text)
+    state.mapChanged { it.pricePerShare }.render(viewScope) { handleValueChanged(it) }
   }
 }

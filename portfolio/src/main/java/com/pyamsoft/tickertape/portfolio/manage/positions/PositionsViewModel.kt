@@ -191,6 +191,10 @@ internal constructor(
     private fun createPositionsList(
         positions: List<DbPosition>
     ): List<PositionsViewState.PositionStock.MaybePosition> {
+      if (positions.isEmpty()) {
+        return emptyList()
+      }
+
       val totalShares = positions.sumOf { it.shareCount().value() }
       val totalCost = positions.sumOf { it.price().value() * it.shareCount().value() }
 

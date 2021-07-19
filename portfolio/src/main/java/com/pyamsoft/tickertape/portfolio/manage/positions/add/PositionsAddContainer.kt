@@ -17,9 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintSet
-import com.pyamsoft.pydroid.ui.util.layout
-import com.pyamsoft.tickertape.ui.UiScrollingConstraintContainer
+import com.pyamsoft.tickertape.ui.UiScrollingContainer
 import javax.inject.Inject
 
 class PositionsAddContainer
@@ -28,38 +26,12 @@ internal constructor(
     parent: ViewGroup,
     nestedPriceEntry: PositionsPriceEntry,
     nestedNumberOfSharesEntry: PositionsShareCountEntry,
+    nestedDate: PositionsPurchaseDate,
     nestedCommit: PositionsCommit,
-) : UiScrollingConstraintContainer<PositionsAddViewState, PositionsAddViewEvent>(parent) {
+) : UiScrollingContainer<PositionsAddViewState, PositionsAddViewEvent>(parent) {
+
   init {
-    nest(nestedNumberOfSharesEntry, nestedPriceEntry, nestedCommit)
-
-    doOnInflate {
-      adoptionParent().layout {
-        nestedNumberOfSharesEntry.also {
-          connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-          connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-          connect(it.id(), ConstraintSet.END, nestedPriceEntry.id(), ConstraintSet.START)
-          constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-          constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-          setHorizontalWeight(it.id(), 1F)
-        }
-
-        nestedPriceEntry.also {
-          connect(it.id(), ConstraintSet.TOP, nestedNumberOfSharesEntry.id(), ConstraintSet.TOP)
-          connect(it.id(), ConstraintSet.START, nestedNumberOfSharesEntry.id(), ConstraintSet.END)
-          connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-          constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-          constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-          setHorizontalWeight(it.id(), 1F)
-        }
-
-        nestedCommit.also {
-          connect(it.id(), ConstraintSet.TOP, nestedPriceEntry.id(), ConstraintSet.BOTTOM)
-          connect(it.id(), ConstraintSet.END, nestedPriceEntry.id(), ConstraintSet.END)
-          constrainWidth(it.id(), ConstraintSet.WRAP_CONTENT)
-          constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
-        }
-      }
-    }
+    nest(nestedNumberOfSharesEntry, nestedPriceEntry, nestedDate, nestedCommit)
   }
+
 }

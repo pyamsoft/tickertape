@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import java.time.LocalDateTime
 import timber.log.Timber
 
 class PositionsAddViewModel
@@ -94,6 +95,15 @@ internal constructor(
               .onSuccess { Timber.d("Created new position $id") }
               .onFailure { Timber.e(it, "Error creating new position $id") }
         })
+  }
+
+  fun handleDatePicker() {
+    val date = state.purchaseDate
+    publish(PositionsAddControllerEvent.OpenDatePicker(date))
+  }
+
+  fun handleDateSelected(date: LocalDateTime) {
+    setState { copy(purchaseDate = date) }
   }
 
   @AssistedFactory

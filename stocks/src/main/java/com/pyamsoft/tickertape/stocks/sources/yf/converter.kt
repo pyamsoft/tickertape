@@ -19,9 +19,9 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 import androidx.annotation.CheckResult
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 @CheckResult
-internal fun timestampToTime(stamp: Long, zoneId: ZoneId): LocalDateTime {
-  return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), zoneId)
+internal fun timestampToTime(stamp: Long): LocalDateTime {
+  return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), ZoneOffset.UTC)
 }

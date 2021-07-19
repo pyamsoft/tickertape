@@ -48,6 +48,11 @@ sealed class PositionsAddViewEvent : UiViewEvent {
 
   data class UpdateSharePrice internal constructor(val price: StockMoneyValue) :
       PositionsAddViewEvent()
+
+  object OpenDatePicker : PositionsAddViewEvent()
 }
 
-sealed class PositionsAddControllerEvent : UiControllerEvent
+sealed class PositionsAddControllerEvent : UiControllerEvent {
+
+  data class OpenDatePicker(val selectedDate: LocalDateTime?) : PositionsAddControllerEvent()
+}

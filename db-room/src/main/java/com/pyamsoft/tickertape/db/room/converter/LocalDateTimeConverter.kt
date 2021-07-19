@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 internal object LocalDateTimeConverter {
@@ -29,15 +28,13 @@ internal object LocalDateTimeConverter {
   @TypeConverter
   @CheckResult
   fun toLocalDateTime(date: Long): LocalDateTime {
-    val zoneId = ZoneId.systemDefault()
-    return LocalDateTime.ofInstant(Instant.ofEpochSecond(date), zoneId)
+    return LocalDateTime.ofInstant(Instant.ofEpochSecond(date), ZoneOffset.UTC)
   }
 
   @JvmStatic
   @TypeConverter
   @CheckResult
   fun fromLocalDateTime(date: LocalDateTime): Long {
-    val offset = ZoneOffset.from(date)
-    return date.toEpochSecond(offset)
+    return date.toEpochSecond(ZoneOffset.UTC)
   }
 }

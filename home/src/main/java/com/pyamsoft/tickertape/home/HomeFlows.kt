@@ -36,6 +36,8 @@ internal constructor(
     val isLoadingGainers: Boolean,
     val losers: PackedData<List<TopDataWithChart>>,
     val isLoadingLosers: Boolean,
+    val trending: PackedData<List<TopDataWithChart>>,
+    val isLoadingTrending: Boolean,
     val bottomOffset: Int,
 ) : UiViewState
 

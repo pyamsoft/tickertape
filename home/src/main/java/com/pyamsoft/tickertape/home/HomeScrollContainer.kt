@@ -28,6 +28,7 @@ internal constructor(
     nestedWatchlistTitle: HomeWatchlistTitle,
     nestedWatchlist: HomeWatchlist,
     nestedIndexes: HomeIndexList,
+    nestedTrending: HomeTrendingList,
     nestedGainers: HomeGainerList,
     nestedLosers: HomeLoserList,
     nestedBottomSpacer: HomeBottomSpacer
@@ -39,8 +40,10 @@ internal constructor(
         nestedWatchlistTitle,
         nestedWatchlist,
         nestedIndexes,
+        nestedTrending,
         nestedGainers,
         nestedLosers,
-        nestedBottomSpacer)
+        nestedBottomSpacer,
+    )
   }
 }

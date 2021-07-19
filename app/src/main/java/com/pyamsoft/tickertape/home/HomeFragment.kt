@@ -108,6 +108,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     viewModel.handleFetchWatchlist(false)
     viewModel.handleFetchGainers(false)
     viewModel.handleFetchLosers(false)
+    viewModel.handleFetchTrending(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

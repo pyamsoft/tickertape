@@ -65,6 +65,8 @@ internal constructor(
                 isLoadingGainers = false,
                 losers = emptyList<TopDataWithChart>().pack(),
                 isLoadingLosers = false,
+                trending = emptyList<TopDataWithChart>().pack(),
+                isLoadingTrending = false,
                 bottomOffset = 0)) {
 
   private val portfolioFetcher =
@@ -99,6 +101,11 @@ internal constructor(
         interactor.getDayLosers(it, WATCHLIST_COUNT)
       }
 
+  private val trendingFetcher =
+      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
+        interactor.getDayTrending(it, TRENDING_COUNT)
+      }
+
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
@@ -130,7 +137,9 @@ internal constructor(
               portfolioFetcher
                   .call(force)
                   .onSuccess {
-                    setState { copy(portfolio = PortfolioStockList(it).pack(), isLoadingPortfolio = false) }
+                    setState {
+                      copy(portfolio = PortfolioStockList(it).pack(), isLoadingPortfolio = false)
+                    }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch portfolio") }
                   .onFailure {
@@ -182,6 +191,21 @@ internal constructor(
             })
       }
 
+  private suspend fun fetchTrending(force: Boolean) =
+      withContext(context = Dispatchers.Default) {
+        setState(
+            stateChange = { copy(isLoadingTrending = true) },
+            andThen = {
+              trendingFetcher
+                  .call(force)
+                  .onSuccess { setState { copy(trending = it.pack(), isLoadingTrending = false) } }
+                  .onFailure { Timber.e(it, "Failed to fetch trending") }
+                  .onFailure {
+                    setState { copy(trending = it.packError(), isLoadingTrending = false) }
+                  }
+            })
+      }
+
   fun handleFetchPortfolio(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
   }
@@ -200,6 +224,10 @@ internal constructor(
 
   fun handleFetchLosers(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchLosers(force) }
+  }
+
+  fun handleFetchTrending(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchTrending(force) }
   }
 
   fun handleOpenPage(page: MainPage) {
@@ -221,6 +249,7 @@ internal constructor(
 
   companion object {
 
+    private const val TRENDING_COUNT = 10
     private const val WATCHLIST_COUNT = 5
     private val INDEXES = listOf("^GSPC", "^DJI", "^IXIC", "^RUT").map { it.asSymbol() }
   }

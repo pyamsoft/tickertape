@@ -19,10 +19,4 @@ package com.pyamsoft.tickertape.home
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-data class TopDataWithChart
-internal constructor(
-    val title: String,
-    val description: String,
-    val quote: StockQuote,
-    val chart: StockChart?
-)
+data class TopDataWithChart internal constructor(val quote: StockQuote, val chart: StockChart?)

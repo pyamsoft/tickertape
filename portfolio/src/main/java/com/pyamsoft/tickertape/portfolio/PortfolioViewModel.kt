@@ -149,14 +149,19 @@ internal constructor(
               portfolio.transformData { p ->
                 p.copy(
                     list =
-                        p.list.map { stock ->
-                          val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                          return@map if (!stock.positions.contains(positionMatchesCallback)) stock
-                          else {
-                            stock.copy(
-                                positions = stock.positions.filterNot(positionMatchesCallback))
-                          }
-                        })
+                        p.list
+                            .map { stock ->
+                              val positionMatchesCallback = { p: DbPosition ->
+                                p.id() == position.id()
+                              }
+                              return@map if (!stock.positions.contains(positionMatchesCallback))
+                                  stock
+                              else {
+                                stock.copy(
+                                    positions = stock.positions.filterNot(positionMatchesCallback))
+                              }
+                            }
+                            .filter { it.positions.isNotEmpty() })
               })
     }
     // TODO offer up undo ability

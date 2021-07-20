@@ -17,21 +17,17 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.portfolio.databinding.PositionItemBinding
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.asMoney
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class PositionItemView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionItemViewState.Position, PositionItemViewEvent, PositionItemBinding>(parent) {
-
-  override val viewBinding = PositionItemBinding::inflate
-
-  override val layoutRoot by boundView { positionItem }
+    BasePositionItemView<PositionItemViewState.Position>(parent) {
 
   init {
     doOnInflate {
@@ -42,27 +38,40 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
     }
 
     doOnTeardown { binding.positionItem.setOnLongClickListener(null) }
-
-    doOnTeardown {
-      binding.apply {
-        positionItemSharePrice.text = ""
-        positionItemNumberOfShares.text = ""
-        positionItemTotal.text = ""
-      }
-    }
   }
 
   override fun onRender(state: UiRender<PositionItemViewState.Position>) {
     state.mapChanged { it.position }.apply {
       mapChanged { it.shareCount() }.render(viewScope) { handleShareCountChanged(it) }
       mapChanged { it.price() }.render(viewScope) { handleSharePriceChanged(it) }
-      render(viewScope) { handleTotalChanged(it) }
+      mapChanged { it.purchaseDate() }.render(viewScope) { handlePurchaseDateChanged(it) }
+    }
+
+    state.mapChanged { it.total }.render(viewScope) { handleTotalChanged(it) }
+    state.mapChanged { it.gainLossDisplayString }.render(viewScope) { handleGainLossChanged(it) }
+    state.mapChanged { it.gainLossDirection }.render(viewScope) {
+      handleGainLossDirectionChanged(it)
     }
   }
 
-  private fun handleTotalChanged(position: DbPosition) {
-    val totalValue = position.shareCount().value() * position.price().value()
-    val total = totalValue.asMoney()
+  private fun handlePurchaseDateChanged(date: LocalDateTime) {
+    binding.positionItemDate.text = DATE_FORMATTER.get().requireNotNull().format(date)
+  }
+
+  private fun handleGainLossDirectionChanged(direction: StockDirection) {
+    binding.positionItemChange.setTextColor(direction.color())
+  }
+
+  private fun handleGainLossChanged(gainLoss: String) {
+    handleGainLossVisibilityChanged(gainLoss.isNotBlank())
+    handleGainLossTextChanged(gainLoss)
+  }
+
+  private fun handleGainLossTextChanged(gainLoss: String) {
+    binding.positionItemChange.text = gainLoss
+  }
+
+  private fun handleTotalChanged(total: StockMoneyValue) {
     binding.positionItemTotal.text = total.asMoneyValue()
   }
 

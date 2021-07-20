@@ -30,6 +30,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.databinding.PositionListBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
@@ -57,9 +58,9 @@ internal constructor(
     doOnInflate {
       binding.positionListList.layoutManager =
           LinearLayoutManager(binding.positionListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -96,9 +97,9 @@ internal constructor(
       // Standard margin on all items
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
-      LinearMarginDecoration.createHorizontal(
-              horizontalMargin = margin, orientation = RecyclerView.VERTICAL)
-          .apply { binding.positionListList.addItemDecoration(this) }
+      LinearMarginDecoration.create(margin = margin, orientation = RecyclerView.VERTICAL).apply {
+        binding.positionListList.addItemDecoration(this)
+      }
     }
 
     doOnTeardown { binding.positionListList.removeAllItemDecorations() }
@@ -126,25 +127,30 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<PositionsViewState>) {
-    state.mapChanged { it.stock }.render(viewScope) { handleList(it) }
+    state.mapChanged { it.position }.render(viewScope) { handleList(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 
   private fun setList(
       holding: DbHolding,
-      positions: List<PositionsViewState.PositionStock.MaybePosition>
+      positions: List<PositionsViewState.CurrentPosition.PositionStock.MaybePosition>,
+      currentSharePrice: StockMoneyValue?
   ) {
     val data =
         positions.map {
           when (it) {
-            is PositionsViewState.PositionStock.MaybePosition.Header -> PositionItemViewState.Header
-            is PositionsViewState.PositionStock.MaybePosition.Footer ->
+            is PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Footer ->
                 PositionItemViewState.Footer(
                     totalShares = it.totalShares,
                     totalCost = it.totalCost,
-                    averageCost = it.averageCost)
-            is PositionsViewState.PositionStock.MaybePosition.Position ->
-                PositionItemViewState.Position(holding = holding, position = it.position)
+                    averageCost = it.averageCost,
+                )
+            is PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Position ->
+                PositionItemViewState.Position(
+                    holding = holding,
+                    position = it.position,
+                    currentSharePrice = currentSharePrice,
+                )
           }
         }
     Timber.d("Submit data list: $data")
@@ -159,7 +165,8 @@ internal constructor(
     binding.positionListSwipeRefresh.isRefreshing = loading
   }
 
-  private fun handleList(stock: PositionsViewState.PositionStock?) {
+  private fun handleList(current: PositionsViewState.CurrentPosition) {
+    val stock = current.stock
     if (stock == null) {
       clearList()
     } else {
@@ -167,7 +174,7 @@ internal constructor(
       if (positions.isEmpty()) {
         clearList()
       } else {
-        setList(stock.holding, positions)
+        setList(stock.holding, positions, current.currentSharePrice)
       }
     }
   }

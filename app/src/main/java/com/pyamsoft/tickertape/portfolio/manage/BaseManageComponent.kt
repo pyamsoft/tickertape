@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.position.BasePositionsComponent
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.chart.BaseChartComponent
 import dagger.BindsInstance
@@ -41,7 +42,8 @@ internal interface BaseManageComponent {
     @CheckResult
     fun create(
         @BindsInstance symbol: StockSymbol,
-        @BindsInstance holdingId: DbHolding.Id
+        @BindsInstance holdingId: DbHolding.Id,
+        @BindsInstance currentStockPrice: StockMoneyValue?,
     ): BaseManageComponent
   }
 }

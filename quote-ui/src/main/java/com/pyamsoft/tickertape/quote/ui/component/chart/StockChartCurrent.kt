@@ -22,9 +22,9 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartCurrentBinding
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import javax.inject.Inject
 
 internal class StockChartCurrent @Inject internal constructor(parent: ViewGroup) :
@@ -55,30 +55,11 @@ internal class StockChartCurrent @Inject internal constructor(parent: ViewGroup)
     } else {
       binding.apply {
         val formatter =
-            if (data.range < StockChart.IntervalRange.THREE_MONTH) FORMATTER_WITH_TIME
-            else FORMATTER
+            if (data.range < StockChart.IntervalRange.THREE_MONTH) DATE_TIME_FORMATTER
+            else DATE_FORMATTER
         componentChartCurrentDate.text = formatter.get().requireNotNull().format(data.date)
         componentChartCurrentPrice.text = data.price.asMoneyValue()
       }
     }
-  }
-
-  companion object {
-
-    private val FORMATTER =
-        object : ThreadLocal<DateTimeFormatter>() {
-
-          override fun initialValue(): DateTimeFormatter {
-            return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-          }
-        }
-
-    private val FORMATTER_WITH_TIME =
-        object : ThreadLocal<DateTimeFormatter>() {
-
-          override fun initialValue(): DateTimeFormatter {
-            return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-          }
-        }
   }
 }

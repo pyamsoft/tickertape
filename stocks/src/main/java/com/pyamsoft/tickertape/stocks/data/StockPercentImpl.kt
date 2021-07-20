@@ -16,14 +16,14 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.PERCENT_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockPercent
-import java.text.DecimalFormat
-import java.text.NumberFormat
 
 internal data class StockPercentImpl(private val percent: Double) : StockPercent {
 
   private val stockPercent by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "0.00%" else requireNotNull(FORMATTER.get()).format(percent / 100)
+    if (isZero()) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(percent / 100)
   }
 
   override fun asPercentValue(): String {
@@ -36,18 +36,5 @@ internal data class StockPercentImpl(private val percent: Double) : StockPercent
 
   override fun isZero(): Boolean {
     return percent.compareTo(0) == 0
-  }
-
-  companion object {
-    private val FORMATTER =
-        object : ThreadLocal<NumberFormat>() {
-
-          override fun initialValue(): NumberFormat {
-            return DecimalFormat.getPercentInstance().apply {
-              minimumFractionDigits = 2
-              maximumFractionDigits = 2
-            }
-          }
-        }
   }
 }

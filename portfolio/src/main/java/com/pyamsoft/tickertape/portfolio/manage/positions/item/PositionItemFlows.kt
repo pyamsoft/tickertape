@@ -20,15 +20,47 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asPercent
 
 sealed class PositionItemViewState : UiViewState {
 
-  data class Position internal constructor(val holding: DbHolding, val position: DbPosition) :
-      PositionItemViewState()
+  data class Position
+  internal constructor(
+      val holding: DbHolding,
+      val position: DbPosition,
+      val currentSharePrice: StockMoneyValue?,
+  ) : PositionItemViewState() {
 
-  object Header : PositionItemViewState()
+    val total: StockMoneyValue
+    val gainLossDisplayString: String
+    val gainLossDirection: StockDirection
+
+    init {
+      val numberOfShares = position.shareCount().value()
+      val costNumber = position.price().value() * numberOfShares
+      total = costNumber.asMoney()
+
+      val price = currentSharePrice
+      if (price == null) {
+        gainLossDisplayString = ""
+        gainLossDirection = StockDirection.none()
+      } else {
+        val todayNumber = price.value() * numberOfShares
+        val gainLossNumber = todayNumber - costNumber
+        val gainLossPercent = gainLossNumber / costNumber * 100
+        val direction = gainLossNumber.asDirection()
+        val sign = direction.sign()
+        gainLossDisplayString =
+            "${sign}${gainLossNumber.asMoney().asMoneyValue()} (${sign}${gainLossPercent.asPercent().asPercentValue()})"
+        gainLossDirection = direction
+      }
+    }
+  }
 
   data class Footer
   internal constructor(

@@ -19,24 +19,24 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.item
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
-import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.portfolio.databinding.PositionItemHolderBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsAdapter
 import javax.inject.Inject
 
 class PositionItemViewHolder
 internal constructor(
-    binding: ListitemFrameBinding,
+    binding: PositionItemHolderBinding,
     factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
     callback: PositionsAdapter.Callback
-) : BasePositionItemViewHolder<PositionItemViewState.Position>(binding, owner) {
+) : BasePositionItemViewHolder<PositionItemViewState.Position>(binding.root, owner) {
 
   @Inject @JvmField internal var position: PositionItemView? = null
 
   override val viewBinder: ViewBinder<PositionItemViewState.Position>
 
   init {
-    factory.create(binding.listitemFrame).inject(this)
+    factory.create(binding.positionItemRoot).inject(this)
 
     val position = requireNotNull(position)
 

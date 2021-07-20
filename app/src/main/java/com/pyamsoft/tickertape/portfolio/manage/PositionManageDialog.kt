@@ -44,7 +44,9 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
@@ -71,6 +73,12 @@ internal class PositionManageDialog :
   private fun getHoldingSymbol(): StockSymbol {
     return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
   }
+
+    @CheckResult
+    private fun getCurrentPrice(): StockMoneyValue? {
+        val price = requireArguments().getDouble(KEY_CURRENT_STOCK_PRICE, -1.0)
+        return if (price.compareTo(0) < 0) null else price.asMoney()
+    }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return object : AppCompatDialog(requireActivity(), theme) {
@@ -101,7 +109,7 @@ internal class PositionManageDialog :
     component =
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusManageComponent()
-            .create(getHoldingSymbol(), getHoldingId())
+            .create(getHoldingSymbol(), getHoldingId(), getCurrentPrice(),)
             .also { c ->
               c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
             }
@@ -200,6 +208,7 @@ internal class PositionManageDialog :
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
+      private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
     const val TAG = "PositionManageDialog"
 
     @JvmStatic
@@ -216,12 +225,13 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    fun newInstance(holding: DbHolding): DialogFragment {
+    fun newInstance(holding: DbHolding, currentSharePrice: StockMoneyValue?): DialogFragment {
       return PositionManageDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_HOLDING_ID, holding.id().id)
               putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
+              currentSharePrice?.also { putDouble(KEY_CURRENT_STOCK_PRICE, it.value()) }
             }
       }
     }

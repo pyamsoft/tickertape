@@ -89,24 +89,28 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
 
   private fun handleChangeToday(change: String, @ColorInt color: Int) {
     binding.portfolioHeaderChangeTodayText.apply {
-      text = change
-      textColor = color
+      postOnAnimation {
+        text = change
+        textColor = color
+      }
     }
   }
 
   private fun handleTotalAmount(today: StockMoneyValue) {
-    binding.portfolioHeaderToday.text = today.asMoneyValue()
+    binding.portfolioHeaderToday.apply { postOnAnimation { text = today.asMoneyValue() } }
   }
 
   private fun handleGainLoss(gainLoss: String, @ColorInt color: Int) {
     binding.portfolioHeaderGainloss.apply {
-      text = gainLoss
-      textColor = color
+      postOnAnimation {
+        text = gainLoss
+        textColor = color
+      }
     }
   }
 
   companion object {
 
-    private val TICKER_CHARACTERS = "($+-${TickerUtils.provideNumberList()}%)"
+    private val TICKER_CHARACTERS = TickerUtils.provideNumberList()
   }
 }

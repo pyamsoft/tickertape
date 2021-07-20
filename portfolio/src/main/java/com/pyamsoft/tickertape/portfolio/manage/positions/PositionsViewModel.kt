@@ -42,9 +42,18 @@ internal constructor(
     private val tapeLauncher: TapeLauncher,
     private val interactor: PositionsInteractor,
     private val thisHoldingId: DbHolding.Id,
+    thisCurrentSharePrice: StockMoneyValue?,
 ) :
     UiViewModel<PositionsViewState, PositionsControllerEvent>(
-        initialState = PositionsViewState(isLoading = false, stock = null)) {
+        initialState =
+            PositionsViewState(
+                isLoading = false,
+                position =
+                    PositionsViewState.CurrentPosition(
+                        stock = null,
+                        currentSharePrice = thisCurrentSharePrice,
+                    ),
+            )) {
 
   private val portfolioFetcher =
       highlander<ResultWrapper<PortfolioStock>, Boolean> {
@@ -65,70 +74,77 @@ internal constructor(
     }
   }
 
-  private fun CoroutineScope.handleUpdatePosition(position: DbPosition) {
-    Timber.d("Existing position updated: $position")
+  private fun CoroutineScope.handleUpdatePosition(pos: DbPosition) {
+    Timber.d("Existing position updated: $pos")
 
     setState {
       copy(
-          stock =
-              stock?.let { s ->
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val onlyPositions = s.onlyPositions()
-                val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
-                return@let s.copy(
-                    positions =
-                        createPositionsList(
-                            if (existingPosition == null) {
-                              onlyPositions + position
-                            } else {
-                              onlyPositions.map {
-                                if (positionMatchesCallback(it)) position else it
-                              }
-                            }))
-              })
+          position =
+              position.copy(
+                  stock =
+                      position.stock?.let { s ->
+                        val positionMatchesCallback = { p: DbPosition -> p.id() == pos.id() }
+                        val onlyPositions = s.onlyPositions()
+                        val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
+                        return@let s.copy(
+                            positions =
+                                createPositionsList(
+                                    if (existingPosition == null) {
+                                      onlyPositions + pos
+                                    } else {
+                                      onlyPositions.map {
+                                        if (positionMatchesCallback(it)) pos else it
+                                      }
+                                    }))
+                      }))
     }
   }
 
-  private fun CoroutineScope.handleInsertPosition(position: DbPosition) {
-    Timber.d("New position inserted: $position")
+  private fun CoroutineScope.handleInsertPosition(pos: DbPosition) {
+    Timber.d("New position inserted: $pos")
 
     setState {
       copy(
-          stock =
-              stock?.let { s ->
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                val onlyPositions = s.onlyPositions()
-                val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
-                return@let s.copy(
-                    positions =
-                        createPositionsList(
-                            if (existingPosition == null) {
-                              onlyPositions + position
-                            } else {
-                              onlyPositions.map {
-                                if (positionMatchesCallback(it)) position else it
-                              }
-                            }))
-              })
+          position =
+              position.copy(
+                  stock =
+                      position.stock?.let { s ->
+                        val positionMatchesCallback = { p: DbPosition -> p.id() == pos.id() }
+                        val onlyPositions = s.onlyPositions()
+                        val existingPosition = onlyPositions.firstOrNull(positionMatchesCallback)
+                        return@let s.copy(
+                            positions =
+                                createPositionsList(
+                                    if (existingPosition == null) {
+                                      onlyPositions + pos
+                                    } else {
+                                      onlyPositions.map {
+                                        if (positionMatchesCallback(it)) pos else it
+                                      }
+                                    }))
+                      }))
     }
   }
 
-  private fun CoroutineScope.handleDeletePosition(position: DbPosition, offerUndo: Boolean) {
-    Timber.d("Existing position deleted: $position")
+  private fun CoroutineScope.handleDeletePosition(pos: DbPosition, offerUndo: Boolean) {
+    Timber.d("Existing position deleted: $pos")
 
     setState {
       copy(
-          stock =
-              stock?.let { s ->
-                val onlyPositions = s.onlyPositions()
-                val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                return@let if (!onlyPositions.contains(positionMatchesCallback)) s
-                else {
-                  s.copy(
-                      positions =
-                          createPositionsList(onlyPositions.filterNot(positionMatchesCallback)))
-                }
-              })
+          position =
+              position.copy(
+                  stock =
+                      position.stock?.let { s ->
+                        val onlyPositions = s.onlyPositions()
+                        val positionMatchesCallback = { p: DbPosition -> p.id() == pos.id() }
+                        return@let if (!onlyPositions.contains(positionMatchesCallback)) s
+                        else {
+                          s.copy(
+                              positions =
+                                  createPositionsList(
+                                      onlyPositions.filterNot(positionMatchesCallback)))
+                        }
+                      }))
     }
     // TODO offer up undo ability
 
@@ -149,14 +165,19 @@ internal constructor(
                 .onSuccess { s ->
                   setState {
                     copy(
-                        stock =
-                            PositionsViewState.PositionStock(
-                                holding = s.holding, positions = createPositionsList(s.positions)),
+                        position =
+                            position.copy(
+                                stock =
+                                    PositionsViewState.CurrentPosition.PositionStock(
+                                        holding = s.holding,
+                                        positions = createPositionsList(s.positions))),
                         isLoading = false)
                   }
                 }
                 .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                .onFailure { setState { copy(stock = null, isLoading = false) } }
+                .onFailure {
+                  setState { copy(position = position.copy(stock = null), isLoading = false) }
+                }
           })
 
       // After the quotes are fetched, start the tape
@@ -166,13 +187,13 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val position = state.stock?.positions?.get(index)
+      val position = state.position.stock?.positions?.get(index)
       if (position == null) {
         Timber.w("NULL stock, cannot remove position at index: $index")
         return@launch
       }
 
-      if (position !is PositionsViewState.PositionStock.MaybePosition.Position) {
+      if (position !is PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Position) {
         Timber.w("Not a position at index: $index $position")
         return@launch
       }
@@ -190,7 +211,7 @@ internal constructor(
     @CheckResult
     private fun createPositionsList(
         positions: List<DbPosition>
-    ): List<PositionsViewState.PositionStock.MaybePosition> {
+    ): List<PositionsViewState.CurrentPosition.PositionStock.MaybePosition> {
       if (positions.isEmpty()) {
         return emptyList()
       }
@@ -198,10 +219,11 @@ internal constructor(
       val totalShares = positions.sumOf { it.shareCount().value() }
       val totalCost = positions.sumOf { it.price().value() * it.shareCount().value() }
 
-      return listOf(PositionsViewState.PositionStock.MaybePosition.Header) +
-          positions.map { PositionsViewState.PositionStock.MaybePosition.Position(it) } +
+      return positions.map {
+        PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Position(it)
+      } +
           listOf(
-              PositionsViewState.PositionStock.MaybePosition.Footer(
+              PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Footer(
                   totalShares = totalShares.asShares(),
                   totalCost = totalCost.asMoney(),
                   averageCost =
@@ -210,10 +232,11 @@ internal constructor(
     }
 
     @CheckResult
-    private fun PositionsViewState.PositionStock.onlyPositions(): List<DbPosition> {
+    private fun PositionsViewState.CurrentPosition.PositionStock.onlyPositions(): List<DbPosition> {
       return this.positions
           .asSequence()
-          .filterIsInstance<PositionsViewState.PositionStock.MaybePosition.Position>()
+          .filterIsInstance<
+              PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Position>()
           .map { it.position }
           .toList()
     }

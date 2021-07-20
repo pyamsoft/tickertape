@@ -16,41 +16,145 @@
 
 <merge>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/position_item"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:baselineAligned="false"
-        android:gravity="center_vertical|start"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/position_item_number_of_shares_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|start"
+            android:text="Shares"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_share_price_label"
+            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/position_item_number_of_shares"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical|start"
-            android:textAppearance="?attr/textAppearanceBody1" />
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_share_price"
+            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/position_item_number_of_shares_label" />
+
+        <TextView
+            android:id="@+id/position_item_share_price_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:text="Price"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_total_label"
+            app:layout_constraintHorizontal_weight="0.8"
+            app:layout_constraintStart_toEndOf="@id/position_item_number_of_shares_label"
+            app:layout_constraintTop_toTopOf="@id/position_item_number_of_shares_label" />
 
         <TextView
             android:id="@+id/position_item_share_price"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_weight="0.7"
             android:gravity="center_vertical|start"
-            android:textAppearance="?attr/textAppearanceBody1" />
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_total"
+            app:layout_constraintHorizontal_weight="0.8"
+            app:layout_constraintStart_toEndOf="@id/position_item_number_of_shares"
+            app:layout_constraintTop_toTopOf="@id/position_item_number_of_shares" />
+
+        <TextView
+            android:id="@+id/position_item_total_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:text="Total"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textStyle="bold"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_share_price_label"
+            app:layout_constraintTop_toTopOf="@id/position_item_share_price_label" />
 
         <TextView
             android:id="@+id/position_item_total"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
             android:gravity="center_vertical|start"
             android:textAppearance="?attr/textAppearanceBody1"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_share_price"
+            app:layout_constraintTop_toTopOf="@id/position_item_share_price" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/position_item_date_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical|start"
+            android:text="Purchased On"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_change"
+            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintStart_toStartOf="@id/position_item_number_of_shares"
+            app:layout_constraintTop_toBottomOf="@id/position_item_number_of_shares" />
+
+        <TextView
+            android:id="@+id/position_item_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|start"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toStartOf="@id/position_item_change"
+            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintStart_toStartOf="@id/position_item_date_label"
+            app:layout_constraintTop_toBottomOf="@id/position_item_date_label" />
+
+        <TextView
+            android:id="@+id/position_item_change_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:text="Change"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_date_label"
+            app:layout_constraintTop_toTopOf="@id/position_item_date_label" />
+
+        <TextView
+            android:id="@+id/position_item_change"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_date"
+            app:layout_constraintTop_toTopOf="@id/position_item_date" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </merge>

@@ -16,26 +16,26 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
+import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import javax.inject.Inject
 
 class PositionFooterViewHolder
 internal constructor(
-    binding: ListitemFrameBinding,
+    itemView: ViewGroup,
     factory: PositionItemComponent.Factory,
     owner: LifecycleOwner,
-) : BasePositionItemViewHolder<PositionItemViewState.Footer>(binding, owner) {
+) : BasePositionItemViewHolder<PositionItemViewState.Footer>(itemView, owner) {
 
   override val viewBinder: ViewBinder<PositionItemViewState.Footer>
 
   @Inject @JvmField internal var footer: PositionFooterView? = null
 
   init {
-    factory.create(binding.listitemFrame).inject(this)
+    factory.create(itemView).inject(this)
 
     viewBinder = createViewBinder(footer.requireNotNull()) {}
   }

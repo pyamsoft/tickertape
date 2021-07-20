@@ -16,17 +16,17 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
-import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.pydroid.util.doOnDestroy
 
 abstract class BasePositionItemViewHolder<S : PositionItemViewState>
 protected constructor(
-    binding: ListitemFrameBinding,
+    itemView: View,
     owner: LifecycleOwner,
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<S> {
+) : RecyclerView.ViewHolder(itemView), ViewBinder<S> {
 
   protected abstract val viewBinder: ViewBinder<S>
 

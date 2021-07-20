@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.manage
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
@@ -26,9 +27,16 @@ import javax.inject.Inject
 @FragmentScope
 class ManagePortfolioViewModel
 @Inject
-internal constructor(private val thisHoldingId: DbHolding.Id, private val thisSymbol: StockSymbol) :
+internal constructor(
+    private val thisHoldingId: DbHolding.Id,
+    private val thisSymbol: StockSymbol,
+) :
     UiViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
-        initialState = ManagePortfolioViewState(symbol = thisSymbol, page = DEFAULT_PAGE)) {
+        initialState =
+            ManagePortfolioViewState(
+                symbol = thisSymbol,
+                page = DEFAULT_PAGE,
+            )) {
 
   fun handleLoadDefaultPage() {
     loadPage(DEFAULT_PAGE)

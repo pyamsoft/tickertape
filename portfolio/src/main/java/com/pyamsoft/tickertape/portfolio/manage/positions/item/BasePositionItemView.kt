@@ -17,16 +17,17 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.tickertape.portfolio.databinding.PositionItemBinding
-import javax.inject.Inject
 
-class PositionHeaderView @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PositionItemViewState.Header, PositionItemViewEvent, PositionItemBinding>(parent) {
+abstract class BasePositionItemView<S : PositionItemViewState>
+protected constructor(parent: ViewGroup) :
+    BaseUiView<S, PositionItemViewEvent, PositionItemBinding>(parent) {
 
-  override val viewBinding = PositionItemBinding::inflate
+  final override val viewBinding = PositionItemBinding::inflate
 
-  override val layoutRoot by boundView { positionItem }
+  final override val layoutRoot by boundView { positionItem }
 
   init {
     doOnTeardown {
@@ -34,15 +35,13 @@ class PositionHeaderView @Inject internal constructor(parent: ViewGroup) :
         positionItemSharePrice.text = ""
         positionItemNumberOfShares.text = ""
         positionItemTotal.text = ""
+        positionItemChange.text = ""
+        positionItemDate.text = ""
       }
     }
+  }
 
-    doOnInflate {
-      binding.apply {
-        positionItemSharePrice.text = "Price"
-        positionItemNumberOfShares.text = "Shares"
-        positionItemTotal.text = "Total"
-      }
-    }
+  protected fun handleGainLossVisibilityChanged(isChangeVisible: Boolean) {
+    binding.positionItemChange.isVisible = isChangeVisible
   }
 }

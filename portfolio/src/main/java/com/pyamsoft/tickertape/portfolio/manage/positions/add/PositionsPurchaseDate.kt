@@ -22,9 +22,8 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingPurchaseDateBinding
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import javax.inject.Inject
 
 class PositionsPurchaseDate @Inject internal constructor(parent: ViewGroup) :
@@ -52,17 +51,7 @@ class PositionsPurchaseDate @Inject internal constructor(parent: ViewGroup) :
 
   private fun handlePurchaseDateChanged(date: LocalDateTime?) {
     binding.holdingDateText.text =
-        if (date == null) "--/--/----" else FORMATTER.get().requireNotNull().format(date)
-  }
-
-  companion object {
-
-    private val FORMATTER =
-        object : ThreadLocal<DateTimeFormatter>() {
-
-          override fun initialValue(): DateTimeFormatter {
-            return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-          }
-        }
+        if (date == null) "--/--/----"
+        else DATE_FORMATTER.get().requireNotNull().format(date)
   }
 }

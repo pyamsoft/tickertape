@@ -16,14 +16,14 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
-import java.text.DecimalFormat
-import java.text.NumberFormat
+import com.pyamsoft.tickertape.stocks.api.VOLUME_FORMATTER
 
 internal data class StockVolumeValueImpl(private val value: Long) : StockVolumeValue {
 
   private val volume by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "0" else requireNotNull(FORMATTER.get()).format(value)
+    if (isZero()) "0" else VOLUME_FORMATTER.get().requireNotNull().format(value)
   }
 
   override fun asVolumeValue(): String {
@@ -36,19 +36,5 @@ internal data class StockVolumeValueImpl(private val value: Long) : StockVolumeV
 
   override fun isZero(): Boolean {
     return value.compareTo(0) == 0
-  }
-
-  companion object {
-    private val FORMATTER =
-        object : ThreadLocal<NumberFormat>() {
-
-          override fun initialValue(): NumberFormat {
-            return DecimalFormat.getNumberInstance().apply {
-              isParseIntegerOnly = true
-              minimumFractionDigits = 0
-              maximumFractionDigits = 0
-            }
-          }
-        }
   }
 }

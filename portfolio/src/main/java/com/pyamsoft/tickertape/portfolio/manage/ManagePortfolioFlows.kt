@@ -23,7 +23,10 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 data class ManagePortfolioViewState
-internal constructor(val symbol: StockSymbol, val page: PortfolioPage) : UiViewState
+internal constructor(
+    val symbol: StockSymbol,
+    val page: PortfolioPage,
+) : UiViewState
 
 sealed class ManagePortfolioViewEvent : UiViewEvent {
 

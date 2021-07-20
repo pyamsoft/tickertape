@@ -26,8 +26,6 @@ interface PositionItemComponent {
 
   fun inject(holder: PositionItemViewHolder)
 
-  fun inject(holder: PositionHeaderViewHolder)
-
   fun inject(holder: PositionFooterViewHolder)
 
   @Subcomponent.Factory

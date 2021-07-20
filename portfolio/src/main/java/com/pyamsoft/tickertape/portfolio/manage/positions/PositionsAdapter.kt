@@ -23,9 +23,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
+import com.pyamsoft.tickertape.portfolio.databinding.PositionItemHolderBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.BasePositionItemViewHolder
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionFooterViewHolder
-import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionHeaderViewHolder
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewHolder
 import com.pyamsoft.tickertape.portfolio.manage.positions.item.PositionItemViewState
@@ -45,8 +45,7 @@ private constructor(
   companion object {
 
     private const val TYPE_POSITION = 1
-    private const val TYPE_HEADER = 2
-    private const val TYPE_FOOTER = 3
+    private const val TYPE_FOOTER = 2
 
     @JvmStatic
     @CheckResult
@@ -79,7 +78,6 @@ private constructor(
   override fun getPopupText(position: Int): String {
     return when (val state = getItem(position)) {
       is PositionItemViewState.Footer -> "Total"
-      is PositionItemViewState.Header -> "Top"
       is PositionItemViewState.Position -> state.holding.symbol().symbol()
     }
   }
@@ -87,7 +85,6 @@ private constructor(
   override fun getItemViewType(position: Int): Int {
     return when (getItem(position)) {
       is PositionItemViewState.Footer -> TYPE_FOOTER
-      is PositionItemViewState.Header -> TYPE_HEADER
       is PositionItemViewState.Position -> TYPE_POSITION
     }
   }
@@ -95,18 +92,21 @@ private constructor(
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
       is PositionItemViewState.Footer -> Long.MIN_VALUE
-      is PositionItemViewState.Header -> Long.MAX_VALUE
       is PositionItemViewState.Position -> state.position.id().hashCode().toLong()
     }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePositionItemViewHolder<*> {
     val inflater = LayoutInflater.from(parent.context)
-    val binding = ListitemFrameBinding.inflate(inflater, parent, false)
     return when (viewType) {
-      TYPE_POSITION -> PositionItemViewHolder(binding, factory, owner, callback)
-      TYPE_HEADER -> PositionHeaderViewHolder(binding, factory, owner)
-      TYPE_FOOTER -> PositionFooterViewHolder(binding, factory, owner)
+      TYPE_POSITION -> {
+        val binding = PositionItemHolderBinding.inflate(inflater, parent, false)
+        PositionItemViewHolder(binding, factory, owner, callback)
+      }
+      TYPE_FOOTER -> {
+        val binding = ListitemFrameBinding.inflate(inflater, parent, false)
+        PositionFooterViewHolder(binding.listitemFrame, factory, owner)
+      }
       else -> throw AssertionError("View Type must be one of the supported. $viewType")
     }
   }
@@ -115,10 +115,6 @@ private constructor(
     return when (val state = getItem(position)) {
       is PositionItemViewState.Footer -> {
         val viewHolder = holder as PositionFooterViewHolder
-        viewHolder.bindState(state)
-      }
-      is PositionItemViewState.Header -> {
-        val viewHolder = holder as PositionHeaderViewHolder
         viewHolder.bindState(state)
       }
       is PositionItemViewState.Position -> {

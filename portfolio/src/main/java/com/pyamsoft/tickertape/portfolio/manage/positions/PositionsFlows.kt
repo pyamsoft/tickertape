@@ -26,26 +26,28 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 data class PositionsViewState(
     val isLoading: Boolean,
-    val stock: PositionStock?,
+    val position: CurrentPosition,
 ) : UiViewState {
 
-  data class PositionStock
-  internal constructor(
-      val holding: DbHolding,
-      val positions: List<MaybePosition>,
-  ) {
+  data class CurrentPosition
+  internal constructor(val stock: PositionStock?, val currentSharePrice: StockMoneyValue?) {
 
-    sealed class MaybePosition {
-      data class Position internal constructor(val position: DbPosition) : MaybePosition()
+    data class PositionStock
+    internal constructor(
+        val holding: DbHolding,
+        val positions: List<MaybePosition>,
+    ) {
 
-      object Header : MaybePosition()
+      sealed class MaybePosition {
+        data class Position internal constructor(val position: DbPosition) : MaybePosition()
 
-      data class Footer
-      internal constructor(
-          val totalShares: StockShareValue,
-          val averageCost: StockMoneyValue,
-          val totalCost: StockMoneyValue
-      ) : MaybePosition()
+        data class Footer
+        internal constructor(
+            val totalShares: StockShareValue,
+            val averageCost: StockMoneyValue,
+            val totalCost: StockMoneyValue
+        ) : MaybePosition()
+      }
     }
   }
 }

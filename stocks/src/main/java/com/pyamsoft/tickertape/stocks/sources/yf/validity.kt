@@ -17,6 +17,8 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
@@ -103,4 +105,11 @@ internal fun Sequence<NetworkQuoteResponse.Resp.Quote>.filterOnlyValidQuotes():
       .filterNot { it.regularMarketDayLow == null }
       .filterNot { it.regularMarketDayRange == null }
       .filterNot { it.regularMarketVolume == null }
+      .filterNot { it.equityType == null }
+      .filter {
+        return@filter when (it.equityType.requireNotNull()) {
+          EquityType.EQUITY.name, EquityType.OPTION.name -> true
+          else -> false
+        }
+      }
 }

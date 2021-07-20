@@ -35,7 +35,8 @@ protected constructor(
     private val interactor: StockInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
-        savedState, SymbolAddViewState(symbol = "", searchResults = emptyList())) {
+        savedState,
+        SymbolAddViewState(searching = false, symbol = "", searchResults = emptyList())) {
 
   private var searchJob: Job? = null
 
@@ -66,26 +67,30 @@ protected constructor(
   private fun CoroutineScope.performLookup(query: String) {
     resetSearchJob()
 
-    searchJob =
-        launch(context = Dispatchers.Default) {
-          // Wait for a bit to debounce inputs
-          delay(300L)
+    setState(
+        stateChange = { copy(searching = true) },
+        andThen = {
+          searchJob =
+              launch(context = Dispatchers.Default) {
+                // Wait for a bit to debounce inputs
+                delay(300L)
 
-          val result =
-              try {
-                val results = interactor.search(false, query)
-                ResultWrapper.success(results)
-              } catch (e: Throwable) {
-                Timber.e(e, "Failed to search for '$query'")
-                ResultWrapper.failure(e)
+                val result =
+                    try {
+                      val results = interactor.search(false, query)
+                      ResultWrapper.success(results)
+                    } catch (e: Throwable) {
+                      Timber.e(e, "Failed to search for '$query'")
+                      ResultWrapper.failure(e)
+                    }
+
+                result
+                    .onSuccess { Timber.d("Search results: $it") }
+                    .onSuccess { setState { copy(searchResults = it, searching = false) } }
+                    .onFailure { Timber.e(it, "Search failed") }
+                    .onFailure { setState { copy(searchResults = emptyList(), searching = false) } }
               }
-
-          result
-              .onSuccess { Timber.d("Search results: $it") }
-              .onSuccess { setState { copy(searchResults = it) } }
-              .onFailure { Timber.e(it, "Search failed") }
-              .onFailure { setState { copy(searchResults = emptyList()) } }
-        }
+        })
   }
 
   fun handleResultSelected(index: Int) {

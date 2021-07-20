@@ -22,7 +22,11 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 
 data class SymbolAddViewState
-internal constructor(val symbol: String, val searchResults: List<SearchResult>) : UiViewState
+internal constructor(
+    val searching: Boolean,
+    val symbol: String,
+    val searchResults: List<SearchResult>,
+) : UiViewState
 
 sealed class SymbolAddViewEvent : UiViewEvent {
 

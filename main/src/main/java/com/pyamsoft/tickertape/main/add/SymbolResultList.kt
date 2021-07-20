@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.main.add
 
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +48,7 @@ internal constructor(
 
   override val viewBinding = SymbolAddResultListBinding::inflate
 
-  override val layoutRoot by boundView { symbolAddResultList }
+  override val layoutRoot by boundView { symbolAddResultRoot }
 
   private var modelAdapter: SearchResultAdapter? = null
 
@@ -56,9 +58,9 @@ internal constructor(
     doOnInflate {
       binding.symbolAddResultList.layoutManager =
           LinearLayoutManager(binding.symbolAddResultList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -118,6 +120,21 @@ internal constructor(
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
     state.mapChanged { it.searchResults }.render(viewScope) { handleList(it) }
+    state.mapChanged { it.searching }.render(viewScope) { handleSearching(it) }
+  }
+
+  private fun handleSearching(searching: Boolean) {
+    if (searching) {
+      binding.apply {
+        symbolAddResultList.isGone = true
+        symbolAddResultEmpty.isVisible = true
+      }
+    } else {
+      binding.apply {
+        symbolAddResultEmpty.isGone = true
+        symbolAddResultList.isVisible = true
+      }
+    }
   }
 
   private fun clearList() {

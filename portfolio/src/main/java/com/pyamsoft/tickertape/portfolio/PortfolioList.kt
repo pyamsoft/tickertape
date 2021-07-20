@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -61,6 +62,10 @@ internal constructor(
   private var lastScrollPosition = 0
 
   init {
+    // For some reason the match_parent height does not make this list fill content
+    // Grab the size of the activity parent and use it as our height
+    doOnInflate { parent.post { layoutRoot.updateLayoutParams { this.height = parent.height } } }
+
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {

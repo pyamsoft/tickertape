@@ -17,13 +17,21 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.ui.UiScrollingContainer
 import javax.inject.Inject
 
-class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
-    BasePortfolioHeader<PortfolioViewState>(parent) {
+class PortfolioScrollContainer
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    nestedHeader: PortfolioHeader,
+    nestedList: PortfolioList,
+) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
 
-  override fun onRender(state: UiRender<PortfolioViewState>) {
-    handleRender(state)
+  init {
+    nest(
+        nestedHeader,
+        nestedList,
+    )
   }
 }

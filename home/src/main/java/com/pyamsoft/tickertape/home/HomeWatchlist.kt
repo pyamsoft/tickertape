@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
+import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
 import com.pyamsoft.tickertape.watchlist.WatchListViewState
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
@@ -108,13 +109,12 @@ internal constructor(
   override fun onRefresh() {}
 
   override fun onRender(state: UiRender<HomeViewState>) {
-    state.render(viewScope) { handleStateChanged(it) }
+    state.mapChanged { it.watchlistState }.render(viewScope) { handleWatchlistChanged(it) }
   }
 
-  private fun handleStateChanged(state: HomeViewState) {
+  private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<QuotedStock>>) {
     handleRender(
-        WatchListViewState(
-                isLoading = state.isLoadingWatchlist, watchlist = state.watchlist, bottomOffset = 0)
+        WatchListViewState(isLoading = state.isLoading, watchlist = state.data, bottomOffset = 0)
             .asUiRender())
   }
 }

@@ -27,24 +27,15 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioHeaderViewBinding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
-import com.robinhood.ticker.TickerUtils
 
 abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent: ViewGroup) :
     BaseUiView<S, Nothing, PortfolioHeaderViewBinding>(parent) {
 
   final override val viewBinding = PortfolioHeaderViewBinding::inflate
 
-  final override val layoutRoot by boundView { portfolioHeaderAppbar }
+  final override val layoutRoot by boundView { portfolioHeaderRoot }
 
   init {
-    doOnInflate {
-      binding.apply {
-        portfolioHeaderChangeTodayText.setCharacterLists(TICKER_CHARACTERS)
-        portfolioHeaderGainloss.setCharacterLists(TICKER_CHARACTERS)
-        portfolioHeaderToday.setCharacterLists(TICKER_CHARACTERS)
-      }
-    }
-
     doOnTeardown { clear() }
   }
 
@@ -91,7 +82,7 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
     binding.portfolioHeaderChangeTodayText.apply {
       postOnAnimation {
         text = change
-        textColor = color
+        setTextColor(color)
       }
     }
   }
@@ -104,13 +95,8 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
     binding.portfolioHeaderGainloss.apply {
       postOnAnimation {
         text = gainLoss
-        textColor = color
+        setTextColor(color)
       }
     }
-  }
-
-  companion object {
-
-    private val TICKER_CHARACTERS = TickerUtils.provideNumberList()
   }
 }

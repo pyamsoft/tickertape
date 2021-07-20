@@ -31,6 +31,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerNestedScrol
   final override val viewBinding = ContainerNestedScrollBinding::inflate
 
   final override fun adoptionParent(): LinearLayout {
-    return binding.containerNestedScrollContent
+    return binding.containerNestedScrollInner
   }
 }

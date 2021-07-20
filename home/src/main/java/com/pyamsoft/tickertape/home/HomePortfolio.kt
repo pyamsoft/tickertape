@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioViewState
 import javax.inject.Inject
 
@@ -27,14 +28,14 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
     BasePortfolioHeader<HomeViewState>(parent) {
 
   override fun onRender(state: UiRender<HomeViewState>) {
-    state.render(viewScope) { handleStateChanged(it) }
+    state.mapChanged { it.portfolioState }.render(viewScope) { handlePortfolioChanged(it) }
   }
 
-  private fun handleStateChanged(state: HomeViewState) {
+  private fun handlePortfolioChanged(state: HomeViewState.RenderState<PortfolioStockList>) {
     handleRender(
         PortfolioViewState(
-                isLoading = state.isLoadingPortfolio,
-                portfolio = state.portfolio,
+                isLoading = state.isLoading,
+                portfolio = state.data,
                 // Bottom offset is always 0 because the bottom offset is handled by the Home
                 // screens
                 bottomOffset = 0)

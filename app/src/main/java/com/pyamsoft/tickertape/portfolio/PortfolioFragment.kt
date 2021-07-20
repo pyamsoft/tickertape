@@ -47,9 +47,9 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   private var stateSaver: StateSaver? = null
 
-  @JvmField @Inject internal var header: PortfolioHeader? = null
+  @JvmField @Inject internal var spacer: PortfolioSpacer? = null
 
-  @JvmField @Inject internal var list: PortfolioList? = null
+  @JvmField @Inject internal var container: PortfolioScrollContainer? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -80,8 +80,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
-            requireNotNull(header),
-            requireNotNull(list),
+            requireNotNull(spacer),
+            requireNotNull(container),
         ) {
           return@createComponent when (it) {
             is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
@@ -126,8 +126,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
     stateSaver = null
     factory = null
 
-    list = null
-    header = null
+    container = null
+    spacer = null
   }
 
   companion object {

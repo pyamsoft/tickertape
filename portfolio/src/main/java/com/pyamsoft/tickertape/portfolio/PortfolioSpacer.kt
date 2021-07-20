@@ -17,13 +17,12 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.UiRender
+import androidx.lifecycle.LifecycleOwner
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.tickertape.ui.UiAppBarSpacer
 import javax.inject.Inject
 
-class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
-    BasePortfolioHeader<PortfolioViewState>(parent) {
-
-  override fun onRender(state: UiRender<PortfolioViewState>) {
-    handleRender(state)
-  }
-}
+class PortfolioSpacer
+@Inject
+internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
+    UiAppBarSpacer<PortfolioViewState, PortfolioViewEvent>(parent, owner, appBarActivity)

@@ -43,7 +43,9 @@ protected constructor(
       binding.uiAppbarRoot.outlineProvider = null
     }
 
-    doOnInflate { binding.uiAppbarSpace.applyAppBarOffset(appBarActivity, owner) }
+    doOnInflate {
+      binding.uiAppbarSpace.apply { post { applyAppBarOffset(appBarActivity, owner) } }
+    }
   }
 
   final override fun onRender(state: UiRender<S>) {

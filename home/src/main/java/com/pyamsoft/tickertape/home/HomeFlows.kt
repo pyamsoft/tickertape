@@ -26,10 +26,10 @@ import com.pyamsoft.tickertape.ui.PackedData
 
 data class HomeViewState
 internal constructor(
-    val portfolio: PackedData<PortfolioStockList>,
-    val isLoadingPortfolio: Boolean,
-    val watchlist: PackedData<List<QuotedStock>>,
-    val isLoadingWatchlist: Boolean,
+    internal val portfolio: PackedData<PortfolioStockList>,
+    internal val isLoadingPortfolio: Boolean,
+    internal val watchlist: PackedData<List<QuotedStock>>,
+    internal val isLoadingWatchlist: Boolean,
     val indexes: PackedData<List<QuotedChart>>,
     val isLoadingIndexes: Boolean,
     val gainers: PackedData<List<TopDataWithChart>>,
@@ -39,7 +39,13 @@ internal constructor(
     val trending: PackedData<List<TopDataWithChart>>,
     val isLoadingTrending: Boolean,
     val bottomOffset: Int,
-) : UiViewState
+) : UiViewState {
+
+  data class RenderState<S> internal constructor(val data: PackedData<S>, val isLoading: Boolean)
+
+  val portfolioState = RenderState(data = portfolio, isLoading = isLoadingPortfolio)
+  val watchlistState = RenderState(data = watchlist, isLoading = isLoadingWatchlist)
+}
 
 sealed class HomeViewEvent : UiViewEvent {
 

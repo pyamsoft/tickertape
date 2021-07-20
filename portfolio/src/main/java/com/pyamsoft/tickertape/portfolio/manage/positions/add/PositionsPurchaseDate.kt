@@ -51,7 +51,6 @@ class PositionsPurchaseDate @Inject internal constructor(parent: ViewGroup) :
 
   private fun handlePurchaseDateChanged(date: LocalDateTime?) {
     binding.holdingDateText.text =
-        if (date == null) "--/--/----"
-        else DATE_FORMATTER.get().requireNotNull().format(date)
+        if (date == null) "--/--/----" else DATE_FORMATTER.get().requireNotNull().format(date)
   }
 }

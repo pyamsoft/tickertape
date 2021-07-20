@@ -41,10 +41,10 @@ import javax.inject.Inject
  * We use this instead of MaterialDatePicker because it loses all of it's onClick listeners on
  * device rotation.
  */
-internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiController<PositionsDateControllerEvent> {
+internal class PurchaseDatePickerDialog :
+    AppCompatDialogFragment(), UiController<PositionsDateControllerEvent> {
 
-  @JvmField @Inject
-  internal var factory: TickerViewModelFactory? = null
+  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
   private val viewModel by fromViewModelFactory<PositionsDateViewModel>(activity = true) {
     factory?.create(requireActivity())
   }
@@ -54,21 +54,21 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Injector.obtainFromApplication<TickerComponent>(requireActivity())
-      .plusPositionDateComponent()
-      .create()
-      .inject(this)
+        .plusPositionDateComponent()
+        .create()
+        .inject(this)
 
     stateSaver =
-      createComponent<UnitViewState, UnitViewEvent, PositionsDateControllerEvent>(
-        savedInstanceState, this, viewModel, this) {}
+        createComponent<UnitViewState, UnitViewEvent, PositionsDateControllerEvent>(
+            savedInstanceState, this, viewModel, this) {}
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val listener =
-      DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        // month is 0-11 but LDT requires 1-12
-        viewModel.handleDateSelected(LocalDateTime.of(year, month + 1, dayOfMonth, 0 ,0 ))
-      }
+        DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+          // month is 0-11 but LDT requires 1-12
+          viewModel.handleDateSelected(LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0))
+        }
 
     val argYear = requireArguments().getInt(KEY_YEAR, -1)
     val argMonth = requireArguments().getInt(KEY_MONTH, -1)
@@ -89,8 +89,9 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
     }
 
     // Month from an LDT is 1-12 but this requires 0-11
-    return DatePickerDialog(requireActivity(), listener, year, month - 1, day)
-      .apply { datePicker.maxDate = Instant.now().toEpochMilli() }
+    return DatePickerDialog(requireActivity(), listener, year, month - 1, day).apply {
+      datePicker.maxDate = Instant.now().toEpochMilli()
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -105,9 +106,9 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
   }
 
   override fun onControllerEvent(event: PositionsDateControllerEvent) {
-      return when (event) {
-        is PositionsDateControllerEvent.Close -> dismiss()
-      }
+    return when (event) {
+      is PositionsDateControllerEvent.Close -> dismiss()
+    }
   }
 
   companion object {
@@ -123,12 +124,12 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
       return PurchaseDatePickerDialog().apply {
         arguments =
             Bundle().apply {
-          if (date != null) {
-            putInt(KEY_YEAR, date.year)
-            putInt(KEY_MONTH, date.monthValue)
-            putInt(KEY_DAY, date.dayOfMonth)
-          }
-        }
+              if (date != null) {
+                putInt(KEY_YEAR, date.year)
+                putInt(KEY_MONTH, date.monthValue)
+                putInt(KEY_DAY, date.dayOfMonth)
+              }
+            }
       }
     }
   }

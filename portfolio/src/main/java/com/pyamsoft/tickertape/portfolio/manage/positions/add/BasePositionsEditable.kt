@@ -41,22 +41,22 @@ abstract class BasePositionsEditable<B : ViewBinding> protected constructor(pare
       val editText = provideEditText()
       delegate =
           UiEditTextDelegate.create(editText) { numberString ->
-        // Blank string reset to 0
-        if (numberString.isBlank()) {
-          publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
-          return@create true
-        }
+            // Blank string reset to 0
+            if (numberString.isBlank()) {
+              publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
+              return@create true
+            }
 
-        val value = numberString.toDoubleOrNull()
-        if (value == null) {
-          Timber.w("Invalid sharePrice $numberString")
-          return@create false
-        }
+            val value = numberString.toDoubleOrNull()
+            if (value == null) {
+              Timber.w("Invalid sharePrice $numberString")
+              return@create false
+            }
 
-        publish(provideEvent(value))
-        return@create true
-      }
-          .apply { handleCreate() }
+            publish(provideEvent(value))
+            return@create true
+          }
+              .apply { handleCreate() }
     }
   }
 

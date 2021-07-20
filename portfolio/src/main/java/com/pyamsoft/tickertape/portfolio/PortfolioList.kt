@@ -69,9 +69,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {
@@ -186,8 +186,8 @@ internal constructor(
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-      binding.portfolioListList.addItemDecoration(this)
-    }
+          binding.portfolioListList.addItemDecoration(this)
+        }
   }
 
   private fun setList(list: List<PortfolioStock>) {

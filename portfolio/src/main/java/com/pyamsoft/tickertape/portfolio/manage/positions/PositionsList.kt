@@ -58,9 +58,9 @@ internal constructor(
     doOnInflate {
       binding.positionListList.layoutManager =
           LinearLayoutManager(binding.positionListList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {

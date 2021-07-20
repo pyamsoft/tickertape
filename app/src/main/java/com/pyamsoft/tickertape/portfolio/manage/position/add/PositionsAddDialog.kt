@@ -137,14 +137,16 @@ internal class PositionsAddDialog :
   }
 
   override fun onControllerEvent(event: PositionsAddControllerEvent) {
-      return when (event) {
-          is PositionsAddControllerEvent.OpenDatePicker -> handleOpenDatePickerDialog(event.selectedDate)
-      }
+    return when (event) {
+      is PositionsAddControllerEvent.OpenDatePicker ->
+          handleOpenDatePickerDialog(event.selectedDate)
+    }
   }
 
-    private fun handleOpenDatePickerDialog(selectedDate: LocalDateTime?) {
-        PurchaseDatePickerDialog.newInstance(selectedDate).show(requireActivity(), PurchaseDatePickerDialog.TAG)
-    }
+  private fun handleOpenDatePickerDialog(selectedDate: LocalDateTime?) {
+    PurchaseDatePickerDialog.newInstance(selectedDate)
+        .show(requireActivity(), PurchaseDatePickerDialog.TAG)
+  }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)

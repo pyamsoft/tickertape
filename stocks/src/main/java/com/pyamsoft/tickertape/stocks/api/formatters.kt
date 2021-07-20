@@ -37,9 +37,9 @@ val MONEY_FORMATTER =
 val DATE_TIME_FORMATTER =
     object : ThreadLocal<DateTimeFormatter>() {
 
-        override fun initialValue(): DateTimeFormatter {
-            return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        }
+      override fun initialValue(): DateTimeFormatter {
+        return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+      }
     }
 
 @JvmField

@@ -33,5 +33,4 @@ internal constructor(
   init {
     nest(nestedNumberOfSharesEntry, nestedPriceEntry, nestedDate, nestedCommit)
   }
-
 }

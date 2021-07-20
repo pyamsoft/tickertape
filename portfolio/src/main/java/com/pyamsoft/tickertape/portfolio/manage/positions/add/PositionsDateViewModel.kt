@@ -24,7 +24,6 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class PositionsDateViewModel
 @Inject

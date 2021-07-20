@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio.manage.position.add
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsViewModel
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateViewModel
 import dagger.Binds
 import dagger.Module

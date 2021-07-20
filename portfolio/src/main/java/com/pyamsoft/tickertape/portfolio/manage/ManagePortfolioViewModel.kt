@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio.manage
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 

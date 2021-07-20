@@ -74,11 +74,11 @@ internal class PositionManageDialog :
     return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
   }
 
-    @CheckResult
-    private fun getCurrentPrice(): StockMoneyValue? {
-        val price = requireArguments().getDouble(KEY_CURRENT_STOCK_PRICE, -1.0)
-        return if (price.compareTo(0) < 0) null else price.asMoney()
-    }
+  @CheckResult
+  private fun getCurrentPrice(): StockMoneyValue? {
+    val price = requireArguments().getDouble(KEY_CURRENT_STOCK_PRICE, -1.0)
+    return if (price.compareTo(0) < 0) null else price.asMoney()
+  }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return object : AppCompatDialog(requireActivity(), theme) {
@@ -109,7 +109,11 @@ internal class PositionManageDialog :
     component =
         Injector.obtainFromApplication<TickerComponent>(view.context)
             .plusManageComponent()
-            .create(getHoldingSymbol(), getHoldingId(), getCurrentPrice(),)
+            .create(
+                getHoldingSymbol(),
+                getHoldingId(),
+                getCurrentPrice(),
+            )
             .also { c ->
               c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
             }
@@ -208,7 +212,7 @@ internal class PositionManageDialog :
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
-      private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
+    private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
     const val TAG = "PositionManageDialog"
 
     @JvmStatic

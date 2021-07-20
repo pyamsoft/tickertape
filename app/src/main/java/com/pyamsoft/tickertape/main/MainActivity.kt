@@ -114,7 +114,7 @@ internal class MainActivity :
     setContentView(binding.root)
 
     Injector.obtainFromApplication<TickerComponent>(this)
-      .plusMainComponent()
+        .plusMainComponent()
         .create(this, this, this, binding.layoutCoordinator, this, this)
         .inject(this)
 

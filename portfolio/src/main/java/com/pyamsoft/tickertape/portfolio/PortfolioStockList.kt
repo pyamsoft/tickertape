@@ -33,10 +33,15 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
   val changeTodayDisplayString: String
 
   init {
-    val sumCostNumber = list.map { it.costNumber }.sum()
-
+    val sumCostNumber = if (list.isEmpty()) 0.0 else list.map { it.costNumber }.sum()
     val todays = list.map { it.todayNumber }
-    val sumTotalAmountNumber = if (todays.any { it == null }) null else todays.filterNotNull().sum()
+
+    val sumTotalAmountNumber =
+        if (todays.any { it == null }) null
+        else {
+          val validTodays = todays.filterNotNull()
+          if (validTodays.isEmpty()) 0.0 else validTodays.sum()
+        }
     val sumTotalGainLossNumber = sumTotalAmountNumber?.minus(sumCostNumber)
     sumTotalAmount = sumTotalAmountNumber?.asMoney() ?: StockMoneyValue.none()
     sumTotalGainLoss = sumTotalGainLossNumber?.asMoney() ?: StockMoneyValue.none()
@@ -51,7 +56,11 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
 
     val todayChanges = list.map { it.todayChangeNumber }
     val sumTodayChangeNumber =
-        if (todayChanges.any { it == null }) null else todayChanges.filterNotNull().sum()
+        if (todayChanges.any { it == null }) null
+        else {
+          val validChanges = todayChanges.filterNotNull()
+          if (validChanges.isEmpty()) 0.0 else validChanges.sum()
+        }
     val sumTodayChange = sumTodayChangeNumber?.asMoney() ?: StockMoneyValue.none()
     val sumTodayPercentNumber =
         sumTodayChangeNumber?.let { change ->

@@ -48,9 +48,17 @@ internal constructor(
   internal val todayNumber: Double?
 
   init {
-    val totalSharesNumber = positions.sumOf { it.shareCount().value() }
-    todayChangeNumber = quote?.quote?.regular()?.amount()?.value()?.times(totalSharesNumber)
-    todayNumber = quote?.quote?.regular()?.price()?.value()?.times(totalSharesNumber)
+    val totalSharesNumber =
+        if (positions.isEmpty()) 0.0 else positions.sumOf { it.shareCount().value() }
+
+    // Avoid -0.0 as a total change number
+    if (totalSharesNumber.compareTo(0) == 0) {
+      todayChangeNumber = 0.0
+      todayNumber = 0.0
+    } else {
+      todayChangeNumber = quote?.quote?.regular()?.amount()?.value()?.times(totalSharesNumber)
+      todayNumber = quote?.quote?.regular()?.price()?.value()?.times(totalSharesNumber)
+    }
 
     val totalGainLossNumber = todayNumber?.minus(costNumber)
 

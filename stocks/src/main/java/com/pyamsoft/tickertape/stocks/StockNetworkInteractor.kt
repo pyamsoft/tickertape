@@ -34,6 +34,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -54,6 +55,12 @@ internal constructor(
   ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+
+        // When hitting the network upstream, we wait for a couple milliseconds to allow the UI
+        // to debounce repeated requests
+        // TODO Add variable? Do we ever need to search immediately?
+        delay(300L)
+
         return@withContext searchSource.search(force, query, equityType)
       }
 

@@ -26,7 +26,6 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -78,9 +77,6 @@ protected constructor(
         andThen = { newState ->
           searchJob =
               launch(context = Dispatchers.Default) {
-                // Wait for a bit to debounce inputs
-                delay(300L)
-
                 val equityType = newState.equityType
                 val result =
                     try {

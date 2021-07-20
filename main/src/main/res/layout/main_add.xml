@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="@string/blank"
+        android:visibility="gone"
         app:elevation="6dp"
         app:fabSize="normal"
         app:layout_anchor="@id/main_bar_root"

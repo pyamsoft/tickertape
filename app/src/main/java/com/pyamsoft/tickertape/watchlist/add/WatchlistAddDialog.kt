@@ -41,8 +41,9 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
             this,
             requireActivity(),
             viewLifecycleOwner,
-            view,
         )
+        .plusWatchlistAddComponent()
+        .create(view)
         .inject(this)
   }
 

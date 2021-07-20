@@ -16,40 +16,33 @@
 
 package com.pyamsoft.tickertape.portfolio.add
 
-import android.view.ViewGroup
+import android.app.Activity
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.portfolio.PortfolioViewModel
-import dagger.Binds
+import androidx.lifecycle.LifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.tickertape.main.add.result.SearchResultComponent
+import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [PortfolioAddComponent.ComponentModule::class])
-internal interface PortfolioAddComponent {
+@Subcomponent(modules = [ThemeProviderModule::class])
+internal interface BasePortfolioAddComponent {
 
-  fun inject(dialog: PortfolioAddDialog)
+  @CheckResult fun plusPortfolioAddComponent(): PortfolioAddComponent.Factory
+
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredSearchResultComponent`(): SearchResultComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance parent: ViewGroup,
-    ): PortfolioAddComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(PortfolioViewModel::class)
-    internal abstract fun bindViewModel(
-        impl: PortfolioAddViewModel.Factory
-    ): UiSavedStateViewModelProvider<out ViewModel>
+        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
+        @BindsInstance activity: Activity,
+        @BindsInstance owner: LifecycleOwner,
+    ): BasePortfolioAddComponent
   }
 }

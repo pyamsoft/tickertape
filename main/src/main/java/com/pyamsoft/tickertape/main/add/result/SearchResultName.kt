@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
-class SymbolResultName @Inject internal constructor(parent: ViewGroup) :
+class SearchResultName @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<SearchResultViewState, SearchResultViewEvent, SymbolResultNameBinding>(parent) {
 
   override val layoutRoot by boundView { symbolResultRoot }

@@ -41,8 +41,9 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
             this,
             requireActivity(),
             viewLifecycleOwner,
-            view,
         )
+        .plusPortfolioAddComponent()
+        .create(view)
         .inject(this)
   }
 

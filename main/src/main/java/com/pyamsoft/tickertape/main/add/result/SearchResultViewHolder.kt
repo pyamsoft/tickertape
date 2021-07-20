@@ -35,13 +35,15 @@ internal constructor(
 
   private val viewBinder: ViewBinder<SearchResultViewState>
 
-  @Inject @JvmField internal var name: SymbolResultName? = null
+  @Inject @JvmField internal var name: SearchResultName? = null
+
+  @Inject @JvmField internal var click: SearchResultClick? = null
 
   init {
     factory.create(itemView).inject(this)
 
     viewBinder =
-        createViewBinder(name.requireNotNull()) {
+        createViewBinder(name.requireNotNull(), click.requireNotNull()) {
           return@createViewBinder when (it) {
             is SearchResultViewEvent.Select -> callback.onSelect(bindingAdapterPosition)
           }

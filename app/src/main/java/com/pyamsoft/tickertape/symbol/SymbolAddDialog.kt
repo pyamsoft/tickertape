@@ -88,6 +88,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             this,
             lookup,
             commit,
+            list,
             toolbar,
             shadow) {
           return@createComponent when (it) {

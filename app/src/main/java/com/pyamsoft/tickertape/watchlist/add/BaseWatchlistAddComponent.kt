@@ -16,39 +16,33 @@
 
 package com.pyamsoft.tickertape.watchlist.add
 
-import android.view.ViewGroup
+import android.app.Activity
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import dagger.Binds
+import androidx.lifecycle.LifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import com.pyamsoft.tickertape.main.add.result.SearchResultComponent
+import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(modules = [WatchlistAddComponent.ComponentModule::class])
-internal interface WatchlistAddComponent {
+@Subcomponent(modules = [ThemeProviderModule::class])
+internal interface BaseWatchlistAddComponent {
 
-  fun inject(dialog: WatchlistAddDialog)
+  @CheckResult fun plusWatchlistAddComponent(): WatchlistAddComponent.Factory
+
+  /** Not actually used, just here so graph can compile */
+  @CheckResult
+  @Suppress("FunctionName")
+  fun `$$daggerRequiredSearchResultComponent`(): SearchResultComponent.Factory
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance parent: ViewGroup,
-    ): WatchlistAddComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(WatchlistAddViewModel::class)
-    internal abstract fun bindViewModel(
-        impl: WatchlistAddViewModel.Factory
-    ): UiSavedStateViewModelProvider<out ViewModel>
+        @BindsInstance savedStateRegistryOwner: SavedStateRegistryOwner,
+        @BindsInstance activity: Activity,
+        @BindsInstance owner: LifecycleOwner,
+    ): BaseWatchlistAddComponent
   }
 }

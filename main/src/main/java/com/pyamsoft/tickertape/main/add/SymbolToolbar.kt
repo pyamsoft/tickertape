@@ -30,7 +30,6 @@ internal constructor(
 ) : UiDialogToolbar<SymbolAddViewState, SymbolAddViewEvent>(imageLoader, parent) {
 
   init {
-
     doOnInflate {
       binding.uiToolbar.setNavigationOnClickListener(
           DebouncedOnClickListener.create { publish(SymbolAddViewEvent.Close) })

@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,7 +88,18 @@ protected constructor(
         }
   }
 
-  abstract fun handleCommitSymbol()
+  fun handleResultSelected(index: Int) {
+    val result: SearchResult = state.searchResults[index]
+    Timber.d("Result selected: $result")
+    handleCommitSymbol(result.symbol().symbol())
+  }
+
+  fun handleCommitSymbol() {
+    val symbol = state.symbol
+    handleCommitSymbol(symbol)
+  }
+
+  protected abstract fun handleCommitSymbol(symbol: String)
 
   companion object {
 

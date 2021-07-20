@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.main.add.result
 
-import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 
-data class SymbolAddViewState
-internal constructor(val symbol: String, val searchResults: List<SearchResult>) : UiViewState
+data class SearchResultViewState internal constructor(val result: SearchResult) : UiViewState
 
-sealed class SymbolAddViewEvent : UiViewEvent {
+sealed class SearchResultViewEvent : UiViewEvent {
 
-  data class UpdateSymbol(val symbol: String) : SymbolAddViewEvent()
-
-  data class SelectResult internal constructor(val index: Int) : SymbolAddViewEvent()
-
-  object Close : SymbolAddViewEvent()
-
-  object CommitSymbol : SymbolAddViewEvent()
-}
-
-sealed class SymbolAddControllerEvent : UiControllerEvent {
-
-  object Close : SymbolAddControllerEvent()
+  data class Select(val index: Int) : SearchResultViewEvent()
 }

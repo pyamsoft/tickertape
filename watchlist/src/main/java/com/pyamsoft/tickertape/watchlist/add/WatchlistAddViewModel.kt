@@ -38,8 +38,7 @@ internal constructor(
     stockInteractor: StockInteractor,
 ) : SymbolAddViewModel(savedState, stockInteractor) {
 
-  override fun handleCommitSymbol() {
-    val symbol = state.symbol
+  override fun handleCommitSymbol(symbol: String) {
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
       interactor

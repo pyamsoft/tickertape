@@ -36,6 +36,7 @@ import com.pyamsoft.tickertape.main.add.SymbolAddViewEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.main.add.SymbolAddViewState
 import com.pyamsoft.tickertape.main.add.SymbolLookup
+import com.pyamsoft.tickertape.main.add.SymbolResultList
 import com.pyamsoft.tickertape.main.add.SymbolToolbar
 import javax.inject.Inject
 
@@ -47,6 +48,8 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
   @JvmField @Inject internal var commit: SymbolAddCommit? = null
 
   @JvmField @Inject internal var toolbar: SymbolToolbar? = null
+
+  @JvmField @Inject internal var list: SymbolResultList? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -70,6 +73,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     val binding = LayoutConstraintBinding.bind(view)
     onInject(binding.layoutConstraint, savedInstanceState)
 
+    val list = requireNotNull(list)
     val lookup = requireNotNull(lookup)
     val commit = requireNotNull(commit)
     val toolbar = requireNotNull(toolbar)
@@ -90,6 +94,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             is SymbolAddViewEvent.Close -> dismiss()
             is SymbolAddViewEvent.UpdateSymbol -> viewModel.handleLookupSymbol(it.symbol)
             is SymbolAddViewEvent.CommitSymbol -> viewModel.handleCommitSymbol()
+            is SymbolAddViewEvent.SelectResult -> viewModel.handleResultSelected(it.index)
           }
         }
 
@@ -116,8 +121,15 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
         constrainHeight(it.id(), ConstraintSet.WRAP_CONTENT)
       }
 
-      commit.also {
+      list.also {
         connect(it.id(), ConstraintSet.TOP, lookup.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+      }
+
+      commit.also {
+        connect(it.id(), ConstraintSet.TOP, list.id(), ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -149,6 +161,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     commit = null
     lookup = null
     toolbar = null
+    list = null
 
     onTeardown()
   }

@@ -65,7 +65,8 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val listener =
       DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        viewModel.handleDateSelected(LocalDateTime.of(year, month, dayOfMonth, 0 ,0 ))
+        // month is 0-11 but LDT requires 1-12
+        viewModel.handleDateSelected(LocalDateTime.of(year, month + 1, dayOfMonth, 0 ,0 ))
       }
 
     val argYear = requireArguments().getInt(KEY_YEAR, -1)
@@ -86,7 +87,8 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
       day = argDay
     }
 
-    return DatePickerDialog(requireActivity(), listener, year, month, day)
+    // Month from an LDT is 1-12 but this requires 0-11
+    return DatePickerDialog(requireActivity(), listener, year, month - 1, day)
       .apply { datePicker.maxDate = Instant.now().toEpochMilli() }
   }
 

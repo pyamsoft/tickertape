@@ -14,30 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.holding
+package com.pyamsoft.tickertape.stocks.api
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-
-interface DbHolding {
-
-  @CheckResult fun id(): Id
-
-  @CheckResult fun symbol(): StockSymbol
-
-  @CheckResult fun type(): EquityType
-
-  data class Id(val id: String) {
-
-    @CheckResult
-    fun isEmpty(): Boolean {
-      return id.isBlank()
-    }
-
-    companion object {
-
-      @JvmField val EMPTY = Id("")
-    }
-  }
+enum class TradeSide {
+  BUY,
+  SELL
 }

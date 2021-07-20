@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbols
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -38,7 +39,7 @@ internal constructor(
     stockInteractor: StockInteractor,
 ) : SymbolAddViewModel(savedState, stockInteractor) {
 
-  override fun handleCommitSymbol(symbol: String) {
+  override fun handleCommitSymbol(symbol: String, equityType: EquityType) {
     viewModelScope.launch(context = Dispatchers.Default) {
       Timber.d("Commit symbol to DB: $symbol")
       interactor

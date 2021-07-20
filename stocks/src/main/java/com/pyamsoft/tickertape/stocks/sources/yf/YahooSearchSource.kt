@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -51,7 +52,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
                   symbol = quote.symbol.asSymbol(),
                   name = requireNotNull(quote.longname ?: quote.shortname).asCompany(),
                   score = quote.score,
-                  type = SearchResult.Type.valueOf(quote.quoteType),
+                  type = EquityType.valueOf(quote.quoteType),
               )
             }
             .toList()
@@ -63,7 +64,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
     @CheckResult
     private fun isValidType(quote: NetworkSearchResponse.Quote): Boolean {
       return when (quote.quoteType) {
-        SearchResult.Type.EQUITY.name, SearchResult.Type.OPTION.name -> true
+        EquityType.EQUITY.name, EquityType.OPTION.name -> true
         else -> false
       }
     }

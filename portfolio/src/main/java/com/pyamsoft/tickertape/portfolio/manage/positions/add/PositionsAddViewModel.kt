@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -50,6 +51,7 @@ internal constructor(
                 numberOfShares = StockShareValue.none(),
                 pricePerShare = StockMoneyValue.none(),
                 purchaseDate = null,
+                tradeSide = DEFAULT_TRADE_SIDE,
             )) {
 
   init {
@@ -70,6 +72,7 @@ internal constructor(
     val sharePrice = state.pricePerShare
     val shareCount = state.numberOfShares
     val purchaseDate = state.purchaseDate
+    val tradeSide = state.tradeSide
 
     if (shareCount.value().compareTo(0) <= 0) {
       Timber.w("Cannot create position, invalid shareCount: ${shareCount.value()}")
@@ -92,7 +95,7 @@ internal constructor(
               pricePerShare = StockMoneyValue.none(),
               numberOfShares = StockShareValue.none(),
               purchaseDate = null,
-          )
+              tradeSide = DEFAULT_TRADE_SIDE)
         },
         andThen = {
           val id = thisHoldingId
@@ -101,7 +104,9 @@ internal constructor(
                   id = id,
                   numberOfShares = shareCount,
                   pricePerShare = sharePrice,
-                  purchaseDate = purchaseDate)
+                  purchaseDate = purchaseDate,
+                  side = tradeSide,
+              )
               .onSuccess { Timber.d("Created new position $id") }
               .onFailure { Timber.e(it, "Error creating new position $id") }
         })
@@ -115,5 +120,10 @@ internal constructor(
   @AssistedFactory
   interface Factory : UiSavedStateViewModelProvider<PositionsAddViewModel> {
     override fun create(savedState: UiSavedState): PositionsAddViewModel
+  }
+
+  companion object {
+
+    private val DEFAULT_TRADE_SIDE = TradeSide.BUY
   }
 }

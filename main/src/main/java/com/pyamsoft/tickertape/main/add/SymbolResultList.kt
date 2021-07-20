@@ -58,9 +58,9 @@ internal constructor(
     doOnInflate {
       binding.symbolAddResultList.layoutManager =
           LinearLayoutManager(binding.symbolAddResultList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {

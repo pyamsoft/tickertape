@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.squareup.moshi.JsonClass
 import java.time.LocalDateTime
 
@@ -32,6 +33,7 @@ internal constructor(
     internal val shareCount: StockShareValue,
     internal val price: StockMoneyValue,
     internal val purchaseDate: LocalDateTime,
+    internal val side: TradeSide,
 ) : DbPosition {
 
   override fun id(): DbPosition.Id {
@@ -54,6 +56,10 @@ internal constructor(
     return purchaseDate
   }
 
+  override fun side(): TradeSide {
+    return side
+  }
+
   companion object {
 
     @JvmStatic
@@ -63,13 +69,16 @@ internal constructor(
         shareCount: StockShareValue,
         price: StockMoneyValue,
         purchaseDate: LocalDateTime,
+        side: TradeSide,
     ): DbPosition {
       return JsonMappableDbPosition(
           id = DbPosition.Id(IdGenerator.generate()),
           holdingId = holdingId,
           shareCount = shareCount,
           price = price,
-          purchaseDate = purchaseDate)
+          purchaseDate = purchaseDate,
+          side = side,
+      )
     }
 
     @JvmStatic
@@ -78,7 +87,13 @@ internal constructor(
       return if (item is JsonMappableDbPosition) item
       else {
         JsonMappableDbPosition(
-            item.id(), item.holdingId(), item.shareCount(), item.price(), item.purchaseDate())
+            item.id(),
+            item.holdingId(),
+            item.shareCount(),
+            item.price(),
+            item.purchaseDate(),
+            item.side(),
+        )
       }
     }
   }

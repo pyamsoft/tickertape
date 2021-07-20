@@ -26,10 +26,5 @@ interface SearchResult {
 
   @CheckResult fun score(): Long
 
-  @CheckResult fun type(): Type
-
-  enum class Type {
-    EQUITY,
-    OPTION,
-  }
+  @CheckResult fun type(): EquityType
 }

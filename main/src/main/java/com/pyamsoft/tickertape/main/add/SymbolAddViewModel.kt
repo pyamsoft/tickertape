@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,12 @@ protected constructor(
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
-        SymbolAddViewState(searching = false, symbol = "", searchResults = emptyList())) {
+        SymbolAddViewState(
+            searching = false,
+            symbol = "",
+            searchResults = emptyList(),
+            equityType = EquityType.EQUITY,
+        )) {
 
   private var searchJob: Job? = null
 
@@ -96,15 +102,14 @@ protected constructor(
   fun handleResultSelected(index: Int) {
     val result: SearchResult = state.searchResults[index]
     Timber.d("Result selected: $result")
-    handleCommitSymbol(result.symbol().symbol())
+    handleCommitSymbol(result.symbol().symbol(), state.equityType)
   }
 
   fun handleCommitSymbol() {
-    val symbol = state.symbol
-    handleCommitSymbol(symbol)
+    handleCommitSymbol(state.symbol, state.equityType)
   }
 
-  protected abstract fun handleCommitSymbol(symbol: String)
+  protected abstract fun handleCommitSymbol(symbol: String, equityType: EquityType)
 
   companion object {
 

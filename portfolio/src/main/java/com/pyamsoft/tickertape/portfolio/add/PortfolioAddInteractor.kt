@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,7 +39,7 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbols: List<StockSymbol>): ResultWrapper<Unit> =
+  suspend fun commitSymbol(symbols: List<StockSymbol>, type: EquityType): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -51,7 +52,7 @@ internal constructor(
               continue
             }
 
-            val newHolding = JsonMappableDbHolding.create(symbol)
+            val newHolding = JsonMappableDbHolding.create(symbol, type)
             if (holdingInsertDao.insert(newHolding)) {
               Timber.d("Insert new holding into DB: $$newHolding")
             } else {

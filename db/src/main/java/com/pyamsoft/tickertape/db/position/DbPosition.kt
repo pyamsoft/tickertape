@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 
 interface DbPosition {
@@ -33,6 +34,8 @@ interface DbPosition {
   @CheckResult fun shareCount(): StockShareValue
 
   @CheckResult fun purchaseDate(): LocalDateTime
+
+  @CheckResult fun side(): TradeSide
 
   data class Id(val id: String) {
 

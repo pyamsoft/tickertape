@@ -28,6 +28,7 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
     internal data class Quote
     internal constructor(
         val symbol: String,
+        val longName: String?,
         val shortName: String?,
         val exchangeDataDelayedBy: Long?,
         // Regular market

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -26,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -39,7 +41,14 @@ internal constructor(
     @YahooFinanceApi private val charts: ChartSource,
     @YahooFinanceApi private val tops: TopSource,
     @YahooFinanceApi private val options: OptionsSource,
-) : QuoteSource, ChartSource, TopSource, OptionsSource {
+    @YahooFinanceApi private val search: SearchSource,
+) : QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource {
+
+  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext search.search(force, query)
+      }
 
   override suspend fun getOptions(
       force: Boolean,

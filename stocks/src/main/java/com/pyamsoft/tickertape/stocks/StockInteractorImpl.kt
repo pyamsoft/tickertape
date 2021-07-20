@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -59,6 +60,21 @@ internal constructor(
   private val loserCache =
       cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
         interactor.getDayLosers(true, it)
+      }
+
+  private val searchCache =
+      multiCachify<String, List<SearchResult>, String>(
+          storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
+
+  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          searchCache.key(query).clear()
+        }
+
+        return@withContext searchCache.key(query).call(query)
       }
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =

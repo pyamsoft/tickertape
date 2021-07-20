@@ -56,7 +56,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .map { stock ->
               StockQuoteImpl(
                   symbol = stock.symbol.asSymbol(),
-                  company = requireNotNull(stock.shortName).asCompany(),
+                  company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
                   dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
                   dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
                   dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),

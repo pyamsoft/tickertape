@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.api
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import com.pyamsoft.tickertape.stocks.sources.TopSource
+import androidx.annotation.CheckResult
 
-interface StockInteractor : QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource
+interface SearchResult {
+
+  @CheckResult fun symbol(): StockSymbol
+
+  @CheckResult fun name(): StockCompany
+
+  @CheckResult fun score(): Long
+
+  @CheckResult fun type(): Type
+
+  enum class Type {
+    EQUITY,
+    OPTION,
+    UNSUPPORTED
+  }
+}

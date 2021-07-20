@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.service
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import com.pyamsoft.tickertape.stocks.sources.TopSource
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.network.NetworkSearchResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-interface StockInteractor : QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource
+internal interface SearchService {
+
+  @CheckResult
+  @GET(
+      "https://query2.finance.yahoo.com/v1/finance/search?quotesCount=6&newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
+  suspend fun performSearch(@Query("q") query: String): NetworkSearchResponse
+}

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -26,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -41,7 +43,14 @@ internal constructor(
     @InternalApi private val chartSource: ChartSource,
     @InternalApi private val topSource: TopSource,
     @InternalApi private val optionsSource: OptionsSource,
+    @InternalApi private val searchSource: SearchSource,
 ) : StockInteractor {
+
+  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext searchSource.search(force, query)
+      }
 
   override suspend fun getOptions(
       force: Boolean,

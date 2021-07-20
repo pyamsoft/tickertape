@@ -75,15 +75,16 @@ protected constructor(
 
     setState(
         stateChange = { copy(searching = true) },
-        andThen = {
+        andThen = { newState ->
           searchJob =
               launch(context = Dispatchers.Default) {
                 // Wait for a bit to debounce inputs
                 delay(300L)
 
+                val equityType = newState.equityType
                 val result =
                     try {
-                      val results = interactor.search(false, query)
+                      val results = interactor.search(false, query, equityType)
                       ResultWrapper.success(results)
                     } catch (e: Throwable) {
                       Timber.e(e, "Failed to search for '$query'")

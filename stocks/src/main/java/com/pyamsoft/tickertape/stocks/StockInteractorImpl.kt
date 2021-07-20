@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
@@ -63,10 +64,20 @@ internal constructor(
       }
 
   private val searchCache =
-      multiCachify<String, List<SearchResult>, String>(
-          storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
+      multiCachify<String, List<SearchResult>, String, EquityType>(
+          storage = { listOf(createNewMemoryCacheStorage()) }) { query, type ->
+        interactor.search(
+            true,
+            query,
+            type,
+        )
+      }
 
-  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+  override suspend fun search(
+      force: Boolean,
+      query: String,
+      equityType: EquityType,
+  ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -74,7 +85,12 @@ internal constructor(
           searchCache.key(query).clear()
         }
 
-        return@withContext searchCache.key(query).call(query)
+        return@withContext searchCache
+            .key(query)
+            .call(query, equityType)
+            // Since network is expensive, we make the query with all results
+            // then we filter the type out before passing it on
+            .filter { it.type() == equityType }
       }
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =

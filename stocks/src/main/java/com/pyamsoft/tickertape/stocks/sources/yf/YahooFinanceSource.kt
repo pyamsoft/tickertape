@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
@@ -44,10 +45,14 @@ internal constructor(
     @YahooFinanceApi private val search: SearchSource,
 ) : QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource {
 
-  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+  override suspend fun search(
+      force: Boolean,
+      query: String,
+      equityType: EquityType,
+  ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext search.search(force, query)
+        return@withContext search.search(force, query, equityType)
       }
 
   override suspend fun getOptions(

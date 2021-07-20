@@ -17,9 +17,15 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 
 interface SearchSource {
 
-  @CheckResult suspend fun search(force: Boolean, query: String): List<SearchResult>
+  @CheckResult
+  suspend fun search(
+      force: Boolean,
+      query: String,
+      equityType: EquityType,
+  ): List<SearchResult>
 }

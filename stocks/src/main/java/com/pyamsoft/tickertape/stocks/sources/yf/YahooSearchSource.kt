@@ -34,7 +34,12 @@ import kotlinx.coroutines.withContext
 internal class YahooSearchSource
 @Inject
 internal constructor(@InternalApi private val service: SearchService) : SearchSource {
-  override suspend fun search(force: Boolean, query: String): List<SearchResult> =
+
+  override suspend fun search(
+      force: Boolean,
+      query: String,
+      equityType: EquityType,
+  ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

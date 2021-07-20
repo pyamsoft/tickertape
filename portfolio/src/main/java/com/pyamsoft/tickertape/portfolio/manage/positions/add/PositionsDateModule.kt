@@ -19,11 +19,11 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.tickertape.core.ActivityScope
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class InternalApi
 
@@ -43,7 +43,7 @@ abstract class PositionsDateModule {
     @Provides
     @JvmStatic
     @InternalApi
-    @ActivityScope
+    @Singleton
     internal fun provideBus(): EventBus<DateSelectPayload> {
       return EventBus.create(emitOnlyWhenActive = false)
     }

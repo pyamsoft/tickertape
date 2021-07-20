@@ -29,6 +29,7 @@ import com.pyamsoft.pydroid.arch.UnitViewState
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
+import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateControllerEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateViewModel
@@ -52,8 +53,8 @@ internal class PurchaseDatePickerDialog : AppCompatDialogFragment(), UiControlle
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    Injector.obtainFromActivity<BasePositionsAddComponent>(requireActivity())
-      .plusDateComponent()
+    Injector.obtainFromApplication<TickerComponent>(requireActivity())
+      .plusPositionDateComponent()
       .create()
       .inject(this)
 

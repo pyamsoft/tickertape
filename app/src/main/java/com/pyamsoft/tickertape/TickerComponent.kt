@@ -35,7 +35,9 @@ import com.pyamsoft.tickertape.main.MainModule
 import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
-import com.pyamsoft.tickertape.portfolio.manage.position.add.BasePositionsAddComponent
+import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddComponent
+import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsDateComponent
+import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.setting.SettingsFragmentComponent
@@ -66,7 +68,8 @@ import javax.inject.Singleton
             AlertModule::class,
             MainModule::class,
             WorkManagerModule::class,
-            UiModule::class])
+            UiModule::class,
+            PositionsDateModule::class])
 internal interface TickerComponent {
 
   // ===============================================
@@ -85,7 +88,9 @@ internal interface TickerComponent {
 
   @CheckResult fun plusPreferenceComponent(): SettingsFragmentComponent.Factory
 
-  @CheckResult fun plusPositionAddComponent(): BasePositionsAddComponent.Factory
+  @CheckResult fun plusPositionAddComponent(): PositionsAddComponent.Factory
+
+  @CheckResult fun plusPositionDateComponent(): PositionsDateComponent.Factory
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 

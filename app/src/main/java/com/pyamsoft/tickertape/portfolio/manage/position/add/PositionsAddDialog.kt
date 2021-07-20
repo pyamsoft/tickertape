@@ -37,6 +37,7 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionAddToolbar
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddContainer
@@ -98,8 +99,8 @@ internal class PositionsAddDialog :
     eatBackButtonPress()
 
     val binding = LayoutLinearVerticalBinding.bind(view)
-    Injector.obtainFromActivity<BasePositionsAddComponent>(requireActivity())
-        .plusAddComponent()
+    Injector.obtainFromApplication<TickerComponent>(requireActivity())
+        .plusPositionAddComponent()
         .create(this, binding.layoutLinearV, getHoldingId(), getHoldingSymbol())
         .inject(this)
 

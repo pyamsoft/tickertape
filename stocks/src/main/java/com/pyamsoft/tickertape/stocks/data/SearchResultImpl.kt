@@ -41,5 +41,5 @@ internal data class SearchResultImpl(
 
   override fun type(): SearchResult.Type {
     return type
- }
+  }
 }

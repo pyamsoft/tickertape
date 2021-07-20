@@ -31,6 +31,5 @@ interface SearchResult {
   enum class Type {
     EQUITY,
     OPTION,
-    UNSUPPORTED
   }
 }

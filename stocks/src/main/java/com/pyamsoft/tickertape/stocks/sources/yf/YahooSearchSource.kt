@@ -16,12 +16,14 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
+import com.pyamsoft.tickertape.stocks.network.NetworkSearchResponse
 import com.pyamsoft.tickertape.stocks.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import javax.inject.Inject
@@ -35,19 +37,35 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val result = service.performSearch(query)
-        return@withContext result.quotes.map { quote ->
-          SearchResultImpl(
-              symbol = quote.symbol.asSymbol(),
-              name = requireNotNull(quote.longname ?: quote.shortname).asCompany(),
-              score = quote.score,
-              type =
-                  when (quote.quoteType) {
-                    SearchResult.Type.EQUITY.name -> SearchResult.Type.EQUITY
-                    SearchResult.Type.OPTION.name -> SearchResult.Type.OPTION
-                    else -> SearchResult.Type.UNSUPPORTED
-                  },
-          )
+        if (query.isBlank()) {
+          return@withContext emptyList()
         }
+
+        val result = service.performSearch(query)
+        return@withContext result
+            .quotes
+            .asSequence()
+            .filter { isValidType(it) }
+            .map { quote ->
+              SearchResultImpl(
+                  symbol = quote.symbol.asSymbol(),
+                  name = requireNotNull(quote.longname ?: quote.shortname).asCompany(),
+                  score = quote.score,
+                  type = SearchResult.Type.valueOf(quote.quoteType),
+              )
+            }
+            .toList()
       }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun isValidType(quote: NetworkSearchResponse.Quote): Boolean {
+      return when (quote.quoteType) {
+        SearchResult.Type.EQUITY.name, SearchResult.Type.OPTION.name -> true
+        else -> false
+      }
+    }
+  }
 }

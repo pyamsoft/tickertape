@@ -19,8 +19,10 @@ package com.pyamsoft.tickertape.main.add
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 
-data class SymbolAddViewState internal constructor(val symbol: String) : UiViewState
+data class SymbolAddViewState
+internal constructor(val symbol: String, val searchResults: List<SearchResult>) : UiViewState
 
 sealed class SymbolAddViewEvent : UiViewEvent {
 

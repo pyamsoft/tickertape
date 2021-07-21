@@ -36,6 +36,16 @@
             android:textAppearance="?attr/textAppearanceBody1"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/symbol_add_result_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="@color/red500"
+            android:visibility="gone" />
+
     </FrameLayout>
 
 

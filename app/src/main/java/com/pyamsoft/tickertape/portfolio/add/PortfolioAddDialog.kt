@@ -29,6 +29,8 @@ import javax.inject.Inject
 
 internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
+  override val isHoldingTypeSupported: Boolean = true
+
   @JvmField @Inject internal var factory: PortfolioAddViewModel.Factory? = null
   override val viewModel by fromViewModelFactory<PortfolioAddViewModel> {
     createSavedStateViewModelFactory(factory)

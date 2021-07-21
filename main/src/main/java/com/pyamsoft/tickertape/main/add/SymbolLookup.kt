@@ -49,10 +49,10 @@ class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.symbol }.render(viewScope) { handleSymbolChanged(it) }
+    state.mapChanged { it.query }.render(viewScope) { handleQueryChanged(it) }
   }
 
-  private fun handleSymbolChanged(symbol: String) {
-    requireNotNull(delegate).handleTextChanged(symbol)
+  private fun handleQueryChanged(query: String) {
+    requireNotNull(delegate).handleTextChanged(query)
   }
 }

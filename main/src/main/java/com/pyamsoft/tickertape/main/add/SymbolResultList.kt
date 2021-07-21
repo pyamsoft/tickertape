@@ -32,6 +32,8 @@ import com.pyamsoft.tickertape.main.add.result.SearchResultComponent
 import com.pyamsoft.tickertape.main.add.result.SearchResultViewState
 import com.pyamsoft.tickertape.main.databinding.SymbolAddResultListBinding
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
 import timber.log.Timber
@@ -119,31 +121,45 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.searchResults }.render(viewScope) { handleList(it) }
-    state.mapChanged { it.searching }.render(viewScope) { handleSearching(it) }
-  }
-
-  private fun handleSearching(searching: Boolean) {
-    if (searching) {
-      binding.apply {
-        symbolAddResultList.isGone = true
-        symbolAddResultEmpty.isVisible = true
-      }
-    } else {
-      binding.apply {
-        symbolAddResultEmpty.isGone = true
-        symbolAddResultList.isVisible = true
-      }
-    }
+    state.mapChanged { it.searchResults }.render(viewScope) { handleData(it) }
   }
 
   private fun clearList() {
     usingAdapter().submitList(null)
+
+    binding.apply {
+      symbolAddResultError.isGone = true
+      symbolAddResultList.isGone = true
+      symbolAddResultEmpty.isVisible = true
+    }
   }
 
   private fun setList(results: List<SearchResult>) {
     val list = results.map { SearchResultViewState(result = it) }
     usingAdapter().submitList(list)
+
+    binding.apply {
+      symbolAddResultError.isGone = true
+      symbolAddResultEmpty.isGone = true
+      symbolAddResultList.isVisible = true
+    }
+  }
+
+  private fun handleData(data: PackedData<List<SearchResult>>) {
+    return when (data) {
+      is PackedData.Data -> handleList(data.value)
+      is PackedData.Error -> handleError(data.throwable)
+    }
+  }
+
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      symbolAddResultList.isGone = true
+      symbolAddResultEmpty.isGone = true
+      symbolAddResultError.isVisible = true
+
+      symbolAddResultError.text = throwable.getUserMessage()
+    }
   }
 
   private fun handleList(list: List<SearchResult>) {

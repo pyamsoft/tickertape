@@ -47,13 +47,21 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
         return@withContext result
             .quotes
             .asSequence()
+            .filterOnlyValidResults()
             .map { quote ->
               val company = requireNotNull(quote.longname ?: quote.shortname).asCompany()
               return@map SearchResultImpl(
                   symbol = quote.symbol.asSymbol(),
                   name = company,
                   score = quote.score,
-              )
+                  type =
+                      when (quote.quoteType) {
+                        "EQUITY" -> SearchResult.Type.EQUITY
+                        "OPTION" -> SearchResult.Type.OPTION
+                        else ->
+                            throw IllegalArgumentException(
+                                "Invalid SearchResult.Type: ${quote.quoteType}")
+                      })
             }
             .toList()
       }

@@ -19,10 +19,11 @@ package com.pyamsoft.tickertape.main.add
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
-import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,14 +33,13 @@ import timber.log.Timber
 abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
-    private val interactor: StockInteractor,
+    private val interactor: SymbolAddInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
-            searching = false,
-            symbol = "",
-            searchResults = emptyList(),
+            query = "",
+            searchResults = emptyList<SearchResult>().pack(),
             type = DEFAULT_TYPE,
         )) {
 
@@ -48,7 +48,7 @@ protected constructor(
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       val symbol = restoreSavedState(KEY_SYMBOL) { "" }
-      setState { copy(symbol = symbol) }
+      setState { copy(query = symbol) }
     }
 
     doOnCleared { resetSearchJob() }
@@ -59,50 +59,57 @@ protected constructor(
     searchJob = null
   }
 
-  fun handleLookupSymbol(symbol: String) {
+  fun handleLookupSymbol(symbol: String, filterType: Boolean) {
     setState(
-        stateChange = { copy(symbol = symbol) },
+        stateChange = { copy(query = symbol) },
         andThen = { newState ->
-          val newSymbol = newState.symbol
+          val newSymbol = newState.query
           putSavedState(KEY_SYMBOL, newSymbol)
-          performLookup(newSymbol)
+          performLookup(newSymbol, filterType)
         })
   }
 
-  private fun CoroutineScope.performLookup(query: String) {
+  private fun CoroutineScope.performLookup(query: String, filterType: Boolean) {
     resetSearchJob()
 
-    setState(
-        stateChange = { copy(searching = true) },
-        andThen = {
-          searchJob =
-              launch(context = Dispatchers.Default) {
-                val result =
-                    try {
-                      val results = interactor.search(false, query)
-                      ResultWrapper.success(results)
-                    } catch (e: Throwable) {
-                      Timber.e(e, "Failed to search for '$query'")
-                      ResultWrapper.failure(e)
-                    }
-
-                result
-                    .onSuccess { Timber.d("Search results: $it") }
-                    .onSuccess { setState { copy(searchResults = it, searching = false) } }
-                    .onFailure { Timber.e(it, "Search failed") }
-                    .onFailure { setState { copy(searchResults = emptyList(), searching = false) } }
-              }
-        })
+    searchJob =
+        launch(context = Dispatchers.Default) {
+          interactor
+              .search(false, query, if (filterType) state.type else null)
+              .onSuccess { Timber.d("Search results: $it") }
+              .onSuccess { setState { copy(searchResults = it.pack()) } }
+              .onFailure { Timber.e(it, "Search failed") }
+              .onFailure { setState { copy(searchResults = it.packError()) } }
+        }
   }
 
   fun handleResultSelected(index: Int) {
-    val result: SearchResult = state.searchResults[index]
+    val data = state.searchResults
+    if (data !is PackedData.Data<List<SearchResult>>) {
+      Timber.w("Cannot handle result selected in error state: $data")
+      return
+    }
+
+    val result = data.value[index]
     Timber.d("Result selected: $result")
     handleCommitSymbol(result.symbol().symbol(), state.type)
   }
 
   fun handleCommitSymbol() {
-    handleCommitSymbol(state.symbol, state.type)
+    handleCommitSymbol(state.query, state.type)
+  }
+
+  fun handleUpdateType() {
+    val newType =
+        when (state.type) {
+          is HoldingType.Equity -> HoldingType.Options.Buy
+          is HoldingType.Options.Buy -> HoldingType.Options.Sell
+          is HoldingType.Options.Sell -> HoldingType.Equity
+        }
+
+    setState(
+        stateChange = { copy(type = newType) },
+        andThen = { newState -> performLookup(newState.query, true) })
   }
 
   protected abstract fun handleCommitSymbol(symbol: String, type: HoldingType)

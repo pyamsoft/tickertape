@@ -20,8 +20,8 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
+import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
-import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.asSymbols
 import dagger.assisted.Assisted
@@ -36,8 +36,8 @@ class WatchlistAddViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val interactor: WatchlistAddInteractor,
-    stockInteractor: StockInteractor,
-) : SymbolAddViewModel(savedState, stockInteractor) {
+    addInteractor: SymbolAddInteractor,
+) : SymbolAddViewModel(savedState, addInteractor) {
 
   override fun handleCommitSymbol(symbol: String, type: HoldingType) {
     viewModelScope.launch(context = Dispatchers.Default) {

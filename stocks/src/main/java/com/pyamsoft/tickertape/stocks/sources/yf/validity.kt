@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
+import com.pyamsoft.tickertape.stocks.network.NetworkSearchResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTrendingResponse
 
@@ -88,6 +89,12 @@ internal fun Sequence<NetworkTopResponse.Resp.Top>.filterOnlyValidTops():
 internal fun Sequence<NetworkTrendingResponse.Resp.Trending.Quote>.filterOnlyValidTrends():
     Sequence<NetworkTrendingResponse.Resp.Trending.Quote> {
   return this.filterNot { it.symbol == null }
+}
+
+@CheckResult
+internal fun Sequence<NetworkSearchResponse.Quote>.filterOnlyValidResults():
+    Sequence<NetworkSearchResponse.Quote> {
+  return this.filter { it.quoteType == "EQUITY" || it.quoteType == "OPTION" }
 }
 
 @CheckResult

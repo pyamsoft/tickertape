@@ -17,25 +17,21 @@
 <merge>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/symbol_add_commit_root"
-        android:layout_width="match_parent"
+        android:id="@+id/symbol_add_holding_root"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:padding="16dp">
+        android:paddingStart="0dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/symbol_add_commit_button"
+        <TextView
+            android:id="@+id/symbol_add_holding_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:contentDescription="@string/blank"
-            android:visibility="gone"
-            app:elevation="6dp"
-            app:fabSize="normal"
-            app:pressedTranslationZ="12dp" />
+            android:layout_gravity="center_vertical|end"
+            android:textAppearance="?attr/textAppearanceBody1" />
 
     </FrameLayout>
-
 
 </merge>

@@ -29,6 +29,8 @@ import javax.inject.Inject
 
 internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
 
+  override val isHoldingTypeSupported: Boolean = false
+
   @JvmField @Inject internal var factory: WatchlistAddViewModel.Factory? = null
   override val viewModel by fromViewModelFactory<WatchlistAddViewModel> {
     createSavedStateViewModelFactory(factory)

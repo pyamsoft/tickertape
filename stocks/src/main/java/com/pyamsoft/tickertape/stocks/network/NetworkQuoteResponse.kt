@@ -31,6 +31,9 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
         val longName: String?,
         val shortName: String?,
         val exchangeDataDelayedBy: Long?,
+        // Options
+        val strike: Double?,
+        val expireDate: Long?,
         // Regular market
         val regularMarketPrice: Double?,
         val regularMarketChange: Double?,

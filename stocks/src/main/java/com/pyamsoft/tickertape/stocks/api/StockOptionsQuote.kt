@@ -14,35 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.holding
+package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDateTime
 
-interface DbHolding {
+interface StockOptionsQuote : StockQuote {
 
-  @CheckResult fun id(): Id
+  @CheckResult fun strike(): StockMoneyValue
 
-  @CheckResult fun symbol(): StockSymbol
-
-  @CheckResult fun type(): HoldingType
-
-  data class Id(val id: String) {
-
-    @CheckResult
-    fun isEmpty(): Boolean {
-      return id.isBlank()
-    }
-
-    companion object {
-
-      @JvmField val EMPTY = Id("")
-    }
-  }
-}
-
-@CheckResult
-fun DbHolding.isSellSide(): Boolean {
-  return type() == HoldingType.Options.Sell
+  @CheckResult fun expireDate(): LocalDateTime
 }

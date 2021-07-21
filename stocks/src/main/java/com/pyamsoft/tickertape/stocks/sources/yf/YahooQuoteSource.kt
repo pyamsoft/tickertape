@@ -91,6 +91,9 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 "symbol",
                 "shortName",
                 "exchangeDataDelayedBy",
+                // Options
+                "strike",
+                "expireDate",
                 // Regular market
                 "regularMarketPrice",
                 "regularMarketChange",

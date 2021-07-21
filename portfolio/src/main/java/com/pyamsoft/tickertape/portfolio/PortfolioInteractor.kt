@@ -91,7 +91,10 @@ internal constructor(
                     val holdingPositions = positions.filter { it.holdingId() == holding.id() }
                     val stock =
                         PortfolioStock(
-                            holding = holding, positions = holdingPositions, quote = quote)
+                            holding = holding,
+                            positions = holdingPositions,
+                            quote = quote,
+                        )
                     result.add(stock)
                   }
 

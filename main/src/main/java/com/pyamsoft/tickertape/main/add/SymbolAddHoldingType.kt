@@ -48,7 +48,7 @@ class SymbolAddHoldingType @Inject internal constructor(parent: ViewGroup) :
   private fun handleTypeChanged(type: HoldingType) {
     binding.symbolAddHoldingType.text =
         when (type) {
-          is HoldingType.Equity -> "Equity"
+          is HoldingType.Stock -> "Stock"
           is HoldingType.Options.Buy -> "Options Buy"
           is HoldingType.Options.Sell -> "Options Sell"
         }

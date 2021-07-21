@@ -29,7 +29,7 @@ interface SearchResult {
   @CheckResult fun type(): Type
 
   enum class Type {
-    EQUITY,
+    STOCK,
     OPTION
   }
 }

@@ -56,7 +56,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
                   score = quote.score,
                   type =
                       when (quote.quoteType) {
-                        "EQUITY" -> SearchResult.Type.EQUITY
+                        "EQUITY", "ETF" -> SearchResult.Type.STOCK
                         "OPTION" -> SearchResult.Type.OPTION
                         else ->
                             throw IllegalArgumentException(

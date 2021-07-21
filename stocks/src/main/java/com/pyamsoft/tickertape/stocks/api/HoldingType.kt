@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 sealed class HoldingType {
-  object Equity : HoldingType()
+  object Stock : HoldingType()
 
   sealed class Options : HoldingType() {
 

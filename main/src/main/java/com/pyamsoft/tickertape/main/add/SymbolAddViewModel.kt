@@ -102,9 +102,9 @@ protected constructor(
   fun handleUpdateType() {
     val newType =
         when (state.type) {
-          is HoldingType.Equity -> HoldingType.Options.Buy
+          is HoldingType.Stock -> HoldingType.Options.Buy
           is HoldingType.Options.Buy -> HoldingType.Options.Sell
-          is HoldingType.Options.Sell -> HoldingType.Equity
+          is HoldingType.Options.Sell -> HoldingType.Stock
         }
 
     setState(
@@ -116,7 +116,7 @@ protected constructor(
 
   companion object {
 
-    private val DEFAULT_TYPE = HoldingType.Equity
+    private val DEFAULT_TYPE = HoldingType.Stock
     private const val KEY_SYMBOL = "symbol"
   }
 }

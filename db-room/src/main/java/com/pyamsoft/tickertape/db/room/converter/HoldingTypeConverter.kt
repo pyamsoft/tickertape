@@ -22,7 +22,7 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 
 internal object HoldingTypeConverter {
 
-  private const val HOLDING_TYPE_EQUITY = "EQUITY"
+  private const val HOLDING_TYPE_STOCK = "STOCK"
   private const val HOLDING_TYPE_OPTION_BUY = "OPTION_BUY"
   private const val HOLDING_TYPE_OPTION_SELL = "OPTION_SELL"
 
@@ -31,12 +31,12 @@ internal object HoldingTypeConverter {
   @CheckResult
   fun toType(type: String): HoldingType {
     return when (type) {
-      HOLDING_TYPE_EQUITY -> HoldingType.Equity
+      HOLDING_TYPE_STOCK -> HoldingType.Stock
       HOLDING_TYPE_OPTION_BUY -> HoldingType.Options.Buy
       HOLDING_TYPE_OPTION_SELL -> HoldingType.Options.Sell
       else ->
           throw AssertionError(
-              "Unexpected HoldingType: $type. Expected one of [$HOLDING_TYPE_EQUITY $HOLDING_TYPE_OPTION_BUY $HOLDING_TYPE_OPTION_SELL]")
+              "Unexpected HoldingType: $type. Expected one of [$HOLDING_TYPE_STOCK $HOLDING_TYPE_OPTION_BUY $HOLDING_TYPE_OPTION_SELL]")
     }
   }
 
@@ -45,7 +45,7 @@ internal object HoldingTypeConverter {
   @CheckResult
   fun fromType(type: HoldingType): String {
     return when (type) {
-      is HoldingType.Equity -> HOLDING_TYPE_EQUITY
+      is HoldingType.Stock -> HOLDING_TYPE_STOCK
       is HoldingType.Options.Buy -> HOLDING_TYPE_OPTION_BUY
       is HoldingType.Options.Sell -> HOLDING_TYPE_OPTION_SELL
     }

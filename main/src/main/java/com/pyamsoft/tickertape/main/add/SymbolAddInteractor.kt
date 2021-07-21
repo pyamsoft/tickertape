@@ -47,7 +47,7 @@ class SymbolAddInteractor @Inject internal constructor(private val interactor: S
                     if (filterByType != null) {
                       val lookingType =
                           when (filterByType) {
-                            is HoldingType.Equity -> SearchResult.Type.EQUITY
+                            is HoldingType.Stock -> SearchResult.Type.STOCK
                             is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
                                 SearchResult.Type.OPTION
                           }

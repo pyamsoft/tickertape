@@ -24,8 +24,6 @@ interface StockQuote {
 
   @CheckResult fun company(): StockCompany
 
-  @CheckResult fun equityType(): EquityType
-
   @CheckResult fun regular(): StockMarketSession
 
   @CheckResult fun afterHours(): StockMarketSession?

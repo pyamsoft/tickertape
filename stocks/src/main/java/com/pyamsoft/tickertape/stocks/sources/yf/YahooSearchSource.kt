@@ -16,15 +16,12 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkSearchResponse
 import com.pyamsoft.tickertape.stocks.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import javax.inject.Inject
@@ -38,7 +35,6 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
   override suspend fun search(
       force: Boolean,
       query: String,
-      equityType: EquityType,
   ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -51,27 +47,14 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
         return@withContext result
             .quotes
             .asSequence()
-            .filter { isValidType(it) }
             .map { quote ->
-              SearchResultImpl(
+              val company = requireNotNull(quote.longname ?: quote.shortname).asCompany()
+              return@map SearchResultImpl(
                   symbol = quote.symbol.asSymbol(),
-                  name = requireNotNull(quote.longname ?: quote.shortname).asCompany(),
+                  name = company,
                   score = quote.score,
-                  type = EquityType.valueOf(quote.quoteType),
               )
             }
             .toList()
       }
-
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun isValidType(quote: NetworkSearchResponse.Quote): Boolean {
-      return when (quote.quoteType) {
-        EquityType.EQUITY.name, EquityType.OPTION.name -> true
-        else -> false
-      }
-    }
-  }
 }

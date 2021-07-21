@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.db.holding
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DbHolding {
@@ -26,7 +26,7 @@ interface DbHolding {
 
   @CheckResult fun symbol(): StockSymbol
 
-  @CheckResult fun type(): EquityType
+  @CheckResult fun type(): HoldingType
 
   data class Id(val id: String) {
 

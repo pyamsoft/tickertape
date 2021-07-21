@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
@@ -48,11 +47,10 @@ internal constructor(
   override suspend fun search(
       force: Boolean,
       query: String,
-      equityType: EquityType,
   ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext search.search(force, query, equityType)
+        return@withContext search.search(force, query)
       }
 
   override suspend fun getOptions(

@@ -31,7 +31,6 @@ import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,7 +64,6 @@ internal constructor(
       numberOfShares: StockShareValue,
       pricePerShare: StockMoneyValue,
       purchaseDate: LocalDateTime,
-      side: TradeSide,
   ): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -86,7 +84,6 @@ internal constructor(
                   shareCount = numberOfShares,
                   price = pricePerShare,
                   purchaseDate = purchaseDate,
-                  side = side,
               )
 
           Timber.d("Insert new position into DB: $position")

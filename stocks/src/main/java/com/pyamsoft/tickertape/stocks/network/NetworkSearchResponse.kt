@@ -28,6 +28,5 @@ internal data class NetworkSearchResponse internal constructor(val quotes: List<
       val longname: String?,
       val shortname: String?,
       val score: Long,
-      val quoteType: String
   )
 }

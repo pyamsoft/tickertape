@@ -16,7 +16,13 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-enum class TradeSide {
-  BUY,
-  SELL
+sealed class HoldingType {
+  object Equity : HoldingType()
+
+  sealed class Options : HoldingType() {
+
+    object Buy : Options()
+
+    object Sell : Options()
+  }
 }

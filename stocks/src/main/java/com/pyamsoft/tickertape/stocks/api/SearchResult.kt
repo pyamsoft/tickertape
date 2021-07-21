@@ -26,5 +26,5 @@ interface SearchResult {
 
   @CheckResult fun score(): Long
 
-  @CheckResult fun type(): EquityType
 }
+

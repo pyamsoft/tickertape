@@ -17,9 +17,7 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -59,7 +57,6 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
               StockQuoteImpl(
                   symbol = stock.symbol.asSymbol(),
                   company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
-                  equityType = EquityType.valueOf(stock.equityType.requireNotNull()),
                   dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
                   dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
                   dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),

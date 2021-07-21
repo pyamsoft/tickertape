@@ -21,7 +21,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ protected constructor(
             searching = false,
             symbol = "",
             searchResults = emptyList(),
-            equityType = EquityType.EQUITY,
+            type = DEFAULT_TYPE,
         )) {
 
   private var searchJob: Job? = null
@@ -74,13 +74,12 @@ protected constructor(
 
     setState(
         stateChange = { copy(searching = true) },
-        andThen = { newState ->
+        andThen = {
           searchJob =
               launch(context = Dispatchers.Default) {
-                val equityType = newState.equityType
                 val result =
                     try {
-                      val results = interactor.search(false, query, equityType)
+                      val results = interactor.search(false, query)
                       ResultWrapper.success(results)
                     } catch (e: Throwable) {
                       Timber.e(e, "Failed to search for '$query'")
@@ -99,17 +98,18 @@ protected constructor(
   fun handleResultSelected(index: Int) {
     val result: SearchResult = state.searchResults[index]
     Timber.d("Result selected: $result")
-    handleCommitSymbol(result.symbol().symbol(), state.equityType)
+    handleCommitSymbol(result.symbol().symbol(), state.type)
   }
 
   fun handleCommitSymbol() {
-    handleCommitSymbol(state.symbol, state.equityType)
+    handleCommitSymbol(state.symbol, state.type)
   }
 
-  protected abstract fun handleCommitSymbol(symbol: String, equityType: EquityType)
+  protected abstract fun handleCommitSymbol(symbol: String, type: HoldingType)
 
   companion object {
 
+    private val DEFAULT_TYPE = HoldingType.Equity
     private const val KEY_SYMBOL = "symbol"
   }
 }

@@ -22,7 +22,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 @Entity(tableName = RoomDbHolding.TABLE_NAME)
@@ -30,7 +30,7 @@ internal data class RoomDbHolding
 internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol,
-    @JvmField @ColumnInfo(name = COLUMN_EQUITY_TYPE) val equityType: EquityType,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_TYPE) val type: HoldingType,
 ) : DbHolding {
 
   @Ignore
@@ -44,8 +44,8 @@ internal constructor(
   }
 
   @Ignore
-  override fun type(): EquityType {
-    return equityType
+  override fun type(): HoldingType {
+    return type
   }
 
   companion object {
@@ -56,7 +56,7 @@ internal constructor(
 
     @Ignore internal const val COLUMN_SYMBOL = "symbol"
 
-    @Ignore internal const val COLUMN_EQUITY_TYPE = "equity_type"
+    @Ignore internal const val COLUMN_HOLDING_TYPE = "holding_type"
 
     @Ignore
     @JvmStatic

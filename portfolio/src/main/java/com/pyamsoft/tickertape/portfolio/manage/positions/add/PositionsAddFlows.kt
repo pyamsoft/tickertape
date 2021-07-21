@@ -22,7 +22,6 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 
 data class PositionsAddViewState(
@@ -30,7 +29,6 @@ data class PositionsAddViewState(
     val numberOfShares: StockShareValue,
     val pricePerShare: StockMoneyValue,
     val purchaseDate: LocalDateTime?,
-    val tradeSide: TradeSide,
 ) : UiViewState {
 
   val isValidPosition: Boolean =

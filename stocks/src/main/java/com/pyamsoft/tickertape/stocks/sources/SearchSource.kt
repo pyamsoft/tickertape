@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 
 interface SearchSource {
@@ -26,6 +25,5 @@ interface SearchSource {
   suspend fun search(
       force: Boolean,
       query: String,
-      equityType: EquityType,
   ): List<SearchResult>
 }

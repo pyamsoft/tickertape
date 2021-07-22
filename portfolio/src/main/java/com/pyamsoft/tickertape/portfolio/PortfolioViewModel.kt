@@ -52,9 +52,11 @@ internal constructor(
         addNewBus = addNewBus,
         initialState =
             PortfolioViewState(
+                section = DEFAULT_SECTION,
                 isLoading = false,
                 portfolio = PortfolioStockList(emptyList()).pack(),
-                bottomOffset = 0)) {
+                bottomOffset = 0,
+            )) {
 
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { interactor.getPortfolio(it) }
@@ -257,5 +259,17 @@ internal constructor(
       val stock = data.value.list[index]
       publish(PortfolioControllerEvent.ManageHolding(stock))
     }
+  }
+
+  fun handleShowStocks() {
+    setState { copy(section = PortfolioSection.STOCKS) }
+  }
+
+  fun handleShowOptions() {
+    setState { copy(section = PortfolioSection.OPTIONS) }
+  }
+
+  companion object {
+    private val DEFAULT_SECTION = PortfolioSection.STOCKS
   }
 }

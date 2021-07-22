@@ -16,28 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
-import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
-import javax.inject.Inject
-
-class PortfolioScrollContainer
-@Inject
-internal constructor(
-    parent: ViewGroup,
-    sectionStocks: PortfolioSectionStocks,
-    sectionOptions: PortfolioSectionOptions,
-    nestedHeader: PortfolioHeader,
-    nestedList: PortfolioList,
-) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
-
-  init {
-    sectionStocks.nest(
-        nestedHeader,
-        nestedList,
-    )
-    nest(
-        sectionStocks,
-        sectionOptions,
-    )
-  }
+enum class PortfolioSection(val display: String) {
+  STOCKS("Stocks"),
+  OPTIONS("Options")
 }

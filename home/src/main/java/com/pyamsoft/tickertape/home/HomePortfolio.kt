@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
+import com.pyamsoft.tickertape.portfolio.PortfolioSection
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioViewState
 import javax.inject.Inject
@@ -36,6 +37,8 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
         PortfolioViewState(
                 isLoading = state.isLoading,
                 portfolio = state.data,
+                // Always show stocks section
+                section = PortfolioSection.STOCKS,
                 // Bottom offset is always 0 because the bottom offset is handled by the Home
                 // screens
                 bottomOffset = 0)

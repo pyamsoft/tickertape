@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
@@ -49,6 +50,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   @JvmField @Inject internal var spacer: PortfolioSpacer? = null
 
+  @JvmField @Inject internal var tabs: PortfolioTabs? = null
+
   @JvmField @Inject internal var container: PortfolioScrollContainer? = null
 
   override fun onCreateView(
@@ -69,7 +72,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             requireToolbarActivity(),
             requireAppBarActivity(),
             requireActivity(),
-            viewLifecycleOwner)
+            viewLifecycleOwner,
+        )
         .plusPortfolioComponent()
         .create(binding.layoutCoordinator)
         .inject(this)
@@ -80,6 +84,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
+            tabs.requireNotNull(),
             requireNotNull(spacer),
             requireNotNull(container),
         ) {
@@ -87,6 +92,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
             is PortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
             is PortfolioViewEvent.Manage -> viewModel.handleManageHolding(it.index)
+            is PortfolioViewEvent.ShowOptions -> viewModel.handleShowOptions()
+            is PortfolioViewEvent.ShowStocks -> viewModel.handleShowStocks()
           }
         }
 
@@ -128,6 +135,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
     container = null
     spacer = null
+    tabs = null
   }
 
   companion object {

@@ -34,10 +34,9 @@
             android:layout_height="32dp"
             android:background="@color/transparent"
             app:tabBackground="@color/transparent"
-            app:tabGravity="fill"
             app:tabIndicatorColor="@color/white"
             app:tabIndicatorFullWidth="false"
-            app:tabMode="scrollable"
+            app:tabMode="auto"
             app:tabPadding="4dp"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/grey500" />

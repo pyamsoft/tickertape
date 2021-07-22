@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import java.time.LocalDateTime
 import javax.inject.Inject
+import timber.log.Timber
 
 class PositionItemView @Inject internal constructor(parent: ViewGroup) :
     BasePositionItemView<PositionItemViewState.Position>(parent) {
@@ -75,7 +76,7 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleCurrentChanged(current: StockMoneyValue) {
-    binding.positionItemCurrent.text = current.asMoneyValue()
+    Timber.d("TODO: Current value is $current")
   }
 
   private fun handleTotalChanged(total: StockMoneyValue) {

@@ -17,18 +17,41 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSharesEntryBinding
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.asShares
+import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
+import timber.log.Timber
 
-class PositionsShareCountEntry @Inject internal constructor(parent: ViewGroup) :
+class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
     BasePositionsEditable<HoldingSharesEntryBinding>(parent) {
 
   override val viewBinding = HoldingSharesEntryBinding::inflate
 
   override val layoutRoot by boundView { positionSharesRoot }
+
+  init {
+    doOnInflate {
+      binding.positionSharesInput.hint =
+          "Number of ${if (type.isOption()) "Contracts" else "Shares"}"
+    }
+
+    doOnInflate {
+      binding.positionSharesEdit.setOnEditorActionListener { _, actionId, _ ->
+        if (actionId == EditorInfo.IME_NULL) {
+          Timber.d("Enter key pushed, open date picker")
+          publish(PositionsAddViewEvent.OpenDatePicker)
+          return@setOnEditorActionListener true
+        }
+
+        return@setOnEditorActionListener false
+      }
+    }
+  }
 
   override fun provideEditText(): TextInputEditText {
     return binding.positionSharesEdit

@@ -23,6 +23,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewModel
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.Binds
 import dagger.BindsInstance
@@ -45,6 +46,7 @@ internal interface PositionsAddComponent {
         @BindsInstance parent: ViewGroup,
         @BindsInstance holdingId: DbHolding.Id,
         @BindsInstance symbol: StockSymbol,
+        @BindsInstance type: HoldingType,
     ): PositionsAddComponent
   }
 

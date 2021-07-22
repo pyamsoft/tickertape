@@ -42,13 +42,17 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.core.isNegative
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.fromHoldingString
+import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import javax.inject.Inject
 
 internal class PositionManageDialog :
@@ -74,6 +78,14 @@ internal class PositionManageDialog :
   private fun getHoldingSymbol(): StockSymbol {
     return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
   }
+
+    @CheckResult
+    private fun getHoldingType(): HoldingType {
+            return requireArguments().getString(
+                KEY_HOLDING_TYPE,
+                ""
+            ).requireNotNull().fromHoldingString()
+    }
 
   @CheckResult
   private fun getCurrentPrice(): StockMoneyValue? {
@@ -114,6 +126,7 @@ internal class PositionManageDialog :
                 getHoldingSymbol(),
                 getHoldingId(),
                 getCurrentPrice(),
+                getHoldingType(),
             )
             .also { c ->
               c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
@@ -188,7 +201,7 @@ internal class PositionManageDialog :
               PositionChartFragment.TAG,
               appendBackStack = false)
       is ManagePortfolioControllerEvent.OpenAdd ->
-          PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol)
+          PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol, type = event.type)
               .show(requireActivity(), PositionsAddDialog.TAG)
     }
   }
@@ -213,6 +226,7 @@ internal class PositionManageDialog :
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
+      private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
     const val TAG = "PositionManageDialog"
 
@@ -230,12 +244,14 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    fun newInstance(holding: DbHolding, currentSharePrice: StockMoneyValue?): DialogFragment {
+    fun newInstance(stock: PortfolioStock, currentSharePrice: StockMoneyValue?): DialogFragment {
       return PositionManageDialog().apply {
         arguments =
             Bundle().apply {
+                val holding = stock.holding
               putString(KEY_HOLDING_ID, holding.id().id)
               putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
+                putString(KEY_HOLDING_TYPE, holding.type().toHoldingString())
               currentSharePrice?.also { putDouble(KEY_CURRENT_STOCK_PRICE, it.value()) }
             }
       }

@@ -16,6 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
+import androidx.annotation.CheckResult
+
 sealed class HoldingType {
   object Stock : HoldingType()
 
@@ -24,5 +26,33 @@ sealed class HoldingType {
     object Buy : Options()
 
     object Sell : Options()
+  }
+}
+
+@CheckResult
+fun HoldingType.isOption(): Boolean {
+  return this != HoldingType.Stock
+}
+
+private const val HOLDING_TYPE_STOCK = "holding_stock"
+private const val HOLDING_TYPE_OPTION_BUY = "holding_option_buy"
+private const val HOLDING_TYPE_OPTION_SELL = "holding_option_sell"
+
+@CheckResult
+fun HoldingType.toHoldingString(): String {
+  return when (this) {
+    is HoldingType.Options.Buy -> HOLDING_TYPE_OPTION_BUY
+    is HoldingType.Options.Sell -> HOLDING_TYPE_OPTION_SELL
+    is HoldingType.Stock -> HOLDING_TYPE_STOCK
+  }
+}
+
+@CheckResult
+fun String.fromHoldingString(): HoldingType {
+  return when (this) {
+    HOLDING_TYPE_OPTION_BUY -> HoldingType.Options.Buy
+    HOLDING_TYPE_OPTION_SELL -> HoldingType.Options.Sell
+    HOLDING_TYPE_STOCK -> HoldingType.Stock
+    else -> throw IllegalArgumentException("String cannot be converted to HoldingType $this")
   }
 }

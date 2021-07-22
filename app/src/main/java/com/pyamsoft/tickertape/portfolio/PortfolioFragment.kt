@@ -103,7 +103,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
   private fun handleOpenHoldingManageDialog(stock: PortfolioStock) {
     val q = stock.quote?.quote
     val session = q?.afterHours() ?: q?.regular()
-    PositionManageDialog.newInstance(stock.holding, session?.price())
+    PositionManageDialog.newInstance(stock, session?.price())
         .show(requireActivity(), PositionManageDialog.TAG)
   }
 

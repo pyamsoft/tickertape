@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.manage
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class ManagePortfolioViewModel
 internal constructor(
     private val thisHoldingId: DbHolding.Id,
     private val thisSymbol: StockSymbol,
+    private val thisType: HoldingType,
 ) :
     UiViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
         initialState =
@@ -61,7 +63,12 @@ internal constructor(
   }
 
   fun handleOpenAddDialog() {
-    publish(ManagePortfolioControllerEvent.OpenAdd(id = thisHoldingId, symbol = thisSymbol))
+    publish(
+        ManagePortfolioControllerEvent.OpenAdd(
+            id = thisHoldingId,
+            symbol = thisSymbol,
+            type = thisType,
+        ))
   }
 
   companion object {

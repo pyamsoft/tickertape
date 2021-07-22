@@ -155,6 +155,33 @@
             app:layout_constraintStart_toEndOf="@id/position_item_date"
             app:layout_constraintTop_toTopOf="@id/position_item_date" />
 
+        <TextView
+            android:id="@+id/position_item_current_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:text="Current"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_change"
+            app:layout_constraintTop_toTopOf="@id/position_item_change" />
+
+        <TextView
+            android:id="@+id/position_item_current"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical|start"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/position_item_current_label"
+            app:layout_constraintTop_toTopOf="@id/position_item_current_label" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </merge>

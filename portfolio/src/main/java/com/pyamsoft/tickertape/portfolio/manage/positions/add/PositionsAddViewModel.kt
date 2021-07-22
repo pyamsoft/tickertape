@@ -21,6 +21,8 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.core.isNegative
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -71,12 +73,12 @@ internal constructor(
     val shareCount = state.numberOfShares
     val purchaseDate = state.purchaseDate
 
-    if (shareCount.value().compareTo(0) <= 0) {
+    if (shareCount.value().let { it.isZero() || it.isNegative() }) {
       Timber.w("Cannot create position, invalid shareCount: ${shareCount.value()}")
       return
     }
 
-    if (sharePrice.value().compareTo(0) <= 0) {
+    if (sharePrice.value().let { it.isZero() || it.isNegative() }) {
       Timber.w("Cannot create position, invalid sharePrice: ${sharePrice.value()}")
       return
     }

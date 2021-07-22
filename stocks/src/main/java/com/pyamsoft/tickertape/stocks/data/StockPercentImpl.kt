@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.PERCENT_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 
@@ -35,6 +36,6 @@ internal data class StockPercentImpl(private val percent: Double) : StockPercent
   }
 
   override fun isZero(): Boolean {
-    return percent.compareTo(0) == 0
+    return percent.isZero()
   }
 }

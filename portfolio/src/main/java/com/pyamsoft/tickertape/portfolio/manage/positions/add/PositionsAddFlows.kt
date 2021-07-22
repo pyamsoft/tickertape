@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.add
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.core.isNegative
+import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -32,8 +34,8 @@ data class PositionsAddViewState(
 ) : UiViewState {
 
   val isValidPosition: Boolean =
-      numberOfShares.value().compareTo(0) > 0 &&
-          pricePerShare.value().compareTo(0) > 0 &&
+      numberOfShares.value().isPositive() &&
+          pricePerShare.value().isPositive() &&
           purchaseDate != null
 }
 

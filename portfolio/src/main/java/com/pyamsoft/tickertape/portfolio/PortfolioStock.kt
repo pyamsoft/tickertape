@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.holding.isSellSide
@@ -76,8 +77,8 @@ internal constructor(
     }
 
     val totalGainLossNumber = tempTodayNumber - cost
-    val isNoTotalChange = totalGainLossNumber.compareTo(0) == 0
-    val isNoTodayChange = tempTodayChange.compareTo(0) == 0
+    val isNoTotalChange = totalGainLossNumber.isZero()
+    val isNoTodayChange = tempTodayChange.isZero()
     val totalGainLossPercentNumber = if (isNoTotalChange) 0.0 else totalGainLossNumber / cost * 100
     val totalGainLossPercent = totalGainLossPercentNumber.asPercent()
 
@@ -103,7 +104,7 @@ internal constructor(
           if (isNoTodayChange) StockDirection.none()
           else (tempTodayChange * sellSideModifier).asDirection()
       current = (tempTodayNumber * sellSideModifier * optionsModifier).asMoney()
-      costNumber = cost * sellSideModifier
+      costNumber = cost
       totalShares = (totalSharesNumber * sellSideModifier).asShares()
     }
 

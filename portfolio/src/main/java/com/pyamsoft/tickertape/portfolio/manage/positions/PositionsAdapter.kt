@@ -92,7 +92,7 @@ private constructor(
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
       is PositionItemViewState.Footer -> Long.MIN_VALUE
-      is PositionItemViewState.Position -> state.position.id().hashCode().toLong()
+      is PositionItemViewState.Position -> state.id.hashCode().toLong()
     }
   }
 

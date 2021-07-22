@@ -44,11 +44,9 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.isOption }.render(viewScope) { handleOptionChanged(it) }
     state.mapChanged { it.positionSize }.render(viewScope) { handleShareCountChanged(it) }
     state.mapChanged { it.positionCost }.render(viewScope) { handleSharePriceChanged(it) }
-    state.mapChanged { it.position }.mapChanged { it.purchaseDate() }.render(viewScope) {
-      handlePurchaseDateChanged(it)
-    }
-
+    state.mapChanged { it.purchaseDate }.render(viewScope) { handlePurchaseDateChanged(it) }
     state.mapChanged { it.total }.render(viewScope) { handleTotalChanged(it) }
+    state.mapChanged { it.current }.render(viewScope) { handleCurrentChanged(it) }
     state.mapChanged { it.gainLossDisplayString }.render(viewScope) { handleGainLossChanged(it) }
     state.mapChanged { it.gainLossDirection }.render(viewScope) {
       handleGainLossDirectionChanged(it)
@@ -56,7 +54,7 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleOptionChanged(isOption: Boolean) {
-      binding.positionItemNumberOfSharesLabel.text = if (isOption) "Contracts" else "Shares"
+    binding.positionItemNumberOfSharesLabel.text = if (isOption) "Contracts" else "Shares"
   }
 
   private fun handlePurchaseDateChanged(date: LocalDateTime) {
@@ -74,6 +72,10 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
 
   private fun handleGainLossTextChanged(gainLoss: String) {
     binding.positionItemChange.text = gainLoss
+  }
+
+  private fun handleCurrentChanged(current: StockMoneyValue) {
+    binding.positionItemCurrent.text = current.asMoneyValue()
   }
 
   private fun handleTotalChanged(total: StockMoneyValue) {

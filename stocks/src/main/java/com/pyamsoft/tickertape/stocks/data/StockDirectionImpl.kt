@@ -19,6 +19,9 @@ package com.pyamsoft.tickertape.stocks.data
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
+import com.pyamsoft.tickertape.core.isNegative
+import com.pyamsoft.tickertape.core.isPositive
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 
 internal data class StockDirectionImpl(private val price: Double) : StockDirection {
@@ -34,15 +37,15 @@ internal data class StockDirectionImpl(private val price: Double) : StockDirecti
   }
 
   override fun isUp(): Boolean {
-    return price.compareTo(0) > 0
+    return price.isPositive()
   }
 
   override fun isDown(): Boolean {
-    return price.compareTo(0) < 0
+    return price.isNegative()
   }
 
   override fun isZero(): Boolean {
-    return price.compareTo(0) == 0
+    return price.isZero()
   }
 
   override fun color(): Int {

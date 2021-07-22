@@ -40,6 +40,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.core.isNegative
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
@@ -77,7 +78,7 @@ internal class PositionManageDialog :
   @CheckResult
   private fun getCurrentPrice(): StockMoneyValue? {
     val price = requireArguments().getDouble(KEY_CURRENT_STOCK_PRICE, -1.0)
-    return if (price.compareTo(0) < 0) null else price.asMoney()
+    return if (price.isNegative()) null else price.asMoney()
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

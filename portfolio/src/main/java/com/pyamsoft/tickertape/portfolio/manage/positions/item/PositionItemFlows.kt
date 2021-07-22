@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.item
 
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.holding.isSellSide
@@ -35,23 +36,27 @@ sealed class PositionItemViewState : UiViewState {
   data class Position
   internal constructor(
       val holding: DbHolding,
-      val position: DbPosition,
-      val currentSharePrice: StockMoneyValue?,
+      private val position: DbPosition,
+      private val currentSharePrice: StockMoneyValue?,
   ) : PositionItemViewState() {
 
+    val id = position.id()
     val total: StockMoneyValue
+    val current: StockMoneyValue
     val gainLossDisplayString: String
     val gainLossDirection: StockDirection
+
     val isOption = holding.isOption()
     val positionCost: StockMoneyValue
     val positionSize: StockShareValue
+    val purchaseDate = position.purchaseDate()
 
     init {
       val optionsModifier = if (isOption) 100 else 1
       val sellSideModifier = if (holding.isSellSide()) -1 else 1
 
       val numberOfShares = position.shareCount().value()
-      val isNoPosition = numberOfShares.compareTo(0) == 0
+      val isNoPosition = numberOfShares.isZero()
       val costNumber = position.price().value() * numberOfShares
       total = (costNumber * optionsModifier * sellSideModifier).asMoney()
 
@@ -59,15 +64,17 @@ sealed class PositionItemViewState : UiViewState {
       if (price == null) {
         gainLossDisplayString = ""
         gainLossDirection = StockDirection.none()
+        current = StockMoneyValue.none()
       } else {
         val todayNumber = price.value() * numberOfShares
         val gainLossNumber = todayNumber - costNumber
         val gainLossPercent = gainLossNumber / costNumber * 100
-        val isNoChange = gainLossNumber.compareTo(0) == 0
+        val isNoChange = gainLossNumber.isZero()
         val direction =
             if (isNoChange) StockDirection.none()
             else (gainLossNumber * sellSideModifier).asDirection()
         val sign = direction.sign()
+        current = (todayNumber * optionsModifier * sellSideModifier).asMoney()
         gainLossDisplayString =
             "${sign}${(gainLossNumber * sellSideModifier).asMoney().asMoneyValue()} (${sign}${(gainLossPercent * sellSideModifier).asPercent().asPercentValue()})"
         gainLossDirection = direction

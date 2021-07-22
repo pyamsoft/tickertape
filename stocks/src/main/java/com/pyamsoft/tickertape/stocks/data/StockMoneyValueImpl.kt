@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
@@ -35,6 +36,6 @@ internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyV
   }
 
   override fun isZero(): Boolean {
-    return value.compareTo(0) == 0
+    return value.isZero()
   }
 }

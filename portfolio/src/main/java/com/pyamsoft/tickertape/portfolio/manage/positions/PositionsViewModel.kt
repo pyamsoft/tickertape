@@ -22,6 +22,7 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.holding.isSellSide
@@ -236,7 +237,7 @@ internal constructor(
                   totalShares = (totalShares * sellSideModifier).asShares(),
                   totalCost = (totalCost * sellSideModifier * optionsModifier).asMoney(),
                   averageCost =
-                      if (totalShares.compareTo(0) == 0) StockMoneyValue.none()
+                      if (totalShares.isZero()) StockMoneyValue.none()
                       else (totalCost / totalShares * sellSideModifier).asMoney(),
               ))
     }

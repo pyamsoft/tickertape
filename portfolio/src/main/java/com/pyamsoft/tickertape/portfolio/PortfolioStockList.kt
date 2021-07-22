@@ -16,9 +16,9 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
@@ -26,7 +26,6 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 data class PortfolioStockList(val list: List<PortfolioStock>) {
 
   val sumTotalAmount: StockMoneyValue
-  val sumTotalGainLoss: StockMoneyValue
   val sumTotalDirection: StockDirection
   val sumTodayDirection: StockDirection
   val gainLossDisplayString: String
@@ -35,47 +34,42 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
   init {
     val sumCostNumber = if (list.isEmpty()) 0.0 else list.map { it.costNumber }.sum()
     val todays = list.map { it.todayNumber }
+    val isAnyDayInvalid = todays.any { it == null }
 
     val sumTotalAmountNumber =
-        if (todays.any { it == null }) null
+        if (isAnyDayInvalid) 0.0
         else {
           val validTodays = todays.filterNotNull()
           if (validTodays.isEmpty()) 0.0 else validTodays.sum()
         }
-    val sumTotalGainLossNumber = sumTotalAmountNumber?.minus(sumCostNumber)
-    sumTotalAmount = sumTotalAmountNumber?.asMoney() ?: StockMoneyValue.none()
-    sumTotalGainLoss = sumTotalGainLossNumber?.asMoney() ?: StockMoneyValue.none()
+
+    val isNoTotal = sumTotalAmountNumber.isZero()
+    val sumTotalGainLossNumber = if (isNoTotal) 0.0 else sumTotalAmountNumber - sumCostNumber
+    sumTotalAmount = sumTotalAmountNumber.asMoney()
 
     val sumTotalPercentNumber =
-        sumTotalGainLossNumber?.let {
-          if (sumCostNumber.compareTo(0) == 0) 0.0 else it / sumCostNumber * 100
-        }
-    val sumTotalPercent = sumTotalPercentNumber?.asPercent() ?: StockPercent.none()
-    sumTotalDirection =
-        sumTotalAmountNumber?.minus(sumCostNumber)?.asDirection() ?: StockDirection.none()
+        if (sumCostNumber.isZero()) 0.0 else sumTotalGainLossNumber / sumCostNumber * 100
+    sumTotalDirection = (sumTotalAmountNumber - sumCostNumber).asDirection()
 
     val todayChanges = list.map { it.todayChangeNumber }
+    val isAnyChangeInvalid = todayChanges.any { it == null }
     val sumTodayChangeNumber =
-        if (todayChanges.any { it == null }) null
+        if (isAnyChangeInvalid) 0.0
         else {
           val validChanges = todayChanges.filterNotNull()
           if (validChanges.isEmpty()) 0.0 else validChanges.sum()
         }
-    val sumTodayChange = sumTodayChangeNumber?.asMoney() ?: StockMoneyValue.none()
     val sumTodayPercentNumber =
-        sumTodayChangeNumber?.let { change ->
-          val total = sumTotalAmountNumber ?: return@let null
-          if (total.compareTo(0) == 0) 0.0 else change / total * 100
-        }
-    val sumTodayPercent = sumTodayPercentNumber?.asPercent() ?: StockPercent.none()
-    sumTodayDirection = sumTodayChangeNumber?.asDirection() ?: StockDirection.none()
+        if (isNoTotal) 0.0 else sumTodayChangeNumber / sumTotalAmountNumber * 100
+    sumTodayDirection = sumTodayChangeNumber.asDirection()
 
     val totalSign = sumTotalDirection.sign()
     gainLossDisplayString =
-        "${totalSign}${sumTotalGainLoss.asMoneyValue()} (${totalSign}${sumTotalPercent.asPercentValue()})"
+        "${totalSign}${sumTotalGainLossNumber.asMoney().asMoneyValue()} (${totalSign}${sumTotalPercentNumber.asPercent().asPercentValue()})"
 
+    val sumTodayChange = sumTodayChangeNumber.asMoney()
     val sign = sumTodayDirection.sign()
     changeTodayDisplayString =
-        "${sign}${sumTodayChange.asMoneyValue()} (${sign}${sumTodayPercent.asPercentValue()})"
+        "${sign}${sumTodayChange.asMoneyValue()} (${sign}${sumTodayPercentNumber.asPercent().asPercentValue()})"
   }
 }

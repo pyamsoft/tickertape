@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.VOLUME_FORMATTER
 
@@ -35,6 +36,6 @@ internal data class StockVolumeValueImpl(private val value: Long) : StockVolumeV
   }
 
   override fun isZero(): Boolean {
-    return value.compareTo(0) == 0
+    return value.isZero()
   }
 }

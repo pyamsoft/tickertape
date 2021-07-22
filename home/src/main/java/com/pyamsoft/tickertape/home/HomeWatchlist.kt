@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
 import com.pyamsoft.tickertape.watchlist.WatchListViewState
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
@@ -114,7 +115,13 @@ internal constructor(
 
   private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<QuotedStock>>) {
     handleRender(
-        WatchListViewState(isLoading = state.isLoading, watchlist = state.data, bottomOffset = 0)
+        WatchListViewState(
+                isLoading = state.isLoading,
+                watchlist = state.data,
+                // Assume Stocks
+                section = TabsSection.STOCKS,
+                bottomOffset = 0,
+            )
             .asUiRender())
   }
 }

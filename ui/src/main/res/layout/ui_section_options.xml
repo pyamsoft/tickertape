@@ -17,7 +17,7 @@
 <merge>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/portfolio_section_stocks"
+        android:id="@+id/ui_section_options"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" />

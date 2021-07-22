@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist
 
-enum class PortfolioSection(val display: String) {
-  STOCKS("Stocks"),
-  OPTIONS("Options")
+import android.view.ViewGroup
+import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import javax.inject.Inject
+
+class WatchlistScrollContainer
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    sectionStocks: WatchlistSectionStocks,
+    sectionOptions: WatchlistSectionOptions,
+) : UiScrollingContainer<WatchListViewState, WatchListViewEvent>(parent) {
+
+  init {
+    nest(
+        sectionStocks,
+        sectionOptions,
+    )
+  }
 }

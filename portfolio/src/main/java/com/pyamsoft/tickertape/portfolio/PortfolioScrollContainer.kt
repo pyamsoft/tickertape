@@ -26,15 +26,9 @@ internal constructor(
     parent: ViewGroup,
     sectionStocks: PortfolioSectionStocks,
     sectionOptions: PortfolioSectionOptions,
-    nestedHeader: PortfolioHeader,
-    nestedList: PortfolioList,
 ) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {
-    sectionStocks.nest(
-        nestedHeader,
-        nestedList,
-    )
     nest(
         sectionStocks,
         sectionOptions,

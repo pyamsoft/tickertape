@@ -30,6 +30,7 @@ import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
@@ -261,15 +262,15 @@ internal constructor(
     }
   }
 
-  fun handleShowStocks() {
-    setState { copy(section = PortfolioSection.STOCKS) }
+  override fun handleShowStocks() {
+    setState { copy(section = TabsSection.STOCKS) }
   }
 
-  fun handleShowOptions() {
-    setState { copy(section = PortfolioSection.OPTIONS) }
+  override fun handleShowOptions() {
+    setState { copy(section = TabsSection.OPTIONS) }
   }
 
   companion object {
-    private val DEFAULT_SECTION = PortfolioSection.STOCKS
+    private val DEFAULT_SECTION = TabsSection.STOCKS
   }
 }

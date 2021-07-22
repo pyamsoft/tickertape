@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.ui
 
-import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.ui.UiSectionStocks
-import javax.inject.Inject
-
-class PortfolioSectionStocks
-@Inject
-internal constructor(
-    parent: ViewGroup,
-    nestedHeader: PortfolioHeader,
-    nestedList: PortfolioList,
-) : UiSectionStocks<PortfolioViewState, PortfolioViewEvent>(parent) {
-
-  init {
-    nest(nestedHeader, nestedList)
-  }
-
-  override fun onRender(state: UiRender<PortfolioViewState>) {
-    state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
-  }
+enum class TabsSection(val display: String) {
+  STOCKS("Stocks"),
+  OPTIONS("Options")
 }

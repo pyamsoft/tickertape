@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist
 
-import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.ui.UiSectionStocks
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.tickertape.ui.UiTabs
 import javax.inject.Inject
 
-class PortfolioSectionStocks
-@Inject
-internal constructor(
-    parent: ViewGroup,
-    nestedHeader: PortfolioHeader,
-    nestedList: PortfolioList,
-) : UiSectionStocks<PortfolioViewState, PortfolioViewEvent>(parent) {
+class WatchlistTabs @Inject internal constructor(appBarActivity: AppBarActivity) :
+    UiTabs<WatchListViewState, WatchListViewEvent>(appBarActivity) {
 
-  init {
-    nest(nestedHeader, nestedList)
+  override fun handleOptionsTabSelected() {
+    publish(WatchListViewEvent.ShowOptions)
   }
 
-  override fun onRender(state: UiRender<PortfolioViewState>) {
+  override fun handleStocksTabSelected() {
+    publish(WatchListViewEvent.ShowStocks)
+  }
+
+  override fun render(state: UiRender<WatchListViewState>) {
     state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
   }
 }

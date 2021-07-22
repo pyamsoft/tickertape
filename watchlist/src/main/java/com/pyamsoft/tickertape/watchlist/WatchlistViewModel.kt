@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
@@ -50,7 +51,11 @@ internal constructor(
         addNewBus = addNewBus,
         initialState =
             WatchListViewState(
-                isLoading = false, watchlist = emptyList<QuotedStock>().pack(), bottomOffset = 0)) {
+                section = DEFAULT_SECTION,
+                isLoading = false,
+                watchlist = emptyList<QuotedStock>().pack(),
+                bottomOffset = 0,
+            )) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<List<QuotedStock>>, Boolean> { interactor.getQuotes(it) }
@@ -156,5 +161,18 @@ internal constructor(
       val quote = data.value[index]
       publish(WatchListControllerEvent.ManageSymbol(quote))
     }
+  }
+
+  override fun handleShowStocks() {
+    setState { copy(section = TabsSection.STOCKS) }
+  }
+
+  override fun handleShowOptions() {
+    setState { copy(section = TabsSection.OPTIONS) }
+  }
+
+  companion object {
+
+    private val DEFAULT_SECTION = TabsSection.STOCKS
   }
 }

@@ -51,7 +51,9 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   @JvmField @Inject internal var spacer: WatchlistSpacer? = null
 
-  @JvmField @Inject internal var list: WatchlistList? = null
+  @JvmField @Inject internal var tabs: WatchlistTabs? = null
+
+  @JvmField @Inject internal var container: WatchlistScrollContainer? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -83,11 +85,15 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             viewModel,
             this,
             spacer.requireNotNull(),
-            list.requireNotNull()) {
+            tabs.requireNotNull(),
+            container.requireNotNull(),
+        ) {
           return@createComponent when (it) {
             is WatchListViewEvent.ForceRefresh -> viewModel.handleFetchQuotes(true)
             is WatchListViewEvent.Remove -> viewModel.handleRemove(it.index)
             is WatchListViewEvent.Select -> viewModel.handleDigSymbol(it.index)
+            is WatchListViewEvent.ShowOptions -> viewModel.handleShowOptions()
+            is WatchListViewEvent.ShowStocks -> viewModel.handleShowStocks()
           }
         }
 
@@ -125,7 +131,8 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     factory = null
 
     spacer = null
-    list = null
+    tabs = null
+    container = null
   }
 
   companion object {

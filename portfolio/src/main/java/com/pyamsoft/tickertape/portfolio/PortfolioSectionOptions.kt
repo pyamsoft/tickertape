@@ -17,24 +17,14 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.portfolio.databinding.PortfolioSectionOptionsBinding
+import com.pyamsoft.tickertape.ui.UiSectionOptions
 import javax.inject.Inject
 
 class PortfolioSectionOptions @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioSectionOptionsBinding>(parent) {
-
-  override val viewBinding = PortfolioSectionOptionsBinding::inflate
-
-  override val layoutRoot by boundView { portfolioSectionOptions }
+    UiSectionOptions<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
     state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
-  }
-
-  private fun handleSection(section: PortfolioSection) {
-    binding.portfolioSectionOptions.isVisible = section == PortfolioSection.OPTIONS
   }
 }

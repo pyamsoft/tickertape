@@ -51,6 +51,7 @@ sealed class PositionItemViewState : UiViewState {
       val sellSideModifier = if (holding.isSellSide()) -1 else 1
 
       val numberOfShares = position.shareCount().value()
+      val isNoPosition = numberOfShares.compareTo(0) == 0
       val costNumber = position.price().value() * numberOfShares
       total = (costNumber * optionsModifier * sellSideModifier).asMoney()
 
@@ -62,18 +63,21 @@ sealed class PositionItemViewState : UiViewState {
         val todayNumber = price.value() * numberOfShares
         val gainLossNumber = todayNumber - costNumber
         val gainLossPercent = gainLossNumber / costNumber * 100
-        val direction = gainLossNumber.asDirection()
+        val isNoChange = gainLossNumber.compareTo(0) == 0
+        val direction =
+            if (isNoChange) StockDirection.none()
+            else (gainLossNumber * sellSideModifier).asDirection()
         val sign = direction.sign()
         gainLossDisplayString =
-            "${sign}${gainLossNumber.asMoney().asMoneyValue()} (${sign}${gainLossPercent.asPercent().asPercentValue()})"
+            "${sign}${(gainLossNumber * sellSideModifier).asMoney().asMoneyValue()} (${sign}${(gainLossPercent * sellSideModifier).asPercent().asPercentValue()})"
         gainLossDirection = direction
       }
 
       positionCost =
-          (if (costNumber.compareTo(0) == 0) 0.0 else costNumber * sellSideModifier).asMoney()
+          if (isNoPosition) StockMoneyValue.none() else (costNumber * sellSideModifier).asMoney()
       positionSize =
-          (if (numberOfShares.compareTo(0) == 0) 0.0 else numberOfShares * sellSideModifier)
-              .asShares()
+          if (isNoPosition) StockShareValue.none()
+          else (numberOfShares * sellSideModifier).asShares()
     }
   }
 

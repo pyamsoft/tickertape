@@ -39,18 +39,6 @@ class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, p
       binding.positionSharesInput.hint =
           "Number of ${if (type.isOption()) "Contracts" else "Shares"}"
     }
-
-    doOnInflate {
-      binding.positionSharesEdit.setOnEditorActionListener { _, actionId, _ ->
-        if (actionId == EditorInfo.IME_NULL) {
-          Timber.d("Enter key pushed, open date picker")
-          publish(PositionsAddViewEvent.OpenDatePicker)
-          return@setOnEditorActionListener true
-        }
-
-        return@setOnEditorActionListener false
-      }
-    }
   }
 
   override fun provideEditText(): TextInputEditText {

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingPriceEntryBinding
@@ -24,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
+import timber.log.Timber
 
 class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
     BasePositionsEditable<HoldingPriceEntryBinding>(parent) {
@@ -35,6 +37,18 @@ class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent
   init {
     doOnInflate {
       binding.positionPriceInput.hint = "Price per ${if (type.isOption()) "Contract" else "Share"}"
+    }
+
+    doOnInflate {
+      binding.positionPriceEdit.setOnEditorActionListener { _, actionId, _ ->
+        Timber.d("Enter key pushed, open date picker $actionId")
+        if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_DONE) {
+          publish(PositionsAddViewEvent.OpenDatePicker)
+          return@setOnEditorActionListener true
+        }
+
+        return@setOnEditorActionListener false
+      }
     }
   }
 

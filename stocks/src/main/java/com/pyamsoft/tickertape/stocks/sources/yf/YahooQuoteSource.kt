@@ -16,7 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks.sources.yf
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -27,7 +29,9 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
+import com.pyamsoft.tickertape.stocks.data.StockOptionsQuoteImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
+import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import javax.inject.Inject
@@ -54,37 +58,80 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .asSequence()
             .filterOnlyValidQuotes()
             .map { stock ->
-              StockQuoteImpl(
-                  symbol = stock.symbol.asSymbol(),
-                  company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
-                  dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
-                  dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
-                  dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
-                  dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
-                  dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
-                  dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
-                  regular =
-                      StockMarketSessionImpl(
-                          amount = requireNotNull(stock.regularMarketChange).asMoney(),
-                          direction = requireNotNull(stock.regularMarketChange).asDirection(),
-                          percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
-                          price = requireNotNull(stock.regularMarketPrice).asMoney(),
-                      ),
-                  afterHours =
-                      if (!hasAfterHoursData(stock)) null
-                      else {
-                        StockMarketSessionImpl(
-                            amount = requireNotNull(stock.postMarketChange).asMoney(),
-                            direction = requireNotNull(stock.postMarketChange).asDirection(),
-                            percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
-                            price = requireNotNull(stock.postMarketPrice).asMoney(),
-                        )
-                      })
+              if (stock.expireDate != null && stock.strike != null) {
+                createOptionsQuote(stock)
+              } else {
+                createQuote(stock)
+              }
             }
             .toList()
       }
 
   companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun createOptionsQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
+      return StockOptionsQuoteImpl(
+          symbol = stock.symbol.asSymbol(),
+          company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
+          strike = stock.strike.requireNotNull().asMoney(),
+          expireDate = timestampToTime(stock.expireDate.requireNotNull()),
+          dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
+          dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
+          dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
+          dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
+          dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
+          dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
+          regular =
+              StockMarketSessionImpl(
+                  amount = requireNotNull(stock.regularMarketChange).asMoney(),
+                  direction = requireNotNull(stock.regularMarketChange).asDirection(),
+                  percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
+                  price = requireNotNull(stock.regularMarketPrice).asMoney(),
+              ),
+          afterHours =
+              if (!hasAfterHoursData(stock)) null
+              else {
+                StockMarketSessionImpl(
+                    amount = requireNotNull(stock.postMarketChange).asMoney(),
+                    direction = requireNotNull(stock.postMarketChange).asDirection(),
+                    percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
+                    price = requireNotNull(stock.postMarketPrice).asMoney(),
+                )
+              })
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun createQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
+      return StockQuoteImpl(
+          symbol = stock.symbol.asSymbol(),
+          company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
+          dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
+          dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
+          dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
+          dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
+          dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
+          dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
+          regular =
+              StockMarketSessionImpl(
+                  amount = requireNotNull(stock.regularMarketChange).asMoney(),
+                  direction = requireNotNull(stock.regularMarketChange).asDirection(),
+                  percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
+                  price = requireNotNull(stock.regularMarketPrice).asMoney(),
+              ),
+          afterHours =
+              if (!hasAfterHoursData(stock)) null
+              else {
+                StockMarketSessionImpl(
+                    amount = requireNotNull(stock.postMarketChange).asMoney(),
+                    direction = requireNotNull(stock.postMarketChange).asDirection(),
+                    percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
+                    price = requireNotNull(stock.postMarketPrice).asMoney(),
+                )
+              })
+    }
 
     private val YF_QUOTE_FIELDS =
         listOf(

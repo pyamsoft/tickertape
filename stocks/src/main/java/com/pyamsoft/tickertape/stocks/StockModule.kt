@@ -32,7 +32,6 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooChartSource
-import com.pyamsoft.tickertape.stocks.sources.yf.YahooFinanceApi
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooOptionsSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooSearchSource
@@ -92,64 +91,34 @@ private class OkHttpClientLazyCallFactory(debug: Boolean) : Call.Factory {
 @Module
 abstract class StockModule {
 
-  // The actual quote source is YF
-  @Binds
-  @CheckResult
-  @InternalApi
-  internal abstract fun bindQuoteSource(impl: YahooFinanceSource): QuoteSource
-
-  // The actual options source is YF
-  @Binds
-  @CheckResult
-  @InternalApi
-  internal abstract fun bindOptionsSource(impl: YahooFinanceSource): OptionsSource
-
-  // The actual chart source is YF
-  @Binds
-  @CheckResult
-  @InternalApi
-  internal abstract fun bindChartSource(impl: YahooFinanceSource): ChartSource
-
-  // The actual top source is YF
-  @Binds
-  @CheckResult
-  @InternalApi
-  internal abstract fun bindTopSource(impl: YahooFinanceSource): TopSource
-
-  // The actual search source is YF
-  @Binds
-  @CheckResult
-  @InternalApi
-  internal abstract fun bindSearchSource(impl: YahooFinanceSource): SearchSource
-
   // The YFSource uses an internal YF quote source
   @Binds
   @CheckResult
-  @YahooFinanceApi
+  @InternalApi
   internal abstract fun bindYFQuoteSource(impl: YahooQuoteSource): QuoteSource
 
   // The YFSource uses an internal YF options source
   @Binds
   @CheckResult
-  @YahooFinanceApi
+  @InternalApi
   internal abstract fun bindYFOptionsSource(impl: YahooOptionsSource): OptionsSource
 
   // The YFSource uses an internal YF chart source
   @Binds
   @CheckResult
-  @YahooFinanceApi
+  @InternalApi
   internal abstract fun bindYFChartSource(impl: YahooChartSource): ChartSource
 
   // The YFSource uses an internal YF top source
   @Binds
   @CheckResult
-  @YahooFinanceApi
+  @InternalApi
   internal abstract fun bindYFTopSource(impl: YahooTopSource): TopSource
 
   // The YFSource uses an internal YF search source
   @Binds
   @CheckResult
-  @YahooFinanceApi
+  @InternalApi
   internal abstract fun bindYFSearchSource(impl: YahooSearchSource): SearchSource
 
   @Binds

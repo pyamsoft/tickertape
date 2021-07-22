@@ -46,3 +46,8 @@ interface DbHolding {
 fun DbHolding.isSellSide(): Boolean {
   return type() == HoldingType.Options.Sell
 }
+
+@CheckResult
+fun DbHolding.isOption(): Boolean {
+  return type() != HoldingType.Stock
+}

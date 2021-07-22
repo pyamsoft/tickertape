@@ -31,7 +31,7 @@
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toStartOf="@id/position_item_share_price_label"
-            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintHorizontal_weight="0.45"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,7 +43,7 @@
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toStartOf="@id/position_item_share_price"
-            app:layout_constraintHorizontal_weight="0.4"
+            app:layout_constraintHorizontal_weight="0.45"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/position_item_number_of_shares_label" />
 
@@ -57,7 +57,7 @@
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toStartOf="@id/position_item_total_label"
-            app:layout_constraintHorizontal_weight="0.8"
+            app:layout_constraintHorizontal_weight="0.7"
             app:layout_constraintStart_toEndOf="@id/position_item_number_of_shares_label"
             app:layout_constraintTop_toTopOf="@id/position_item_number_of_shares_label" />
 
@@ -70,7 +70,7 @@
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toStartOf="@id/position_item_total"
-            app:layout_constraintHorizontal_weight="0.8"
+            app:layout_constraintHorizontal_weight="0.7"
             app:layout_constraintStart_toEndOf="@id/position_item_number_of_shares"
             app:layout_constraintTop_toTopOf="@id/position_item_number_of_shares" />
 

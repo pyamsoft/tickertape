@@ -41,10 +41,11 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<PositionItemViewState.Position>) {
-    state.mapChanged { it.position }.apply {
-      mapChanged { it.shareCount() }.render(viewScope) { handleShareCountChanged(it) }
-      mapChanged { it.price() }.render(viewScope) { handleSharePriceChanged(it) }
-      mapChanged { it.purchaseDate() }.render(viewScope) { handlePurchaseDateChanged(it) }
+    state.mapChanged { it.isOption }.render(viewScope) { handleOptionChanged(it) }
+    state.mapChanged { it.positionSize }.render(viewScope) { handleShareCountChanged(it) }
+    state.mapChanged { it.positionCost }.render(viewScope) { handleSharePriceChanged(it) }
+    state.mapChanged { it.position }.mapChanged { it.purchaseDate() }.render(viewScope) {
+      handlePurchaseDateChanged(it)
     }
 
     state.mapChanged { it.total }.render(viewScope) { handleTotalChanged(it) }
@@ -52,6 +53,10 @@ class PositionItemView @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.gainLossDirection }.render(viewScope) {
       handleGainLossDirectionChanged(it)
     }
+  }
+
+  private fun handleOptionChanged(isOption: Boolean) {
+      binding.positionItemNumberOfSharesLabel.text = if (isOption) "Contracts" else "Shares"
   }
 
   private fun handlePurchaseDateChanged(date: LocalDateTime) {

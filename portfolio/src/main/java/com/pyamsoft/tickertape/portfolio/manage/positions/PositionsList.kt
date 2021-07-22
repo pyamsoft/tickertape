@@ -58,9 +58,9 @@ internal constructor(
     doOnInflate {
       binding.positionListList.layoutManager =
           LinearLayoutManager(binding.positionListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -141,6 +141,7 @@ internal constructor(
           when (it) {
             is PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Footer ->
                 PositionItemViewState.Footer(
+                    isOption = it.isOption,
                     totalShares = it.totalShares,
                     totalCost = it.totalCost,
                     averageCost = it.averageCost,

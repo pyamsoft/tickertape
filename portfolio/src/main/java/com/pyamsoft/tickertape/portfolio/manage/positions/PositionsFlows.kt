@@ -43,6 +43,7 @@ data class PositionsViewState(
 
         data class Footer
         internal constructor(
+            val isOption: Boolean,
             val totalShares: StockShareValue,
             val averageCost: StockMoneyValue,
             val totalCost: StockMoneyValue

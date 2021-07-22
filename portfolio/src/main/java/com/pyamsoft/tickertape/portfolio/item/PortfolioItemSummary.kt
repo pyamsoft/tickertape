@@ -38,6 +38,7 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
 
   override fun onRender(state: UiRender<PortfolioItemViewState>) {
     state.mapChanged { it.stock }.apply {
+      mapChanged { it.isOption }.render(viewScope) { handleOptionChanged(it) }
       mapChanged { it.totalShares }.render(viewScope) { handleTotalSharesChanged(it) }
       mapChanged { it.gainLossDisplayString }.render(viewScope) { handleGainLossChanged(it) }
       mapChanged { it.current }.render(viewScope) { handleCurrentValueChanged(it) }
@@ -45,6 +46,10 @@ class PortfolioItemSummary @Inject internal constructor(parent: ViewGroup) :
       mapChanged { it.totalDirection }.render(viewScope) { handleTotalDirectionChanged(it) }
       mapChanged { it.changeTodayDisplayString }.render(viewScope) { handleTodayChanged(it) }
     }
+  }
+
+  private fun handleOptionChanged(isOption: Boolean) {
+    binding.holdingSummaryTotalSharesLabel.text = if (isOption) "Contracts" else "Shares"
   }
 
   private fun handleTotalDirectionChanged(direction: StockDirection) {

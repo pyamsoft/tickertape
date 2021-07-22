@@ -23,6 +23,8 @@ import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.holding.isOption
+import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
@@ -89,6 +91,7 @@ internal constructor(
                         return@let s.copy(
                             positions =
                                 createPositionsList(
+                                    s.holding,
                                     if (existingPosition == null) {
                                       onlyPositions + pos
                                     } else {
@@ -115,6 +118,7 @@ internal constructor(
                         return@let s.copy(
                             positions =
                                 createPositionsList(
+                                    s.holding,
                                     if (existingPosition == null) {
                                       onlyPositions + pos
                                     } else {
@@ -142,7 +146,7 @@ internal constructor(
                           s.copy(
                               positions =
                                   createPositionsList(
-                                      onlyPositions.filterNot(positionMatchesCallback)))
+                                      s.holding, onlyPositions.filterNot(positionMatchesCallback)))
                         }
                       }))
     }
@@ -170,7 +174,7 @@ internal constructor(
                                 stock =
                                     PositionsViewState.CurrentPosition.PositionStock(
                                         holding = s.holding,
-                                        positions = createPositionsList(s.positions))),
+                                        positions = createPositionsList(s.holding, s.positions))),
                         isLoading = false)
                   }
                 }
@@ -210,12 +214,16 @@ internal constructor(
     @JvmStatic
     @CheckResult
     private fun createPositionsList(
+        holding: DbHolding,
         positions: List<DbPosition>
     ): List<PositionsViewState.CurrentPosition.PositionStock.MaybePosition> {
       if (positions.isEmpty()) {
         return emptyList()
       }
 
+      val isOption = holding.isOption()
+      val optionsModifier = if (isOption) 100 else 1
+      val sellSideModifier = if (holding.isSellSide()) -1 else 1
       val totalShares = positions.sumOf { it.shareCount().value() }
       val totalCost = positions.sumOf { it.price().value() * it.shareCount().value() }
 
@@ -224,11 +232,13 @@ internal constructor(
       } +
           listOf(
               PositionsViewState.CurrentPosition.PositionStock.MaybePosition.Footer(
-                  totalShares = totalShares.asShares(),
-                  totalCost = totalCost.asMoney(),
+                  isOption = isOption,
+                  totalShares = (totalShares * sellSideModifier).asShares(),
+                  totalCost = (totalCost * sellSideModifier * optionsModifier).asMoney(),
                   averageCost =
                       if (totalShares.compareTo(0) == 0) StockMoneyValue.none()
-                      else (totalCost / totalShares).asMoney()))
+                      else (totalCost / totalShares * sellSideModifier).asMoney(),
+              ))
     }
 
     @CheckResult

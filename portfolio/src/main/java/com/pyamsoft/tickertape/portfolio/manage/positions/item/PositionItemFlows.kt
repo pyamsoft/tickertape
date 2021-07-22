@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.item
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.holding.isOption
+import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -26,6 +28,7 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.asShares
 
 sealed class PositionItemViewState : UiViewState {
 
@@ -39,11 +42,17 @@ sealed class PositionItemViewState : UiViewState {
     val total: StockMoneyValue
     val gainLossDisplayString: String
     val gainLossDirection: StockDirection
+    val isOption = holding.isOption()
+    val positionCost: StockMoneyValue
+    val positionSize: StockShareValue
 
     init {
+      val optionsModifier = if (isOption) 100 else 1
+      val sellSideModifier = if (holding.isSellSide()) -1 else 1
+
       val numberOfShares = position.shareCount().value()
       val costNumber = position.price().value() * numberOfShares
-      total = costNumber.asMoney()
+      total = (costNumber * optionsModifier * sellSideModifier).asMoney()
 
       val price = currentSharePrice
       if (price == null) {
@@ -59,11 +68,18 @@ sealed class PositionItemViewState : UiViewState {
             "${sign}${gainLossNumber.asMoney().asMoneyValue()} (${sign}${gainLossPercent.asPercent().asPercentValue()})"
         gainLossDirection = direction
       }
+
+      positionCost =
+          (if (costNumber.compareTo(0) == 0) 0.0 else costNumber * sellSideModifier).asMoney()
+      positionSize =
+          (if (numberOfShares.compareTo(0) == 0) 0.0 else numberOfShares * sellSideModifier)
+              .asShares()
     }
   }
 
   data class Footer
   internal constructor(
+      val isOption: Boolean,
       val totalShares: StockShareValue,
       val averageCost: StockMoneyValue,
       val totalCost: StockMoneyValue

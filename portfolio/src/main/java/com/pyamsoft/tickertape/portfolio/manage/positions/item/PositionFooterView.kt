@@ -42,9 +42,14 @@ class PositionFooterView @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<PositionItemViewState.Footer>) {
+    state.mapChanged { it.isOption }.render(viewScope) { handleOptionChanged(it) }
     state.mapChanged { it.totalShares }.render(viewScope) { handleShareCountChanged(it) }
     state.mapChanged { it.totalCost }.render(viewScope) { handleTotalPriceChanged(it) }
     state.mapChanged { it.averageCost }.render(viewScope) { handleAverageChanged(it) }
+  }
+
+  private fun handleOptionChanged(isOption: Boolean) {
+    binding.positionFooterTotalSharesLabel.text = "Total ${if (isOption) "Contracts" else "Shares"}"
   }
 
   private fun handleAverageChanged(price: StockMoneyValue) {

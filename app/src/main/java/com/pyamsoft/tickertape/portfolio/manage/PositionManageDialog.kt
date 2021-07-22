@@ -79,13 +79,10 @@ internal class PositionManageDialog :
     return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
   }
 
-    @CheckResult
-    private fun getHoldingType(): HoldingType {
-            return requireArguments().getString(
-                KEY_HOLDING_TYPE,
-                ""
-            ).requireNotNull().fromHoldingString()
-    }
+  @CheckResult
+  private fun getHoldingType(): HoldingType {
+    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
+  }
 
   @CheckResult
   private fun getCurrentPrice(): StockMoneyValue? {
@@ -226,7 +223,7 @@ internal class PositionManageDialog :
 
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
-      private const val KEY_HOLDING_TYPE = "key_holding_type"
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
     const val TAG = "PositionManageDialog"
 
@@ -248,10 +245,10 @@ internal class PositionManageDialog :
       return PositionManageDialog().apply {
         arguments =
             Bundle().apply {
-                val holding = stock.holding
+              val holding = stock.holding
               putString(KEY_HOLDING_ID, holding.id().id)
               putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
-                putString(KEY_HOLDING_TYPE, holding.type().toHoldingString())
+              putString(KEY_HOLDING_TYPE, holding.type().toHoldingString())
               currentSharePrice?.also { putDouble(KEY_CURRENT_STOCK_PRICE, it.value()) }
             }
       }

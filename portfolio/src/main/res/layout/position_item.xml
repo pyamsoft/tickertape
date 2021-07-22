@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical|start"
-            android:text="Purchased On"
+            android:text="Purchased"
             android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toStartOf="@id/position_item_change"
@@ -139,7 +139,7 @@
             app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@id/position_item_date_label"
+            app:layout_constraintStart_toEndOf="@id/position_item_date"
             app:layout_constraintTop_toTopOf="@id/position_item_date_label" />
 
         <TextView

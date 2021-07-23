@@ -33,6 +33,7 @@ import timber.log.Timber
 abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
+    thisHoldingType: HoldingType,
     private val interactor: SymbolAddInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
@@ -40,7 +41,7 @@ protected constructor(
         SymbolAddViewState(
             query = "",
             searchResults = emptyList<SearchResult>().pack(),
-            type = DEFAULT_TYPE,
+            type = thisHoldingType,
         )) {
 
   private var searchJob: Job? = null
@@ -102,9 +103,12 @@ protected constructor(
   fun handleUpdateType() {
     val newType =
         when (state.type) {
-          is HoldingType.Stock -> HoldingType.Options.Buy
           is HoldingType.Options.Buy -> HoldingType.Options.Sell
-          is HoldingType.Options.Sell -> HoldingType.Stock
+          is HoldingType.Options.Sell -> HoldingType.Options.Buy
+            is HoldingType.Stock -> {
+                Timber.w("Cannot update type when type is Stock.")
+                return
+            }
         }
 
     setState(
@@ -116,7 +120,6 @@ protected constructor(
 
   companion object {
 
-    private val DEFAULT_TYPE = HoldingType.Stock
     private const val KEY_SYMBOL = "symbol"
   }
 }

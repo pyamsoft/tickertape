@@ -37,7 +37,7 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val interactor: WatchlistAddInteractor,
     addInteractor: SymbolAddInteractor,
-) : SymbolAddViewModel(savedState, addInteractor) {
+) : SymbolAddViewModel(savedState, HoldingType.Stock, addInteractor) {
 
   override fun handleCommitSymbol(symbol: String, type: HoldingType) {
     viewModelScope.launch(context = Dispatchers.Default) {

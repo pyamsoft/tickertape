@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
@@ -78,7 +79,12 @@ internal constructor(
 
   override fun CoroutineScope.onAddNewEvent() {
     Timber.d("Portfolio add new holding!")
-    publish(PortfolioControllerEvent.AddNewHolding)
+    publish(
+        PortfolioControllerEvent.AddNewHolding(
+            when (state.section) {
+              TabsSection.STOCKS -> HoldingType.Stock
+              TabsSection.OPTIONS -> HoldingType.Options.Buy
+            }))
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {

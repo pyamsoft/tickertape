@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -103,7 +102,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                           .map { stock ->
                             StockQuoteImpl(
                                 symbol = stock.symbol.asSymbol(),
-                                equityType = EquityType.valueOf(stock.quoteType.requireNotNull()),
+                                equityType = stock.quoteType.requireNotNull(),
                                 company =
                                     requireNotNull(stock.longName ?: stock.shortName).asCompany(),
                                 dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),

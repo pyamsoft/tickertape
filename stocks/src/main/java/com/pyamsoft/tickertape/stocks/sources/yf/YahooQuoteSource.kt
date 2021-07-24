@@ -75,7 +75,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
     private fun createOptionsQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
       return StockOptionsQuoteImpl(
           symbol = stock.symbol.asSymbol(),
-          equityType = EquityType.valueOf(stock.quoteType.requireNotNull()),
+          equityType = stock.quoteType.requireNotNull(),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           strike = stock.strike.requireNotNull().asMoney(),
           expireDate = timestampToTime(stock.expireDate.requireNotNull()),
@@ -109,7 +109,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
     private fun createQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
       return StockQuoteImpl(
           symbol = stock.symbol.asSymbol(),
-          equityType = EquityType.valueOf(stock.quoteType.requireNotNull()),
+          equityType = stock.quoteType.requireNotNull(),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),

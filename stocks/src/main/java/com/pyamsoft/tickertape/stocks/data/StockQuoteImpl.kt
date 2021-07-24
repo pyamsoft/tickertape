@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 internal data class StockQuoteImpl(
     private val symbol: StockSymbol,
     private val company: StockCompany,
-    private val equityType: EquityType,
+    private val equityType: String,
     private val regular: StockMarketSession,
     private val afterHours: StockMarketSession?,
     private val dataDelayBy: Long,
@@ -42,7 +42,7 @@ internal data class StockQuoteImpl(
     return symbol
   }
 
-  override fun type(): EquityType {
+  override fun type(): String {
     return equityType
   }
 

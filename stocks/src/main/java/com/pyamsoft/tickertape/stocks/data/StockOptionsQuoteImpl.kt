@@ -29,7 +29,7 @@ internal data class StockOptionsQuoteImpl(
     private val symbol: StockSymbol,
     private val company: StockCompany,
     private val strike: StockMoneyValue,
-    private val equityType: EquityType,
+    private val equityType: String,
     private val expireDate: LocalDateTime,
     private val regular: StockMarketSession,
     private val afterHours: StockMarketSession?,
@@ -45,7 +45,7 @@ internal data class StockOptionsQuoteImpl(
     return symbol
   }
 
-  override fun type(): EquityType {
+  override fun type(): String {
     return equityType
   }
 

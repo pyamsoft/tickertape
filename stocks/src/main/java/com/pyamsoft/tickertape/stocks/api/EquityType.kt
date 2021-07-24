@@ -16,10 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-enum class EquityType {
-  EQUITY,
-  ETF,
-  INDEX,
-  CRYPTOCURRENCY,
-  OPTION
+object EquityType {
+  const val OPTION = "OPTION"
 }

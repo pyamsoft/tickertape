@@ -24,7 +24,7 @@ interface StockQuote {
 
   @CheckResult fun company(): StockCompany
 
-  @CheckResult fun type(): EquityType
+  @CheckResult fun type(): String
 
   @CheckResult fun regular(): StockMarketSession
 

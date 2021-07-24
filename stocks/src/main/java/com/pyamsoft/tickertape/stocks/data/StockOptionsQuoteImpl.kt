@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -28,6 +29,7 @@ internal data class StockOptionsQuoteImpl(
     private val symbol: StockSymbol,
     private val company: StockCompany,
     private val strike: StockMoneyValue,
+    private val equityType: EquityType,
     private val expireDate: LocalDateTime,
     private val regular: StockMarketSession,
     private val afterHours: StockMarketSession?,
@@ -41,6 +43,10 @@ internal data class StockOptionsQuoteImpl(
 
   override fun symbol(): StockSymbol {
     return symbol
+  }
+
+  override fun type(): EquityType {
+    return equityType
   }
 
   override fun dataDelayBy(): Long {

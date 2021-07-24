@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -74,6 +75,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
     private fun createOptionsQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
       return StockOptionsQuoteImpl(
           symbol = stock.symbol.asSymbol(),
+          equityType = EquityType.valueOf(stock.equityType.requireNotNull()),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           strike = stock.strike.requireNotNull().asMoney(),
           expireDate = timestampToTime(stock.expireDate.requireNotNull()),
@@ -107,6 +109,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
     private fun createQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
       return StockQuoteImpl(
           symbol = stock.symbol.asSymbol(),
+          equityType = EquityType.valueOf(stock.equityType.requireNotNull()),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),

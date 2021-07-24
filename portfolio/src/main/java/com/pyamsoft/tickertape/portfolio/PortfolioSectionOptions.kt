@@ -21,8 +21,16 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSectionOptions
 import javax.inject.Inject
 
-class PortfolioSectionOptions @Inject internal constructor(parent: ViewGroup) :
-    UiSectionOptions<PortfolioViewState, PortfolioViewEvent>(parent) {
+class PortfolioSectionOptions
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    nestedList: PortfolioList,
+) : UiSectionOptions<PortfolioViewState, PortfolioViewEvent>(parent) {
+
+  init {
+    nest(nestedList)
+  }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
     state.mapChanged { it.section }.render(viewScope) { handleSection(it) }

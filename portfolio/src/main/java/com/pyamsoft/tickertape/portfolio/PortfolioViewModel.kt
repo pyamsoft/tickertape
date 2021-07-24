@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
+import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
@@ -39,7 +40,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class PortfolioViewModel
@@ -221,23 +221,29 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
   }
 
-  private suspend fun fetchPortfolio(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              portfolioFetcher
-                  .call(force)
-                  .onSuccess {
-                    setState { copy(portfolio = PortfolioStockList(it).pack(), isLoading = false) }
+  private fun CoroutineScope.fetchPortfolio(force: Boolean) {
+    val currentSection = state.section
+    setState(
+        stateChange = { copy(isLoading = true) },
+        andThen = {
+          portfolioFetcher
+              .call(force)
+              .map { list ->
+                list.filter { ps ->
+                  when (currentSection) {
+                    TabsSection.STOCKS -> ps.holding.type() == HoldingType.Stock
+                    TabsSection.OPTIONS -> ps.holding.isOption()
                   }
-                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(portfolio = it.packError(), isLoading = false) } }
-
-              // After the quotes are fetched, start the tape
-              tapeLauncher.start()
-            })
-      }
+                }
+              }
+              .onSuccess {
+                setState { copy(portfolio = PortfolioStockList(it).pack(), isLoading = false) }
+              }
+              .onFailure { Timber.e(it, "Failed to fetch quotes") }
+              .onFailure { setState { copy(portfolio = it.packError(), isLoading = false) } }
+              .onSuccess { tapeLauncher.start() }
+        })
+  }
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -269,11 +275,13 @@ internal constructor(
   }
 
   override fun handleShowStocks() {
-    setState { copy(section = TabsSection.STOCKS) }
+    setState(
+        stateChange = { copy(section = TabsSection.STOCKS) }, andThen = { fetchPortfolio(false) })
   }
 
   override fun handleShowOptions() {
-    setState { copy(section = TabsSection.OPTIONS) }
+    setState(
+        stateChange = { copy(section = TabsSection.OPTIONS) }, andThen = { fetchPortfolio(false) })
   }
 
   companion object {

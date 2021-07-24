@@ -30,6 +30,7 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
         val symbol: String,
         val longName: String?,
         val shortName: String?,
+        val equityType: String?,
         val exchangeDataDelayedBy: Long?,
         // Options
         val strike: Double?,

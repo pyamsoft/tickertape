@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
@@ -36,7 +37,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class WatchlistViewModel
@@ -112,27 +112,32 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchQuotes(force) }
   }
 
-  private suspend fun fetchQuotes(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoading = true) },
-            andThen = {
-              quoteFetcher
-                  .call(force)
-                  .onSuccess {
-                    setState {
-                      copy(
-                          watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(),
-                          isLoading = false)
-                    }
+  private fun CoroutineScope.fetchQuotes(force: Boolean) {
+    val currentSection = state.section
+    setState(
+        stateChange = { copy(isLoading = true) },
+        andThen = {
+          quoteFetcher
+              .call(force)
+              .map { list ->
+                list.filter { qs ->
+                  val quote = qs.quote ?: return@filter false
+                  return@filter when (currentSection) {
+                    TabsSection.STOCKS -> quote.type() != EquityType.OPTIONS
+                    TabsSection.OPTIONS -> quote.type() == EquityType.OPTIONS
                   }
-                  .onFailure { Timber.e(it, "Failed to fetch quotes") }
-                  .onFailure { setState { copy(watchlist = it.packError(), isLoading = false) } }
-            })
-
-        // After the quotes are fetched, start the tape
-        tapeLauncher.start()
-      }
+                }
+              }
+              .onSuccess {
+                setState {
+                  copy(watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(), isLoading = false)
+                }
+              }
+              .onFailure { Timber.e(it, "Failed to fetch quotes") }
+              .onFailure { setState { copy(watchlist = it.packError(), isLoading = false) } }
+              .onSuccess { tapeLauncher.start() }
+        })
+  }
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -164,11 +169,12 @@ internal constructor(
   }
 
   override fun handleShowStocks() {
-    setState { copy(section = TabsSection.STOCKS) }
+    setState(stateChange = { copy(section = TabsSection.STOCKS) }, andThen = { fetchQuotes(false) })
   }
 
   override fun handleShowOptions() {
-    setState { copy(section = TabsSection.OPTIONS) }
+    setState(
+        stateChange = { copy(section = TabsSection.OPTIONS) }, andThen = { fetchQuotes(false) })
   }
 
   companion object {

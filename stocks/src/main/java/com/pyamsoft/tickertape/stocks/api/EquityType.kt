@@ -16,29 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-import androidx.annotation.CheckResult
-
-interface StockQuote {
-
-  @CheckResult fun symbol(): StockSymbol
-
-  @CheckResult fun company(): StockCompany
-
-  @CheckResult fun type(): EquityType
-
-  @CheckResult fun regular(): StockMarketSession
-
-  @CheckResult fun afterHours(): StockMarketSession?
-
-  @CheckResult fun dataDelayBy(): Long
-
-  @CheckResult fun dayPreviousClose(): StockMoneyValue?
-
-  @CheckResult fun dayOpen(): StockMoneyValue
-
-  @CheckResult fun dayHigh(): StockMoneyValue
-
-  @CheckResult fun dayLow(): StockMoneyValue
-
-  @CheckResult fun dayVolume(): StockVolumeValue
+enum class EquityType(val apiName: String) {
+  STOCK("EQUITY"),
+  OPTIONS("OPTIONS")
 }

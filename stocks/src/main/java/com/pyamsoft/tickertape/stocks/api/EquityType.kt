@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-enum class EquityType(val apiName: String) {
-  STOCK("EQUITY"),
-  OPTIONS("OPTIONS")
+enum class EquityType {
+  EQUITY,
+  OPTIONS
 }

@@ -123,8 +123,8 @@ internal constructor(
                 list.filter { qs ->
                   val quote = qs.quote ?: return@filter false
                   return@filter when (currentSection) {
-                    TabsSection.STOCKS -> quote.type() != EquityType.OPTIONS
-                    TabsSection.OPTIONS -> quote.type() == EquityType.OPTIONS
+                    TabsSection.STOCKS -> quote.type() != EquityType.OPTION
+                    TabsSection.OPTIONS -> quote.type() == EquityType.OPTION
                   }
                 }
               }

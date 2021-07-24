@@ -18,5 +18,8 @@ package com.pyamsoft.tickertape.stocks.api
 
 enum class EquityType {
   EQUITY,
-  OPTIONS
+  ETF,
+  INDEX,
+  CRYPTOCURRENCY,
+  OPTION
 }

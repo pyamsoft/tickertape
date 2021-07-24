@@ -22,10 +22,16 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSectionOptions
 import javax.inject.Inject
 
-class WatchlistSectionOptions @Inject internal constructor(parent: ViewGroup) :
-    UiSectionOptions<WatchListViewState, WatchListViewEvent>(parent) {
+class WatchlistSectionOptions
+@Inject
+internal constructor(
+    parent: ViewGroup,
+    nestedWatchlist: WatchlistList,
+) : UiSectionOptions<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
+    nest(nestedWatchlist)
+
     // For some reason the match_parent height does not make this list fill content
     // Grab the size of the activity parent and use it as our height
     doOnInflate { parent.post { layoutRoot.updateLayoutParams { this.height = parent.height } } }

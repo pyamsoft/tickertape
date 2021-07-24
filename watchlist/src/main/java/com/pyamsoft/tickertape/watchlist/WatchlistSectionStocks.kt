@@ -21,12 +21,13 @@ import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSectionStocks
 import javax.inject.Inject
-import timber.log.Timber
 
 class WatchlistSectionStocks
 @Inject
-internal constructor(parent: ViewGroup, nestedWatchlist: WatchlistList) :
-    UiSectionStocks<WatchListViewState, WatchListViewEvent>(parent) {
+internal constructor(
+    parent: ViewGroup,
+    nestedWatchlist: WatchlistList,
+) : UiSectionStocks<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
     nest(nestedWatchlist)

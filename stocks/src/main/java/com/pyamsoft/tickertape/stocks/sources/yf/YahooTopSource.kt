@@ -103,7 +103,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                           .map { stock ->
                             StockQuoteImpl(
                                 symbol = stock.symbol.asSymbol(),
-                                equityType = EquityType.valueOf(stock.equityType.requireNotNull()),
+                                equityType = EquityType.valueOf(stock.quoteType.requireNotNull()),
                                 company =
                                     requireNotNull(stock.longName ?: stock.shortName).asCompany(),
                                 dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),

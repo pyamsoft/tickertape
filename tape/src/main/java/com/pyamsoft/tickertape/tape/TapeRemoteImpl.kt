@@ -20,11 +20,14 @@ import android.app.Service
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -50,10 +53,18 @@ internal constructor(
   }
 
   @CheckResult
-  private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> {
+  private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
     return try {
       interactor
           .getWatchlistQuotes(force)
+          .map { quotes ->
+            quotes
+                .asSequence()
+                .filterNot { it.quote == null }
+                .map { it.quote.requireNotNull() }
+                .filter { it.type() !== EquityType.OPTION }
+                .toList()
+          }
           .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
           .recover { emptyList() }
     } catch (e: Throwable) {

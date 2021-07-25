@@ -47,7 +47,6 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
         return@withContext result
             .quotes
             .asSequence()
-            .filterOnlyValidResults()
             .map { quote ->
               val company = requireNotNull(quote.longname ?: quote.shortname).asCompany()
               return@map SearchResultImpl(

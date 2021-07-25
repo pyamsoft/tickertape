@@ -36,7 +36,6 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
-import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
@@ -124,15 +123,10 @@ internal constructor(
   private fun updateTickerInfo(
       remoteViews: RemoteViews,
       index: Int,
-      quotes: List<QuotedStock>,
+      quotes: List<StockQuote>,
       remoteViewIdGroup: RemoteViewIds
   ) {
-    val quote = quotes[index].quote
-    if (quote == null) {
-      Timber.w("Missing quote for index $index $quotes")
-      return
-    }
-
+    val quote = quotes[index]
     val session = getQuoteSession(quote)
     val percent = session.percent().asPercentValue()
     val changeAmount = session.amount().asMoneyValue()
@@ -156,7 +150,7 @@ internal constructor(
 
   private fun updateTickers(
       remoteViews: RemoteViews,
-      quotes: List<QuotedStock>,
+      quotes: List<StockQuote>,
       index: Int,
       pageSize: Int
   ) {
@@ -196,7 +190,7 @@ internal constructor(
   @CheckResult
   private fun hydrateNotification(
       channelInfo: NotifyChannelInfo,
-      quotes: List<QuotedStock>,
+      quotes: List<StockQuote>,
       index: Int
   ): Notification {
     guaranteeNotificationChannelExists(channelInfo)

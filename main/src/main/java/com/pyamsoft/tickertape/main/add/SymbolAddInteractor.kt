@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
@@ -43,20 +42,7 @@ class SymbolAddInteractor @Inject internal constructor(private val interactor: S
 
         val result =
             try {
-              val results =
-                  interactor.search(force, query).let { list ->
-                    if (filterByType != null) {
-                      return@let list.filter {
-                        when (filterByType) {
-                          is HoldingType.Stock -> it.type() != EquityType.OPTION
-                          is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
-                              it.type() == EquityType.OPTION
-                        }
-                      }
-                    } else {
-                      return@let list
-                    }
-                  }
+              val results = interactor.search(force, query)
               ResultWrapper.success(results)
             } catch (e: Throwable) {
               Timber.e(e, "Failed to search for '$query'")

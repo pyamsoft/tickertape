@@ -92,14 +92,6 @@ internal fun Sequence<NetworkTrendingResponse.Resp.Trending.Quote>.filterOnlyVal
 }
 
 @CheckResult
-internal fun Sequence<NetworkSearchResponse.Quote>.filterOnlyValidResults():
-    Sequence<NetworkSearchResponse.Quote> {
-  return this.filter {
-    it.quoteType == "EQUITY" || it.quoteType == "OPTION" || it.quoteType == "ETF"
-  }
-}
-
-@CheckResult
 internal fun Sequence<NetworkQuoteResponse.Resp.Quote>.filterOnlyValidQuotes():
     Sequence<NetworkQuoteResponse.Resp.Quote> {
   // If the symbol does not exist, these values will return null

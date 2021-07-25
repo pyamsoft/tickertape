@@ -59,19 +59,19 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<HomeViewState>) {
-    state.mapChanged { it.trending }.render(viewScope) { handleMostShortedChanged(it) }
+    state.mapChanged { it.mostShorted }.render(viewScope) { handleMostShortedChanged(it) }
   }
 
-  private fun handleMostShortedChanged(trending: PackedData<List<TopDataWithChart>>) {
-    return when (trending) {
+  private fun handleMostShortedChanged(mostShorted: PackedData<List<TopDataWithChart>>) {
+    return when (mostShorted) {
       is PackedData.Data -> {
         val list =
-            trending.value.map {
+            mostShorted.value.map {
               QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart)
             }
         handleList(list)
       }
-      is PackedData.Error -> handleError(trending.throwable)
+      is PackedData.Error -> handleError(mostShorted.throwable)
     }
   }
 }

@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -79,13 +80,12 @@ internal constructor(
     val totalGainLossNumber = tempTodayNumber - cost
     val isNoTotalChange = totalGainLossNumber.isZero()
     val isNoTodayChange = tempTodayChange.isZero()
-    val totalGainLossPercentNumber = if (isNoTotalChange) 0.0 else totalGainLossNumber / cost * 100
-    val totalGainLossPercent = totalGainLossPercentNumber.asPercent()
 
     todayChangeNumber = tempTodayChange * optionsModifier
     todayNumber = tempTodayNumber * optionsModifier
 
     val totalGainLoss: StockMoneyValue
+    val totalGainLossPercent: StockPercent
     if (isNoPosition) {
       current = StockMoneyValue.none()
       costNumber = 0.0
@@ -93,6 +93,7 @@ internal constructor(
       totalDirection = StockDirection.none()
       todayDirection = StockDirection.none()
       totalGainLoss = StockMoneyValue.none()
+      totalGainLossPercent = StockPercent.none()
     } else {
       totalGainLoss =
           if (isNoTotalChange) StockMoneyValue.none()
@@ -106,6 +107,10 @@ internal constructor(
       current = (tempTodayNumber * sellSideModifier * optionsModifier).asMoney()
       costNumber = cost
       totalShares = (totalSharesNumber * sellSideModifier).asShares()
+
+      val totalGainLossPercentNumber =
+          if (isNoTotalChange) 0.0 else totalGainLossNumber / cost * 100
+      totalGainLossPercent = (totalGainLossPercentNumber * sellSideModifier).asPercent()
     }
 
     val sign = totalDirection.sign()

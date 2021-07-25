@@ -24,7 +24,7 @@ internal data class SearchResultImpl(
     private val symbol: StockSymbol,
     private val name: StockCompany,
     private val score: Long,
-    private val type: SearchResult.Type,
+    private val type: String,
 ) : SearchResult {
 
   override fun symbol(): StockSymbol {
@@ -39,7 +39,7 @@ internal data class SearchResultImpl(
     return score
   }
 
-  override fun type(): SearchResult.Type {
+  override fun type(): String {
     return type
   }
 }

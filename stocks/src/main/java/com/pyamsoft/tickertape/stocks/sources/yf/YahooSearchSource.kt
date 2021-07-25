@@ -54,14 +54,8 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
                   symbol = quote.symbol.asSymbol(),
                   name = company,
                   score = quote.score,
-                  type =
-                      when (quote.quoteType) {
-                        "EQUITY", "ETF" -> SearchResult.Type.STOCK
-                        "OPTION" -> SearchResult.Type.OPTION
-                        else ->
-                            throw IllegalArgumentException(
-                                "Invalid SearchResult.Type: ${quote.quoteType}")
-                      })
+                  type = quote.quoteType,
+              )
             }
             .toList()
       }

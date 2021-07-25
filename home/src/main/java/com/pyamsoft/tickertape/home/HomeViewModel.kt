@@ -37,6 +37,7 @@ import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,7 +68,10 @@ internal constructor(
                 isLoadingLosers = false,
                 trending = emptyList<TopDataWithChart>().pack(),
                 isLoadingTrending = false,
-                bottomOffset = 0)) {
+                mostShorted = emptyList<TopDataWithChart>().pack(),
+                isLoadingMostShorted = false,
+                bottomOffset = 0,
+            )) {
 
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> {
@@ -99,6 +103,11 @@ internal constructor(
   private val losersFetcher =
       highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
         interactor.getDayLosers(it, WATCHLIST_COUNT)
+      }
+
+  private val shortedFetcher =
+      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
+        interactor.getMostShorted(it, WATCHLIST_COUNT)
       }
 
   private val trendingFetcher =
@@ -148,63 +157,69 @@ internal constructor(
             })
       }
 
-  private suspend fun fetchIndexes(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingIndexes = true) },
-            andThen = {
-              indexesFetcher
-                  .call(force)
-                  .onSuccess { setState { copy(indexes = it.pack(), isLoadingIndexes = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch indexes") }
-                  .onFailure {
-                    setState { copy(indexes = it.packError(), isLoadingIndexes = false) }
-                  }
-            })
-      }
+  private fun CoroutineScope.fetchIndexes(force: Boolean) {
+    setState(
+        stateChange = { copy(isLoadingIndexes = true) },
+        andThen = {
+          indexesFetcher
+              .call(force)
+              .onSuccess { setState { copy(indexes = it.pack(), isLoadingIndexes = false) } }
+              .onFailure { Timber.e(it, "Failed to fetch indexes") }
+              .onFailure { setState { copy(indexes = it.packError(), isLoadingIndexes = false) } }
+        })
+  }
 
-  private suspend fun fetchGainers(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingGainers = true) },
-            andThen = {
-              gainersFetcher
-                  .call(force)
-                  .onSuccess { setState { copy(gainers = it.pack(), isLoadingGainers = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch gainers") }
-                  .onFailure {
-                    setState { copy(gainers = it.packError(), isLoadingGainers = false) }
-                  }
-            })
-      }
+  private fun CoroutineScope.fetchGainers(force: Boolean) {
+    setState(
+        stateChange = { copy(isLoadingGainers = true) },
+        andThen = {
+          gainersFetcher
+              .call(force)
+              .onSuccess { setState { copy(gainers = it.pack(), isLoadingGainers = false) } }
+              .onFailure { Timber.e(it, "Failed to fetch gainers") }
+              .onFailure { setState { copy(gainers = it.packError(), isLoadingGainers = false) } }
+        })
+  }
 
-  private suspend fun fetchLosers(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingLosers = true) },
-            andThen = {
-              losersFetcher
-                  .call(force)
-                  .onSuccess { setState { copy(losers = it.pack(), isLoadingLosers = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch losers") }
-                  .onFailure { setState { copy(losers = it.packError(), isLoadingLosers = false) } }
-            })
-      }
+  private fun CoroutineScope.fetchLosers(force: Boolean) {
+    setState(
+        stateChange = { copy(isLoadingLosers = true) },
+        andThen = {
+          losersFetcher
+              .call(force)
+              .onSuccess { setState { copy(losers = it.pack(), isLoadingLosers = false) } }
+              .onFailure { Timber.e(it, "Failed to fetch losers") }
+              .onFailure { setState { copy(losers = it.packError(), isLoadingLosers = false) } }
+        })
+  }
 
-  private suspend fun fetchTrending(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingTrending = true) },
-            andThen = {
-              trendingFetcher
-                  .call(force)
-                  .onSuccess { setState { copy(trending = it.pack(), isLoadingTrending = false) } }
-                  .onFailure { Timber.e(it, "Failed to fetch trending") }
-                  .onFailure {
-                    setState { copy(trending = it.packError(), isLoadingTrending = false) }
-                  }
-            })
-      }
+  private fun CoroutineScope.fetchMostShorted(force: Boolean) {
+    setState(
+        stateChange = { copy(isLoadingMostShorted = true) },
+        andThen = {
+          shortedFetcher
+              .call(force)
+              .onSuccess {
+                setState { copy(mostShorted = it.pack(), isLoadingMostShorted = false) }
+              }
+              .onFailure { Timber.e(it, "Failed to fetch most shorted") }
+              .onFailure {
+                setState { copy(mostShorted = it.packError(), isLoadingMostShorted = false) }
+              }
+        })
+  }
+
+  private fun CoroutineScope.fetchTrending(force: Boolean) {
+    setState(
+        stateChange = { copy(isLoadingTrending = true) },
+        andThen = {
+          trendingFetcher
+              .call(force)
+              .onSuccess { setState { copy(trending = it.pack(), isLoadingTrending = false) } }
+              .onFailure { Timber.e(it, "Failed to fetch trending") }
+              .onFailure { setState { copy(trending = it.packError(), isLoadingTrending = false) } }
+        })
+  }
 
   fun handleFetchPortfolio(force: Boolean) {
     viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
@@ -230,6 +245,10 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) { fetchTrending(force) }
   }
 
+  fun handleFetchMostShorted(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) { fetchMostShorted(force) }
+  }
+
   fun handleOpenPage(page: MainPage) {
     viewModelScope.launch(context = Dispatchers.Default) { mainPageBus.send(page) }
   }
@@ -249,8 +268,8 @@ internal constructor(
 
   companion object {
 
-    private const val TRENDING_COUNT = 10
-    private const val WATCHLIST_COUNT = 5
+    private const val TRENDING_COUNT = 20
+    private const val WATCHLIST_COUNT = 10
     private val INDEXES = listOf("^GSPC", "^DJI", "^IXIC", "^RUT").map { it.asSymbol() }
   }
 }

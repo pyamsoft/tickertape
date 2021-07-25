@@ -31,6 +31,7 @@ internal constructor(
     nestedTrending: HomeTrendingList,
     nestedGainers: HomeGainerList,
     nestedLosers: HomeLoserList,
+    nestedMostShorted: HomeMostShortedList,
     nestedBottomSpacer: HomeBottomSpacer
 ) : UiScrollingContainer<HomeViewState, HomeViewEvent>(parent) {
 
@@ -43,6 +44,7 @@ internal constructor(
         nestedTrending,
         nestedGainers,
         nestedLosers,
+        nestedMostShorted,
         nestedBottomSpacer,
     )
   }

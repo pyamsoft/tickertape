@@ -26,5 +26,7 @@ interface TopSource {
 
   @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): StockTops
 
+  @CheckResult suspend fun getMostShorted(force: Boolean, count: Int): StockTops
+
   @CheckResult suspend fun getTrending(force: Boolean, count: Int): StockTrends
 }

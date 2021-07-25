@@ -75,6 +75,10 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
     return getTops(TopType.LOSERS, count)
   }
 
+  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops {
+    return getTops(TopType.SHORTED, count)
+  }
+
   @CheckResult
   private suspend fun getTops(type: TopType, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
@@ -84,6 +88,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
             when (type) {
               TopType.GAINERS -> service.getDayGainers(count)
               TopType.LOSERS -> service.getDayLosers(count)
+              TopType.SHORTED -> service.getMostShorted(count)
             }
         return@withContext result
             .finance
@@ -143,6 +148,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
 
   private enum class TopType {
     GAINERS,
-    LOSERS
+    LOSERS,
+    SHORTED
   }
 }

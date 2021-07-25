@@ -38,6 +38,8 @@ internal constructor(
     val isLoadingLosers: Boolean,
     val trending: PackedData<List<TopDataWithChart>>,
     val isLoadingTrending: Boolean,
+    val mostShorted: PackedData<List<TopDataWithChart>>,
+    val isLoadingMostShorted: Boolean,
     val bottomOffset: Int,
 ) : UiViewState {
 

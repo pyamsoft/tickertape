@@ -103,12 +103,15 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   override fun onStart() {
     super.onStart()
-    viewModel.handleFetchIndexes(false)
-    viewModel.handleFetchPortfolio(false)
-    viewModel.handleFetchWatchlist(false)
-    viewModel.handleFetchGainers(false)
-    viewModel.handleFetchLosers(false)
-    viewModel.handleFetchTrending(false)
+    viewModel.apply {
+      handleFetchIndexes(false)
+      handleFetchPortfolio(false)
+      handleFetchWatchlist(false)
+      handleFetchGainers(false)
+      handleFetchLosers(false)
+      handleFetchTrending(false)
+      handleFetchMostShorted(false)
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

@@ -90,6 +90,12 @@ internal constructor(
         return@withContext topSource.getDayLosers(force, count)
       }
 
+  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext topSource.getMostShorted(force, count)
+      }
+
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()

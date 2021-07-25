@@ -85,6 +85,20 @@ internal constructor(private val interactor: StockInteractor) {
       }
 
   @CheckResult
+  suspend fun getMostShorted(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext try {
+          val top = interactor.getMostShorted(force, count)
+          pairWithChart(force, top.quotes())
+        } catch (e: Throwable) {
+          Timber.e(e, "Error getting most shorted")
+          ResultWrapper.failure(e)
+        }
+      }
+
+  @CheckResult
   suspend fun getDayTrending(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()

@@ -62,6 +62,11 @@ internal constructor(
         interactor.getDayLosers(true, it)
       }
 
+  private val shortedCache =
+      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
+        interactor.getMostShorted(true, it)
+      }
+
   private val searchCache =
       multiCachify<String, List<SearchResult>, String>(
           storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
@@ -111,6 +116,17 @@ internal constructor(
         }
 
         return@withContext loserCache.call(count)
+      }
+
+  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          shortedCache.clear()
+        }
+
+        return@withContext shortedCache.call(count)
       }
 
   override suspend fun getOptions(

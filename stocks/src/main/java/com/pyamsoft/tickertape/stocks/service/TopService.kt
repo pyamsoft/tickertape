@@ -35,6 +35,11 @@ internal interface TopService {
   suspend fun getDayLosers(@Query("count") count: Int): NetworkTopResponse
 
   @CheckResult
+  @GET(
+    "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=most_shorted_stocks")
+  suspend fun getMostShorted(@Query("count") count: Int): NetworkTopResponse
+
+  @CheckResult
   @GET("https://query1.finance.yahoo.com/v1/finance/trending/US")
   suspend fun getTrending(@Query("count") count: Int): NetworkTrendingResponse
 }

@@ -21,11 +21,10 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.ui.PackedData
-import com.pyamsoft.tickertape.ui.TabsSection
 
 // Public constructor, used in home module
 data class WatchListViewState(
-    val section: TabsSection,
+    val section: WatchlistTabSection,
     val isLoading: Boolean,
     val watchlist: PackedData<List<QuotedStock>>,
     val bottomOffset: Int,
@@ -42,6 +41,8 @@ sealed class WatchListViewEvent : UiViewEvent {
   object ShowStocks : WatchListViewEvent()
 
   object ShowOptions : WatchListViewEvent()
+
+  object ShowCrypto : WatchListViewEvent()
 }
 
 sealed class WatchListControllerEvent : UiControllerEvent {

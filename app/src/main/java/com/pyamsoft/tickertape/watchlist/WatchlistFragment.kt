@@ -94,6 +94,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             is WatchListViewEvent.Select -> viewModel.handleDigSymbol(it.index)
             is WatchListViewEvent.ShowOptions -> viewModel.handleShowOptions()
             is WatchListViewEvent.ShowStocks -> viewModel.handleShowStocks()
+            is WatchListViewEvent.ShowCrypto -> viewModel.handleShowCrypto()
           }
         }
 

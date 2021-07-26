@@ -34,6 +34,8 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
-    state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
+    state.mapChanged { it.section }.render(viewScope) {
+      handleSection(it == PortfolioTabSection.STOCK)
+    }
   }
 }

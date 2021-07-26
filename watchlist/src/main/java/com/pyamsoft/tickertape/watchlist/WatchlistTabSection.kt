@@ -14,27 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.converter
+package com.pyamsoft.tickertape.watchlist
 
-import androidx.annotation.CheckResult
-import androidx.room.TypeConverter
-import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.fromHoldingString
-import com.pyamsoft.tickertape.stocks.api.toHoldingString
-
-internal object HoldingTypeConverter {
-
-  @JvmStatic
-  @TypeConverter
-  @CheckResult
-  fun toType(type: String): HoldingType {
-    return type.fromHoldingString()
-  }
-
-  @JvmStatic
-  @TypeConverter
-  @CheckResult
-  fun fromType(type: HoldingType): String {
-    return type.toHoldingString()
-  }
+enum class WatchlistTabSection(val display: String) {
+  STOCK("Stocks"),
+  OPTION("Options"),
+  CRYPTO("Cryptocurrency")
 }

@@ -33,7 +33,6 @@ import timber.log.Timber
 abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
-    thisHoldingType: HoldingType,
     private val interactor: SymbolAddInteractor,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
@@ -41,7 +40,7 @@ protected constructor(
         SymbolAddViewState(
             query = "",
             searchResults = emptyList<SearchResult>().pack(),
-            type = thisHoldingType,
+            type = HoldingType.Stock
         )) {
 
   private var searchJob: Job? = null
@@ -105,10 +104,10 @@ protected constructor(
         when (state.type) {
           is HoldingType.Options.Buy -> HoldingType.Options.Sell
           is HoldingType.Options.Sell -> HoldingType.Options.Buy
-            is HoldingType.Stock -> {
-                Timber.w("Cannot update type when type is Stock.")
-                return
-            }
+          is HoldingType.Stock, HoldingType.Crypto -> {
+            Timber.w("Cannot update type when type is not Options.")
+            return
+          }
         }
 
     setState(

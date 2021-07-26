@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.ui
+package com.pyamsoft.tickertape.portfolio
 
-enum class TabsSection(val display: String) {
-  STOCKS("Stocks"),
-  OPTIONS("Options")
+enum class PortfolioTabSection(val display: String) {
+  STOCK("Stocks"),
+  OPTION("Options"),
+  CRYPTO("Cryptocurrency")
 }

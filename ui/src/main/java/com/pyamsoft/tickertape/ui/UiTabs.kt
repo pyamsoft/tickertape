@@ -22,11 +22,12 @@ import com.google.android.material.tabs.TabLayout
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.tickertape.ui.databinding.UiTabsBinding
 import timber.log.Timber
 
-abstract class UiTabs<S : UiViewState, V : UiViewEvent>
+abstract class UiTabs<S : UiViewState, V : UiViewEvent, E : Enum<*>>
 protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
 
   private var _bindingRoot: TabLayout? = null
@@ -60,24 +61,12 @@ protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
     tabs.removeAllTabs()
   }
 
-  private fun addTabs(tabs: TabLayout) {
-    tabs.apply {
-      for (e in TabsSection.values()) {
-        addTab(newTab().setText(e.display).setTag(e))
-      }
-    }
-  }
-
   private fun attachListener(tabs: TabLayout) {
     val listener =
         object : TabLayout.OnTabSelectedListener {
 
           override fun onTabSelected(tab: TabLayout.Tab) {
-            val section = getTabSection(tab) ?: return
-            return when (section) {
-              TabsSection.STOCKS -> handleStocksTabSelected()
-              TabsSection.OPTIONS -> handleOptionsTabSelected()
-            }
+            handleTabSelected(tab)
           }
 
           override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -91,7 +80,7 @@ protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
     }
   }
 
-  protected fun handleSection(section: TabsSection) {
+  protected fun handleSection(section: E) {
     val tabs = layoutRoot
     for (i in 0 until tabs.tabCount) {
       val tab = tabs.getTabAt(i)
@@ -100,7 +89,7 @@ protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
         continue
       }
 
-      val tag = getTabSection(tab)
+      val tag = getTabSection(tab, section::class.java)
       if (tag == section) {
         tabs.selectTab(tab, true)
         break
@@ -108,27 +97,27 @@ protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
     }
   }
 
-  protected abstract fun handleStocksTabSelected()
+  protected abstract fun addTabs(tabs: TabLayout)
 
-  protected abstract fun handleOptionsTabSelected()
+  protected abstract fun handleTabSelected(tab: TabLayout.Tab)
 
   companion object {
 
     @JvmStatic
     @CheckResult
-    private fun getTabSection(tab: TabLayout.Tab): TabsSection? {
+    protected fun <E : Enum<*>> getTabSection(tab: TabLayout.Tab, clazz: Class<E>): E? {
       val tag = tab.tag
       if (tag == null) {
         Timber.w("No tag found on tab: $tab")
         return null
       }
 
-      if (tag !is TabsSection) {
-        Timber.w("Tag is not PortfolioSection model: $tag")
+      if (tag::class.java !== clazz) {
+        Timber.w("Tag is not ${clazz.simpleName} model: $tag")
         return null
       }
 
-      return tag
+      return clazz.cast(tag).requireNotNull()
     }
   }
 }

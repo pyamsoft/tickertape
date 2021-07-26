@@ -25,9 +25,9 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
-import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
 import com.pyamsoft.tickertape.watchlist.WatchListViewState
+import com.pyamsoft.tickertape.watchlist.WatchlistTabSection
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import io.cabriole.decorator.DecorationLookup
 import io.cabriole.decorator.LinearMarginDecoration
@@ -119,7 +119,7 @@ internal constructor(
                 isLoading = state.isLoading,
                 watchlist = state.data,
                 // Assume Stocks
-                section = TabsSection.STOCKS,
+                section = WatchlistTabSection.STOCK,
                 bottomOffset = 0,
             )
             .asUiRender())

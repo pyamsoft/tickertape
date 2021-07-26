@@ -30,7 +30,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, UiSectionOptionsBind
 
   final override val layoutRoot by boundView { uiSectionOptions }
 
-  protected fun handleSection(section: TabsSection) {
-    binding.uiSectionOptions.isVisible = section == TabsSection.OPTIONS
+  protected fun handleSection(isOptions: Boolean) {
+    binding.uiSectionOptions.isVisible = isOptions
   }
 }

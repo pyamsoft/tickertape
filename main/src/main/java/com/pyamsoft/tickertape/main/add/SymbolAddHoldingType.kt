@@ -51,6 +51,7 @@ class SymbolAddHoldingType @Inject internal constructor(parent: ViewGroup) :
           is HoldingType.Stock -> "Stock"
           is HoldingType.Options.Buy -> "Options Buy"
           is HoldingType.Options.Sell -> "Options Sell"
+          is HoldingType.Crypto -> "Cryptocurrency"
         }
   }
 }

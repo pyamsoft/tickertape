@@ -38,6 +38,8 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
+    state.mapChanged { it.section }.render(viewScope) {
+      handleSection(it == WatchlistTabSection.OPTION)
+    }
   }
 }

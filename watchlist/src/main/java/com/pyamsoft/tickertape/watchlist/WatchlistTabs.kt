@@ -16,23 +16,33 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import com.google.android.material.tabs.TabLayout
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.tickertape.ui.UiTabs
 import javax.inject.Inject
 
 class WatchlistTabs @Inject internal constructor(appBarActivity: AppBarActivity) :
-    UiTabs<WatchListViewState, WatchListViewEvent>(appBarActivity) {
-
-  override fun handleOptionsTabSelected() {
-    publish(WatchListViewEvent.ShowOptions)
-  }
-
-  override fun handleStocksTabSelected() {
-    publish(WatchListViewEvent.ShowStocks)
-  }
+    UiTabs<WatchListViewState, WatchListViewEvent, WatchlistTabSection>(appBarActivity) {
 
   override fun render(state: UiRender<WatchListViewState>) {
     state.mapChanged { it.section }.render(viewScope) { handleSection(it) }
+  }
+
+  override fun addTabs(tabs: TabLayout) {
+    tabs.apply {
+      for (e in WatchlistTabSection.values()) {
+        addTab(newTab().setText(e.display).setTag(e))
+      }
+    }
+  }
+
+  override fun handleTabSelected(tab: TabLayout.Tab) {
+    val section = getTabSection(tab, WatchlistTabSection::class.java) ?: return
+    return when (section) {
+      WatchlistTabSection.STOCK -> publish(WatchListViewEvent.ShowStocks)
+      WatchlistTabSection.OPTION -> publish(WatchListViewEvent.ShowOptions)
+      WatchlistTabSection.CRYPTO -> publish(WatchListViewEvent.ShowCrypto)
+    }
   }
 }

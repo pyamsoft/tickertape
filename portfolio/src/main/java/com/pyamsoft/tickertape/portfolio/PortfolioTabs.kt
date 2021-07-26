@@ -16,20 +16,30 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import com.google.android.material.tabs.TabLayout
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.tickertape.ui.UiTabs
 import javax.inject.Inject
 
 class PortfolioTabs @Inject internal constructor(appBarActivity: AppBarActivity) :
-    UiTabs<PortfolioViewState, PortfolioViewEvent>(appBarActivity) {
+    UiTabs<PortfolioViewState, PortfolioViewEvent, PortfolioTabSection>(appBarActivity) {
 
-  override fun handleOptionsTabSelected() {
-    publish(PortfolioViewEvent.ShowOptions)
+  override fun addTabs(tabs: TabLayout) {
+    tabs.apply {
+      for (e in PortfolioTabSection.values()) {
+        addTab(newTab().setText(e.display).setTag(e))
+      }
+    }
   }
 
-  override fun handleStocksTabSelected() {
-    publish(PortfolioViewEvent.ShowStocks)
+  override fun handleTabSelected(tab: TabLayout.Tab) {
+    val section = getTabSection(tab, PortfolioTabSection::class.java) ?: return
+    return when (section) {
+      PortfolioTabSection.STOCK -> publish(PortfolioViewEvent.ShowStocks)
+      PortfolioTabSection.OPTION -> publish(PortfolioViewEvent.ShowOptions)
+      PortfolioTabSection.CRYPTO -> publish(PortfolioViewEvent.ShowCrypto)
+    }
   }
 
   override fun render(state: UiRender<PortfolioViewState>) {

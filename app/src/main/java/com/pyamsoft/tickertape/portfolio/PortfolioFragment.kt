@@ -95,6 +95,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             is PortfolioViewEvent.Manage -> viewModel.handleManageHolding(it.index)
             is PortfolioViewEvent.ShowOptions -> viewModel.handleShowOptions()
             is PortfolioViewEvent.ShowStocks -> viewModel.handleShowStocks()
+            is PortfolioViewEvent.ShowCrypto -> viewModel.handleShowCrypto()
           }
         }
 
@@ -103,7 +104,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   override fun onControllerEvent(event: PortfolioControllerEvent) {
     return when (event) {
-      is PortfolioControllerEvent.AddNewHolding -> handleOpenHoldingAddDialog(event.type)
+      is PortfolioControllerEvent.AddNewHolding -> handleOpenHoldingAddDialog()
       is PortfolioControllerEvent.ManageHolding -> handleOpenHoldingManageDialog(event.stock)
     }
   }
@@ -115,8 +116,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
         .show(requireActivity(), PositionManageDialog.TAG)
   }
 
-  private fun handleOpenHoldingAddDialog(type: HoldingType) {
-    PortfolioAddDialog.newInstance(type).show(requireActivity(), PortfolioAddDialog.TAG)
+  private fun handleOpenHoldingAddDialog() {
+    PortfolioAddDialog.newInstance().show(requireActivity(), PortfolioAddDialog.TAG)
   }
 
   override fun onStart() {

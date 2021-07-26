@@ -32,7 +32,6 @@ import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
-import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
@@ -79,12 +78,7 @@ internal constructor(
 
   override fun CoroutineScope.onAddNewEvent() {
     Timber.d("Portfolio add new holding!")
-    publish(
-        PortfolioControllerEvent.AddNewHolding(
-            when (state.section) {
-              TabsSection.STOCKS -> HoldingType.Stock
-              TabsSection.OPTIONS -> HoldingType.Options.Buy
-            }))
+    publish(PortfolioControllerEvent.AddNewHolding)
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
@@ -231,8 +225,9 @@ internal constructor(
               .map { list ->
                 list.filter { ps ->
                   when (currentSection) {
-                    TabsSection.STOCKS -> ps.holding.type() == HoldingType.Stock
-                    TabsSection.OPTIONS -> ps.holding.isOption()
+                    PortfolioTabSection.STOCK -> ps.holding.type() == HoldingType.Stock
+                    PortfolioTabSection.OPTION -> ps.holding.isOption()
+                    PortfolioTabSection.CRYPTO -> ps.holding.type() == HoldingType.Crypto
                   }
                 }
               }
@@ -276,15 +271,23 @@ internal constructor(
 
   override fun handleShowStocks() {
     setState(
-        stateChange = { copy(section = TabsSection.STOCKS) }, andThen = { fetchPortfolio(false) })
+        stateChange = { copy(section = PortfolioTabSection.STOCK) },
+        andThen = { fetchPortfolio(false) })
   }
 
   override fun handleShowOptions() {
     setState(
-        stateChange = { copy(section = TabsSection.OPTIONS) }, andThen = { fetchPortfolio(false) })
+        stateChange = { copy(section = PortfolioTabSection.OPTION) },
+        andThen = { fetchPortfolio(false) })
+  }
+
+  override fun handleShowCrypto() {
+    setState(
+        stateChange = { copy(section = PortfolioTabSection.CRYPTO) },
+        andThen = { fetchPortfolio(false) })
   }
 
   companion object {
-    private val DEFAULT_SECTION = TabsSection.STOCKS
+    private val DEFAULT_SECTION = PortfolioTabSection.STOCK
   }
 }

@@ -29,7 +29,6 @@ import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
-import com.pyamsoft.tickertape.ui.TabsSection
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
@@ -121,10 +120,11 @@ internal constructor(
               .call(force)
               .map { list ->
                 list.filter { qs ->
-                  val quote = qs.quote ?: return@filter false
+                  val type = qs.quote?.type() ?: return@filter false
                   return@filter when (currentSection) {
-                    TabsSection.STOCKS -> quote.type() != EquityType.OPTION
-                    TabsSection.OPTIONS -> quote.type() == EquityType.OPTION
+                    WatchlistTabSection.STOCK -> !CATCH_ALL_TYPE.contains(type)
+                    WatchlistTabSection.OPTION -> type == EquityType.OPTION
+                    WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTO
                   }
                 }
               }
@@ -169,16 +169,26 @@ internal constructor(
   }
 
   override fun handleShowStocks() {
-    setState(stateChange = { copy(section = TabsSection.STOCKS) }, andThen = { fetchQuotes(false) })
+    setState(
+        stateChange = { copy(section = WatchlistTabSection.STOCK) },
+        andThen = { fetchQuotes(false) })
   }
 
   override fun handleShowOptions() {
     setState(
-        stateChange = { copy(section = TabsSection.OPTIONS) }, andThen = { fetchQuotes(false) })
+        stateChange = { copy(section = WatchlistTabSection.OPTION) },
+        andThen = { fetchQuotes(false) })
+  }
+
+  override fun handleShowCrypto() {
+    setState(
+        stateChange = { copy(section = WatchlistTabSection.CRYPTO) },
+        andThen = { fetchQuotes(false) })
   }
 
   companion object {
 
-    private val DEFAULT_SECTION = TabsSection.STOCKS
+    private val CATCH_ALL_TYPE = arrayOf(EquityType.OPTION, EquityType.CRYPTO)
+    private val DEFAULT_SECTION = WatchlistTabSection.STOCK
   }
 }

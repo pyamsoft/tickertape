@@ -35,6 +35,8 @@ protected constructor(private val addNewBus: EventConsumer<AddNew>, initialState
 
   abstract fun handleShowOptions()
 
+  abstract fun handleShowCrypto()
+
   fun handleListenForAddEvents(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Default) { addNewBus.onEvent { onAddNewEvent() } }
   }

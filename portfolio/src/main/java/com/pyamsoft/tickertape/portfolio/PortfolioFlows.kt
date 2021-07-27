@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.ui.PackedData
 
 // Public constructor, used in home module
 data class PortfolioViewState(
+    val query: String,
     val section: PortfolioTabSection,
     val isLoading: Boolean,
     val portfolio: PackedData<PortfolioStockList>,
@@ -32,6 +33,8 @@ data class PortfolioViewState(
 sealed class PortfolioViewEvent : UiViewEvent {
 
   object ForceRefresh : PortfolioViewEvent()
+
+  data class Search internal constructor(val query: String) : PortfolioViewEvent()
 
   data class Remove internal constructor(val index: Int) : PortfolioViewEvent()
 

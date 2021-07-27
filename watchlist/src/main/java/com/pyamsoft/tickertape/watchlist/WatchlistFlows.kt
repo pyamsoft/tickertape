@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.ui.PackedData
 
 // Public constructor, used in home module
 data class WatchListViewState(
+    val query: String,
     val section: WatchlistTabSection,
     val isLoading: Boolean,
     val watchlist: PackedData<List<QuotedStock>>,
@@ -31,6 +32,8 @@ data class WatchListViewState(
 ) : UiViewState
 
 sealed class WatchListViewEvent : UiViewEvent {
+
+  data class Search internal constructor(val query: String) : WatchListViewEvent()
 
   object ForceRefresh : WatchListViewEvent()
 

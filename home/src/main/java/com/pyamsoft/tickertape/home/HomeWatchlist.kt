@@ -116,6 +116,7 @@ internal constructor(
   private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<QuotedStock>>) {
     handleRender(
         WatchListViewState(
+                query = "",
                 isLoading = state.isLoading,
                 watchlist = state.data,
                 // Assume Stocks

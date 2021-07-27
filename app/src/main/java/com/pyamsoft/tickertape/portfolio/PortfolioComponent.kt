@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
@@ -54,6 +55,8 @@ internal interface PortfolioComponent {
     @Binds
     @IntoMap
     @ClassKey(PortfolioViewModel::class)
-    internal abstract fun bindViewModel(impl: PortfolioViewModel): ViewModel
+    internal abstract fun bindViewModel(
+        impl: PortfolioViewModel.Factory
+    ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

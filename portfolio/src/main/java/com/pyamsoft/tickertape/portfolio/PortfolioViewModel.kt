@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.arch.UiSavedState
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
@@ -35,24 +37,29 @@ import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PortfolioViewModel
-@Inject
+@AssistedInject
 internal constructor(
+    @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
     private val interactor: PortfolioInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>,
     addNewBus: EventConsumer<AddNew>
 ) :
     MainAdderViewModel<PortfolioViewState, PortfolioControllerEvent>(
+        savedState = savedState,
         addNewBus = addNewBus,
         initialState =
             PortfolioViewState(
+                query = "",
                 section = DEFAULT_SECTION,
                 isLoading = false,
                 portfolio = PortfolioStockList(emptyList()).pack(),
@@ -73,6 +80,11 @@ internal constructor(
 
     viewModelScope.launch(context = Dispatchers.Default) {
       interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val search = restoreSavedState(KEY_SEARCH) { "" }
+      setState { copy(query = search) }
     }
   }
 
@@ -217,6 +229,7 @@ internal constructor(
 
   private fun CoroutineScope.fetchPortfolio(force: Boolean) {
     val currentSection = state.section
+    val currentSearch = state.query
     setState(
         stateChange = { copy(isLoading = true) },
         andThen = {
@@ -229,6 +242,14 @@ internal constructor(
                     PortfolioTabSection.OPTION -> ps.holding.isOption()
                     PortfolioTabSection.CRYPTO -> ps.holding.type() == HoldingType.Crypto
                   }
+                }
+              }
+              .map { list ->
+                list.filter { qs ->
+                  val symbol = qs.holding.symbol().symbol()
+                  val name = qs.quote?.quote?.company()?.company()
+                  return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                  else name?.contains(currentSearch, ignoreCase = true) ?: false
                 }
               }
               .onSuccess {
@@ -269,6 +290,15 @@ internal constructor(
     }
   }
 
+  fun handleSearch(query: String) {
+    setState(
+        stateChange = { copy(query = query) },
+        andThen = { newState ->
+          putSavedState(KEY_SEARCH, newState.query)
+          fetchPortfolio(false)
+        })
+  }
+
   override fun handleShowStocks() {
     setState(
         stateChange = { copy(section = PortfolioTabSection.STOCK) },
@@ -287,7 +317,13 @@ internal constructor(
         andThen = { fetchPortfolio(false) })
   }
 
+  @AssistedFactory
+  interface Factory : UiSavedStateViewModelProvider<PortfolioViewModel> {
+    override fun create(savedState: UiSavedState): PortfolioViewModel
+  }
+
   companion object {
+    private const val KEY_SEARCH = "search"
     private val DEFAULT_SECTION = PortfolioTabSection.STOCK
   }
 }

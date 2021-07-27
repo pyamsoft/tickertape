@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
@@ -34,7 +35,6 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
@@ -42,12 +42,14 @@ import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
-  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
+  @JvmField @Inject internal var factory: WatchlistViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<WatchlistViewModel>(activity = true) {
-    factory?.create(requireActivity())
+      createSavedStateViewModelFactory(factory)
   }
 
   private var stateSaver: StateSaver? = null
+
+  @JvmField @Inject internal var toolbar: WatchlistToolbar? = null
 
   @JvmField @Inject internal var spacer: WatchlistSpacer? = null
 
@@ -84,6 +86,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
+            toolbar.requireNotNull(),
             spacer.requireNotNull(),
             tabs.requireNotNull(),
             container.requireNotNull(),
@@ -95,6 +98,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             is WatchListViewEvent.ShowOptions -> viewModel.handleShowOptions()
             is WatchListViewEvent.ShowStocks -> viewModel.handleShowStocks()
             is WatchListViewEvent.ShowCrypto -> viewModel.handleShowCrypto()
+            is WatchListViewEvent.Search -> viewModel.handleSearch(it.query)
           }
         }
 
@@ -134,6 +138,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     spacer = null
     tabs = null
     container = null
+    toolbar = null
   }
 
   companion object {

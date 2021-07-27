@@ -17,7 +17,8 @@
 package com.pyamsoft.tickertape.main
 
 import com.pyamsoft.pydroid.arch.UiControllerEvent
-import com.pyamsoft.pydroid.arch.UiViewModel
+import com.pyamsoft.pydroid.arch.UiSavedState
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.ui.AddNew
@@ -26,8 +27,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 abstract class MainAdderViewModel<S : UiViewState, C : UiControllerEvent>
-protected constructor(private val addNewBus: EventConsumer<AddNew>, initialState: S) :
-    UiViewModel<S, C>(initialState) {
+protected constructor(
+    savedState: UiSavedState,
+    private val addNewBus: EventConsumer<AddNew>,
+    initialState: S
+) : UiSavedStateViewModel<S, C>(savedState, initialState) {
 
   protected abstract fun CoroutineScope.onAddNewEvent()
 

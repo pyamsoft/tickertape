@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.arch.UiSavedState
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
@@ -32,24 +34,29 @@ import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WatchlistViewModel
-@Inject
+@AssistedInject
 internal constructor(
+    @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
     private val bottomOffsetBus: EventConsumer<BottomOffset>,
     addNewBus: EventConsumer<AddNew>
 ) :
     MainAdderViewModel<WatchListViewState, WatchListControllerEvent>(
+        savedState = savedState,
         addNewBus = addNewBus,
         initialState =
             WatchListViewState(
+                query = "",
                 section = DEFAULT_SECTION,
                 isLoading = false,
                 watchlist = emptyList<QuotedStock>().pack(),
@@ -66,6 +73,11 @@ internal constructor(
 
     viewModelScope.launch(context = Dispatchers.Default) {
       interactor.listenForChanges { handleRealtimeEvent(it) }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val search = restoreSavedState(KEY_SEARCH) { "" }
+      setState { copy(query = search) }
     }
   }
 
@@ -113,6 +125,8 @@ internal constructor(
 
   private fun CoroutineScope.fetchQuotes(force: Boolean) {
     val currentSection = state.section
+    val currentSearch = state.query
+
     setState(
         stateChange = { copy(isLoading = true) },
         andThen = {
@@ -128,6 +142,14 @@ internal constructor(
                   }
                 }
               }
+              .map { list ->
+                list.filter { qs ->
+                  val symbol = qs.symbol.symbol()
+                  val name = qs.quote?.company()?.company()
+                  return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                  else name?.contains(currentSearch, ignoreCase = true) ?: false
+                }
+              }
               .onSuccess {
                 setState {
                   copy(watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(), isLoading = false)
@@ -136,6 +158,15 @@ internal constructor(
               .onFailure { Timber.e(it, "Failed to fetch quotes") }
               .onFailure { setState { copy(watchlist = it.packError(), isLoading = false) } }
               .onSuccess { tapeLauncher.start() }
+        })
+  }
+
+  fun handleSearch(query: String) {
+    setState(
+        stateChange = { copy(query = query) },
+        andThen = { newState ->
+          putSavedState(KEY_SEARCH, newState.query)
+          fetchQuotes(false)
         })
   }
 
@@ -186,8 +217,14 @@ internal constructor(
         andThen = { fetchQuotes(false) })
   }
 
+  @AssistedFactory
+  interface Factory : UiSavedStateViewModelProvider<WatchlistViewModel> {
+    override fun create(savedState: UiSavedState): WatchlistViewModel
+  }
+
   companion object {
 
+    private const val KEY_SEARCH = "search"
     private val CATCH_ALL_TYPE = arrayOf(EquityType.OPTION, EquityType.CRYPTO)
     private val DEFAULT_SECTION = WatchlistTabSection.STOCK
   }

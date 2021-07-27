@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.watchlist
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
+import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
@@ -54,6 +55,8 @@ internal interface WatchlistComponent {
     @Binds
     @IntoMap
     @ClassKey(WatchlistViewModel::class)
-    internal abstract fun bindViewModel(impl: WatchlistViewModel): ViewModel
+    internal abstract fun bindViewModel(
+        impl: WatchlistViewModel.Factory
+    ): UiSavedStateViewModelProvider<out ViewModel>
   }
 }

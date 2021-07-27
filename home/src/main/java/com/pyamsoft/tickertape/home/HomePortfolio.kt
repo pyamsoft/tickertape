@@ -35,6 +35,7 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
   private fun handlePortfolioChanged(state: HomeViewState.RenderState<PortfolioStockList>) {
     handleRender(
         PortfolioViewState(
+                query = "",
                 isLoading = state.isLoading,
                 portfolio = state.data,
                 // Always show stocks section

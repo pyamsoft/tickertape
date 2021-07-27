@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
@@ -34,20 +35,20 @@ import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
 import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
-  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
+  @JvmField @Inject internal var factory: PortfolioViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<PortfolioViewModel>(activity = true) {
-    factory?.create(requireActivity())
+    createSavedStateViewModelFactory(factory)
   }
 
   private var stateSaver: StateSaver? = null
+
+  @JvmField @Inject internal var toolbar: PortfolioToolbar? = null
 
   @JvmField @Inject internal var spacer: PortfolioSpacer? = null
 
@@ -86,6 +87,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             viewModel,
             this,
             tabs.requireNotNull(),
+            toolbar.requireNotNull(),
             requireNotNull(spacer),
             requireNotNull(container),
         ) {
@@ -96,6 +98,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             is PortfolioViewEvent.ShowOptions -> viewModel.handleShowOptions()
             is PortfolioViewEvent.ShowStocks -> viewModel.handleShowStocks()
             is PortfolioViewEvent.ShowCrypto -> viewModel.handleShowCrypto()
+            is PortfolioViewEvent.Search -> viewModel.handleSearch(it.query)
           }
         }
 
@@ -136,6 +139,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
     factory = null
 
     container = null
+    toolbar = null
     spacer = null
     tabs = null
   }

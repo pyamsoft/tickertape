@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSectionStocks
 import javax.inject.Inject
@@ -31,10 +30,6 @@ internal constructor(
 
   init {
     nest(nestedWatchlist)
-
-    // For some reason the match_parent height does not make this list fill content
-    // Grab the size of the activity parent and use it as our height
-    doOnInflate { parent.post { layoutRoot.updateLayoutParams { this.height = parent.height } } }
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {

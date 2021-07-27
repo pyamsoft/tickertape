@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.ui.UiSectionCrypto
 import javax.inject.Inject
 
-class PortfolioScrollContainer
+class WatchlistSectionCrypto
 @Inject
 internal constructor(
     parent: ViewGroup,
-    sectionStocks: PortfolioSectionStocks,
-    sectionOptions: PortfolioSectionOptions,
-    sectionCrypto: PortfolioSectionCrypto,
-) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
+    nestedWatchlist: WatchlistList,
+) : UiSectionCrypto<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
-    nest(
-        sectionStocks,
-        sectionOptions,
-        sectionCrypto,
-    )
+    nest(nestedWatchlist)
+  }
+
+  override fun onRender(state: UiRender<WatchListViewState>) {
+    state.mapChanged { it.section }.render(viewScope) {
+      handleSection(it == WatchlistTabSection.CRYPTO)
+    }
   }
 }

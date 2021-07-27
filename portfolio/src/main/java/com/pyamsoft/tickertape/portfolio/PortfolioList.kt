@@ -20,12 +20,10 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
@@ -33,6 +31,7 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
 import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
+import com.pyamsoft.tickertape.ui.MatchParentUiView
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -48,7 +47,7 @@ internal constructor(
     owner: LifecycleOwner,
     factory: PortfolioItemComponent.Factory
 ) :
-    BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
+    MatchParentUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
     PortfolioAdapter.Callback {
 
@@ -62,16 +61,12 @@ internal constructor(
   private var lastScrollPosition = 0
 
   init {
-    // For some reason the match_parent height does not make this list fill content
-    // Grab the size of the activity parent and use it as our height
-    doOnInflate { parent.post { layoutRoot.updateLayoutParams { this.height = parent.height } } }
-
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -186,8 +181,8 @@ internal constructor(
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.portfolioListList.addItemDecoration(this)
-        }
+      binding.portfolioListList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<PortfolioStock>) {

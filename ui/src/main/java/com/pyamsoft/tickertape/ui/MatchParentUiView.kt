@@ -17,20 +17,18 @@
 package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.viewbinding.ViewBinding
+import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.ui.databinding.UiSectionOptionsBinding
 
-abstract class UiSectionOptions<S : UiViewState, V : UiViewEvent>
-protected constructor(parent: ViewGroup) :
-    MatchParentUiView<S, V, UiSectionOptionsBinding>(parent) {
+abstract class MatchParentUiView<S : UiViewState, V : UiViewEvent, B : ViewBinding>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, B>(parent) {
 
-  final override val viewBinding = UiSectionOptionsBinding::inflate
-
-  final override val layoutRoot by boundView { uiSectionOptions }
-
-  protected fun handleSection(isOptions: Boolean) {
-    binding.uiSectionOptions.isVisible = isOptions
+  init {
+    // For some reason the match_parent height does not make this list fill content
+    // Grab the size of the activity parent and use it as our height
+    doOnInflate { parent.post { layoutRoot.updateLayoutParams { this.height = parent.height } } }
   }
 }

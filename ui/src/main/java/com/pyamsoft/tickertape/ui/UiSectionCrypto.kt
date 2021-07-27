@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio
+package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
-import javax.inject.Inject
+import androidx.core.view.isVisible
+import com.pyamsoft.pydroid.arch.UiViewEvent
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.ui.databinding.UiSectionCryptoBinding
 
-class PortfolioScrollContainer
-@Inject
-internal constructor(
-    parent: ViewGroup,
-    sectionStocks: PortfolioSectionStocks,
-    sectionOptions: PortfolioSectionOptions,
-    sectionCrypto: PortfolioSectionCrypto,
-) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
+abstract class UiSectionCrypto<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : MatchParentUiView<S, V, UiSectionCryptoBinding>(parent) {
 
-  init {
-    nest(
-        sectionStocks,
-        sectionOptions,
-        sectionCrypto,
-    )
+  final override val viewBinding = UiSectionCryptoBinding::inflate
+
+  final override val layoutRoot by boundView { uiSectionCrypto }
+
+  protected fun handleSection(isCrypto: Boolean) {
+    binding.uiSectionCrypto.isVisible = isCrypto
   }
 }

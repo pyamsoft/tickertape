@@ -17,23 +17,24 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.ui.UiSectionCrypto
 import javax.inject.Inject
 
-class PortfolioScrollContainer
+class PortfolioSectionCrypto
 @Inject
 internal constructor(
     parent: ViewGroup,
-    sectionStocks: PortfolioSectionStocks,
-    sectionOptions: PortfolioSectionOptions,
-    sectionCrypto: PortfolioSectionCrypto,
-) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
+    nestedList: PortfolioList,
+) : UiSectionCrypto<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {
-    nest(
-        sectionStocks,
-        sectionOptions,
-        sectionCrypto,
-    )
+    nest(nestedList)
+  }
+
+  override fun onRender(state: UiRender<PortfolioViewState>) {
+    state.mapChanged { it.section }.render(viewScope) {
+      handleSection(it == PortfolioTabSection.CRYPTO)
+    }
   }
 }

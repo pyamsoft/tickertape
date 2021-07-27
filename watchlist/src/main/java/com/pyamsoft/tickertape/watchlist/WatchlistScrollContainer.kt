@@ -26,12 +26,14 @@ internal constructor(
     parent: ViewGroup,
     sectionStocks: WatchlistSectionStocks,
     sectionOptions: WatchlistSectionOptions,
+    sectionCrypto: WatchlistSectionCrypto,
 ) : UiScrollingContainer<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
     nest(
         sectionStocks,
         sectionOptions,
+        sectionCrypto,
     )
   }
 }

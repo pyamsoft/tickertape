@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -67,7 +68,12 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val binding = LayoutCoordinatorBinding.bind(view)
+    // Animate layout changes
+    val binding =
+        LayoutCoordinatorBinding.bind(view).apply {
+          layoutCoordinator.layoutTransition = LayoutTransition()
+        }
+
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusPortfolioComponent()
         .create(

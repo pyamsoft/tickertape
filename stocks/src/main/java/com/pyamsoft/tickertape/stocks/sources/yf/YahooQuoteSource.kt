@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany

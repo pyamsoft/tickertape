@@ -66,19 +66,19 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
 
           actionView =
               SearchView(toolbar.context).apply {
-            setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                  override fun onQueryTextSubmit(query: String): Boolean {
-                    publishSearch(query)
-                    return true
-                  }
+                setOnQueryTextListener(
+                    object : SearchView.OnQueryTextListener {
+                      override fun onQueryTextSubmit(query: String): Boolean {
+                        publishSearch(query)
+                        return true
+                      }
 
-                  override fun onQueryTextChange(newText: String): Boolean {
-                    publishSearch(newText)
-                    return true
-                  }
-                })
-          }
+                      override fun onQueryTextChange(newText: String): Boolean {
+                        publishSearch(newText)
+                        return true
+                      }
+                    })
+              }
         }
       }
     }

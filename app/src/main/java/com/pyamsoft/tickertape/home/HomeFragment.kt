@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -63,7 +64,12 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val binding = LayoutCoordinatorBinding.bind(view)
+    // Animate layout changes
+    val binding =
+        LayoutCoordinatorBinding.bind(view).apply {
+          layoutCoordinator.layoutTransition = LayoutTransition()
+        }
+
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusHomeComponent()
         .create(

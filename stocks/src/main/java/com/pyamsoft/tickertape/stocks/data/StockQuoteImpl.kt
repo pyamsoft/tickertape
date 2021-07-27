@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue

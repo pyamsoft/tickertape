@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,7 +45,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   @JvmField @Inject internal var factory: WatchlistViewModel.Factory? = null
   private val viewModel by fromViewModelFactory<WatchlistViewModel>(activity = true) {
-      createSavedStateViewModelFactory(factory)
+    createSavedStateViewModelFactory(factory)
   }
 
   private var stateSaver: StateSaver? = null
@@ -68,7 +69,12 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val binding = LayoutCoordinatorBinding.bind(view)
+    // Animate layout changes
+    val binding =
+        LayoutCoordinatorBinding.bind(view).apply {
+          layoutCoordinator.layoutTransition = LayoutTransition()
+        }
+
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusWatchlistComponent()
         .create(

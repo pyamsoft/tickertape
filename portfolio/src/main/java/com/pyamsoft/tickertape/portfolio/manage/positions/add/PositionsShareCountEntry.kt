@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.portfolio.manage.positions.add
 
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSharesEntryBinding
@@ -25,7 +24,6 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
-import timber.log.Timber
 
 class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
     BasePositionsEditable<HoldingSharesEntryBinding>(parent) {

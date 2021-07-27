@@ -40,8 +40,7 @@ protected constructor(
         SymbolAddViewState(
             query = "",
             searchResults = emptyList<SearchResult>().pack(),
-            type = HoldingType.Stock
-        )) {
+            type = HoldingType.Stock)) {
 
   private var searchJob: Job? = null
 

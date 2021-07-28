@@ -34,13 +34,14 @@ abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
+    thisHoldingType: HoldingType,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
             query = "",
             searchResults = emptyList<SearchResult>().pack(),
-            type = HoldingType.Stock)) {
+            type = thisHoldingType)) {
 
   private var searchJob: Job? = null
 
@@ -58,23 +59,23 @@ protected constructor(
     searchJob = null
   }
 
-  fun handleLookupSymbol(symbol: String, filterType: Boolean) {
+  fun handleLookupSymbol(symbol: String) {
     setState(
         stateChange = { copy(query = symbol) },
         andThen = { newState ->
           val newSymbol = newState.query
           putSavedState(KEY_SYMBOL, newSymbol)
-          performLookup(newSymbol, filterType)
+          performLookup(newSymbol)
         })
   }
 
-  private fun CoroutineScope.performLookup(query: String, filterType: Boolean) {
+  private fun CoroutineScope.performLookup(query: String) {
     resetSearchJob()
 
     searchJob =
         launch(context = Dispatchers.Default) {
           interactor
-              .search(false, query, if (filterType) state.type else null)
+              .search(false, query)
               .onSuccess { Timber.d("Search results: $it") }
               .onSuccess { setState { copy(searchResults = it.pack()) } }
               .onFailure { Timber.e(it, "Search failed") }
@@ -91,30 +92,10 @@ protected constructor(
 
     val result = data.value[index]
     Timber.d("Result selected: $result")
-    handleCommitSymbol(result.symbol().symbol(), state.type)
+    // TODO on select, load text as result.symbol and figure out type
   }
 
-  fun handleCommitSymbol() {
-    handleCommitSymbol(state.query, state.type)
-  }
-
-  fun handleUpdateType() {
-    val newType =
-        when (state.type) {
-          is HoldingType.Options.Buy -> HoldingType.Options.Sell
-          is HoldingType.Options.Sell -> HoldingType.Options.Buy
-          is HoldingType.Stock, HoldingType.Crypto -> {
-            Timber.w("Cannot update type when type is not Options.")
-            return
-          }
-        }
-
-    setState(
-        stateChange = { copy(type = newType) },
-        andThen = { newState -> performLookup(newState.query, true) })
-  }
-
-  protected abstract fun handleCommitSymbol(symbol: String, type: HoldingType)
+  abstract fun handleCommitSymbol()
 
   companion object {
 

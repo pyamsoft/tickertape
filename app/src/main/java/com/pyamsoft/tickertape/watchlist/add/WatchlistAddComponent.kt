@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -38,6 +39,7 @@ internal interface WatchlistAddComponent {
     @CheckResult
     fun create(
         @BindsInstance parent: ViewGroup,
+        @BindsInstance type: HoldingType,
     ): WatchlistAddComponent
   }
 

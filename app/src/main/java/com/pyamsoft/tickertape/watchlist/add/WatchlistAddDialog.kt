@@ -21,19 +21,26 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.DialogFragment
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.fromHoldingString
+import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog
 import javax.inject.Inject
 
 internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
 
-  override val isHoldingTypeSupported: Boolean = false
-
   @JvmField @Inject internal var factory: WatchlistAddViewModel.Factory? = null
   override val viewModel by fromViewModelFactory<WatchlistAddViewModel> {
     createSavedStateViewModelFactory(factory)
+  }
+
+  @CheckResult
+  private fun getHoldingType(): HoldingType {
+    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
   }
 
   override fun onInject(view: ViewGroup, savedInstanceState: Bundle?) {
@@ -45,7 +52,7 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
             viewLifecycleOwner,
         )
         .plusWatchlistAddComponent()
-        .create(view)
+        .create(view, getHoldingType())
         .inject(this)
   }
 
@@ -55,12 +62,15 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
 
   companion object {
 
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     const val TAG = "WatchlistAddDialog"
 
     @JvmStatic
     @CheckResult
-    fun newInstance(): DialogFragment {
-      return WatchlistAddDialog().apply { arguments = Bundle().apply {} }
+    fun newInstance(type: HoldingType): DialogFragment {
+      return WatchlistAddDialog().apply {
+        arguments = Bundle().apply { putString(KEY_HOLDING_TYPE, type.toHoldingString()) }
+      }
     }
   }
 }

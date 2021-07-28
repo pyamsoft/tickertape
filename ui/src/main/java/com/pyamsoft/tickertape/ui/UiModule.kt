@@ -21,8 +21,6 @@ import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
 
 @Module
 abstract class UiModule {
@@ -36,20 +34,4 @@ abstract class UiModule {
   internal abstract fun bindBottomOffsetConsumer(
       impl: EventBus<BottomOffset>
   ): EventConsumer<BottomOffset>
-
-  @Binds
-  @CheckResult
-  internal abstract fun bindAddNewConsumer(impl: EventBus<AddNew>): EventConsumer<AddNew>
-
-  @Module
-  companion object {
-
-    @Provides
-    @JvmStatic
-    @Singleton
-    @CheckResult
-    internal fun provideAddNewBus(): EventBus<AddNew> {
-      return EventBus.create(emitOnlyWhenActive = false)
-    }
-  }
 }

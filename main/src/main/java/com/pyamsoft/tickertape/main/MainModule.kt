@@ -31,6 +31,10 @@ abstract class MainModule {
   @CheckResult
   internal abstract fun bindMainPageConsumer(impl: EventBus<MainPage>): EventConsumer<MainPage>
 
+  @Binds
+  @CheckResult
+  internal abstract fun bindAddNewConsumer(impl: EventBus<AddNew>): EventConsumer<AddNew>
+
   @Module
   companion object {
 
@@ -39,6 +43,14 @@ abstract class MainModule {
     @Singleton
     @CheckResult
     internal fun provideMainPageBus(): EventBus<MainPage> {
+      return EventBus.create(emitOnlyWhenActive = false)
+    }
+
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideAddNewBus(): EventBus<AddNew> {
       return EventBus.create(emitOnlyWhenActive = false)
     }
   }

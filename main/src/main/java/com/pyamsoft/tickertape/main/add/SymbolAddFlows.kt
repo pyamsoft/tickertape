@@ -39,8 +39,6 @@ sealed class SymbolAddViewEvent : UiViewEvent {
   object Close : SymbolAddViewEvent()
 
   object CommitSymbol : SymbolAddViewEvent()
-
-  object UpdateType : SymbolAddViewEvent()
 }
 
 sealed class SymbolAddControllerEvent : UiControllerEvent {

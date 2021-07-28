@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,11 +31,7 @@ import timber.log.Timber
 class SymbolAddInteractor @Inject internal constructor(private val interactor: StockInteractor) {
 
   @CheckResult
-  suspend fun search(
-      force: Boolean,
-      query: String,
-      filterByType: HoldingType?
-  ): ResultWrapper<List<SearchResult>> =
+  suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

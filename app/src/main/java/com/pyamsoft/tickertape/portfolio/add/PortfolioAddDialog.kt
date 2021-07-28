@@ -21,19 +21,26 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.DialogFragment
 import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.fromHoldingString
+import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog
 import javax.inject.Inject
 
 internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
-  override val isHoldingTypeSupported: Boolean = true
-
   @JvmField @Inject internal var factory: PortfolioAddViewModel.Factory? = null
   override val viewModel by fromViewModelFactory<PortfolioAddViewModel> {
     createSavedStateViewModelFactory(factory)
+  }
+
+  @CheckResult
+  private fun getHoldingType(): HoldingType {
+    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
   }
 
   override fun onInject(view: ViewGroup, savedInstanceState: Bundle?) {
@@ -45,7 +52,7 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
             viewLifecycleOwner,
         )
         .plusPortfolioAddComponent()
-        .create(view)
+        .create(view, getHoldingType())
         .inject(this)
   }
 
@@ -55,12 +62,15 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
   companion object {
 
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     const val TAG = "PortfolioAddDialog"
 
     @JvmStatic
     @CheckResult
-    fun newInstance(): DialogFragment {
-      return PortfolioAddDialog().apply { arguments = Bundle().apply {} }
+    fun newInstance(type: HoldingType): DialogFragment {
+      return PortfolioAddDialog().apply {
+        arguments = Bundle().apply { putString(KEY_HOLDING_TYPE, type.toHoldingString()) }
+      }
     }
   }
 }

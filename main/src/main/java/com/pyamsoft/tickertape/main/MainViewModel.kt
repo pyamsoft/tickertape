@@ -23,7 +23,7 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.tickertape.ui.AddNew
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -85,7 +85,10 @@ internal constructor(
 
   fun handleAddNewRequest() {
     Timber.d("Add New requested!")
-    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew) }
+    viewModelScope.launch(context = Dispatchers.Default) {
+      // TODO configure type
+      addNewBus.send(AddNew(HoldingType.Stock))
+    }
   }
 
   private suspend inline fun publishNewSelection(

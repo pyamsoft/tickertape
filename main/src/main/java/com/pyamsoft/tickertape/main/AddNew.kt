@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.ui
+package com.pyamsoft.tickertape.main
 
-object AddNew
+import com.pyamsoft.tickertape.stocks.api.HoldingType
+
+data class AddNew internal constructor(val type: HoldingType)

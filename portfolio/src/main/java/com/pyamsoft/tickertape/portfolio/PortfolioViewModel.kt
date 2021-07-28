@@ -23,15 +23,15 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.MainAdderViewModel
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.ui.AddNew
+import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
@@ -88,9 +88,9 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent() {
+  override fun CoroutineScope.onAddNewEvent(type: HoldingType) {
     Timber.d("Portfolio add new holding!")
-    publish(PortfolioControllerEvent.AddNewHolding)
+    publish(PortfolioControllerEvent.AddNewHolding(type))
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {

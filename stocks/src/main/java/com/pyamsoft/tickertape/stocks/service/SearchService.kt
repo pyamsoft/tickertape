@@ -25,6 +25,9 @@ internal interface SearchService {
 
   @CheckResult
   @GET(
-      "https://query2.finance.yahoo.com/v1/finance/search?quotesCount=6&newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
-  suspend fun performSearch(@Query("q") query: String): NetworkSearchResponse
+      "https://query2.finance.yahoo.com/v1/finance/search?newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
+  suspend fun performSearch(
+      @Query("q") query: String,
+      @Query("quotesCount") count: Int
+  ): NetworkSearchResponse
 }

@@ -37,16 +37,19 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val interactor: PortfolioAddInteractor,
     addInteractor: SymbolAddInteractor,
-) : SymbolAddViewModel(savedState, addInteractor) {
+    thisHoldingType: HoldingType,
+) : SymbolAddViewModel(savedState, addInteractor, thisHoldingType) {
 
-  override fun handleCommitSymbol(symbol: String, type: HoldingType) {
+  override fun handleCommitSymbol() {
     viewModelScope.launch(context = Dispatchers.Default) {
+      val symbol = state.query
+      val type = state.type
+
       Timber.d("Commit symbol to DB: $symbol")
       interactor
           .commitSymbol(symbol.asSymbols(), type)
           .onSuccess { Timber.d("Committed new symbols to db: $symbol") }
           .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol") }
-      publish(SymbolAddControllerEvent.Close)
     }
   }
 

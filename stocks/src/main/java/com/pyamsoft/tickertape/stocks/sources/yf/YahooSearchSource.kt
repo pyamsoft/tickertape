@@ -43,7 +43,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
           return@withContext emptyList()
         }
 
-        val result = service.performSearch(query)
+        val result = service.performSearch(query, count = 20)
         return@withContext result
             .quotes
             .asSequence()

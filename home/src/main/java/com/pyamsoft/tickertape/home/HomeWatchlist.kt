@@ -43,8 +43,6 @@ internal constructor(
 
   init {
     doOnInflate {
-      binding.watchlistList.isNestedScrollingEnabled = false
-      binding.watchlistSwipeRefresh.isNestedScrollingEnabled = false
       binding.watchlistSwipeRefresh.isEnabled = false
     }
 

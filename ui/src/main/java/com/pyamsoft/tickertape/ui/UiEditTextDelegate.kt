@@ -74,13 +74,11 @@ private constructor(
     onTextChanged = null
   }
 
-  private fun applyText(text: String, stopIfInitialRenderPerformed: Boolean) {
+  private fun applyText(text: String) {
     if (text.isNotBlank()) {
-      if (stopIfInitialRenderPerformed) {
-        // Don't keep setting text here as it is too slow
-        if (initialRenderPerformed) {
-          return
-        }
+      // Don't keep setting text here as it is too slow
+      if (initialRenderPerformed) {
+        return
       }
 
       initialRenderPerformed = true
@@ -92,12 +90,8 @@ private constructor(
     }
   }
 
-  fun forceSetText(text: String) {
-    applyText(text, stopIfInitialRenderPerformed = false)
-  }
-
   fun handleTextChanged(text: String) {
-    applyText(text, stopIfInitialRenderPerformed = true)
+    applyText(text)
   }
 
   companion object {

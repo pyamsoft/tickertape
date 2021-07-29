@@ -33,7 +33,7 @@ internal constructor(private val height: Int, context: Context) : PreferenceComp
     super.onBindViewHolder(holder)
     height.let { h ->
       // Multiply by 2 to account for the bar offset and the height change in MainContainer
-      holder.itemView.updateLayoutParams<ViewGroup.LayoutParams> { this.height = h * 2 }
+      holder.itemView.updateLayoutParams<ViewGroup.LayoutParams> { this.height = h * 3 }
     }
   }
 }

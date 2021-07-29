@@ -35,17 +35,18 @@ protected constructor(
 
   final override val viewBinding = UiAppBarSpacerBinding::inflate
 
-  final override val layoutRoot by boundView { uiAppbarRoot }
+  final override val layoutRoot by boundView { uiSpacerAppbar }
 
   init {
     doOnInflate {
       // Remove outline provider to stop shadow
-      binding.uiAppbarRoot.outlineProvider = null
+      binding.uiSpacerAppbar.apply {
+        outlineProvider = null
+        elevation = 0F
+      }
     }
 
-    doOnInflate {
-      binding.uiAppbarSpace.apply { post { applyAppBarOffset(appBarActivity, owner) } }
-    }
+    doOnInflate { binding.uiSpacerCollapse.apply { post { applyAppBarOffset(appBarActivity, owner) } } }
   }
 
   final override fun onRender(state: UiRender<S>) {

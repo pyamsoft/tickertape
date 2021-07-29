@@ -25,11 +25,11 @@ class WatchlistSectionOptions
 @Inject
 internal constructor(
     parent: ViewGroup,
-    nestedWatchlist: WatchlistList,
+    watchlist: WatchlistList,
 ) : UiSectionOptions<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
-    nest(nestedWatchlist)
+    nest(watchlist)
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {

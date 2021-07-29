@@ -74,7 +74,7 @@ sealed class PositionItemViewState : UiViewState {
             if (isNoChange) StockDirection.none()
             else (gainLossNumber * sellSideModifier).asDirection()
         val sign = direction.sign()
-        current = (todayNumber * optionsModifier * sellSideModifier).asMoney()
+        current = (price.value() * optionsModifier * sellSideModifier).asMoney()
         gainLossDisplayString =
             "${sign}${(gainLossNumber * sellSideModifier).asMoney().asMoneyValue()} (${sign}${(gainLossPercent * sellSideModifier).asPercent().asPercentValue()})"
         gainLossDirection = direction

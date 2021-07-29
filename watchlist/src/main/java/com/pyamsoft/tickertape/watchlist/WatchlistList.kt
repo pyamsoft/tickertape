@@ -18,7 +18,9 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -33,6 +35,8 @@ internal constructor(
     owner: LifecycleOwner,
     factory: WatchlistItemComponent.Factory
 ) : BaseWatchlistList<WatchListViewState, WatchListViewEvent>(parent, owner, factory) {
+
+  private var bottomDecoration: RecyclerView.ItemDecoration? = null
 
   init {
     doOnInflate {
@@ -49,12 +53,11 @@ internal constructor(
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
       LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
+    }
 
-      // The bottom has additional space to fit the FAB
-      val bottomMargin = 24.asDp(binding.watchlistList.context)
-      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
-        binding.watchlistList.addItemDecoration(this)
-      }
+    doOnTeardown {
+      binding.watchlistList.removeAllItemDecorations()
+      bottomDecoration = null
     }
   }
 
@@ -72,5 +75,14 @@ internal constructor(
 
   override fun onRender(state: UiRender<WatchListViewState>) {
     handleRender(state)
+    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+  }
+
+  private fun handleBottomOffset(height: Int) {
+    bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
+    bottomDecoration =
+        LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
+      binding.watchlistList.addItemDecoration(this)
+    }
   }
 }

@@ -49,8 +49,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   @Inject @JvmField internal var container: HomeScrollContainer? = null
 
-  @Inject @JvmField internal var spacer: HomeSpacer? = null
-
   private var stateSaver: StateSaver? = null
 
   override fun onCreateView(
@@ -87,7 +85,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             viewLifecycleOwner,
             viewModel,
             this,
-            spacer.requireNotNull(),
             container.requireNotNull()) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
@@ -131,7 +128,6 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
     factory = null
 
     container = null
-    spacer = null
   }
 
   companion object {

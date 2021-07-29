@@ -17,24 +17,12 @@
 package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
-import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.ui.UiSectionStocks
+import androidx.lifecycle.LifecycleOwner
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.tickertape.ui.UiAppBarSpacer
 import javax.inject.Inject
 
-class WatchlistSectionStocks
+class WatchlistBottomSpacer
 @Inject
-internal constructor(
-    parent: ViewGroup,
-    watchlist: WatchlistList,
-) : UiSectionStocks<WatchListViewState, WatchListViewEvent>(parent) {
-
-  init {
-    nest(watchlist)
-  }
-
-  override fun onRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.section }.render(viewScope) {
-      handleSection(it == WatchlistTabSection.STOCK)
-    }
-  }
-}
+internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
+    UiAppBarSpacer<WatchListViewState, WatchListViewEvent>(parent, owner, appBarActivity)

@@ -18,20 +18,19 @@ package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
-import androidx.viewbinding.ViewBinding
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.ui.databinding.BottomSpacerBinding
 
-abstract class MatchParentUiView<S : UiViewState, V : UiViewEvent, B : ViewBinding>
-protected constructor(parent: ViewGroup) : BaseUiView<S, V, B>(parent) {
+abstract class UiBottomSpacer<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, BottomSpacerBinding>(parent) {
 
-  init {
-    // For some reason the match_parent height does not make this list fill content
-    // Grab the size of the activity parent and use it as our height
-    doOnInflate {
-      val root = layoutRoot
-      parent.post { root.post { root.updateLayoutParams { this.height = parent.height - 400 } } }
-    }
+  final override val layoutRoot by boundView { bottomSpacer }
+
+  final override val viewBinding = BottomSpacerBinding::inflate
+
+  protected fun handleBottomOffset(height: Int) {
+    layoutRoot.updateLayoutParams { this.height = height }
   }
 }

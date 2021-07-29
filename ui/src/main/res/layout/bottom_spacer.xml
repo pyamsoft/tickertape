@@ -17,7 +17,7 @@
 <merge>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/home_spacer"
+        android:id="@+id/bottom_spacer"
         android:layout_width="match_parent"
         android:layout_height="0dp" />
 

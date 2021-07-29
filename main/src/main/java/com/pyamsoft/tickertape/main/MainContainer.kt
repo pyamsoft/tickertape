@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.ui.UiFragmentContainer
 import javax.inject.Inject
 
@@ -27,9 +28,12 @@ class MainContainer @Inject internal constructor(parent: ViewGroup) :
 
   private var initialHeight = 0
   private var lastBottomBarHeight = 0
+  private var slightOffset = 0
 
   init {
     doOnInflate {
+      slightOffset = 64.asDp(layoutRoot.context)
+
       layoutRoot.also { v ->
         v.post {
           initialHeight = v.height
@@ -52,6 +56,8 @@ class MainContainer @Inject internal constructor(parent: ViewGroup) :
     // Add additional height to the main container so that when it scrolls as a result of the
     // coordinator layout,
     // we avoid the blank strip on the bottom.
-    layoutRoot.updateLayoutParams { this.height = initialHeight + lastBottomBarHeight }
+    layoutRoot.updateLayoutParams {
+      this.height = initialHeight - lastBottomBarHeight + slightOffset
+    }
   }
 }

@@ -25,11 +25,11 @@ class PortfolioSectionCrypto
 @Inject
 internal constructor(
     parent: ViewGroup,
-    nestedList: PortfolioList,
+    list: PortfolioList,
 ) : UiSectionCrypto<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {
-    nest(nestedList)
+    nest(list)
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {

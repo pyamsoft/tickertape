@@ -17,25 +17,14 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
-import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.home.databinding.HomeSpacerBinding
+import com.pyamsoft.tickertape.ui.UiBottomSpacer
 import javax.inject.Inject
 
 class HomeBottomSpacer @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<HomeViewState, HomeViewEvent, HomeSpacerBinding>(parent) {
-
-  override val layoutRoot by boundView { homeSpacer }
-
-  override val viewBinding = HomeSpacerBinding::inflate
+    UiBottomSpacer<HomeViewState, HomeViewEvent>(parent) {
 
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
-  }
-
-  private fun handleBottomOffset(height: Int) {
-    // Multiply by 2 to account for the bar offset and the height change in MainContainer
-    layoutRoot.updateLayoutParams { this.height = height * 2 }
   }
 }

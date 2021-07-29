@@ -52,8 +52,6 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   @JvmField @Inject internal var toolbar: PortfolioToolbar? = null
 
-  @JvmField @Inject internal var spacer: PortfolioSpacer? = null
-
   @JvmField @Inject internal var tabs: PortfolioTabs? = null
 
   @JvmField @Inject internal var container: PortfolioScrollContainer? = null
@@ -95,8 +93,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
             this,
             tabs.requireNotNull(),
             toolbar.requireNotNull(),
-            requireNotNull(spacer),
-            requireNotNull(container),
+            container.requireNotNull(),
         ) {
           return@createComponent when (it) {
             is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
@@ -147,7 +144,6 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
     container = null
     toolbar = null
-    spacer = null
     tabs = null
   }
 

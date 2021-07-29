@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
@@ -31,7 +32,6 @@ import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
 import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
-import com.pyamsoft.tickertape.ui.MatchParentUiView
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearBoundsMarginDecoration
@@ -47,7 +47,7 @@ internal constructor(
     owner: LifecycleOwner,
     factory: PortfolioItemComponent.Factory
 ) :
-    MatchParentUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
+    BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
     SwipeRefreshLayout.OnRefreshListener,
     PortfolioAdapter.Callback {
 
@@ -64,9 +64,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -104,12 +104,6 @@ internal constructor(
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
       LinearMarginDecoration.create(margin).apply {
-        binding.portfolioListList.addItemDecoration(this)
-      }
-
-      // The bottom has additional space to fit the FAB
-      val bottomMargin = 24.asDp(binding.portfolioListList.context)
-      LinearBoundsMarginDecoration(bottomMargin = bottomMargin).apply {
         binding.portfolioListList.addItemDecoration(this)
       }
     }
@@ -180,9 +174,9 @@ internal constructor(
     // Add additional padding to the list bottom to account for the height change in MainContainer
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.portfolioListList.addItemDecoration(this)
-        }
+        LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
+      binding.portfolioListList.addItemDecoration(this)
+    }
   }
 
   private fun setList(list: List<PortfolioStock>) {

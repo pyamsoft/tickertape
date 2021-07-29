@@ -55,7 +55,6 @@ protected constructor(
 
   private var modelAdapter: WatchlistItemAdapter? = null
 
-  private var bottomDecoration: RecyclerView.ItemDecoration? = null
   private var lastScrollPosition = 0
 
   init {
@@ -97,7 +96,6 @@ protected constructor(
 
     doOnTeardown {
       binding.watchlistList.removeAllItemDecorations()
-      bottomDecoration = null
     }
 
     doOnTeardown {
@@ -118,7 +116,6 @@ protected constructor(
   protected fun handleRender(state: UiRender<WatchListViewState>) {
     state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlist(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
-    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
   private fun handleWatchlist(watchlist: PackedData<List<QuotedStock>>) {
@@ -136,15 +133,6 @@ protected constructor(
 
       watchlistError.text = throwable.getUserMessage()
     }
-  }
-
-  private fun handleBottomOffset(height: Int) {
-    // Add additional padding to the list bottom to account for the height change in MainContainer
-    bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
-    bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height * 2).apply {
-          binding.watchlistList.addItemDecoration(this)
-        }
   }
 
   private fun setList(list: List<QuotedStock>) {

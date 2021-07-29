@@ -25,12 +25,12 @@ class PortfolioSectionStocks
 @Inject
 internal constructor(
     parent: ViewGroup,
-    nestedHeader: PortfolioHeader,
-    nestedList: PortfolioList,
+    header: PortfolioHeader,
+    list: PortfolioList,
 ) : UiSectionStocks<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {
-    nest(nestedHeader, nestedList)
+    nest(header, list)
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {

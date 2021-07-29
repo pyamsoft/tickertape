@@ -53,8 +53,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   @JvmField @Inject internal var toolbar: WatchlistToolbar? = null
 
-  @JvmField @Inject internal var spacer: WatchlistSpacer? = null
-
   @JvmField @Inject internal var tabs: WatchlistTabs? = null
 
   @JvmField @Inject internal var container: WatchlistScrollContainer? = null
@@ -94,7 +92,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
             viewModel,
             this,
             toolbar.requireNotNull(),
-            spacer.requireNotNull(),
             tabs.requireNotNull(),
             container.requireNotNull(),
         ) {
@@ -142,7 +139,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     stateSaver = null
     factory = null
 
-    spacer = null
     tabs = null
     container = null
     toolbar = null

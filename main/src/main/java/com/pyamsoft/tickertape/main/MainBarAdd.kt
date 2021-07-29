@@ -17,24 +17,34 @@
 package com.pyamsoft.tickertape.main
 
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
+import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import com.pyamsoft.pydroid.util.doOnApplyWindowInsets
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
 import com.pyamsoft.tickertape.ui.R
 import javax.inject.Inject
 
 class MainBarAdd
 @Inject
-internal constructor(private val imageLoader: ImageLoader, parent: ViewGroup) :
-    BaseUiView<MainViewState, MainViewEvent, MainAddBinding>(parent) {
+internal constructor(
+    private val imageLoader: ImageLoader,
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+) : BaseUiView<MainViewState, MainViewEvent, MainAddBinding>(parent) {
 
   override val viewBinding = MainAddBinding::inflate
 
   override val layoutRoot by boundView { mainBarAdd }
 
   init {
+    doOnInflate {
+      binding.mainBarAdd.doOnApplyWindowInsets(owner) { v, _, _ -> v.updatePadding(0, 0, 0, 0) }
+    }
+
     doOnInflate {
       binding.mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
     }

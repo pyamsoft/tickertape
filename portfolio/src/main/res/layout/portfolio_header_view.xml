@@ -16,7 +16,7 @@
 
 <merge>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/portfolio_header_root"
         android:layout_width="match_parent"
@@ -86,6 +86,6 @@
             android:textColor="@color/red500"
             android:visibility="gone" />
 
-    </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </merge>

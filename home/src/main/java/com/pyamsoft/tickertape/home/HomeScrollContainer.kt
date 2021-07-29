@@ -24,28 +24,30 @@ class HomeScrollContainer
 @Inject
 internal constructor(
     parent: ViewGroup,
-    nestedPortfolio: HomePortfolio,
-    nestedWatchlistTitle: HomeWatchlistTitle,
-    nestedWatchlist: HomeWatchlist,
-    nestedIndexes: HomeIndexList,
-    nestedTrending: HomeTrendingList,
-    nestedGainers: HomeGainerList,
-    nestedLosers: HomeLoserList,
-    nestedMostShorted: HomeMostShortedList,
-    nestedBottomSpacer: HomeBottomSpacer
+    spacer: HomeSpacer,
+    portfolio: HomePortfolio,
+    watchlistTitle: HomeWatchlistTitle,
+    watchlist: HomeWatchlist,
+    indexes: HomeIndexList,
+    trending: HomeTrendingList,
+    gainers: HomeGainerList,
+    losers: HomeLoserList,
+    mostShorted: HomeMostShortedList,
+    bottomSpacer: HomeBottomSpacer
 ) : UiScrollingContainer<HomeViewState, HomeViewEvent>(parent) {
 
   init {
     nest(
-        nestedPortfolio,
-        nestedWatchlistTitle,
-        nestedWatchlist,
-        nestedIndexes,
-        nestedTrending,
-        nestedGainers,
-        nestedLosers,
-        nestedMostShorted,
-        nestedBottomSpacer,
+        spacer,
+        portfolio,
+        watchlistTitle,
+        watchlist,
+        indexes,
+        trending,
+        gainers,
+        losers,
+        mostShorted,
+        bottomSpacer,
     )
   }
 }

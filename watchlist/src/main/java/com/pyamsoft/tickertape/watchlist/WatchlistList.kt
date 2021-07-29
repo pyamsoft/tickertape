@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.graphics.Color
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +55,13 @@ internal constructor(
     }
 
     doOnInflate {
+      // Offset the refresh indicator so it appears where we expect it to on page
+      // start is the "start location"
+      // end is the "pulldown distance"
+      binding.watchlistSwipeRefresh.setProgressViewOffset(false, 200, 400)
+    }
+
+    doOnInflate {
       val margin = 16.asDp(binding.watchlistList.context)
 
       // Standard margin on all items
@@ -83,7 +89,7 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {
-    handleRender(state, includeAppBarSpacer = true)
+    handleRender(state)
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 

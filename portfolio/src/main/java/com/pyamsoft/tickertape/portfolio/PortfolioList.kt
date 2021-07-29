@@ -78,6 +78,13 @@ internal constructor(
 
     doOnInflate { binding.portfolioListSwipeRefresh.setOnRefreshListener(this) }
 
+    doOnInflate {
+      // Offset the refresh indicator so it appears where we expect it to on page
+      // start is the "start location"
+      // end is the "pulldown distance"
+      binding.portfolioListSwipeRefresh.setProgressViewOffset(false, 200, 400)
+    }
+
     doOnInflate { savedInstanceState ->
       val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
       if (position >= 0) {

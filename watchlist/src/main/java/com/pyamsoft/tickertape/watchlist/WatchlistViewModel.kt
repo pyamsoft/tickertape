@@ -16,20 +16,21 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
+import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
@@ -57,6 +58,7 @@ internal constructor(
         addNewBus = addNewBus,
         initialState =
             WatchListViewState(
+                embedded = false,
                 query = "",
                 section = DEFAULT_SECTION,
                 isLoading = false,
@@ -126,8 +128,6 @@ internal constructor(
 
   private fun CoroutineScope.fetchQuotes(force: Boolean) {
     val currentSection = state.section
-    val currentSearch = state.query
-
     setState(
         stateChange = { copy(isLoading = true) },
         andThen = {
@@ -135,20 +135,13 @@ internal constructor(
               .call(force)
               .map { list ->
                 list.filter { qs ->
-                  val type = qs.quote?.type() ?: return@filter false
+                  // If the quote is null, always show this because it was a bad network fetch
+                  val type = qs.quote?.type() ?: return@filter true
                   return@filter when (currentSection) {
                     WatchlistTabSection.STOCK -> !CATCH_ALL_TYPE.contains(type)
                     WatchlistTabSection.OPTION -> type == EquityType.OPTION
                     WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTO
                   }
-                }
-              }
-              .map { list ->
-                list.filter { qs ->
-                  val symbol = qs.symbol.symbol()
-                  val name = qs.quote?.company()?.company()
-                  return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
-                  else name?.contains(currentSearch, ignoreCase = true) ?: false
                 }
               }
               .onSuccess {
@@ -171,32 +164,37 @@ internal constructor(
         })
   }
 
+  @CheckResult
+  private fun getDisplayedItem(index: Int): QuotedStock? {
+    val data = state.displayWatchlist
+    if (data !is PackedData.Data<List<WatchListViewState.DisplayWatchlist>>) {
+      Timber.w("displayWatchlist is not Data: $data")
+      return null
+    }
+
+    val stock = data.value[index]
+    if (stock !is WatchListViewState.DisplayWatchlist.Item) {
+      Timber.w("stock is not DisplayWatchlist.Item: $stock")
+      return null
+    }
+
+    return stock.stock
+  }
+
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.watchlist
-      if (data !is PackedData.Data<List<QuotedStock>>) {
-        Timber.w("Cannot remove symbol in error state: $data")
-        return@launch
-      }
-
-      val quote = data.value[index]
+      val stock = getDisplayedItem(index) ?: return@launch
       interactor
-          .removeQuote(quote.symbol)
-          .onSuccess { Timber.d("Removed quote $quote") }
-          .onFailure { Timber.e(it, "Error removing quote: $quote") }
+          .removeQuote(stock.symbol)
+          .onSuccess { Timber.d("Removed quote $stock") }
+          .onFailure { Timber.e(it, "Error removing quote: $stock") }
     }
   }
 
   fun handleDigSymbol(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.watchlist
-      if (data !is PackedData.Data<List<QuotedStock>>) {
-        Timber.w("Cannot dig symbol in error state: $data")
-        return@launch
-      }
-
-      val quote = data.value[index]
-      publish(WatchListControllerEvent.ManageSymbol(quote))
+      val stock = getDisplayedItem(index) ?: return@launch
+      publish(WatchListControllerEvent.ManageSymbol(stock))
     }
   }
 

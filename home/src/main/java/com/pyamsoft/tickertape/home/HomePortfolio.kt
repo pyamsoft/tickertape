@@ -17,8 +17,10 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
@@ -27,6 +29,13 @@ import javax.inject.Inject
 
 class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
     BasePortfolioHeader<HomeViewState>(parent) {
+
+  init {
+    doOnInflate {
+      val padding = 16.asDp(layoutRoot.context)
+      layoutRoot.updatePadding(left = padding, right = padding, top = padding)
+    }
+  }
 
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.portfolioState }.render(viewScope) { handlePortfolioChanged(it) }

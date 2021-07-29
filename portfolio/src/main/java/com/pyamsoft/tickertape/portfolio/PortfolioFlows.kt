@@ -43,8 +43,19 @@ data class PortfolioViewState(
               } else {
                 emptyList()
               }
+
+          val currentSearch = query
           val allItems =
-              listOf(DisplayPortfolio.Spacer) + header + list.map { DisplayPortfolio.Item(it) }
+              listOf(DisplayPortfolio.Spacer) + header +
+                  list
+                  .asSequence()
+                  .filter { qs ->
+                    val symbol = qs.holding.symbol().symbol()
+                    val name = qs.quote?.quote?.company()?.company()
+                    return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                    else name?.contains(currentSearch, ignoreCase = true) ?: false
+                  }
+                  .map { DisplayPortfolio.Item(it) }
           allItems.pack()
         }
         is PackedData.Error -> portfolio.throwable.packError()

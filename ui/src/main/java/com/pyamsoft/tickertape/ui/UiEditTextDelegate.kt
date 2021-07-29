@@ -85,7 +85,7 @@ private constructor(
       ignoreWatcher { it.setTextKeepState(text) }
     } else {
       // But if the state has been blanked out, clear out the editable
-      initialRenderPerformed = true
+      initialRenderPerformed = false
       ignoreWatcher { it.text.clear() }
     }
   }

@@ -114,6 +114,7 @@ internal constructor(
   private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<QuotedStock>>) {
     handleRender(
         WatchListViewState(
+                embedded = true,
                 query = "",
                 isLoading = state.isLoading,
                 watchlist = state.data,
@@ -121,8 +122,6 @@ internal constructor(
                 section = WatchlistTabSection.STOCK,
                 bottomOffset = 0,
             )
-            .asUiRender(),
-        includeAppBarSpacer = false,
-    )
+            .asUiRender())
   }
 }

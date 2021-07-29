@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:elevation="0dp"
             android:paddingTop="0dp"
+            android:paddingBottom="16dp"
             app:layout_scrollFlags="scroll">
 
             <View

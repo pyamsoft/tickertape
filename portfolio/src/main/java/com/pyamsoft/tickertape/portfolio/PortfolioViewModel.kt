@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
@@ -229,7 +230,6 @@ internal constructor(
 
   private fun CoroutineScope.fetchPortfolio(force: Boolean) {
     val currentSection = state.section
-    val currentSearch = state.query
     setState(
         stateChange = { copy(isLoading = true) },
         andThen = {
@@ -244,14 +244,6 @@ internal constructor(
                   }
                 }
               }
-              .map { list ->
-                list.filter { qs ->
-                  val symbol = qs.holding.symbol().symbol()
-                  val name = qs.quote?.quote?.company()?.company()
-                  return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
-                  else name?.contains(currentSearch, ignoreCase = true) ?: false
-                }
-              }
               .onSuccess {
                 setState { copy(portfolio = PortfolioStockList(it).pack(), isLoading = false) }
               }
@@ -261,22 +253,28 @@ internal constructor(
         })
   }
 
+  @CheckResult
+  private fun getDisplayedItem(index: Int): PortfolioStock? {
+    val data = state.displayPortfolio
+    if (data !is PackedData.Data<List<PortfolioViewState.DisplayPortfolio>>) {
+      Timber.w("displayPortfolio is not Data: $data")
+      return null
+    }
+
+    val stock = data.value[index]
+    if (stock !is PortfolioViewState.DisplayPortfolio.Item) {
+      Timber.w("stock is not DisplayPortfolio.Item: $stock")
+      return null
+    }
+
+    return stock.stock
+  }
+
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.displayPortfolio
-      if (data !is PackedData.Data<List<PortfolioViewState.DisplayPortfolio>>) {
-        Timber.w("displayPortfolio is not Data: $data")
-        return@launch
-      }
-
-      val stock = data.value[index]
-      if (stock !is PortfolioViewState.DisplayPortfolio.Item) {
-        Timber.w("stock is not DisplayPortfolio.Item: $stock")
-        return@launch
-      }
-
+      val stock = getDisplayedItem(index) ?: return@launch
       interactor
-          .removeHolding(stock.stock.holding.id())
+          .removeHolding(stock.holding.id())
           .onSuccess { Timber.d("Removed holding $stock") }
           .onFailure { Timber.e(it, "Error removing holding: $stock") }
     }
@@ -284,19 +282,8 @@ internal constructor(
 
   fun handleManageHolding(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.displayPortfolio
-      if (data !is PackedData.Data<List<PortfolioViewState.DisplayPortfolio>>) {
-        Timber.w("displayPortfolio is not Data: $data")
-        return@launch
-      }
-
-      val stock = data.value[index]
-      if (stock !is PortfolioViewState.DisplayPortfolio.Item) {
-        Timber.w("stock is not DisplayPortfolio.Item: $stock")
-        return@launch
-      }
-
-      publish(PortfolioControllerEvent.ManageHolding(stock.stock))
+      val stock = getDisplayedItem(index) ?: return@launch
+      publish(PortfolioControllerEvent.ManageHolding(stock))
     }
   }
 

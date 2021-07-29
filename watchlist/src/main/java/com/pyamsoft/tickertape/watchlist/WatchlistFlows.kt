@@ -22,15 +22,48 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 
 // Public constructor, used in home module
 data class WatchListViewState(
+    val embedded: Boolean,
     val query: String,
     val section: WatchlistTabSection,
     val isLoading: Boolean,
     val watchlist: PackedData<List<QuotedStock>>,
     val bottomOffset: Int,
-) : UiViewState
+) : UiViewState {
+
+  val displayWatchlist =
+      when (watchlist) {
+        is PackedData.Data -> {
+          val list = watchlist.value
+          val spacer = if (embedded) emptyList() else listOf(DisplayWatchlist.Spacer)
+          val currentSearch = query
+          val allItems =
+              spacer +
+                  list
+                  .asSequence()
+                  .filter { qs ->
+                    val symbol = qs.symbol.symbol()
+                    val name = qs.quote?.company()?.company()
+                    return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                    else name?.contains(currentSearch, ignoreCase = true) ?: false
+                  }
+                  .map { DisplayWatchlist.Item(it) }
+          allItems.pack()
+        }
+        is PackedData.Error -> watchlist.throwable.packError()
+      }
+
+  sealed class DisplayWatchlist {
+
+    object Spacer : DisplayWatchlist()
+
+    data class Item internal constructor(val stock: QuotedStock) : DisplayWatchlist()
+  }
+}
 
 sealed class WatchListViewEvent : UiViewEvent {
 

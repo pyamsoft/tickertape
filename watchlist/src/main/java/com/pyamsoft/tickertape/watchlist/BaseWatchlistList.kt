@@ -29,7 +29,6 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
-import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
@@ -111,17 +110,14 @@ protected constructor(
     return requireNotNull(modelAdapter)
   }
 
-  protected fun handleRender(state: UiRender<WatchListViewState>, includeAppBarSpacer: Boolean) {
-    state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlist(it, includeAppBarSpacer) }
+  protected fun handleRender(state: UiRender<WatchListViewState>) {
+    state.mapChanged { it.displayWatchlist }.render(viewScope) { handleWatchlist(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 
-  private fun handleWatchlist(
-      watchlist: PackedData<List<QuotedStock>>,
-      includeAppBarSpacer: Boolean
-  ) {
+  private fun handleWatchlist(watchlist: PackedData<List<WatchListViewState.DisplayWatchlist>>) {
     return when (watchlist) {
-      is PackedData.Data -> handleList(watchlist.value, includeAppBarSpacer)
+      is PackedData.Data -> handleList(watchlist.value)
       is PackedData.Error -> handleError(watchlist.throwable)
     }
   }
@@ -136,11 +132,17 @@ protected constructor(
     }
   }
 
-  private fun setList(list: List<QuotedStock>, includeAppBarSpacer: Boolean) {
-    val data = list.map { WatchlistItemViewState.Item(symbol = it.symbol, quote = it.quote) }
+  private fun setList(list: List<WatchListViewState.DisplayWatchlist>) {
+    val data =
+        list.map { item ->
+          when (item) {
+            is WatchListViewState.DisplayWatchlist.Item ->
+                WatchlistItemViewState.Item(symbol = item.stock.symbol, quote = item.stock.quote)
+            is WatchListViewState.DisplayWatchlist.Spacer -> WatchlistItemViewState.Spacer
+          }
+        }
     Timber.d("Submit data list: $data")
-    val items = if (includeAppBarSpacer) listOf(WatchlistItemViewState.Spacer) + data else data
-    usingAdapter().submitList(items)
+    usingAdapter().submitList(data)
 
     binding.apply {
       watchlistError.isGone = true
@@ -167,11 +169,11 @@ protected constructor(
     }
   }
 
-  private fun handleList(schedule: List<QuotedStock>, includeAppBarSpacer: Boolean) {
+  private fun handleList(schedule: List<WatchListViewState.DisplayWatchlist>) {
     if (schedule.isEmpty()) {
       clearList()
     } else {
-      setList(schedule, includeAppBarSpacer)
+      setList(schedule)
     }
   }
 

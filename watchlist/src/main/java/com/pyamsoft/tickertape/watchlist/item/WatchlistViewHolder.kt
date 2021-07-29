@@ -32,7 +32,7 @@ internal constructor(
     factory: WatchlistItemComponent.Factory,
     owner: LifecycleOwner,
     callback: WatchlistItemAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistItemViewState> {
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<WatchlistItemViewState.Item> {
 
   @Inject @JvmField internal var summary: WatchlistItemSummary? = null
 
@@ -40,7 +40,7 @@ internal constructor(
 
   @Inject @JvmField internal var quote: WatchlistItemQuote? = null
 
-  private val viewBinder: ViewBinder<WatchlistItemViewState>
+  private val viewBinder: ViewBinder<WatchlistItemViewState.Item>
 
   init {
     factory.create(binding.watchlistItem).inject(this)
@@ -77,7 +77,7 @@ internal constructor(
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: WatchlistItemViewState) {
+  override fun bindState(state: WatchlistItemViewState.Item) {
     viewBinder.bindState(state)
   }
 

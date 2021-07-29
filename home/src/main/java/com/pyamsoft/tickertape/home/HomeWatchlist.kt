@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
@@ -38,13 +39,12 @@ class HomeWatchlist
 internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    factory: WatchlistItemComponent.Factory
-) : BaseWatchlistList<HomeViewState, HomeViewEvent>(parent, owner, factory) {
+    appBarActivity: AppBarActivity,
+    factory: WatchlistItemComponent.Factory,
+) : BaseWatchlistList<HomeViewState, HomeViewEvent>(parent, owner, appBarActivity, factory) {
 
   init {
-    doOnInflate {
-      binding.watchlistSwipeRefresh.isEnabled = false
-    }
+    doOnInflate { binding.watchlistSwipeRefresh.isEnabled = false }
 
     // For some reason the match_parent height does not make this list fill content
     // Either way, we only want the list to be one card high as we will modify it to scroll
@@ -121,6 +121,8 @@ internal constructor(
                 section = WatchlistTabSection.STOCK,
                 bottomOffset = 0,
             )
-            .asUiRender())
+            .asUiRender(),
+        includeAppBarSpacer = false,
+    )
   }
 }

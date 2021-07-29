@@ -22,12 +22,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.ui.PackedData
@@ -36,13 +36,13 @@ import com.pyamsoft.tickertape.watchlist.databinding.WatchlistBinding
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemAdapter
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemViewState
-import io.cabriole.decorator.LinearBoundsMarginDecoration
 import timber.log.Timber
 
 abstract class BaseWatchlistList<S : UiViewState, V : UiViewEvent>
 protected constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
+    appBarActivity: AppBarActivity,
     factory: WatchlistItemComponent.Factory
 ) :
     BaseUiView<S, V, WatchlistBinding>(parent),
@@ -61,13 +61,13 @@ protected constructor(
     doOnInflate {
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
-      modelAdapter = WatchlistItemAdapter.create(factory, owner, this)
+      modelAdapter = WatchlistItemAdapter.create(factory, owner, appBarActivity, this)
       binding.watchlistList.adapter = modelAdapter
     }
 
@@ -94,9 +94,7 @@ protected constructor(
       outState.remove<Nothing>(LAST_SCROLL_POSITION)
     }
 
-    doOnTeardown {
-      binding.watchlistList.removeAllItemDecorations()
-    }
+    doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
 
     doOnTeardown {
       binding.watchlistList.adapter = null
@@ -113,14 +111,17 @@ protected constructor(
     return requireNotNull(modelAdapter)
   }
 
-  protected fun handleRender(state: UiRender<WatchListViewState>) {
-    state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlist(it) }
+  protected fun handleRender(state: UiRender<WatchListViewState>, includeAppBarSpacer: Boolean) {
+    state.mapChanged { it.watchlist }.render(viewScope) { handleWatchlist(it, includeAppBarSpacer) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 
-  private fun handleWatchlist(watchlist: PackedData<List<QuotedStock>>) {
+  private fun handleWatchlist(
+      watchlist: PackedData<List<QuotedStock>>,
+      includeAppBarSpacer: Boolean
+  ) {
     return when (watchlist) {
-      is PackedData.Data -> handleList(watchlist.value)
+      is PackedData.Data -> handleList(watchlist.value, includeAppBarSpacer)
       is PackedData.Error -> handleError(watchlist.throwable)
     }
   }
@@ -135,11 +136,11 @@ protected constructor(
     }
   }
 
-  private fun setList(list: List<QuotedStock>) {
-    val data = list.map { WatchlistItemViewState(symbol = it.symbol, quote = it.quote) }
+  private fun setList(list: List<QuotedStock>, includeAppBarSpacer: Boolean) {
+    val data = list.map { WatchlistItemViewState.Item(symbol = it.symbol, quote = it.quote) }
     Timber.d("Submit data list: $data")
-
-    usingAdapter().submitList(data)
+    val items = if (includeAppBarSpacer) listOf(WatchlistItemViewState.Spacer) + data else data
+    usingAdapter().submitList(items)
 
     binding.apply {
       watchlistError.isGone = true
@@ -166,11 +167,11 @@ protected constructor(
     }
   }
 
-  private fun handleList(schedule: List<QuotedStock>) {
+  private fun handleList(schedule: List<QuotedStock>, includeAppBarSpacer: Boolean) {
     if (schedule.isEmpty()) {
       clearList()
     } else {
-      setList(schedule)
+      setList(schedule, includeAppBarSpacer)
     }
   }
 

@@ -26,7 +26,7 @@ import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemSummaryBinding
 import javax.inject.Inject
 
 class WatchlistItemSummary @Inject internal constructor(parent: ViewGroup) :
-    BaseUiView<WatchlistItemViewState, WatchlistItemViewEvent, WatchlistItemSummaryBinding>(
+    BaseUiView<WatchlistItemViewState.Item, WatchlistItemViewEvent, WatchlistItemSummaryBinding>(
         parent) {
 
   override val viewBinding = WatchlistItemSummaryBinding::inflate
@@ -37,7 +37,7 @@ class WatchlistItemSummary @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { clear() }
   }
 
-  override fun onRender(state: UiRender<WatchlistItemViewState>) {
+  override fun onRender(state: UiRender<WatchlistItemViewState.Item>) {
     state.mapChanged { it.quote }.apply {
       mapChanged { it?.dayOpen() }.render(viewScope) { handleDayOpenChanged(it) }
       mapChanged { it?.dayPreviousClose() }.render(viewScope) { handleDayCloseChanged(it) }

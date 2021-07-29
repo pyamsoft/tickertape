@@ -16,10 +16,12 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import android.graphics.Color
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
@@ -32,9 +34,16 @@ class WatchlistList
 @Inject
 internal constructor(
     parent: ViewGroup,
+    appBarActivity: AppBarActivity,
     owner: LifecycleOwner,
-    factory: WatchlistItemComponent.Factory
-) : BaseWatchlistList<WatchListViewState, WatchListViewEvent>(parent, owner, factory) {
+    factory: WatchlistItemComponent.Factory,
+) :
+    BaseWatchlistList<WatchListViewState, WatchListViewEvent>(
+        parent,
+        owner,
+        appBarActivity,
+        factory,
+    ) {
 
   private var bottomDecoration: RecyclerView.ItemDecoration? = null
 
@@ -74,7 +83,7 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<WatchListViewState>) {
-    handleRender(state)
+    handleRender(state, includeAppBarSpacer = true)
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 

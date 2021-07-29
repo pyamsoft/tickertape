@@ -21,7 +21,12 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-data class WatchlistItemViewState(val symbol: StockSymbol, val quote: StockQuote?) : UiViewState
+sealed class WatchlistItemViewState : UiViewState {
+
+  object Spacer : WatchlistItemViewState()
+
+  data class Item(val symbol: StockSymbol, val quote: StockQuote?) : WatchlistItemViewState()
+}
 
 sealed class WatchlistItemViewEvent : UiViewEvent {
 

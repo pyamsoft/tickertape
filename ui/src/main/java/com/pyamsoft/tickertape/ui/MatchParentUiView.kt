@@ -31,7 +31,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, B>(parent) {
     // Grab the size of the activity parent and use it as our height
     doOnInflate {
       val root = layoutRoot
-      parent.post { root.post { root.updateLayoutParams { this.height = parent.height - 400 } } }
+      parent.post { root.post { root.updateLayoutParams { this.height = parent.height } } }
     }
   }
 }

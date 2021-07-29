@@ -24,7 +24,6 @@ class WatchlistScrollContainer
 @Inject
 internal constructor(
     parent: ViewGroup,
-    spacer: WatchlistSpacer,
     sectionStocks: WatchlistSectionStocks,
     sectionOptions: WatchlistSectionOptions,
     sectionCrypto: WatchlistSectionCrypto,
@@ -32,7 +31,6 @@ internal constructor(
 
   init {
     nest(
-        spacer,
         sectionStocks,
         sectionOptions,
         sectionCrypto,

@@ -23,7 +23,7 @@ import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
 class WatchlistItemClick @Inject internal constructor(parent: ViewGroup) :
-    UiView<WatchlistItemViewState, WatchlistItemViewEvent>() {
+    UiView<WatchlistItemViewState.Item, WatchlistItemViewEvent>() {
 
   init {
 
@@ -32,5 +32,5 @@ class WatchlistItemClick @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
 
-  override fun render(state: UiRender<WatchlistItemViewState>) {}
+  override fun render(state: UiRender<WatchlistItemViewState.Item>) {}
 }

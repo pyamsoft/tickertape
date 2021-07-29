@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.quote.ui.view.QuoteViewState
 import javax.inject.Inject
 
 class WatchlistItemQuote @Inject internal constructor(parent: ViewGroup) :
-    QuoteView<WatchlistItemViewState, WatchlistItemViewEvent>(parent) {
+    QuoteView<WatchlistItemViewState.Item, WatchlistItemViewEvent>(parent) {
 
   override fun handleRemove() {
     publish(WatchlistItemViewEvent.Remove)
@@ -34,11 +34,11 @@ class WatchlistItemQuote @Inject internal constructor(parent: ViewGroup) :
     publish(WatchlistItemViewEvent.Select)
   }
 
-  override fun onRender(state: UiRender<WatchlistItemViewState>) {
+  override fun onRender(state: UiRender<WatchlistItemViewState.Item>) {
     state.render(viewScope) { handleStateChanged(it) }
   }
 
-  private fun handleStateChanged(state: WatchlistItemViewState) {
+  private fun handleStateChanged(state: WatchlistItemViewState.Item) {
     handleRender(
         QuoteViewState(symbol = state.symbol, quote = state.quote, chart = null).asUiRender())
   }

@@ -14,19 +14,20 @@
   ~ limitations under the License.
   -->
 
-<merge>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listitem_spacer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/container_nested_scroll"
+    <FrameLayout
+        android:id="@+id/listitem_spacer_grow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/container_nested_scroll_inner"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:layout_height="0dp" />
 
-    </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
 
-</merge>
+</FrameLayout>

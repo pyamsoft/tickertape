@@ -22,15 +22,21 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
+import com.pyamsoft.tickertape.ui.SpacerViewHolder
 import me.zhanghai.android.fastscroll.PopupTextProvider
+import timber.log.Timber
 
 class PortfolioAdapter
 private constructor(
     private val factory: PortfolioItemComponent.Factory,
     private val owner: LifecycleOwner,
+    private val appBarActivity: AppBarActivity,
     private val callback: Callback
-) : ListAdapter<PortfolioItemViewState, PortfolioItemViewHolder>(DIFFER), PopupTextProvider {
+) : ListAdapter<PortfolioItemViewState, RecyclerView.ViewHolder>(DIFFER), PopupTextProvider {
 
   init {
     setHasStableIds(true)
@@ -38,14 +44,19 @@ private constructor(
 
   companion object {
 
+    private const val VIEW_TYPE_SPACER = 1
+    private const val VIEW_TYPE_HEADER = 2
+    private const val VIEW_TYPE_ITEM = 3
+
     @JvmStatic
     @CheckResult
     fun create(
         factory: PortfolioItemComponent.Factory,
         owner: LifecycleOwner,
+        appBarActivity: AppBarActivity,
         callback: Callback
     ): PortfolioAdapter {
-      return PortfolioAdapter(factory, owner, callback)
+      return PortfolioAdapter(factory, owner, appBarActivity, callback)
     }
 
     private val DIFFER =
@@ -55,7 +66,7 @@ private constructor(
               oldItem: PortfolioItemViewState,
               newItem: PortfolioItemViewState
           ): Boolean {
-            return oldItem.stock.holding.id() == newItem.stock.holding.id()
+            return oldItem::class.java == newItem::class.java
           }
 
           override fun areContentsTheSame(
@@ -68,22 +79,57 @@ private constructor(
   }
 
   override fun getPopupText(position: Int): String {
-    return getItem(position).stock.holding.symbol().symbol()
+    return when (val state = getItem(position)) {
+      is PortfolioItemViewState.Header -> "PORTFOLIO"
+      is PortfolioItemViewState.Item -> state.stock.holding.symbol().symbol()
+      is PortfolioItemViewState.Spacer -> "TOP"
+    }
   }
 
   override fun getItemId(position: Int): Long {
-    return getItem(position).stock.holding.id().hashCode().toLong()
+    return when (val state = getItem(position)) {
+      is PortfolioItemViewState.Header -> state.state.hashCode()
+      is PortfolioItemViewState.Item -> state.stock.holding.id().hashCode()
+      is PortfolioItemViewState.Spacer -> PortfolioItemViewState.Spacer.hashCode()
+    }.toLong()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PortfolioItemViewHolder {
+  override fun getItemViewType(position: Int): Int {
+    return when (getItem(position)) {
+      is PortfolioItemViewState.Header -> VIEW_TYPE_HEADER
+      is PortfolioItemViewState.Item -> VIEW_TYPE_ITEM
+      is PortfolioItemViewState.Spacer -> VIEW_TYPE_SPACER
+    }
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     val inflater = LayoutInflater.from(parent.context)
-    val binding = PortfolioItemBinding.inflate(inflater, parent, false)
-    return PortfolioItemViewHolder(binding, factory, owner, callback)
+    return when (viewType) {
+      VIEW_TYPE_ITEM -> {
+        val binding = PortfolioItemBinding.inflate(inflater, parent, false)
+        PortfolioItemViewHolder(binding, factory, owner, callback)
+      }
+      VIEW_TYPE_HEADER -> {
+        val binding = ListitemFrameBinding.inflate(inflater, parent, false)
+        PortfolioHeaderViewHolder(binding, factory, owner)
+      }
+      VIEW_TYPE_SPACER -> SpacerViewHolder.create(parent, appBarActivity, owner)
+      else -> throw AssertionError("Invalid view type: $viewType")
+    }
   }
 
-  override fun onBindViewHolder(holder: PortfolioItemViewHolder, position: Int) {
-    val state = getItem(position)
-    holder.bindState(state)
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    return when (val state = getItem(position)) {
+      is PortfolioItemViewState.Header -> {
+        val viewHolder = holder as PortfolioHeaderViewHolder
+        viewHolder.bindState(state)
+      }
+      is PortfolioItemViewState.Item -> {
+        val viewHolder = holder as PortfolioItemViewHolder
+        viewHolder.bindState(state)
+      }
+      is PortfolioItemViewState.Spacer -> Timber.d("Ignore bind on Spacer item")
+    }
   }
 
   interface Callback {

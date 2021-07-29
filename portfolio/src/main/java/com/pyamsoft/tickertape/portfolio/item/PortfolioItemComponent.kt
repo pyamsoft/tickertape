@@ -26,6 +26,8 @@ interface PortfolioItemComponent {
 
   fun inject(holder: PortfolioItemViewHolder)
 
+  fun inject(holder: PortfolioHeaderViewHolder)
+
   @Subcomponent.Factory
   interface Factory {
 

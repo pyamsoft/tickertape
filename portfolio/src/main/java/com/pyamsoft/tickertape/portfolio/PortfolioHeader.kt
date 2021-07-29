@@ -18,12 +18,18 @@ package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.asUiRender
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
 import javax.inject.Inject
 
 class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
-    BasePortfolioHeader<PortfolioViewState>(parent) {
+    BasePortfolioHeader<PortfolioItemViewState.Header>(parent) {
 
-  override fun onRender(state: UiRender<PortfolioViewState>) {
-    handleRender(state)
+  override fun onRender(state: UiRender<PortfolioItemViewState.Header>) {
+    state.mapChanged { it.state }.render(viewScope) { handleHeader(it) }
+  }
+
+  private fun handleHeader(state: PortfolioViewState) {
+    handleRender(state.asUiRender())
   }
 }

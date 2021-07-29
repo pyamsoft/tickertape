@@ -26,7 +26,7 @@ import com.pyamsoft.tickertape.ui.UiDelegate
 import javax.inject.Inject
 
 class PortfolioItemQuote @Inject internal constructor(parent: ViewGroup) :
-    QuoteView<PortfolioItemViewState, PortfolioItemViewEvent>(parent), UiDelegate {
+    QuoteView<PortfolioItemViewState.Item, PortfolioItemViewEvent>(parent), UiDelegate {
 
   override fun handleRemove() {
     publish(PortfolioItemViewEvent.Remove)
@@ -36,7 +36,7 @@ class PortfolioItemQuote @Inject internal constructor(parent: ViewGroup) :
     publish(PortfolioItemViewEvent.Select)
   }
 
-  override fun onRender(state: UiRender<PortfolioItemViewState>) {
+  override fun onRender(state: UiRender<PortfolioItemViewState.Item>) {
     state.mapChanged { it.stock }.render(viewScope) { handleStockChanged(it) }
   }
 

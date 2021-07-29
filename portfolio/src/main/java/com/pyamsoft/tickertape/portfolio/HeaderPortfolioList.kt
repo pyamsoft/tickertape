@@ -19,10 +19,17 @@ package com.pyamsoft.tickertape.portfolio
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.tickertape.ui.UiAppBarSpacer
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
 import javax.inject.Inject
 
-class PortfolioBottomSpacer
+class HeaderPortfolioList
 @Inject
-internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
-    UiAppBarSpacer<PortfolioViewState, PortfolioViewEvent>(parent, owner, appBarActivity)
+internal constructor(
+    parent: ViewGroup,
+    owner: LifecycleOwner,
+    appBarActivity: AppBarActivity,
+    factory: PortfolioItemComponent.Factory
+) : BasePortfolioList(parent, owner, appBarActivity, factory) {
+
+  override val includeHeader: Boolean = true
+}

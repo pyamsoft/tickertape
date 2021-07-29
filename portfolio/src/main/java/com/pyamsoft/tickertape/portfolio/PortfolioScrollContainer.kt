@@ -24,7 +24,6 @@ class PortfolioScrollContainer
 @Inject
 internal constructor(
     parent: ViewGroup,
-    spacer: PortfolioSpacer,
     sectionStocks: PortfolioSectionStocks,
     sectionOptions: PortfolioSectionOptions,
     sectionCrypto: PortfolioSectionCrypto,
@@ -32,7 +31,6 @@ internal constructor(
 
   init {
     nest(
-        spacer,
         sectionStocks,
         sectionOptions,
         sectionCrypto,

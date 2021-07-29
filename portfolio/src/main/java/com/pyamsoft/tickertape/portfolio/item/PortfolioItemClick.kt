@@ -23,7 +23,7 @@ import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import javax.inject.Inject
 
 class PortfolioItemClick @Inject internal constructor(parent: ViewGroup) :
-    UiView<PortfolioItemViewState, PortfolioItemViewEvent>() {
+    UiView<PortfolioItemViewState.Item, PortfolioItemViewEvent>() {
 
   init {
 
@@ -32,5 +32,5 @@ class PortfolioItemClick @Inject internal constructor(parent: ViewGroup) :
     doOnTeardown { parent.setOnDebouncedClickListener(null) }
   }
 
-  override fun render(state: UiRender<PortfolioItemViewState>) {}
+  override fun render(state: UiRender<PortfolioItemViewState.Item>) {}
 }

@@ -32,7 +32,7 @@ internal constructor(
     factory: PortfolioItemComponent.Factory,
     owner: LifecycleOwner,
     callback: PortfolioAdapter.Callback
-) : RecyclerView.ViewHolder(binding.root), ViewBinder<PortfolioItemViewState> {
+) : RecyclerView.ViewHolder(binding.root), ViewBinder<PortfolioItemViewState.Item> {
 
   @Inject @JvmField internal var quote: PortfolioItemQuote? = null
 
@@ -40,7 +40,7 @@ internal constructor(
 
   @Inject @JvmField internal var click: PortfolioItemClick? = null
 
-  private val viewBinder: ViewBinder<PortfolioItemViewState>
+  private val viewBinder: ViewBinder<PortfolioItemViewState.Item>
 
   init {
     factory.create(binding.portfolioItemRoot).inject(this)
@@ -77,7 +77,7 @@ internal constructor(
     owner.doOnDestroy { teardown() }
   }
 
-  override fun bindState(state: PortfolioItemViewState) {
+  override fun bindState(state: PortfolioItemViewState.Item) {
     viewBinder.bindState(state)
   }
 

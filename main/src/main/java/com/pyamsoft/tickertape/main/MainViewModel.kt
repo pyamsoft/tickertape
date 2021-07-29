@@ -39,16 +39,34 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
     private val addNewBus: EventBus<AddNew>,
+    private val stopAddBus: EventBus<StopAdd>,
     private val pageBus: EventConsumer<MainPage>,
     @Named("app_name") appNameRes: Int,
 ) :
     UiSavedStateViewModel<MainViewState, MainControllerEvent>(
         savedState,
-        MainViewState(appNameRes = appNameRes, page = DEFAULT_PAGE, bottomBarHeight = 0)) {
+        MainViewState(
+            appNameRes = appNameRes,
+            page = DEFAULT_PAGE,
+            bottomBarHeight = 0,
+            adding = false,
+        )) {
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       pageBus.onEvent { handleSelectPage(it, force = true) }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val adding = restoreSavedState(KEY_ADDING) { false }
+      setState { copy(adding = adding) }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      stopAddBus.onEvent {
+        setState(
+            stateChange = { copy(adding = false) }, andThen = { putSavedState(KEY_ADDING, false) })
+      }
     }
   }
 
@@ -84,11 +102,11 @@ internal constructor(
   }
 
   fun handleAddNewRequest() {
-    Timber.d("Add New requested!")
-    viewModelScope.launch(context = Dispatchers.Default) {
-      // TODO configure type
-      addNewBus.send(AddNew(HoldingType.Stock))
-    }
+    setState(stateChange = { copy(adding = true) }, andThen = { putSavedState(KEY_ADDING, true) })
+  }
+
+  fun handleOpenAdd(type: HoldingType) {
+    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew(type)) }
   }
 
   private suspend inline fun publishNewSelection(
@@ -121,6 +139,7 @@ internal constructor(
         }
 
     private const val KEY_PAGE = "page"
+    private const val KEY_ADDING = "adding"
   }
 
   @AssistedFactory

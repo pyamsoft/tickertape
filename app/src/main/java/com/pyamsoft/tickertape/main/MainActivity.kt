@@ -144,6 +144,7 @@ internal class MainActivity :
             is MainViewEvent.OpenSettings ->
                 viewModel.handleSelectPage(MainPage.Settings, force = false)
             is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
+            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type)
           }
         }
 

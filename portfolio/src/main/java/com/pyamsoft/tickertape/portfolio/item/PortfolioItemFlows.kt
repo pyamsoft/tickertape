@@ -19,12 +19,21 @@ package com.pyamsoft.tickertape.portfolio.item
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.portfolio.PortfolioViewState
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
+import com.pyamsoft.tickertape.ui.PackedData
 
 sealed class PortfolioItemViewState : UiViewState {
   object Spacer : PortfolioItemViewState()
 
-  data class Header internal constructor(val state: PortfolioViewState) : PortfolioItemViewState()
+  data class Header
+  internal constructor(
+      val query: String,
+      val section: PortfolioTabSection,
+      val isLoading: Boolean,
+      val portfolio: PackedData<PortfolioStockList>,
+      val bottomOffset: Int,
+  ) : PortfolioItemViewState()
 
   data class Item internal constructor(val stock: PortfolioStock) : PortfolioItemViewState()
 }

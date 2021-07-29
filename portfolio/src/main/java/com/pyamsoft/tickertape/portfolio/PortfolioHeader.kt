@@ -26,10 +26,18 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
     BasePortfolioHeader<PortfolioItemViewState.Header>(parent) {
 
   override fun onRender(state: UiRender<PortfolioItemViewState.Header>) {
-    state.mapChanged { it.state }.render(viewScope) { handleHeader(it) }
+    state.render(viewScope) { handleHeader(it) }
   }
 
-  private fun handleHeader(state: PortfolioViewState) {
-    handleRender(state.asUiRender())
+  private fun handleHeader(state: PortfolioItemViewState.Header) {
+    handleRender(
+        PortfolioViewState(
+                query = state.query,
+                section = state.section,
+                isLoading = state.isLoading,
+                portfolio = state.portfolio,
+                bottomOffset = state.bottomOffset,
+            )
+            .asUiRender())
   }
 }

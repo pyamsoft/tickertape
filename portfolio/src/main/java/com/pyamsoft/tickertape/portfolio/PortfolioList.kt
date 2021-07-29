@@ -17,10 +17,29 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
+import androidx.annotation.CheckResult
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.pyamsoft.pydroid.arch.BaseUiView
+import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
+import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
+import com.pyamsoft.pydroid.util.asDp
+import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
+import com.pyamsoft.tickertape.portfolio.item.PortfolioAdapter
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItemComponent
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItemViewState
+import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.getUserMessage
+import io.cabriole.decorator.LinearBoundsMarginDecoration
+import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import timber.log.Timber
 
 class PortfolioList
 @Inject
@@ -29,7 +48,187 @@ internal constructor(
     owner: LifecycleOwner,
     appBarActivity: AppBarActivity,
     factory: PortfolioItemComponent.Factory
-) : BasePortfolioList(parent, owner, appBarActivity, factory) {
+) :
+    BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
+    SwipeRefreshLayout.OnRefreshListener,
+    PortfolioAdapter.Callback {
 
-  override val includeHeader: Boolean = false
+  override val viewBinding = PortfolioListBinding::inflate
+
+  override val layoutRoot by boundView { portfolioListSwipeRefresh }
+
+  private var modelAdapter: PortfolioAdapter? = null
+
+  private var bottomDecoration: RecyclerView.ItemDecoration? = null
+  private var lastScrollPosition = 0
+
+  init {
+    doOnInflate {
+      binding.portfolioListList.layoutManager =
+          LinearLayoutManager(binding.portfolioListList.context).apply {
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
+    }
+
+    doOnInflate {
+      modelAdapter = PortfolioAdapter.create(factory, owner, appBarActivity, this)
+      binding.portfolioListList.adapter = modelAdapter
+    }
+
+    doOnInflate { binding.portfolioListSwipeRefresh.setOnRefreshListener(this) }
+
+    doOnInflate { savedInstanceState ->
+      val position = savedInstanceState.get(LAST_SCROLL_POSITION) ?: -1
+      if (position >= 0) {
+        Timber.d("Last scroll position saved at: $position")
+        lastScrollPosition = position
+      }
+    }
+
+    doOnSaveState { outState ->
+      val manager = binding.portfolioListList.layoutManager
+      if (manager is LinearLayoutManager) {
+        val position = manager.findFirstVisibleItemPosition()
+        if (position > 0) {
+          outState.put(LAST_SCROLL_POSITION, position)
+          return@doOnSaveState
+        }
+      }
+
+      outState.remove<Nothing>(LAST_SCROLL_POSITION)
+    }
+
+    doOnInflate {
+      val margin = 16.asDp(binding.portfolioListList.context)
+
+      // Standard margin on all items
+      // For some reason, the margin registers only half as large as it needs to
+      // be, so we must double it.
+      LinearMarginDecoration.create(margin).apply {
+        binding.portfolioListList.addItemDecoration(this)
+      }
+    }
+
+    doOnInflate {
+      FastScrollerBuilder(binding.portfolioListList)
+          .useMd2Style()
+          .setPopupTextProvider(usingAdapter())
+          .build()
+    }
+
+    doOnTeardown {
+      binding.portfolioListList.removeAllItemDecorations()
+      bottomDecoration = null
+    }
+
+    doOnTeardown {
+      binding.portfolioListList.adapter = null
+
+      binding.portfolioListSwipeRefresh.setOnRefreshListener(null)
+      binding.portfolioListError.text = null
+
+      modelAdapter = null
+    }
+  }
+
+  @CheckResult
+  private fun usingAdapter(): PortfolioAdapter {
+    return requireNotNull(modelAdapter)
+  }
+
+  override fun onSelect(index: Int) {
+    publish(PortfolioViewEvent.Manage(index))
+  }
+
+  override fun onRefresh() {
+    publish(PortfolioViewEvent.ForceRefresh)
+  }
+
+  override fun onRemove(index: Int) {
+    publish(PortfolioViewEvent.Remove(index))
+  }
+
+  override fun onRender(state: UiRender<PortfolioViewState>) {
+    state.render(viewScope) { handlePortfolio(it) }
+    state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
+    state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+  }
+
+  private fun handlePortfolio(state: PortfolioViewState) {
+    return when (val portfolio = state.displayPortfolio) {
+      is PackedData.Data -> handleList(portfolio.value)
+      is PackedData.Error -> handleError(portfolio.throwable)
+    }
+  }
+
+  private fun handleError(throwable: Throwable) {
+    binding.apply {
+      portfolioListList.isGone = true
+      portfolioListEmptyState.isGone = true
+      portfolioListError.isVisible = true
+
+      portfolioListError.text = throwable.getUserMessage()
+    }
+  }
+
+  private fun handleBottomOffset(height: Int) {
+    // Add additional padding to the list bottom to account for the height change in MainContainer
+    bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
+    bottomDecoration =
+        LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
+      binding.portfolioListList.addItemDecoration(this)
+    }
+  }
+
+  private fun setList(items: List<PortfolioViewState.DisplayPortfolio>) {
+    val data =
+        items.map { item ->
+          when (item) {
+            is PortfolioViewState.DisplayPortfolio.Header ->
+                PortfolioItemViewState.Header(
+                    query = item.query,
+                    section = item.section,
+                    portfolio = item.portfolio,
+                    isLoading = item.isLoading,
+                    bottomOffset = item.bottomOffset)
+            is PortfolioViewState.DisplayPortfolio.Item -> PortfolioItemViewState.Item(item.stock)
+            is PortfolioViewState.DisplayPortfolio.Spacer -> PortfolioItemViewState.Spacer
+          }
+        }
+    Timber.d("Submit data list: $data")
+    usingAdapter().submitList(data)
+
+    binding.apply {
+      portfolioListError.isGone = true
+      portfolioListEmptyState.isGone = true
+      portfolioListList.isVisible = true
+    }
+  }
+
+  private fun clearList() {
+    usingAdapter().submitList(null)
+
+    binding.apply {
+      portfolioListError.isGone = true
+      portfolioListList.isGone = true
+      portfolioListEmptyState.isVisible = true
+    }
+  }
+
+  private fun handleLoading(loading: Boolean) {
+    binding.portfolioListSwipeRefresh.isRefreshing = loading
+  }
+
+  private fun handleList(list: List<PortfolioViewState.DisplayPortfolio>) {
+    if (list.isEmpty()) {
+      clearList()
+    } else {
+      setList(list)
+    }
+  }
+
+  companion object {
+    private const val LAST_SCROLL_POSITION = "portfolio_last_scroll_position"
+  }
 }

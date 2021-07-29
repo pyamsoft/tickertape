@@ -25,7 +25,7 @@ class PortfolioSectionStocks
 @Inject
 internal constructor(
     parent: ViewGroup,
-    list: HeaderPortfolioList,
+    list: PortfolioList,
 ) : UiSectionStocks<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {

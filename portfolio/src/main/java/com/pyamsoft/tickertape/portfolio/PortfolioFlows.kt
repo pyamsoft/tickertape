@@ -21,6 +21,8 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.pack
+import com.pyamsoft.tickertape.ui.packError
 
 // Public constructor, used in home module
 data class PortfolioViewState(
@@ -29,7 +31,41 @@ data class PortfolioViewState(
     val isLoading: Boolean,
     val portfolio: PackedData<PortfolioStockList>,
     val bottomOffset: Int,
-) : UiViewState
+) : UiViewState {
+
+  val displayPortfolio =
+      when (portfolio) {
+        is PackedData.Data -> {
+          val list = portfolio.value.list
+          val header =
+              if (section == PortfolioTabSection.STOCK) {
+                listOf(DisplayPortfolio.Header(query, section, isLoading, portfolio, bottomOffset))
+              } else {
+                emptyList()
+              }
+          val allItems =
+              listOf(DisplayPortfolio.Spacer) + header + list.map { DisplayPortfolio.Item(it) }
+          allItems.pack()
+        }
+        is PackedData.Error -> portfolio.throwable.packError()
+      }
+
+  sealed class DisplayPortfolio {
+
+    object Spacer : DisplayPortfolio()
+
+    data class Header
+    internal constructor(
+        val query: String,
+        val section: PortfolioTabSection,
+        val isLoading: Boolean,
+        val portfolio: PackedData<PortfolioStockList>,
+        val bottomOffset: Int,
+    ) : DisplayPortfolio()
+
+    data class Item internal constructor(val stock: PortfolioStock) : DisplayPortfolio()
+  }
+}
 
 sealed class PortfolioViewEvent : UiViewEvent {
 

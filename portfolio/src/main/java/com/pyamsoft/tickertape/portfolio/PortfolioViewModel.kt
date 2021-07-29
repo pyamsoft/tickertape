@@ -23,15 +23,15 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
-import com.pyamsoft.tickertape.main.MainAdderViewModel
-import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.main.AddNew
+import com.pyamsoft.tickertape.main.MainAdderViewModel
+import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
@@ -263,15 +263,20 @@ internal constructor(
 
   fun handleRemove(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.portfolio
-      if (data !is PackedData.Data<PortfolioStockList>) {
-        Timber.w("Cannot remove symbol in error state: $data")
+      val data = state.displayPortfolio
+      if (data !is PackedData.Data<List<PortfolioViewState.DisplayPortfolio>>) {
+        Timber.w("displayPortfolio is not Data: $data")
         return@launch
       }
 
-      val stock = data.value.list[index]
+      val stock = data.value[index]
+      if (stock !is PortfolioViewState.DisplayPortfolio.Item) {
+        Timber.w("stock is not DisplayPortfolio.Item: $stock")
+        return@launch
+      }
+
       interactor
-          .removeHolding(stock.holding.id())
+          .removeHolding(stock.stock.holding.id())
           .onSuccess { Timber.d("Removed holding $stock") }
           .onFailure { Timber.e(it, "Error removing holding: $stock") }
     }
@@ -279,14 +284,19 @@ internal constructor(
 
   fun handleManageHolding(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      val data = state.portfolio
-      if (data !is PackedData.Data<PortfolioStockList>) {
-        Timber.w("Cannot manage symbol in error state: $data")
+      val data = state.displayPortfolio
+      if (data !is PackedData.Data<List<PortfolioViewState.DisplayPortfolio>>) {
+        Timber.w("displayPortfolio is not Data: $data")
         return@launch
       }
 
-      val stock = data.value.list[index]
-      publish(PortfolioControllerEvent.ManageHolding(stock))
+      val stock = data.value[index]
+      if (stock !is PortfolioViewState.DisplayPortfolio.Item) {
+        Timber.w("stock is not DisplayPortfolio.Item: $stock")
+        return@launch
+      }
+
+      publish(PortfolioControllerEvent.ManageHolding(stock.stock))
     }
   }
 

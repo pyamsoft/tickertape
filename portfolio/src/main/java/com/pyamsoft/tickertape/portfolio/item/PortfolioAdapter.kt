@@ -88,7 +88,7 @@ private constructor(
 
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
-      is PortfolioItemViewState.Header -> state.state.hashCode()
+      is PortfolioItemViewState.Header -> state.hashCode()
       is PortfolioItemViewState.Item -> state.stock.holding.id().hashCode()
       is PortfolioItemViewState.Spacer -> PortfolioItemViewState.Spacer.hashCode()
     }.toLong()

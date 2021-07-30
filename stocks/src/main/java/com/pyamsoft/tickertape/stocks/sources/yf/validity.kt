@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.sources.yf
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
@@ -63,14 +64,20 @@ private fun NetworkChartResponse.Resp.SymbolChart.isValidStockData(): Boolean {
 @CheckResult
 internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
   return stock.run {
-    postMarketChange != null && postMarketPrice != null && postMarketChangePercent != null
+    marketState != MarketState.REGULAR &&
+        postMarketChange != null &&
+        postMarketPrice != null &&
+        postMarketChangePercent != null
   }
 }
 
 @CheckResult
 internal fun hasPreMarketData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
   return stock.run {
-    preMarketChange != null && preMarketPrice != null && preMarketChangePercent != null
+    marketState != MarketState.REGULAR &&
+        preMarketChange != null &&
+        preMarketPrice != null &&
+        preMarketChangePercent != null
   }
 }
 

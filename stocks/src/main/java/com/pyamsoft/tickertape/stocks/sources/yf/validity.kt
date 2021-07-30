@@ -68,6 +68,13 @@ internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean 
 }
 
 @CheckResult
+internal fun hasPreMarketData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
+  return stock.run {
+    preMarketChange != null && preMarketPrice != null && preMarketChangePercent != null
+  }
+}
+
+@CheckResult
 internal fun Sequence<NetworkTrendingResponse.Resp.Trending>.filterOnlyValidTrending():
     Sequence<NetworkTrendingResponse.Resp.Trending> {
   // We need all of these values to have a valid trender

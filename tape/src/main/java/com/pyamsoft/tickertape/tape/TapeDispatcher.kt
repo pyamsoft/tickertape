@@ -112,12 +112,19 @@ internal constructor(
 
   @CheckResult
   private fun getQuoteSession(quote: StockQuote): StockMarketSession {
-    val after = quote.afterHours()
-    if (after != null) {
-      return after
-    }
+    return quote.run {
+      val pre = preMarket()
+      if (pre != null) {
+        return@run pre
+      }
 
-    return quote.regular()
+      val after = afterHours()
+      if (after != null) {
+        return@run after
+      }
+
+      return@run regular()
+    }
   }
 
   private fun updateTickerInfo(

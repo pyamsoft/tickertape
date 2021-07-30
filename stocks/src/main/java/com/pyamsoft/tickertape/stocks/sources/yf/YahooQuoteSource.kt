@@ -100,7 +100,18 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
                     price = requireNotNull(stock.postMarketPrice).asMoney(),
                 )
-              })
+              },
+          preMarket =
+              if (!hasPreMarketData(stock)) null
+              else {
+                StockMarketSessionImpl(
+                    amount = stock.preMarketChange.requireNotNull().asMoney(),
+                    direction = stock.preMarketChange.requireNotNull().asDirection(),
+                    percent = stock.preMarketChangePercent.requireNotNull().asPercent(),
+                    price = stock.preMarketPrice.requireNotNull().asMoney(),
+                )
+              },
+      )
     }
 
     @JvmStatic
@@ -132,7 +143,18 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
                     price = requireNotNull(stock.postMarketPrice).asMoney(),
                 )
-              })
+              },
+          preMarket =
+              if (!hasPreMarketData(stock)) null
+              else {
+                StockMarketSessionImpl(
+                    amount = stock.preMarketChange.requireNotNull().asMoney(),
+                    direction = stock.preMarketChange.requireNotNull().asDirection(),
+                    percent = stock.preMarketChangePercent.requireNotNull().asPercent(),
+                    price = stock.preMarketPrice.requireNotNull().asMoney(),
+                )
+              },
+      )
     }
 
     private val YF_QUOTE_FIELDS =
@@ -157,6 +179,10 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 "postMarketPrice",
                 "postMarketChange",
                 "postMarketChangePercent",
+                // Pre Market
+                "preMarketPrice",
+                "preMarketChange",
+                "preMarketChangePercent",
             )
             .joinToString(",")
     private const val YF_QUOTE_FORMAT = "json"

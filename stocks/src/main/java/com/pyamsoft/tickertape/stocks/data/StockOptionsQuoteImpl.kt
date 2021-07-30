@@ -31,6 +31,7 @@ internal data class StockOptionsQuoteImpl(
     private val equityType: String,
     private val expireDate: LocalDateTime,
     private val regular: StockMarketSession,
+    private val preMarket: StockMarketSession?,
     private val afterHours: StockMarketSession?,
     private val dataDelayBy: Long,
     private val dayPreviousClose: StockMoneyValue?,
@@ -66,6 +67,10 @@ internal data class StockOptionsQuoteImpl(
 
   override fun regular(): StockMarketSession {
     return regular
+  }
+
+  override fun preMarket(): StockMarketSession? {
+    return preMarket
   }
 
   override fun afterHours(): StockMarketSession? {

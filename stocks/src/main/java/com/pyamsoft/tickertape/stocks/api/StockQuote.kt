@@ -28,6 +28,8 @@ interface StockQuote {
 
   @CheckResult fun regular(): StockMarketSession
 
+  @CheckResult fun preMarket(): StockMarketSession?
+
   @CheckResult fun afterHours(): StockMarketSession?
 
   @CheckResult fun dataDelayBy(): Long
@@ -41,4 +43,9 @@ interface StockQuote {
   @CheckResult fun dayLow(): StockMoneyValue
 
   @CheckResult fun dayVolume(): StockVolumeValue
+}
+
+@CheckResult
+fun StockQuote.currentSession(): StockMarketSession {
+  return preMarket() ?: afterHours() ?: regular()
 }

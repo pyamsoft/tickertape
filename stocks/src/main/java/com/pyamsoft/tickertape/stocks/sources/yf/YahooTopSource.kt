@@ -139,7 +139,21 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                                   .asPercent(),
                                           price = requireNotNull(stock.postMarketPrice).asMoney(),
                                       )
-                                    })
+                                    },
+                                preMarket =
+                                    if (!hasPreMarketData(stock)) null
+                                    else {
+                                      StockMarketSessionImpl(
+                                          amount = requireNotNull(stock.preMarketChange).asMoney(),
+                                          direction =
+                                              requireNotNull(stock.preMarketChange).asDirection(),
+                                          percent =
+                                              requireNotNull(stock.preMarketChangePercent)
+                                                  .asPercent(),
+                                          price = requireNotNull(stock.preMarketPrice).asMoney(),
+                                      )
+                                    },
+                            )
                           }
                           .toList())
             }

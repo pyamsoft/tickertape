@@ -93,19 +93,32 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
     val quote = notification.quote
     val session: StockMarketSession
-    val isAfterHours: Boolean
+    val sessionType: SessionType
     val afterHoursSession = quote.afterHours()
-    if (afterHoursSession == null) {
-      session = quote.regular()
-      isAfterHours = false
-    } else {
-      session = afterHoursSession
-      isAfterHours = true
+    val preMarketSession = quote.preMarket()
+    when {
+      afterHoursSession != null -> {
+        session = afterHoursSession
+        sessionType = SessionType.POST
+      }
+      preMarketSession != null -> {
+        session = preMarketSession
+        sessionType = SessionType.PRE
+      }
+      else -> {
+        session = quote.regular()
+        sessionType = SessionType.REGULAR
+      }
     }
 
     val percent = session.percent()
     val direction = session.direction()
-    val afterHoursString = if (isAfterHours) "after hours" else "so far today"
+    val sessionString =
+        when (sessionType) {
+          SessionType.REGULAR -> "so far today"
+          SessionType.POST -> "after hours"
+          SessionType.PRE -> "pre-market"
+        }
 
     @DrawableRes val icon: Int
     val movingString: String
@@ -135,7 +148,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
       bold { append(quote.symbol().symbol()) }
       append(" is $directionString ")
       bold { append(percent.asPercentValue()) }
-      append(" $afterHoursString")
+      append(" $sessionString")
     }
 
     return NotificationCompat.Builder(context.applicationContext, channelInfo.id)
@@ -155,5 +168,11 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
   companion object {
     private const val REQUEST_CODE_ACTIVITY = 69420
+  }
+
+  private enum class SessionType {
+    REGULAR,
+    POST,
+    PRE,
   }
 }

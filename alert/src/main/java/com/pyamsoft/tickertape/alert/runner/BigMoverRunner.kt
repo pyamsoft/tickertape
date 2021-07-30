@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.coroutineScope
@@ -69,7 +70,7 @@ internal constructor(
     return this.asSequence()
         .mapNotNull { it.quote }
         .filter { quote ->
-          val session = quote.afterHours() ?: quote.regular()
+          val session = quote.currentSession()
           val value = session.percent().value()
           return@filter value.compareTo(10.0) > 0 || value.compareTo(-10.0) < 1
         }

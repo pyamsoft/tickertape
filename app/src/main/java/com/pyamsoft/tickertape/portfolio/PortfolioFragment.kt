@@ -39,6 +39,7 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
 import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
@@ -118,7 +119,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   private fun handleOpenHoldingManageDialog(stock: PortfolioStock) {
     val q = stock.quote?.quote
-    val session = q?.afterHours() ?: q?.regular()
+    val session = q?.currentSession()
     PositionManageDialog.newInstance(stock, session?.price())
         .show(requireActivity(), PositionManageDialog.TAG)
   }

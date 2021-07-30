@@ -92,11 +92,12 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
   private fun handleQuotePresent(quote: StockQuote) {
     handleCompanyChanged(quote.company())
 
+    val preMarket = quote.preMarket()
     val afterHours = quote.afterHours()
-    if (afterHours == null) {
-      handleSessionChanged("Normal Market", quote.regular())
-    } else {
-      handleSessionChanged("After Hours", afterHours)
+    when {
+      afterHours != null -> handleSessionChanged("After Hours", afterHours)
+      preMarket != null -> handleSessionChanged("Pre-Market", preMarket)
+      else -> handleSessionChanged("Normal Market", quote.regular())
     }
   }
 

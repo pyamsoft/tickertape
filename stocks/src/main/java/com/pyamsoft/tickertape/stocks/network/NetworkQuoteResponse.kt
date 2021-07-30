@@ -50,6 +50,11 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
         val postMarketChange: Double?,
         val postMarketChangePercent: Double?,
         val postMarketPreviousClose: Double?,
+        // Pre market
+        val preMarketPrice: Double?,
+        val preMarketChange: Double?,
+        val preMarketChangePercent: Double?,
+        val preMarketPreviousClose: Double?,
     )
   }
 }

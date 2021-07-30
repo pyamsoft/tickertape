@@ -16,10 +16,70 @@
   ~ limitations under the License.
   -->
 
-<merge>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
+        android:id="@+id/main_bar_add_crypto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/main_bar_add_options">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/floater_background"
+            android:padding="8dp"
+            android:text="Add Cryptocurrency"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorOnPrimary" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/main_bar_add_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/main_bar_add_stock">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/floater_background"
+            android:padding="8dp"
+            android:text="Add Options"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorOnPrimary" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/main_bar_add_stock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layout_anchor="@id/main_bar_add">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/floater_background"
+            android:padding="8dp"
+            android:text="Add Stock"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorOnPrimary" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/main_bar_add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,5 +89,6 @@
         app:fabSize="normal"
         app:layout_anchor="@id/main_bar_root"
         app:pressedTranslationZ="12dp" />
+
 </merge>
 

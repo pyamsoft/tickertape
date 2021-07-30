@@ -48,7 +48,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
             .quotes
             .asSequence()
             .map { quote ->
-              val company = requireNotNull(quote.longname ?: quote.shortname).asCompany()
+              val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
               return@map SearchResultImpl(
                   symbol = quote.symbol.asSymbol(),
                   name = company,

@@ -92,10 +92,20 @@ protected constructor(
 
     val result = data.value[index]
     Timber.d("Result selected: $result")
-    // TODO on select, load text as result.symbol and figure out type
+      // We have to clear first to reset the delegate, and then we re-publish with the text
+      setState(stateChange = { copy(query = "")}, andThen = {
+          setState { copy(query = result.symbol().symbol()) }
+      })
   }
 
-  abstract fun handleCommitSymbol()
+  fun handleCommitSymbol() {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      onCommitSymbol()
+      setState { copy(query = "") }
+   }
+  }
+
+  protected abstract suspend fun onCommitSymbol()
 
   companion object {
 

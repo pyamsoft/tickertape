@@ -17,9 +17,11 @@
 package com.pyamsoft.tickertape.main.add
 
 import android.view.ViewGroup
+import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.tickertape.main.R
+import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.UiDialogToolbar
 import javax.inject.Inject
 
@@ -53,11 +55,26 @@ internal constructor(
     }
   }
 
+  override fun onRender(state: UiRender<SymbolAddViewState>) {
+    state.mapChanged { it.type }.render(viewScope) { handleType(it) }
+  }
+
+  private fun handleType(type: HoldingType) {
+    val name =
+        when (type) {
+          is HoldingType.Crypto -> "Cryptocurrency"
+          is HoldingType.Stock -> "Stock"
+          is HoldingType.Options.Buy, is HoldingType.Options.Sell -> "Option"
+        }
+    binding.uiToolbar.title = "Add $name"
+  }
+
   private fun clear() {
     binding.uiToolbar.apply {
       menu.clear()
       setNavigationOnClickListener(null)
       setOnMenuItemClickListener(null)
+      title = ""
     }
   }
 }

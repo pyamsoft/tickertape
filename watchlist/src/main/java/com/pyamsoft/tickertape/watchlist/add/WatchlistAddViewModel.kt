@@ -16,10 +16,8 @@
 
 package com.pyamsoft.tickertape.watchlist.add
 
-import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.stocks.api.HoldingType
@@ -27,8 +25,6 @@ import com.pyamsoft.tickertape.stocks.api.asSymbols
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WatchlistAddViewModel
@@ -40,16 +36,14 @@ internal constructor(
     thisHoldingType: HoldingType,
 ) : SymbolAddViewModel(savedState, addInteractor, thisHoldingType) {
 
-  override fun handleCommitSymbol() {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      val symbol = state.query
+  override suspend fun onCommitSymbol() {
+    val symbol = state.query
 
-      Timber.d("Commit symbol to DB: $symbol")
-      interactor
-          .commitSymbol(symbol.asSymbols())
-          .onSuccess { Timber.d("Committed symbols: $symbol") }
-          .onFailure { Timber.e(it, "Error committing symbols: $symbol") }
-    }
+    Timber.d("Commit symbol to DB: $symbol")
+    interactor
+        .commitSymbol(symbol.asSymbols())
+        .onSuccess { Timber.d("Committed symbols: $symbol") }
+        .onFailure { Timber.e(it, "Error committing symbols: $symbol") }
   }
 
   @AssistedFactory

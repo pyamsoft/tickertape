@@ -39,7 +39,6 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
     private val addNewBus: EventBus<AddNew>,
-    private val stopAddBus: EventBus<StopAdd>,
     private val pageBus: EventConsumer<MainPage>,
     @Named("app_name") appNameRes: Int,
 ) :
@@ -60,13 +59,6 @@ internal constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       val adding = restoreSavedState(KEY_ADDING) { false }
       setState { copy(adding = adding) }
-    }
-
-    viewModelScope.launch(context = Dispatchers.Default) {
-      stopAddBus.onEvent {
-        setState(
-            stateChange = { copy(adding = false) }, andThen = { putSavedState(KEY_ADDING, false) })
-      }
     }
   }
 
@@ -95,18 +87,22 @@ internal constructor(
     // If the pages match we can just run the after, no need to set and publish
     val oldPage = state.page
     setState(
-        stateChange = { copy(page = newPage) },
+        stateChange = { copy(page = newPage, adding = false) },
         andThen = { newState ->
           publishNewSelection(requireNotNull(newState.page), oldPage, force)
         })
   }
 
   fun handleAddNewRequest() {
-    setState(stateChange = { copy(adding = true) }, andThen = { putSavedState(KEY_ADDING, true) })
+    setState(
+        stateChange = { copy(adding = !state.adding) },
+        andThen = { newState -> putSavedState(KEY_ADDING, newState.adding) })
   }
 
   fun handleOpenAdd(type: HoldingType) {
-    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew(type)) }
+    viewModelScope.launch(context = Dispatchers.Default) {
+      setState(stateChange = { copy(adding = false) }, andThen = { addNewBus.send(AddNew(type)) })
+    }
   }
 
   private suspend inline fun publishNewSelection(

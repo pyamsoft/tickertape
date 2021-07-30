@@ -35,10 +35,6 @@ abstract class MainModule {
   @CheckResult
   internal abstract fun bindAddNewConsumer(impl: EventBus<AddNew>): EventConsumer<AddNew>
 
-  @Binds
-  @CheckResult
-  internal abstract fun bindStopAddConsumer(impl: EventBus<StopAdd>): EventConsumer<StopAdd>
-
   @Module
   companion object {
 
@@ -55,14 +51,6 @@ abstract class MainModule {
     @Singleton
     @CheckResult
     internal fun provideAddNewBus(): EventBus<AddNew> {
-      return EventBus.create(emitOnlyWhenActive = false)
-    }
-
-    @Provides
-    @JvmStatic
-    @Singleton
-    @CheckResult
-    internal fun provideStopAddBus(): EventBus<StopAdd> {
       return EventBus.create(emitOnlyWhenActive = false)
     }
   }

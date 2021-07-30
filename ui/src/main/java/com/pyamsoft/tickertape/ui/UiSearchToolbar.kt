@@ -18,7 +18,9 @@ package com.pyamsoft.tickertape.ui
 
 import android.os.Handler
 import android.os.Looper
+import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.iterator
@@ -26,11 +28,18 @@ import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 
 abstract class UiSearchToolbar<S : UiViewState, V : UiViewEvent>
 protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, V>() {
+
+  // We must generate the menu item here instead of inflating a menu XML
+  // or else the expand-collapse listener doesn't work for some dumb reason.
+  private val groupIdSearch = View.generateViewId()
+  private val itemIdSearch = View.generateViewId()
+
+  // Cache the created menuItem to avoid menu.findItem() lookups
+  private var searchItem: MenuItem? = null
 
   private val publishHandler = Handler(Looper.getMainLooper())
 
@@ -48,9 +57,13 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
   init {
     doOnInflate {
       toolbarActivity.withToolbar { toolbar ->
-        toolbar.inflateMenu(R.menu.search)
-        toolbar.menu.findItem(R.id.menu_search).requireNotNull().apply {
-          setOnActionExpandListener(
+        searchItem =
+            toolbar.menu.add(groupIdSearch, itemIdSearch, Menu.NONE, "Search").also { item ->
+          item.setIcon(R.drawable.ic_search_24dp)
+          item.setShowAsAction(
+              MenuItem.SHOW_AS_ACTION_IF_ROOM or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+
+          item.setOnActionExpandListener(
               object : MenuItem.OnActionExpandListener {
 
                 override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
@@ -64,21 +77,21 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
                 }
               })
 
-          actionView =
+          item.actionView =
               SearchView(toolbar.context).apply {
-                setOnQueryTextListener(
-                    object : SearchView.OnQueryTextListener {
-                      override fun onQueryTextSubmit(query: String): Boolean {
-                        publishSearch(query)
-                        return true
-                      }
+            setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                  override fun onQueryTextSubmit(query: String): Boolean {
+                    publishSearch(query)
+                    return true
+                  }
 
-                      override fun onQueryTextChange(newText: String): Boolean {
-                        publishSearch(newText)
-                        return true
-                      }
-                    })
-              }
+                  override fun onQueryTextChange(newText: String): Boolean {
+                    publishSearch(newText)
+                    return true
+                  }
+                })
+          }
         }
       }
     }
@@ -88,7 +101,8 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
         toolbar.handler?.removeCallbacksAndMessages(null)
         publishHandler.removeCallbacksAndMessages(null)
         setVisibilityOfNonSearchItems(toolbar, true)
-        toolbar.menu.removeItem(R.id.menu_search)
+        toolbar.menu.removeGroup(groupIdSearch)
+        searchItem = null
       }
     }
   }
@@ -100,7 +114,7 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
 
   private fun setVisibilityOfNonSearchItems(toolbar: Toolbar, visible: Boolean) {
     for (item in toolbar.menu) {
-      if (item.itemId != R.id.menu_search) {
+      if (item.itemId != itemIdSearch) {
         item.isVisible = visible
       }
     }
@@ -110,17 +124,17 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
     if (initialRenderPerformed) {
       return
     }
-    initialRenderPerformed = true
 
-    toolbarActivity.withToolbar { toolbar ->
-      val item = toolbar.menu.findItem(R.id.menu_search) ?: return@withToolbar
-      val searchView = item.actionView as? SearchView ?: return@withToolbar
+    val item = searchItem ?: return
+    val searchView = item.actionView as? SearchView ?: return
 
-      if (search.isNotBlank()) {
-        if (item.expandActionView()) {
-          searchView.setQuery(search, true)
-        }
+    if (search.isNotBlank()) {
+      if (item.isActionViewExpanded || item.expandActionView()) {
+        initialRenderPerformed = true
+        searchView.setQuery(search, true)
       }
+    } else {
+      initialRenderPerformed = false
     }
   }
 

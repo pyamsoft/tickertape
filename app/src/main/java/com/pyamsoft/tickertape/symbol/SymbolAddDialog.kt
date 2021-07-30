@@ -22,18 +22,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.bus.EventBus
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
-import com.pyamsoft.tickertape.main.StopAdd
 import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
@@ -42,8 +38,6 @@ import com.pyamsoft.tickertape.main.add.SymbolLookup
 import com.pyamsoft.tickertape.main.add.SymbolResultList
 import com.pyamsoft.tickertape.main.add.SymbolToolbar
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {
@@ -53,8 +47,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
   @JvmField @Inject internal var toolbar: SymbolToolbar? = null
 
   @JvmField @Inject internal var list: SymbolResultList? = null
-
-  @JvmField @Inject internal var stopAddBus: EventBus<StopAdd>? = null
 
   private var stateSaver: StateSaver? = null
 
@@ -153,12 +145,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
 
   final override fun onDestroyView() {
     super.onDestroyView()
-
-    // Fire from the activity so we make sure this scope finishes the send() operation.
-    // NOTE(Peter): This is a little shitty and we should work on it
-    requireActivity().lifecycleScope.launch(context = Dispatchers.Default) {
-      stopAddBus.requireNotNull().send(StopAdd)
-    }
 
     stateSaver = null
 

@@ -64,7 +64,7 @@ private fun NetworkChartResponse.Resp.SymbolChart.isValidStockData(): Boolean {
 @CheckResult
 internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
   return stock.run {
-    marketState != MarketState.REGULAR &&
+    marketState == MarketState.POST &&
         postMarketChange != null &&
         postMarketPrice != null &&
         postMarketChangePercent != null
@@ -74,7 +74,7 @@ internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean 
 @CheckResult
 internal fun hasPreMarketData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
   return stock.run {
-    marketState != MarketState.REGULAR &&
+    marketState == MarketState.PRE &&
         preMarketChange != null &&
         preMarketPrice != null &&
         preMarketChangePercent != null

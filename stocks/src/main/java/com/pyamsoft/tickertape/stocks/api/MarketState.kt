@@ -18,4 +18,6 @@ package com.pyamsoft.tickertape.stocks.api
 
 object MarketState {
   const val REGULAR = "REGULAR"
+  const val POST = "POST"
+  const val PRE = "PRE"
 }

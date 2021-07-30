@@ -59,40 +59,40 @@ protected constructor(private val toolbarActivity: ToolbarActivity) : UiView<S, 
       toolbarActivity.withToolbar { toolbar ->
         searchItem =
             toolbar.menu.add(groupIdSearch, itemIdSearch, Menu.NONE, "Search").also { item ->
-          item.setIcon(R.drawable.ic_search_24dp)
-          item.setShowAsAction(
-              MenuItem.SHOW_AS_ACTION_IF_ROOM or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+              item.setIcon(R.drawable.ic_search_24dp)
+              item.setShowAsAction(
+                  MenuItem.SHOW_AS_ACTION_IF_ROOM or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
 
-          item.setOnActionExpandListener(
-              object : MenuItem.OnActionExpandListener {
+              item.setOnActionExpandListener(
+                  object : MenuItem.OnActionExpandListener {
 
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                  toolbar.post { setVisibilityOfNonSearchItems(toolbar, false) }
-                  return true
-                }
+                    override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                      toolbar.post { setVisibilityOfNonSearchItems(toolbar, false) }
+                      return true
+                    }
 
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                  toolbar.post { setVisibilityOfNonSearchItems(toolbar, true) }
-                  return true
-                }
-              })
+                    override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                      toolbar.post { setVisibilityOfNonSearchItems(toolbar, true) }
+                      return true
+                    }
+                  })
 
-          item.actionView =
-              SearchView(toolbar.context).apply {
-            setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                  override fun onQueryTextSubmit(query: String): Boolean {
-                    publishSearch(query)
-                    return true
+              item.actionView =
+                  SearchView(toolbar.context).apply {
+                    setOnQueryTextListener(
+                        object : SearchView.OnQueryTextListener {
+                          override fun onQueryTextSubmit(query: String): Boolean {
+                            publishSearch(query)
+                            return true
+                          }
+
+                          override fun onQueryTextChange(newText: String): Boolean {
+                            publishSearch(newText)
+                            return true
+                          }
+                        })
                   }
-
-                  override fun onQueryTextChange(newText: String): Boolean {
-                    publishSearch(newText)
-                    return true
-                  }
-                })
-          }
-        }
+            }
       }
     }
 

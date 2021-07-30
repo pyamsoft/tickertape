@@ -21,7 +21,6 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.pyamsoft.tickertape.main.add.result.SearchResultComponent
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.BindsInstance
 import dagger.Subcomponent

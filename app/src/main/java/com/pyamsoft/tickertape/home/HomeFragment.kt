@@ -81,11 +81,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
     stateSaver =
         createComponent(
-            savedInstanceState,
-            viewLifecycleOwner,
-            viewModel,
-            this,
-            container.requireNotNull()) {
+            savedInstanceState, viewLifecycleOwner, viewModel, this, container.requireNotNull()) {
           return@createComponent when (it) {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)

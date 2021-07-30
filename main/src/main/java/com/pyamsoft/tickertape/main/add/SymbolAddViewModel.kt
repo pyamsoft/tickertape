@@ -19,8 +19,10 @@ package com.pyamsoft.tickertape.main.add
 import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
@@ -39,9 +41,7 @@ protected constructor(
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
-            query = "",
-            searchResults = emptyList<SearchResult>().pack(),
-            type = thisHoldingType)) {
+            query = "", searchResults = emptyList<SearchResult>().pack(), type = thisHoldingType)) {
 
   private var searchJob: Job? = null
 
@@ -74,13 +74,39 @@ protected constructor(
 
     searchJob =
         launch(context = Dispatchers.Default) {
+          val currentType = state.type
+
           interactor
               .search(false, query)
+              .map { results ->
+                results.filter { item ->
+                  val type = item.type()
+                  return@filter when (currentType) {
+                    is HoldingType.Stock -> !NOT_STOCK_TYPES.contains(type)
+                    is HoldingType.Crypto -> type === EquityType.CRYPTO
+                    is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
+                        type == EquityType.OPTION
+                  }
+                }
+              }
               .onSuccess { Timber.d("Search results: $it") }
               .onSuccess { setState { copy(searchResults = it.pack()) } }
               .onFailure { Timber.e(it, "Search failed") }
               .onFailure { setState { copy(searchResults = it.packError()) } }
         }
+  }
+
+  fun handleUpdateOptionSide() {
+    val currentType = state.type
+    if (!currentType.isOption()) {
+      Timber.w("Cannot update type when not an option type: $currentType ")
+      return
+    }
+    setState(
+        stateChange = {
+          copy(type = if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell else HoldingType.Options.Buy)
+        },
+        andThen = { newState -> performLookup(newState.query) })
   }
 
   fun handleResultSelected(index: Int) {
@@ -92,23 +118,28 @@ protected constructor(
 
     val result = data.value[index]
     Timber.d("Result selected: $result")
-      // We have to clear first to reset the delegate, and then we re-publish with the text
-      setState(stateChange = { copy(query = "")}, andThen = {
-          setState { copy(query = result.symbol().symbol()) }
-      })
+    // We have to clear first to reset the delegate, and then we re-publish with the text
+    setState(
+        stateChange = { copy(query = "") },
+        andThen = { setState { copy(query = result.symbol().symbol()) } })
   }
 
   fun handleCommitSymbol() {
     viewModelScope.launch(context = Dispatchers.Default) {
       onCommitSymbol()
       setState { copy(query = "") }
-   }
+    }
   }
 
   protected abstract suspend fun onCommitSymbol()
 
   companion object {
 
+    private val NOT_STOCK_TYPES =
+        arrayOf(
+            EquityType.CRYPTO,
+            EquityType.OPTION,
+        )
     private const val KEY_SYMBOL = "symbol"
   }
 }

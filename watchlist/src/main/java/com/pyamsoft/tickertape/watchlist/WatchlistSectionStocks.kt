@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.graphics.Color
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.ui.UiSectionStocks

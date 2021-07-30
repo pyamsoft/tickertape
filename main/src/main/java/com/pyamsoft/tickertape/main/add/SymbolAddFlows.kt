@@ -36,6 +36,8 @@ sealed class SymbolAddViewEvent : UiViewEvent {
 
   data class SelectResult internal constructor(val index: Int) : SymbolAddViewEvent()
 
+  object UpdateOptionSide : SymbolAddViewEvent()
+
   object Close : SymbolAddViewEvent()
 
   object CommitSymbol : SymbolAddViewEvent()

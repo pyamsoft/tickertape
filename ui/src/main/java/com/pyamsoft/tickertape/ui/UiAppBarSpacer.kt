@@ -46,7 +46,9 @@ protected constructor(
       }
     }
 
-    doOnInflate { binding.uiSpacerCollapse.apply { post { applyAppBarOffset(appBarActivity, owner) } } }
+    doOnInflate {
+      binding.uiSpacerCollapse.apply { post { applyAppBarOffset(appBarActivity, owner) } }
+    }
   }
 
   final override fun onRender(state: UiRender<S>) {

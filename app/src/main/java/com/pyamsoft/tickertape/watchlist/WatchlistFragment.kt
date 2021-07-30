@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.watchlist
 
 import android.animation.LayoutTransition
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

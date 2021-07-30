@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState

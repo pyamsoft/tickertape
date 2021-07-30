@@ -97,7 +97,7 @@ internal constructor(
     bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
-      binding.watchlistList.addItemDecoration(this)
-    }
+          binding.watchlistList.addItemDecoration(this)
+        }
   }
 }

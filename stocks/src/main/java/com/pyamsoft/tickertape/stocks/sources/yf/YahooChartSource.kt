@@ -49,7 +49,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
             service.getCharts(
                 url = YF_CHART_SOURCE,
                 symbols = symbols.joinToString(",") { it.symbol() },
-                includePrePost = false,
+                includePrePost = true,
                 range = range.apiValue,
                 interval = interval.apiValue)
 

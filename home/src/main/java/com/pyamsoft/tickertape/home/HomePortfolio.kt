@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
+import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
 import com.pyamsoft.tickertape.portfolio.PortfolioViewState
@@ -41,7 +42,7 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.portfolioState }.render(viewScope) { handlePortfolioChanged(it) }
   }
 
-  private fun handlePortfolioChanged(state: HomeViewState.RenderState<PortfolioStockList>) {
+  private fun handlePortfolioChanged(state: HomeViewState.RenderState<List<PortfolioStock>>) {
     handleRender(
         PortfolioViewState(
                 query = "",

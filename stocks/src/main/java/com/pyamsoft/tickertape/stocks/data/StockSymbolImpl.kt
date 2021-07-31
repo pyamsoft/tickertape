@@ -17,15 +17,10 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.util.Locale
 
 internal data class StockSymbolImpl(private val symbol: String) : StockSymbol {
 
-  private val stockSymbol by lazy(LazyThreadSafetyMode.NONE) {
-    symbol.uppercase(Locale.getDefault())
-  }
-
   override fun symbol(): String {
-    return stockSymbol
+    return symbol
   }
 }

@@ -21,7 +21,7 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.asSymbols
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -36,13 +36,12 @@ internal constructor(
     thisHoldingType: HoldingType,
 ) : SymbolAddViewModel(savedState, addInteractor, thisHoldingType) {
 
-  override suspend fun onCommitSymbol() {
-    val symbol = state.query
+  override suspend fun onCommitSymbol(symbol: String) {
     val type = state.type
 
     Timber.d("Commit symbol to DB: $symbol")
     interactor
-        .commitSymbol(symbol.asSymbols(), type)
+        .commitSymbol(symbol.asSymbol(), type)
         .onSuccess { Timber.d("Committed new symbols to db: $symbol") }
         .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol") }
   }

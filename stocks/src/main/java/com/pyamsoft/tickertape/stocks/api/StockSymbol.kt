@@ -34,14 +34,3 @@ private fun String.asSymbol(locale: Locale): StockSymbol {
 fun String.asSymbol(): StockSymbol {
   return this.asSymbol(Locale.getDefault())
 }
-
-@CheckResult
-fun String.asSymbols(): List<StockSymbol> {
-  val locale = Locale.getDefault()
-  return this.trim()
-      .split("\\s+".toRegex())
-      .asSequence()
-      .filterNot { it.isBlank() }
-      .map { it.asSymbol(locale) }
-      .toList()
-}

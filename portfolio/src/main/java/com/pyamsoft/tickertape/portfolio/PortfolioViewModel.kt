@@ -63,7 +63,7 @@ internal constructor(
                 query = "",
                 section = DEFAULT_SECTION,
                 isLoading = false,
-                portfolio = PortfolioStockList(emptyList()).pack(),
+                portfolio = emptyList<PortfolioStock>().pack(),
                 bottomOffset = 0,
             )) {
 
@@ -109,22 +109,19 @@ internal constructor(
       copy(
           portfolio =
               portfolio.transformData { p ->
-                p.copy(
-                    list =
-                        p.list.map { stock ->
-                          val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                          val existingPosition =
-                              stock.positions.firstOrNull(positionMatchesCallback)
-                          return@map stock.copy(
-                              positions =
-                                  if (existingPosition == null) {
-                                    stock.positions + position
-                                  } else {
-                                    stock.positions.map {
-                                      if (positionMatchesCallback(it)) position else it
-                                    }
-                                  })
-                        })
+                p.map { stock ->
+                  val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                  val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
+                  return@map stock.copy(
+                      positions =
+                          if (existingPosition == null) {
+                            stock.positions + position
+                          } else {
+                            stock.positions.map {
+                              if (positionMatchesCallback(it)) position else it
+                            }
+                          })
+                }
               })
     }
   }
@@ -136,22 +133,19 @@ internal constructor(
       copy(
           portfolio =
               portfolio.transformData { p ->
-                p.copy(
-                    list =
-                        p.list.map { stock ->
-                          val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
-                          val existingPosition =
-                              stock.positions.firstOrNull(positionMatchesCallback)
-                          return@map stock.copy(
-                              positions =
-                                  if (existingPosition == null) {
-                                    stock.positions + position
-                                  } else {
-                                    stock.positions.map {
-                                      if (positionMatchesCallback(it)) position else it
-                                    }
-                                  })
-                        })
+                p.map { stock ->
+                  val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                  val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
+                  return@map stock.copy(
+                      positions =
+                          if (existingPosition == null) {
+                            stock.positions + position
+                          } else {
+                            stock.positions.map {
+                              if (positionMatchesCallback(it)) position else it
+                            }
+                          })
+                }
               })
     }
   }
@@ -163,21 +157,15 @@ internal constructor(
       copy(
           portfolio =
               portfolio.transformData { p ->
-                p.copy(
-                    list =
-                        p.list
-                            .map { stock ->
-                              val positionMatchesCallback = { p: DbPosition ->
-                                p.id() == position.id()
-                              }
-                              return@map if (!stock.positions.contains(positionMatchesCallback))
-                                  stock
-                              else {
-                                stock.copy(
-                                    positions = stock.positions.filterNot(positionMatchesCallback))
-                              }
-                            }
-                            .filter { it.positions.isNotEmpty() })
+                p
+                    .map { stock ->
+                      val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
+                      return@map if (!stock.positions.contains(positionMatchesCallback)) stock
+                      else {
+                        stock.copy(positions = stock.positions.filterNot(positionMatchesCallback))
+                      }
+                    }
+                    .filter { it.positions.isNotEmpty() }
               })
     }
     // TODO offer up undo ability
@@ -215,9 +203,7 @@ internal constructor(
     setState {
       copy(
           portfolio =
-              portfolio.transformData { p ->
-                p.copy(list = p.list.filterNot { it.holding.id() == holding.id() })
-              })
+              portfolio.transformData { p -> p.filterNot { it.holding.id() == holding.id() } })
     }
     // TODO offer up undo ability
 
@@ -244,9 +230,7 @@ internal constructor(
                   }
                 }
               }
-              .onSuccess {
-                setState { copy(portfolio = PortfolioStockList(it).pack(), isLoading = false) }
-              }
+              .onSuccess { setState { copy(portfolio = it.pack(), isLoading = false) } }
               .onFailure { Timber.e(it, "Failed to fetch quotes") }
               .onFailure { setState { copy(portfolio = it.packError(), isLoading = false) } }
               .onSuccess { tapeLauncher.start() }

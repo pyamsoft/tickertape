@@ -29,14 +29,20 @@ data class PortfolioViewState(
     val query: String,
     val section: PortfolioTabSection,
     val isLoading: Boolean,
-    val portfolio: PackedData<PortfolioStockList>,
+    val portfolio: PackedData<List<PortfolioStock>>,
     val bottomOffset: Int,
 ) : UiViewState {
 
+  val stockList: PackedData<PortfolioStockList> =
+      when (val p = portfolio) {
+        is PackedData.Data -> PortfolioStockList(p.value).pack()
+        is PackedData.Error -> p.throwable.packError()
+      }
+
   val displayPortfolio =
-      when (portfolio) {
+      when (val p = portfolio) {
         is PackedData.Data -> {
-          val list = portfolio.value.list
+          val list = p.value
           val header =
               if (section == PortfolioTabSection.STOCK) {
                 listOf(DisplayPortfolio.Header(query, section, isLoading, portfolio, bottomOffset))
@@ -46,20 +52,19 @@ data class PortfolioViewState(
 
           val currentSearch = query
           val allItems =
-              listOf(DisplayPortfolio.Spacer) +
-                  header +
+              listOf(DisplayPortfolio.Spacer) + header +
                   list
-                      .asSequence()
-                      .filter { qs ->
-                        val symbol = qs.holding.symbol().symbol()
-                        val name = qs.quote?.quote?.company()?.company()
-                        return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
-                        else name?.contains(currentSearch, ignoreCase = true) ?: false
-                      }
-                      .map { DisplayPortfolio.Item(it) }
+                  .asSequence()
+                  .filter { qs ->
+                    val symbol = qs.holding.symbol().symbol()
+                    val name = qs.quote?.quote?.company()?.company()
+                    return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                    else name?.contains(currentSearch, ignoreCase = true) ?: false
+                  }
+                  .map { DisplayPortfolio.Item(it) }
           allItems.pack()
         }
-        is PackedData.Error -> portfolio.throwable.packError()
+        is PackedData.Error -> p.throwable.packError()
       }
 
   sealed class DisplayPortfolio {
@@ -71,7 +76,7 @@ data class PortfolioViewState(
         val query: String,
         val section: PortfolioTabSection,
         val isLoading: Boolean,
-        val portfolio: PackedData<PortfolioStockList>,
+        val portfolio: PackedData<List<PortfolioStock>>,
         val bottomOffset: Int,
     ) : DisplayPortfolio()
 

@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -126,12 +127,12 @@ protected constructor(
 
   fun handleCommitSymbol() {
     viewModelScope.launch(context = Dispatchers.Default) {
-      onCommitSymbol()
+      onCommitSymbol(state.query.uppercase(Locale.getDefault()))
       setState { copy(query = "") }
     }
   }
 
-  protected abstract suspend fun onCommitSymbol()
+  protected abstract suspend fun onCommitSymbol(symbol: String)
 
   companion object {
 

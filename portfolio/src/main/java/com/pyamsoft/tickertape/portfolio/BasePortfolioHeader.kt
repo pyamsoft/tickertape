@@ -41,7 +41,7 @@ abstract class BasePortfolioHeader<S : UiViewState> protected constructor(parent
 
   protected fun handleRender(state: UiRender<PortfolioViewState>) {
     state.mapChanged { it.query }.render(viewScope) { handleQuery(it) }
-    state.mapChanged { it.portfolio }.render(viewScope) { handlePortfolio(it) }
+    state.mapChanged { it.stockList }.render(viewScope) { handlePortfolio(it) }
   }
 
   private fun handleQuery(query: String) {

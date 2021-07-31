@@ -39,30 +39,28 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbols: List<StockSymbol>, type: HoldingType): ResultWrapper<Unit> =
+  suspend fun commitSymbol(symbol: StockSymbol, type: HoldingType): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          for (symbol in symbols) {
-            // TODO move this query into the DAO layer
-            val existingHolding = holdingQueryDao.query(true).firstOrNull { it.symbol() == symbol }
-            if (existingHolding != null) {
-              Timber.d("Holding already exists in DB: $existingHolding")
-              continue
-            }
+          // TODO move this query into the DAO layer
+          val existingHolding = holdingQueryDao.query(true).firstOrNull { it.symbol() == symbol }
+          if (existingHolding != null) {
+            Timber.d("Holding already exists in DB: $existingHolding")
+            return@withContext ResultWrapper.success(Unit)
+          }
 
-            val newHolding = JsonMappableDbHolding.create(symbol, type)
-            if (holdingInsertDao.insert(newHolding)) {
-              Timber.d("Insert new holding into DB: $$newHolding")
-            } else {
-              Timber.d("Update existing holding into DB: $newHolding")
-            }
+          val newHolding = JsonMappableDbHolding.create(symbol, type)
+          if (holdingInsertDao.insert(newHolding)) {
+            Timber.d("Insert new holding into DB: $$newHolding")
+          } else {
+            Timber.d("Update existing holding into DB: $newHolding")
           }
 
           ResultWrapper.success(Unit)
         } catch (e: Throwable) {
-          Timber.e(e, "Error committing symbols: $symbols")
+          Timber.e(e, "Error committing symbol: $symbol")
           ResultWrapper.failure(e)
         }
       }

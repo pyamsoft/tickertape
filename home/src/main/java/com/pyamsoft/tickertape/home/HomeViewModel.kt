@@ -25,7 +25,6 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
@@ -56,7 +55,7 @@ internal constructor(
     UiViewModel<HomeViewState, HomeControllerEvent>(
         initialState =
             HomeViewState(
-                portfolio = PortfolioStockList(emptyList()).pack(),
+                portfolio = emptyList<PortfolioStock>().pack(),
                 isLoadingPortfolio = false,
                 watchlist = emptyList<QuotedStock>().pack(),
                 isLoadingWatchlist = false,
@@ -146,9 +145,7 @@ internal constructor(
               portfolioFetcher
                   .call(force)
                   .onSuccess {
-                    setState {
-                      copy(portfolio = PortfolioStockList(it).pack(), isLoadingPortfolio = false)
-                    }
+                    setState { copy(portfolio = it.pack(), isLoadingPortfolio = false) }
                   }
                   .onFailure { Timber.e(it, "Failed to fetch portfolio") }
                   .onFailure {

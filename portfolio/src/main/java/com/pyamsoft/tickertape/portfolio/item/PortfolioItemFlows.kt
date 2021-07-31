@@ -31,7 +31,7 @@ sealed class PortfolioItemViewState : UiViewState {
       val query: String,
       val section: PortfolioTabSection,
       val isLoading: Boolean,
-      val portfolio: PackedData<PortfolioStockList>,
+      val portfolio: PackedData<List<PortfolioStock>>,
       val bottomOffset: Int,
   ) : PortfolioItemViewState()
 

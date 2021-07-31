@@ -66,9 +66,9 @@ internal constructor(
     doOnInflate {
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -157,13 +157,13 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<PortfolioViewState>) {
-    state.render(viewScope) { handlePortfolio(it) }
+    state.mapChanged { it.displayPortfolio }.render(viewScope) { handlePortfolio(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
-  private fun handlePortfolio(state: PortfolioViewState) {
-    return when (val portfolio = state.displayPortfolio) {
+  private fun handlePortfolio(portfolio: PackedData<List<PortfolioViewState.DisplayPortfolio>>) {
+    return when (portfolio) {
       is PackedData.Data -> handleList(portfolio.value)
       is PackedData.Error -> handleError(portfolio.throwable)
     }
@@ -184,8 +184,8 @@ internal constructor(
     bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
     bottomDecoration =
         LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
-          binding.portfolioListList.addItemDecoration(this)
-        }
+      binding.portfolioListList.addItemDecoration(this)
+    }
   }
 
   private fun setList(items: List<PortfolioViewState.DisplayPortfolio>) {

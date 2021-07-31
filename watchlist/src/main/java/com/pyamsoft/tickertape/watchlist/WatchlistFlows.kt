@@ -44,14 +44,14 @@ data class WatchListViewState(
           val allItems =
               spacer +
                   list
-                      .asSequence()
-                      .filter { qs ->
-                        val symbol = qs.symbol.symbol()
-                        val name = qs.quote?.company()?.company()
-                        return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
-                        else name?.contains(currentSearch, ignoreCase = true) ?: false
-                      }
-                      .map { DisplayWatchlist.Item(it) }
+                  .asSequence()
+                  .filter { qs ->
+                    val symbol = qs.symbol.symbol()
+                    val name = qs.quote?.company()?.company()
+                    return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                    else name?.contains(currentSearch, ignoreCase = true) ?: false
+                  }
+                  .map { DisplayWatchlist.Item(it) }
           allItems.pack()
         }
         is PackedData.Error -> watchlist.throwable.packError()

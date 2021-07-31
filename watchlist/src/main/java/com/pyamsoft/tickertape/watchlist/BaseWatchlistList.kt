@@ -58,6 +58,8 @@ protected constructor(
 
   init {
     doOnInflate {
+      binding.watchlistList.setHasFixedSize(true)
+
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
             isItemPrefetchEnabled = true

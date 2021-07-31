@@ -64,6 +64,8 @@ internal constructor(
 
   init {
     doOnInflate {
+      binding.portfolioListList.setHasFixedSize(true)
+
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
         isItemPrefetchEnabled = true

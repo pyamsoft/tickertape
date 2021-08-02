@@ -18,17 +18,21 @@ package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.ui.databinding.UiSectionOptionsBinding
 
 abstract class UiSectionOptions<S : UiViewState, V : UiViewEvent>
-protected constructor(parent: ViewGroup) :
-    MatchParentUiView<S, V, UiSectionOptionsBinding>(parent) {
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, UiSectionOptionsBinding>(parent) {
 
   final override val viewBinding = UiSectionOptionsBinding::inflate
 
   final override val layoutRoot by boundView { uiSectionOptions }
+
+  init {
+    doOnInflate { ViewFixes.correctMatchParentHeight(layoutRoot, parent) }
+  }
 
   protected fun handleSection(isOptions: Boolean) {
     binding.uiSectionOptions.isVisible = isOptions

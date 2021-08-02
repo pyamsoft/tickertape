@@ -32,7 +32,7 @@ internal constructor(
   override val viewBinding = HomeWatchlistTitleBinding::inflate
 
   init {
-    doOnInflate { binding.homeWatchlistTitle.text = "My Watchlist Top 5" }
+    doOnInflate { binding.homeWatchlistTitle.text = "My Watchlist Top 10" }
 
     doOnTeardown { binding.homeWatchlistTitle.text = null }
   }

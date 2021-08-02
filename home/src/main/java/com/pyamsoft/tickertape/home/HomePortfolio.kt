@@ -23,7 +23,6 @@ import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.BasePortfolioHeader
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
 import com.pyamsoft.tickertape.portfolio.PortfolioViewState
 import javax.inject.Inject

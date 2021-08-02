@@ -28,12 +28,10 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,20 +48,27 @@ protected constructor(
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
-            query = "", searchResults = emptyList<SearchResult>().pack(), type = thisHoldingType)) {
+            quote = null,
+            query = "",
+            searchResults = emptyList<SearchResult>().pack(),
+            type = thisHoldingType,
+        )) {
 
-  private val quoteFetcher = highlander<ResultWrapper<StockQuote>, StockSymbol> {  symbol ->
-    quoteInteractor.getQuotes(false, listOf(symbol))
-      .map { it.first() }
-      .map { it.quote.requireNotNull() }
-  }
+  private val quoteFetcher =
+      highlander<ResultWrapper<StockQuote>, StockSymbol> { symbol ->
+        quoteInteractor.getQuotes(false, listOf(symbol)).map { it.first() }.map {
+          it.quote.requireNotNull()
+        }
+      }
 
   private var searchJob: Job? = null
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       val symbol = restoreSavedState(KEY_SYMBOL) { "" }
-      setState { copy(query = symbol) }
+      setState(
+          stateChange = { copy(query = symbol, quote = null) },
+          andThen = { newState -> performLookup(newState.query) })
     }
 
     doOnCleared { resetSearchJob() }
@@ -119,7 +124,10 @@ protected constructor(
     }
     setState(
         stateChange = {
-          copy(type = if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell else HoldingType.Options.Buy)
+          copy(
+              type =
+                  if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell
+                  else HoldingType.Options.Buy)
         },
         andThen = { newState -> performLookup(newState.query) })
   }
@@ -134,19 +142,30 @@ protected constructor(
     val result = data.value[index]
     Timber.d("Result selected: $result")
     // We have to clear first to reset the delegate, and then we re-publish with the text
+    val symbol = result.symbol()
     setState(
-        stateChange = { copy(query = "") },
-        andThen = { setState { copy(query = result.symbol().symbol()) } })
+        stateChange = { copy(query = "", quote = null) },
+        andThen = {
+          setState(
+              stateChange = { copy(query = symbol.symbol()) },
+              andThen = {
+                quoteFetcher
+                    .call(symbol)
+                    .onSuccess { setState { copy(quote = it) } }
+                    .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
+                    .onFailure { setState { copy(quote = null) } }
+              })
+        })
   }
 
-  fun handleCommitSymbol() {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      val symbol = state.query.uppercase(Locale.getDefault())
-        quoteFetcher.call(symbol.asSymbol())
-            .onSuccess { setState { copy(query = "") } }
-            .onSuccess { onCommitSymbol(it) }
-            .onFailure { Timber.e(it, "Failed to lookup quote for query: $symbol") }
+  private suspend fun commitSymbol() {
+    val quote = state.quote
+    if (quote == null) {
+      Timber.w("Cannot commit symbol without quote: $quote")
+      return
     }
+
+    setState(stateChange = { copy(query = "", quote = null) }, andThen = { onCommitSymbol(quote) })
   }
 
   protected abstract suspend fun onCommitSymbol(stock: StockQuote)

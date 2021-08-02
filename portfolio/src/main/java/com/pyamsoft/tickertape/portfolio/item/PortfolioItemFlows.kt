@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio.item
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
 import com.pyamsoft.tickertape.ui.PackedData
 

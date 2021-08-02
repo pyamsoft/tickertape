@@ -21,10 +21,12 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.PackedData
 
 data class SymbolAddViewState
 internal constructor(
+    val quote: StockQuote?,
     val query: String,
     val searchResults: PackedData<List<SearchResult>>,
     val type: HoldingType,
@@ -39,8 +41,6 @@ sealed class SymbolAddViewEvent : UiViewEvent {
   object UpdateOptionSide : SymbolAddViewEvent()
 
   object Close : SymbolAddViewEvent()
-
-  object CommitSymbol : SymbolAddViewEvent()
 }
 
 sealed class SymbolAddControllerEvent : UiControllerEvent {

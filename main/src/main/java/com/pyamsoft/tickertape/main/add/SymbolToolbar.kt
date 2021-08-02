@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
-import com.pyamsoft.tickertape.main.R
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.UiDialogToolbar
 import javax.inject.Inject
@@ -39,20 +38,6 @@ internal constructor(
     }
 
     doOnTeardown { clear() }
-
-    doOnInflate { binding.uiToolbar.inflateMenu(R.menu.add) }
-
-    doOnInflate {
-      binding.uiToolbar.setOnMenuItemClickListener { item ->
-        return@setOnMenuItemClickListener when (item.itemId) {
-          R.id.menu_symbol_add -> {
-            publish(SymbolAddViewEvent.CommitSymbol)
-            true
-          }
-          else -> false
-        }
-      }
-    }
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
@@ -73,7 +58,6 @@ internal constructor(
     binding.uiToolbar.apply {
       menu.clear()
       setNavigationOnClickListener(null)
-      setOnMenuItemClickListener(null)
       title = ""
     }
   }

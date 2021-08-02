@@ -109,7 +109,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             savedInstanceState, viewLifecycleOwner, viewModel, this, *views.toTypedArray()) {
           return@createComponent when (it) {
             is SymbolAddViewEvent.Close -> dismiss()
-            is SymbolAddViewEvent.CommitSymbol -> viewModel.handleCommitSymbol()
             is SymbolAddViewEvent.UpdateSymbol -> viewModel.handleLookupSymbol(it.symbol)
             is SymbolAddViewEvent.SelectResult -> viewModel.handleResultSelected(it.index)
             is SymbolAddViewEvent.UpdateOptionSide -> viewModel.handleUpdateOptionSide()
@@ -156,11 +155,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     }
   }
 
-  protected abstract fun onInject(
-    view: ViewGroup,
-    savedInstanceState: Bundle?,
-    type: HoldingType
-  )
+  protected abstract fun onInject(view: ViewGroup, savedInstanceState: Bundle?, type: HoldingType)
 
   protected abstract fun onTeardown()
 
@@ -191,6 +186,5 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
 
     // NOTE(Peter): protected one day
     internal const val KEY_HOLDING_TYPE = "key_holding_type"
-
   }
 }

@@ -28,18 +28,16 @@ import androidx.core.view.updatePadding
 
 object ViewFixes {
 
+  // Watch a view and run function when the layout of said view changes (for, we assume, MW reasons)
   @CheckResult
   inline fun correctMultiWindow(view: View, crossinline correction: (View) -> Unit): Unregister {
-    view.apply {
-      val listener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> correction(v) }
-      addOnLayoutChangeListener(listener)
-      return Unregister { removeOnLayoutChangeListener(listener) }
-    }
+    val listener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> correction(v) }
+    view.addOnLayoutChangeListener(listener)
+    return Unregister { view.removeOnLayoutChangeListener(listener) }
   }
 
   // For some views nested inside of other UiView components, the match_parent does not fill the
-  // parent
-  // fully.
+  // parent fully.
   fun correctMatchParentHeight(view: View, parent: View) {
     parent.post { view.post { view.updateLayoutParams { this.height = parent.height } } }
   }

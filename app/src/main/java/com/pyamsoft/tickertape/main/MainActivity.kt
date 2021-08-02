@@ -131,6 +131,8 @@ internal class MainActivity :
     inflateComponents(savedInstanceState)
     beginWork()
     handleLaunchIntent()
+
+    viewModel.handleLoadDefaultPage()
   }
 
   private fun inflateComponents(savedInstanceState: Bundle?) {
@@ -157,11 +159,6 @@ internal class MainActivity :
             is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type)
           }
         }
-
-    val existingFragment = supportFragmentManager.findFragmentById(fragmentContainerId)
-    if (savedInstanceState == null || existingFragment == null) {
-      viewModel.handleLoadDefaultPage()
-    }
   }
 
   override fun onStart() {

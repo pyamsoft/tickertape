@@ -128,9 +128,7 @@ internal class WatchlistDigDialog :
           }
         }
 
-    if (savedInstanceState == null) {
-      viewModel.handleLoadDefaultPage()
-    }
+    viewModel.handleLoadDefaultPage()
   }
 
   private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {

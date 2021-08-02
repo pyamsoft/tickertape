@@ -89,6 +89,7 @@ internal constructor(
     setState(
         stateChange = { copy(page = newPage, adding = false) },
         andThen = { newState ->
+          putSavedState(KEY_PAGE, newPage.asString())
           publishNewSelection(requireNotNull(newState.page), oldPage, force)
         })
   }
@@ -105,13 +106,12 @@ internal constructor(
     }
   }
 
-  private suspend inline fun publishNewSelection(
+  private fun publishNewSelection(
       newPage: MainPage,
       oldPage: MainPage?,
       force: Boolean,
   ) {
     Timber.d("Publish selection: $oldPage -> $newPage")
-    putSavedState(KEY_PAGE, newPage.asString())
     publish(MainControllerEvent.PushPage(newPage, oldPage, force))
   }
 

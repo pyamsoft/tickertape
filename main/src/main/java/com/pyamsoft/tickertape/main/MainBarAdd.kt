@@ -23,6 +23,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
+import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
@@ -47,6 +49,23 @@ internal constructor(
   private var animator: ViewPropertyAnimatorCompat? = null
 
   init {
+    doOnInflate {
+      // The bottom FAB can sometimes float weirdly when in multi-window
+      // if the Activity is opened, and then Home is pushed and then the app is
+      // opened again from the Launcher
+      binding.mainBarAdd.apply {
+        val initialMarginBottom = this.marginBottom
+        val listener =
+            View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+              v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                this.bottomMargin = initialMarginBottom
+              }
+            }
+        addOnLayoutChangeListener(listener)
+        doOnTeardown { removeOnLayoutChangeListener(listener) }
+      }
+    }
+
     doOnInflate {
       binding.apply {
         mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
@@ -123,10 +142,10 @@ internal constructor(
     animator?.cancel()
     animator =
         ViewCompat.animate(binding.mainBarAdd)
-            .setDuration(ANIMATION_DURATION)
-            .setInterpolator(interpolator)
-            .rotation(if (adding) 45F else 0F)
-            .apply { start() }
+        .setDuration(ANIMATION_DURATION)
+        .setInterpolator(interpolator)
+        .rotation(if (adding) 45F else 0F)
+        .apply { start() }
   }
 
   private fun handleFabVisible(visible: Boolean) {

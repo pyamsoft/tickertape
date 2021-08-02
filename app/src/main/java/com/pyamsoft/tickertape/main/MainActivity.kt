@@ -126,6 +126,8 @@ internal class MainActivity :
         .create(this, this, this, binding.layoutCoordinator, this, this)
         .inject(this)
 
+    lifecycleScope
+
     stableLayoutHideNavigation()
 
     inflateComponents(savedInstanceState)

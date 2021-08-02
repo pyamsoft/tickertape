@@ -27,6 +27,7 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.util.doOnApplyWindowInsets
 import com.pyamsoft.tickertape.main.databinding.MainBottomBarBinding
+import com.pyamsoft.tickertape.ui.ViewFixes
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -47,18 +48,19 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
     doOnInflate { binding.mainBarNav.menu.findItem(R.id.menu_placeholder)?.isEnabled = false }
 
     doOnInflate {
+      val resetNavBarPadding = ViewFixes.captureAndResetInitialPadding(binding.mainBarNav)
       layoutRoot.doOnApplyWindowInsets(owner) { view, _, _ ->
 
-        // Ensure this happens last
-        view.post {
-          // Set all padding to zero or bar is too puffy with nav buttons
-          view.updatePadding(left = 0, right = 0, top = 0, bottom = 0)
+        // Set root padding to 0 to avoid puffy navbar
+        view.updatePadding(left = 0, top = 0, right = 0, bottom = 0)
 
-          // Make sure we are laid out before grabbing the height
-          view.post {
-            // Publish the measured height
-            publish(MainViewEvent.BottomBarMeasured(view.height))
-          }
+        // Reset the navbar padding to it's initial values to avoid MW puffy bar nonsense
+        resetNavBarPadding()
+
+        // Make sure we are laid out before grabbing the height
+        view.post {
+          // Publish the measured height
+          publish(MainViewEvent.BottomBarMeasured(view.height))
         }
       }
     }

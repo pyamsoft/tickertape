@@ -24,6 +24,7 @@ import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 
 object ViewFixes {
 
@@ -36,30 +37,48 @@ object ViewFixes {
     }
   }
 
-  // A view can sometimes size weirdly when in multi-window
-  // if the Activity is opened, and then Home is pushed and then the app is
-  // opened again from the Launcher
-  @CheckResult
-  fun correctMultiWindowMargin(view: View): Unregister {
-    val initialLeft = view.marginLeft
-    val initialTop = view.marginTop
-    val initialRight = view.marginRight
-    val initialBottom = view.marginBottom
-    return correctMultiWindow(view) {
-      it.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.bottomMargin = initialBottom
-        this.topMargin = initialTop
-        this.leftMargin = initialLeft
-        this.rightMargin = initialRight
-      }
-    }
-  }
-
   // For some views nested inside of other UiView components, the match_parent does not fill the
   // parent
   // fully.
   fun correctMatchParentHeight(view: View, parent: View) {
     parent.post { view.post { view.updateLayoutParams { this.height = parent.height } } }
+  }
+
+  // Captures the initial padding for a given view and provides a function which, when called, will
+  // reset the padding of the view back to its initial state
+  @CheckResult
+  fun captureAndResetInitialPadding(view: View): () -> Unit {
+    val initialLeft = view.paddingLeft
+    val initialTop = view.paddingTop
+    val initialRight = view.paddingRight
+    val initialBottom = view.paddingBottom
+    return {
+      view.updatePadding(
+          left = initialLeft,
+          top = initialTop,
+          right = initialRight,
+          bottom = initialBottom,
+      )
+    }
+  }
+
+  // Captures the initial padding for a given view and provides a function which, when called, will
+  // reset the padding of the view back to its initial state
+  @CheckResult
+  fun captureAndResetInitialMargin(view: View): () -> Unit {
+    val initialLeft = view.marginLeft
+    val initialTop = view.marginTop
+    val initialRight = view.marginRight
+    val initialBottom = view.marginBottom
+
+    return {
+      view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.leftMargin = initialLeft
+        this.rightMargin = initialRight
+        this.topMargin = initialTop
+        this.bottomMargin = initialBottom
+      }
+    }
   }
 }
 

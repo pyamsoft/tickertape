@@ -36,21 +36,27 @@ import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.commitNow
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
+import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsFragment
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 internal class MainActivity :
     ChangeLogActivity(), UiController<MainControllerEvent>, AppBarActivity, AppBarActivityProvider {
@@ -73,6 +79,8 @@ internal class MainActivity :
 
   private var rootBinding: LayoutCoordinatorBinding? = null
   private var stateSaver: StateSaver? = null
+
+  @JvmField @Inject internal var notificationCanceller: NotificationCanceller? = null
 
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
 
@@ -121,6 +129,8 @@ internal class MainActivity :
     stableLayoutHideNavigation()
 
     inflateComponents(savedInstanceState)
+    beginWork()
+    handleLaunchIntent()
   }
 
   private fun inflateComponents(savedInstanceState: Bundle?) {
@@ -152,8 +162,6 @@ internal class MainActivity :
     if (savedInstanceState == null || existingFragment == null) {
       viewModel.handleLoadDefaultPage()
     }
-
-    beginWork()
   }
 
   override fun onStart() {
@@ -201,6 +209,29 @@ internal class MainActivity :
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
+    handleLaunchIntent()
+  }
+
+  private fun handleLaunchIntent() {
+    val extraKey = BigMoverNotificationData.INTENT_KEY_SYMBOL
+    val launchIntent = intent
+    if (launchIntent == null) {
+      Timber.w("Missing launch intent")
+      return
+    }
+
+    val symbolString = launchIntent.getStringExtra(extraKey)
+    if (symbolString == null) {
+      Timber.w("Missing launch key: $extraKey")
+      return
+    }
+
+    launchIntent.removeExtra(extraKey)
+    val symbol = symbolString.asSymbol()
+
+    Timber.d("Launch intent with symbol: $symbol")
+    notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
+    WatchlistDigDialog.newInstance(symbol).show(this, WatchlistDigDialog.TAG)
   }
 
   override fun onBackPressed() {
@@ -222,9 +253,11 @@ internal class MainActivity :
     super.onDestroy()
     stateSaver = null
     factory = null
-    capturedAppBar = null
+    notificationCanceller = null
 
+    capturedAppBar = null
     rootBinding = null
+
     container = null
     bottomBar = null
     addNew = null

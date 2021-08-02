@@ -17,11 +17,18 @@
 package com.pyamsoft.tickertape.main.add
 
 import androidx.lifecycle.viewModelScope
+import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
@@ -37,12 +44,19 @@ abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
+    quoteInteractor: QuoteInteractor,
     thisHoldingType: HoldingType,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
             query = "", searchResults = emptyList<SearchResult>().pack(), type = thisHoldingType)) {
+
+  private val quoteFetcher = highlander<ResultWrapper<StockQuote>, StockSymbol> {  symbol ->
+    quoteInteractor.getQuotes(false, listOf(symbol))
+      .map { it.first() }
+      .map { it.quote.requireNotNull() }
+  }
 
   private var searchJob: Job? = null
 
@@ -127,12 +141,15 @@ protected constructor(
 
   fun handleCommitSymbol() {
     viewModelScope.launch(context = Dispatchers.Default) {
-      onCommitSymbol(state.query.uppercase(Locale.getDefault()))
-      setState { copy(query = "") }
+      val symbol = state.query.uppercase(Locale.getDefault())
+        quoteFetcher.call(symbol.asSymbol())
+            .onSuccess { setState { copy(query = "") } }
+            .onSuccess { onCommitSymbol(it) }
+            .onFailure { Timber.e(it, "Failed to lookup quote for query: $symbol") }
     }
   }
 
-  protected abstract suspend fun onCommitSymbol(symbol: String)
+  protected abstract suspend fun onCommitSymbol(stock: StockQuote)
 
   companion object {
 

@@ -36,6 +36,7 @@ import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.R
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,11 +75,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
   }
 
   @CheckResult
-  private fun getActivityPendingIntent(): PendingIntent {
+  private fun getActivityPendingIntent(symbol: StockSymbol): PendingIntent {
     val appContext = context.applicationContext
     val activityIntent =
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, symbol.symbol())
         }
     return PendingIntent.getActivity(
         appContext, REQUEST_CODE_ACTIVITY, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -144,8 +146,9 @@ internal constructor(private val context: Context, private val activityClass: Cl
       append(" is $movingString today!")
     }
 
+    val symbol = quote.symbol()
     val description = buildSpannedString {
-      bold { append(quote.symbol().symbol()) }
+      bold { append(symbol.symbol()) }
       append(" is $directionString ")
       bold { append(percent.asPercentValue()) }
       append(" $sessionString")
@@ -156,7 +159,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setShowWhen(false)
         .setAutoCancel(false)
-        .setContentIntent(getActivityPendingIntent())
+        .setContentIntent(getActivityPendingIntent(symbol))
         .setContentTitle(title)
         .setContentText(description)
         .build()

@@ -64,7 +64,9 @@ private fun NetworkChartResponse.Resp.SymbolChart.isValidStockData(): Boolean {
 @CheckResult
 internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean {
   return stock.run {
-    marketState == MarketState.POST &&
+    val isNotNormalMarket = marketState != MarketState.REGULAR && marketState != MarketState.PRE
+    // After Hours should still be displayed even when state is CLOSED
+    (isNotNormalMarket || marketState == MarketState.POST) &&
         postMarketChange != null &&
         postMarketPrice != null &&
         postMarketChangePercent != null

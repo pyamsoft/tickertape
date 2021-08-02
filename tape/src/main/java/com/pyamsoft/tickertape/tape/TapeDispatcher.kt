@@ -286,7 +286,7 @@ internal constructor(
                 percentViewId = R.id.remote_views_percent3),
         )
 
-    private const val REQUEST_CODE_ACTIVITY = 69420
+    private const val REQUEST_CODE_ACTIVITY = 1337420
     private const val REQUEST_CODE_NEXT = REQUEST_CODE_ACTIVITY + 1
     private const val REQUEST_CODE_REFRESH = REQUEST_CODE_ACTIVITY + 2
 

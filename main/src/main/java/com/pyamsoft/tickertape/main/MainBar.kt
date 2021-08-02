@@ -55,7 +55,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
         view.updatePadding(left = 0, top = 0, right = 0, bottom = 0)
 
         // Reset the navbar padding to it's initial values to avoid MW puffy bar nonsense
-        resetNavBarPadding()
+        resetNavBarPadding.reset()
 
         // Make sure we are laid out before grabbing the height
         view.post {

@@ -53,8 +53,8 @@ internal constructor(
       // if the Activity is opened, and then Home is pushed and then the app is
       // opened again from the Launcher
       val add = binding.mainBarAdd
-      val reset = ViewFixes.captureAndResetInitialMargin(add)
-      ViewFixes.correctMultiWindow(add) { reset() }.also { doOnTeardown { it.unregister() } }
+      val resetter = ViewFixes.captureAndResetInitialMargin(add)
+      ViewFixes.correctMultiWindow(add) { resetter.reset() }.also { doOnTeardown { it.unregister() } }
     }
 
     doOnInflate {

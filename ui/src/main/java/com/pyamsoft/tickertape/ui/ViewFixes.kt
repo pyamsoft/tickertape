@@ -45,12 +45,12 @@ object ViewFixes {
   // Captures the initial padding for a given view and provides a function which, when called, will
   // reset the padding of the view back to its initial state
   @CheckResult
-  fun captureAndResetInitialPadding(view: View): () -> Unit {
+  fun captureAndResetInitialPadding(view: View): Reset {
     val initialLeft = view.paddingLeft
     val initialTop = view.paddingTop
     val initialRight = view.paddingRight
     val initialBottom = view.paddingBottom
-    return {
+    return Reset {
       view.updatePadding(
           left = initialLeft,
           top = initialTop,
@@ -63,13 +63,13 @@ object ViewFixes {
   // Captures the initial padding for a given view and provides a function which, when called, will
   // reset the padding of the view back to its initial state
   @CheckResult
-  fun captureAndResetInitialMargin(view: View): () -> Unit {
+  fun captureAndResetInitialMargin(view: View): Reset {
     val initialLeft = view.marginLeft
     val initialTop = view.marginTop
     val initialRight = view.marginRight
     val initialBottom = view.marginBottom
 
-    return {
+    return Reset {
       view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
         this.leftMargin = initialLeft
         this.rightMargin = initialRight
@@ -83,4 +83,9 @@ object ViewFixes {
 fun interface Unregister {
 
   fun unregister()
+}
+
+fun interface Reset {
+
+  fun reset()
 }

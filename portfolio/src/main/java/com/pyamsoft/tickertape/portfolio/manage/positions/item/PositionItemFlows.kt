@@ -56,8 +56,8 @@ sealed class PositionItemViewState : UiViewState {
       val sellSideModifier = if (holding.isSellSide()) -1 else 1
 
       val numberOfShares = position.shareCount().value()
-      val isNoPosition = numberOfShares.isZero()
-      val costNumber = position.price().value() * numberOfShares
+      val positionPrice = position.price().value()
+      val costNumber = positionPrice * numberOfShares
       total = (costNumber * optionsModifier * sellSideModifier).asMoney()
 
       val price = currentSharePrice
@@ -80,11 +80,14 @@ sealed class PositionItemViewState : UiViewState {
         gainLossDirection = direction
       }
 
-      positionCost =
-          if (isNoPosition) StockMoneyValue.none() else (costNumber * sellSideModifier).asMoney()
-      positionSize =
-          if (isNoPosition) StockShareValue.none()
-          else (numberOfShares * sellSideModifier).asShares()
+      val isNoPosition = numberOfShares.isZero()
+      if (isNoPosition) {
+        positionCost = StockMoneyValue.none()
+        positionSize = StockShareValue.none()
+      } else {
+        positionCost = (positionPrice * sellSideModifier).asMoney()
+        positionSize = (numberOfShares * sellSideModifier).asShares()
+      }
     }
   }
 

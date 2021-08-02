@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
 import androidx.viewbinding.ViewBinding
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
@@ -29,9 +28,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, B>(parent) {
   init {
     // For some reason the match_parent height does not make this list fill content
     // Grab the size of the activity parent and use it as our height
-    doOnInflate {
-      val root = layoutRoot
-      parent.post { root.post { root.updateLayoutParams { this.height = parent.height } } }
-    }
+    doOnInflate { ViewFixes.correctMatchParentHeight(layoutRoot, parent) }
   }
 }

@@ -40,7 +40,6 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
   private val handler = Handler(Looper.getMainLooper())
 
   init {
-
     doOnInflate { layoutRoot.outlineProvider = ViewOutlineProvider.BACKGROUND }
 
     doOnInflate { binding.mainBarNav.outlineProvider = null }

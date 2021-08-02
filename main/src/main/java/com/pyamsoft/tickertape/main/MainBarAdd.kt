@@ -23,8 +23,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
-import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
@@ -32,6 +30,7 @@ import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.R
+import com.pyamsoft.tickertape.ui.ViewFixes
 import javax.inject.Inject
 
 class MainBarAdd
@@ -53,16 +52,8 @@ internal constructor(
       // The bottom FAB can sometimes float weirdly when in multi-window
       // if the Activity is opened, and then Home is pushed and then the app is
       // opened again from the Launcher
-      binding.mainBarAdd.apply {
-        val initialMarginBottom = this.marginBottom
-        val listener =
-            View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-              v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                this.bottomMargin = initialMarginBottom
-              }
-            }
-        addOnLayoutChangeListener(listener)
-        doOnTeardown { removeOnLayoutChangeListener(listener) }
+      ViewFixes.correctMultiWindowMargin(binding.mainBarAdd).also {
+        doOnTeardown { it.unregister() }
       }
     }
 

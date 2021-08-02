@@ -16,11 +16,15 @@
 
 package com.pyamsoft.tickertape.main.add
 
+import android.view.MenuItem
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
+import com.pyamsoft.tickertape.main.R
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.UiDialogToolbar
 import javax.inject.Inject
 
@@ -31,6 +35,8 @@ internal constructor(
     parent: ViewGroup,
 ) : UiDialogToolbar<SymbolAddViewState, SymbolAddViewEvent>(imageLoader, parent) {
 
+  private var addItem: MenuItem? = null
+
   init {
     doOnInflate {
       binding.uiToolbar.setNavigationOnClickListener(
@@ -38,10 +44,36 @@ internal constructor(
     }
 
     doOnTeardown { clear() }
+
+    doOnTeardown { addItem = null }
+
+    doOnInflate {
+      binding.uiToolbar.also { toolbar ->
+        toolbar.inflateMenu(R.menu.add)
+        addItem = toolbar.menu.findItem(R.id.menu_symbol_add)
+      }
+    }
+
+    doOnInflate {
+      binding.uiToolbar.setOnMenuItemClickListener { item ->
+        return@setOnMenuItemClickListener when (item.itemId) {
+          R.id.menu_symbol_add -> {
+            publish(SymbolAddViewEvent.CommitSymbol)
+            true
+          }
+          else -> false
+        }
+      }
+    }
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
     state.mapChanged { it.type }.render(viewScope) { handleType(it) }
+    state.mapChanged { it.quote }.render(viewScope) { handleQuote(it) }
+  }
+
+  private fun handleQuote(quote: StockQuote?) {
+    addItem.requireNotNull().isEnabled = quote != null
   }
 
   private fun handleType(type: HoldingType) {
@@ -58,6 +90,7 @@ internal constructor(
     binding.uiToolbar.apply {
       menu.clear()
       setNavigationOnClickListener(null)
+      setOnMenuItemClickListener(null)
       title = ""
     }
   }

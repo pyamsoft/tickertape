@@ -112,6 +112,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             is SymbolAddViewEvent.UpdateSymbol -> viewModel.handleLookupSymbol(it.symbol)
             is SymbolAddViewEvent.SelectResult -> viewModel.handleResultSelected(it.index)
             is SymbolAddViewEvent.UpdateOptionSide -> viewModel.handleUpdateOptionSide()
+            is SymbolAddViewEvent.CommitSymbol -> viewModel.handleCommitSymbol()
           }
         }
 

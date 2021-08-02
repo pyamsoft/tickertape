@@ -158,7 +158,7 @@ protected constructor(
         })
   }
 
-  private suspend fun commitSymbol() {
+  fun handleCommitSymbol() {
     val quote = state.quote
     if (quote == null) {
       Timber.w("Cannot commit symbol without quote: $quote")

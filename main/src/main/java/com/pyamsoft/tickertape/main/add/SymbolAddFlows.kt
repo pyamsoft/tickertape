@@ -41,6 +41,8 @@ sealed class SymbolAddViewEvent : UiViewEvent {
   object UpdateOptionSide : SymbolAddViewEvent()
 
   object Close : SymbolAddViewEvent()
+
+  object CommitSymbol : SymbolAddViewEvent()
 }
 
 sealed class SymbolAddControllerEvent : UiControllerEvent {

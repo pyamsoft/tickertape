@@ -177,9 +177,6 @@ protected constructor(
     } else {
       setList(schedule)
     }
-
-    // Re-request a layout pass because sometimes this can leave weird gaps
-    binding.watchlistList.requestLayout()
   }
 
   companion object {

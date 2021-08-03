@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.tickertape.ui.SpacerViewHolder
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
+import kotlin.random.Random
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import timber.log.Timber
 
@@ -43,6 +44,7 @@ private constructor(
 
   companion object {
 
+    private val SPACER_HASH_CODE = Random.nextInt()
     private const val VIEW_TYPE_SPACE = 1
     private const val VIEW_TYPE_ITEM = 2
 
@@ -63,14 +65,28 @@ private constructor(
               oldItem: WatchlistItemViewState,
               newItem: WatchlistItemViewState
           ): Boolean {
-            return oldItem::class.java == newItem::class.java
+            return when (oldItem) {
+              is WatchlistItemViewState.Item ->
+                  when (newItem) {
+                    is WatchlistItemViewState.Item -> oldItem.symbol == newItem.symbol
+                    else -> false
+                  }
+              is WatchlistItemViewState.Spacer -> newItem is WatchlistItemViewState.Spacer
+            }
           }
 
           override fun areContentsTheSame(
               oldItem: WatchlistItemViewState,
               newItem: WatchlistItemViewState
           ): Boolean {
-            return oldItem == newItem
+            return when (oldItem) {
+              is WatchlistItemViewState.Item ->
+                  when (newItem) {
+                    is WatchlistItemViewState.Item -> oldItem == newItem
+                    else -> false
+                  }
+              is WatchlistItemViewState.Spacer -> newItem is WatchlistItemViewState.Spacer
+            }
           }
         }
   }
@@ -78,7 +94,7 @@ private constructor(
   override fun getPopupText(position: Int): String {
     return when (val state = getItem(position)) {
       is WatchlistItemViewState.Item -> state.symbol.symbol()
-      is WatchlistItemViewState.Spacer -> "TOP"
+      is WatchlistItemViewState.Spacer -> ""
     }
   }
 
@@ -92,7 +108,7 @@ private constructor(
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
       is WatchlistItemViewState.Item -> state.symbol.symbol().hashCode()
-      is WatchlistItemViewState.Spacer -> WatchlistItemViewState.Spacer.hashCode()
+      is WatchlistItemViewState.Spacer -> SPACER_HASH_CODE
     }.toLong()
   }
 

@@ -27,6 +27,7 @@ import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
 import com.pyamsoft.tickertape.ui.SpacerViewHolder
+import kotlin.random.Random
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import timber.log.Timber
 
@@ -44,6 +45,8 @@ private constructor(
 
   companion object {
 
+    private val SPACER_HASH_CODE = Random.nextInt()
+    private val HEADER_HASH_CODE = Random.nextInt()
     private const val VIEW_TYPE_SPACER = 1
     private const val VIEW_TYPE_HEADER = 2
     private const val VIEW_TYPE_ITEM = 3
@@ -66,14 +69,35 @@ private constructor(
               oldItem: PortfolioItemViewState,
               newItem: PortfolioItemViewState
           ): Boolean {
-            return oldItem::class.java == newItem::class.java
+            return when (oldItem) {
+              is PortfolioItemViewState.Header -> newItem is PortfolioItemViewState.Header
+              is PortfolioItemViewState.Item ->
+                  when (newItem) {
+                    is PortfolioItemViewState.Item ->
+                        oldItem.stock.holding.id() == newItem.stock.holding.id()
+                    else -> false
+                  }
+              is PortfolioItemViewState.Spacer -> newItem is PortfolioItemViewState.Spacer
+            }
           }
 
           override fun areContentsTheSame(
               oldItem: PortfolioItemViewState,
               newItem: PortfolioItemViewState
           ): Boolean {
-            return oldItem == newItem
+            return when (oldItem) {
+              is PortfolioItemViewState.Header ->
+                  when (newItem) {
+                    is PortfolioItemViewState.Header -> oldItem == newItem
+                    else -> false
+                  }
+              is PortfolioItemViewState.Item ->
+                  when (newItem) {
+                    is PortfolioItemViewState.Item -> oldItem == newItem
+                    else -> false
+                  }
+              is PortfolioItemViewState.Spacer -> newItem is PortfolioItemViewState.Spacer
+            }
           }
         }
   }
@@ -82,15 +106,15 @@ private constructor(
     return when (val state = getItem(position)) {
       is PortfolioItemViewState.Header -> "PORTFOLIO"
       is PortfolioItemViewState.Item -> state.stock.holding.symbol().symbol()
-      is PortfolioItemViewState.Spacer -> "TOP"
+      is PortfolioItemViewState.Spacer -> ""
     }
   }
 
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
-      is PortfolioItemViewState.Header -> state.hashCode()
+      is PortfolioItemViewState.Header -> HEADER_HASH_CODE
       is PortfolioItemViewState.Item -> state.stock.holding.id().hashCode()
-      is PortfolioItemViewState.Spacer -> PortfolioItemViewState.Spacer.hashCode()
+      is PortfolioItemViewState.Spacer -> SPACER_HASH_CODE
     }.toLong()
   }
 

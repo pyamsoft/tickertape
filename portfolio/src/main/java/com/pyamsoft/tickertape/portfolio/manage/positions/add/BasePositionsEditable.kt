@@ -21,7 +21,6 @@ import androidx.annotation.CheckResult
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.tickertape.stocks.api.StockDoubleValue
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import timber.log.Timber
@@ -39,24 +38,25 @@ abstract class BasePositionsEditable<B : ViewBinding> protected constructor(pare
 
     doOnInflate {
       val editText = provideEditText()
+
       delegate =
           UiEditTextDelegate.create(editText) { numberString ->
-            // Blank string reset to 0
-            if (numberString.isBlank()) {
-              publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
-              return@create true
-            }
+        // Blank string reset to 0
+        if (numberString.isBlank()) {
+          publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
+          return@create true
+        }
 
-            val value = numberString.toDoubleOrNull()
-            if (value == null) {
-              Timber.w("Invalid sharePrice $numberString")
-              return@create false
-            }
+        val value = numberString.toDoubleOrNull()
+        if (value == null) {
+          Timber.w("Invalid sharePrice $numberString")
+          return@create false
+        }
 
-            publish(provideEvent(value))
-            return@create true
-          }
-              .apply { handleCreate() }
+        publish(provideEvent(value))
+        return@create true
+      }
+          .apply { handleCreate() }
     }
   }
 
@@ -64,9 +64,7 @@ abstract class BasePositionsEditable<B : ViewBinding> protected constructor(pare
 
   @CheckResult protected abstract fun provideEvent(value: Double): PositionsAddViewEvent
 
-  protected fun handleValueChanged(value: StockDoubleValue) {
-    // Don't use asMoneyValue() here since we do not want to include the $ and stuff
-    val text = if (value.isZero()) "" else value.value().toString()
+  protected fun handleValueChanged(text: String) {
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

@@ -21,6 +21,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSharesEntryBinding
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
@@ -48,6 +49,11 @@ class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, p
   }
 
   override fun onRender(state: UiRender<PositionsAddViewState>) {
-    state.mapChanged { it.numberOfShares }.render(viewScope) { handleValueChanged(it) }
+    state.mapChanged { it.numberOfShares }.render(viewScope) { handleCountChanged(it) }
+  }
+
+  private fun handleCountChanged(value: StockShareValue) {
+    // Use asShareValue() so we output a double when fractional but otherwise a whole number
+    handleValueChanged(if (value.isZero()) "" else value.asShareValue())
   }
 }

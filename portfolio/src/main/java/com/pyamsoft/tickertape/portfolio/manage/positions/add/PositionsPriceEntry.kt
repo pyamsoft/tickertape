@@ -22,6 +22,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingPriceEntryBinding
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
@@ -61,6 +62,11 @@ class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent
   }
 
   override fun onRender(state: UiRender<PositionsAddViewState>) {
-    state.mapChanged { it.pricePerShare }.render(viewScope) { handleValueChanged(it) }
+    state.mapChanged { it.pricePerShare }.render(viewScope) { handlePriceChanged(it) }
+  }
+
+  private fun handlePriceChanged(value: StockMoneyValue) {
+    // Don't use asMoneyValue() since we don't want to include the $ and stuff
+    handleValueChanged(if (value.isZero()) "" else value.value().toString())
   }
 }

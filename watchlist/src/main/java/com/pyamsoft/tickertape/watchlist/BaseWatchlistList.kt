@@ -62,9 +62,9 @@ protected constructor(
 
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-            isItemPrefetchEnabled = true
-            initialPrefetchItemCount = 3
-          }
+        isItemPrefetchEnabled = true
+        initialPrefetchItemCount = 3
+      }
     }
 
     doOnInflate {
@@ -177,6 +177,9 @@ protected constructor(
     } else {
       setList(schedule)
     }
+
+    // Re-request a layout pass because sometimes this can leave weird gaps
+    binding.watchlistList.requestLayout()
   }
 
   companion object {

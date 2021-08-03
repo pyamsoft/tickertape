@@ -235,6 +235,9 @@ internal constructor(
     } else {
       setList(list)
     }
+
+    // Re-request a layout pass because sometimes this can leave weird gaps
+    binding.portfolioListList.requestLayout()
   }
 
   companion object {

@@ -26,11 +26,17 @@ import com.pyamsoft.tickertape.ui.PackedData
 
 data class SymbolAddViewState
 internal constructor(
+    val error: Throwable?,
     val quote: StockQuote?,
     val query: String,
     val searchResults: PackedData<List<SearchResult>>,
     val type: HoldingType,
-) : UiViewState
+) : UiViewState {
+
+  data class TypeMismatchException(val expectedType: String, val foundType: HoldingType) :
+      IllegalArgumentException(
+          "Type mismatch. Expected type $expectedType but found type: ${foundType.display}")
+}
 
 sealed class SymbolAddViewEvent : UiViewEvent {
 

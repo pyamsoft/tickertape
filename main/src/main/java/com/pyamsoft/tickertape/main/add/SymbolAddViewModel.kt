@@ -48,6 +48,7 @@ protected constructor(
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
         SymbolAddViewState(
+            error = null,
             quote = null,
             query = "",
             searchResults = emptyList<SearchResult>().pack(),

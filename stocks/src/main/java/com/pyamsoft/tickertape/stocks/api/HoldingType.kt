@@ -18,13 +18,13 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 
-sealed class HoldingType {
+sealed class HoldingType(val display: String) {
 
-  object Stock : HoldingType()
+  object Stock : HoldingType("Stock")
 
-  object Crypto : HoldingType()
+  object Crypto : HoldingType("Cryptocurrency")
 
-  sealed class Options : HoldingType() {
+  sealed class Options : HoldingType("Option") {
 
     object Buy : Options()
 

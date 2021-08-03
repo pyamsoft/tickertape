@@ -20,6 +20,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
+import com.pyamsoft.tickertape.main.add.SymbolAddViewState
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.HoldingType
@@ -45,23 +46,43 @@ internal constructor(
 
     val holdingType =
         when (val equityType = stock.type()) {
-          EquityType.CRYPTO -> HoldingType.Crypto
           EquityType.OPTION ->
-              when (type) {
-                is HoldingType.Options.Buy, is HoldingType.Options.Sell -> type
-                else -> {
-                  Timber.w(
-                      "EquityType from network and HoldingType from UI do not match: $equityType $type")
-                  return
+              if (type == HoldingType.Options.Buy || type == HoldingType.Options.Sell) type
+              else {
+                Timber.w(
+                    "Option EquityType and expected HoldingType do not match: $equityType $type")
+                setState {
+                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
                 }
+                return
               }
-          else -> HoldingType.Stock
+          EquityType.CRYPTO ->
+              if (type == HoldingType.Crypto) type
+              else {
+                Timber.w(
+                    "Crypto EquityType and expected HoldingType do not match: $equityType $type")
+                setState {
+                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
+                }
+                return
+              }
+          else ->
+              if (type == HoldingType.Stock) type
+              else {
+                Timber.w(
+                    "Stock EquityType and expected HoldingType do not match: $equityType $type")
+                setState {
+                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
+                }
+                return
+              }
         }
 
     Timber.d("Commit symbol to DB: $symbol $holdingType")
     interactor
         .commitSymbol(symbol, holdingType)
         .onSuccess { Timber.d("Committed new symbols to db: $symbol $holdingType") }
+        .onSuccess { setState { copy(error = null) } }
         .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol $holdingType") }
   }
 

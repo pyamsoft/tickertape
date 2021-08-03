@@ -54,7 +54,9 @@ internal constructor(
       // opened again from the Launcher
       val add = binding.mainBarAdd
       val resetter = ViewFixes.captureAndResetInitialMargin(add)
-      ViewFixes.correctMultiWindow(add) { resetter.reset() }.also { doOnTeardown { it.unregister() } }
+      ViewFixes.correctMultiWindow(add) { resetter.reset() }.also {
+        doOnTeardown { it.unregister() }
+      }
     }
 
     doOnInflate {
@@ -133,10 +135,10 @@ internal constructor(
     animator?.cancel()
     animator =
         ViewCompat.animate(binding.mainBarAdd)
-        .setDuration(ANIMATION_DURATION)
-        .setInterpolator(interpolator)
-        .rotation(if (adding) 45F else 0F)
-        .apply { start() }
+            .setDuration(ANIMATION_DURATION)
+            .setInterpolator(interpolator)
+            .rotation(if (adding) 45F else 0F)
+            .apply { start() }
   }
 
   private fun handleFabVisible(visible: Boolean) {

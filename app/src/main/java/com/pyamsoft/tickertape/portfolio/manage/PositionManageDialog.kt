@@ -148,7 +148,7 @@ internal class PositionManageDialog :
           }
         }
 
-      viewModel.handleLoadDefaultPage()
+    viewModel.handleLoadDefaultPage()
   }
 
   private fun eatBackButtonPress() {

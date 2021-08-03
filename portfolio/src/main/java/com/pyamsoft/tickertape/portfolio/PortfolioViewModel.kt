@@ -134,6 +134,10 @@ internal constructor(
           portfolio =
               portfolio.transformData { p ->
                 p.map { stock ->
+                  if (stock.holding.id() != position.holdingId()) {
+                    return@map stock
+                  }
+
                   val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
                   val existingPosition = stock.positions.firstOrNull(positionMatchesCallback)
                   return@map stock.copy(
@@ -159,6 +163,10 @@ internal constructor(
               portfolio.transformData { p ->
                 p
                     .map { stock ->
+                      if (stock.holding.id() != position.holdingId()) {
+                        return@map stock
+                      }
+
                       val positionMatchesCallback = { p: DbPosition -> p.id() == position.id() }
                       return@map if (!stock.positions.contains(positionMatchesCallback)) stock
                       else {

@@ -200,19 +200,25 @@ internal constructor(
 
   override fun handleShowStocks() {
     setState(
-        stateChange = { copy(section = WatchlistTabSection.STOCK) },
+        stateChange = {
+          copy(section = WatchlistTabSection.STOCK, watchlist = emptyList<QuotedStock>().pack())
+        },
         andThen = { fetchQuotes(false) })
   }
 
   override fun handleShowOptions() {
     setState(
-        stateChange = { copy(section = WatchlistTabSection.OPTION) },
+        stateChange = {
+          copy(section = WatchlistTabSection.OPTION, watchlist = emptyList<QuotedStock>().pack())
+        },
         andThen = { fetchQuotes(false) })
   }
 
   override fun handleShowCrypto() {
     setState(
-        stateChange = { copy(section = WatchlistTabSection.CRYPTO) },
+        stateChange = {
+          copy(section = WatchlistTabSection.CRYPTO, watchlist = emptyList<QuotedStock>().pack())
+        },
         andThen = { fetchQuotes(false) })
   }
 

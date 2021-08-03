@@ -290,19 +290,25 @@ internal constructor(
 
   override fun handleShowStocks() {
     setState(
-        stateChange = { copy(section = PortfolioTabSection.STOCK) },
+        stateChange = {
+          copy(section = PortfolioTabSection.STOCK, portfolio = emptyList<PortfolioStock>().pack())
+        },
         andThen = { fetchPortfolio(false) })
   }
 
   override fun handleShowOptions() {
     setState(
-        stateChange = { copy(section = PortfolioTabSection.OPTION) },
+        stateChange = {
+          copy(section = PortfolioTabSection.OPTION, portfolio = emptyList<PortfolioStock>().pack())
+        },
         andThen = { fetchPortfolio(false) })
   }
 
   override fun handleShowCrypto() {
     setState(
-        stateChange = { copy(section = PortfolioTabSection.CRYPTO) },
+        stateChange = {
+          copy(section = PortfolioTabSection.CRYPTO, portfolio = emptyList<PortfolioStock>().pack())
+        },
         andThen = { fetchPortfolio(false) })
   }
 

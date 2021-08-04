@@ -22,29 +22,42 @@ import android.content.Intent
 import android.os.Build
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 class TapeLauncher
 @Inject
-internal constructor(private val context: Context, private val serviceClass: Class<out Service>) {
+internal constructor(
+    private val context: Context,
+    private val serviceClass: Class<out Service>,
+    private val preferences: TapePreferences,
+) {
 
   @JvmOverloads
-  fun start(options: Options? = null) {
-    val appContext = context.applicationContext
-    val service =
-        Intent(appContext, serviceClass).apply {
-          options?.also { opts ->
-            opts.index?.also { i -> putExtra(TapeRemote.KEY_CURRENT_INDEX, i) }
-            opts.forceRefresh?.also { f -> putExtra(TapeRemote.KEY_FORCE_REFRESH, f) }
-          }
+  suspend fun start(options: Options? = null) =
+      withContext(context = Dispatchers.Default) {
+        if (!preferences.isTapeNotificationEnabled()) {
+          Timber.w("Not launching Tape service since it is not enabled")
+          return@withContext
         }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      appContext.startForegroundService(service)
-    } else {
-      appContext.startService(service)
-    }
-  }
+        val appContext = context.applicationContext
+        val service =
+            Intent(appContext, serviceClass).apply {
+              options?.also { opts ->
+                opts.index?.also { i -> putExtra(TapeRemote.KEY_CURRENT_INDEX, i) }
+                opts.forceRefresh?.also { f -> putExtra(TapeRemote.KEY_FORCE_REFRESH, f) }
+              }
+            }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          appContext.startForegroundService(service)
+        } else {
+          appContext.startService(service)
+        }
+      }
 
   data class Options(val index: Int?, val forceRefresh: Boolean?)
 }

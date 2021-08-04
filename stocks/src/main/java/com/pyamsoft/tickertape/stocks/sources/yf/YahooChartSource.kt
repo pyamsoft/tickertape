@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.data.StockChartImpl
 import com.pyamsoft.tickertape.stocks.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -53,6 +54,7 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
                 range = range.apiValue,
                 interval = interval.apiValue)
 
+        val localId = ZoneId.systemDefault()
         return@withContext result
             .spark
             .result
@@ -61,13 +63,13 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
             .map { resp ->
               val chart = resp.response.first()
               val meta = chart.meta.requireNotNull()
-              val currentDate = timestampToTime(meta.regularMarketTime.requireNotNull())
+              val currentDate = parseMarketTime(meta.regularMarketTime.requireNotNull(), localId)
               val currentPrice = meta.regularMarketPrice.requireNotNull().asMoney()
               val startingPrice = meta.chartPreviousClose.requireNotNull().asMoney()
               val timestamps = chart.timestamp.requireNotNull()
               val quote = chart.indicators.requireNotNull().quote.requireNotNull().first()
 
-              val dates = timestamps.map { timestampToTime(it) }
+              val dates = timestamps.map { parseMarketTime(it, localId) }
               val closes = quote.close.requireNotNull()
 
               val validDates = mutableListOf<LocalDateTime>()

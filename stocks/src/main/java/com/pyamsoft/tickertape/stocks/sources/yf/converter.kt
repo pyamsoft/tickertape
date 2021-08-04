@@ -19,9 +19,20 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 import androidx.annotation.CheckResult
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
+private val MARKET_TIME_ZONE = ZoneId.of("US/Eastern")
+
+/**
+ * Parse market related timestamps to a local time
+ *
+ * The market is located on the US East Coast, so we assume all timestamps are seconds in US East
+ * time.
+ */
 @CheckResult
-internal fun timestampToTime(stamp: Long): LocalDateTime {
-  return LocalDateTime.ofInstant(Instant.ofEpochSecond(stamp), ZoneOffset.UTC)
+internal fun parseMarketTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {
+  return ZonedDateTime.ofInstant(Instant.ofEpochSecond(stamp), MARKET_TIME_ZONE)
+      .withZoneSameInstant(localZoneId)
+      .toLocalDateTime()
 }

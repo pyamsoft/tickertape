@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -67,11 +68,13 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
     val symbol = option.underlyingSymbol.asSymbol()
     val calls = chain.calls.map { it.asContract(symbol) }
     val puts = chain.puts.map { it.asContract(symbol) }
+
+    val localId = ZoneId.systemDefault()
     return StockOptionsImpl(
         symbol = symbol,
-        expirationDates = option.expirationDates.map { timestampToTime(it) },
+        expirationDates = option.expirationDates.map { parseMarketTime(it, localId) },
         strikes = option.strikes.map { it.asMoney() },
-        date = timestampToTime(chain.expirationDate),
+        date = parseMarketTime(chain.expirationDate, localId),
         calls = calls,
         puts = puts)
   }

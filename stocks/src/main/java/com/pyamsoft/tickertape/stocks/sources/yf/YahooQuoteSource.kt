@@ -34,6 +34,7 @@ import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -52,6 +53,8 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                 format = YF_QUOTE_FORMAT,
                 fields = YF_QUOTE_FIELDS,
                 symbols = symbols.joinToString(",") { it.symbol() })
+
+        val localId = ZoneId.systemDefault()
         return@withContext result
             .quoteResponse
             .result
@@ -59,7 +62,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .filterOnlyValidQuotes()
             .map { stock ->
               if (stock.expireDate != null && stock.strike != null) {
-                createOptionsQuote(stock)
+                createOptionsQuote(stock, localId)
               } else {
                 createQuote(stock)
               }
@@ -71,13 +74,16 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
 
     @JvmStatic
     @CheckResult
-    private fun createOptionsQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
+    private fun createOptionsQuote(
+        stock: NetworkQuoteResponse.Resp.Quote,
+        localId: ZoneId
+    ): StockQuote {
       return StockOptionsQuoteImpl(
           symbol = stock.symbol.asSymbol(),
           equityType = stock.quoteType.requireNotNull(),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           strike = stock.strike.requireNotNull().asMoney(),
-          expireDate = timestampToTime(stock.expireDate.requireNotNull()),
+          expireDate = parseMarketTime(stock.expireDate.requireNotNull(), localId),
           dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
           dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),

@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.work
+package com.pyamsoft.tickertape.alert.preference
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.pydroid.util.PreferenceListener
 
-interface AlarmFactory {
+interface BigMoverPreferences {
 
-  @CheckResult suspend fun bigMoverAlarm(params: BigMoverParameters): Alarm
+  @CheckResult suspend fun isBigMoverNotificationEnabled(): Boolean
 
-  @CheckResult suspend fun refresherAlarm(params: RefreshParameters): Alarm
+  suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
+
+  @CheckResult
+  suspend fun listenForBigMoverNotificationChanged(onChange: (Boolean) -> Unit): PreferenceListener
 }

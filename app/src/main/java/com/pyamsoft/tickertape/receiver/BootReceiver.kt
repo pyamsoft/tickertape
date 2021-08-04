@@ -26,6 +26,9 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal class BootReceiver internal constructor() : BroadcastReceiver() {
@@ -44,7 +47,7 @@ internal class BootReceiver internal constructor() : BroadcastReceiver() {
     if (intent.action === Intent.ACTION_BOOT_COMPLETED) {
       Timber.d("Start service on boot")
       inject(context)
-      requireNotNull(tapeLauncher).start()
+      MainScope().launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
     }
   }
 

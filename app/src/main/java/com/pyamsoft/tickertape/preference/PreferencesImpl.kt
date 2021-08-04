@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.PreferenceListener
 import com.pyamsoft.pydroid.util.onChange
+import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,7 +30,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Singleton
-internal class PreferencesImpl @Inject internal constructor(context: Context) : TapePreferences {
+internal class PreferencesImpl @Inject internal constructor(context: Context) :
+    TapePreferences, BigMoverPreferences {
 
   private val preferences by lazy {
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
@@ -58,7 +60,31 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) : 
         }
       }
 
+  override suspend fun isBigMoverNotificationEnabled(): Boolean =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext preferences.getBoolean(KEY_BIG_MOVER_NOTIFICATION, true)
+      }
+
+  override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        preferences.edit { putBoolean(KEY_BIG_MOVER_NOTIFICATION, enabled) }
+      }
+
+  override suspend fun listenForBigMoverNotificationChanged(
+      onChange: (Boolean) -> Unit
+  ): PreferenceListener =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext preferences.onChange(KEY_BIG_MOVER_NOTIFICATION) {
+          val enabled = isBigMoverNotificationEnabled()
+          onChange(enabled)
+        }
+      }
+
   companion object {
     private const val KEY_TAPE_NOTIFICATION = "key_tape_notification_v1"
+    private const val KEY_BIG_MOVER_NOTIFICATION = "key_big_mover_notification_v1"
   }
 }

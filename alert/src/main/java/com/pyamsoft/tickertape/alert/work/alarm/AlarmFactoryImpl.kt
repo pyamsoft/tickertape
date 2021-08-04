@@ -16,21 +16,41 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
+import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.work.NoopAlarm
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
-internal class AlarmFactoryImpl @Inject internal constructor() : AlarmFactory {
+internal class AlarmFactoryImpl
+@Inject
+internal constructor(
+    private val bigMoverPreferences: BigMoverPreferences,
+) : AlarmFactory {
 
-  override fun bigMoverAlarm(params: BigMoverParameters): Alarm {
-    return BigMoverAlarm(params)
-  }
+  override suspend fun bigMoverAlarm(params: BigMoverParameters): Alarm =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
 
-  override fun refresherAlarm(params: RefreshParameters): Alarm {
-    return RefresherAlarm(params)
-  }
+        return@withContext if (!bigMoverPreferences.isBigMoverNotificationEnabled()) {
+          Timber.w("Big mover alarm is not enabled. Noop.")
+          NoopAlarm("BigMover")
+        } else {
+          BigMoverAlarm(params)
+        }
+      }
+
+  override suspend fun refresherAlarm(params: RefreshParameters): Alarm =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext RefresherAlarm(params)
+      }
 }

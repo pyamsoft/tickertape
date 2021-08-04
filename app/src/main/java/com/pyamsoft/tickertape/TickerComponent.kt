@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.inject.AlertComponent
+import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
@@ -129,6 +130,10 @@ internal interface TickerComponent {
   abstract class TickerProvider {
 
     @Binds @CheckResult abstract fun bindTapePreferences(impl: PreferencesImpl): TapePreferences
+
+    @Binds
+    @CheckResult
+    abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
 
     @Module
     companion object {

@@ -59,5 +59,12 @@ internal constructor(
         }
       }
 
+  suspend fun stop() =
+      withContext(context = Dispatchers.Default) {
+        val appContext = context.applicationContext
+        val service = Intent(appContext, serviceClass)
+        appContext.stopService(service)
+      }
+
   data class Options(val index: Int?, val forceRefresh: Boolean?)
 }

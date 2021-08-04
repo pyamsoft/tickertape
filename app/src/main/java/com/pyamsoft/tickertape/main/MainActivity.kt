@@ -165,7 +165,9 @@ internal class MainActivity :
 
   override fun onStart() {
     super.onStart()
-    requireNotNull(tapeLauncher).start()
+    lifecycleScope.launch(context = Dispatchers.Default) {
+      requireNotNull(tapeLauncher).start()
+    }
   }
 
   private fun beginWork() {

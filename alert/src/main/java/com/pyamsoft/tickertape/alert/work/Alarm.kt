@@ -26,3 +26,18 @@ interface Alarm {
 
   @CheckResult suspend fun period(): Long
 }
+
+data class NoopAlarm(private val tag: String) : Alarm {
+
+  override suspend fun tag(): String {
+    return "NOOP Alarm: $tag"
+  }
+
+  override suspend fun parameters(): AlarmParameters {
+    return AlarmParameters.empty()
+  }
+
+  override suspend fun period(): Long {
+    return 0
+  }
+}

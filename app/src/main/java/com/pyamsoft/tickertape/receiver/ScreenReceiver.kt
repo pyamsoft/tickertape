@@ -26,11 +26,17 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 
   @Inject @JvmField internal var tapeLauncher: TapeLauncher? = null
+
+  private val scope = MainScope()
 
   private fun inject(context: Context) {
     if (tapeLauncher != null) {
@@ -44,8 +50,14 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
     if (intent.action === Intent.ACTION_SCREEN_ON) {
       Timber.d("Start service on screen on")
       inject(context)
-      requireNotNull(tapeLauncher).start()
+
+      scope.launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
     }
+  }
+
+  internal fun destroy() {
+    Timber.d("Destroy screen receiver")
+    scope.cancel()
   }
 
   fun interface Registration {
@@ -72,6 +84,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
           Timber.d("Unregister new ScreenReceiver")
           registered = false
           appContext.unregisterReceiver(receiver)
+          receiver.destroy()
         }
       }
     }

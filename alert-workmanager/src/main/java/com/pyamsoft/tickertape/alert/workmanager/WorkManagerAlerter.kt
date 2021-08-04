@@ -31,6 +31,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
+import com.pyamsoft.tickertape.alert.work.NoopAlarm
 import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.work.alarm.PeriodicAlarm
 import com.pyamsoft.tickertape.alert.work.alarm.RefresherAlarm
@@ -78,6 +79,11 @@ internal constructor(
 
   private suspend fun queueAlarm(alarm: Alarm) {
     Enforcer.assertOffMainThread()
+
+    if (alarm is NoopAlarm) {
+      Timber.w("Not queuing alarm: Alarm is a No-op")
+    }
+
     cancelAlarm(alarm)
 
     val tag = alarm.tag()

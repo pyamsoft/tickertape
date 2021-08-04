@@ -50,7 +50,7 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) :
       }
 
   override suspend fun listenForTapeNotificationChanged(
-      onChange: (Boolean) -> Unit
+      onChange: suspend (Boolean) -> Unit
   ): PreferenceListener =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -73,7 +73,7 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) :
       }
 
   override suspend fun listenForBigMoverNotificationChanged(
-      onChange: (Boolean) -> Unit
+      onChange: suspend (Boolean) -> Unit
   ): PreferenceListener =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()

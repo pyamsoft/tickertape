@@ -20,6 +20,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.pyamsoft.pydroid.bus.EventBus
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ import timber.log.Timber
 class TapeLauncher
 @Inject
 internal constructor(
+    @param:TapeInternalApi private val tapeStopBus: EventBus<TapeRemote.StopCommand>,
     private val context: Context,
     private val serviceClass: Class<out Service>,
     private val preferences: TapePreferences,
@@ -38,11 +40,6 @@ internal constructor(
   @JvmOverloads
   suspend fun start(options: Options? = null) =
       withContext(context = Dispatchers.Default) {
-        if (!preferences.isTapeNotificationEnabled()) {
-          Timber.w("Not launching Tape service since it is not enabled")
-          return@withContext
-        }
-
         val appContext = context.applicationContext
         val service =
             Intent(appContext, serviceClass).apply {
@@ -52,18 +49,18 @@ internal constructor(
               }
             }
 
+        if (!preferences.isTapeNotificationEnabled()) {
+          Timber.w("Stop tape notification because it is not enabled.")
+          appContext.stopService(service)
+          tapeStopBus.send(TapeRemote.StopCommand)
+          return@withContext
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           appContext.startForegroundService(service)
         } else {
           appContext.startService(service)
         }
-      }
-
-  suspend fun stop() =
-      withContext(context = Dispatchers.Default) {
-        val appContext = context.applicationContext
-        val service = Intent(appContext, serviceClass)
-        appContext.stopService(service)
       }
 
   data class Options(val index: Int?, val forceRefresh: Boolean?)

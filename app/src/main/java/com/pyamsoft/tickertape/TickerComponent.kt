@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.home.BaseHomeComponent
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainModule
+import com.pyamsoft.tickertape.notification.BaseNotificationComponent
 import com.pyamsoft.tickertape.portfolio.BasePortfolioComponent
 import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
@@ -89,6 +90,8 @@ internal interface TickerComponent {
   fun inject(receiver: ScreenReceiver)
 
   fun inject(application: TickerTape)
+
+  @CheckResult fun plusNotificationComponent(): BaseNotificationComponent.Factory
 
   @CheckResult fun plusSettingsComponent(): SettingsFragmentComponent.Factory
 

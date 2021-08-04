@@ -47,6 +47,7 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
+import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.setting.SettingsFragment
@@ -197,8 +198,8 @@ internal class MainActivity :
         tag = HomeFragment.TAG
       }
       is MainPage.Notifications -> {
-        fragment = SettingsFragment.newInstance()
-        tag = SettingsFragment.TAG
+        fragment = NotificationFragment.newInstance()
+        tag = NotificationFragment.TAG
       }
       is MainPage.WatchList -> {
         fragment = WatchlistFragment.newInstance()

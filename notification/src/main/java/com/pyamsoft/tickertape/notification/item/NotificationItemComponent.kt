@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.notification.item
 
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.util.PreferenceListener
+import com.pyamsoft.tickertape.notification.item.mover.BigMoverViewHolder
+import com.pyamsoft.tickertape.notification.item.tape.TapeViewHolder
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-interface TapePreferences {
+@Subcomponent
+interface NotificationItemComponent {
 
-    @CheckResult
-    suspend fun isTapeNotificationEnabled() : Boolean
+  fun inject(holder: TapeViewHolder)
 
-    suspend fun setTapeNotificationEnabled(enabled: Boolean)
+  fun inject(holder: BigMoverViewHolder)
 
-    @CheckResult
-    suspend fun listenForTapeNotificationChanged(onChange: suspend (Boolean) -> Unit): PreferenceListener
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): NotificationItemComponent
+  }
 }

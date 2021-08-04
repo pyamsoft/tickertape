@@ -26,7 +26,11 @@ interface TapeRemote {
 
   fun stopNotification(service: Service)
 
+  suspend fun onStopReceived(onStop: () -> Unit)
+
   data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
+
+  object StopCommand
 
   companion object {
 

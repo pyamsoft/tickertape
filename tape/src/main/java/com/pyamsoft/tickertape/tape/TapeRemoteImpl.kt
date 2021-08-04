@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.tape
 
 import android.app.Service
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -37,9 +38,13 @@ import timber.log.Timber
 internal class TapeRemoteImpl
 @Inject
 internal constructor(
+    @param:TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
+    @param:TapeInternalApi private val notifier: Notifier,
     private val interactor: QuoteInteractor,
-    @TapeInternalApi private val notifier: Notifier,
 ) : TapeRemote {
+
+  override suspend fun onStopReceived(onStop: () -> Unit) =
+      withContext(context = Dispatchers.IO) { stopBus.onEvent { onStop() } }
 
   override fun createNotification(service: Service) {
     notifier.startForeground(

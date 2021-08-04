@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.tape
 
 import android.content.Context
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import dagger.Binds
@@ -25,6 +27,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class TapeInternalApi
 
@@ -38,10 +41,17 @@ abstract class TapeModule {
 
   @Binds internal abstract fun bindRemote(impl: TapeRemoteImpl): TapeRemote
 
+  @Binds
+  @TapeInternalApi
+  internal abstract fun bindTapeStopConsumer(
+      @TapeInternalApi impl: EventBus<TapeRemote.StopCommand>
+  ): EventConsumer<TapeRemote.StopCommand>
+
   @Module
   companion object {
 
     @Provides
+    @Singleton
     @JvmStatic
     @CheckResult
     @TapeInternalApi
@@ -51,6 +61,15 @@ abstract class TapeModule {
         context: Context
     ): Notifier {
       return Notifier.createDefault(context, dispatchers)
+    }
+
+    @Provides
+    @Singleton
+    @JvmStatic
+    @CheckResult
+    @TapeInternalApi
+    internal fun provideTapeStopBus(): EventBus<TapeRemote.StopCommand> {
+      return EventBus.create(emitOnlyWhenActive = false)
     }
   }
 }

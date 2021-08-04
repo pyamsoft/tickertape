@@ -29,6 +29,10 @@ class RefresherAlarm internal constructor(private val params: RefreshParameters)
     return AlarmParameters { putBoolean(FORCE_REFRESH, params.forceRefresh) }
   }
 
+  override suspend fun isEnabled(): Boolean {
+    return true
+  }
+
   companion object {
 
     const val FORCE_REFRESH = "force_refresh_v1"

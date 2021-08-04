@@ -22,12 +22,10 @@ import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
-import com.pyamsoft.tickertape.alert.work.NoopAlarm
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Singleton
 internal class AlarmFactoryImpl
@@ -40,12 +38,10 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        return@withContext if (!bigMoverPreferences.isBigMoverNotificationEnabled()) {
-          Timber.w("Big mover alarm is not enabled. Noop.")
-          NoopAlarm("BigMover")
-        } else {
-          BigMoverAlarm(params)
-        }
+        return@withContext BigMoverAlarm(
+            params,
+            bigMoverPreferences.isBigMoverNotificationEnabled(),
+        )
       }
 
   override suspend fun refresherAlarm(params: RefreshParameters): Alarm =

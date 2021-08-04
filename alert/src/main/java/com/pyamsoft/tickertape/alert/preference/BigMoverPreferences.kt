@@ -26,5 +26,5 @@ interface BigMoverPreferences {
   suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
 
   @CheckResult
-  suspend fun listenForBigMoverNotificationChanged(onChange: (Boolean) -> Unit): PreferenceListener
+  suspend fun listenForBigMoverNotificationChanged(onChange: suspend (Boolean) -> Unit): PreferenceListener
 }

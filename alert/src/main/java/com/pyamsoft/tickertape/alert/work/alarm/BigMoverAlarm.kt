@@ -19,7 +19,11 @@ package com.pyamsoft.tickertape.alert.work.alarm
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 
-class BigMoverAlarm internal constructor(private val params: BigMoverParameters) : PeriodicAlarm() {
+class BigMoverAlarm
+internal constructor(
+    private val params: BigMoverParameters,
+    private val isEnabled: Boolean,
+) : PeriodicAlarm() {
 
   override suspend fun tag(): String {
     return "Big Mover Alarm 1"
@@ -27,6 +31,10 @@ class BigMoverAlarm internal constructor(private val params: BigMoverParameters)
 
   override suspend fun parameters(): AlarmParameters {
     return AlarmParameters { putBoolean(FORCE_REFRESH, params.forceRefresh) }
+  }
+
+  override suspend fun isEnabled(): Boolean {
+    return isEnabled
   }
 
   companion object {

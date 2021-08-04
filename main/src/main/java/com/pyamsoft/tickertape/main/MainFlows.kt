@@ -32,13 +32,15 @@ internal constructor(
 
 sealed class MainViewEvent : UiViewEvent {
 
+  object OpenSettings : MainViewEvent()
+
   object OpenHome : MainViewEvent()
 
   object OpenWatchList : MainViewEvent()
 
   object OpenPortfolio : MainViewEvent()
 
-  object OpenSettings : MainViewEvent()
+  object OpenNotifications : MainViewEvent()
 
   data class BottomBarMeasured internal constructor(val height: Int) : MainViewEvent()
 

@@ -16,22 +16,9 @@
 
 package com.pyamsoft.tickertape.setting
 
-import android.content.Context
 import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
-import androidx.preference.PreferenceViewHolder
-import com.pyamsoft.pydroid.ui.preference.PreferenceCompat
+import com.pyamsoft.tickertape.ui.UiFragmentContainer
+import javax.inject.Inject
 
-internal class PreferenceBottomSpace
-internal constructor(private val height: Int, context: Context) : PreferenceCompat(context) {
-
-  init {
-    layoutResource = R.layout.preference_spacer
-  }
-
-  override fun onBindViewHolder(holder: PreferenceViewHolder) {
-    super.onBindViewHolder(holder)
-    val h = height
-    holder.itemView.updateLayoutParams<ViewGroup.LayoutParams> { this.height = h }
-  }
-}
+class SettingsContainer @Inject internal constructor(parent: ViewGroup) :
+    UiFragmentContainer<SettingsViewState, SettingsViewEvent>(parent)

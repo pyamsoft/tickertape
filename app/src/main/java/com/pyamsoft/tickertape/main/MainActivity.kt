@@ -48,6 +48,7 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
+import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
@@ -155,10 +156,11 @@ internal class MainActivity :
                 viewModel.handleSelectPage(MainPage.Portfolio, force = false)
             is MainViewEvent.OpenWatchList ->
                 viewModel.handleSelectPage(MainPage.WatchList, force = false)
-            is MainViewEvent.OpenSettings ->
-                viewModel.handleSelectPage(MainPage.Settings, force = false)
+            is MainViewEvent.OpenNotifications ->
+                viewModel.handleSelectPage(MainPage.Notifications, force = false)
             is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
             is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type)
+            is MainViewEvent.OpenSettings -> handleOpenSettings()
           }
         }
   }
@@ -168,6 +170,10 @@ internal class MainActivity :
     lifecycleScope.launch(context = Dispatchers.Default) {
       requireNotNull(tapeLauncher).start()
     }
+  }
+
+  private fun handleOpenSettings() {
+    SettingsDialog.newInstance().show(this, SettingsDialog.TAG)
   }
 
   private fun beginWork() {
@@ -190,7 +196,7 @@ internal class MainActivity :
         fragment = HomeFragment.newInstance()
         tag = HomeFragment.TAG
       }
-      is MainPage.Settings -> {
+      is MainPage.Notifications -> {
         fragment = SettingsFragment.newInstance()
         tag = SettingsFragment.TAG
       }

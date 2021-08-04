@@ -16,9 +16,9 @@
 
 package com.pyamsoft.tickertape.setting
 
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
-import androidx.preference.PreferenceScreen
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -31,12 +31,12 @@ import dagger.multibindings.IntoMap
     modules = [SettingsFragmentComponent.ComponentModule::class, ViewModelFactoryModule::class])
 internal interface SettingsFragmentComponent {
 
-  fun inject(fragment: SettingsFragment.SettingsPreferenceFragment)
+  fun inject(fragment: SettingsDialog)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance parent: PreferenceScreen): SettingsFragmentComponent
+    @CheckResult fun create(@BindsInstance parent: ViewGroup): SettingsFragmentComponent
   }
 
   @Module
@@ -44,7 +44,7 @@ internal interface SettingsFragmentComponent {
 
     @Binds
     @IntoMap
-    @ClassKey(PreferenceViewModel::class)
-    internal abstract fun bindViewModel(impl: PreferenceViewModel): ViewModel
+    @ClassKey(SettingsViewModel::class)
+    internal abstract fun bindViewModel(impl: SettingsViewModel): ViewModel
   }
 }

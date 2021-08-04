@@ -16,6 +16,12 @@
 
 package com.pyamsoft.tickertape.setting
 
+import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 
-data class SettingsViewState internal constructor(val bottomOffset: Int) : UiViewState
+object SettingsViewState : UiViewState
+
+sealed class SettingsViewEvent : UiViewEvent {
+
+  object Close : SettingsViewEvent()
+}

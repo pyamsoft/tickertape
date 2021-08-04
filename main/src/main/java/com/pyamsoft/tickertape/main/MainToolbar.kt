@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.main
 
-import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewOutlineProvider
@@ -41,6 +40,7 @@ import com.pyamsoft.pydroid.util.doOnApplyWindowInsets
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.main.databinding.MainToolbarBinding
+import com.pyamsoft.tickertape.ui.ViewFixes
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
 import javax.inject.Named
@@ -90,8 +90,6 @@ internal constructor(
       binding.mainToolbar.addPrivacy(viewScope, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL)
     }
 
-    doOnInflate { animateToolbar() }
-
     doOnTeardown {
       titleAnimator?.cancel()
       titleAnimator = null
@@ -103,15 +101,34 @@ internal constructor(
     }
 
     doOnInflate {
-      val listener =
-          View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            binding.mainAppbar.withRoundedBackground(applyAllCorners = true)
-            binding.mainToolbar.elevation = 0F
-          }
-      binding.mainAppbar.addOnLayoutChangeListener(listener)
-
-      doOnTeardown { binding.mainAppbar.removeOnLayoutChangeListener(listener) }
+      ViewFixes.correctMultiWindow(binding.mainAppbar) {
+        binding.apply {
+          mainAppbar.withRoundedBackground(applyAllCorners = true)
+          mainToolbar.elevation = 0F
+        }
+      }
+          .also { doOnTeardown { it.unregister() } }
     }
+
+    doOnInflate { binding.mainToolbar.inflateMenu(R.menu.toolbar) }
+
+    doOnInflate {
+      binding.mainToolbar.setOnMenuItemClickListener { item ->
+        return@setOnMenuItemClickListener when (item.itemId) {
+          R.id.menu_main_settings -> {
+            publish(MainViewEvent.OpenSettings)
+            true
+          }
+          else -> false
+        }
+      }
+    }
+
+    doOnTeardown { binding.mainToolbar.setOnMenuItemClickListener(null) }
+
+    doOnTeardown { binding.mainToolbar.menu.removeItem(R.id.menu_main_settings) }
+
+    doOnInflate { animateToolbar() }
   }
 
   private fun animateToolbar() {

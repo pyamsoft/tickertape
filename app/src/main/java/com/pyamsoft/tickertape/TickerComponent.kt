@@ -90,7 +90,7 @@ internal interface TickerComponent {
 
   fun inject(application: TickerTape)
 
-  @CheckResult fun plusPreferenceComponent(): SettingsFragmentComponent.Factory
+  @CheckResult fun plusSettingsComponent(): SettingsFragmentComponent.Factory
 
   @CheckResult fun plusPositionAddComponent(): PositionsAddComponent.Factory
 

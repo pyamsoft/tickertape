@@ -16,26 +16,9 @@
 
 package com.pyamsoft.tickertape.setting
 
-import androidx.lifecycle.viewModelScope
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.arch.UnitControllerEvent
-import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.tickertape.ui.BottomOffset
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class PreferenceViewModel
-@Inject
-internal constructor(
-    bottomOffsetBus: EventConsumer<BottomOffset>,
-) :
-    UiViewModel<SettingsViewState, UnitControllerEvent>(
-        initialState = SettingsViewState(bottomOffset = 0)) {
-
-  init {
-    viewModelScope.launch(context = Dispatchers.Default) {
-      bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
-    }
-  }
-}
+class SettingsViewModel @Inject internal constructor() :
+    UiViewModel<SettingsViewState, UnitControllerEvent>(initialState = SettingsViewState)

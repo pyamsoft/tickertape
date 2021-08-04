@@ -128,7 +128,7 @@ internal constructor(
     private fun String.asPage(): MainPage =
         when (this) {
           MainPage.WatchList::class.java.name -> MainPage.WatchList
-          MainPage.Settings::class.java.name -> MainPage.Settings
+          MainPage.Notifications::class.java.name -> MainPage.Notifications
           MainPage.Home::class.java.name -> MainPage.Home
           MainPage.Portfolio::class.java.name -> MainPage.Portfolio
           else -> throw IllegalStateException("Cannot convert to MainPage: $this")

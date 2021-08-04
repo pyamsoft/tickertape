@@ -37,8 +37,8 @@
         android:title="Portfolio" />
 
     <item
-        android:id="@+id/menu_settings"
-        android:icon="@drawable/ic_settings_24dp"
-        android:title="Settings" />
+        android:id="@+id/menu_notification"
+        android:icon="@drawable/ic_notifications_24dp"
+        android:title="Alerts" />
 
 </menu>

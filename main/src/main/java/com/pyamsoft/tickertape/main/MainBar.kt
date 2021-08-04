@@ -78,7 +78,7 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
         Timber.d("Click nav item: $item")
         return@setOnItemSelectedListener when (item.itemId) {
           R.id.menu_watchlist -> select(MainViewEvent.OpenWatchList)
-          R.id.menu_settings -> select(MainViewEvent.OpenSettings)
+          R.id.menu_notification -> select(MainViewEvent.OpenNotifications)
           R.id.menu_portfolio -> select(MainViewEvent.OpenPortfolio)
           R.id.menu_home -> select(MainViewEvent.OpenHome)
           else -> false
@@ -124,8 +124,8 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
       return when (page) {
         is MainPage.Home -> R.id.menu_home
         is MainPage.WatchList -> R.id.menu_watchlist
-        is MainPage.Settings -> R.id.menu_settings
         is MainPage.Portfolio -> R.id.menu_portfolio
+        is MainPage.Notifications -> R.id.menu_notification
       }
     }
   }

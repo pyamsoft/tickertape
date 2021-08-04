@@ -17,29 +17,12 @@
 package com.pyamsoft.tickertape.setting
 
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
-import com.pyamsoft.pydroid.arch.StateSaver
-import com.pyamsoft.pydroid.arch.UiController
-import com.pyamsoft.pydroid.arch.UnitControllerEvent
-import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.settings.AppSettingsFragment
 import com.pyamsoft.pydroid.ui.settings.AppSettingsPreferenceFragment
-import com.pyamsoft.pydroid.ui.util.applyAppBarOffset
-import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
-import javax.inject.Inject
 
 internal class SettingsFragment : AppSettingsFragment() {
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    view.applyAppBarOffset(requireAppBarActivity(), viewLifecycleOwner)
-  }
 
   override fun provideSettingsFragment(): AppSettingsPreferenceFragment {
     return SettingsPreferenceFragment()
@@ -60,50 +43,11 @@ internal class SettingsFragment : AppSettingsFragment() {
     }
   }
 
-  internal class SettingsPreferenceFragment :
-      AppSettingsPreferenceFragment(), UiController<UnitControllerEvent> {
+  internal class SettingsPreferenceFragment : AppSettingsPreferenceFragment() {
 
     override val preferenceXmlResId = 0
 
     override val hideUpgradeInformation = true
-
-    @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-    private val viewModel by fromViewModelFactory<PreferenceViewModel>(activity = true) {
-      factory?.create(requireActivity())
-    }
-
-    @JvmField @Inject internal var bottomSpacer: SettingsBottomSpacer? = null
-
-    private var stateSaver: StateSaver? = null
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-      super.onViewCreated(view, savedInstanceState)
-      Injector.obtainFromApplication<TickerComponent>(view.context)
-          .plusPreferenceComponent()
-          .create(preferenceScreen)
-          .inject(this)
-
-      stateSaver =
-          createComponent(
-              savedInstanceState,
-              viewLifecycleOwner,
-              viewModel,
-              this,
-              requireNotNull(bottomSpacer)) {}
-    }
-
-    override fun onControllerEvent(event: UnitControllerEvent) {}
-
-    override fun onSaveInstanceState(outState: Bundle) {
-      super.onSaveInstanceState(outState)
-      stateSaver?.saveState(outState)
-    }
-
-    override fun onDestroyView() {
-      super.onDestroyView()
-      factory = null
-      stateSaver = null
-    }
 
     companion object {
 

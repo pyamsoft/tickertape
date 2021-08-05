@@ -67,7 +67,7 @@ dependencies {
   kapt "com.google.dagger:dagger-compiler:$dagger"
 
   // AndroidX
-  api "androidx.fragment:fragment:$fragment"
+  api "androidx.fragment:fragment-ktx:$fragment"
   api "androidx.recyclerview:recyclerview:$recyclerView"
   api "androidx.constraintlayout:constraintlayout:$constraintLayout"
   api "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefresh"

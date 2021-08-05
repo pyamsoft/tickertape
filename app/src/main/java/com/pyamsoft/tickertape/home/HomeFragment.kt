@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
@@ -30,7 +31,6 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
@@ -43,8 +43,8 @@ import javax.inject.Inject
 class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<HomeViewModel>(activity = true) {
-    factory?.create(requireActivity())
+  private val viewModel by activityViewModels<HomeViewModel> {
+    factory.requireNotNull().create(requireActivity())
   }
 
   @Inject @JvmField internal var container: HomeScrollContainer? = null

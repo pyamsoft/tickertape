@@ -27,13 +27,13 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.tickertape.R
@@ -52,7 +52,7 @@ internal class WatchlistDigDialog :
   @JvmField @Inject internal var container: BaseWatchlistDigContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<BaseWatchlistDigViewModel> { factory?.create(this) }
+  private val viewModel by viewModels<BaseWatchlistDigViewModel> { factory.requireNotNull().create(this) }
 
   private var component: BaseWatchlistDigComponent? = null
 

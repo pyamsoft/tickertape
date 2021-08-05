@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.UnitControllerEvent
@@ -31,7 +32,6 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -40,8 +40,8 @@ import javax.inject.Inject
 class NotificationFragment : Fragment(), UiController<UnitControllerEvent> {
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<NotificationViewModel>(activity = true) {
-    factory?.create(this)
+  private val viewModel by activityViewModels<NotificationViewModel>{
+    factory.requireNotNull().create(this)
   }
 
   private var stateSaver: StateSaver? = null

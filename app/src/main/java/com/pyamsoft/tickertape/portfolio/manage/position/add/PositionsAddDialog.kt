@@ -26,14 +26,14 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
+import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
@@ -60,8 +60,8 @@ internal class PositionsAddDialog :
   @JvmField @Inject internal var toolbar: PositionAddToolbar? = null
 
   @JvmField @Inject internal var factory: PositionsAddViewModel.Factory? = null
-  private val viewModel by fromViewModelFactory<PositionsAddViewModel> {
-    createSavedStateViewModelFactory(factory)
+  private val viewModel by viewModels<PositionsAddViewModel> {
+    factory.requireNotNull().asFactory(this)
   }
 
   private var stateSaver: StateSaver? = null

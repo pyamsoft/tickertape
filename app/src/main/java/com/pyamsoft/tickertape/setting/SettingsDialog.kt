@@ -24,6 +24,7 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.UnitControllerEvent
@@ -32,7 +33,6 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.commitNow
 import com.pyamsoft.pydroid.ui.util.layout
@@ -46,8 +46,8 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
 
   @JvmField @Inject
   internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<SettingsViewModel>(activity = true) {
-    factory?.create(requireActivity())
+  private val viewModel by activityViewModels<SettingsViewModel> {
+    factory.requireNotNull().create(requireActivity())
   }
 
   @JvmField @Inject

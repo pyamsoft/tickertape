@@ -19,18 +19,18 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
+import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
@@ -50,7 +50,6 @@ import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.SettingsDialog
-import com.pyamsoft.tickertape.setting.SettingsFragment
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
@@ -87,8 +86,8 @@ internal class MainActivity :
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
 
   @JvmField @Inject internal var factory: MainViewModel.Factory? = null
-  private val viewModel by fromViewModelFactory<MainViewModel> {
-    createSavedStateViewModelFactory(factory)
+  private val viewModel by viewModels<MainViewModel> {
+    factory.requireNotNull().asFactory(this)
   }
 
   @JvmField @Inject internal var container: MainContainer? = null

@@ -21,11 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -41,7 +41,7 @@ abstract class BaseChartFragment protected constructor() :
   @JvmField @Inject internal var container: StockChartContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<StockChartViewModel> { factory?.create(this) }
+  private val viewModel by viewModels<StockChartViewModel> { factory.requireNotNull().create(this) }
 
   private var stateSaver: StateSaver? = null
 

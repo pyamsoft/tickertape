@@ -22,10 +22,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.databinding.LayoutFrameBinding
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -41,7 +42,7 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
   @JvmField @Inject internal var list: PositionsList? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<PositionsViewModel> { factory?.create(this) }
+  private val viewModel by viewModels<PositionsViewModel> { factory.requireNotNull().create(this) }
 
   private var stateSaver: StateSaver? = null
 

@@ -23,16 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
+import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
@@ -45,8 +45,8 @@ import javax.inject.Inject
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   @JvmField @Inject internal var factory: WatchlistViewModel.Factory? = null
-  private val viewModel by fromViewModelFactory<WatchlistViewModel>(activity = true) {
-    createSavedStateViewModelFactory(factory)
+  private val viewModel by activityViewModels<WatchlistViewModel> {
+    factory.requireNotNull().asFactory(this)
   }
 
   private var stateSaver: StateSaver? = null

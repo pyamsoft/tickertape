@@ -22,13 +22,14 @@ import android.os.Bundle
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.UnitViewEvent
 import com.pyamsoft.pydroid.arch.UnitViewState
 import com.pyamsoft.pydroid.arch.createComponent
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateControllerEvent
@@ -45,8 +46,8 @@ internal class PurchaseDatePickerDialog :
     AppCompatDialogFragment(), UiController<PositionsDateControllerEvent> {
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by fromViewModelFactory<PositionsDateViewModel>(activity = true) {
-    factory?.create(requireActivity())
+  private val viewModel by activityViewModels<PositionsDateViewModel> {
+    factory.requireNotNull().create(requireActivity())
   }
 
   private var stateSaver: StateSaver? = null

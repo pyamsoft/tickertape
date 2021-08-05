@@ -20,9 +20,10 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.fragment.app.DialogFragment
-import com.pyamsoft.pydroid.arch.createSavedStateViewModelFactory
+import androidx.fragment.app.viewModels
+import com.pyamsoft.pydroid.arch.asFactory
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.arch.fromViewModelFactory
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.toHoldingString
@@ -32,8 +33,8 @@ import javax.inject.Inject
 internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
   @JvmField @Inject internal var factory: PortfolioAddViewModel.Factory? = null
-  override val viewModel by fromViewModelFactory<PortfolioAddViewModel> {
-    createSavedStateViewModelFactory(factory)
+  override val viewModel by viewModels<PortfolioAddViewModel> {
+    factory.requireNotNull().asFactory(this)
   }
 
   override fun onInject(view: ViewGroup, savedInstanceState: Bundle?, type: HoldingType) {

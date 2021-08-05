@@ -35,6 +35,7 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
+import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.R
@@ -95,21 +96,21 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
     val quote = notification.quote
     val session: StockMarketSession
-    val sessionType: SessionType
+    val sessionType: MarketState
     val afterHoursSession = quote.afterHours()
     val preMarketSession = quote.preMarket()
     when {
       afterHoursSession != null -> {
         session = afterHoursSession
-        sessionType = SessionType.POST
+        sessionType = MarketState.POST
       }
       preMarketSession != null -> {
         session = preMarketSession
-        sessionType = SessionType.PRE
+        sessionType = MarketState.PRE
       }
       else -> {
         session = quote.regular()
-        sessionType = SessionType.REGULAR
+        sessionType = MarketState.REGULAR
       }
     }
 
@@ -117,9 +118,9 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val direction = session.direction()
     val sessionString =
         when (sessionType) {
-          SessionType.REGULAR -> "so far today"
-          SessionType.POST -> "after hours"
-          SessionType.PRE -> "pre-market"
+          MarketState.REGULAR -> "so far today"
+          MarketState.POST -> "after hours"
+          MarketState.PRE -> "pre-market"
         }
 
     @DrawableRes val icon: Int
@@ -171,11 +172,5 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
   companion object {
     private const val REQUEST_CODE_ACTIVITY = 69420
-  }
-
-  private enum class SessionType {
-    REGULAR,
-    POST,
-    PRE,
   }
 }

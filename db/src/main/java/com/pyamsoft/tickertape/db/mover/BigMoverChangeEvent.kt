@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.mover
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
+sealed class BigMoverChangeEvent {
 
-interface TickerDb : DbCache {
+  data class Insert(val mover: BigMoverReport) : BigMoverChangeEvent()
 
-  @CheckResult fun symbols(): SymbolDb
+  data class Update(val mover: BigMoverReport) : BigMoverChangeEvent()
 
-  @CheckResult fun holdings(): HoldingDb
-
-  @CheckResult fun positions(): PositionDb
-
-  @CheckResult fun bigMover(): BigMoverDb
+  data class Delete(
+      val mover: BigMoverReport,
+      val offerUndo: Boolean,
+  ) : BigMoverChangeEvent()
 }

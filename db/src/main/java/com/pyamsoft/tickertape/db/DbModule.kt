@@ -23,6 +23,12 @@ import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.HoldingRealtime
+import com.pyamsoft.tickertape.db.mover.BigMoverDb
+import com.pyamsoft.tickertape.db.mover.BigMoverDbImpl
+import com.pyamsoft.tickertape.db.mover.BigMoverDeleteDao
+import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
+import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
+import com.pyamsoft.tickertape.db.mover.BigMoverRealtime
 import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.position.PositionDbImpl
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
@@ -50,6 +56,8 @@ abstract class DbModule {
   @Binds @CheckResult internal abstract fun provideHoldingDbImpl(impl: HoldingDbImpl): HoldingDb
 
   @Binds @CheckResult internal abstract fun providePositionDbImpl(impl: PositionDbImpl): PositionDb
+
+  @Binds @CheckResult internal abstract fun provideBigMoverDbImpl(impl: BigMoverDbImpl): BigMoverDb
 
   @Module
   companion object {
@@ -159,6 +167,42 @@ abstract class DbModule {
     @Provides
     @CheckResult
     internal fun providePositionDeleteDao(@InternalApi db: PositionDb): PositionDeleteDao {
+      return db.deleteDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    @InternalApi
+    internal fun provideBigMoverDb(db: TickerDb): BigMoverDb {
+      return db.bigMover()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideBigMoverRealtimeDao(@InternalApi db: BigMoverDb): BigMoverRealtime {
+      return db.realtime()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideBigMoverQueryDao(@InternalApi db: BigMoverDb): BigMoverQueryDao {
+      return db.queryDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideBigMoverInsertDao(@InternalApi db: BigMoverDb): BigMoverInsertDao {
+      return db.insertDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideBigMoverDeleteDao(@InternalApi db: BigMoverDb): BigMoverDeleteDao {
       return db.deleteDao()
     }
   }

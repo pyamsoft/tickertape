@@ -16,8 +16,33 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-object MarketState {
-  const val REGULAR = "REGULAR"
-  const val POST = "POST"
-  const val PRE = "PRE"
+import androidx.annotation.CheckResult
+import timber.log.Timber
+
+enum class MarketState {
+  REGULAR,
+  POST,
+  PRE;
+
+  companion object {
+
+    /**
+     * Convert from string to enum safely, return null instead of throwing.
+     */
+    @JvmStatic
+    @CheckResult
+    fun from(name: String?): MarketState? {
+      if (name == null) {
+        Timber.w("Cannot convert null state to MarketState")
+        return null
+      }
+
+      return try {
+        valueOf(name)
+      } catch (e: Throwable) {
+        Timber.e(e, "Unmatched MarketState: $name")
+        null
+      }
+    }
+  }
 }

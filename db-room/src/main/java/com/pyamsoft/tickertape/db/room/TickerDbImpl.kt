@@ -17,6 +17,7 @@ package com.pyamsoft.tickertape.db.room
 
 import com.pyamsoft.tickertape.db.TickerDb
 import com.pyamsoft.tickertape.db.holding.HoldingDb
+import com.pyamsoft.tickertape.db.mover.BigMoverDb
 import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 import javax.inject.Inject
@@ -28,7 +29,8 @@ internal class TickerDbImpl
 internal constructor(
     private val symbolDb: SymbolDb,
     private val holdingDb: HoldingDb,
-    private val positionDb: PositionDb
+    private val positionDb: PositionDb,
+    private val bigMoverDb: BigMoverDb,
 ) : TickerDb {
 
   override fun symbols(): SymbolDb {
@@ -43,9 +45,14 @@ internal constructor(
     return positionDb
   }
 
+  override fun bigMover(): BigMoverDb {
+    return bigMoverDb
+  }
+
   override suspend fun invalidate() {
     symbolDb.invalidate()
     holdingDb.invalidate()
     positionDb.invalidate()
+    bigMoverDb.invalidate()
   }
 }

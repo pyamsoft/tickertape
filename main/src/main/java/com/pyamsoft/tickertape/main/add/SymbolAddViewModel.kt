@@ -30,6 +30,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.asEditData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +51,7 @@ protected constructor(
         SymbolAddViewState(
             error = null,
             quote = null,
-            query = "",
+            query = "".asEditData(),
             searchResults = emptyList<SearchResult>().pack(),
             type = thisHoldingType,
         )) {
@@ -68,8 +69,8 @@ protected constructor(
     viewModelScope.launch(context = Dispatchers.Default) {
       val symbol = restoreSavedState(KEY_SYMBOL) { "" }
       setState(
-          stateChange = { copy(query = symbol, quote = null) },
-          andThen = { newState -> performLookup(newState.query) })
+          stateChange = { copy(query = symbol.asEditData(true), quote = null) },
+          andThen = { newState -> performLookup(newState.query.text) })
     }
 
     doOnCleared { resetSearchJob() }
@@ -82,11 +83,11 @@ protected constructor(
 
   fun handleLookupSymbol(symbol: String) {
     setState(
-        stateChange = { copy(query = symbol) },
+        stateChange = { copy(query = symbol.asEditData()) },
         andThen = { newState ->
           val newSymbol = newState.query
-          putSavedState(KEY_SYMBOL, newSymbol)
-          performLookup(newSymbol)
+          putSavedState(KEY_SYMBOL, newSymbol.text)
+          performLookup(newSymbol.text)
         })
   }
 
@@ -130,7 +131,7 @@ protected constructor(
                   if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell
                   else HoldingType.Options.Buy)
         },
-        andThen = { newState -> performLookup(newState.query) })
+        andThen = { newState -> performLookup(newState.query.text) })
   }
 
   fun handleResultSelected(index: Int) {
@@ -144,11 +145,8 @@ protected constructor(
     Timber.d("Result selected: $result")
     // We have to clear first to reset the delegate, and then we re-publish with the text
     val symbol = result.symbol()
-    setState(
-        stateChange = { copy(query = "", quote = null) },
-        andThen = {
           setState(
-              stateChange = { copy(query = symbol.symbol()) },
+              stateChange = { copy(query = symbol.symbol().asEditData(true)) },
               andThen = {
                 quoteFetcher
                     .call(symbol)
@@ -156,7 +154,6 @@ protected constructor(
                     .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
                     .onFailure { setState { copy(quote = null) } }
               })
-        })
   }
 
   fun handleCommitSymbol() {
@@ -166,7 +163,7 @@ protected constructor(
       return
     }
 
-    setState(stateChange = { copy(query = "", quote = null) }, andThen = { onCommitSymbol(quote) })
+    setState(stateChange = { copy(query = "".asEditData(true), quote = null) }, andThen = { onCommitSymbol(quote) })
   }
 
   protected abstract suspend fun onCommitSymbol(stock: StockQuote)

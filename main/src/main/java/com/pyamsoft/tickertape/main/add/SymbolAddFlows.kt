@@ -23,12 +23,13 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 
 data class SymbolAddViewState
 internal constructor(
     val error: Throwable?,
     val quote: StockQuote?,
-    val query: String,
+    val query: UiEditTextDelegate.Data,
     val searchResults: PackedData<List<SearchResult>>,
     val type: HoldingType,
 ) : UiViewState {

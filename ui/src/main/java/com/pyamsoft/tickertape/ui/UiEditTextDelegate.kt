@@ -74,24 +74,29 @@ private constructor(
     onTextChanged = null
   }
 
-  private fun applyText(text: String) {
-    if (text.isNotBlank()) {
-      // Don't keep setting text here as it is too slow
-      if (initialRenderPerformed) {
-        return
-      }
+  private fun applyText(text: String, force: Boolean) {
+    // Don't keep setting text here as it is too slow
+    val skipRender = if (force) false else initialRenderPerformed
+    if (skipRender) {
+      return
+    }
+    initialRenderPerformed = true
 
-      initialRenderPerformed = true
-      ignoreWatcher { it.setTextKeepState(text) }
-    } else {
-      // But if the state has been blanked out, clear out the editable
-      initialRenderPerformed = false
-      ignoreWatcher { it.text.clear() }
+    ignoreWatcher { edit ->
+      if (text.isNotBlank()) {
+        edit.setTextKeepState(text)
+      } else {
+        edit.text.clear()
+      }
     }
   }
 
   fun handleTextChanged(text: String) {
-    applyText(text)
+    applyText(text, false)
+  }
+
+  fun handleTextChanged(data: Data) {
+    applyText(data.text, data.force)
   }
 
   companion object {
@@ -158,4 +163,15 @@ private constructor(
       }
     }
   }
+
+  data class Data
+  internal constructor(
+      val text: String,
+      val force: Boolean,
+  )
+}
+
+@CheckResult
+fun String.asEditData(force: Boolean = false): UiEditTextDelegate.Data {
+  return UiEditTextDelegate.Data(text = this, force = force)
 }

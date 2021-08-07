@@ -52,7 +52,7 @@ class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.query }.render(viewScope) { handleQueryChanged(it) }
   }
 
-  private fun handleQueryChanged(query: String) {
+  private fun handleQueryChanged(query: UiEditTextDelegate.Data) {
     requireNotNull(delegate).handleTextChanged(query)
   }
 }

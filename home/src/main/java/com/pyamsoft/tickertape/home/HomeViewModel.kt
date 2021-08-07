@@ -38,8 +38,9 @@ import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class HomeViewModel
@@ -55,6 +56,7 @@ internal constructor(
     UiViewModel<HomeViewState, HomeControllerEvent>(
         initialState =
             HomeViewState(
+                isLoading = false,
                 portfolio = emptyList<PortfolioStock>().pack(),
                 isLoadingPortfolio = false,
                 watchlist = emptyList<QuotedStock>().pack(),
@@ -120,39 +122,31 @@ internal constructor(
     }
   }
 
-  private suspend fun fetchWatchlist(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingWatchlist = true) },
-            andThen = {
-              watchlistFetcher
-                  .call(force)
-                  .onSuccess {
-                    setState { copy(watchlist = it.pack(), isLoadingWatchlist = false) }
-                  }
-                  .onFailure { Timber.e(it, "Failed to fetch watchlist") }
-                  .onFailure {
-                    setState { copy(watchlist = it.packError(), isLoadingWatchlist = false) }
-                  }
-            })
-      }
+  private fun CoroutineScope.fetchWatchlist(force: Boolean) =
+      setState(
+          stateChange = { copy(isLoadingWatchlist = true) },
+          andThen = {
+            watchlistFetcher
+                .call(force)
+                .onSuccess { setState { copy(watchlist = it.pack(), isLoadingWatchlist = false) } }
+                .onFailure { Timber.e(it, "Failed to fetch watchlist") }
+                .onFailure {
+                  setState { copy(watchlist = it.packError(), isLoadingWatchlist = false) }
+                }
+          })
 
-  private suspend fun fetchPortfolio(force: Boolean) =
-      withContext(context = Dispatchers.Default) {
-        setState(
-            stateChange = { copy(isLoadingPortfolio = true) },
-            andThen = {
-              portfolioFetcher
-                  .call(force)
-                  .onSuccess {
-                    setState { copy(portfolio = it.pack(), isLoadingPortfolio = false) }
-                  }
-                  .onFailure { Timber.e(it, "Failed to fetch portfolio") }
-                  .onFailure {
-                    setState { copy(portfolio = it.packError(), isLoadingPortfolio = false) }
-                  }
-            })
-      }
+  private fun CoroutineScope.fetchPortfolio(force: Boolean) =
+      setState(
+          stateChange = { copy(isLoadingPortfolio = true) },
+          andThen = {
+            portfolioFetcher
+                .call(force)
+                .onSuccess { setState { copy(portfolio = it.pack(), isLoadingPortfolio = false) } }
+                .onFailure { Timber.e(it, "Failed to fetch portfolio") }
+                .onFailure {
+                  setState { copy(portfolio = it.packError(), isLoadingPortfolio = false) }
+                }
+          })
 
   private fun CoroutineScope.fetchIndexes(force: Boolean) {
     setState(
@@ -218,32 +212,22 @@ internal constructor(
         })
   }
 
-  fun handleFetchPortfolio(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchPortfolio(force) }
-  }
-
-  fun handleFetchWatchlist(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchWatchlist(force) }
-  }
-
-  fun handleFetchIndexes(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchIndexes(force) }
-  }
-
-  fun handleFetchGainers(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchGainers(force) }
-  }
-
-  fun handleFetchLosers(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchLosers(force) }
-  }
-
-  fun handleFetchTrending(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchTrending(force) }
-  }
-
-  fun handleFetchMostShorted(force: Boolean) {
-    viewModelScope.launch(context = Dispatchers.Default) { fetchMostShorted(force) }
+  fun handleLoad(force: Boolean) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      setState(
+          stateChange = { copy(isLoading = true) },
+          andThen = {
+            awaitAll(
+                async { fetchWatchlist(force) },
+                async { fetchPortfolio(force) },
+                async { fetchTrending(force) },
+                async { fetchLosers(force) },
+                async { fetchIndexes(force) },
+                async { fetchGainers(force) },
+                async { fetchMostShorted(force) },
+            )
+          })
+    }
   }
 
   fun handleOpenPage(page: MainPage) {

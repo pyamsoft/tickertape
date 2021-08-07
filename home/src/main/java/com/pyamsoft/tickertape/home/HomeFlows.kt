@@ -30,6 +30,7 @@ internal constructor(
     internal val isLoadingPortfolio: Boolean,
     internal val watchlist: PackedData<List<QuotedStock>>,
     internal val isLoadingWatchlist: Boolean,
+    val isLoading: Boolean,
     val indexes: PackedData<List<QuotedChart>>,
     val isLoadingIndexes: Boolean,
     val gainers: PackedData<List<TopDataWithChart>>,
@@ -52,6 +53,8 @@ internal constructor(
 sealed class HomeViewEvent : UiViewEvent {
 
   data class DigDeeperWatchlist internal constructor(val index: Int) : HomeViewEvent()
+
+  object Refresh : HomeViewEvent()
 
   object OpenWatchlist : HomeViewEvent()
 

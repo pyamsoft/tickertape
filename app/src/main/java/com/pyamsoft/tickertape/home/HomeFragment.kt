@@ -86,6 +86,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
             is HomeViewEvent.DigDeeperWatchlist -> viewModel.handleDigWatchlistSymbol(it.index)
+            is HomeViewEvent.Refresh -> viewModel.handleLoad(true)
           }
         }
   }
@@ -102,15 +103,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   override fun onStart() {
     super.onStart()
-    viewModel.apply {
-      handleFetchIndexes(false)
-      handleFetchPortfolio(false)
-      handleFetchWatchlist(false)
-      handleFetchGainers(false)
-      handleFetchLosers(false)
-      handleFetchTrending(false)
-      handleFetchMostShorted(false)
-    }
+    viewModel.handleLoad(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

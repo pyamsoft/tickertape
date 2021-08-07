@@ -17,7 +17,8 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.ui.UiSwipeRefreshContainer
 import javax.inject.Inject
 
 class HomeScrollContainer
@@ -34,7 +35,7 @@ internal constructor(
     losers: HomeLoserList,
     mostShorted: HomeMostShortedList,
     bottomSpacer: HomeBottomSpacer
-) : UiScrollingContainer<HomeViewState, HomeViewEvent>(parent) {
+) : UiSwipeRefreshContainer<HomeViewState, HomeViewEvent>(parent) {
 
   init {
     nest(
@@ -49,5 +50,15 @@ internal constructor(
         mostShorted,
         bottomSpacer,
     )
+
+    doOnInflate {
+      binding.containerSwipeRefresh.setOnRefreshListener { publish(HomeViewEvent.Refresh) }
+    }
+
+    doOnInflate { binding.containerSwipeRefresh.setOnRefreshListener(null) }
+  }
+
+  override fun onRender(state: UiRender<HomeViewState>) {
+    state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
   }
 }

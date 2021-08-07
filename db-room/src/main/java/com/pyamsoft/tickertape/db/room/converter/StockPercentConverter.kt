@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.asPercent
 
-interface DbInsert<T : Any> {
+internal object StockPercentConverter {
 
-  @CheckResult suspend fun insert(o: T): InsertResult
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toPercent(percent: Double): StockPercent {
+    return percent.asPercent()
+  }
 
-  enum class InsertResult {
-    INSERT,
-    UPDATE,
-    FAIL
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromPercent(percent: StockPercent): Double {
+    return percent.value()
   }
 }

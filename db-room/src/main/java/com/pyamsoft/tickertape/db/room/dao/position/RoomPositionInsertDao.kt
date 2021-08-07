@@ -22,8 +22,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
+import com.pyamsoft.tickertape.db.room.ROOM_ROW_COUNT_UPDATE_INVALID
+import com.pyamsoft.tickertape.db.room.ROOM_ROW_ID_INSERT_INVALID
 import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,20 +34,26 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomPositionInsertDao : PositionInsertDao {
 
-  override suspend fun insert(o: DbPosition): Boolean =
+  override suspend fun insert(o: DbPosition): DbInsert.InsertResult =
       withContext(context = Dispatchers.IO) {
         val roomPosition = RoomDbPosition.create(o)
         return@withContext if (daoQuery(roomPosition.id()) == null) {
-          daoInsert(roomPosition)
-          true
+          if (daoInsert(roomPosition) != ROOM_ROW_ID_INSERT_INVALID) {
+            DbInsert.InsertResult.INSERT
+          } else {
+            DbInsert.InsertResult.FAIL
+          }
         } else {
-          daoUpdate(roomPosition)
-          false
+          if (daoUpdate(roomPosition) > ROOM_ROW_COUNT_UPDATE_INVALID) {
+            DbInsert.InsertResult.UPDATE
+          } else {
+            DbInsert.InsertResult.FAIL
+          }
         }
       }
 
   @Insert(onConflict = OnConflictStrategy.ABORT)
-  internal abstract suspend fun daoInsert(symbol: RoomDbPosition)
+  internal abstract suspend fun daoInsert(symbol: RoomDbPosition): Long
 
   @CheckResult
   @Query(
@@ -55,5 +64,5 @@ internal abstract class RoomPositionInsertDao : PositionInsertDao {
         """)
   internal abstract suspend fun daoQuery(id: DbPosition.Id): RoomDbPosition?
 
-  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbPosition)
+  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbPosition): Int
 }

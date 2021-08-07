@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.MarketState
 
-interface DbInsert<T : Any> {
+internal object MarketStateConverter {
 
-  @CheckResult suspend fun insert(o: T): InsertResult
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toState(state: String): MarketState {
+    return MarketState.valueOf(state)
+  }
 
-  enum class InsertResult {
-    INSERT,
-    UPDATE,
-    FAIL
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromState(state: MarketState): String {
+    return state.name
   }
 }

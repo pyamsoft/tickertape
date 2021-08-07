@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "5ea82704377bfe59289e92b443c55664",
+    "identityHash": "d3f684e9b684dd1440d3b286c1e86209",
     "entities": [
       {
         "tableName": "room_symbol_table",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "room_holding_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `holding_type` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -43,6 +43,12 @@
           {
             "fieldPath": "symbol",
             "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "holding_type",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -58,7 +64,7 @@
       },
       {
         "tableName": "room_position_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `price` REAL NOT NULL, `share_count` REAL NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `price` REAL NOT NULL, `share_count` REAL NOT NULL, `purchase_date` INTEGER NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -82,6 +88,12 @@
             "fieldPath": "shareCount",
             "columnName": "share_count",
             "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purchaseDate",
+            "columnName": "purchase_date",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -114,12 +126,62 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "room_big_mover_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `last_date` INTEGER NOT NULL, `last_percent` REAL NOT NULL, `last_price` REAL NOT NULL, `last_state` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastNotified",
+            "columnName": "last_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPercent",
+            "columnName": "last_percent",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPrice",
+            "columnName": "last_price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastState",
+            "columnName": "last_state",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5ea82704377bfe59289e92b443c55664')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3f684e9b684dd1440d3b286c1e86209')"
     ]
   }
 }

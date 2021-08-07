@@ -25,6 +25,9 @@ import com.pyamsoft.tickertape.db.TickerDb
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.mover.BigMoverDeleteDao
+import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
+import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
@@ -120,6 +123,27 @@ abstract class RoomModule {
     @JvmStatic
     internal fun provideRoomPositionDeleteDao(@InternalApi db: RoomTickerDb): PositionDeleteDao {
       return db.roomPositionDeleteDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomBigMoverQueryDao(@InternalApi db: RoomTickerDb): BigMoverQueryDao {
+      return db.roomBigMoverQueryDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomBigMoverInsertDao(@InternalApi db: RoomTickerDb): BigMoverInsertDao {
+      return db.roomBigMoverInsertDao()
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomBigMoverDeleteDao(@InternalApi db: RoomTickerDb): BigMoverDeleteDao {
+      return db.roomBigMoverDeleteDao()
     }
   }
 }

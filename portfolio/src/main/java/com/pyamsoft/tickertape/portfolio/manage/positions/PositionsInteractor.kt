@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.manage.positions
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -64,7 +65,7 @@ internal constructor(
       numberOfShares: StockShareValue,
       pricePerShare: StockMoneyValue,
       purchaseDate: LocalDateTime,
-  ): ResultWrapper<Boolean> =
+  ): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -87,7 +88,11 @@ internal constructor(
               )
 
           Timber.d("Insert new position into DB: $position")
-          ResultWrapper.success(positionInsertDao.insert(position))
+          return@withContext when (positionInsertDao.insert(position)) {
+            DbInsert.InsertResult.INSERT -> Timber.d("Inserted new position: $position")
+            DbInsert.InsertResult.UPDATE -> Timber.d("Updated existing position: $position")
+            DbInsert.InsertResult.FAIL -> Timber.w("Failed to insert/update position")
+          }.run { ResultWrapper.success(Unit) }
         } catch (e: Throwable) {
           Timber.e(e, "Error creating position $id $numberOfShares $pricePerShare")
           ResultWrapper.failure(e)

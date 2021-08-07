@@ -20,6 +20,9 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingInsertDao
 import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingQueryDao
+import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverDeleteDao
+import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverInsertDao
+import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverQueryDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionInsertDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionQueryDao
@@ -46,4 +49,10 @@ internal interface RoomTickerDb {
   @CheckResult fun roomPositionInsertDao(): RoomPositionInsertDao
 
   @CheckResult fun roomPositionDeleteDao(): RoomPositionDeleteDao
+
+  @CheckResult fun roomBigMoverQueryDao(): RoomBigMoverQueryDao
+
+  @CheckResult fun roomBigMoverInsertDao(): RoomBigMoverInsertDao
+
+  @CheckResult fun roomBigMoverDeleteDao(): RoomBigMoverDeleteDao
 }

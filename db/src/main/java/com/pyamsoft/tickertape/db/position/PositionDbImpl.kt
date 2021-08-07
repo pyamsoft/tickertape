@@ -20,10 +20,12 @@ import com.pyamsoft.cachify.cachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
+import com.pyamsoft.tickertape.db.DbInsert
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 internal class PositionDbImpl
@@ -85,14 +87,14 @@ internal constructor(
         return@withContext queryCache.call()
       }
 
-  override suspend fun insert(o: DbPosition): Boolean =
+  override suspend fun insert(o: DbPosition): DbInsert.InsertResult =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext realInsertDao.insert(o).also { inserted ->
-          if (inserted) {
-            publish(PositionChangeEvent.Insert(o))
-          } else {
-            publish(PositionChangeEvent.Update(o))
+        return@withContext realInsertDao.insert(o).also { result ->
+          return@also when (result) {
+            DbInsert.InsertResult.INSERT -> publish(PositionChangeEvent.Insert(o))
+            DbInsert.InsertResult.UPDATE -> publish(PositionChangeEvent.Update(o))
+            DbInsert.InsertResult.FAIL -> Timber.w("Insert attempt failed: $o")
           }
         }
       }

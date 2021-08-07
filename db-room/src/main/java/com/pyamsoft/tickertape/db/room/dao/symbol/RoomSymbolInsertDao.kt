@@ -22,6 +22,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.room.ROOM_ROW_COUNT_UPDATE_INVALID
+import com.pyamsoft.tickertape.db.room.ROOM_ROW_ID_INSERT_INVALID
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 import com.pyamsoft.tickertape.db.symbol.DbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
@@ -31,20 +34,26 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
 
-  override suspend fun insert(o: DbSymbol): Boolean =
+  override suspend fun insert(o: DbSymbol): DbInsert.InsertResult =
       withContext(context = Dispatchers.IO) {
         val roomSymbol = RoomDbSymbol.create(o)
         return@withContext if (daoQuery(roomSymbol.id()) == null) {
-          daoInsert(roomSymbol)
-          true
+          if (daoInsert(roomSymbol) != ROOM_ROW_ID_INSERT_INVALID) {
+            DbInsert.InsertResult.INSERT
+          } else {
+            DbInsert.InsertResult.FAIL
+          }
         } else {
-          daoUpdate(roomSymbol)
-          false
+          if (daoUpdate(roomSymbol) > ROOM_ROW_COUNT_UPDATE_INVALID) {
+            DbInsert.InsertResult.UPDATE
+          } else {
+            DbInsert.InsertResult.FAIL
+          }
         }
       }
 
   @Insert(onConflict = OnConflictStrategy.ABORT)
-  internal abstract suspend fun daoInsert(symbol: RoomDbSymbol)
+  internal abstract suspend fun daoInsert(symbol: RoomDbSymbol): Long
 
   @CheckResult
   @Query(
@@ -55,5 +64,5 @@ internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
         """)
   internal abstract suspend fun daoQuery(id: DbSymbol.Id): RoomDbSymbol?
 
-  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbSymbol)
+  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbSymbol): Int
 }

@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.db.mover.BigMoverReport
 
-interface DbInsert<T : Any> {
+internal object BigMoverReportIdConverter {
 
-  @CheckResult suspend fun insert(o: T): InsertResult
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toId(id: String): BigMoverReport.Id {
+    return BigMoverReport.Id(id)
+  }
 
-  enum class InsertResult {
-    INSERT,
-    UPDATE,
-    FAIL
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromId(id: BigMoverReport.Id): String {
+    return id.id
   }
 }

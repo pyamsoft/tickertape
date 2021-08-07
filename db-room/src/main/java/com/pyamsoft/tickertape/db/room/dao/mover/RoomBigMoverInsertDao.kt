@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.dao.holding
+package com.pyamsoft.tickertape.db.room.dao.mover
 
 import androidx.annotation.CheckResult
 import androidx.room.Dao
@@ -23,28 +23,28 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
+import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
+import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.room.ROOM_ROW_COUNT_UPDATE_INVALID
 import com.pyamsoft.tickertape.db.room.ROOM_ROW_ID_INSERT_INVALID
-import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
+import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Dao
-internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
+internal abstract class RoomBigMoverInsertDao : BigMoverInsertDao {
 
-  override suspend fun insert(o: DbHolding): DbInsert.InsertResult =
+  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult =
       withContext(context = Dispatchers.IO) {
-        val roomHolding = RoomDbHolding.create(o)
-        return@withContext if (daoQuery(roomHolding.id()) == null) {
-          if (daoInsert(roomHolding) != ROOM_ROW_ID_INSERT_INVALID) {
+        val roomBigMover = RoomBigMoverReport.create(o)
+        return@withContext if (daoQuery(roomBigMover.id()) == null) {
+          if (daoInsert(roomBigMover) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.INSERT
           } else {
             DbInsert.InsertResult.FAIL
           }
         } else {
-          if (daoUpdate(roomHolding) > ROOM_ROW_COUNT_UPDATE_INVALID) {
+          if (daoUpdate(roomBigMover) > ROOM_ROW_COUNT_UPDATE_INVALID) {
             DbInsert.InsertResult.UPDATE
           } else {
             DbInsert.InsertResult.FAIL
@@ -53,16 +53,16 @@ internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
       }
 
   @Insert(onConflict = OnConflictStrategy.ABORT)
-  internal abstract suspend fun daoInsert(symbol: RoomDbHolding): Long
+  internal abstract suspend fun daoInsert(symbol: RoomBigMoverReport): Long
 
   @CheckResult
   @Query(
       """
-        SELECT * FROM ${RoomDbHolding.TABLE_NAME} WHERE
-        ${RoomDbHolding.COLUMN_ID} = :id
+        SELECT * FROM ${RoomBigMoverReport.TABLE_NAME} WHERE
+        ${RoomBigMoverReport.COLUMN_ID} = :id
         LIMIT 1
         """)
-  internal abstract suspend fun daoQuery(id: DbHolding.Id): RoomDbHolding?
+  internal abstract suspend fun daoQuery(id: BigMoverReport.Id): RoomBigMoverReport?
 
-  @Update internal abstract suspend fun daoUpdate(symbol: RoomDbHolding): Int
+  @Update internal abstract suspend fun daoUpdate(symbol: RoomBigMoverReport): Int
 }

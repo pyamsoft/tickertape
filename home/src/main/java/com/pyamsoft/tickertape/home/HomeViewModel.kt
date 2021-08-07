@@ -36,7 +36,6 @@ import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -58,62 +57,27 @@ internal constructor(
             HomeViewState(
                 isLoading = false,
                 portfolio = emptyList<PortfolioStock>().pack(),
-                isLoadingPortfolio = false,
                 watchlist = emptyList<QuotedStock>().pack(),
-                isLoadingWatchlist = false,
                 indexes = emptyList<QuotedChart>().pack(),
-                isLoadingIndexes = false,
                 gainers = emptyList<TopDataWithChart>().pack(),
-                isLoadingGainers = false,
                 losers = emptyList<TopDataWithChart>().pack(),
-                isLoadingLosers = false,
                 trending = emptyList<TopDataWithChart>().pack(),
-                isLoadingTrending = false,
                 mostShorted = emptyList<TopDataWithChart>().pack(),
-                isLoadingMostShorted = false,
                 bottomOffset = 0,
             )) {
 
-  private val portfolioFetcher =
-      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> {
-        portfolioInteractor.getPortfolio(it)
-      }
-
-  private val watchlistFetcher =
-      highlander<ResultWrapper<List<QuotedStock>>, Boolean> {
-        watchlistInteractor
-            .getQuotes(it)
-            .map { quotes -> quotes.sortedWith(QuotedStock.COMPARATOR) }
-            .map { quotes -> quotes.take(WATCHLIST_COUNT) }
-      }
-
-  private val indexesFetcher =
-      highlander<ResultWrapper<List<QuotedChart>>, Boolean> { force ->
-        quoteInteractor.getCharts(
-            force = force,
-            symbols = INDEXES,
-            range = StockChart.IntervalRange.ONE_DAY,
-            includeQuote = true)
-      }
-
-  private val gainersFetcher =
-      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
-        interactor.getDayGainers(it, WATCHLIST_COUNT)
-      }
-
-  private val losersFetcher =
-      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
-        interactor.getDayLosers(it, WATCHLIST_COUNT)
-      }
-
-  private val shortedFetcher =
-      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
-        interactor.getMostShorted(it, WATCHLIST_COUNT)
-      }
-
-  private val trendingFetcher =
-      highlander<ResultWrapper<List<TopDataWithChart>>, Boolean> {
-        interactor.getDayTrending(it, TRENDING_COUNT)
+  private val homeFetcher =
+      highlander<ResultWrapper<Unit>, Boolean> { force ->
+        awaitAll(
+            async { fetchWatchlist(force) },
+            async { fetchPortfolio(force) },
+            async { fetchTrending(force) },
+            async { fetchLosers(force) },
+            async { fetchIndexes(force) },
+            async { fetchGainers(force) },
+            async { fetchMostShorted(force) },
+        )
+        return@highlander ResultWrapper.success(Unit)
       }
 
   init {
@@ -122,94 +86,66 @@ internal constructor(
     }
   }
 
-  private fun CoroutineScope.fetchWatchlist(force: Boolean) =
-      setState(
-          stateChange = { copy(isLoadingWatchlist = true) },
-          andThen = {
-            watchlistFetcher
-                .call(force)
-                .onSuccess { setState { copy(watchlist = it.pack(), isLoadingWatchlist = false) } }
-                .onFailure { Timber.e(it, "Failed to fetch watchlist") }
-                .onFailure {
-                  setState { copy(watchlist = it.packError(), isLoadingWatchlist = false) }
-                }
-          })
-
-  private fun CoroutineScope.fetchPortfolio(force: Boolean) =
-      setState(
-          stateChange = { copy(isLoadingPortfolio = true) },
-          andThen = {
-            portfolioFetcher
-                .call(force)
-                .onSuccess { setState { copy(portfolio = it.pack(), isLoadingPortfolio = false) } }
-                .onFailure { Timber.e(it, "Failed to fetch portfolio") }
-                .onFailure {
-                  setState { copy(portfolio = it.packError(), isLoadingPortfolio = false) }
-                }
-          })
-
-  private fun CoroutineScope.fetchIndexes(force: Boolean) {
-    setState(
-        stateChange = { copy(isLoadingIndexes = true) },
-        andThen = {
-          indexesFetcher
-              .call(force)
-              .onSuccess { setState { copy(indexes = it.pack(), isLoadingIndexes = false) } }
-              .onFailure { Timber.e(it, "Failed to fetch indexes") }
-              .onFailure { setState { copy(indexes = it.packError(), isLoadingIndexes = false) } }
-        })
+  private suspend fun fetchWatchlist(force: Boolean) {
+    watchlistInteractor
+        .getQuotes(force)
+        .map { quotes -> quotes.sortedWith(QuotedStock.COMPARATOR) }
+        .map { quotes -> quotes.take(WATCHLIST_COUNT) }
+        .onSuccess { setState { copy(watchlist = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch watchlist") }
+        .onFailure { setState { copy(watchlist = it.packError()) } }
   }
 
-  private fun CoroutineScope.fetchGainers(force: Boolean) {
-    setState(
-        stateChange = { copy(isLoadingGainers = true) },
-        andThen = {
-          gainersFetcher
-              .call(force)
-              .onSuccess { setState { copy(gainers = it.pack(), isLoadingGainers = false) } }
-              .onFailure { Timber.e(it, "Failed to fetch gainers") }
-              .onFailure { setState { copy(gainers = it.packError(), isLoadingGainers = false) } }
-        })
+  private suspend fun fetchPortfolio(force: Boolean) {
+    portfolioInteractor
+        .getPortfolio(force)
+        .onSuccess { setState { copy(portfolio = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch portfolio") }
+        .onFailure { setState { copy(portfolio = it.packError()) } }
   }
 
-  private fun CoroutineScope.fetchLosers(force: Boolean) {
-    setState(
-        stateChange = { copy(isLoadingLosers = true) },
-        andThen = {
-          losersFetcher
-              .call(force)
-              .onSuccess { setState { copy(losers = it.pack(), isLoadingLosers = false) } }
-              .onFailure { Timber.e(it, "Failed to fetch losers") }
-              .onFailure { setState { copy(losers = it.packError(), isLoadingLosers = false) } }
-        })
+  private suspend fun fetchIndexes(force: Boolean) {
+    quoteInteractor
+        .getCharts(
+            force = force,
+            symbols = INDEXES,
+            range = StockChart.IntervalRange.ONE_DAY,
+            includeQuote = true)
+        .onSuccess { setState { copy(indexes = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch indexes") }
+        .onFailure { setState { copy(indexes = it.packError()) } }
   }
 
-  private fun CoroutineScope.fetchMostShorted(force: Boolean) {
-    setState(
-        stateChange = { copy(isLoadingMostShorted = true) },
-        andThen = {
-          shortedFetcher
-              .call(force)
-              .onSuccess {
-                setState { copy(mostShorted = it.pack(), isLoadingMostShorted = false) }
-              }
-              .onFailure { Timber.e(it, "Failed to fetch most shorted") }
-              .onFailure {
-                setState { copy(mostShorted = it.packError(), isLoadingMostShorted = false) }
-              }
-        })
+  private suspend fun fetchGainers(force: Boolean) {
+    interactor
+        .getDayGainers(force, WATCHLIST_COUNT)
+        .onSuccess { setState { copy(gainers = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch gainers") }
+        .onFailure { setState { copy(gainers = it.packError()) } }
   }
 
-  private fun CoroutineScope.fetchTrending(force: Boolean) {
-    setState(
-        stateChange = { copy(isLoadingTrending = true) },
-        andThen = {
-          trendingFetcher
-              .call(force)
-              .onSuccess { setState { copy(trending = it.pack(), isLoadingTrending = false) } }
-              .onFailure { Timber.e(it, "Failed to fetch trending") }
-              .onFailure { setState { copy(trending = it.packError(), isLoadingTrending = false) } }
-        })
+  private suspend fun fetchLosers(force: Boolean) {
+    interactor
+        .getDayLosers(force, WATCHLIST_COUNT)
+        .onSuccess { setState { copy(losers = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch losers") }
+        .onFailure { setState { copy(losers = it.packError()) } }
+  }
+
+  private suspend fun fetchMostShorted(force: Boolean) {
+    interactor
+        .getMostShorted(force, WATCHLIST_COUNT)
+        .onSuccess { setState { copy(mostShorted = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch most shorted") }
+        .onFailure { setState { copy(mostShorted = it.packError()) } }
+  }
+
+  private suspend fun fetchTrending(force: Boolean) {
+    interactor
+        .getDayTrending(force, TRENDING_COUNT)
+        .onSuccess { setState { copy(trending = it.pack()) } }
+        .onFailure { Timber.e(it, "Failed to fetch trending") }
+        .onFailure { setState { copy(trending = it.packError()) } }
   }
 
   fun handleLoad(force: Boolean) {
@@ -217,15 +153,11 @@ internal constructor(
       setState(
           stateChange = { copy(isLoading = true) },
           andThen = {
-            awaitAll(
-                async { fetchWatchlist(force) },
-                async { fetchPortfolio(force) },
-                async { fetchTrending(force) },
-                async { fetchLosers(force) },
-                async { fetchIndexes(force) },
-                async { fetchGainers(force) },
-                async { fetchMostShorted(force) },
-            )
+            homeFetcher
+                .call(force)
+                .onSuccess { setState { copy(isLoading = false) } }
+                .onFailure { Timber.e(it, "Error refreshing home page") }
+                .onFailure { setState { copy(isLoading = false) } }
           })
     }
   }

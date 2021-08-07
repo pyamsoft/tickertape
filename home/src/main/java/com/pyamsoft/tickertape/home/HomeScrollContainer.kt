@@ -52,10 +52,17 @@ internal constructor(
     )
 
     doOnInflate {
+      // Offset the refresh indicator so it appears where we expect it to on page
+      // start is the "start location"
+      // end is the "pulldown distance"
+      binding.containerSwipeRefresh.setProgressViewOffset(false, 200, 400)
+    }
+
+    doOnInflate {
       binding.containerSwipeRefresh.setOnRefreshListener { publish(HomeViewEvent.Refresh) }
     }
 
-    doOnInflate { binding.containerSwipeRefresh.setOnRefreshListener(null) }
+    doOnTeardown { binding.containerSwipeRefresh.setOnRefreshListener(null) }
   }
 
   override fun onRender(state: UiRender<HomeViewState>) {

@@ -36,7 +36,7 @@ import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 
 @Database(
-    version = 2,
+    version = 1,
     entities =
         [
             RoomDbSymbol::class,

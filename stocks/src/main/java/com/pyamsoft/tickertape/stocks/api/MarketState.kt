@@ -22,13 +22,12 @@ import timber.log.Timber
 enum class MarketState {
   REGULAR,
   POST,
+  CLOSED,
   PRE;
 
   companion object {
 
-    /**
-     * Convert from string to enum safely, return null instead of throwing.
-     */
+    /** Convert from string to enum safely, return null instead of throwing. */
     @JvmStatic
     @CheckResult
     fun from(name: String?): MarketState? {
@@ -40,7 +39,7 @@ enum class MarketState {
       return try {
         valueOf(name)
       } catch (e: Throwable) {
-        Timber.e(e, "Unmatched MarketState: $name")
+        Timber.w(e, "Unmatched MarketState: $name")
         null
       }
     }

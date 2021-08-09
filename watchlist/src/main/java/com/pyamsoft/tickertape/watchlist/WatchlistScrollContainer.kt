@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.tickertape.ui.UiVerticalContainer
 import javax.inject.Inject
 
 class WatchlistScrollContainer
@@ -27,7 +27,7 @@ internal constructor(
     sectionStocks: WatchlistSectionStocks,
     sectionOptions: WatchlistSectionOptions,
     sectionCrypto: WatchlistSectionCrypto,
-) : UiScrollingContainer<WatchListViewState, WatchListViewEvent>(parent) {
+) : UiVerticalContainer<WatchListViewState, WatchListViewEvent>(parent) {
 
   init {
     nest(

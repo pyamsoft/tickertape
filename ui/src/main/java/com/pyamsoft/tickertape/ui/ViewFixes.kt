@@ -36,31 +36,6 @@ object ViewFixes {
     return Unregister { view.removeOnLayoutChangeListener(listener) }
   }
 
-  @CheckResult
-  private inline fun correctMatchParent(
-      view: View,
-      parent: View,
-      crossinline onUpdate: ViewGroup.LayoutParams.(parent: View) -> Unit
-  ): Unregister {
-    return listenLayoutChanged(parent) { p ->
-      view.updateLayoutParams { this.onUpdate(p) }
-    }
-  }
-
-  // For some views nested inside of other UiView components, the match_parent does not fill the
-  // parent fully.
-  @CheckResult
-  fun correctMatchParentHeight(view: View, parent: View): Unregister {
-    return correctMatchParent(view, parent) { this.height = it.height }
-  }
-
-  // For some views nested inside of other UiView components, the match_parent does not fill the
-  // parent fully.
-  @CheckResult
-  fun correctMatchParentWidth(view: View, parent: View): Unregister {
-    return correctMatchParent(view, parent) { this.width = it.width }
-  }
-
   // Captures the initial padding for a given view and provides a function which, when called, will
   // reset the padding of the view back to its initial state
   @CheckResult

@@ -49,17 +49,6 @@ internal constructor(
 
   init {
     doOnInflate {
-      // The bottom FAB can sometimes float weirdly when in multi-window
-      // if the Activity is opened, and then Home is pushed and then the app is
-      // opened again from the Launcher
-      val add = binding.mainBarAdd
-      val resetter = ViewFixes.captureAndResetInitialMargin(add)
-      ViewFixes.listenLayoutChanged(add) { resetter.reset() }.also {
-        doOnTeardown { it.unregister() }
-      }
-    }
-
-    doOnInflate {
       binding.apply {
         mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
         mainBarAddStock.setOnDebouncedClickListener {
@@ -78,15 +67,6 @@ internal constructor(
     doOnInflate {
       imageLoader.asDrawable().load(R.drawable.ic_add_24dp).into(binding.mainBarAdd).also { l ->
         doOnTeardown { l.dispose() }
-      }
-    }
-
-    doOnInflate {
-      ViewFixes.correctMatchParentHeight(binding.mainBarAddOverlay, parent).also {
-        doOnTeardown { it.unregister() }
-      }
-      ViewFixes.correctMatchParentWidth(binding.mainBarAddOverlay, parent).also {
-        doOnTeardown { it.unregister() }
       }
     }
 

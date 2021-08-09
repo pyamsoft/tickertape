@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.portfolio
 
 import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.tickertape.ui.UiVerticalContainer
 import javax.inject.Inject
 
 class PortfolioScrollContainer
@@ -27,7 +27,7 @@ internal constructor(
     sectionStocks: PortfolioSectionStocks,
     sectionOptions: PortfolioSectionOptions,
     sectionCrypto: PortfolioSectionCrypto,
-) : UiScrollingContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
+) : UiVerticalContainer<PortfolioViewState, PortfolioViewEvent>(parent) {
 
   init {
     nest(

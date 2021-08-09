@@ -30,14 +30,6 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, UiSectionStocksBindi
 
   final override val layoutRoot by boundView { uiSectionStocks }
 
-  init {
-    doOnInflate {
-      ViewFixes.correctMatchParentHeight(layoutRoot, parent).also {
-        doOnTeardown { it.unregister() }
-      }
-    }
-  }
-
   protected fun handleSection(isStocks: Boolean) {
     binding.uiSectionStocks.isVisible = isStocks
   }

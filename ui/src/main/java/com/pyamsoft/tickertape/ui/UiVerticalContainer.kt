@@ -17,20 +17,20 @@
 package com.pyamsoft.tickertape.ui
 
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import android.widget.LinearLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.ui.databinding.UiSectionCryptoBinding
+import com.pyamsoft.tickertape.ui.databinding.ContainerVerticalBinding
 
-abstract class UiSectionCrypto<S : UiViewState, V : UiViewEvent>
-protected constructor(parent: ViewGroup) : BaseUiView<S, V, UiSectionCryptoBinding>(parent) {
+abstract class UiVerticalContainer<S : UiViewState, V : UiViewEvent>
+protected constructor(parent: ViewGroup) : BaseUiView<S, V, ContainerVerticalBinding>(parent) {
 
-  final override val viewBinding = UiSectionCryptoBinding::inflate
+  final override val layoutRoot by boundView { containerVertical }
 
-  final override val layoutRoot by boundView { uiSectionCrypto }
+  final override val viewBinding = ContainerVerticalBinding::inflate
 
-  protected fun handleSection(isCrypto: Boolean) {
-    binding.uiSectionCrypto.isVisible = isCrypto
+  final override fun adoptionParent(): LinearLayout {
+    return binding.containerVertical
   }
 }

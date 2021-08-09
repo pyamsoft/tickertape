@@ -62,13 +62,6 @@ class MainBar @Inject internal constructor(parent: ViewGroup, owner: LifecycleOw
 
           // Publish the measured height
           publish(MainViewEvent.BottomBarMeasured(view.height))
-
-          // Re-request a layout pass to fix any view bugs.
-          //
-          // Sometimes when entering/exiting MW mode
-          // this bar will be huge for some reason.
-          // No idea why, but it will fix itself after a layout pass.
-          view.requestLayout()
         }
       }
     }

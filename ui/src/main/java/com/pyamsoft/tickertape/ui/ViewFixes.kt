@@ -43,7 +43,7 @@ object ViewFixes {
       crossinline onUpdate: ViewGroup.LayoutParams.(parent: View) -> Unit
   ): Unregister {
     return listenLayoutChanged(parent) { p ->
-      p.post { view.post { view.updateLayoutParams { this.onUpdate(p) } } }
+      view.updateLayoutParams { this.onUpdate(p) }
     }
   }
 

@@ -34,7 +34,8 @@ internal constructor(
     parent: ViewGroup,
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
-) : BaseHomeChartList<HomeMostShortedBinding>(parent, factory, owner) {
+    pool: RecyclerView.RecycledViewPool,
+) : BaseHomeChartList<HomeMostShortedBinding>(parent, factory, owner, pool) {
 
   override val layoutRoot by boundView { homeMostShortedRoot }
 

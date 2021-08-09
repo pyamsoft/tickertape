@@ -34,7 +34,8 @@ internal constructor(
     parent: ViewGroup,
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
-) : BaseHomeChartList<HomeTrendingBinding>(parent, factory, owner) {
+    pool: RecyclerView.RecycledViewPool,
+) : BaseHomeChartList<HomeTrendingBinding>(parent, factory, owner, pool) {
 
   override val layoutRoot by boundView { homeTrendingRoot }
 

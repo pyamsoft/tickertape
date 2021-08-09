@@ -71,6 +71,7 @@ internal constructor(
         mainBarAddCrypto.setOnDebouncedClickListener {
           publish(MainViewEvent.OpenAdd(HoldingType.Crypto))
         }
+        mainBarAddOverlay.setOnDebouncedClickListener { publish(MainViewEvent.StopAdd) }
       }
     }
 
@@ -80,12 +81,18 @@ internal constructor(
       }
     }
 
+    doOnInflate {
+      ViewFixes.correctMatchParentHeight(binding.mainBarAddOverlay, parent)
+      ViewFixes.correctMatchParentWidth(binding.mainBarAddOverlay, parent)
+    }
+
     doOnTeardown {
       binding.apply {
         mainBarAdd.setOnDebouncedClickListener(null)
         mainBarAddStock.setOnDebouncedClickListener(null)
         mainBarAddOptions.setOnDebouncedClickListener(null)
         mainBarAddCrypto.setOnDebouncedClickListener(null)
+        mainBarAddOverlay.setOnDebouncedClickListener(null)
       }
     }
 
@@ -99,6 +106,7 @@ internal constructor(
         mainBarAddStock.isGone = true
         mainBarAddOptions.isGone = true
         mainBarAddCrypto.isGone = true
+        mainBarAddOverlay.isGone = true
       }
     }
   }
@@ -128,6 +136,7 @@ internal constructor(
       mainBarAddStock.showHideView(adding)
       mainBarAddOptions.showHideView(adding)
       mainBarAddCrypto.showHideView(adding)
+      mainBarAddOverlay.showHideView(adding)
     }
   }
 
@@ -135,10 +144,10 @@ internal constructor(
     animator?.cancel()
     animator =
         ViewCompat.animate(binding.mainBarAdd)
-            .setDuration(ANIMATION_DURATION)
-            .setInterpolator(interpolator)
-            .rotation(if (adding) 45F else 0F)
-            .apply { start() }
+        .setDuration(ANIMATION_DURATION)
+        .setInterpolator(interpolator)
+        .rotation(if (adding) 45F else 0F)
+        .apply { start() }
   }
 
   private fun handleFabVisible(visible: Boolean) {

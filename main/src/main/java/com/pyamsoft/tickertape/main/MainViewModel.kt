@@ -94,10 +94,14 @@ internal constructor(
         })
   }
 
-  fun handleAddNewRequest() {
+  private fun setAdding(adding: Boolean) {
     setState(
-        stateChange = { copy(adding = !state.adding) },
+        stateChange = { copy(adding = adding) },
         andThen = { newState -> putSavedState(KEY_ADDING, newState.adding) })
+  }
+
+  fun handleAddNewRequest() {
+    setAdding(!state.adding)
   }
 
   fun handleOpenAdd(type: HoldingType) {
@@ -113,6 +117,10 @@ internal constructor(
   ) {
     Timber.d("Publish selection: $oldPage -> $newPage")
     publish(MainControllerEvent.PushPage(newPage, oldPage, force))
+  }
+
+  fun handleStopAdd() {
+    setAdding(false)
   }
 
   companion object {

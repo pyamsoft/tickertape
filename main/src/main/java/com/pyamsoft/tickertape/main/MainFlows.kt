@@ -47,6 +47,8 @@ sealed class MainViewEvent : UiViewEvent {
   data class OpenAdd internal constructor(val type: HoldingType) : MainViewEvent()
 
   object AddRequest : MainViewEvent()
+
+  object StopAdd : MainViewEvent()
 }
 
 sealed class MainControllerEvent : UiControllerEvent {

@@ -161,6 +161,7 @@ internal class MainActivity :
             is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
             is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type)
             is MainViewEvent.OpenSettings -> handleOpenSettings()
+            is MainViewEvent.StopAdd -> viewModel.handleStopAdd()
           }
         }
   }

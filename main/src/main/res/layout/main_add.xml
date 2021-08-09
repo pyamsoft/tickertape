@@ -19,6 +19,13 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <View
+        android:id="@+id/main_bar_add_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/shadow_scrim50"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/main_bar_add_crypto"
         android:layout_width="wrap_content"
@@ -81,7 +88,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/main_bar_add"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/blank"
         android:visibility="gone"

@@ -47,7 +47,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
   }
 
   override fun onReceive(context: Context, intent: Intent) {
-    if (intent.action === Intent.ACTION_SCREEN_ON) {
+    if (intent.action == Intent.ACTION_SCREEN_ON) {
       Timber.d("Start service on screen on")
       inject(context)
 

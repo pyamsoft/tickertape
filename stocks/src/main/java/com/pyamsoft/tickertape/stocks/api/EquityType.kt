@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-object EquityType {
-  const val OPTION = "OPTION"
-  const val CRYPTO = "CRYPTOCURRENCY"
+enum class EquityType {
+  OPTION,
+  CRYPTOCURRENCY
 }

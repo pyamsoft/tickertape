@@ -44,7 +44,7 @@ internal class BootReceiver internal constructor() : BroadcastReceiver() {
   }
 
   override fun onReceive(context: Context, intent: Intent) {
-    if (intent.action === Intent.ACTION_BOOT_COMPLETED) {
+    if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
       Timber.d("Start service on boot")
       inject(context)
       MainScope().launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }

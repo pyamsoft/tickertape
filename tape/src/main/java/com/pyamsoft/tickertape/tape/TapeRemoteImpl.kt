@@ -102,7 +102,7 @@ internal constructor(
 
   companion object {
 
-    private val IGNORE_NOTIFICATION_QUOTES = arrayOf(EquityType.OPTION)
+    private val IGNORE_NOTIFICATION_QUOTES = arrayOf(EquityType.OPTION.name)
     private val NOTIFICATION_ID = 42069.toNotifyId()
     private val EMPTY_TAPE_NOTIFICATION = TapeNotificationData(quotes = emptyList(), index = 0)
 

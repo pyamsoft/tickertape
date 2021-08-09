@@ -105,9 +105,9 @@ protected constructor(
                   val type = item.type()
                   return@filter when (currentType) {
                     is HoldingType.Stock -> !NOT_STOCK_TYPES.contains(type)
-                    is HoldingType.Crypto -> type === EquityType.CRYPTO
+                    is HoldingType.Crypto -> type == EquityType.CRYPTOCURRENCY.name
                     is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
-                        type == EquityType.OPTION
+                        type == EquityType.OPTION.name
                   }
                 }
               }
@@ -172,8 +172,8 @@ protected constructor(
 
     private val NOT_STOCK_TYPES =
         arrayOf(
-            EquityType.CRYPTO,
-            EquityType.OPTION,
+            EquityType.CRYPTOCURRENCY.name,
+            EquityType.OPTION.name,
         )
     private const val KEY_SYMBOL = "symbol"
   }

@@ -16,7 +16,13 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-enum class EquityType {
-  OPTION,
-  CRYPTOCURRENCY
+/**
+ * Yeah its an object of strings instead of an enum because it will always be compared to string types
+ * and we would just end up unwrapping the enum with .name
+ *
+ * So this instead.
+ */
+object EquityType {
+  const val OPTION = "OPTION"
+  const val CRYPTO = "CRYPTOCURRENCY"
 }

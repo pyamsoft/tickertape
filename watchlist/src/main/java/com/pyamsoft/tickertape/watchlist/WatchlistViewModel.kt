@@ -139,8 +139,8 @@ internal constructor(
                   val type = qs.quote?.type() ?: return@filter true
                   return@filter when (currentSection) {
                     WatchlistTabSection.STOCK -> !CATCH_ALL_TYPE.contains(type)
-                    WatchlistTabSection.OPTION -> type == EquityType.OPTION.name
-                    WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTOCURRENCY.name
+                    WatchlistTabSection.OPTION -> type == EquityType.OPTION
+                    WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTO
                   }
                 }
               }
@@ -230,7 +230,7 @@ internal constructor(
   companion object {
 
     private const val KEY_SEARCH = "search"
-    private val CATCH_ALL_TYPE = arrayOf(EquityType.OPTION.name, EquityType.CRYPTOCURRENCY.name)
+    private val CATCH_ALL_TYPE = arrayOf(EquityType.OPTION, EquityType.CRYPTO)
     private val DEFAULT_SECTION = WatchlistTabSection.STOCK
   }
 }

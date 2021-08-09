@@ -30,30 +30,35 @@ object ViewFixes {
 
   // Watch a view and run function when the layout of said view changes (for, we assume, MW reasons)
   @CheckResult
-  inline fun correctMultiWindow(view: View, crossinline correction: (View) -> Unit): Unregister {
+  inline fun listenLayoutChanged(view: View, crossinline correction: (View) -> Unit): Unregister {
     val listener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> correction(v) }
     view.addOnLayoutChangeListener(listener)
     return Unregister { view.removeOnLayoutChangeListener(listener) }
   }
 
+  @CheckResult
   private inline fun correctMatchParent(
       view: View,
       parent: View,
       crossinline onUpdate: ViewGroup.LayoutParams.(parent: View) -> Unit
-  ) {
-    parent.post { view.post { view.updateLayoutParams { this.onUpdate(parent) } } }
+  ): Unregister {
+    return listenLayoutChanged(parent) { p ->
+      p.post { view.post { view.updateLayoutParams { this.onUpdate(p) } } }
+    }
   }
 
   // For some views nested inside of other UiView components, the match_parent does not fill the
   // parent fully.
-  fun correctMatchParentHeight(view: View, parent: View) {
-    correctMatchParent(view, parent) { this.height = it.height }
+  @CheckResult
+  fun correctMatchParentHeight(view: View, parent: View): Unregister {
+    return correctMatchParent(view, parent) { this.height = it.height }
   }
 
   // For some views nested inside of other UiView components, the match_parent does not fill the
   // parent fully.
-  fun correctMatchParentWidth(view: View, parent: View) {
-    correctMatchParent(view, parent) { this.width = it.width }
+  @CheckResult
+  fun correctMatchParentWidth(view: View, parent: View): Unregister {
+    return correctMatchParent(view, parent) { this.width = it.width }
   }
 
   // Captures the initial padding for a given view and provides a function which, when called, will

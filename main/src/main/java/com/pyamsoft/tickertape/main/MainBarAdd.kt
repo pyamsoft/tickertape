@@ -54,7 +54,7 @@ internal constructor(
       // opened again from the Launcher
       val add = binding.mainBarAdd
       val resetter = ViewFixes.captureAndResetInitialMargin(add)
-      ViewFixes.correctMultiWindow(add) { resetter.reset() }.also {
+      ViewFixes.listenLayoutChanged(add) { resetter.reset() }.also {
         doOnTeardown { it.unregister() }
       }
     }
@@ -82,8 +82,12 @@ internal constructor(
     }
 
     doOnInflate {
-      ViewFixes.correctMatchParentHeight(binding.mainBarAddOverlay, parent)
-      ViewFixes.correctMatchParentWidth(binding.mainBarAddOverlay, parent)
+      ViewFixes.correctMatchParentHeight(binding.mainBarAddOverlay, parent).also {
+        doOnTeardown { it.unregister() }
+      }
+      ViewFixes.correctMatchParentWidth(binding.mainBarAddOverlay, parent).also {
+        doOnTeardown { it.unregister() }
+      }
     }
 
     doOnTeardown {

@@ -101,7 +101,7 @@ internal constructor(
     }
 
     doOnInflate {
-      ViewFixes.correctMultiWindow(binding.mainAppbar) {
+      ViewFixes.listenLayoutChanged(binding.mainAppbar) {
         binding.apply {
           mainAppbar.withRoundedBackground(applyAllCorners = true)
           mainToolbar.elevation = 0F

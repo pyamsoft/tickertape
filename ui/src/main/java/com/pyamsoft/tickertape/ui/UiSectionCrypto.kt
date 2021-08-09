@@ -31,7 +31,11 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, UiSectionCryptoBindi
   final override val layoutRoot by boundView { uiSectionCrypto }
 
   init {
-    doOnInflate { ViewFixes.correctMatchParentHeight(layoutRoot, parent) }
+    doOnInflate {
+      ViewFixes.correctMatchParentHeight(layoutRoot, parent).also {
+        doOnTeardown { it.unregister() }
+      }
+    }
   }
 
   protected fun handleSection(isCrypto: Boolean) {

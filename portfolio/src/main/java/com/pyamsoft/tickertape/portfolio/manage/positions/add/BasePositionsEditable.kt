@@ -64,7 +64,7 @@ abstract class BasePositionsEditable<B : ViewBinding> protected constructor(pare
 
   @CheckResult protected abstract fun provideEvent(value: Double): PositionsAddViewEvent
 
-  protected fun handleValueChanged(text: String) {
+  protected fun handleValueChanged(text: UiEditTextDelegate.Data) {
     requireNotNull(delegate).handleTextChanged(text)
   }
 }

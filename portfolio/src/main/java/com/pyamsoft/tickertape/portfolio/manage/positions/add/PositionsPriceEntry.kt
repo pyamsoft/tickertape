@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.isOption
+import com.pyamsoft.tickertape.ui.asEditData
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -67,6 +68,7 @@ class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent
 
   private fun handlePriceChanged(value: StockMoneyValue) {
     // Don't use asMoneyValue() since we don't want to include the $ and stuff
-    handleValueChanged(if (value.isZero()) "" else value.value().toString())
+    val text = if (value.isZero()) "".asEditData(true) else value.value().toString().asEditData()
+    handleValueChanged(text)
   }
 }

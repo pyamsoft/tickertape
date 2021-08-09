@@ -91,10 +91,6 @@ private constructor(
     }
   }
 
-  fun handleTextChanged(text: String) {
-    applyText(text, false)
-  }
-
   fun handleTextChanged(data: Data) {
     applyText(data.text, data.force)
   }
@@ -168,10 +164,17 @@ private constructor(
   internal constructor(
       val text: String,
       val force: Boolean,
-  )
+  ) {
+
+    companion object {
+
+      @JvmField val EMPTY = Data(text = "", force = true)
+    }
+  }
 }
 
 @CheckResult
 fun String.asEditData(force: Boolean = false): UiEditTextDelegate.Data {
-  return UiEditTextDelegate.Data(text = this, force = force)
+  return if (this.isBlank()) UiEditTextDelegate.Data.EMPTY
+  else UiEditTextDelegate.Data(text = this, force = force)
 }

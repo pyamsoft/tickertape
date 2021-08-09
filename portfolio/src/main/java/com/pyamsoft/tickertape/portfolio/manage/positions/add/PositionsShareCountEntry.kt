@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.stocks.api.isOption
+import com.pyamsoft.tickertape.ui.asEditData
 import javax.inject.Inject
 
 class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
@@ -54,6 +55,7 @@ class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, p
 
   private fun handleCountChanged(value: StockShareValue) {
     // Use asShareValue() so we output a double when fractional but otherwise a whole number
-    handleValueChanged(if (value.isZero()) "" else value.asShareValue())
+    val text = if (value.isZero()) "".asEditData(true) else value.asShareValue().asEditData(false)
+    handleValueChanged(text)
   }
 }

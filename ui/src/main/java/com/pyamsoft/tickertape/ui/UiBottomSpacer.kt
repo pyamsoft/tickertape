@@ -21,6 +21,7 @@ import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.ui.databinding.BottomSpacerBinding
 
 abstract class UiBottomSpacer<S : UiViewState, V : UiViewEvent>

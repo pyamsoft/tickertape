@@ -135,10 +135,12 @@ internal constructor(
   }
 
   private fun handleBottomOffset(height: Int) {
-    // Add additional padding to the list bottom to account for the height change in MainContainer
     bottomDecoration?.also { binding.notificationList.removeItemDecoration(it) }
+
+    // Need to multiply the offset and add additional spacing
+    val spacing = 16.asDp(layoutRoot.context)
     bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
+        LinearBoundsMarginDecoration(bottomMargin = height + spacing).apply {
       binding.notificationList.addItemDecoration(this)
     }
   }

@@ -95,9 +95,12 @@ internal constructor(
 
   private fun handleBottomOffset(height: Int) {
     bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
+
+    // Need to multiply the offset and add additional spacing
+    val spacing = 16.asDp(layoutRoot.context)
     bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = (height * 1.5).toInt()).apply {
-          binding.watchlistList.addItemDecoration(this)
-        }
+        LinearBoundsMarginDecoration(bottomMargin = height + spacing).apply {
+      binding.watchlistList.addItemDecoration(this)
+    }
   }
 }

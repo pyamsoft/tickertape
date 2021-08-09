@@ -26,12 +26,12 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
-import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
@@ -233,11 +233,12 @@ internal constructor(
                 list.filter { ps ->
                   when (currentSection) {
                     PortfolioTabSection.STOCK -> ps.holding.type() == HoldingType.Stock
-                    PortfolioTabSection.OPTION -> ps.holding.isOption()
+                    PortfolioTabSection.OPTION -> ps.holding.type().isOption()
                     PortfolioTabSection.CRYPTO -> ps.holding.type() == HoldingType.Crypto
                   }
                 }
               }
+              .onSuccess { Timber.d("Loaded portfolio: $it") }
               .onSuccess { setState { copy(portfolio = it.pack(), isLoading = false) } }
               .onFailure { Timber.e(it, "Failed to fetch quotes") }
               .onFailure { setState { copy(portfolio = it.packError(), isLoading = false) } }

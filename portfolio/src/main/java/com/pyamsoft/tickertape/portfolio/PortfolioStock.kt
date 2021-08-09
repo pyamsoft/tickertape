@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.portfolio
 
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.isOption
 import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.QuotedStock
@@ -30,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
+import com.pyamsoft.tickertape.stocks.api.isOption
 
 data class PortfolioStock
 internal constructor(
@@ -44,7 +44,7 @@ internal constructor(
   val totalShares: StockShareValue
   val gainLossDisplayString: String
   val changeTodayDisplayString: String
-  val isOption = holding.isOption()
+  val isOption = holding.type().isOption()
 
   // Used in PortfolioStockList
   internal val costNumber: Double

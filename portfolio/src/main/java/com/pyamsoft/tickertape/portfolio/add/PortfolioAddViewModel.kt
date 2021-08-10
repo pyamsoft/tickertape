@@ -56,7 +56,7 @@ internal constructor(
                 }
                 return
               }
-          EquityType.CRYPTO ->
+          EquityType.CRYPTOCURRENCY ->
               if (type == HoldingType.Crypto) type
               else {
                 Timber.w(

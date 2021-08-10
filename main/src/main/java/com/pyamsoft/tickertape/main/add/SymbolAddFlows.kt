@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main.add
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -34,7 +35,7 @@ internal constructor(
     val type: HoldingType,
 ) : UiViewState {
 
-  data class TypeMismatchException(val expectedType: String, val foundType: HoldingType) :
+  data class TypeMismatchException(val expectedType: EquityType, val foundType: HoldingType) :
       IllegalArgumentException(
           "Type mismatch. Expected type $expectedType but found type: ${foundType.display}")
 }

@@ -26,7 +26,6 @@ import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,7 +65,6 @@ internal constructor(
                 .asSequence()
                 .filterNot { it.quote == null }
                 .map { it.quote.requireNotNull() }
-                .filterNot { IGNORE_NOTIFICATION_QUOTES.contains(it.type()) }
                 .toList()
           }
           .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
@@ -102,7 +100,6 @@ internal constructor(
 
   companion object {
 
-    private val IGNORE_NOTIFICATION_QUOTES = arrayOf(EquityType.OPTION)
     private val NOTIFICATION_ID = 42069.toNotifyId()
     private val EMPTY_TAPE_NOTIFICATION = TapeNotificationData(quotes = emptyList(), index = 0)
 

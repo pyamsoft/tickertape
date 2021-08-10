@@ -16,13 +16,32 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
-/**
- * Yeah its an object of strings instead of an enum because it will always be compared to string types
- * and we would just end up unwrapping the enum with .name
- *
- * So this instead.
- */
-object EquityType {
-  const val OPTION = "OPTION"
-  const val CRYPTO = "CRYPTOCURRENCY"
+import androidx.annotation.CheckResult
+
+enum class EquityType {
+  STOCK,
+  OPTION,
+  CRYPTOCURRENCY;
+
+  companion object {
+
+    private val valueSet by lazy(LazyThreadSafetyMode.NONE) { values().toSet() }
+
+    /**
+     * Parse the EquityType string, fall back to STOCK if it is nothing else we can support
+     *
+     * Looping over the values is faster than using a try catch on the valueOf() static function.
+     */
+    @JvmStatic
+    @CheckResult
+    fun from(name: String): EquityType {
+      for (value in valueSet) {
+        if (value.name == name) {
+          return value
+        }
+      }
+
+      return STOCK
+    }
+  }
 }

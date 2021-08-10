@@ -104,8 +104,8 @@ protected constructor(
                 results.filter { item ->
                   val type = item.type()
                   return@filter when (currentType) {
-                    is HoldingType.Stock -> !NOT_STOCK_TYPES.contains(type)
-                    is HoldingType.Crypto -> type == EquityType.CRYPTO
+                    is HoldingType.Stock -> type == EquityType.STOCK
+                    is HoldingType.Crypto -> type == EquityType.CRYPTOCURRENCY
                     is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
                         type == EquityType.OPTION
                   }
@@ -145,15 +145,15 @@ protected constructor(
     Timber.d("Result selected: $result")
     // We have to clear first to reset the delegate, and then we re-publish with the text
     val symbol = result.symbol()
-          setState(
-              stateChange = { copy(query = symbol.symbol().asEditData(true)) },
-              andThen = {
-                quoteFetcher
-                    .call(symbol)
-                    .onSuccess { setState { copy(quote = it) } }
-                    .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
-                    .onFailure { setState { copy(quote = null) } }
-              })
+    setState(
+        stateChange = { copy(query = symbol.symbol().asEditData(true)) },
+        andThen = {
+          quoteFetcher
+              .call(symbol)
+              .onSuccess { setState { copy(quote = it) } }
+              .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
+              .onFailure { setState { copy(quote = null) } }
+        })
   }
 
   fun handleCommitSymbol() {
@@ -163,18 +163,15 @@ protected constructor(
       return
     }
 
-    setState(stateChange = { copy(query = "".asEditData(true), quote = null) }, andThen = { onCommitSymbol(quote) })
+    setState(
+        stateChange = { copy(query = "".asEditData(true), quote = null) },
+        andThen = { onCommitSymbol(quote) })
   }
 
   protected abstract suspend fun onCommitSymbol(stock: StockQuote)
 
   companion object {
 
-    private val NOT_STOCK_TYPES =
-        arrayOf(
-            EquityType.CRYPTO,
-            EquityType.OPTION,
-        )
     private const val KEY_SYMBOL = "symbol"
   }
 }

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -53,7 +54,7 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
                   symbol = quote.symbol.asSymbol(),
                   name = company,
                   score = quote.score,
-                  type = quote.quoteType,
+                  type = EquityType.from(quote.quoteType),
               )
             }
             .toList()

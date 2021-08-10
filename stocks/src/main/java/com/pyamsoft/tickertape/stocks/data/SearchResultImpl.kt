@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -24,7 +25,7 @@ internal data class SearchResultImpl(
     private val symbol: StockSymbol,
     private val name: StockCompany,
     private val score: Long,
-    private val type: String,
+    private val type: EquityType,
 ) : SearchResult {
 
   override fun symbol(): StockSymbol {
@@ -39,7 +40,7 @@ internal data class SearchResultImpl(
     return score
   }
 
-  override fun type(): String {
+  override fun type(): EquityType {
     return type
   }
 }

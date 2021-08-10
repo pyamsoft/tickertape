@@ -138,9 +138,9 @@ internal constructor(
                   // If the quote is null, always show this because it was a bad network fetch
                   val type = qs.quote?.type() ?: return@filter true
                   return@filter when (currentSection) {
-                    WatchlistTabSection.STOCK -> !CATCH_ALL_TYPE.contains(type)
+                    WatchlistTabSection.STOCK -> type == EquityType.STOCK
                     WatchlistTabSection.OPTION -> type == EquityType.OPTION
-                    WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTO
+                    WatchlistTabSection.CRYPTO -> type == EquityType.CRYPTOCURRENCY
                   }
                 }
               }
@@ -230,7 +230,6 @@ internal constructor(
   companion object {
 
     private const val KEY_SEARCH = "search"
-    private val CATCH_ALL_TYPE = arrayOf(EquityType.OPTION, EquityType.CRYPTO)
     private val DEFAULT_SECTION = WatchlistTabSection.STOCK
   }
 }

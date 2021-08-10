@@ -18,6 +18,9 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 
+/**
+ * Slightly different from EquityType as this splits out options into the Buy and Sell sides.
+ */
 sealed class HoldingType(val display: String) {
 
   object Stock : HoldingType("Stock")

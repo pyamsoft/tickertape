@@ -32,7 +32,7 @@ internal constructor(
     val quote: StockQuote?,
     val query: UiEditTextDelegate.Data,
     val searchResults: PackedData<List<SearchResult>>,
-    val type: HoldingType,
+    val type: AddPageType,
 ) : UiViewState {
 
   data class TypeMismatchException(val expectedType: EquityType, val foundType: HoldingType) :

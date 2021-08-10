@@ -101,7 +101,19 @@ internal constructor(
   }
 
   fun handleAddNewRequest() {
+    return when (val page = state.page) {
+      is MainPage.Portfolio -> handleAddPortfolioRequest()
+      is MainPage.WatchList -> handleAddWatchlistRequest()
+      else -> Timber.w("Unsupported add new request page: $page")
+    }
+  }
+
+  private fun handleAddPortfolioRequest() {
     setAdding(!state.adding)
+  }
+
+  private fun handleAddWatchlistRequest() {
+    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew(null)) }
   }
 
   fun handleOpenAdd(type: HoldingType) {

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.add
 
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.main.add.AddPageType
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.main.add.SymbolAddViewState
@@ -37,12 +38,19 @@ internal constructor(
     private val interactor: PortfolioAddInteractor,
     quoteInteractor: QuoteInteractor,
     addInteractor: SymbolAddInteractor,
-    thisHoldingType: HoldingType,
-) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor, thisHoldingType) {
+    thisPageType: AddPageType,
+) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor, thisPageType) {
 
   override suspend fun onCommitSymbol(stock: StockQuote) {
     val symbol = stock.symbol()
-    val type = state.type
+    val type =
+        when (val pageType = state.type) {
+          is AddPageType.Portfolio -> pageType.holdingType
+          is AddPageType.Watchlist -> {
+            Timber.w("Unable to comit symbol on watchlist page")
+            return
+          }
+        }
 
     val holdingType =
         when (val equityType = stock.type()) {

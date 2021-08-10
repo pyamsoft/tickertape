@@ -76,13 +76,18 @@ internal constructor(
     addItem.requireNotNull().isEnabled = quote != null
   }
 
-  private fun handleType(type: HoldingType) {
+  private fun handleType(pageType: AddPageType) {
     val name =
-        when (type) {
-          is HoldingType.Crypto -> "Cryptocurrency"
-          is HoldingType.Stock -> "Stock"
-          is HoldingType.Options.Buy, is HoldingType.Options.Sell -> "Option"
+        when (pageType) {
+          is AddPageType.Portfolio ->
+              when (pageType.holdingType) {
+                is HoldingType.Crypto -> "Cryptocurrency"
+                is HoldingType.Stock -> "Stock"
+                is HoldingType.Options.Buy, is HoldingType.Options.Sell -> "Option"
+              }
+          is AddPageType.Watchlist -> "Noteworthy"
         }
+
     binding.uiToolbar.title = "Add $name"
   }
 

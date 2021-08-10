@@ -20,10 +20,11 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.main.add.AddPageType
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
@@ -39,7 +40,6 @@ internal interface WatchlistAddComponent {
     @CheckResult
     fun create(
         @BindsInstance parent: ViewGroup,
-        @BindsInstance type: HoldingType,
     ): WatchlistAddComponent
   }
 
@@ -52,5 +52,16 @@ internal interface WatchlistAddComponent {
     internal abstract fun bindViewModel(
         impl: WatchlistAddViewModel.Factory
     ): UiSavedStateViewModelProvider<out ViewModel>
+
+    @Module
+    companion object {
+
+      @Provides
+      @JvmStatic
+      @CheckResult
+      internal fun provideAddPageType(): AddPageType {
+        return AddPageType.Watchlist
+      }
+    }
   }
 }

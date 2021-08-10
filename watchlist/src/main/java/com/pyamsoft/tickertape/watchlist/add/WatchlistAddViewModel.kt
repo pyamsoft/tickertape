@@ -18,10 +18,10 @@ package com.pyamsoft.tickertape.watchlist.add
 
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
+import com.pyamsoft.tickertape.main.add.AddPageType
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -35,8 +35,8 @@ internal constructor(
     private val interactor: WatchlistAddInteractor,
     addInteractor: SymbolAddInteractor,
     quoteInteractor: QuoteInteractor,
-    thisHoldingType: HoldingType,
-) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor, thisHoldingType) {
+    thisPageType: AddPageType,
+) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor, thisPageType) {
 
   override suspend fun onCommitSymbol(stock: StockQuote) {
     val symbol = stock.symbol()

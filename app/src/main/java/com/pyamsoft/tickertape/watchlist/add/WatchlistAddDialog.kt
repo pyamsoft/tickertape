@@ -25,8 +25,6 @@ import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog
 import javax.inject.Inject
 
@@ -37,7 +35,7 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
     factory.requireNotNull().asFactory(this)
   }
 
-  override fun onInject(view: ViewGroup, savedInstanceState: Bundle?, type: HoldingType) {
+  override fun onInject(view: ViewGroup, savedInstanceState: Bundle?) {
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusWatchlistAddComponent()
         .create(
@@ -46,8 +44,12 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
             viewLifecycleOwner,
         )
         .plusWatchlistAddComponent()
-        .create(view, type)
+        .create(view)
         .inject(this)
+  }
+
+  override fun shouldShowOptionSides(): Boolean {
+    return false
   }
 
   override fun onTeardown() {
@@ -60,10 +62,8 @@ internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
 
     @JvmStatic
     @CheckResult
-    fun newInstance(type: HoldingType): DialogFragment {
-      return WatchlistAddDialog().apply {
-        arguments = Bundle().apply { putString(KEY_HOLDING_TYPE, type.toHoldingString()) }
-      }
+    fun newInstance(): DialogFragment {
+      return WatchlistAddDialog().apply { arguments = Bundle().apply {} }
     }
   }
 }

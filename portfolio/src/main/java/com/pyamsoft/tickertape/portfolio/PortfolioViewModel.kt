@@ -89,9 +89,13 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent(type: HoldingType) {
-    Timber.d("Portfolio add new holding!")
-    publish(PortfolioControllerEvent.AddNewHolding(type))
+  override fun CoroutineScope.onAddNewEvent(type: HoldingType?) {
+    if (type == null) {
+      Timber.w("Cannot add new portfolio holding without type")
+    } else {
+      Timber.d("Portfolio add new holding! $type")
+      publish(PortfolioControllerEvent.AddNewHolding(type))
+    }
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {

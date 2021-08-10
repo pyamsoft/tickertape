@@ -72,7 +72,16 @@ class SymbolOptionSides @Inject internal constructor(parent: ViewGroup) :
     state.mapChanged { it.type }.render(viewScope) { handlePage(it) }
   }
 
-  private fun handlePage(type: HoldingType) {
+  private fun handlePage(pageType: AddPageType) {
+    val type =
+        when (pageType) {
+          is AddPageType.Portfolio -> pageType.holdingType
+          is AddPageType.Watchlist -> {
+            Timber.w("Unable to handle option sides in watchlist page")
+            return
+          }
+        }
+
     val tabs = binding.symbolAddOptionSides
     for (i in 0 until tabs.tabCount) {
       val tab = tabs.getTabAt(i)

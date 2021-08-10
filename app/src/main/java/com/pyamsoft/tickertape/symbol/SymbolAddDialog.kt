@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
 import com.pyamsoft.pydroid.arch.StateSaver
@@ -40,9 +39,6 @@ import com.pyamsoft.tickertape.main.add.SymbolLookup
 import com.pyamsoft.tickertape.main.add.SymbolOptionSides
 import com.pyamsoft.tickertape.main.add.SymbolResultList
 import com.pyamsoft.tickertape.main.add.SymbolToolbar
-import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.fromHoldingString
-import com.pyamsoft.tickertape.stocks.api.isOption
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -69,11 +65,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     return inflater.inflate(R.layout.layout_constraint, container, false)
   }
 
-  @CheckResult
-  private fun getHoldingType(): HoldingType {
-    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
-  }
-
   final override fun onViewCreated(
       view: View,
       savedInstanceState: Bundle?,
@@ -82,15 +73,13 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     makeFullWidth()
 
     val binding = LayoutConstraintBinding.bind(view)
-    val type = getHoldingType()
-    onInject(binding.layoutConstraint, savedInstanceState, type)
+    onInject(binding.layoutConstraint, savedInstanceState)
 
     val list = requireNotNull(list)
     val lookup = requireNotNull(lookup)
     val toolbar = requireNotNull(toolbar)
     val shadow =
         DropshadowView.createTyped<SymbolAddViewState, SymbolAddViewEvent>(binding.layoutConstraint)
-    val sides = if (type.isOption()) optionSidesProvider.requireNotNull().get() else null
 
     val views =
         mutableListOf(
@@ -100,6 +89,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             shadow,
         )
 
+    val sides = if (shouldShowOptionSides()) optionSidesProvider.requireNotNull().get() else null
     if (sides != null) {
       views.add(sides)
     }
@@ -156,7 +146,9 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     }
   }
 
-  protected abstract fun onInject(view: ViewGroup, savedInstanceState: Bundle?, type: HoldingType)
+  protected abstract fun shouldShowOptionSides(): Boolean
+
+  protected abstract fun onInject(view: ViewGroup, savedInstanceState: Bundle?)
 
   protected abstract fun onTeardown()
 
@@ -181,11 +173,5 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     list = null
 
     onTeardown()
-  }
-
-  companion object {
-
-    // NOTE(Peter): protected one day
-    internal const val KEY_HOLDING_TYPE = "key_holding_type"
   }
 }

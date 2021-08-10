@@ -44,7 +44,7 @@ protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
     quoteInteractor: QuoteInteractor,
-    thisHoldingType: HoldingType,
+    thisPageType: AddPageType,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
@@ -53,7 +53,7 @@ protected constructor(
             quote = null,
             query = "".asEditData(),
             searchResults = emptyList<SearchResult>().pack(),
-            type = thisHoldingType,
+            type = thisPageType,
         )) {
 
   private val quoteFetcher =
@@ -101,14 +101,18 @@ protected constructor(
           interactor
               .search(false, query)
               .map { results ->
-                results.filter { item ->
-                  val type = item.type()
-                  return@filter when (currentType) {
-                    is HoldingType.Stock -> type == EquityType.STOCK
-                    is HoldingType.Crypto -> type == EquityType.CRYPTOCURRENCY
-                    is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
-                        type == EquityType.OPTION
-                  }
+                return@map when (currentType) {
+                  is AddPageType.Watchlist -> results
+                  is AddPageType.Portfolio ->
+                      results.filter { item ->
+                        val type = item.type()
+                        return@filter when (currentType.holdingType) {
+                          is HoldingType.Stock -> type == EquityType.STOCK
+                          is HoldingType.Crypto -> type == EquityType.CRYPTOCURRENCY
+                          is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
+                              type == EquityType.OPTION
+                        }
+                      }
                 }
               }
               .onSuccess { Timber.d("Search results: $it") }
@@ -119,17 +123,29 @@ protected constructor(
   }
 
   fun handleUpdateOptionSide() {
-    val currentType = state.type
+    val currentType =
+        when (val pageType = state.type) {
+          is AddPageType.Portfolio -> pageType.holdingType
+          is AddPageType.Watchlist -> {
+            Timber.w("Cannot update type on watchlist page")
+            return
+          }
+        }
+
     if (!currentType.isOption()) {
       Timber.w("Cannot update type when not an option type: $currentType ")
       return
     }
+
     setState(
         stateChange = {
           copy(
               type =
-                  if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell
-                  else HoldingType.Options.Buy)
+                  AddPageType.Portfolio(
+                      holdingType =
+                          if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell
+                          else HoldingType.Options.Buy),
+          )
         },
         andThen = { newState -> performLookup(newState.query.text) })
   }

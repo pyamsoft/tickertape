@@ -33,7 +33,7 @@ protected constructor(
     initialState: S
 ) : UiSavedStateViewModel<S, C>(savedState, initialState) {
 
-  protected abstract fun CoroutineScope.onAddNewEvent(type: HoldingType)
+  protected abstract fun CoroutineScope.onAddNewEvent(type: HoldingType?)
 
   abstract fun handleShowStocks()
 

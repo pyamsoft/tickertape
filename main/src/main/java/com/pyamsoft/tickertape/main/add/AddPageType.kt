@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.main.add
 
 import com.pyamsoft.tickertape.stocks.api.HoldingType
 
-data class AddNew internal constructor(val type: HoldingType?)
+sealed class AddPageType {
+
+  object Watchlist : AddPageType()
+
+  data class Portfolio(val holdingType: HoldingType) : AddPageType()
+}

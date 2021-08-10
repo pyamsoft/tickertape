@@ -84,9 +84,13 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent(type: HoldingType) {
-    Timber.d("Watchlist add new symbol!")
-    publish(WatchListControllerEvent.AddNewSymbol(type))
+  override fun CoroutineScope.onAddNewEvent(type: HoldingType?) {
+      if (type != null) {
+          Timber.w("Cannot add new watchlist target with specific type: $type")
+      } else {
+          Timber.d("Watchlist add new symbol!")
+          publish(WatchListControllerEvent.AddNewSymbol)
+      }
   }
 
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =

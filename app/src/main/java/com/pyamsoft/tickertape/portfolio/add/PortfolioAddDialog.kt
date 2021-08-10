@@ -26,6 +26,8 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.fromHoldingString
+import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog
 import javax.inject.Inject
@@ -37,7 +39,16 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
     factory.requireNotNull().asFactory(this)
   }
 
-  override fun onInject(view: ViewGroup, savedInstanceState: Bundle?, type: HoldingType) {
+  @CheckResult
+  private fun getHoldingType(): HoldingType {
+    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
+  }
+
+  override fun shouldShowOptionSides(): Boolean {
+    return getHoldingType().isOption()
+  }
+
+  override fun onInject(view: ViewGroup, savedInstanceState: Bundle?) {
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusPortfolioAddComponent()
         .create(
@@ -46,7 +57,7 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
             viewLifecycleOwner,
         )
         .plusPortfolioAddComponent()
-        .create(view, type)
+        .create(view, getHoldingType())
         .inject(this)
   }
 
@@ -56,6 +67,7 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
   companion object {
 
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     const val TAG = "PortfolioAddDialog"
 
     @JvmStatic

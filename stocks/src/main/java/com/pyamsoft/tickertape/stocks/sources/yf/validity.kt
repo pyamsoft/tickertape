@@ -66,9 +66,8 @@ internal fun hasAfterHoursData(stock: NetworkQuoteResponse.Resp.Quote): Boolean 
   return stock.run {
     val state = MarketState.from(marketState) ?: return@run false
 
-    val isNotNormalMarket = state != MarketState.REGULAR && state != MarketState.PRE
     // After Hours should still be displayed even when state is CLOSED
-    (isNotNormalMarket || state == MarketState.POST) &&
+    (state == MarketState.CLOSED || state == MarketState.POST || state == MarketState.POSTPOST) &&
         postMarketChange != null &&
         postMarketPrice != null &&
         postMarketChangePercent != null

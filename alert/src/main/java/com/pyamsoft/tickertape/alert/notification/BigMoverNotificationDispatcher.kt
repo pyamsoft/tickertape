@@ -121,7 +121,9 @@ internal constructor(private val context: Context, private val activityClass: Cl
           MarketState.REGULAR -> "so far today"
           MarketState.PRE -> "pre-market"
           // Closed and After-Hours are gonna basically show the same thing.
-          MarketState.POST, MarketState.CLOSED -> "after hours"
+          MarketState.POSTPOST,
+          MarketState.POST,
+          MarketState.CLOSED -> "after hours"
         }
 
     @DrawableRes val icon: Int

@@ -43,6 +43,7 @@ protected constructor(
     parent: ViewGroup,
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
+    pool: RecyclerView.RecycledViewPool,
 ) : BaseUiView<HomeViewState, HomeViewEvent, B>(parent) {
 
   private var modelAdapter: HomeIndexAdapter? = null
@@ -52,6 +53,7 @@ protected constructor(
   init {
     doOnInflate {
       val list = provideList()
+      list.setRecycledViewPool(pool)
       list.layoutManager =
           LinearLayoutManager(list.context).apply {
             orientation = RecyclerView.HORIZONTAL

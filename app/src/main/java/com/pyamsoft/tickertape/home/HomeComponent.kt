@@ -19,11 +19,13 @@ package com.pyamsoft.tickertape.home
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
@@ -55,5 +57,16 @@ internal interface HomeComponent {
     @IntoMap
     @ClassKey(HomeViewModel::class)
     internal abstract fun bindViewModel(impl: HomeViewModel): ViewModel
+
+    @Module
+    companion object {
+
+        @Provides
+        @JvmStatic
+        @CheckResult
+        internal fun provideRecyclerPool(): RecyclerView.RecycledViewPool {
+            return RecyclerView.RecycledViewPool()
+        }
+    }
   }
 }

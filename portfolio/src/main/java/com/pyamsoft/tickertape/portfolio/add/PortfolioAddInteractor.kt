@@ -23,8 +23,9 @@ import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +41,11 @@ internal constructor(
 ) {
 
   @CheckResult
-  suspend fun commitSymbol(symbol: StockSymbol, type: HoldingType): ResultWrapper<Unit> =
+  suspend fun commitSymbol(
+      symbol: StockSymbol,
+      type: EquityType,
+      side: TradeSide
+  ): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -52,7 +57,7 @@ internal constructor(
             return@withContext ResultWrapper.success(Unit)
           }
 
-          val newHolding = JsonMappableDbHolding.create(symbol, type)
+          val newHolding = JsonMappableDbHolding.create(symbol, type, side)
           return@withContext when (holdingInsertDao.insert(newHolding)) {
             DbInsert.InsertResult.INSERT -> Timber.d("New portfolio holding inserted: $newHolding")
             DbInsert.InsertResult.UPDATE ->

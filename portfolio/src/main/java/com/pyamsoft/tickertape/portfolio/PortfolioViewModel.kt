@@ -30,8 +30,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
-import com.pyamsoft.tickertape.stocks.api.HoldingType
-import com.pyamsoft.tickertape.stocks.api.isOption
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
@@ -89,13 +88,8 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent(type: HoldingType?) {
-    if (type == null) {
-      Timber.w("Cannot add new portfolio holding without type")
-    } else {
-      Timber.d("Portfolio add new holding! $type")
-      publish(PortfolioControllerEvent.AddNewHolding(type))
-    }
+  override fun CoroutineScope.onAddNewEvent() {
+    publish(PortfolioControllerEvent.AddNewHolding)
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
@@ -236,9 +230,9 @@ internal constructor(
               .map { list ->
                 list.filter { ps ->
                   when (currentSection) {
-                    PortfolioTabSection.STOCK -> ps.holding.type() == HoldingType.Stock
-                    PortfolioTabSection.OPTION -> ps.holding.type().isOption()
-                    PortfolioTabSection.CRYPTO -> ps.holding.type() == HoldingType.Crypto
+                    PortfolioTabSection.STOCK -> ps.holding.type() == EquityType.STOCK
+                    PortfolioTabSection.OPTION -> ps.holding.type() == EquityType.OPTION
+                    PortfolioTabSection.CRYPTO -> ps.holding.type() == EquityType.CRYPTOCURRENCY
                   }
                 }
               }

@@ -159,7 +159,7 @@ internal class MainActivity :
             is MainViewEvent.OpenNotifications ->
                 viewModel.handleSelectPage(MainPage.Notifications, force = false)
             is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
-            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type)
+            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd()
             is MainViewEvent.OpenSettings -> handleOpenSettings()
             is MainViewEvent.StopAdd -> viewModel.handleStopAdd()
           }

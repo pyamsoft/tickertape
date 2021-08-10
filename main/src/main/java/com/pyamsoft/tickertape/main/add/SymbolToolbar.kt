@@ -23,7 +23,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.DebouncedOnClickListener
 import com.pyamsoft.tickertape.main.R
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.UiDialogToolbar
 import javax.inject.Inject
@@ -68,24 +68,27 @@ internal constructor(
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.type }.render(viewScope) { handleType(it) }
     state.mapChanged { it.quote }.render(viewScope) { handleQuote(it) }
   }
 
   private fun handleQuote(quote: StockQuote?) {
+    handleCommitItem(quote)
+    handleQuoteType(quote)
+  }
+
+  private fun handleCommitItem(quote: StockQuote?) {
     addItem.requireNotNull().isEnabled = quote != null
   }
 
-  private fun handleType(pageType: AddPageType) {
+  private fun handleQuoteType(quote: StockQuote?) {
     val name =
-        when (pageType) {
-          is AddPageType.Portfolio ->
-              when (pageType.holdingType) {
-                is HoldingType.Crypto -> "Cryptocurrency"
-                is HoldingType.Stock -> "Stock"
-                is HoldingType.Options.Buy, is HoldingType.Options.Sell -> "Option"
-              }
-          is AddPageType.Watchlist -> "Noteworthy"
+        if (quote == null) "New"
+        else {
+          when (quote.type()) {
+            EquityType.STOCK -> "Stock"
+            EquityType.OPTION -> "Option"
+            EquityType.CRYPTOCURRENCY -> "Cryptocurrency"
+          }
         }
 
     binding.uiToolbar.title = "Add $name"

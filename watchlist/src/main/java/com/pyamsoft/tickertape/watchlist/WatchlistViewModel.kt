@@ -28,7 +28,6 @@ import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
@@ -84,13 +83,9 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent(type: HoldingType?) {
-      if (type != null) {
-          Timber.w("Cannot add new watchlist target with specific type: $type")
-      } else {
-          Timber.d("Watchlist add new symbol!")
-          publish(WatchListControllerEvent.AddNewSymbol)
-      }
+  override fun CoroutineScope.onAddNewEvent() {
+    Timber.d("Watchlist add new symbol!")
+    publish(WatchListControllerEvent.AddNewSymbol)
   }
 
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =

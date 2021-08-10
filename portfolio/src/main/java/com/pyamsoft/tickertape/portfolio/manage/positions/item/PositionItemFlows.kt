@@ -20,16 +20,16 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.stocks.api.isOption
 
 sealed class PositionItemViewState : UiViewState {
 
@@ -46,14 +46,14 @@ sealed class PositionItemViewState : UiViewState {
     val gainLossDisplayString: String
     val gainLossDirection: StockDirection
 
-    val isOption = holding.type().isOption()
+    val isOption = holding.type() == EquityType.OPTION
     val positionCost: StockMoneyValue
     val positionSize: StockShareValue
     val purchaseDate = position.purchaseDate()
 
     init {
       val optionsModifier = if (isOption) 100 else 1
-      val sellSideModifier = if (holding.isSellSide()) -1 else 1
+      val sellSideModifier = if (holding.side() == TradeSide.SELL) -1 else 1
 
       val numberOfShares = position.shareCount().value()
       val positionPrice = position.price().value()

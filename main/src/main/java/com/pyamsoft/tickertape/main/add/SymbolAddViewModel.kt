@@ -23,12 +23,10 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.isOption
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.asEditData
 import com.pyamsoft.tickertape.ui.pack
@@ -44,7 +42,6 @@ protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
     quoteInteractor: QuoteInteractor,
-    thisPageType: AddPageType,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
@@ -53,7 +50,7 @@ protected constructor(
             quote = null,
             query = "".asEditData(),
             searchResults = emptyList<SearchResult>().pack(),
-            type = thisPageType,
+            side = TradeSide.BUY,
         )) {
 
   private val quoteFetcher =
@@ -96,25 +93,8 @@ protected constructor(
 
     searchJob =
         launch(context = Dispatchers.Default) {
-          val currentType = state.type
-
           interactor
               .search(false, query)
-              .map { results ->
-                return@map when (currentType) {
-                  is AddPageType.Watchlist -> results
-                  is AddPageType.Portfolio ->
-                      results.filter { item ->
-                        val type = item.type()
-                        return@filter when (currentType.holdingType) {
-                          is HoldingType.Stock -> type == EquityType.STOCK
-                          is HoldingType.Crypto -> type == EquityType.CRYPTOCURRENCY
-                          is HoldingType.Options.Buy, is HoldingType.Options.Sell ->
-                              type == EquityType.OPTION
-                        }
-                      }
-                }
-              }
               .onSuccess { Timber.d("Search results: $it") }
               .onSuccess { setState { copy(searchResults = it.pack()) } }
               .onFailure { Timber.e(it, "Search failed") }
@@ -123,29 +103,14 @@ protected constructor(
   }
 
   fun handleUpdateOptionSide() {
-    val currentType =
-        when (val pageType = state.type) {
-          is AddPageType.Portfolio -> pageType.holdingType
-          is AddPageType.Watchlist -> {
-            Timber.w("Cannot update type on watchlist page")
-            return
-          }
-        }
-
-    if (!currentType.isOption()) {
-      Timber.w("Cannot update type when not an option type: $currentType ")
-      return
-    }
-
     setState(
         stateChange = {
           copy(
-              type =
-                  AddPageType.Portfolio(
-                      holdingType =
-                          if (currentType == HoldingType.Options.Buy) HoldingType.Options.Sell
-                          else HoldingType.Options.Buy),
-          )
+              side =
+                  when (state.side) {
+                    TradeSide.BUY -> TradeSide.SELL
+                    TradeSide.SELL -> TradeSide.BUY
+                  })
         },
         andThen = { newState -> performLookup(newState.query.text) })
   }
@@ -180,7 +145,13 @@ protected constructor(
     }
 
     setState(
-        stateChange = { copy(query = "".asEditData(true), quote = null) },
+        stateChange = {
+          copy(
+              query = "".asEditData(true),
+              quote = null,
+              searchResults = emptyList<SearchResult>().pack(),
+          )
+        },
         andThen = { onCommitSymbol(quote) })
   }
 

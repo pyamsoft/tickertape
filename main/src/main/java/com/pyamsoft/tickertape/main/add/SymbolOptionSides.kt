@@ -21,7 +21,7 @@ import com.google.android.material.tabs.TabLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.main.databinding.SymbolAddOptionSidesBinding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -69,17 +69,14 @@ class SymbolOptionSides @Inject internal constructor(parent: ViewGroup) :
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.type }.render(viewScope) { handlePage(it) }
+    state.mapChanged { it.side }.render(viewScope) { handlePage(it) }
   }
 
-  private fun handlePage(pageType: AddPageType) {
-    val type =
-        when (pageType) {
-          is AddPageType.Portfolio -> pageType.holdingType
-          is AddPageType.Watchlist -> {
-            Timber.w("Unable to handle option sides in watchlist page")
-            return
-          }
+  private fun handlePage(side: TradeSide) {
+    val page =
+        when (side) {
+          TradeSide.BUY -> SIDE_BUY
+          TradeSide.SELL -> SIDE_SELL
         }
 
     val tabs = binding.symbolAddOptionSides
@@ -89,16 +86,6 @@ class SymbolOptionSides @Inject internal constructor(parent: ViewGroup) :
         Timber.w("No tab found at index: $i")
         continue
       }
-
-      val page =
-          when (type) {
-            is HoldingType.Options.Buy -> SIDE_BUY
-            is HoldingType.Options.Sell -> SIDE_SELL
-            else -> {
-              Timber.w("Cannot handle page when type is not Options: $type")
-              return
-            }
-          }
 
       val tag = tab.text
       if (tag == page) {

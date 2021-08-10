@@ -17,12 +17,12 @@
 package com.pyamsoft.tickertape.portfolio
 
 import com.pyamsoft.tickertape.core.isZero
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
-import com.pyamsoft.tickertape.stocks.api.isOption
 
 data class PortfolioStockList(val list: List<PortfolioStock>) {
 
@@ -33,13 +33,12 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
   val changeTodayDisplayString: String
 
   init {
+    val filterOptions = { h: PortfolioStock -> h.holding.type() == EquityType.OPTION }
     val sumCostNumber =
         if (list.isEmpty()) 0.0
-        else
-            list.asSequence().filterNot { it.holding.type().isOption() }.map { it.costNumber }.sum()
+        else list.asSequence().filterNot(filterOptions).map { it.costNumber }.sum()
 
-    val todays =
-        list.asSequence().filterNot { it.holding.type().isOption() }.map { it.todayNumber }.toList()
+    val todays = list.asSequence().filterNot(filterOptions).map { it.todayNumber }.toList()
     val isAnyDayInvalid = todays.any { it == null }
 
     val sumTotalAmountNumber =
@@ -58,10 +57,7 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
     sumTotalDirection = (sumTotalAmountNumber - sumCostNumber).asDirection()
 
     val todayChanges =
-        list.asSequence()
-            .filterNot { it.holding.type().isOption() }
-            .map { it.todayChangeNumber }
-            .toList()
+        list.asSequence().filterNot(filterOptions).map { it.todayChangeNumber }.toList()
     val isAnyChangeInvalid = todayChanges.any { it == null }
 
     val sumTodayChangeNumber =

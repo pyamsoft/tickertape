@@ -20,7 +20,6 @@ import androidx.annotation.StringRes
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 
 data class MainViewState
 internal constructor(
@@ -44,7 +43,7 @@ sealed class MainViewEvent : UiViewEvent {
 
   data class BottomBarMeasured internal constructor(val height: Int) : MainViewEvent()
 
-  data class OpenAdd internal constructor(val type: HoldingType) : MainViewEvent()
+  object OpenAdd : MainViewEvent()
 
   object AddRequest : MainViewEvent()
 

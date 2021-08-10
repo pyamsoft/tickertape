@@ -20,8 +20,9 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 data class ManagePortfolioViewState
 internal constructor(
@@ -46,7 +47,8 @@ sealed class ManagePortfolioControllerEvent : UiControllerEvent {
   internal constructor(
       val id: DbHolding.Id,
       val symbol: StockSymbol,
-      val type: HoldingType,
+      val type: EquityType,
+      val side: TradeSide,
   ) : ManagePortfolioControllerEvent()
 
   object PushPositions : ManagePortfolioControllerEvent()

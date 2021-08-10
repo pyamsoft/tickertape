@@ -23,7 +23,6 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -113,12 +112,12 @@ internal constructor(
   }
 
   private fun handleAddWatchlistRequest() {
-    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew(null)) }
+    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew) }
   }
 
-  fun handleOpenAdd(type: HoldingType) {
+  fun handleOpenAdd() {
     viewModelScope.launch(context = Dispatchers.Default) {
-      setState(stateChange = { copy(adding = false) }, andThen = { addNewBus.send(AddNew(type)) })
+      setState(stateChange = { copy(adding = false) }, andThen = { addNewBus.send(AddNew) })
     }
   }
 

@@ -18,13 +18,9 @@ package com.pyamsoft.tickertape.portfolio.add
 
 import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.main.add.AddPageType
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
-import com.pyamsoft.tickertape.main.add.SymbolAddViewState
 import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -38,60 +34,19 @@ internal constructor(
     private val interactor: PortfolioAddInteractor,
     quoteInteractor: QuoteInteractor,
     addInteractor: SymbolAddInteractor,
-    thisPageType: AddPageType,
-) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor, thisPageType) {
+) : SymbolAddViewModel(savedState, addInteractor, quoteInteractor) {
 
   override suspend fun onCommitSymbol(stock: StockQuote) {
     val symbol = stock.symbol()
-    val type =
-        when (val pageType = state.type) {
-          is AddPageType.Portfolio -> pageType.holdingType
-          is AddPageType.Watchlist -> {
-            Timber.w("Unable to comit symbol on watchlist page")
-            return
-          }
-        }
+    val type = stock.type()
+    val side = state.side
 
-    val holdingType =
-        when (val equityType = stock.type()) {
-          EquityType.OPTION ->
-              if (type == HoldingType.Options.Buy || type == HoldingType.Options.Sell) type
-              else {
-                Timber.w(
-                    "Option EquityType and expected HoldingType do not match: $equityType $type")
-                setState {
-                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
-                }
-                return
-              }
-          EquityType.CRYPTOCURRENCY ->
-              if (type == HoldingType.Crypto) type
-              else {
-                Timber.w(
-                    "Crypto EquityType and expected HoldingType do not match: $equityType $type")
-                setState {
-                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
-                }
-                return
-              }
-          else ->
-              if (type == HoldingType.Stock) type
-              else {
-                Timber.w(
-                    "Stock EquityType and expected HoldingType do not match: $equityType $type")
-                setState {
-                  copy(error = SymbolAddViewState.TypeMismatchException(equityType, type))
-                }
-                return
-              }
-        }
-
-    Timber.d("Commit symbol to DB: $symbol $holdingType")
+    Timber.d("Commit symbol to DB: $symbol $type $side")
     interactor
-        .commitSymbol(symbol, holdingType)
-        .onSuccess { Timber.d("Committed new symbols to db: $symbol $holdingType") }
+        .commitSymbol(symbol, type, side)
+        .onSuccess { Timber.d("Committed new symbols to db: $symbol $type $side") }
         .onSuccess { setState { copy(error = null) } }
-        .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol $holdingType") }
+        .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol $type $side") }
   }
 
   @AssistedFactory

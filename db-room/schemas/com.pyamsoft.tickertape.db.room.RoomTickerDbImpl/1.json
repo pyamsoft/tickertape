@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d3f684e9b684dd1440d3b286c1e86209",
+    "identityHash": "0a1dea352bc39e1a494a44a596e12516",
     "entities": [
       {
         "tableName": "room_symbol_table",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "room_holding_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `holding_type` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `holding_type` TEXT NOT NULL, `holding_side` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -49,6 +49,12 @@
           {
             "fieldPath": "type",
             "columnName": "holding_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "side",
+            "columnName": "holding_side",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -181,7 +187,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3f684e9b684dd1440d3b286c1e86209')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a1dea352bc39e1a494a44a596e12516')"
     ]
   }
 }

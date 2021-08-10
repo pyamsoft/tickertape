@@ -46,13 +46,12 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.PositionsFragment
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddDialog
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.fromHoldingString
-import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import javax.inject.Inject
 
 internal class PositionManageDialog :
@@ -63,7 +62,9 @@ internal class PositionManageDialog :
   @JvmField @Inject internal var container: ManagePortfolioContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by viewModels<ManagePortfolioViewModel> { factory.requireNotNull().create(this) }
+  private val viewModel by viewModels<ManagePortfolioViewModel> {
+    factory.requireNotNull().create(this)
+  }
 
   private var component: BaseManageComponent? = null
 
@@ -80,8 +81,13 @@ internal class PositionManageDialog :
   }
 
   @CheckResult
-  private fun getHoldingType(): HoldingType {
-    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
+  private fun getHoldingType(): EquityType {
+    return EquityType.valueOf(requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull())
+  }
+
+  @CheckResult
+  private fun getHoldingSide(): TradeSide {
+    return TradeSide.valueOf(requireArguments().getString(KEY_HOLDING_SIDE, "").requireNotNull())
   }
 
   @CheckResult
@@ -124,6 +130,7 @@ internal class PositionManageDialog :
                 getHoldingId(),
                 getCurrentPrice(),
                 getHoldingType(),
+                getHoldingSide(),
             )
             .also { c ->
               c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
@@ -196,7 +203,12 @@ internal class PositionManageDialog :
               PositionChartFragment.TAG,
               appendBackStack = false)
       is ManagePortfolioControllerEvent.OpenAdd ->
-          PositionsAddDialog.newInstance(id = event.id, symbol = event.symbol, type = event.type)
+          PositionsAddDialog.newInstance(
+                  id = event.id,
+                  symbol = event.symbol,
+                  type = event.type,
+                  side = event.side,
+              )
               .show(requireActivity(), PositionsAddDialog.TAG)
     }
   }
@@ -222,6 +234,7 @@ internal class PositionManageDialog :
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
+    private const val KEY_HOLDING_SIDE = "key_holding_side"
     private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
     const val TAG = "PositionManageDialog"
 
@@ -246,7 +259,8 @@ internal class PositionManageDialog :
               val holding = stock.holding
               putString(KEY_HOLDING_ID, holding.id().id)
               putString(KEY_HOLDING_SYMBOL, holding.symbol().symbol())
-              putString(KEY_HOLDING_TYPE, holding.type().toHoldingString())
+              putString(KEY_HOLDING_TYPE, holding.type().name)
+              putString(KEY_HOLDING_SIDE, holding.side().name)
               currentSharePrice?.also { putDouble(KEY_CURRENT_STOCK_PRICE, it.value()) }
             }
       }

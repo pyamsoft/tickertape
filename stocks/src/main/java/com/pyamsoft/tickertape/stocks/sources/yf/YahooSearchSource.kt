@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
 internal class YahooSearchSource
 @Inject
@@ -44,19 +45,32 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
           return@withContext emptyList()
         }
 
-        val result = service.performSearch(query, count = 20)
-        return@withContext result
-            .quotes
-            .asSequence()
-            .map { quote ->
-              val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
-              return@map SearchResultImpl(
-                  symbol = quote.symbol.asSymbol(),
-                  name = company,
-                  score = quote.score,
-                  type = EquityType.from(quote.quoteType),
-              )
+        try {
+          val result = service.performSearch(query, count = 20)
+          return@withContext result
+              .quotes
+              .asSequence()
+              .map { quote ->
+                val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
+                return@map SearchResultImpl(
+                    symbol = quote.symbol.asSymbol(),
+                    name = company,
+                    score = quote.score,
+                    type = EquityType.from(quote.quoteType),
+                )
+              }
+              .toList()
+        } catch (e: Throwable) {
+          if (e is HttpException) {
+            // If YF delivers us a 404, then it just could not find any search results.
+            // Empty list
+            if (e.code() == 404) {
+              return@withContext emptyList<SearchResult>()
             }
-            .toList()
+          }
+
+          // Otherwise rethrow the exception,
+          throw e
+        }
       }
 }

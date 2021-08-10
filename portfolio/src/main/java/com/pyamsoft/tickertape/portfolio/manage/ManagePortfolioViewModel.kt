@@ -19,8 +19,9 @@ package com.pyamsoft.tickertape.portfolio.manage
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.core.FragmentScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 
 // Share this single VM between the entire fragment scope, so page is always up to date
@@ -30,7 +31,8 @@ class ManagePortfolioViewModel
 internal constructor(
     private val thisHoldingId: DbHolding.Id,
     private val thisSymbol: StockSymbol,
-    private val thisType: HoldingType,
+    private val thisType: EquityType,
+    private val thisSide: TradeSide,
 ) :
     UiViewModel<ManagePortfolioViewState, ManagePortfolioControllerEvent>(
         initialState =
@@ -68,6 +70,7 @@ internal constructor(
             id = thisHoldingId,
             symbol = thisSymbol,
             type = thisType,
+            side = thisSide,
         ))
   }
 

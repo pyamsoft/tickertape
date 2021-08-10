@@ -20,13 +20,10 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.main.add.AddPageType
 import com.pyamsoft.tickertape.portfolio.PortfolioViewModel
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
@@ -42,7 +39,6 @@ internal interface PortfolioAddComponent {
     @CheckResult
     fun create(
         @BindsInstance parent: ViewGroup,
-        @BindsInstance type: HoldingType,
     ): PortfolioAddComponent
   }
 
@@ -55,17 +51,5 @@ internal interface PortfolioAddComponent {
     internal abstract fun bindViewModel(
         impl: PortfolioAddViewModel.Factory
     ): UiSavedStateViewModelProvider<out ViewModel>
-
-    @Module
-    companion object {
-
-      @Provides
-      @JvmStatic
-      @CheckResult
-      internal fun provideAddPageType(type: HoldingType): AddPageType {
-        return AddPageType.Portfolio(holdingType = type)
-      }
-
-    }
   }
 }

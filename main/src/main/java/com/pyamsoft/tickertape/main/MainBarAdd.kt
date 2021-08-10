@@ -28,9 +28,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.R
-import com.pyamsoft.tickertape.ui.ViewFixes
 import javax.inject.Inject
 
 class MainBarAdd
@@ -51,15 +49,9 @@ internal constructor(
     doOnInflate {
       binding.apply {
         mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
-        mainBarAddStock.setOnDebouncedClickListener {
-          publish(MainViewEvent.OpenAdd(HoldingType.Stock))
-        }
-        mainBarAddOptions.setOnDebouncedClickListener {
-          publish(MainViewEvent.OpenAdd(HoldingType.Options.Buy))
-        }
-        mainBarAddCrypto.setOnDebouncedClickListener {
-          publish(MainViewEvent.OpenAdd(HoldingType.Crypto))
-        }
+        mainBarAddStock.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
+        mainBarAddOptions.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
+        mainBarAddCrypto.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
         mainBarAddOverlay.setOnDebouncedClickListener { publish(MainViewEvent.StopAdd) }
       }
     }
@@ -128,10 +120,10 @@ internal constructor(
     animator?.cancel()
     animator =
         ViewCompat.animate(binding.mainBarAdd)
-        .setDuration(ANIMATION_DURATION)
-        .setInterpolator(interpolator)
-        .rotation(if (adding) 45F else 0F)
-        .apply { start() }
+            .setDuration(ANIMATION_DURATION)
+            .setInterpolator(interpolator)
+            .rotation(if (adding) 45F else 0F)
+            .apply { start() }
   }
 
   private fun handleFabVisible(visible: Boolean) {

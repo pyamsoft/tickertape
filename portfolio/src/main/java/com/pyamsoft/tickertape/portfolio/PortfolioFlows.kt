@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
@@ -104,7 +103,7 @@ sealed class PortfolioViewEvent : UiViewEvent {
 
 sealed class PortfolioControllerEvent : UiControllerEvent {
 
-  data class AddNewHolding internal constructor(val type: HoldingType) : PortfolioControllerEvent()
+  object AddNewHolding : PortfolioControllerEvent()
 
   data class ManageHolding internal constructor(val stock: PortfolioStock) :
       PortfolioControllerEvent()

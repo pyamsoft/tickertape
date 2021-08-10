@@ -19,10 +19,9 @@ package com.pyamsoft.tickertape.main.add
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.HoldingType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 
@@ -32,13 +31,8 @@ internal constructor(
     val quote: StockQuote?,
     val query: UiEditTextDelegate.Data,
     val searchResults: PackedData<List<SearchResult>>,
-    val type: AddPageType,
-) : UiViewState {
-
-  data class TypeMismatchException(val expectedType: EquityType, val foundType: HoldingType) :
-      IllegalArgumentException(
-          "Type mismatch. Expected type $expectedType but found type: ${foundType.display}")
-}
+    val side: TradeSide,
+) : UiViewState
 
 sealed class SymbolAddViewEvent : UiViewEvent {
 

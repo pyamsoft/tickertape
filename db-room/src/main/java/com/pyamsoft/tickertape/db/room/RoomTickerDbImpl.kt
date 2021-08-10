@@ -23,13 +23,14 @@ import com.pyamsoft.tickertape.db.room.converter.BigMoverReportIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbHoldingIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbPositionIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbSymbolIdConverter
-import com.pyamsoft.tickertape.db.room.converter.HoldingTypeConverter
+import com.pyamsoft.tickertape.db.room.converter.EquityTypeConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateTimeConverter
 import com.pyamsoft.tickertape.db.room.converter.MarketStateConverter
 import com.pyamsoft.tickertape.db.room.converter.StockMoneyValueConverter
 import com.pyamsoft.tickertape.db.room.converter.StockPercentConverter
 import com.pyamsoft.tickertape.db.room.converter.StockShareValueConverter
 import com.pyamsoft.tickertape.db.room.converter.StockSymbolConverter
+import com.pyamsoft.tickertape.db.room.converter.TradeSideConverter
 import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
 import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
 import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
@@ -53,8 +54,9 @@ import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
     StockShareValueConverter::class,
     StockMoneyValueConverter::class,
     LocalDateTimeConverter::class,
-    HoldingTypeConverter::class,
+    EquityTypeConverter::class,
     MarketStateConverter::class,
     StockPercentConverter::class,
+    TradeSideConverter::class,
 )
 internal abstract class RoomTickerDbImpl internal constructor() : RoomDatabase(), RoomTickerDb

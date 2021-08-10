@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main.add
+package com.pyamsoft.tickertape.db.room.converter
 
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
-sealed class AddPageType {
+internal object TradeSideConverter {
 
-  object Watchlist : AddPageType()
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toSide(side: String): TradeSide {
+    return TradeSide.valueOf(side)
+  }
 
-  data class Portfolio(val holdingType: HoldingType) : AddPageType()
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromSide(side: TradeSide): String {
+    return side.name
+  }
 }

@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BottomOffset
@@ -99,6 +100,8 @@ internal constructor(
   private suspend fun fetchPortfolio(force: Boolean) {
     portfolioInteractor
         .getPortfolio(force)
+        // Make sure we only show value of stocks in the home portfolio
+        .map { result -> result.filter { it.holding.type() == EquityType.STOCK } }
         .onSuccess { setState { copy(portfolio = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch portfolio") }
         .onFailure { setState { copy(portfolio = it.packError()) } }

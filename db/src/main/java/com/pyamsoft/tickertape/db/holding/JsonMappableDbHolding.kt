@@ -18,8 +18,9 @@ package com.pyamsoft.tickertape.db.holding
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.IdGenerator
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -27,7 +28,8 @@ data class JsonMappableDbHolding
 internal constructor(
     internal val id: DbHolding.Id,
     internal val symbol: StockSymbol,
-    internal val type: HoldingType,
+    internal val type: EquityType,
+    internal val side: TradeSide,
 ) : DbHolding {
 
   override fun id(): DbHolding.Id {
@@ -38,19 +40,24 @@ internal constructor(
     return symbol
   }
 
-  override fun type(): HoldingType {
+  override fun type(): EquityType {
     return type
+  }
+
+  override fun side(): TradeSide {
+    return side
   }
 
   companion object {
 
     @JvmStatic
     @CheckResult
-    fun create(symbol: StockSymbol, type: HoldingType): DbHolding {
+    fun create(symbol: StockSymbol, type: EquityType, side: TradeSide): DbHolding {
       return JsonMappableDbHolding(
           id = DbHolding.Id(IdGenerator.generate()),
           symbol = symbol,
           type = type,
+          side = side,
       )
     }
 
@@ -63,6 +70,7 @@ internal constructor(
             item.id(),
             item.symbol(),
             item.type(),
+            item.side(),
         )
       }
     }

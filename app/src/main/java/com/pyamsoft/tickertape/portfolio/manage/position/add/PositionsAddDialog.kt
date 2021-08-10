@@ -44,11 +44,10 @@ import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddContai
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddControllerEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsAddViewModel
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.fromHoldingString
-import com.pyamsoft.tickertape.stocks.api.toHoldingString
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -77,8 +76,13 @@ internal class PositionsAddDialog :
   }
 
   @CheckResult
-  private fun getHoldingType(): HoldingType {
-    return requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull().fromHoldingString()
+  private fun getHoldingType(): EquityType {
+    return EquityType.valueOf(requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull())
+  }
+
+  @CheckResult
+  private fun getHoldingSide(): TradeSide {
+    return TradeSide.valueOf(requireArguments().getString(KEY_HOLDING_SIDE, "").requireNotNull())
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -115,6 +119,7 @@ internal class PositionsAddDialog :
             getHoldingId(),
             getHoldingSymbol(),
             getHoldingType(),
+            getHoldingSide(),
         )
         .inject(this)
 
@@ -181,17 +186,24 @@ internal class PositionsAddDialog :
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_SYMBOL = "key_holding_symbol"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
+    private const val KEY_HOLDING_SIDE = "key_holding_side"
     const val TAG = "PositionAddDialog"
 
     @JvmStatic
     @CheckResult
-    fun newInstance(id: DbHolding.Id, symbol: StockSymbol, type: HoldingType): DialogFragment {
+    fun newInstance(
+        id: DbHolding.Id,
+        symbol: StockSymbol,
+        type: EquityType,
+        side: TradeSide
+    ): DialogFragment {
       return PositionsAddDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_HOLDING_ID, id.id)
               putString(KEY_HOLDING_SYMBOL, symbol.symbol())
-              putString(KEY_HOLDING_TYPE, type.toHoldingString())
+              putString(KEY_HOLDING_TYPE, type.name)
+              putString(KEY_HOLDING_SIDE, side.name)
             }
       }
     }

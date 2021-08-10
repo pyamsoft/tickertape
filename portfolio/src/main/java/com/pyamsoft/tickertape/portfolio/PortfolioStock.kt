@@ -18,18 +18,18 @@ package com.pyamsoft.tickertape.portfolio
 
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.stocks.api.isOption
 
 data class PortfolioStock
 internal constructor(
@@ -44,7 +44,7 @@ internal constructor(
   val totalShares: StockShareValue
   val gainLossDisplayString: String
   val changeTodayDisplayString: String
-  val isOption = holding.type().isOption()
+  val isOption = holding.type() == EquityType.OPTION
 
   // Used in PortfolioStockList
   internal val costNumber: Double
@@ -53,7 +53,7 @@ internal constructor(
 
   init {
     val optionsModifier = if (isOption) 100 else 1
-    val sellSideModifier = if (holding.isSellSide()) -1 else 1
+    val sellSideModifier = if (holding.side() == TradeSide.SELL) -1 else 1
 
     val isNoPosition = positions.isEmpty()
     val cost =

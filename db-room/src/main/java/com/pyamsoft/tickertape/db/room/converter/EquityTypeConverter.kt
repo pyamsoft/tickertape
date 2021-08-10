@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.db.room.converter
 
-object AddNew
+import androidx.annotation.CheckResult
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.stocks.api.EquityType
+
+internal object EquityTypeConverter {
+
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toType(type: String): EquityType {
+    return EquityType.valueOf(type)
+  }
+
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromType(type: EquityType): String {
+    return type.name
+  }
+}

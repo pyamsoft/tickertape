@@ -24,14 +24,14 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.isSellSide
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -222,9 +222,9 @@ internal constructor(
         return emptyList()
       }
 
-      val isOption = holding.type().isOption()
+      val isOption = holding.type() == EquityType.OPTION
       val optionsModifier = if (isOption) 100 else 1
-      val sellSideModifier = if (holding.isSellSide()) -1 else 1
+      val sellSideModifier = if (holding.side() == TradeSide.SELL) -1 else 1
       val totalShares = positions.sumOf { it.shareCount().value() }
       val totalCost = positions.sumOf { it.price().value() * it.shareCount().value() }
 

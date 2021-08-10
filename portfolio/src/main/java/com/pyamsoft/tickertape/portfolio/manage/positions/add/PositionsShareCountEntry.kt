@@ -20,14 +20,13 @@ import android.view.ViewGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingSharesEntryBinding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.asEditData
 import javax.inject.Inject
 
-class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
+class PositionsShareCountEntry @Inject internal constructor(type: EquityType, parent: ViewGroup) :
     BasePositionsEditable<HoldingSharesEntryBinding>(parent) {
 
   override val viewBinding = HoldingSharesEntryBinding::inflate
@@ -37,7 +36,7 @@ class PositionsShareCountEntry @Inject internal constructor(type: HoldingType, p
   init {
     doOnInflate {
       binding.positionSharesInput.hint =
-          "Number of ${if (type.isOption()) "Contracts" else "Shares"}"
+          "Number of ${if (type == EquityType.OPTION) "Contracts" else "Shares"}"
     }
   }
 

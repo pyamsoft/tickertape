@@ -17,8 +17,9 @@
 package com.pyamsoft.tickertape.db.holding
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 interface DbHolding {
 
@@ -26,7 +27,9 @@ interface DbHolding {
 
   @CheckResult fun symbol(): StockSymbol
 
-  @CheckResult fun type(): HoldingType
+  @CheckResult fun type(): EquityType
+
+  @CheckResult fun side(): TradeSide
 
   data class Id(val id: String) {
 
@@ -40,9 +43,4 @@ interface DbHolding {
       @JvmField val EMPTY = Id("")
     }
   }
-}
-
-@CheckResult
-fun DbHolding.isSellSide(): Boolean {
-  return type() == HoldingType.Options.Sell
 }

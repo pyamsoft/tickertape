@@ -21,15 +21,14 @@ import android.view.inputmethod.EditorInfo
 import com.google.android.material.textfield.TextInputEditText
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.portfolio.databinding.HoldingPriceEntryBinding
-import com.pyamsoft.tickertape.stocks.api.HoldingType
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.isOption
 import com.pyamsoft.tickertape.ui.asEditData
 import javax.inject.Inject
 import timber.log.Timber
 
-class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent: ViewGroup) :
+class PositionsPriceEntry @Inject internal constructor(type: EquityType, parent: ViewGroup) :
     BasePositionsEditable<HoldingPriceEntryBinding>(parent) {
 
   override val viewBinding = HoldingPriceEntryBinding::inflate
@@ -38,7 +37,8 @@ class PositionsPriceEntry @Inject internal constructor(type: HoldingType, parent
 
   init {
     doOnInflate {
-      binding.positionPriceInput.hint = "Price per ${if (type.isOption()) "Contract" else "Share"}"
+      binding.positionPriceInput.hint =
+          "Price per ${if (type == EquityType.OPTION) "Contract" else "Share"}"
     }
 
     doOnInflate {

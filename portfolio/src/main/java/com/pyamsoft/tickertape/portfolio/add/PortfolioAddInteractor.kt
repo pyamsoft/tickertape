@@ -44,6 +44,7 @@ internal constructor(
   suspend fun commitSymbol(
       symbol: StockSymbol,
       type: EquityType,
+      realEquityType: String,
       side: TradeSide
   ): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
@@ -57,7 +58,7 @@ internal constructor(
             return@withContext ResultWrapper.success(Unit)
           }
 
-          val newHolding = JsonMappableDbHolding.create(symbol, type, side)
+          val newHolding = JsonMappableDbHolding.create(symbol, type, realEquityType, side)
           return@withContext when (holdingInsertDao.insert(newHolding)) {
             DbInsert.InsertResult.INSERT -> Timber.d("New portfolio holding inserted: $newHolding")
             DbInsert.InsertResult.UPDATE ->

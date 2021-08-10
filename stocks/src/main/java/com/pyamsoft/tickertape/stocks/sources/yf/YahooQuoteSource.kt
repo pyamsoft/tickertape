@@ -82,6 +82,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
       return StockOptionsQuoteImpl(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
+          realEquityType = stock.quoteType.requireNotNull(),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           strike = stock.strike.requireNotNull().asMoney(),
           expireDate = parseMarketTime(stock.expireDate.requireNotNull(), localId),
@@ -127,6 +128,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
       return StockQuoteImpl(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
+          realEquityType = stock.quoteType.requireNotNull(),
           company = requireNotNull(stock.longName ?: stock.shortName).asCompany(),
           dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),

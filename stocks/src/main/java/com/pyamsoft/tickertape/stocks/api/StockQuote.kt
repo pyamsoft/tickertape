@@ -26,6 +26,8 @@ interface StockQuote {
 
   @CheckResult fun type(): EquityType
 
+  @CheckResult fun realEquityType(): String
+
   @CheckResult fun regular(): StockMarketSession
 
   @CheckResult fun preMarket(): StockMarketSession?

@@ -32,6 +32,7 @@ internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_TYPE) val type: EquityType,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_REAL_TYPE) val realEquityType: String,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_SIDE) val side: TradeSide,
 ) : DbHolding {
 
@@ -51,6 +52,11 @@ internal constructor(
   }
 
   @Ignore
+  override fun realEquityType(): String {
+    return realEquityType
+  }
+
+  @Ignore
   override fun side(): TradeSide {
     return side
   }
@@ -65,6 +71,8 @@ internal constructor(
 
     @Ignore internal const val COLUMN_HOLDING_TYPE = "holding_type"
 
+    @Ignore internal const val COLUMN_HOLDING_REAL_TYPE = "holding_real_type"
+
     @Ignore internal const val COLUMN_HOLDING_SIDE = "holding_side"
 
     @Ignore
@@ -77,6 +85,7 @@ internal constructor(
             item.id(),
             item.symbol(),
             item.type(),
+            item.realEquityType(),
             item.side(),
         )
       }

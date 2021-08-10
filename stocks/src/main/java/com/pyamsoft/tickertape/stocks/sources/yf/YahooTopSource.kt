@@ -109,6 +109,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                             StockQuoteImpl(
                                 symbol = stock.symbol.asSymbol(),
                                 equityType = EquityType.from(stock.quoteType.requireNotNull()),
+                                realEquityType = stock.quoteType.requireNotNull(),
                                 company =
                                     requireNotNull(stock.longName ?: stock.shortName).asCompany(),
                                 dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),

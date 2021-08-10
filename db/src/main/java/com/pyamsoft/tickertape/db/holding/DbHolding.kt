@@ -27,6 +27,8 @@ interface DbHolding {
 
   @CheckResult fun symbol(): StockSymbol
 
+  @CheckResult fun realEquityType(): String
+
   @CheckResult fun type(): EquityType
 
   @CheckResult fun side(): TradeSide

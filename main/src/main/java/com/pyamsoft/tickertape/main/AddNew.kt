@@ -16,4 +16,11 @@
 
 package com.pyamsoft.tickertape.main
 
-object AddNew
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
+
+data class AddNew
+internal constructor(
+    val type: EquityType,
+    val side: TradeSide,
+)

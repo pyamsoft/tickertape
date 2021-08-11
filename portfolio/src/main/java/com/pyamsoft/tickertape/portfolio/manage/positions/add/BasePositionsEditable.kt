@@ -28,36 +28,31 @@ import timber.log.Timber
 abstract class BasePositionsEditable<B : ViewBinding> protected constructor(parent: ViewGroup) :
     BaseUiView<PositionsAddViewState, PositionsAddViewEvent, B>(parent) {
 
-  private var delegate: UiEditTextDelegate? = null
+  private val delegate by lazy(LazyThreadSafetyMode.NONE) {
+    val editText = provideEditText()
 
-  init {
-    doOnTeardown {
-      delegate?.handleTeardown()
-      delegate = null
-    }
-
-    doOnInflate {
-      val editText = provideEditText()
-
-      delegate =
-          UiEditTextDelegate.create(editText) { numberString ->
-        // Blank string reset to 0
-        if (numberString.isBlank()) {
-          publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
-          return@create true
-        }
-
-        val value = numberString.toDoubleOrNull()
-        if (value == null) {
-          Timber.w("Invalid sharePrice $numberString")
-          return@create false
-        }
-
-        publish(provideEvent(value))
+    UiEditTextDelegate.create(editText) { numberString ->
+      // Blank string reset to 0
+      if (numberString.isBlank()) {
+        publish(PositionsAddViewEvent.UpdateSharePrice(StockMoneyValue.none()))
         return@create true
       }
-          .apply { handleCreate() }
+
+      val value = numberString.toDoubleOrNull()
+      if (value == null) {
+        Timber.w("Invalid sharePrice $numberString")
+        return@create false
+      }
+
+      publish(provideEvent(value))
+      return@create true
     }
+  }
+
+  init {
+    doOnTeardown { delegate.handleTeardown() }
+
+    doOnInflate { delegate.handleCreate() }
   }
 
   @CheckResult protected abstract fun provideEditText(): TextInputEditText
@@ -65,6 +60,6 @@ abstract class BasePositionsEditable<B : ViewBinding> protected constructor(pare
   @CheckResult protected abstract fun provideEvent(value: Double): PositionsAddViewEvent
 
   protected fun handleValueChanged(text: UiEditTextDelegate.Data) {
-    requireNotNull(delegate).handleTextChanged(text)
+    delegate.handleTextChanged(text)
   }
 }

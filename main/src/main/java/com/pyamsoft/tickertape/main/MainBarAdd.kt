@@ -28,6 +28,8 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.databinding.MainAddBinding
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.R
 import javax.inject.Inject
 
@@ -49,9 +51,27 @@ internal constructor(
     doOnInflate {
       binding.apply {
         mainBarAdd.setOnDebouncedClickListener { publish(MainViewEvent.AddRequest) }
-        mainBarAddStock.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
-        mainBarAddOptions.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
-        mainBarAddCrypto.setOnDebouncedClickListener { publish(MainViewEvent.OpenAdd) }
+        mainBarAddStock.setOnDebouncedClickListener {
+          publish(
+              MainViewEvent.OpenAdd(
+                  type = EquityType.STOCK,
+                  side = TradeSide.BUY,
+              ))
+        }
+        mainBarAddOptions.setOnDebouncedClickListener {
+          publish(
+              MainViewEvent.OpenAdd(
+                  type = EquityType.OPTION,
+                  side = TradeSide.BUY,
+              ))
+        }
+        mainBarAddCrypto.setOnDebouncedClickListener {
+          publish(
+              MainViewEvent.OpenAdd(
+                  type = EquityType.CRYPTOCURRENCY,
+                  side = TradeSide.BUY,
+              ))
+        }
         mainBarAddOverlay.setOnDebouncedClickListener { publish(MainViewEvent.StopAdd) }
       }
     }

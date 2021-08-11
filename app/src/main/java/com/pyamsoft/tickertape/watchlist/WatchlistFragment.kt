@@ -36,7 +36,9 @@ import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
@@ -110,7 +112,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   override fun onControllerEvent(event: WatchListControllerEvent) {
     return when (event) {
-      is WatchListControllerEvent.AddNewSymbol -> handleOpenSymbolAddDialog()
+      is WatchListControllerEvent.AddNewSymbol -> handleOpenSymbolAddDialog(event.type, event.side)
       is WatchListControllerEvent.ManageSymbol -> handleOpenDigDialog(event.quote.symbol)
     }
   }
@@ -119,8 +121,8 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
     WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
   }
 
-  private fun handleOpenSymbolAddDialog() {
-    WatchlistAddDialog.newInstance().show(requireActivity(), WatchlistAddDialog.TAG)
+  private fun handleOpenSymbolAddDialog(type: EquityType, side: TradeSide) {
+    WatchlistAddDialog.newInstance(type, side).show(requireActivity(), WatchlistAddDialog.TAG)
   }
 
   override fun onStart() {

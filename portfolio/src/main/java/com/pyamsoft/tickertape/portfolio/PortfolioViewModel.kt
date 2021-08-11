@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
@@ -88,8 +89,8 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent() {
-    publish(PortfolioControllerEvent.AddNewHolding)
+  override fun CoroutineScope.onAddNewEvent(type: EquityType, side: TradeSide) {
+    publish(PortfolioControllerEvent.AddNewHolding(type, side))
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {

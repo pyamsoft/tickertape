@@ -16,11 +16,12 @@
 
 <merge>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/symbol_add_lookup_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:padding="16dp">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -39,8 +40,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
-                android:maxLines="1"
                 android:hint="Symbol Lookup"
+                android:maxLines="1"
                 android:paddingStart="8dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="8dp"
@@ -49,6 +50,15 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-    </FrameLayout>
+        <ImageView
+            android:id="@+id/symbol_add_search_trigger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/floater_background"
+            android:contentDescription="@string/blank" />
+
+    </LinearLayout>
 
 </merge>

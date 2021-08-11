@@ -19,33 +19,47 @@ package com.pyamsoft.tickertape.main.add
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.loader.ImageLoader
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import com.pyamsoft.tickertape.main.R
 import com.pyamsoft.tickertape.main.databinding.SymbolAddLookupBinding
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 import javax.inject.Inject
 
-class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
+class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent: ViewGroup) :
     BaseUiView<SymbolAddViewState, SymbolAddViewEvent, SymbolAddLookupBinding>(parent) {
 
   override val viewBinding = SymbolAddLookupBinding::inflate
 
   override val layoutRoot by boundView { symbolAddLookupRoot }
 
-  private var delegate: UiEditTextDelegate? = null
+  private val delegate by lazy(LazyThreadSafetyMode.NONE) {
+    UiEditTextDelegate.create(binding.symbolAddLookupEdit) { symbol ->
+      publish(SymbolAddViewEvent.UpdateSymbol(symbol))
+      return@create true
+    }
+  }
 
   init {
-    doOnTeardown {
-      delegate?.handleTeardown()
-      delegate = null
+    doOnTeardown { delegate.handleTeardown() }
+
+    doOnInflate {
+      imageLoader
+          .asDrawable()
+          .load(R.drawable.ic_search_24dp)
+          .into(binding.symbolAddSearchTrigger)
+          .also { doOnTeardown { it.dispose() } }
     }
 
     doOnInflate {
-      delegate =
-          UiEditTextDelegate.create(binding.symbolAddLookupEdit) { symbol ->
-            publish(SymbolAddViewEvent.UpdateSymbol(symbol))
-            return@create true
-          }
-              .apply { handleCreate() }
+      binding.symbolAddSearchTrigger.setOnDebouncedClickListener {
+        publish(SymbolAddViewEvent.TriggerSearch)
+      }
     }
+
+    doOnTeardown { binding.symbolAddSearchTrigger.setOnDebouncedClickListener(null) }
+
+    doOnInflate { delegate.handleCreate() }
   }
 
   override fun onRender(state: UiRender<SymbolAddViewState>) {
@@ -53,6 +67,6 @@ class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleQueryChanged(query: UiEditTextDelegate.Data) {
-    requireNotNull(delegate).handleTextChanged(query)
+    delegate.handleTextChanged(query)
   }
 }

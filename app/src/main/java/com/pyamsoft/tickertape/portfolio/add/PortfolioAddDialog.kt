@@ -25,6 +25,8 @@ import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.symbol.SymbolAddDialog
 import javax.inject.Inject
 
@@ -35,11 +37,12 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
     factory.requireNotNull().asFactory(this)
   }
 
-  override fun shouldShowOptionSides(): Boolean {
-    return true
-  }
-
-  override fun onInject(view: ViewGroup, savedInstanceState: Bundle?) {
+  override fun onInject(
+      view: ViewGroup,
+      savedInstanceState: Bundle?,
+      equityType: EquityType,
+      tradeSide: TradeSide
+  ) {
     Injector.obtainFromApplication<TickerComponent>(view.context)
         .plusPortfolioAddComponent()
         .create(
@@ -48,7 +51,11 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
             viewLifecycleOwner,
         )
         .plusPortfolioAddComponent()
-        .create(view)
+        .create(
+            view,
+            equityType,
+            tradeSide,
+        )
         .inject(this)
   }
 
@@ -62,8 +69,14 @@ internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
     @JvmStatic
     @CheckResult
-    fun newInstance(): DialogFragment {
-      return PortfolioAddDialog().apply { arguments = Bundle().apply {} }
+    fun newInstance(type: EquityType, side: TradeSide): DialogFragment {
+      return PortfolioAddDialog().apply {
+        arguments =
+            Bundle().apply {
+              putString(KEY_HOLDING_TYPE, type.name)
+              putString(KEY_HOLDING_SIDE, side.name)
+            }
+      }
     }
   }
 }

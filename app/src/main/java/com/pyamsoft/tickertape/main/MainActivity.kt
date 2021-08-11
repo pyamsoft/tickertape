@@ -86,9 +86,7 @@ internal class MainActivity :
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
 
   @JvmField @Inject internal var factory: MainViewModel.Factory? = null
-  private val viewModel by viewModels<MainViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  private val viewModel by viewModels<MainViewModel> { factory.requireNotNull().asFactory(this) }
 
   @JvmField @Inject internal var container: MainContainer? = null
 
@@ -159,7 +157,7 @@ internal class MainActivity :
             is MainViewEvent.OpenNotifications ->
                 viewModel.handleSelectPage(MainPage.Notifications, force = false)
             is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
-            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd()
+            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type, it.side)
             is MainViewEvent.OpenSettings -> handleOpenSettings()
             is MainViewEvent.StopAdd -> viewModel.handleStopAdd()
           }
@@ -168,9 +166,7 @@ internal class MainActivity :
 
   override fun onStart() {
     super.onStart()
-    lifecycleScope.launch(context = Dispatchers.Default) {
-      requireNotNull(tapeLauncher).start()
-    }
+    lifecycleScope.launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
   }
 
   private fun handleOpenSettings() {

@@ -38,6 +38,8 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
 import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 
@@ -111,7 +113,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   override fun onControllerEvent(event: PortfolioControllerEvent) {
     return when (event) {
-      is PortfolioControllerEvent.AddNewHolding -> handleOpenHoldingAddDialog()
+      is PortfolioControllerEvent.AddNewHolding ->
+          handleOpenHoldingAddDialog(event.type, event.side)
       is PortfolioControllerEvent.ManageHolding -> handleOpenHoldingManageDialog(event.stock)
     }
   }
@@ -123,8 +126,8 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
         .show(requireActivity(), PositionManageDialog.TAG)
   }
 
-  private fun handleOpenHoldingAddDialog() {
-    PortfolioAddDialog.newInstance().show(requireActivity(), PortfolioAddDialog.TAG)
+  private fun handleOpenHoldingAddDialog(type: EquityType, side: TradeSide) {
+    PortfolioAddDialog.newInstance(type, side).show(requireActivity(), PortfolioAddDialog.TAG)
   }
 
   override fun onStart() {

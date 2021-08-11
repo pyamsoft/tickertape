@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.main.MainAdderViewModel
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
@@ -83,9 +84,9 @@ internal constructor(
     }
   }
 
-  override fun CoroutineScope.onAddNewEvent() {
+  override fun CoroutineScope.onAddNewEvent(type: EquityType, side: TradeSide) {
     Timber.d("Watchlist add new symbol!")
-    publish(WatchListControllerEvent.AddNewSymbol)
+    publish(WatchListControllerEvent.AddNewSymbol(type, side))
   }
 
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =

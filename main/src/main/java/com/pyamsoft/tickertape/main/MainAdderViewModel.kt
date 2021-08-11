@@ -21,6 +21,8 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,7 +34,7 @@ protected constructor(
     initialState: S
 ) : UiSavedStateViewModel<S, C>(savedState, initialState) {
 
-  protected abstract fun CoroutineScope.onAddNewEvent()
+  protected abstract fun CoroutineScope.onAddNewEvent(type: EquityType, side: TradeSide)
 
   abstract fun handleShowStocks()
 
@@ -41,6 +43,8 @@ protected constructor(
   abstract fun handleShowCrypto()
 
   fun handleListenForAddEvents(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Default) { addNewBus.onEvent { onAddNewEvent() } }
+    scope.launch(context = Dispatchers.Default) {
+      addNewBus.onEvent { onAddNewEvent(it.type, it.side) }
+    }
   }
 }

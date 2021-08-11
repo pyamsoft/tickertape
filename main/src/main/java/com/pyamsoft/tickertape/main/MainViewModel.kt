@@ -23,6 +23,8 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.BottomOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -100,24 +102,15 @@ internal constructor(
   }
 
   fun handleAddNewRequest() {
-    return when (val page = state.page) {
-      is MainPage.Portfolio -> handleAddPortfolioRequest()
-      is MainPage.WatchList -> handleAddWatchlistRequest()
-      else -> Timber.w("Unsupported add new request page: $page")
-    }
-  }
-
-  private fun handleAddPortfolioRequest() {
     setAdding(!state.adding)
   }
 
-  private fun handleAddWatchlistRequest() {
-    viewModelScope.launch(context = Dispatchers.Default) { addNewBus.send(AddNew) }
-  }
-
-  fun handleOpenAdd() {
+  fun handleOpenAdd(type: EquityType, side: TradeSide) {
     viewModelScope.launch(context = Dispatchers.Default) {
-      setState(stateChange = { copy(adding = false) }, andThen = { addNewBus.send(AddNew) })
+      setState(
+          stateChange = { copy(adding = false) },
+          andThen = { addNewBus.send(AddNew(type = type, side = side)) },
+      )
     }
   }
 

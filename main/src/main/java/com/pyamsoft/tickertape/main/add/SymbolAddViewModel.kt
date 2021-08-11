@@ -23,10 +23,12 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.asEditData
 import com.pyamsoft.tickertape.ui.pack
@@ -42,6 +44,8 @@ protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
     quoteInteractor: QuoteInteractor,
+    private val equityType: EquityType,
+    side: TradeSide,
 ) :
     UiSavedStateViewModel<SymbolAddViewState, SymbolAddControllerEvent>(
         savedState,
@@ -50,7 +54,7 @@ protected constructor(
             quote = null,
             query = "".asEditData(),
             searchResults = emptyList<SearchResult>().pack(),
-            side = TradeSide.BUY,
+            side = side,
         )) {
 
   private val quoteFetcher =
@@ -91,10 +95,20 @@ protected constructor(
   private fun CoroutineScope.performLookup(query: String) {
     resetSearchJob()
 
+    val thisType = equityType
     searchJob =
         launch(context = Dispatchers.Default) {
           interactor
               .search(false, query)
+              .map { result ->
+                result.filter {
+                  when (val type = it.type()) {
+                    EquityType.STOCK -> type == thisType
+                    EquityType.OPTION -> type == thisType
+                    EquityType.CRYPTOCURRENCY -> type == thisType
+                  }
+                }
+              }
               .onSuccess { Timber.d("Search results: $it") }
               .onSuccess { setState { copy(searchResults = it.pack()) } }
               .onFailure { Timber.e(it, "Search failed") }
@@ -128,13 +142,21 @@ protected constructor(
     val symbol = result.symbol()
     setState(
         stateChange = { copy(query = symbol.symbol().asEditData(true)) },
-        andThen = {
-          quoteFetcher
-              .call(symbol)
-              .onSuccess { setState { copy(quote = it) } }
-              .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
-              .onFailure { setState { copy(quote = null) } }
-        })
+        andThen = { resolveQuote(symbol) })
+  }
+
+  private suspend fun CoroutineScope.resolveQuote(symbol: StockSymbol) {
+    val self = this
+    quoteFetcher
+        .call(symbol)
+        .onSuccess { self.setState { copy(quote = it) } }
+        .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
+        .onFailure { self.setState { copy(quote = null) } }
+  }
+
+  fun handleSearchTriggered() {
+    val symbol = state.query.text.asSymbol()
+    viewModelScope.launch(context = Dispatchers.Default) { resolveQuote(symbol) }
   }
 
   fun handleCommitSymbol() {

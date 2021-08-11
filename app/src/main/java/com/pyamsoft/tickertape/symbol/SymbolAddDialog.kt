@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.constraintlayout.widget.ConstraintSet
 import com.pyamsoft.pydroid.arch.StateSaver
@@ -39,6 +40,8 @@ import com.pyamsoft.tickertape.main.add.SymbolLookup
 import com.pyamsoft.tickertape.main.add.SymbolOptionSides
 import com.pyamsoft.tickertape.main.add.SymbolResultList
 import com.pyamsoft.tickertape.main.add.SymbolToolbar
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -65,6 +68,16 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     return inflater.inflate(R.layout.layout_constraint, container, false)
   }
 
+  @CheckResult
+  private fun getHoldingType(): EquityType {
+    return EquityType.valueOf(requireArguments().getString(KEY_HOLDING_TYPE, "").requireNotNull())
+  }
+
+  @CheckResult
+  private fun getHoldingSide(): TradeSide {
+    return TradeSide.valueOf(requireArguments().getString(KEY_HOLDING_SIDE, "").requireNotNull())
+  }
+
   final override fun onViewCreated(
       view: View,
       savedInstanceState: Bundle?,
@@ -72,8 +85,16 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     super.onViewCreated(view, savedInstanceState)
     makeFullWidth()
 
+    val equityType = getHoldingType()
+    val tradeSide = getHoldingSide()
+
     val binding = LayoutConstraintBinding.bind(view)
-    onInject(binding.layoutConstraint, savedInstanceState)
+    onInject(
+        binding.layoutConstraint,
+        savedInstanceState,
+        equityType,
+        tradeSide,
+    )
 
     val list = requireNotNull(list)
     val lookup = requireNotNull(lookup)
@@ -89,7 +110,8 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             shadow,
         )
 
-    val sides = if (shouldShowOptionSides()) optionSidesProvider.requireNotNull().get() else null
+    val sides =
+        if (equityType == EquityType.OPTION) optionSidesProvider.requireNotNull().get() else null
     if (sides != null) {
       views.add(sides)
     }
@@ -103,6 +125,7 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
             is SymbolAddViewEvent.SelectResult -> viewModel.handleResultSelected(it.index)
             is SymbolAddViewEvent.UpdateOptionSide -> viewModel.handleUpdateOptionSide()
             is SymbolAddViewEvent.CommitSymbol -> viewModel.handleCommitSymbol()
+            is SymbolAddViewEvent.TriggerSearch -> viewModel.handleSearchTriggered()
           }
         }
 
@@ -146,9 +169,12 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     }
   }
 
-  protected abstract fun shouldShowOptionSides(): Boolean
-
-  protected abstract fun onInject(view: ViewGroup, savedInstanceState: Bundle?)
+  protected abstract fun onInject(
+      view: ViewGroup,
+      savedInstanceState: Bundle?,
+      equityType: EquityType,
+      tradeSide: TradeSide,
+  )
 
   protected abstract fun onTeardown()
 
@@ -173,5 +199,11 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     list = null
 
     onTeardown()
+  }
+
+  companion object {
+
+    internal const val KEY_HOLDING_TYPE = "key_holding_type"
+    internal const val KEY_HOLDING_SIDE = "key_holding_side"
   }
 }

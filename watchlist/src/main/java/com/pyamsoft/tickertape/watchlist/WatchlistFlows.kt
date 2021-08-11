@@ -20,6 +20,8 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
@@ -85,5 +87,9 @@ sealed class WatchListControllerEvent : UiControllerEvent {
 
   data class ManageSymbol internal constructor(val quote: QuotedStock) : WatchListControllerEvent()
 
-  object AddNewSymbol : WatchListControllerEvent()
+  data class AddNewSymbol
+  internal constructor(
+      val type: EquityType,
+      val side: TradeSide,
+  ) : WatchListControllerEvent()
 }

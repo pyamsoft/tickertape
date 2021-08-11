@@ -47,7 +47,7 @@ class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent
       imageLoader
           .asDrawable()
           .load(R.drawable.ic_search_24dp)
-          .into(binding.symbolAddSearchTrigger)
+          .into(binding.symbolAddSearchTriggerImage)
           .also { doOnTeardown { it.dispose() } }
     }
 
@@ -67,6 +67,15 @@ class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent
   }
 
   private fun handleQueryChanged(query: UiEditTextDelegate.Data) {
+    handleLookupTextChanged(query)
+    handleTriggerEnabledState(query)
+  }
+
+  private fun handleTriggerEnabledState(query: UiEditTextDelegate.Data) {
+    binding.symbolAddSearchTrigger.apply { isEnabled = query.text.isNotBlank() }
+  }
+
+  private fun handleLookupTextChanged(query: UiEditTextDelegate.Data) {
     delegate.handleTextChanged(query)
   }
 }

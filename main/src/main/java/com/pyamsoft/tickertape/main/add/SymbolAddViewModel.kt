@@ -138,25 +138,32 @@ protected constructor(
 
     val result = data.value[index]
     Timber.d("Result selected: $result")
-    // We have to clear first to reset the delegate, and then we re-publish with the text
     val symbol = result.symbol()
-    setState(
-        stateChange = { copy(query = symbol.symbol().asEditData(true)) },
-        andThen = { resolveQuote(symbol) })
+    resolveQuote(symbol)
   }
 
-  private suspend fun CoroutineScope.resolveQuote(symbol: StockSymbol) {
-    val self = this
-    quoteFetcher
-        .call(symbol)
-        .onSuccess { self.setState { copy(quote = it) } }
-        .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
-        .onFailure { self.setState { copy(quote = null) } }
+  private fun resolveQuote(symbol: StockSymbol) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      quoteFetcher
+          .call(symbol)
+          .onSuccess {
+            setState { copy(quote = it, query = it.symbol().symbol().asEditData(true)) }
+          }
+          .onFailure { Timber.e(it, "Failed to lookup stock quote: $symbol") }
+          .onFailure { setState { copy(quote = null) } }
+    }
   }
 
   fun handleSearchTriggered() {
-    val symbol = state.query.text.asSymbol()
-    viewModelScope.launch(context = Dispatchers.Default) { resolveQuote(symbol) }
+    val text = state.query.text
+    if (text.isBlank()) {
+      Timber.w("Blank text do not trigger quote lookup manually")
+      setState { copy(quote = null, searchResults = emptyList<SearchResult>().pack()) }
+      return
+    }
+
+    val symbol = text.asSymbol()
+    resolveQuote(symbol)
   }
 
   fun handleCommitSymbol() {

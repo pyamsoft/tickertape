@@ -25,8 +25,9 @@
         android:padding="16dp">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center_vertical|start"
             app:boxBackgroundColor="@null"
             app:boxBackgroundMode="outline"
@@ -50,14 +51,22 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
+        <FrameLayout
             android:id="@+id/symbol_add_search_trigger"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:layout_marginStart="8dp"
             android:background="@drawable/floater_background"
-            android:contentDescription="@string/blank" />
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/symbol_add_search_trigger_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/blank" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

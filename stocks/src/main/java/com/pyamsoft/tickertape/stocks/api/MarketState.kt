@@ -20,29 +20,13 @@ import androidx.annotation.CheckResult
 import timber.log.Timber
 
 enum class MarketState {
-  /**
-   * Normal market
-   */
+  /** Normal market */
   REGULAR,
 
-  /**
-   * After hours
-   */
+  /** After hours */
   POST,
 
-  /**
-   * After hours closed but market not closed yet
-   */
-  POSTPOST,
-
-  /**
-   * Market closed
-   */
-  CLOSED,
-
-  /**
-   * Pre-market
-   */
+  /** Pre-market */
   PRE;
 
   companion object {

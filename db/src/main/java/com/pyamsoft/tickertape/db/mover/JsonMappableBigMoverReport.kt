@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.squareup.moshi.JsonClass
 import java.time.LocalDateTime
 
@@ -66,38 +67,16 @@ internal constructor(
     @JvmStatic
     @CheckResult
     fun create(quote: StockQuote): BigMoverReport {
-      val price: StockMoneyValue
-      val percent: StockPercent
-      val state: MarketState
-
-      val afterHours = quote.afterHours()
-      val preMarket = quote.preMarket()
-      val regular = quote.regular()
-      when {
-        afterHours != null -> {
-          state = MarketState.POST
-          price = afterHours.price()
-          percent = afterHours.percent()
-        }
-        preMarket != null -> {
-          state = MarketState.PRE
-          price = preMarket.price()
-          percent = preMarket.percent()
-        }
-        else -> {
-          state = MarketState.REGULAR
-          price = regular.price()
-          percent = regular.percent()
-        }
-      }
+      val session = quote.currentSession()
 
       return JsonMappableBigMoverReport(
           id = BigMoverReport.Id(IdGenerator.generate()),
           symbol = quote.symbol(),
-          lastPrice = price,
-          lastPercent = percent,
-          lastState = state,
-          lastNotified = LocalDateTime.now())
+          lastPrice = session.price(),
+          lastPercent = session.percent(),
+          lastState = session.state(),
+          lastNotified = LocalDateTime.now(),
+      )
     }
 
     @JvmStatic

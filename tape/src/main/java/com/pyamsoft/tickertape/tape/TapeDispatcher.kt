@@ -36,8 +36,8 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
-import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -110,23 +110,6 @@ internal constructor(
     }
   }
 
-  @CheckResult
-  private fun getQuoteSession(quote: StockQuote): StockMarketSession {
-    return quote.run {
-      val pre = preMarket()
-      if (pre != null) {
-        return@run pre
-      }
-
-      val after = afterHours()
-      if (after != null) {
-        return@run after
-      }
-
-      return@run regular()
-    }
-  }
-
   private fun updateTickerInfo(
       remoteViews: RemoteViews,
       index: Int,
@@ -134,7 +117,7 @@ internal constructor(
       remoteViewIdGroup: RemoteViewIds
   ) {
     val quote = quotes[index]
-    val session = getQuoteSession(quote)
+    val session = quote.currentSession()
     val percent = session.percent().asPercentValue()
     val changeAmount = session.amount().asMoneyValue()
     val directionSign = session.direction().sign()

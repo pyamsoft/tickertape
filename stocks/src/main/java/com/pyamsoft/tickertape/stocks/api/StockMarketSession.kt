@@ -27,4 +27,6 @@ interface StockMarketSession {
   @CheckResult fun amount(): StockMoneyValue
 
   @CheckResult fun percent(): StockPercent
+
+  @CheckResult fun state(): MarketState
 }

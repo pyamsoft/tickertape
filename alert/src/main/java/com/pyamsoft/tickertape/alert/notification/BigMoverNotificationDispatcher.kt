@@ -36,8 +36,8 @@ import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.MarketState
-import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.tape.R
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -95,29 +95,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
     guaranteeNotificationChannelExists(channelInfo)
 
     val quote = notification.quote
-    val session: StockMarketSession
-    val sessionType: MarketState
-    val afterHoursSession = quote.afterHours()
-    val preMarketSession = quote.preMarket()
-    when {
-      afterHoursSession != null -> {
-        session = afterHoursSession
-        sessionType = MarketState.POST
-      }
-      preMarketSession != null -> {
-        session = preMarketSession
-        sessionType = MarketState.PRE
-      }
-      else -> {
-        session = quote.regular()
-        sessionType = MarketState.REGULAR
-      }
-    }
+    val session = quote.currentSession()
 
     val percent = session.percent()
     val direction = session.direction()
     val sessionString =
-        when (sessionType) {
+        when (session.state()) {
           MarketState.REGULAR -> "so far today"
           MarketState.PRE -> "pre-market"
           MarketState.POST -> "after hours"

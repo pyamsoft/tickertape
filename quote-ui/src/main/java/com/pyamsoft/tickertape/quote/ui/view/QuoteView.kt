@@ -28,10 +28,12 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteItemBinding
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteNumbersBinding
+import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.currentSession
 
 abstract class QuoteView<S : UiViewState, V : UiViewEvent>
 protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(parent) {
@@ -92,12 +94,11 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
   private fun handleQuotePresent(quote: StockQuote) {
     handleCompanyChanged(quote.company())
 
-    val preMarket = quote.preMarket()
-    val afterHours = quote.afterHours()
-    when {
-      afterHours != null -> handleSessionChanged("After Hours", afterHours)
-      preMarket != null -> handleSessionChanged("Pre-Market", preMarket)
-      else -> handleSessionChanged("Normal Market", quote.regular())
+    val session = quote.currentSession()
+    return when (session.state()) {
+      MarketState.POST -> handleSessionChanged("After Hours", session)
+      MarketState.PRE -> handleSessionChanged("Pre-Market", session)
+      MarketState.REGULAR -> handleSessionChanged("Normal Market", session)
     }
   }
 

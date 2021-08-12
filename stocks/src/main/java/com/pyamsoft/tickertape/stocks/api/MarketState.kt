@@ -31,6 +31,10 @@ enum class MarketState {
 
   companion object {
 
+    private const val PREPRE = "PREPRE"
+    private const val POSTPOST = "POSTPOST"
+    private const val CLOSED = "CLOSED"
+
     /** Convert from string to enum safely, return null instead of throwing. */
     @JvmStatic
     @CheckResult
@@ -44,7 +48,13 @@ enum class MarketState {
         valueOf(name)
       } catch (e: Throwable) {
         Timber.w(e, "Unmatched MarketState: $name")
-        null
+
+        // Other states from YF
+        when (name) {
+            PREPRE -> PRE
+            POSTPOST, CLOSED -> POST
+            else -> null
+        }
       }
     }
   }

@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -98,6 +99,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                   direction = requireNotNull(stock.regularMarketChange).asDirection(),
                   percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
                   price = requireNotNull(stock.regularMarketPrice).asMoney(),
+                  state = MarketState.REGULAR,
               ),
           afterHours =
               if (!hasAfterHoursData(stock)) null
@@ -107,6 +109,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     direction = requireNotNull(stock.postMarketChange).asDirection(),
                     percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
                     price = requireNotNull(stock.postMarketPrice).asMoney(),
+                    state = MarketState.POST,
                 )
               },
           preMarket =
@@ -117,6 +120,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     direction = stock.preMarketChange.requireNotNull().asDirection(),
                     percent = stock.preMarketChangePercent.requireNotNull().asPercent(),
                     price = stock.preMarketPrice.requireNotNull().asMoney(),
+                    state = MarketState.PRE,
                 )
               },
       )
@@ -142,6 +146,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                   direction = requireNotNull(stock.regularMarketChange).asDirection(),
                   percent = requireNotNull(stock.regularMarketChangePercent).asPercent(),
                   price = requireNotNull(stock.regularMarketPrice).asMoney(),
+                  state = MarketState.REGULAR,
               ),
           afterHours =
               if (!hasAfterHoursData(stock)) null
@@ -151,6 +156,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     direction = requireNotNull(stock.postMarketChange).asDirection(),
                     percent = requireNotNull(stock.postMarketChangePercent).asPercent(),
                     price = requireNotNull(stock.postMarketPrice).asMoney(),
+                    state = MarketState.POST,
                 )
               },
           preMarket =
@@ -161,6 +167,7 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
                     direction = stock.preMarketChange.requireNotNull().asDirection(),
                     percent = stock.preMarketChangePercent.requireNotNull().asPercent(),
                     price = stock.preMarketPrice.requireNotNull().asMoney(),
+                    state = MarketState.PRE,
                 )
               },
       )

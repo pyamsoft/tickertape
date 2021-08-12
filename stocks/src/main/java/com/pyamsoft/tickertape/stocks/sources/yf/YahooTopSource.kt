@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -128,6 +129,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                             requireNotNull(stock.regularMarketChangePercent)
                                                 .asPercent(),
                                         price = requireNotNull(stock.regularMarketPrice).asMoney(),
+                                        state = MarketState.REGULAR,
                                     ),
                                 afterHours =
                                     if (!hasAfterHoursData(stock)) null
@@ -140,6 +142,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                               requireNotNull(stock.postMarketChangePercent)
                                                   .asPercent(),
                                           price = requireNotNull(stock.postMarketPrice).asMoney(),
+                                          state = MarketState.POST,
                                       )
                                     },
                                 preMarket =
@@ -153,6 +156,7 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                               requireNotNull(stock.preMarketChangePercent)
                                                   .asPercent(),
                                           price = requireNotNull(stock.preMarketPrice).asMoney(),
+                                          state = MarketState.PRE,
                                       )
                                     },
                             )

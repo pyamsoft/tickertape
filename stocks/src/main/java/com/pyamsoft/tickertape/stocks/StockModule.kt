@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks
 
-import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.Enforcer
@@ -41,18 +40,13 @@ import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Qualifier
 import javax.net.SocketFactory
 import kotlin.reflect.KClass
-import okhttp3.Cache
-import okhttp3.CacheControl
 import okhttp3.Call
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -62,35 +56,13 @@ internal const val STOCK_API_URL = "${STOCK_BASE_URL}/"
 
 @Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class InternalApi
 
-private class OkHttpClientLazyCallFactory(context: Context, debug: Boolean) : Call.Factory {
+private class OkHttpClientLazyCallFactory(debug: Boolean) : Call.Factory {
 
-  private val client by lazy {
-    createOkHttpClient(context, debug, DelegatingSocketFactory.create())
-  }
+  private val client by lazy { createOkHttpClient(debug, DelegatingSocketFactory.create()) }
 
   override fun newCall(request: Request): Call {
     Enforcer.assertOffMainThread()
     return client.newCall(request)
-  }
-
-  /** Cache all requests for at least 15 seconds to avoid overloading third party endpoints. */
-  private class AlwaysCachingInterceptor : Interceptor {
-
-    override fun intercept(chain: Interceptor.Chain): Response {
-      val cacheControl = CacheControl.Builder().maxAge(15, TimeUnit.SECONDS).build()
-
-      val response = chain.proceed(chain.request())
-      val cachingStrategy = response.header(CACHE_CONTROL_HEADER)
-      return if (cachingStrategy != CACHE_CONTROL_NO_CACHING) response
-      else {
-        response.newBuilder().header(CACHE_CONTROL_HEADER, cacheControl.toString()).build()
-      }
-    }
-
-    companion object {
-      private const val CACHE_CONTROL_HEADER = "Cache-Control"
-      private const val CACHE_CONTROL_NO_CACHING = "no-cache"
-    }
   }
 
   companion object {
@@ -98,18 +70,12 @@ private class OkHttpClientLazyCallFactory(context: Context, debug: Boolean) : Ca
     @JvmStatic
     @CheckResult
     private fun createOkHttpClient(
-        context: Context,
         debug: Boolean,
         socketFactory: SocketFactory,
     ): OkHttpClient {
       Enforcer.assertOffMainThread()
 
-      // Cache up to 1MB of data
-      val diskCache = Cache(context.applicationContext.cacheDir, 1_000_000L)
-
       return OkHttpClient.Builder()
-          .cache(diskCache)
-          .addNetworkInterceptor(AlwaysCachingInterceptor())
           .socketFactory(socketFactory)
           .apply {
             if (debug) {
@@ -180,10 +146,10 @@ abstract class StockModule {
 
     @JvmStatic
     @CheckResult
-    private fun createRetrofit(context: Context, debug: Boolean, moshi: Moshi): Retrofit {
+    private fun createRetrofit(debug: Boolean, moshi: Moshi): Retrofit {
       return Retrofit.Builder()
           .baseUrl(STOCK_API_URL)
-          .callFactory(OkHttpClientLazyCallFactory(context, debug))
+          .callFactory(OkHttpClientLazyCallFactory(debug))
           .addConverterFactory(MoshiConverterFactory.create(moshi))
           .build()
     }
@@ -193,11 +159,10 @@ abstract class StockModule {
     @InternalApi
     @CheckResult
     internal fun provideNetworkCreator(
-        context: Context,
         @Named("debug") debug: Boolean,
     ): NetworkServiceCreator {
       // Don't inject these to avoid needing Dagger API in build.gradle
-      val retrofit = createRetrofit(context, debug, createMoshi())
+      val retrofit = createRetrofit(debug, createMoshi())
       return object : NetworkServiceCreator {
 
         override fun <T : Any> create(target: KClass<T>): T {

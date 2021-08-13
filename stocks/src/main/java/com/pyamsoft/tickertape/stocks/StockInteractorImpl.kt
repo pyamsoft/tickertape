@@ -16,8 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks
 
+import com.pyamsoft.cachify.Cached1
+import com.pyamsoft.cachify.Cached2
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -32,6 +33,8 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -42,10 +45,11 @@ internal constructor(
     @InternalApi private val interactor: StockInteractor,
 ) : StockInteractor {
 
+  private val optionsMutex = Mutex()
+  private val searchMutex = Mutex()
+
   private val optionsCache =
-      multiCachify<OptionsKey, StockOptions, StockSymbol, LocalDateTime?> { symbol, date ->
-        interactor.getOptions(true, symbol, date)
-      }
+      mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDateTime?>>()
 
   private val trendingCache =
       cachify<StockTrends, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
@@ -67,9 +71,7 @@ internal constructor(
         interactor.getMostShorted(true, it)
       }
 
-  private val searchCache =
-      multiCachify<String, List<SearchResult>, String>(
-          storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
+  private val searchCache = mutableMapOf<String, Cached1<List<SearchResult>, String>>()
 
   override suspend fun search(
       force: Boolean,
@@ -78,11 +80,26 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        if (force) {
-          searchCache.key(query).clear()
-        }
+        return@withContext searchMutex.withLock {
+          if (force) {
+            // Remove the cache from the search map and clear it if it exists
+            searchCache.remove(query)?.clear()
+          }
 
-        return@withContext searchCache.key(query).call(query)
+          val cached = searchCache[query]
+          val cache: Cached1<List<SearchResult>, String>
+          if (cached == null) {
+            cache =
+                cachify<List<SearchResult>, String>(
+                    storage = { listOf(createNewMemoryCacheStorage()) },
+                ) { interactor.search(true, it) }
+                    .also { c -> searchCache[query] = c }
+          } else {
+            cache = cached
+          }
+
+          return@withLock cache.call(query)
+        }
       }
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
@@ -137,12 +154,27 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val key = OptionsKey(symbol, date)
-        if (force) {
-          optionsCache.key(key).clear()
-        }
+        return@withContext optionsMutex.withLock {
+          val key = OptionsKey(symbol, date)
+          if (force) {
+            // Remove the cache from the options map and clear it if it exists
+            optionsCache.remove(key)?.clear()
+          }
 
-        return@withContext optionsCache.key(key).call(symbol, date)
+          val cached = optionsCache[key]
+          val cache: Cached2<StockOptions, StockSymbol, LocalDateTime?>
+          if (cached == null) {
+            cache =
+                cachify<StockOptions, StockSymbol, LocalDateTime?>(
+                    storage = { listOf(createNewMemoryCacheStorage()) },
+                ) { s, d -> interactor.getOptions(true, s, d) }
+                    .also { c -> optionsCache[key] = c }
+          } else {
+            cache = cached
+          }
+
+          return@withLock cache.call(symbol, date)
+        }
       }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =

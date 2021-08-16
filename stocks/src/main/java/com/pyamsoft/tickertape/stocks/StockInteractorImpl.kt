@@ -16,9 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks
 
-import com.pyamsoft.cachify.Cached1
 import com.pyamsoft.cachify.Cached2
 import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -46,7 +46,6 @@ internal constructor(
 ) : StockInteractor {
 
   private val optionsMutex = Mutex()
-  private val searchMutex = Mutex()
 
   private val optionsCache =
       mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDateTime?>>()
@@ -71,7 +70,9 @@ internal constructor(
         interactor.getMostShorted(true, it)
       }
 
-  private val searchCache = mutableMapOf<String, Cached1<List<SearchResult>, String>>()
+  private val searchCache =
+      multiCachify<String, List<SearchResult>, String>(
+          storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
 
   override suspend fun search(
       force: Boolean,
@@ -80,26 +81,12 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        return@withContext searchMutex.withLock {
-          if (force) {
-            // Remove the cache from the search map and clear it if it exists
-            searchCache.remove(query)?.clear()
-          }
-
-          val cached = searchCache[query]
-          val cache: Cached1<List<SearchResult>, String>
-          if (cached == null) {
-            cache =
-                cachify<List<SearchResult>, String>(
-                    storage = { listOf(createNewMemoryCacheStorage()) },
-                ) { interactor.search(true, it) }
-                    .also { c -> searchCache[query] = c }
-          } else {
-            cache = cached
-          }
-
-          return@withLock cache.call(query)
+        if (force) {
+          // Remove the cache from the search map and clear it if it exists
+          searchCache.key(query).clear()
         }
+
+        return@withContext searchCache.key(query).call(query)
       }
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =

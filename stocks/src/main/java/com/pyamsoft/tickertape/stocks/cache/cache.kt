@@ -23,27 +23,5 @@ import java.util.concurrent.TimeUnit
 
 @CheckResult
 fun <T : Any> createNewMemoryCacheStorage(): CacheStorage<T> {
-  return MemoryCacheStorage.create(5, TimeUnit.MINUTES)
-}
-
-@CheckResult
-fun <T : Any> createNewDiskCacheStorage(time: Long, unit: TimeUnit): CacheStorage<T> {
-  return DiskCacheStorage(unit.toMillis(time))
-}
-
-
-private class DiskCacheStorage<T: Any> constructor(private val ttl: Long): CacheStorage<T> {
-
-  override suspend fun clear() {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun cache(data: T) {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun retrieve(): T? {
-    TODO("Not yet implemented")
-  }
-
+  return MemoryCacheStorage.create(2, TimeUnit.MINUTES)
 }

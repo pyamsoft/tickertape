@@ -55,8 +55,18 @@ internal constructor(
   }
 
   @Ignore
+  override fun lastNotified(notified: LocalDateTime): BigMoverReport {
+    return this.copy(lastNotified = notified)
+  }
+
+  @Ignore
   override fun lastPercent(): StockPercent {
     return lastPercent
+  }
+
+  @Ignore
+  override fun lastPercent(percent: StockPercent): BigMoverReport {
+    return this.copy(lastPercent = percent)
   }
 
   @Ignore
@@ -65,8 +75,18 @@ internal constructor(
   }
 
   @Ignore
+  override fun lastPrice(price: StockMoneyValue): BigMoverReport {
+    return this.copy(lastPrice = price)
+  }
+
+  @Ignore
   override fun lastState(): MarketState {
     return lastState
+  }
+
+  @Ignore
+  override fun lastState(state: MarketState): BigMoverReport {
+    return this.copy(lastState = state)
   }
 
   companion object {

@@ -31,11 +31,19 @@ interface BigMoverReport {
 
   @CheckResult fun lastNotified(): LocalDateTime
 
+  @CheckResult fun lastNotified(notified: LocalDateTime): BigMoverReport
+
   @CheckResult fun lastState(): MarketState
+
+  @CheckResult fun lastState(state: MarketState): BigMoverReport
 
   @CheckResult fun lastPrice(): StockMoneyValue
 
+  @CheckResult fun lastPrice(price: StockMoneyValue): BigMoverReport
+
   @CheckResult fun lastPercent(): StockPercent
+
+  @CheckResult fun lastPercent(percent: StockPercent): BigMoverReport
 
   data class Id(val id: String) {
 

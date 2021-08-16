@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.alert.runner
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.tickertape.alert.AlertInternalApi
@@ -24,13 +25,21 @@ import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
 import com.pyamsoft.tickertape.alert.notification.NotificationType
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
+import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
+import com.pyamsoft.tickertape.db.mover.BigMoverReport
+import com.pyamsoft.tickertape.db.mover.JsonMappableBigMoverReport
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.currentSession
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
@@ -38,6 +47,8 @@ internal class BigMoverRunner
 @Inject
 internal constructor(
     @param:AlertInternalApi private val notifier: Notifier,
+    private val bigMoverQueryDao: BigMoverQueryDao,
+    private val bigMoverInsertDao: BigMoverInsertDao,
     private val idMap: NotificationIdMap,
     private val quoteInteractor: QuoteInteractor,
 ) : BaseRunner<BigMoverParameters>() {
@@ -55,14 +66,65 @@ internal constructor(
     return@coroutineScope
   }
 
-  private fun postNotifications(bigMovers: List<StockQuote>) {
-    bigMovers.forEach { mover ->
-      val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { mover.symbol() }
-      notifier.show(
-          id = id,
-          channelInfo = CHANNEL_INFO,
-          notification = BigMoverNotificationData(quote = mover))
+  @CheckResult
+  private fun BigMoverReport.updateToSession(
+      now: LocalDateTime,
+      session: StockMarketSession,
+  ): BigMoverReport {
+    return this.lastNotified(now)
+        .lastPercent(session.percent())
+        .lastPrice(session.price())
+        .lastState(session.state())
+  }
+
+  private suspend fun postNotifications(bigMovers: List<StockQuote>) {
+    Enforcer.assertOffMainThread()
+
+    val now = LocalDateTime.now()
+    val allQuotes = withContext(context = Dispatchers.IO) { bigMoverQueryDao.query(false) }
+
+    bigMovers.forEach { quote ->
+      val moverRecord = allQuotes.firstOrNull { it.symbol() == quote.symbol() }
+      val insertRecord =
+          if (moverRecord == null) {
+            // If no mover record exists yet, make a new one
+            JsonMappableBigMoverReport.create(quote)
+          } else {
+            val session = quote.currentSession()
+            if (moverRecord.lastState() != session.state()) {
+              // State has changed, update the record
+              moverRecord.updateToSession(now, session)
+            } else {
+              if (now.minusHours(NOTIFY_PERIOD).isAfter(moverRecord.lastNotified())) {
+                // Was last notified over PERIOD hours ago, notify again
+                moverRecord.updateToSession(now, session)
+              } else {
+                // Was last notified within PERIOD hours, do not notify again.
+                null
+              }
+            }
+          }
+
+      if (insertRecord == null) {
+        Timber.w("Not showing repeat big mover notification for: ${quote.symbol()}")
+        return@forEach
+      }
+
+      // Insert the record so that we can avoid future noisy big mover updates.
+      withContext(context = Dispatchers.IO) { bigMoverInsertDao.insert(insertRecord) }
+
+      postNotification(quote)
     }
+  }
+
+  private fun postNotification(quote: StockQuote) {
+    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { quote.symbol() }
+    notifier.show(
+            id = id,
+            channelInfo = CHANNEL_INFO,
+            notification = BigMoverNotificationData(quote = quote),
+        )
+        .also { Timber.d("Posted big mover notification: $it") }
   }
 
   @CheckResult
@@ -78,6 +140,9 @@ internal constructor(
   }
 
   companion object {
+
+    // Notify once every PERIOD hours
+    private const val NOTIFY_PERIOD = 2L
 
     private val CHANNEL_INFO =
         NotifyChannelInfo(

@@ -83,9 +83,11 @@ internal constructor(
         fetchQuotes(force)
             .onSuccess { quotes ->
               notifier.show(
-                  id = NOTIFICATION_ID,
-                  channelInfo = CHANNEL_INFO,
-                  notification = TapeNotificationData(quotes = quotes, index = options.index))
+                      id = NOTIFICATION_ID,
+                      channelInfo = CHANNEL_INFO,
+                      notification = TapeNotificationData(quotes = quotes, index = options.index),
+                  )
+                  .also { Timber.d("Update tape notification: $it") }
             }
             .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
             .onFailure { Timber.e(it, "Unable to refresh notification") }

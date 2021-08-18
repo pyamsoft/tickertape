@@ -47,6 +47,10 @@ internal constructor(
     doOnTeardown { binding.homeLosersTitle.text = null }
   }
 
+  override fun provideChartType(): HomeChartType {
+    return HomeChartType.LOSER
+  }
+
   override fun provideList(): RecyclerView {
     return binding.homeLosers
   }

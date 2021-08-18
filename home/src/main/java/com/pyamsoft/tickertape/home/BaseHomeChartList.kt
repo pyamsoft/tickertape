@@ -44,7 +44,7 @@ protected constructor(
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
     pool: RecyclerView.RecycledViewPool,
-) : BaseUiView<HomeViewState, HomeViewEvent, B>(parent) {
+) : BaseUiView<HomeViewState, HomeViewEvent, B>(parent), HomeIndexAdapter.Callback {
 
   private var modelAdapter: HomeIndexAdapter? = null
 
@@ -63,7 +63,7 @@ protected constructor(
     }
 
     doOnInflate {
-      modelAdapter = HomeIndexAdapter.create(factory, owner)
+      modelAdapter = HomeIndexAdapter.create(factory, owner, callback = this)
       provideList().adapter = modelAdapter
     }
 
@@ -133,6 +133,10 @@ protected constructor(
     }
   }
 
+  override fun onSelected(index: Int) {
+    publish(HomeViewEvent.DigDeeperChart(index, provideChartType()))
+  }
+
   @CheckResult
   private fun usingAdapter(): HomeIndexAdapter {
     return requireNotNull(modelAdapter)
@@ -185,6 +189,9 @@ protected constructor(
 
   // Same goes for the empty state view
   @CheckResult protected abstract fun provideEmpty(): View
+
+  // Provide the chart type
+  @CheckResult protected abstract fun provideChartType(): HomeChartType
 
   companion object {
 

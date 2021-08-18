@@ -30,18 +30,30 @@ internal constructor(
     binding: HomeIndexItemBinding,
     factory: HomeIndexComponent.Factory,
     owner: LifecycleOwner,
+    callback: HomeIndexAdapter.Callback,
 ) : RecyclerView.ViewHolder(binding.root), ViewBinder<HomeIndexViewState> {
 
   @Inject @JvmField internal var symbol: HomeIndexSymbol? = null
 
   @Inject @JvmField internal var chart: HomeIndexChart? = null
 
+  @Inject @JvmField internal var click: HomeIndexClick? = null
+
   private val viewBinder: ViewBinder<HomeIndexViewState>
 
   init {
     factory.create(binding.homeIndexItem).inject(this)
 
-    viewBinder = createViewBinder(symbol.requireNotNull(), chart.requireNotNull()) {}
+    viewBinder =
+        createViewBinder(
+            symbol.requireNotNull(),
+            chart.requireNotNull(),
+            click.requireNotNull(),
+        ) {
+          return@createViewBinder when (it) {
+            is HomeIndexViewEvent.DigDeeper -> callback.onSelected(bindingAdapterPosition)
+          }
+        }
 
     owner.doOnDestroy { teardown() }
   }

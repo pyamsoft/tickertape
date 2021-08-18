@@ -178,7 +178,62 @@ internal constructor(
       }
 
       val quote = data.value[index]
-      publish(HomeControllerEvent.ManageWatchlistSymbol(quote))
+      publish(HomeControllerEvent.DigWatchlistSymbol(quote))
+    }
+  }
+
+  fun handleDigChart(index: Int, type: HomeChartType) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      val data =
+          when (type) {
+            HomeChartType.INDEX -> {
+              val chart = state.indexes
+              if (chart is PackedData.Data<List<QuotedChart>>) chart.value[index].quote
+              else {
+                Timber.w("Cannot dig symbol in error state: $chart")
+                return@launch
+              }
+            }
+            HomeChartType.GAINER -> {
+                val chart = state.gainers
+                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+                else {
+                    Timber.w("Cannot dig symbol in error state: $chart")
+                    return@launch
+                }
+            }
+            HomeChartType.LOSER -> {
+                val chart = state.losers
+                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+                else {
+                    Timber.w("Cannot dig symbol in error state: $chart")
+                    return@launch
+                }
+            }
+            HomeChartType.TRENDING -> {
+                val chart = state.trending
+                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+                else {
+                    Timber.w("Cannot dig symbol in error state: $chart")
+                    return@launch
+                }
+            }
+            HomeChartType.MOST_SHORTED -> {
+                val chart = state.mostShorted
+                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+                else {
+                    Timber.w("Cannot dig symbol in error state: $chart")
+                    return@launch
+                }
+            }
+          }
+
+        if (data == null) {
+            Timber.w("Cannot dig chart when quote is null")
+            return@launch
+        }
+
+      publish(HomeControllerEvent.DigChartSymbol(data))
     }
   }
 

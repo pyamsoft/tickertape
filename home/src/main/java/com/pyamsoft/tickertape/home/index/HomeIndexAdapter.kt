@@ -28,6 +28,7 @@ class HomeIndexAdapter
 private constructor(
     private val factory: HomeIndexComponent.Factory,
     private val owner: LifecycleOwner,
+    private val callback: Callback,
 ) : ListAdapter<HomeIndexViewState, HomeIndexViewHolder>(DIFFER) {
 
   init {
@@ -41,8 +42,9 @@ private constructor(
     fun create(
         factory: HomeIndexComponent.Factory,
         owner: LifecycleOwner,
+        callback: Callback,
     ): HomeIndexAdapter {
-      return HomeIndexAdapter(factory, owner)
+      return HomeIndexAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
@@ -70,11 +72,16 @@ private constructor(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeIndexViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = HomeIndexItemBinding.inflate(inflater, parent, false)
-    return HomeIndexViewHolder(binding, factory, owner)
+    return HomeIndexViewHolder(binding, factory, owner, callback)
   }
 
   override fun onBindViewHolder(holder: HomeIndexViewHolder, position: Int) {
     val state = getItem(position)
     holder.bindState(state)
+  }
+
+  interface Callback {
+
+    fun onSelected(index: Int)
   }
 }

@@ -86,6 +86,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
             is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
             is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
             is HomeViewEvent.DigDeeperWatchlist -> viewModel.handleDigWatchlistSymbol(it.index)
+            is HomeViewEvent.DigDeeperChart -> viewModel.handleDigChart(it.index, it.type)
             is HomeViewEvent.Refresh -> viewModel.handleLoad(true)
           }
         }
@@ -93,7 +94,8 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
 
   override fun onControllerEvent(event: HomeControllerEvent) {
     return when (event) {
-      is HomeControllerEvent.ManageWatchlistSymbol -> handleOpenDigDialog(event.quote.symbol)
+      is HomeControllerEvent.DigWatchlistSymbol -> handleOpenDigDialog(event.quote.symbol)
+      is HomeControllerEvent.DigChartSymbol -> handleOpenDigDialog(event.quote.symbol())
     }
   }
 

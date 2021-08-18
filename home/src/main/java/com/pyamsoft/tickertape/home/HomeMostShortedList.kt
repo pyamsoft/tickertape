@@ -47,6 +47,10 @@ internal constructor(
     doOnTeardown { binding.homeMostShortedTitle.text = null }
   }
 
+  override fun provideChartType(): HomeChartType {
+    return HomeChartType.MOST_SHORTED
+  }
+
   override fun provideList(): RecyclerView {
     return binding.homeMostShorted
   }

@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.home.index
+package com.pyamsoft.tickertape.home
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-
-data class HomeIndexViewState(
-    val symbol: StockSymbol,
-    val quote: StockQuote?,
-    val chart: StockChart?,
-) : UiViewState
-
-sealed class HomeIndexViewEvent : UiViewEvent {
-
-  object DigDeeper : HomeIndexViewEvent()
+enum class HomeChartType {
+  INDEX,
+  GAINER,
+  LOSER,
+  TRENDING,
+  MOST_SHORTED
 }

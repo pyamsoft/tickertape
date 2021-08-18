@@ -16,19 +16,20 @@
 
 package com.pyamsoft.tickertape.home.index
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import android.view.ViewGroup
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.pydroid.arch.UiView
+import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import javax.inject.Inject
 
-data class HomeIndexViewState(
-    val symbol: StockSymbol,
-    val quote: StockQuote?,
-    val chart: StockChart?,
-) : UiViewState
+class HomeIndexClick @Inject internal constructor(parent: ViewGroup) :
+    UiView<HomeIndexViewState, HomeIndexViewEvent>() {
 
-sealed class HomeIndexViewEvent : UiViewEvent {
+  init {
+    doOnInflate { parent.setOnDebouncedClickListener { publish(HomeIndexViewEvent.DigDeeper) } }
 
-  object DigDeeper : HomeIndexViewEvent()
+    doOnTeardown { parent.setOnDebouncedClickListener(null) }
+  }
+
+  override fun render(state: UiRender<HomeIndexViewState>) {}
 }

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote.ui.view
 
 import android.graphics.Color
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -26,8 +27,8 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
+import com.pyamsoft.tickertape.quote.ui.databinding.QuoteDataBinding
 import com.pyamsoft.tickertape.quote.ui.databinding.QuoteItemBinding
-import com.pyamsoft.tickertape.quote.ui.databinding.QuoteNumbersBinding
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
@@ -56,7 +57,7 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
       binding.apply {
         quoteItem.setOnLongClickListener(null)
 
-        clearSession(quoteItemData.quoteNumbers)
+        clearSession(quoteItemData)
 
         quoteItemSymbol.text = ""
         quoteItemCompany.text = ""
@@ -85,32 +86,13 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
 
   private fun handleQuoteMissing() {
     binding.quoteItemData.quoteSession.isInvisible = true
-    clearSession(binding.quoteItemData.quoteNumbers)
-
     handleCompanyChanged(null)
-    handleSessionError(binding.quoteItemData.quoteNumbers)
+    handleSessionError(binding.quoteItemData)
   }
 
   private fun handleQuotePresent(quote: StockQuote) {
     handleCompanyChanged(quote.company())
-
-    val session = quote.currentSession()
-    return when (session.state()) {
-      MarketState.POST -> handleSessionChanged("After Hours", session)
-      MarketState.PRE -> handleSessionChanged("Pre-Market", session)
-      MarketState.REGULAR -> handleSessionChanged("Normal Market", session)
-    }
-  }
-
-  private fun handleSessionChanged(name: String, session: StockMarketSession) {
-    binding.apply {
-      quoteItemData.apply {
-        quoteSession.isVisible = true
-        quoteSession.text = name
-
-        populateSession(binding.quoteItemData.quoteNumbers, session)
-      }
-    }
+    handleSessionChanged(binding.quoteItemData, quote.currentSession())
   }
 
   private fun handleCompanyChanged(company: StockCompany?) {
@@ -124,20 +106,28 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
   companion object {
 
     @JvmStatic
-    private fun populateSession(
-        binding: QuoteNumbersBinding,
-        session: StockMarketSession,
-    ) {
-      val percent = session.percent().asPercentValue()
-      val changeAmount = session.amount().asMoneyValue()
-      val directionSign = session.direction().sign()
-      val color = session.direction().color()
+    private fun handleSessionChanged(binding: QuoteDataBinding, session: StockMarketSession) {
+      clearSession(binding)
 
       binding.apply {
-        quoteError.apply {
-          text = ""
-          isGone = true
+        quoteError.wipe()
+
+        val name =
+            when (session.state()) {
+              MarketState.REGULAR -> "Normal Market"
+              MarketState.POST -> "After Hours"
+              MarketState.PRE -> "Pre-Market"
+            }
+
+        quoteSession.apply {
+          text = name
+          isVisible = true
         }
+
+        val percent = session.percent().asPercentValue()
+        val changeAmount = session.amount().asMoneyValue()
+        val directionSign = session.direction().sign()
+        val color = session.direction().color()
 
         quotePrice.apply {
           text = session.price().asMoneyValue()
@@ -160,39 +150,31 @@ protected constructor(parent: ViewGroup) : BaseUiView<S, V, QuoteItemBinding>(pa
     }
 
     @JvmStatic
-    private fun clearSession(binding: QuoteNumbersBinding) {
+    private fun clearSession(binding: QuoteDataBinding) {
       binding.apply {
-        quoteError.text = ""
-        quoteChange.text = ""
-        quotePercent.text = ""
-        quotePrice.text = ""
+        quoteError.wipe()
+
+        quoteChange.wipe()
+        quotePercent.wipe()
+        quotePrice.wipe()
       }
     }
 
     @JvmStatic
-    private fun handleSessionError(binding: QuoteNumbersBinding) {
+    private fun handleSessionError(binding: QuoteDataBinding) {
       clearSession(binding)
-      binding.apply {
-        quoteError.apply {
-          text = "Could not get quote."
-          setTextColor(Color.RED)
-          isVisible = true
-        }
 
-        quotePrice.apply {
-          text = null
-          isGone = true
-        }
+      binding.quoteError.apply {
+        text = "Could not get quote."
+        setTextColor(Color.RED)
+        isVisible = true
+      }
+    }
 
-        quotePercent.apply {
-          text = null
-          isGone = true
-        }
-
-        quoteChange.apply {
-          text = null
-          isGone = true
-        }
+    private fun TextView.wipe() {
+      this.apply {
+        text = null
+        isGone = true
       }
     }
   }

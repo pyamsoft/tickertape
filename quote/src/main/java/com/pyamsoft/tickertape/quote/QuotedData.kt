@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.currentSession
 
 data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
 
@@ -46,7 +47,10 @@ data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
           }
 
           // Sort by the change percent
-          return@Comparator q2.regular().percent().value().compareTo(q1.regular().percent().value())
+          return@Comparator q2.currentSession()
+              .percent()
+              .value()
+              .compareTo(q1.currentSession().percent().value())
         }
   }
 }

@@ -38,7 +38,7 @@ private constructor(
       elevation = 0F
     }
 
-    binding.listitemSpacerGrow.apply { post { applyAppBarOffset(appBarActivity, owner) } }
+    binding.listitemSpacerGrow.applyAppBarOffset(appBarActivity, owner)
   }
 
   companion object {

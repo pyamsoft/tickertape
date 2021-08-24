@@ -25,15 +25,16 @@ import androidx.core.view.marginRight
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import com.pyamsoft.pydroid.ui.util.doOnLayoutChanged
 
 object ViewFixes {
 
   // Watch a view and run function when the layout of said view changes (for, we assume, MW reasons)
   @CheckResult
   inline fun listenLayoutChanged(view: View, crossinline correction: (View) -> Unit): Unregister {
-    val listener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> correction(v) }
-    view.addOnLayoutChangeListener(listener)
-    return Unregister { view.removeOnLayoutChangeListener(listener) }
+    return view.doOnLayoutChanged { v, _, _, _, _, _, _, _, _ -> correction(v) }.let {
+      Unregister { it.cancel() }
+    }
   }
 
   // Captures the initial padding for a given view and provides a function which, when called, will

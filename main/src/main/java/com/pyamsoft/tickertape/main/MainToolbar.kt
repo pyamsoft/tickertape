@@ -103,6 +103,7 @@ internal constructor(
               mainToolbar.elevation = 0F
             }
 
+            // Need to include the margin here when measuring top
             publish(MainViewEvent.TopBarMeasured(v.height + v.marginTop))
           }
           .also { doOnTeardown { it.cancel() } }

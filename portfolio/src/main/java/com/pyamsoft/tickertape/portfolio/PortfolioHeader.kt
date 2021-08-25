@@ -36,6 +36,7 @@ class PortfolioHeader @Inject internal constructor(parent: ViewGroup) :
                 section = state.section,
                 isLoading = state.isLoading,
                 portfolio = state.portfolio,
+                topOffset = state.topOffset,
                 bottomOffset = state.bottomOffset,
             )
             .asUiRender())

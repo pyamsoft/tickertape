@@ -23,14 +23,13 @@ import com.pyamsoft.tickertape.portfolio.PortfolioTabSection
 import com.pyamsoft.tickertape.ui.PackedData
 
 sealed class PortfolioItemViewState : UiViewState {
-  object Spacer : PortfolioItemViewState()
-
   data class Header
   internal constructor(
       val query: String,
       val section: PortfolioTabSection,
       val isLoading: Boolean,
       val portfolio: PackedData<List<PortfolioStock>>,
+      val topOffset: Int,
       val bottomOffset: Int,
   ) : PortfolioItemViewState()
 

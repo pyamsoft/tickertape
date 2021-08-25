@@ -14,20 +14,11 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/listitem_spacer"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<merge>
 
-    <FrameLayout
-        android:id="@+id/listitem_spacer_grow"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/top_spacer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-    </FrameLayout>
-
-</FrameLayout>
+</merge>

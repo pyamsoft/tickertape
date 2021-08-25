@@ -20,8 +20,6 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 
 sealed class NotificationItemViewState : UiViewState {
-  object Spacer : NotificationItemViewState()
-
   data class BigMover internal constructor(val enabled: Boolean) : NotificationItemViewState() {
 
     val title = "Enable Big Mover notifications"

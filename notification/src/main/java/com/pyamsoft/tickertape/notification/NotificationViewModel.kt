@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.TopOffset
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -36,16 +37,18 @@ import kotlinx.coroutines.withContext
 class NotificationViewModel
 @Inject
 internal constructor(
-    private val bottomOffsetBus: EventConsumer<BottomOffset>,
     private val tapePreferences: TapePreferences,
     private val bigMoverPreferences: BigMoverPreferences,
     private val tapeLauncher: TapeLauncher,
     private val alarmFactory: AlarmFactory,
     private val alerter: Alerter,
+    bottomOffsetBus: EventConsumer<BottomOffset>,
+    topOffsetBus: EventConsumer<TopOffset>,
 ) :
     UiViewModel<NotificationViewState, UnitControllerEvent>(
         initialState =
             NotificationViewState(
+                topOffset = 0,
                 bottomOffset = 0,
                 isTapeEnabled = false,
                 isBigMoverEnabled = false,
@@ -55,6 +58,10 @@ internal constructor(
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      topOffsetBus.onEvent { setState { copy(topOffset = it.height) } }
     }
 
     setState(

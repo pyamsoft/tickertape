@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.ui
+package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import com.pyamsoft.pydroid.arch.BaseUiView
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.ui.databinding.BottomSpacerBinding
+import com.pyamsoft.pydroid.arch.UiRender
+import com.pyamsoft.tickertape.home.databinding.TopSpacerBinding
+import javax.inject.Inject
 
-abstract class UiBottomSpacer<S : UiViewState, V : UiViewEvent>
-protected constructor(parent: ViewGroup) : BaseUiView<S, V, BottomSpacerBinding>(parent) {
+class HomeTopSpacer @Inject internal constructor(parent: ViewGroup) :
+    BaseUiView<HomeViewState, HomeViewEvent, TopSpacerBinding>(parent) {
 
-  final override val layoutRoot by boundView { bottomSpacer }
+  override val layoutRoot by boundView { topSpacer }
 
-  final override val viewBinding = BottomSpacerBinding::inflate
+  override val viewBinding = TopSpacerBinding::inflate
 
-  protected fun handleBottomOffset(height: Int) {
+  private fun handleTopOffset(height: Int) {
     layoutRoot.updateLayoutParams { this.height = height }
+  }
+
+  override fun onRender(state: UiRender<HomeViewState>) {
+    state.mapChanged { it.topOffset }.render(viewScope) { handleTopOffset(it) }
   }
 }

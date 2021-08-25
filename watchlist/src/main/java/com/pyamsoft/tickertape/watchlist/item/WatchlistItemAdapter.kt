@@ -23,18 +23,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.tickertape.ui.SpacerViewHolder
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
-import kotlin.random.Random
 import me.zhanghai.android.fastscroll.PopupTextProvider
-import timber.log.Timber
 
 class WatchlistItemAdapter
 private constructor(
     private val factory: WatchlistItemComponent.Factory,
     private val owner: LifecycleOwner,
-    private val appBarActivity: AppBarActivity,
     private val callback: Callback
 ) : ListAdapter<WatchlistItemViewState, RecyclerView.ViewHolder>(DIFFER), PopupTextProvider {
 
@@ -44,8 +39,6 @@ private constructor(
 
   companion object {
 
-    private val SPACER_HASH_CODE = Random.nextInt()
-    private const val VIEW_TYPE_SPACE = 1
     private const val VIEW_TYPE_ITEM = 2
 
     @JvmStatic
@@ -53,10 +46,9 @@ private constructor(
     fun create(
         factory: WatchlistItemComponent.Factory,
         owner: LifecycleOwner,
-        appBarActivity: AppBarActivity,
         callback: Callback
     ): WatchlistItemAdapter {
-      return WatchlistItemAdapter(factory, owner, appBarActivity, callback)
+      return WatchlistItemAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
@@ -69,9 +61,7 @@ private constructor(
               is WatchlistItemViewState.Item ->
                   when (newItem) {
                     is WatchlistItemViewState.Item -> oldItem.symbol == newItem.symbol
-                    else -> false
                   }
-              is WatchlistItemViewState.Spacer -> newItem is WatchlistItemViewState.Spacer
             }
           }
 
@@ -83,9 +73,7 @@ private constructor(
               is WatchlistItemViewState.Item ->
                   when (newItem) {
                     is WatchlistItemViewState.Item -> oldItem == newItem
-                    else -> false
                   }
-              is WatchlistItemViewState.Spacer -> newItem is WatchlistItemViewState.Spacer
             }
           }
         }
@@ -94,21 +82,18 @@ private constructor(
   override fun getPopupText(position: Int): String {
     return when (val state = getItem(position)) {
       is WatchlistItemViewState.Item -> state.symbol.symbol()
-      is WatchlistItemViewState.Spacer -> ""
     }
   }
 
   override fun getItemViewType(position: Int): Int {
     return when (getItem(position)) {
       is WatchlistItemViewState.Item -> VIEW_TYPE_ITEM
-      is WatchlistItemViewState.Spacer -> VIEW_TYPE_SPACE
     }
   }
 
   override fun getItemId(position: Int): Long {
     return when (val state = getItem(position)) {
       is WatchlistItemViewState.Item -> state.symbol.symbol().hashCode()
-      is WatchlistItemViewState.Spacer -> SPACER_HASH_CODE
     }.toLong()
   }
 
@@ -119,7 +104,6 @@ private constructor(
         val binding = WatchlistItemBinding.inflate(inflater, parent, false)
         WatchlistViewHolder(binding, factory, owner, callback)
       }
-      VIEW_TYPE_SPACE -> SpacerViewHolder.create(parent, appBarActivity, owner)
       else -> throw AssertionError("Invalid View type: $viewType")
     }
   }
@@ -130,7 +114,6 @@ private constructor(
         val viewHolder = holder as WatchlistViewHolder
         viewHolder.bindState(state)
       }
-      is WatchlistItemViewState.Spacer -> Timber.d("Ignore bind on Spacer item")
     }
   }
 

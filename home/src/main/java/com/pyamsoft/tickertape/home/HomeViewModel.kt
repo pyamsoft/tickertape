@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.TopOffset
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
@@ -50,8 +51,9 @@ internal constructor(
     private val portfolioInteractor: PortfolioInteractor,
     private val watchlistInteractor: WatchlistInteractor,
     private val quoteInteractor: QuoteInteractor,
-    private val bottomOffsetBus: EventConsumer<BottomOffset>,
     private val mainPageBus: EventBus<MainPage>,
+    topOffsetBus: EventConsumer<TopOffset>,
+    bottomOffsetBus: EventConsumer<BottomOffset>,
 ) :
     UiViewModel<HomeViewState, HomeControllerEvent>(
         initialState =
@@ -64,8 +66,10 @@ internal constructor(
                 losers = emptyList<TopDataWithChart>().pack(),
                 trending = emptyList<TopDataWithChart>().pack(),
                 mostShorted = emptyList<TopDataWithChart>().pack(),
+                topOffset = 0,
                 bottomOffset = 0,
-            )) {
+            ),
+    ) {
 
   private val homeFetcher =
       highlander<ResultWrapper<Unit>, Boolean> { force ->
@@ -84,6 +88,10 @@ internal constructor(
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      topOffsetBus.onEvent { setState { copy(topOffset = it.height) } }
     }
   }
 
@@ -195,43 +203,43 @@ internal constructor(
               }
             }
             HomeChartType.GAINER -> {
-                val chart = state.gainers
-                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
-                else {
-                    Timber.w("Cannot dig symbol in error state: $chart")
-                    return@launch
-                }
+              val chart = state.gainers
+              if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+              else {
+                Timber.w("Cannot dig symbol in error state: $chart")
+                return@launch
+              }
             }
             HomeChartType.LOSER -> {
-                val chart = state.losers
-                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
-                else {
-                    Timber.w("Cannot dig symbol in error state: $chart")
-                    return@launch
-                }
+              val chart = state.losers
+              if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+              else {
+                Timber.w("Cannot dig symbol in error state: $chart")
+                return@launch
+              }
             }
             HomeChartType.TRENDING -> {
-                val chart = state.trending
-                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
-                else {
-                    Timber.w("Cannot dig symbol in error state: $chart")
-                    return@launch
-                }
+              val chart = state.trending
+              if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+              else {
+                Timber.w("Cannot dig symbol in error state: $chart")
+                return@launch
+              }
             }
             HomeChartType.MOST_SHORTED -> {
-                val chart = state.mostShorted
-                if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
-                else {
-                    Timber.w("Cannot dig symbol in error state: $chart")
-                    return@launch
-                }
+              val chart = state.mostShorted
+              if (chart is PackedData.Data<List<TopDataWithChart>>) chart.value[index].quote
+              else {
+                Timber.w("Cannot dig symbol in error state: $chart")
+                return@launch
+              }
             }
           }
 
-        if (data == null) {
-            Timber.w("Cannot dig chart when quote is null")
-            return@launch
-        }
+      if (data == null) {
+        Timber.w("Cannot dig chart when quote is null")
+        return@launch
+      }
 
       publish(HomeControllerEvent.DigChartSymbol(data))
     }

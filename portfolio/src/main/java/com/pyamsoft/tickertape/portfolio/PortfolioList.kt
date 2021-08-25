@@ -22,11 +22,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioListBinding
@@ -46,7 +44,6 @@ class PortfolioList
 internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    appBarActivity: AppBarActivity,
     factory: PortfolioItemComponent.Factory
 ) :
     BaseUiView<PortfolioViewState, PortfolioViewEvent, PortfolioListBinding>(parent),
@@ -59,7 +56,8 @@ internal constructor(
 
   private var modelAdapter: PortfolioAdapter? = null
 
-  private var bottomDecoration: RecyclerView.ItemDecoration? = null
+  private val topDecoration = LinearBoundsMarginDecoration(topMargin = 0)
+  private val bottomDecoration = LinearBoundsMarginDecoration(bottomMargin = 0)
   private var lastScrollPosition = 0
 
   init {
@@ -68,13 +66,13 @@ internal constructor(
 
       binding.portfolioListList.layoutManager =
           LinearLayoutManager(binding.portfolioListList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {
-      modelAdapter = PortfolioAdapter.create(factory, owner, appBarActivity, this)
+      modelAdapter = PortfolioAdapter.create(factory, owner, this)
       binding.portfolioListList.adapter = modelAdapter
     }
 
@@ -117,6 +115,11 @@ internal constructor(
       LinearMarginDecoration.create(margin).apply {
         binding.portfolioListList.addItemDecoration(this)
       }
+
+      binding.portfolioListList.apply {
+        addItemDecoration(topDecoration)
+        addItemDecoration(bottomDecoration)
+      }
     }
 
     doOnInflate {
@@ -126,10 +129,7 @@ internal constructor(
           .build()
     }
 
-    doOnTeardown {
-      binding.portfolioListList.removeAllItemDecorations()
-      bottomDecoration = null
-    }
+    doOnTeardown { binding.portfolioListList.removeAllItemDecorations() }
 
     doOnTeardown {
       binding.portfolioListList.adapter = null
@@ -161,6 +161,7 @@ internal constructor(
   override fun onRender(state: UiRender<PortfolioViewState>) {
     state.mapChanged { it.displayPortfolio }.render(viewScope) { handlePortfolio(it) }
     state.mapChanged { it.isLoading }.render(viewScope) { handleLoading(it) }
+    state.mapChanged { it.topOffset }.render(viewScope) { handleTopOffset(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
   }
 
@@ -181,15 +182,16 @@ internal constructor(
     }
   }
 
-  private fun handleBottomOffset(height: Int) {
-    bottomDecoration?.also { binding.portfolioListList.removeItemDecoration(it) }
+  private fun handleTopOffset(height: Int) {
+    topDecoration.setMargin(top = height)
+    binding.portfolioListList.invalidateItemDecorations()
+  }
 
+  private fun handleBottomOffset(height: Int) {
     // Need to multiply the offset and add additional spacing
     val spacing = 16.asDp(layoutRoot.context)
-    bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height + spacing).apply {
-      binding.portfolioListList.addItemDecoration(this)
-    }
+    bottomDecoration.setMargin(bottom = height + spacing)
+    binding.portfolioListList.invalidateItemDecorations()
   }
 
   private fun setList(items: List<PortfolioViewState.DisplayPortfolio>) {
@@ -202,9 +204,10 @@ internal constructor(
                     section = item.section,
                     portfolio = item.portfolio,
                     isLoading = item.isLoading,
-                    bottomOffset = item.bottomOffset)
+                    topOffset = item.topOffset,
+                    bottomOffset = item.bottomOffset,
+                )
             is PortfolioViewState.DisplayPortfolio.Item -> PortfolioItemViewState.Item(item.stock)
-            is PortfolioViewState.DisplayPortfolio.Spacer -> PortfolioItemViewState.Spacer
           }
         }
     Timber.d("Submit data list: $data")

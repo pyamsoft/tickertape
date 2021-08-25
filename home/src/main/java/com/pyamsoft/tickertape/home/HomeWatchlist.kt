@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.quote.QuotedStock
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
@@ -39,9 +38,8 @@ class HomeWatchlist
 internal constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    appBarActivity: AppBarActivity,
     factory: WatchlistItemComponent.Factory,
-) : BaseWatchlistList<HomeViewState, HomeViewEvent>(parent, owner, appBarActivity, factory) {
+) : BaseWatchlistList<HomeViewState, HomeViewEvent>(parent, owner, factory) {
 
   init {
     doOnInflate { binding.watchlistSwipeRefresh.isEnabled = false }
@@ -120,6 +118,7 @@ internal constructor(
                 watchlist = state.data,
                 // Assume Stocks
                 section = WatchlistTabSection.STOCK,
+                topOffset = 0,
                 bottomOffset = 0,
             )
             .asUiRender())

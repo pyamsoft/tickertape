@@ -22,10 +22,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.notification.databinding.NotificationListBinding
@@ -43,7 +41,6 @@ internal constructor(
     parent: ViewGroup,
     factory: NotificationItemComponent.Factory,
     owner: LifecycleOwner,
-    appBarActivity: AppBarActivity,
 ) :
     BaseUiView<NotificationViewState, NotificationViewEvent, NotificationListBinding>(parent),
     NotificationAdapter.Callback {
@@ -54,7 +51,8 @@ internal constructor(
 
   private var modelAdapter: NotificationAdapter? = null
 
-  private var bottomDecoration: RecyclerView.ItemDecoration? = null
+  private val topDecoration = LinearBoundsMarginDecoration(topMargin = 0)
+  private val bottomDecoration = LinearBoundsMarginDecoration(bottomMargin = 0)
   private var lastScrollPosition = 0
 
   init {
@@ -63,13 +61,13 @@ internal constructor(
 
       binding.notificationList.layoutManager =
           LinearLayoutManager(binding.notificationList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {
-      modelAdapter = NotificationAdapter.create(factory, owner, appBarActivity, this)
+      modelAdapter = NotificationAdapter.create(factory, owner, this)
       binding.notificationList.adapter = modelAdapter
     }
 
@@ -103,12 +101,14 @@ internal constructor(
       LinearMarginDecoration.create(margin).apply {
         binding.notificationList.addItemDecoration(this)
       }
+
+      binding.notificationList.apply {
+        addItemDecoration(topDecoration)
+        addItemDecoration(bottomDecoration)
+      }
     }
 
-    doOnTeardown {
-      binding.notificationList.removeAllItemDecorations()
-      bottomDecoration = null
-    }
+    doOnTeardown { binding.notificationList.removeAllItemDecorations() }
 
     doOnTeardown {
       binding.notificationList.adapter = null
@@ -132,17 +132,19 @@ internal constructor(
   override fun onRender(state: UiRender<NotificationViewState>) {
     state.mapChanged { it.list }.render(viewScope) { handleList(it) }
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+    state.mapChanged { it.topOffset }.render(viewScope) { handleTopOffset(it) }
+  }
+
+  private fun handleTopOffset(height: Int) {
+    topDecoration.setMargin(top = height)
+    binding.notificationList.invalidateItemDecorations()
   }
 
   private fun handleBottomOffset(height: Int) {
-    bottomDecoration?.also { binding.notificationList.removeItemDecoration(it) }
-
     // Need to multiply the offset and add additional spacing
     val spacing = 16.asDp(layoutRoot.context)
-    bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height + spacing).apply {
-      binding.notificationList.addItemDecoration(this)
-    }
+    bottomDecoration.setMargin(bottom = height + spacing)
+    binding.notificationList.invalidateItemDecorations()
   }
 
   private fun setList(items: List<NotificationViewState.ListItem>) {
@@ -151,7 +153,6 @@ internal constructor(
           when (item) {
             is NotificationViewState.ListItem.BigMover ->
                 NotificationItemViewState.BigMover(enabled = item.enabled)
-            is NotificationViewState.ListItem.Spacer -> NotificationItemViewState.Spacer
             is NotificationViewState.ListItem.Tape ->
                 NotificationItemViewState.Tape(enabled = item.enabled)
           }

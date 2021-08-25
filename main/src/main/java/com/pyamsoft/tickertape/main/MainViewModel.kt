@@ -26,6 +26,7 @@ import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.BottomOffset
+import com.pyamsoft.tickertape.ui.TopOffset
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -39,6 +40,7 @@ class MainViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val bottomOffsetBus: EventBus<BottomOffset>,
+    private val topOffsetBus: EventBus<TopOffset>,
     private val addNewBus: EventBus<AddNew>,
     private val pageBus: EventConsumer<MainPage>,
     @Named("app_name") appNameRes: Int,
@@ -49,8 +51,10 @@ internal constructor(
             appNameRes = appNameRes,
             page = DEFAULT_PAGE,
             bottomBarHeight = 0,
+            topBarHeight = 0,
             adding = false,
-        )) {
+        ),
+    ) {
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -68,6 +72,14 @@ internal constructor(
       val page = restoreSavedState(KEY_PAGE) { DEFAULT_PAGE.asString() }.asPage()
       Timber.d("Loading initial page: $page")
       handleSelectPage(page, force = true)
+    }
+  }
+
+  fun handleConsumeTopBarHeight(height: Int) {
+    viewModelScope.launch(context = Dispatchers.Default) {
+      setState(
+          stateChange = { copy(topBarHeight = height) },
+          andThen = { topOffsetBus.send(TopOffset(it.topBarHeight)) })
     }
   }
 

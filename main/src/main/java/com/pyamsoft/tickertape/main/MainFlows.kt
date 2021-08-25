@@ -28,6 +28,7 @@ internal constructor(
     @StringRes val appNameRes: Int,
     val adding: Boolean,
     val page: MainPage,
+    val topBarHeight: Int,
     val bottomBarHeight: Int,
 ) : UiViewState
 
@@ -50,6 +51,8 @@ sealed class MainViewEvent : UiViewEvent {
       val type: EquityType,
       val side: TradeSide,
   ) : MainViewEvent()
+
+  data class TopBarMeasured internal constructor(val height: Int) : MainViewEvent()
 
   object AddRequest : MainViewEvent()
 

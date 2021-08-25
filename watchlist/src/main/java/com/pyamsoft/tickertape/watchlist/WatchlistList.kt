@@ -18,9 +18,7 @@ package com.pyamsoft.tickertape.watchlist
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItemComponent
@@ -33,18 +31,17 @@ class WatchlistList
 @Inject
 internal constructor(
     parent: ViewGroup,
-    appBarActivity: AppBarActivity,
     owner: LifecycleOwner,
     factory: WatchlistItemComponent.Factory,
 ) :
     BaseWatchlistList<WatchListViewState, WatchListViewEvent>(
         parent,
         owner,
-        appBarActivity,
         factory,
     ) {
 
-  private var bottomDecoration: RecyclerView.ItemDecoration? = null
+  private val topDecoration = LinearBoundsMarginDecoration(topMargin = 0)
+  private val bottomDecoration = LinearBoundsMarginDecoration(bottomMargin = 0)
 
   init {
     doOnInflate {
@@ -68,12 +65,14 @@ internal constructor(
       // For some reason, the margin registers only half as large as it needs to
       // be, so we must double it.
       LinearMarginDecoration.create(margin).apply { binding.watchlistList.addItemDecoration(this) }
+
+      binding.watchlistList.apply {
+        addItemDecoration(topDecoration)
+        addItemDecoration(bottomDecoration)
+      }
     }
 
-    doOnTeardown {
-      binding.watchlistList.removeAllItemDecorations()
-      bottomDecoration = null
-    }
+    doOnTeardown { binding.watchlistList.removeAllItemDecorations() }
   }
 
   override fun onSelect(index: Int) {
@@ -91,16 +90,18 @@ internal constructor(
   override fun onRender(state: UiRender<WatchListViewState>) {
     handleRender(state)
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }
+    state.mapChanged { it.topOffset }.render(viewScope) { handleTopOffset(it) }
+  }
+
+  private fun handleTopOffset(height: Int) {
+    topDecoration.setMargin(top = height)
+    binding.watchlistList.invalidateItemDecorations()
   }
 
   private fun handleBottomOffset(height: Int) {
-    bottomDecoration?.also { binding.watchlistList.removeItemDecoration(it) }
-
     // Need to multiply the offset and add additional spacing
     val spacing = 16.asDp(layoutRoot.context)
-    bottomDecoration =
-        LinearBoundsMarginDecoration(bottomMargin = height + spacing).apply {
-      binding.watchlistList.addItemDecoration(this)
-    }
+    bottomDecoration.setMargin(bottom = height + spacing)
+    binding.watchlistList.invalidateItemDecorations()
   }
 }

@@ -31,6 +31,7 @@ data class PortfolioViewState(
     val section: PortfolioTabSection,
     val isLoading: Boolean,
     val portfolio: PackedData<List<PortfolioStock>>,
+    val topOffset: Int,
     val bottomOffset: Int,
 ) : UiViewState {
 
@@ -46,15 +47,22 @@ data class PortfolioViewState(
           val list = p.value
           val header =
               if (section == PortfolioTabSection.STOCK) {
-                listOf(DisplayPortfolio.Header(query, section, isLoading, portfolio, bottomOffset))
+                listOf(
+                    DisplayPortfolio.Header(
+                        query,
+                        section,
+                        isLoading,
+                        portfolio,
+                        topOffset,
+                        bottomOffset,
+                    ))
               } else {
                 emptyList()
               }
 
           val currentSearch = query
           val allItems =
-              listOf(DisplayPortfolio.Spacer) +
-                  header +
+              header +
                   list
                       .asSequence()
                       .filter { qs ->
@@ -71,14 +79,13 @@ data class PortfolioViewState(
 
   sealed class DisplayPortfolio {
 
-    object Spacer : DisplayPortfolio()
-
     data class Header
     internal constructor(
         val query: String,
         val section: PortfolioTabSection,
         val isLoading: Boolean,
         val portfolio: PackedData<List<PortfolioStock>>,
+        val topOffset: Int,
         val bottomOffset: Int,
     ) : DisplayPortfolio()
 

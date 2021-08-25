@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.item
+package com.pyamsoft.tickertape.ui
 
-import com.pyamsoft.pydroid.arch.UiViewEvent
-import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-
-sealed class WatchlistItemViewState : UiViewState {
-
-  data class Item(val symbol: StockSymbol, val quote: StockQuote?) : WatchlistItemViewState()
-}
-
-sealed class WatchlistItemViewEvent : UiViewEvent {
-
-  object Select : WatchlistItemViewEvent()
-
-  object Remove : WatchlistItemViewEvent()
-}
+data class TopOffset(val height: Int)

@@ -17,12 +17,22 @@
 package com.pyamsoft.tickertape.home
 
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
+import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.tickertape.ui.UiBottomSpacer
+import com.pyamsoft.tickertape.home.databinding.BottomSpacerBinding
 import javax.inject.Inject
 
 class HomeBottomSpacer @Inject internal constructor(parent: ViewGroup) :
-    UiBottomSpacer<HomeViewState, HomeViewEvent>(parent) {
+    BaseUiView<HomeViewState, HomeViewEvent, BottomSpacerBinding>(parent) {
+
+  override val layoutRoot by boundView { bottomSpacer }
+
+  override val viewBinding = BottomSpacerBinding::inflate
+
+  private fun handleBottomOffset(height: Int) {
+    layoutRoot.updateLayoutParams { this.height = height }
+  }
 
   override fun onRender(state: UiRender<HomeViewState>) {
     state.mapChanged { it.bottomOffset }.render(viewScope) { handleBottomOffset(it) }

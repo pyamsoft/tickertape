@@ -106,12 +106,12 @@ internal class MainActivity :
     capturedAppBar = bar
   }
 
-  override fun requireAppBar(func: (AppBarLayout) -> Unit) {
-    requireNotNull(capturedAppBar).let(func)
+  override fun <T> requireAppBar(func: (AppBarLayout) -> T): T {
+    return requireNotNull(capturedAppBar).let(func)
   }
 
-  override fun withAppBar(func: (AppBarLayout) -> Unit) {
-    capturedAppBar?.let(func)
+  override fun <T> withAppBar(func: (AppBarLayout) -> T): T? {
+    return capturedAppBar?.let(func)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,6 +149,7 @@ internal class MainActivity :
             toolbar.requireNotNull()) {
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
+            is MainViewEvent.TopBarMeasured -> viewModel.handleConsumeTopBarHeight(it.height)
             is MainViewEvent.OpenHome -> viewModel.handleSelectPage(MainPage.Home, force = false)
             is MainViewEvent.OpenPortfolio ->
                 viewModel.handleSelectPage(MainPage.Portfolio, force = false)

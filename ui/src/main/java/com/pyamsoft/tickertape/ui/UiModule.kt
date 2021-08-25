@@ -27,6 +27,14 @@ abstract class UiModule {
 
   @Binds
   @CheckResult
+  internal abstract fun bindTopOffsetBus(impl: TopOffsetBus): EventBus<TopOffset>
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindTopOffsetConsumer(impl: EventBus<TopOffset>): EventConsumer<TopOffset>
+
+  @Binds
+  @CheckResult
   internal abstract fun bindBottomOffsetBus(impl: BottomOffsetBus): EventBus<BottomOffset>
 
   @Binds

@@ -23,26 +23,19 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.tickertape.notification.databinding.NotificationItemWrapperBinding
 import com.pyamsoft.tickertape.notification.item.mover.BigMoverViewHolder
 import com.pyamsoft.tickertape.notification.item.tape.TapeViewHolder
-import com.pyamsoft.tickertape.ui.SpacerViewHolder
-import kotlin.random.Random
-import timber.log.Timber
 
 internal class NotificationAdapter
 private constructor(
     private val factory: NotificationItemComponent.Factory,
     private val owner: LifecycleOwner,
-    private val appBarActivity: AppBarActivity,
     private val callback: Callback,
 ) : ListAdapter<NotificationItemViewState, RecyclerView.ViewHolder>(DIFFER) {
 
   companion object {
 
-    private val SPACER_HASH_CODE = Random.nextInt()
-    private const val VIEW_TYPE_SPACER = 1
     private const val VIEW_TYPE_BIG_MOVER = 2
     private const val VIEW_TYPE_TAPE = 3
 
@@ -51,10 +44,9 @@ private constructor(
     fun create(
         factory: NotificationItemComponent.Factory,
         owner: LifecycleOwner,
-        appBarActivity: AppBarActivity,
         callback: Callback
     ): NotificationAdapter {
-      return NotificationAdapter(factory, owner, appBarActivity, callback)
+      return NotificationAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
@@ -67,7 +59,6 @@ private constructor(
             return when (oldItem) {
               is NotificationItemViewState.Tape -> newItem is NotificationItemViewState.Tape
               is NotificationItemViewState.BigMover -> newItem is NotificationItemViewState.BigMover
-              is NotificationItemViewState.Spacer -> newItem is NotificationItemViewState.Spacer
             }
           }
 
@@ -86,7 +77,6 @@ private constructor(
                     is NotificationItemViewState.BigMover -> oldItem == newItem
                     else -> false
                   }
-              is NotificationItemViewState.Spacer -> newItem is NotificationItemViewState.Spacer
             }
           }
         }
@@ -96,7 +86,6 @@ private constructor(
     return when (val state = getItem(position)) {
       is NotificationItemViewState.BigMover -> state.hashCode()
       is NotificationItemViewState.Tape -> state.hashCode()
-      is NotificationItemViewState.Spacer -> SPACER_HASH_CODE
     }.toLong()
   }
 
@@ -104,7 +93,6 @@ private constructor(
     return when (getItem(position)) {
       is NotificationItemViewState.BigMover -> VIEW_TYPE_BIG_MOVER
       is NotificationItemViewState.Tape -> VIEW_TYPE_TAPE
-      is NotificationItemViewState.Spacer -> VIEW_TYPE_SPACER
     }
   }
 
@@ -119,7 +107,6 @@ private constructor(
         val binding = NotificationItemWrapperBinding.inflate(inflater, parent, false)
         BigMoverViewHolder(binding, factory, owner, callback)
       }
-      VIEW_TYPE_SPACER -> SpacerViewHolder.create(parent, appBarActivity, owner)
       else -> throw AssertionError("Invalid view type: $viewType")
     }
   }
@@ -134,7 +121,6 @@ private constructor(
         val viewHolder = holder as BigMoverViewHolder
         viewHolder.bindState(state)
       }
-      is NotificationItemViewState.Spacer -> Timber.d("Ignore bind on Spacer item")
     }
   }
 

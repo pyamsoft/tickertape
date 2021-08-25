@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.arch.UiViewState
 
 data class NotificationViewState
 internal constructor(
+    val topOffset: Int,
     val bottomOffset: Int,
     internal val isTapeEnabled: Boolean,
     internal val isBigMoverEnabled: Boolean,
@@ -30,13 +31,10 @@ internal constructor(
     data class Tape internal constructor(val enabled: Boolean) : ListItem()
 
     data class BigMover internal constructor(val enabled: Boolean) : ListItem()
-
-    object Spacer : ListItem()
   }
 
   val list =
       listOf(
-          ListItem.Spacer,
           ListItem.Tape(isTapeEnabled),
           ListItem.BigMover(isBigMoverEnabled),
       )

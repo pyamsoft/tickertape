@@ -27,7 +27,6 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.util.removeAllItemDecorations
 import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
@@ -41,7 +40,6 @@ abstract class BaseWatchlistList<S : UiViewState, V : UiViewEvent>
 protected constructor(
     parent: ViewGroup,
     owner: LifecycleOwner,
-    appBarActivity: AppBarActivity,
     factory: WatchlistItemComponent.Factory
 ) :
     BaseUiView<S, V, WatchlistBinding>(parent),
@@ -62,13 +60,13 @@ protected constructor(
 
       binding.watchlistList.layoutManager =
           LinearLayoutManager(binding.watchlistList.context).apply {
-        isItemPrefetchEnabled = true
-        initialPrefetchItemCount = 3
-      }
+            isItemPrefetchEnabled = true
+            initialPrefetchItemCount = 3
+          }
     }
 
     doOnInflate {
-      modelAdapter = WatchlistItemAdapter.create(factory, owner, appBarActivity, this)
+      modelAdapter = WatchlistItemAdapter.create(factory, owner, this)
       binding.watchlistList.adapter = modelAdapter
     }
 
@@ -140,7 +138,6 @@ protected constructor(
           when (item) {
             is WatchListViewState.DisplayWatchlist.Item ->
                 WatchlistItemViewState.Item(symbol = item.stock.symbol, quote = item.stock.quote)
-            is WatchListViewState.DisplayWatchlist.Spacer -> WatchlistItemViewState.Spacer
           }
         }
     Timber.d("Submit data list: $data")

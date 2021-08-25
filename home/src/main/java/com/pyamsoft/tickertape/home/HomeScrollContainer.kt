@@ -25,7 +25,7 @@ class HomeScrollContainer
 @Inject
 internal constructor(
     parent: ViewGroup,
-    spacer: HomeSpacer,
+    topSpacer: HomeTopSpacer,
     portfolio: HomePortfolio,
     watchlistTitle: HomeWatchlistTitle,
     watchlist: HomeWatchlist,
@@ -39,7 +39,7 @@ internal constructor(
 
   init {
     nest(
-        spacer,
+        topSpacer,
         portfolio,
         watchlistTitle,
         watchlist,

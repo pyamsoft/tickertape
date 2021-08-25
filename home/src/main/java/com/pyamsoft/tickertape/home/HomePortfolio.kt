@@ -51,7 +51,9 @@ class HomePortfolio @Inject internal constructor(parent: ViewGroup) :
                 section = PortfolioTabSection.STOCK,
                 // Bottom offset is always 0 because the bottom offset is handled by the Home
                 // screens
-                bottomOffset = 0)
+                topOffset = 0,
+                bottomOffset = 0,
+            )
             .asUiRender())
   }
 }

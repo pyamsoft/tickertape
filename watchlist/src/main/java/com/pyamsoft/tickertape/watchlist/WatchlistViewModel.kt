@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.BottomOffset
 import com.pyamsoft.tickertape.ui.PackedData
+import com.pyamsoft.tickertape.ui.TopOffset
 import com.pyamsoft.tickertape.ui.pack
 import com.pyamsoft.tickertape.ui.packError
 import com.pyamsoft.tickertape.ui.transformData
@@ -50,7 +51,8 @@ internal constructor(
     @Assisted savedState: UiSavedState,
     private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
-    private val bottomOffsetBus: EventConsumer<BottomOffset>,
+    bottomOffsetBus: EventConsumer<BottomOffset>,
+    topOffsetBus: EventConsumer<TopOffset>,
     addNewBus: EventConsumer<AddNew>
 ) :
     MainAdderViewModel<WatchListViewState, WatchListControllerEvent>(
@@ -63,8 +65,10 @@ internal constructor(
                 section = DEFAULT_SECTION,
                 isLoading = false,
                 watchlist = emptyList<QuotedStock>().pack(),
+                topOffset = 0,
                 bottomOffset = 0,
-            )) {
+            ),
+    ) {
 
   private val quoteFetcher =
       highlander<ResultWrapper<List<QuotedStock>>, Boolean> { interactor.getQuotes(it) }
@@ -72,6 +76,10 @@ internal constructor(
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
       bottomOffsetBus.onEvent { setState { copy(bottomOffset = it.height) } }
+    }
+
+    viewModelScope.launch(context = Dispatchers.Default) {
+      topOffsetBus.onEvent { setState { copy(topOffset = it.height) } }
     }
 
     viewModelScope.launch(context = Dispatchers.Default) {

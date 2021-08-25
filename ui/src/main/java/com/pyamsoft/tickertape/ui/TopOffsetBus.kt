@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.home
+package com.pyamsoft.tickertape.ui
 
-import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.tickertape.ui.UiAppBarSpacer
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.core.Enforcer
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class HomeSpacer
-@Inject
-internal constructor(parent: ViewGroup, owner: LifecycleOwner, appBarActivity: AppBarActivity) :
-    UiAppBarSpacer<HomeViewState, HomeViewEvent>(parent, owner, appBarActivity)
+@Singleton
+internal class TopOffsetBus @Inject internal constructor() : EventBus<TopOffset> {
+
+  private val bus = EventBus.create<TopOffset>(emitOnlyWhenActive = false, replayCount = 1)
+
+  override suspend fun onEvent(emitter: suspend (event: TopOffset) -> Unit) {
+    Enforcer.assertOffMainThread()
+    return bus.onEvent(emitter)
+  }
+
+  override suspend fun send(event: TopOffset) {
+    Enforcer.assertOffMainThread()
+    bus.send(event)
+  }
+}

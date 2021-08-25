@@ -35,6 +35,7 @@ internal constructor(
     val losers: PackedData<List<TopDataWithChart>>,
     val trending: PackedData<List<TopDataWithChart>>,
     val mostShorted: PackedData<List<TopDataWithChart>>,
+    val topOffset: Int,
     val bottomOffset: Int,
 ) : UiViewState {
 

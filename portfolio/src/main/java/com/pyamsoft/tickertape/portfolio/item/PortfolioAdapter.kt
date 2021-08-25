@@ -23,19 +23,15 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.databinding.ListitemFrameBinding
 import com.pyamsoft.tickertape.portfolio.databinding.PortfolioItemBinding
-import com.pyamsoft.tickertape.ui.SpacerViewHolder
 import kotlin.random.Random
 import me.zhanghai.android.fastscroll.PopupTextProvider
-import timber.log.Timber
 
 class PortfolioAdapter
 private constructor(
     private val factory: PortfolioItemComponent.Factory,
     private val owner: LifecycleOwner,
-    private val appBarActivity: AppBarActivity,
     private val callback: Callback
 ) : ListAdapter<PortfolioItemViewState, RecyclerView.ViewHolder>(DIFFER), PopupTextProvider {
 
@@ -45,9 +41,7 @@ private constructor(
 
   companion object {
 
-    private val SPACER_HASH_CODE = Random.nextInt()
     private val HEADER_HASH_CODE = Random.nextInt()
-    private const val VIEW_TYPE_SPACER = 1
     private const val VIEW_TYPE_HEADER = 2
     private const val VIEW_TYPE_ITEM = 3
 
@@ -56,10 +50,9 @@ private constructor(
     fun create(
         factory: PortfolioItemComponent.Factory,
         owner: LifecycleOwner,
-        appBarActivity: AppBarActivity,
         callback: Callback
     ): PortfolioAdapter {
-      return PortfolioAdapter(factory, owner, appBarActivity, callback)
+      return PortfolioAdapter(factory, owner, callback)
     }
 
     private val DIFFER =
@@ -77,7 +70,6 @@ private constructor(
                         oldItem.stock.holding.id() == newItem.stock.holding.id()
                     else -> false
                   }
-              is PortfolioItemViewState.Spacer -> newItem is PortfolioItemViewState.Spacer
             }
           }
 
@@ -96,7 +88,6 @@ private constructor(
                     is PortfolioItemViewState.Item -> oldItem == newItem
                     else -> false
                   }
-              is PortfolioItemViewState.Spacer -> newItem is PortfolioItemViewState.Spacer
             }
           }
         }
@@ -106,7 +97,6 @@ private constructor(
     return when (val state = getItem(position)) {
       is PortfolioItemViewState.Header -> "PORTFOLIO"
       is PortfolioItemViewState.Item -> state.stock.holding.symbol().symbol()
-      is PortfolioItemViewState.Spacer -> ""
     }
   }
 
@@ -114,7 +104,6 @@ private constructor(
     return when (val state = getItem(position)) {
       is PortfolioItemViewState.Header -> HEADER_HASH_CODE
       is PortfolioItemViewState.Item -> state.stock.holding.id().hashCode()
-      is PortfolioItemViewState.Spacer -> SPACER_HASH_CODE
     }.toLong()
   }
 
@@ -122,7 +111,6 @@ private constructor(
     return when (getItem(position)) {
       is PortfolioItemViewState.Header -> VIEW_TYPE_HEADER
       is PortfolioItemViewState.Item -> VIEW_TYPE_ITEM
-      is PortfolioItemViewState.Spacer -> VIEW_TYPE_SPACER
     }
   }
 
@@ -137,7 +125,6 @@ private constructor(
         val binding = ListitemFrameBinding.inflate(inflater, parent, false)
         PortfolioHeaderViewHolder(binding, factory, owner)
       }
-      VIEW_TYPE_SPACER -> SpacerViewHolder.create(parent, appBarActivity, owner)
       else -> throw AssertionError("Invalid view type: $viewType")
     }
   }
@@ -152,7 +139,6 @@ private constructor(
         val viewHolder = holder as PortfolioItemViewHolder
         viewHolder.bindState(state)
       }
-      is PortfolioItemViewState.Spacer -> Timber.d("Ignore bind on Spacer item")
     }
   }
 

@@ -33,34 +33,31 @@ data class WatchListViewState(
     val section: WatchlistTabSection,
     val isLoading: Boolean,
     val watchlist: PackedData<List<QuotedStock>>,
+    val topOffset: Int,
     val bottomOffset: Int,
 ) : UiViewState {
 
-  val displayWatchlist =
+  val displayWatchlist: PackedData<List<DisplayWatchlist>> =
       when (watchlist) {
         is PackedData.Data -> {
           val list = watchlist.value
-          val spacer = if (embedded) emptyList() else listOf(DisplayWatchlist.Spacer)
           val currentSearch = query
           val allItems =
-              spacer +
-                  list
-                      .asSequence()
-                      .filter { qs ->
-                        val symbol = qs.symbol.symbol()
-                        val name = qs.quote?.company()?.company()
-                        return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
-                        else name?.contains(currentSearch, ignoreCase = true) ?: false
-                      }
-                      .map { DisplayWatchlist.Item(it) }
+              list.asSequence()
+                  .filter { qs ->
+                    val symbol = qs.symbol.symbol()
+                    val name = qs.quote?.company()?.company()
+                    return@filter if (symbol.contains(currentSearch, ignoreCase = true)) true
+                    else name?.contains(currentSearch, ignoreCase = true) ?: false
+                  }
+                  .map { DisplayWatchlist.Item(it) }
+                  .toList()
           allItems.pack()
         }
         is PackedData.Error -> watchlist.throwable.packError()
       }
 
   sealed class DisplayWatchlist {
-
-    object Spacer : DisplayWatchlist()
 
     data class Item internal constructor(val stock: QuotedStock) : DisplayWatchlist()
   }

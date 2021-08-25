@@ -31,8 +31,6 @@ import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
 import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
-import com.pyamsoft.pydroid.ui.privacy.addPrivacy
-import com.pyamsoft.pydroid.ui.privacy.removePrivacy
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.util.doOnLayoutChanged
 import com.pyamsoft.pydroid.util.doOnApplyWindowInsets
@@ -81,8 +79,6 @@ internal constructor(
             v.updateLayoutParams<ViewGroup.MarginLayoutParams> { this.topMargin = toolbarTopMargin }
           }
           .also { doOnTeardown { it.cancel() } }
-
-      binding.mainToolbar.addPrivacy(viewScope, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL)
     }
 
     doOnTeardown {
@@ -91,7 +87,6 @@ internal constructor(
     }
 
     doOnTeardown {
-      binding.mainToolbar.removePrivacy()
       toolbarActivityProvider.setToolbar(null)
     }
 

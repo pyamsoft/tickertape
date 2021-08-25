@@ -20,6 +20,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
@@ -31,6 +32,8 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
 import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
+import com.pyamsoft.pydroid.ui.app.ToolbarActivity
+import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
@@ -60,7 +63,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal class MainActivity :
-    ChangeLogActivity(), UiController<MainControllerEvent>, AppBarActivity, AppBarActivityProvider {
+    ChangeLogActivity(),
+    UiController<MainControllerEvent>,
+    AppBarActivity,
+    AppBarActivityProvider,
+    ToolbarActivity,
+    ToolbarActivityProvider {
 
   override val checkForUpdates = false
 
@@ -102,6 +110,8 @@ internal class MainActivity :
 
   private var capturedAppBar: AppBarLayout? = null
 
+  private var capturedToolbar: Toolbar? = null
+
   override fun setAppBar(bar: AppBarLayout?) {
     capturedAppBar = bar
   }
@@ -112,6 +122,18 @@ internal class MainActivity :
 
   override fun <T> withAppBar(func: (AppBarLayout) -> T): T? {
     return capturedAppBar?.let(func)
+  }
+
+  override fun setToolbar(toolbar: Toolbar?) {
+    capturedToolbar = toolbar
+  }
+
+  override fun <T> requireToolbar(func: (Toolbar) -> T): T {
+    return capturedToolbar.requireNotNull().let(func)
+  }
+
+  override fun <T> withToolbar(func: (Toolbar) -> T): T? {
+    return capturedToolbar?.let(func)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -261,6 +283,7 @@ internal class MainActivity :
     notificationCanceller = null
 
     capturedAppBar = null
+    capturedToolbar = null
     rootBinding = null
 
     container = null

@@ -46,7 +46,7 @@ buildscript {
     spark = "2.0.0"
 
     // Jobs
-    workmanager = "2.5.0"
+    workmanager = "2.6.0"
 
     // Leak Canary
     leakCanary = "2.7"

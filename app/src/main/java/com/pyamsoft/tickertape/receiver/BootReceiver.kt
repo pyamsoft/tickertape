@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.tape.TapeLauncher
@@ -47,7 +48,7 @@ internal class BootReceiver internal constructor() : BroadcastReceiver() {
     if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
       Timber.d("Start service on boot")
       inject(context)
-      MainScope().launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
+      MainScope().launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
     }
   }
 

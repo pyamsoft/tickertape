@@ -67,12 +67,12 @@ internal class PositionsAddDialog :
 
   @CheckResult
   private fun getHoldingId(): DbHolding.Id {
-    return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+    return DbHolding.Id(requireArguments().getString(KEY_HOLDING_ID).requireNotNull())
   }
 
   @CheckResult
   private fun getHoldingSymbol(): StockSymbol {
-    return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
+    return requireArguments().getString(KEY_HOLDING_SYMBOL).requireNotNull().asSymbol()
   }
 
   @CheckResult

@@ -79,11 +79,11 @@ internal class MainActivity :
   override val versionName = BuildConfig.VERSION_NAME
 
   override val fragmentContainerId: Int
-    get() = requireNotNull(container).id()
+    get() = container.requireNotNull().id()
 
   override val snackbarRoot: ViewGroup
     get() {
-      return requireNotNull(rootBinding).layoutCoordinator
+      return rootBinding.requireNotNull().layoutCoordinator
     }
 
   private var rootBinding: LayoutCoordinatorBinding? = null
@@ -117,7 +117,7 @@ internal class MainActivity :
   }
 
   override fun <T> requireAppBar(func: (AppBarLayout) -> T): T {
-    return requireNotNull(capturedAppBar).let(func)
+    return capturedAppBar.requireNotNull().let(func)
   }
 
   override fun <T> withAppBar(func: (AppBarLayout) -> T): T? {
@@ -168,7 +168,8 @@ internal class MainActivity :
             container.requireNotNull(),
             bottomBar.requireNotNull(),
             addNew.requireNotNull(),
-            toolbar.requireNotNull()) {
+            toolbar.requireNotNull(),
+        ) {
           return@createComponent when (it) {
             is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
             is MainViewEvent.TopBarMeasured -> viewModel.handleConsumeTopBarHeight(it.height)
@@ -189,7 +190,7 @@ internal class MainActivity :
 
   override fun onStart() {
     super.onStart()
-    lifecycleScope.launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
+    lifecycleScope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
   }
 
   private fun handleOpenSettings() {
@@ -198,7 +199,7 @@ internal class MainActivity :
 
   private fun beginWork() {
     lifecycleScope.launch(context = Dispatchers.Default) {
-      requireNotNull(alerter).initOnAppStart(requireNotNull(alarmFactory))
+      alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
     }
   }
 
@@ -228,7 +229,7 @@ internal class MainActivity :
         fragment = PortfolioFragment.newInstance()
         tag = PortfolioFragment.TAG
       }
-    }.requireNotNull()
+    }
 
     supportFragmentManager.commitNow(this) { replace(fragmentContainerId, fragment, tag) }
   }

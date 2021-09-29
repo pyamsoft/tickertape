@@ -61,12 +61,12 @@ internal interface HomeComponent {
     @Module
     companion object {
 
-        @Provides
-        @JvmStatic
-        @CheckResult
-        internal fun provideRecyclerPool(): RecyclerView.RecycledViewPool {
-            return RecyclerView.RecycledViewPool()
-        }
+      @Provides
+      @JvmStatic
+      @CheckResult
+      internal fun provideRecyclerPool(): RecyclerView.RecycledViewPool {
+        return RecyclerView.RecycledViewPool()
+      }
     }
   }
 }

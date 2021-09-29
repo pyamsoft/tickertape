@@ -51,9 +51,9 @@ enum class MarketState {
 
         // Other states from YF
         when (name) {
-            PREPRE -> PRE
-            POSTPOST, CLOSED -> POST
-            else -> null
+          PREPRE -> PRE
+          POSTPOST, CLOSED -> POST
+          else -> null
         }
       }
     }

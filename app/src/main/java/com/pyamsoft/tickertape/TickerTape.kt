@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
@@ -74,7 +75,7 @@ class TickerTape : Application() {
     // post to the main thread to defer this work until after start up is done
     Handler(Looper.getMainLooper()).post {
       applicationScope.launch(context = Dispatchers.Default) {
-        requireNotNull(alerter).initOnAppStart(requireNotNull(alarmFactory))
+        alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
       }
     }
   }

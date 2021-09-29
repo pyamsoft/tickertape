@@ -112,36 +112,46 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                 equityType = EquityType.from(stock.quoteType.requireNotNull()),
                                 realEquityType = stock.quoteType.requireNotNull(),
                                 company =
-                                    requireNotNull(stock.longName ?: stock.shortName).asCompany(),
-                                dataDelayBy = requireNotNull(stock.exchangeDataDelayedBy),
+                                    (stock.longName ?: stock.shortName)
+                                        .requireNotNull()
+                                        .asCompany(),
+                                dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
                                 dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
-                                dayHigh = requireNotNull(stock.regularMarketDayHigh).asMoney(),
-                                dayLow = requireNotNull(stock.regularMarketDayLow).asMoney(),
-                                dayOpen = requireNotNull(stock.regularMarketOpen).asMoney(),
-                                dayVolume = requireNotNull(stock.regularMarketVolume).asVolume(),
+                                dayHigh = stock.regularMarketDayHigh.requireNotNull().asMoney(),
+                                dayLow = stock.regularMarketDayLow.requireNotNull().asMoney(),
+                                dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
+                                dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
                                 regular =
                                     StockMarketSessionImpl(
                                         amount =
-                                            requireNotNull(stock.regularMarketChange).asMoney(),
+                                            stock.regularMarketChange.requireNotNull().asMoney(),
                                         direction =
-                                            requireNotNull(stock.regularMarketChange).asDirection(),
+                                            stock
+                                                .regularMarketChange
+                                                .requireNotNull()
+                                                .asDirection(),
                                         percent =
-                                            requireNotNull(stock.regularMarketChangePercent)
+                                            stock
+                                                .regularMarketChangePercent
+                                                .requireNotNull()
                                                 .asPercent(),
-                                        price = requireNotNull(stock.regularMarketPrice).asMoney(),
+                                        price = stock.regularMarketPrice.requireNotNull().asMoney(),
                                         state = MarketState.REGULAR,
                                     ),
                                 afterHours =
                                     if (!hasAfterHoursData(stock)) null
                                     else {
                                       StockMarketSessionImpl(
-                                          amount = requireNotNull(stock.postMarketChange).asMoney(),
+                                          amount =
+                                              stock.postMarketChange.requireNotNull().asMoney(),
                                           direction =
-                                              requireNotNull(stock.postMarketChange).asDirection(),
+                                              stock.postMarketChange.requireNotNull().asDirection(),
                                           percent =
-                                              requireNotNull(stock.postMarketChangePercent)
+                                              stock
+                                                  .postMarketChangePercent
+                                                  .requireNotNull()
                                                   .asPercent(),
-                                          price = requireNotNull(stock.postMarketPrice).asMoney(),
+                                          price = stock.postMarketPrice.requireNotNull().asMoney(),
                                           state = MarketState.POST,
                                       )
                                     },
@@ -149,13 +159,15 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                                     if (!hasPreMarketData(stock)) null
                                     else {
                                       StockMarketSessionImpl(
-                                          amount = requireNotNull(stock.preMarketChange).asMoney(),
+                                          amount = stock.preMarketChange.requireNotNull().asMoney(),
                                           direction =
-                                              requireNotNull(stock.preMarketChange).asDirection(),
+                                              stock.preMarketChange.requireNotNull().asDirection(),
                                           percent =
-                                              requireNotNull(stock.preMarketChangePercent)
+                                              stock
+                                                  .preMarketChangePercent
+                                                  .requireNotNull()
                                                   .asPercent(),
-                                          price = requireNotNull(stock.preMarketPrice).asMoney(),
+                                          price = stock.preMarketPrice.requireNotNull().asMoney(),
                                           state = MarketState.PRE,
                                       )
                                     },

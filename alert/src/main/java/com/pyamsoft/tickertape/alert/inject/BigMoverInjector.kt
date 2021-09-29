@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.alert.inject
 
 import android.content.Context
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.runner.BigMoverRunner
@@ -36,6 +37,6 @@ class BigMoverInjector(context: Context) : BaseInjector<BigMoverParameters>(cont
   ): WorkResult {
     Injector.obtainFromApplication<AlertComponent>(context).inject(this)
 
-    return requireNotNull(runner).doWork(id, tags, params)
+    return runner.requireNotNull().doWork(id, tags, params)
   }
 }

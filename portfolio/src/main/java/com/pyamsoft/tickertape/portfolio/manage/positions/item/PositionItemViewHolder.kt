@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.manage.positions.item
 import androidx.lifecycle.LifecycleOwner
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.portfolio.databinding.PositionItemHolderBinding
 import com.pyamsoft.tickertape.portfolio.manage.positions.PositionsAdapter
 import javax.inject.Inject
@@ -38,10 +39,8 @@ internal constructor(
   init {
     factory.create(binding.positionItemRoot).inject(this)
 
-    val position = requireNotNull(position)
-
     viewBinder =
-        createViewBinder(position) {
+        createViewBinder(position.requireNotNull()) {
           return@createViewBinder when (it) {
             is PositionItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
           }
@@ -49,6 +48,8 @@ internal constructor(
   }
 
   override fun onTeardown() {
+    viewBinder.teardown()
+
     position = null
   }
 }

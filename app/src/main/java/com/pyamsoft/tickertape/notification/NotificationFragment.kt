@@ -40,7 +40,7 @@ import javax.inject.Inject
 class NotificationFragment : Fragment(), UiController<UnitControllerEvent> {
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by activityViewModels<NotificationViewModel>{
+  private val viewModel by activityViewModels<NotificationViewModel> {
     factory.requireNotNull().create(this)
   }
 
@@ -85,14 +85,13 @@ class NotificationFragment : Fragment(), UiController<UnitControllerEvent> {
             list.requireNotNull(),
         ) {
           return@createComponent when (it) {
-              is NotificationViewEvent.UpdateBigMover -> viewModel.handleBigMoverUpdated(it.enabled)
-              is NotificationViewEvent.UpdateTape -> viewModel.handleTapeUpdated(it.enabled)
+            is NotificationViewEvent.UpdateBigMover -> viewModel.handleBigMoverUpdated(it.enabled)
+            is NotificationViewEvent.UpdateTape -> viewModel.handleTapeUpdated(it.enabled)
           }
         }
   }
 
-  override fun onControllerEvent(event: UnitControllerEvent) {
-  }
+  override fun onControllerEvent(event: UnitControllerEvent) {}
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)

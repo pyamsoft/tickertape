@@ -72,12 +72,12 @@ internal class PositionManageDialog :
 
   @CheckResult
   private fun getHoldingId(): DbHolding.Id {
-    return DbHolding.Id(requireNotNull(requireArguments().getString(KEY_HOLDING_ID)))
+    return DbHolding.Id(requireArguments().getString(KEY_HOLDING_ID).requireNotNull())
   }
 
   @CheckResult
   private fun getHoldingSymbol(): StockSymbol {
-    return requireNotNull(requireArguments().getString(KEY_HOLDING_SYMBOL)).asSymbol()
+    return requireArguments().getString(KEY_HOLDING_SYMBOL).requireNotNull().asSymbol()
   }
 
   @CheckResult
@@ -136,9 +136,6 @@ internal class PositionManageDialog :
               c.plusPositionManageComponent().create(binding.layoutLinearV).inject(this)
             }
 
-    val container = requireNotNull(container)
-    val toolbar = requireNotNull(toolbar)
-
     stateSaver =
         createComponent(
             savedInstanceState,
@@ -146,7 +143,8 @@ internal class PositionManageDialog :
             viewModel,
             this,
             toolbar.requireNotNull(),
-            container.requireNotNull()) {
+            container.requireNotNull(),
+        ) {
           return@createComponent when (it) {
             is ManagePortfolioViewEvent.Close -> requireActivity().onBackPressed()
             is ManagePortfolioViewEvent.Add -> viewModel.handleOpenAddDialog()
@@ -180,7 +178,7 @@ internal class PositionManageDialog :
 
   private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
     val fm = childFragmentManager
-    val containerId = requireNotNull(container).id()
+    val containerId = container.requireNotNull().id()
     val existing = fm.findFragmentById(containerId)
     if (existing == null || existing.tag !== tag) {
       fm.commit(viewLifecycleOwner) {
@@ -243,7 +241,7 @@ internal class PositionManageDialog :
     fun getInjector(fragment: Fragment): BaseManageComponent {
       val parent = fragment.parentFragment
       if (parent is PositionManageDialog) {
-        return requireNotNull(parent.component)
+        return parent.component.requireNotNull()
       }
 
       throw AssertionError(

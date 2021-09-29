@@ -20,6 +20,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.requireNotNull
 import timber.log.Timber
 
 class UiEditTextDelegate
@@ -43,7 +44,7 @@ private constructor(
 
   @CheckResult
   private fun getEditText(): EditText {
-    return requireNotNull(editText)
+    return editText.requireNotNull()
   }
 
   private fun killWatcher() {
@@ -61,7 +62,7 @@ private constructor(
   fun handleCreate() {
     killWatcher()
     val edit = getEditText()
-    val watcher = createTextWatcher(edit, requireNotNull(onTextChanged))
+    val watcher = createTextWatcher(edit, onTextChanged.requireNotNull())
     edit.addTextChangedListener(watcher)
     textWatcher = watcher
   }

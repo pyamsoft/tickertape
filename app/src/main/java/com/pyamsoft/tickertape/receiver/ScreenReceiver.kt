@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
@@ -51,7 +52,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
       Timber.d("Start service on screen on")
       inject(context)
 
-      scope.launch(context = Dispatchers.Default) { requireNotNull(tapeLauncher).start() }
+      scope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
     }
   }
 

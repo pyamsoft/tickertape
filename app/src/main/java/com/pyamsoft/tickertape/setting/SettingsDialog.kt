@@ -44,22 +44,19 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
 
   private var stateSaver: StateSaver? = null
 
-  @JvmField @Inject
-  internal var factory: TickerViewModelFactory? = null
+  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
   private val viewModel by activityViewModels<SettingsViewModel> {
     factory.requireNotNull().create(requireActivity())
   }
 
-  @JvmField @Inject
-  internal var toolbar: SettingToolbar? = null
+  @JvmField @Inject internal var toolbar: SettingToolbar? = null
 
-  @JvmField @Inject
-  internal var container: SettingsContainer? = null
+  @JvmField @Inject internal var container: SettingsContainer? = null
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R.layout.layout_constraint, container, false)
   }
@@ -70,34 +67,42 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
 
     val binding = LayoutConstraintBinding.bind(view)
     Injector.obtainFromApplication<TickerComponent>(view.context)
-      .plusSettingsComponent()
-      .create(binding.layoutConstraint)
-      .inject(this)
+        .plusSettingsComponent()
+        .create(binding.layoutConstraint)
+        .inject(this)
 
     val toolbar = toolbar.requireNotNull()
     val container = container.requireNotNull()
 
-    stateSaver = createComponent(savedInstanceState, viewLifecycleOwner, viewModel, this, toolbar, container,) {
-      return@createComponent when(it) {
-        is SettingsViewEvent.Close -> dismiss()
-      }
-    }
-
-    binding.layoutConstraint.layout {
-        toolbar.also {
-          connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-          connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-          connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-          constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+    stateSaver =
+        createComponent(
+            savedInstanceState,
+            viewLifecycleOwner,
+            viewModel,
+            this,
+            toolbar,
+            container,
+        ) {
+          return@createComponent when (it) {
+            is SettingsViewEvent.Close -> dismiss()
+          }
         }
 
-        container.also {
-          connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
-          connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-          connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-          connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-          constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-          constrainHeight(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+    binding.layoutConstraint.layout {
+      toolbar.also {
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+      }
+
+      container.also {
+        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+        connect(it.id(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
+        constrainHeight(it.id(), ConstraintSet.MATCH_CONSTRAINT)
       }
     }
 
@@ -121,8 +126,7 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
     container = null
   }
 
-  override fun onControllerEvent(event: UnitControllerEvent) {
-  }
+  override fun onControllerEvent(event: UnitControllerEvent) {}
 
   companion object {
 
@@ -131,9 +135,7 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
     @JvmStatic
     @CheckResult
     fun newInstance(): DialogFragment {
-      return SettingsDialog().apply {
-        arguments = Bundle().apply {  }
-      }
+      return SettingsDialog().apply { arguments = Bundle().apply {} }
     }
   }
 }

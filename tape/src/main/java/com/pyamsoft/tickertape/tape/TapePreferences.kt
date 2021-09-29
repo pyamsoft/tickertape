@@ -21,11 +21,12 @@ import com.pyamsoft.pydroid.util.PreferenceListener
 
 interface TapePreferences {
 
-    @CheckResult
-    suspend fun isTapeNotificationEnabled() : Boolean
+  @CheckResult suspend fun isTapeNotificationEnabled(): Boolean
 
-    suspend fun setTapeNotificationEnabled(enabled: Boolean)
+  suspend fun setTapeNotificationEnabled(enabled: Boolean)
 
-    @CheckResult
-    suspend fun listenForTapeNotificationChanged(onChange: suspend (Boolean) -> Unit): PreferenceListener
+  @CheckResult
+  suspend fun listenForTapeNotificationChanged(
+      onChange: suspend (Boolean) -> Unit
+  ): PreferenceListener
 }

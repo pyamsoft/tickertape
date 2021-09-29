@@ -17,6 +17,6 @@
 package com.pyamsoft.tickertape.stocks.api
 
 enum class TradeSide {
-    BUY,
-    SELL
+  BUY,
+  SELL
 }

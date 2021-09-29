@@ -34,8 +34,6 @@ import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.util.doOnLayoutChanged
 import com.pyamsoft.pydroid.util.doOnApplyWindowInsets
-import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
-import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.main.databinding.MainToolbarBinding
 import com.pyamsoft.tickertape.ui.withRoundedBackground
 import javax.inject.Inject
@@ -86,9 +84,7 @@ internal constructor(
       titleAnimator = null
     }
 
-    doOnTeardown {
-      toolbarActivityProvider.setToolbar(null)
-    }
+    doOnTeardown { toolbarActivityProvider.setToolbar(null) }
 
     doOnInflate {
       binding.mainAppbar

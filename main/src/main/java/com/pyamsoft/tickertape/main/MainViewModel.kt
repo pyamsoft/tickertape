@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.BottomOffset
@@ -103,7 +104,7 @@ internal constructor(
         stateChange = { copy(page = newPage, adding = false) },
         andThen = { newState ->
           putSavedState(KEY_PAGE, newPage.asString())
-          publishNewSelection(requireNotNull(newState.page), oldPage, force)
+          publishNewSelection(newState.page.requireNotNull(), oldPage, force)
         })
   }
 

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.alert.inject
 
 import android.content.Context
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.runner.RefresherRunner
@@ -36,6 +37,6 @@ class RefresherInjector(context: Context) : BaseInjector<RefreshParameters>(cont
   ): WorkResult {
     Injector.obtainFromApplication<AlertComponent>(context).inject(this)
 
-    return requireNotNull(runner).doWork(id, tags, params)
+    return runner.requireNotNull().doWork(id, tags, params)
   }
 }

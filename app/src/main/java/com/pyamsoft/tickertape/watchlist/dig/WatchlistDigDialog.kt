@@ -52,7 +52,9 @@ internal class WatchlistDigDialog :
   @JvmField @Inject internal var container: BaseWatchlistDigContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by viewModels<BaseWatchlistDigViewModel> { factory.requireNotNull().create(this) }
+  private val viewModel by viewModels<BaseWatchlistDigViewModel> {
+    factory.requireNotNull().create(this)
+  }
 
   private var component: BaseWatchlistDigComponent? = null
 
@@ -60,7 +62,7 @@ internal class WatchlistDigDialog :
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
-    return requireNotNull(requireArguments().getString(KEY_SYMBOL)).asSymbol()
+    return requireArguments().getString(KEY_SYMBOL).requireNotNull().asSymbol()
   }
 
   private fun eatBackButtonPress() {
@@ -122,7 +124,8 @@ internal class WatchlistDigDialog :
             viewModel,
             this,
             toolbar.requireNotNull(),
-            container.requireNotNull()) {
+            container.requireNotNull(),
+        ) {
           return@createComponent when (it) {
             is BaseWatchListDigViewEvent.Close -> requireActivity().onBackPressed()
           }

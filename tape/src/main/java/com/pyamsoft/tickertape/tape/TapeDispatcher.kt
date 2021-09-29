@@ -32,6 +32,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
@@ -54,7 +55,7 @@ internal constructor(
 ) : NotifyDispatcher<TapeNotificationData> {
 
   private val channelCreator by lazy {
-    requireNotNull(context.applicationContext.getSystemService<NotificationManager>())
+    context.applicationContext.getSystemService<NotificationManager>().requireNotNull()
   }
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {

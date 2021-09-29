@@ -19,12 +19,9 @@ package com.pyamsoft.tickertape.db.room.dao.mover
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
-import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

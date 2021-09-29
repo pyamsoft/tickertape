@@ -32,7 +32,7 @@ protected constructor(appBarActivity: AppBarActivity) : UiView<S, V>() {
 
   private var _bindingRoot: TabLayout? = null
   private val layoutRoot: TabLayout
-    get() = requireNotNull(_bindingRoot)
+    get() = _bindingRoot.requireNotNull()
 
   init {
     // Replace the app bar background during switcher presence

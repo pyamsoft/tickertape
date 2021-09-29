@@ -38,16 +38,12 @@ internal constructor(
 
   private val viewBinder: ViewBinder<NotificationItemViewState.Tape>
 
-    @Inject
-    @JvmField
-    internal var toplevel: TapeTopLevel? = null
+  @Inject @JvmField internal var toplevel: TapeTopLevel? = null
 
-    init {
-        factory.create(binding.notificationItemWrapper).inject(this)
+  init {
+    factory.create(binding.notificationItemWrapper).inject(this)
 
-        viewBinder = createViewBinder(toplevel.requireNotNull()) {
-            callback.onTapeUpdated(it.enabled)
-        }
+    viewBinder = createViewBinder(toplevel.requireNotNull()) { callback.onTapeUpdated(it.enabled) }
 
     owner.doOnDestroy { teardown() }
   }
@@ -59,6 +55,6 @@ internal constructor(
   override fun teardown() {
     viewBinder.teardown()
 
-      toplevel = null
+    toplevel = null
   }
 }

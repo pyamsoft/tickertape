@@ -38,15 +38,13 @@ internal constructor(
 
   private val viewBinder: ViewBinder<NotificationItemViewState.BigMover>
 
-  @Inject @JvmField
-  internal var toplevel: BigMoverTopLevel? = null
+  @Inject @JvmField internal var toplevel: BigMoverTopLevel? = null
 
   init {
     factory.create(binding.notificationItemWrapper).inject(this)
 
-    viewBinder = createViewBinder(toplevel.requireNotNull()) {
-        callback.onBigMoverUpdated(it.enabled)
-    }
+    viewBinder =
+        createViewBinder(toplevel.requireNotNull()) { callback.onBigMoverUpdated(it.enabled) }
 
     owner.doOnDestroy { teardown() }
   }
@@ -58,6 +56,6 @@ internal constructor(
   override fun teardown() {
     viewBinder.teardown()
 
-      toplevel = null
+    toplevel = null
   }
 }

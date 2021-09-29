@@ -96,9 +96,9 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
         tradeSide,
     )
 
-    val list = requireNotNull(list)
-    val lookup = requireNotNull(lookup)
-    val toolbar = requireNotNull(toolbar)
+    val list = list.requireNotNull()
+    val lookup = lookup.requireNotNull()
+    val toolbar = toolbar.requireNotNull()
     val shadow =
         DropshadowView.createTyped<SymbolAddViewState, SymbolAddViewEvent>(binding.layoutConstraint)
 

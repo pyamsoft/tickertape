@@ -31,6 +31,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
@@ -50,7 +51,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
     NotifyDispatcher<BigMoverNotificationData> {
 
   private val channelCreator by lazy {
-    requireNotNull(context.applicationContext.getSystemService<NotificationManager>())
+    context.applicationContext.getSystemService<NotificationManager>().requireNotNull()
   }
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {

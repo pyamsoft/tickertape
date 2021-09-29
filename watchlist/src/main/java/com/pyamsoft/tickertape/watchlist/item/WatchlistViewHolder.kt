@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.ViewBinder
 import com.pyamsoft.pydroid.arch.createViewBinder
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.util.layout
 import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.tickertape.watchlist.databinding.WatchlistItemBinding
@@ -45,11 +46,15 @@ internal constructor(
   init {
     factory.create(binding.watchlistItem).inject(this)
 
-    val quote = requireNotNull(quote)
-    val summary = requireNotNull(summary)
+    val quote = quote.requireNotNull()
+    val summary = summary.requireNotNull()
 
     viewBinder =
-        createViewBinder(quote, summary, requireNotNull(click)) {
+        createViewBinder(
+            quote,
+            summary,
+            click.requireNotNull(),
+        ) {
           return@createViewBinder when (it) {
             is WatchlistItemViewEvent.Remove -> callback.onRemove(bindingAdapterPosition)
             is WatchlistItemViewEvent.Select -> callback.onSelect(bindingAdapterPosition)

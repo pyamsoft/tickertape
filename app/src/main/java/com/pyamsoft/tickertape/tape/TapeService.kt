@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.tape
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -53,7 +54,7 @@ class TapeService : Service() {
 
     Injector.obtainFromApplication<TickerComponent>(this).plusTapeComponent().create().inject(this)
 
-    requireNotNull(tapeRemote).also { remote ->
+    tapeRemote.requireNotNull().also { remote ->
       serviceScope.launch(context = Dispatchers.Default) {
         remote.onStopReceived {
           Timber.w("Stop command received from remote. Stop TapeService")
@@ -83,7 +84,8 @@ class TapeService : Service() {
     val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
 
     serviceScope.launch(context = Dispatchers.Default) {
-      requireNotNull(tapeRemote)
+      tapeRemote
+          .requireNotNull()
           .updateNotification(
               TapeRemote.NotificationOptions(index = index, forceRefresh = forceRefresh))
     }
@@ -93,7 +95,7 @@ class TapeService : Service() {
     super.onDestroy()
 
     Timber.d("Stop notification in foreground and kill service")
-    requireNotNull(tapeRemote).stopNotification(this)
+    tapeRemote.requireNotNull().stopNotification(this)
 
     stopSelf()
 

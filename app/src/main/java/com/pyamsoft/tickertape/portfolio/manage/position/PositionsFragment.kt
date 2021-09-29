@@ -68,15 +68,13 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
         .create(binding.layoutFrame)
         .inject(this)
 
-    val list = requireNotNull(list)
-
     stateSaver =
         createComponent(
             savedInstanceState,
             viewLifecycleOwner,
             viewModel,
             this,
-            list,
+            list.requireNotNull(),
         ) {
           return@createComponent when (it) {
             is PositionsViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)

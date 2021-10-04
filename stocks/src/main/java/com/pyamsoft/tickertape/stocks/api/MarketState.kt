@@ -47,13 +47,14 @@ enum class MarketState {
       return try {
         valueOf(name)
       } catch (e: Throwable) {
-        Timber.w(e, "Unmatched MarketState: $name")
-
         // Other states from YF
         when (name) {
           PREPRE -> PRE
           POSTPOST, CLOSED -> POST
-          else -> null
+          else -> {
+            Timber.w(e, "Unmatched MarketState: $name")
+            null
+          }
         }
       }
     }

@@ -18,14 +18,18 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.isZero
-import com.pyamsoft.tickertape.stocks.api.MONEY_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.SMALL_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 
 internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
 
-  private val money by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) "$0.00" else MONEY_FORMATTER.get().requireNotNull().format(value)
-  }
+  private val money by
+      lazy(LazyThreadSafetyMode.NONE) {
+        // If its a small money < $10, allow more decimals
+        val formatter = if (value.compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
+        return@lazy if (isZero()) "$0.00" else formatter.get().requireNotNull().format(value)
+      }
 
   override fun asMoneyValue(): String {
     return money

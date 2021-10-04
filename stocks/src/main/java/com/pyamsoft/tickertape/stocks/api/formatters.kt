@@ -22,7 +22,19 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @JvmField
-val MONEY_FORMATTER =
+val SMALL_MONEY_FORMATTER =
+    object : ThreadLocal<NumberFormat>() {
+
+      override fun initialValue(): NumberFormat? {
+        return DecimalFormat.getCurrencyInstance().apply {
+          minimumFractionDigits = 2
+          maximumFractionDigits = 4
+        }
+      }
+    }
+
+@JvmField
+val BIG_MONEY_FORMATTER =
     object : ThreadLocal<NumberFormat>() {
 
       override fun initialValue(): NumberFormat? {

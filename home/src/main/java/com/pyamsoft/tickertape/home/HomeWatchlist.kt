@@ -48,7 +48,7 @@ internal constructor(
     // Either way, we only want the list to be one card high as we will modify it to scroll
     // horizontally
     doOnInflate {
-      val size = (124 + 16).asDp(layoutRoot.context)
+      val size = (124 + 20).asDp(layoutRoot.context)
       layoutRoot.updateLayoutParams { this.height = size }
     }
 

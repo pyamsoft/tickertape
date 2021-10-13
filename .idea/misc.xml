@@ -5,6 +5,7 @@
       <map>
         <entry key="home/src/main/res/layout/top_spacer.xml" value="0.1" />
         <entry key="portfolio/src/main/res/layout/holding_quote.xml" value="0.1947463768115942" />
+        <entry key="watchlist/src/main/res/layout/watchlist_item.xml" value="0.1" />
       </map>
     </option>
   </component>

@@ -22,7 +22,6 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangeItemTextBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.ui.R
-import java.util.Locale
 import javax.inject.Inject
 
 internal class ChartRangeText @Inject internal constructor(parent: ViewGroup) :
@@ -47,6 +46,6 @@ internal class ChartRangeText @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleRangeChanged(range: StockChart.IntervalRange) {
-    binding.componentChartRangeItemText.text = range.display.uppercase(Locale.getDefault())
+    binding.componentChartRangeItemText.text = range.display.uppercase()
   }
 }

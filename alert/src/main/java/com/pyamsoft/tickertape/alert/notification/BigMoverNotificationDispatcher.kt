@@ -40,6 +40,7 @@ import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.tape.R
+import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Singleton
 import timber.log.Timber
@@ -85,7 +86,11 @@ internal constructor(private val context: Context, private val activityClass: Cl
           putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, symbol.symbol())
         }
     return PendingIntent.getActivity(
-        appContext, REQUEST_CODE_ACTIVITY, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        appContext,
+        REQUEST_CODE_ACTIVITY,
+        activityIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
   }
 
   override fun build(
@@ -113,12 +118,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
     when {
       direction.isUp() -> {
-        icon = R.drawable.ic_chart_up_24dp
+        icon = R2.drawable.ic_chart_up_24dp
         movingString = "rising"
         directionString = "up"
       }
       direction.isDown() -> {
-        icon = R.drawable.ic_chart_down_24dp
+        icon = R2.drawable.ic_chart_down_24dp
         movingString = "dropping"
         directionString = "down"
       }

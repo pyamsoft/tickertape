@@ -39,6 +39,7 @@ import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.currentSession
+import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -88,7 +89,11 @@ internal constructor(
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
     return PendingIntent.getActivity(
-        appContext, REQUEST_CODE_ACTIVITY, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        appContext,
+        REQUEST_CODE_ACTIVITY,
+        activityIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
   }
 
   @CheckResult
@@ -104,10 +109,18 @@ internal constructor(
         }
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       PendingIntent.getForegroundService(
-          appContext, requestCode, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+          appContext,
+          requestCode,
+          serviceIntent,
+          PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+      )
     } else {
       PendingIntent.getService(
-          appContext, requestCode, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+          appContext,
+          requestCode,
+          serviceIntent,
+          PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+      )
     }
   }
 
@@ -169,7 +182,7 @@ internal constructor(
       channelInfo: NotifyChannelInfo
   ): NotificationCompat.Builder {
     return NotificationCompat.Builder(context.applicationContext, channelInfo.id)
-        .setSmallIcon(R.drawable.ic_watchlist_24dp)
+        .setSmallIcon(R2.drawable.ic_watchlist_24dp)
         .setShowWhen(false)
         .setAutoCancel(false)
         .setOngoing(true)

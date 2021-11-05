@@ -20,6 +20,7 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
+import coil.Coil
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.ModuleProvider
@@ -47,7 +48,21 @@ class TickerTape : Application() {
     val url = "https://github.com/pyamsoft/tickertape"
     val parameters =
         PYDroid.Parameters(
-            url, "$url/issues", PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL, BuildConfig.VERSION_CODE)
+            googlePlayLicenseVerificationKey = BuildConfig.LICENSE_KEY,
+            viewSourceUrl = url,
+            bugReportUrl = "$url/issues",
+            privacyPolicyUrl = PRIVACY_POLICY_URL,
+            termsConditionsUrl = TERMS_CONDITIONS_URL,
+            version = BuildConfig.VERSION_CODE,
+            imageLoader = { Coil.imageLoader(this) },
+            logger = createLogger(),
+            theme = { themeProvider, content ->
+              TickerTapeTheme(
+                  themeProvider = themeProvider,
+                  content = content,
+              )
+            },
+        )
 
     return@lazy createComponent(PYDroid.init(this, parameters))
   }

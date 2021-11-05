@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.ui.chart
 
 import android.os.Bundle
+import com.pyamsoft.pydroid.ui.R as R2
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,7 @@ abstract class BaseChartFragment protected constructor() :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_frame, container, false)
+    return inflater.inflate(R2.layout.layout_frame, container, false)
   }
 
   final override fun onViewCreated(

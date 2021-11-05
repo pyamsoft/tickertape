@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.manage.position
 
 import android.os.Bundle
+import com.pyamsoft.pydroid.ui.R as R2
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,7 @@ internal class PositionsFragment : Fragment(), UiController<PositionsControllerE
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_frame, container, false)
+    return inflater.inflate(R2.layout.layout_frame, container, false)
   }
 
   override fun onViewCreated(

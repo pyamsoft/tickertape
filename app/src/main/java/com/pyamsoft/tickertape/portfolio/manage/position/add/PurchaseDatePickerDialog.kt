@@ -19,6 +19,9 @@ package com.pyamsoft.tickertape.portfolio.manage.position.add
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
@@ -34,6 +37,7 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateControllerEvent
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateViewModel
+import com.pyamsoft.tickertape.ui.correctBackground
 import java.time.Instant
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -51,6 +55,16 @@ internal class PurchaseDatePickerDialog :
   }
 
   private var stateSaver: StateSaver? = null
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return super.onCreateView(inflater, container, savedInstanceState)?.apply {
+        correctBackground(this)
+    }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

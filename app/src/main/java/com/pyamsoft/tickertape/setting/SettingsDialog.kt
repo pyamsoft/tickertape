@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -36,8 +37,10 @@ import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.commitNow
 import com.pyamsoft.pydroid.ui.util.layout
+import com.pyamsoft.pydroid.util.valueFromCurrentTheme
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.ui.correctBackground
 import javax.inject.Inject
 
 internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitControllerEvent> {
@@ -45,9 +48,8 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
   private var stateSaver: StateSaver? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by activityViewModels<SettingsViewModel> {
-    factory.requireNotNull().create(requireActivity())
-  }
+  private val viewModel by
+      activityViewModels<SettingsViewModel> { factory.requireNotNull().create(requireActivity()) }
 
   @JvmField @Inject internal var toolbar: SettingToolbar? = null
 
@@ -58,7 +60,9 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_constraint, container, false)
+    return inflater.inflate(R.layout.layout_constraint, container, false).apply {
+      correctBackground(this)
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

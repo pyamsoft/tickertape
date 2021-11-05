@@ -81,11 +81,6 @@ internal class MainActivity :
   private val fragmentContainerId: Int
     get() = container.requireNotNull().id()
 
-  override val snackbarRoot: ViewGroup
-    get() {
-      return rootBinding.requireNotNull().layoutCoordinator
-    }
-
   private var rootBinding: LayoutCoordinatorBinding? = null
   private var stateSaver: StateSaver? = null
 

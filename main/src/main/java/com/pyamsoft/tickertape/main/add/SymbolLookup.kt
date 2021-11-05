@@ -24,6 +24,7 @@ import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
 import com.pyamsoft.tickertape.main.R
 import com.pyamsoft.tickertape.main.databinding.SymbolAddLookupBinding
 import com.pyamsoft.tickertape.ui.UiEditTextDelegate
+import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 
 class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent: ViewGroup) :
@@ -46,7 +47,7 @@ class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent
     doOnInflate {
       imageLoader
           .asDrawable()
-          .load(R.drawable.ic_search_24dp)
+          .load(R2.drawable.ic_search_24dp)
           .into(binding.symbolAddSearchTriggerImage)
           .also { doOnTeardown { it.dispose() } }
     }

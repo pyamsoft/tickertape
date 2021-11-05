@@ -31,6 +31,7 @@ import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
@@ -46,9 +47,8 @@ import javax.inject.Inject
 class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   @JvmField @Inject internal var factory: PortfolioViewModel.Factory? = null
-  private val viewModel by activityViewModels<PortfolioViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  private val viewModel by
+      activityViewModels<PortfolioViewModel> { factory.requireNotNull().asFactory(this) }
 
   private var stateSaver: StateSaver? = null
 
@@ -63,7 +63,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View? {
-    return inflater.inflate(R.layout.layout_coordinator, container, false)
+    return inflater.inflate(R2.layout.layout_coordinator, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

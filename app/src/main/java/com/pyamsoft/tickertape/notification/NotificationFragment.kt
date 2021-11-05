@@ -35,6 +35,7 @@ import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.pydroid.ui.R as R2
 import javax.inject.Inject
 
 class NotificationFragment : Fragment(), UiController<UnitControllerEvent> {
@@ -53,7 +54,7 @@ class NotificationFragment : Fragment(), UiController<UnitControllerEvent> {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View? {
-    return inflater.inflate(R.layout.layout_coordinator, container, false)
+    return inflater.inflate(R2.layout.layout_coordinator, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

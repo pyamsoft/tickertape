@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.quote.ui.databinding.ComponentChartRangeItemTextBinding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.ui.R
+import com.pyamsoft.pydroid.ui.R as R2
 import javax.inject.Inject
 
 internal class ChartRangeText @Inject internal constructor(parent: ViewGroup) :
@@ -42,7 +43,7 @@ internal class ChartRangeText @Inject internal constructor(parent: ViewGroup) :
   }
 
   private fun handleSelectedChanged(selected: Boolean) {
-    binding.componentChartRangeItemText.setBackgroundResource(if (selected) R.color.blue500 else 0)
+    binding.componentChartRangeItemText.setBackgroundResource(if (selected) R2.color.blue500 else 0)
   }
 
   private fun handleRangeChanged(range: StockChart.IntervalRange) {

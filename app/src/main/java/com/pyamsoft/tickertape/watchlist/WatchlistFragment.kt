@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import com.pyamsoft.pydroid.ui.R as R2
 import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -63,7 +64,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View? {
-    return inflater.inflate(R.layout.layout_coordinator, container, false)
+    return inflater.inflate(R2.layout.layout_coordinator, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

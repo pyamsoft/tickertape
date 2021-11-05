@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import com.pyamsoft.pydroid.ui.R as R2
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,6 +42,7 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.correctBackground
 import com.pyamsoft.tickertape.watchlist.dig.chart.WatchlistDigChartFragment
 import javax.inject.Inject
 
@@ -99,7 +101,9 @@ internal class WatchlistDigDialog :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_linear_vertical, container, false)
+    return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
+        correctBackground(this)
+    }
   }
 
   override fun onViewCreated(

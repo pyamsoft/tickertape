@@ -42,6 +42,7 @@ import com.pyamsoft.tickertape.main.add.SymbolResultList
 import com.pyamsoft.tickertape.main.add.SymbolToolbar
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.ui.correctBackground
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -65,7 +66,9 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_constraint, container, false)
+    return inflater.inflate(R.layout.layout_constraint, container, false).apply {
+      correctBackground(this)
+    }
   }
 
   @CheckResult

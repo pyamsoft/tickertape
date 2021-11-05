@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.position.add
 
+import com.pyamsoft.pydroid.ui.R as R2
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -48,6 +49,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.correctBackground
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -99,7 +101,9 @@ internal class PositionsAddDialog :
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View? {
-    return inflater.inflate(R.layout.layout_linear_vertical, container, false)
+    return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
+        correctBackground(this)
+    }
   }
 
   override fun onViewCreated(

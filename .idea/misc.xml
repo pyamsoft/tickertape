@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/dialog_background.xml" value="0.12129629629629629" />
         <entry key="home/src/main/res/layout/top_spacer.xml" value="0.1" />
         <entry key="portfolio/src/main/res/layout/holding_quote.xml" value="0.1947463768115942" />
         <entry key="watchlist/src/main/res/layout/watchlist_item.xml" value="0.1" />

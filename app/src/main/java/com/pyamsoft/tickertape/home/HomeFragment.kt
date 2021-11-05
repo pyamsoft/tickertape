@@ -38,6 +38,7 @@ import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
+import com.pyamsoft.pydroid.ui.R as R2
 import javax.inject.Inject
 
 class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
@@ -56,7 +57,7 @@ class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View? {
-    return inflater.inflate(R.layout.layout_coordinator, container, false)
+    return inflater.inflate(R2.layout.layout_coordinator, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

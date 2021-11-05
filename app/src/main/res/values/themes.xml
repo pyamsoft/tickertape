@@ -18,8 +18,8 @@
     <!-- Base application theme. -->
     <style name="Theme.TickerTape" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar">
 
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/blue500</item>
+        <item name="colorPrimaryVariant">@color/blue700</item>
         <item name="colorOnPrimary">@color/white</item>
 
         <item name="colorSecondary">@color/teal_200</item>

@@ -17,6 +17,7 @@
 apply plugin: "com.android.application"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply from: '../gradle/local.gradle'
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -64,6 +65,8 @@ android {
 
   buildTypes {
     release {
+      buildConfigField "String", "LICENSE_KEY", "\"${LICENSE_KEY_HASH}\""
+
       signingConfig signingConfigs.release
       minifyEnabled true
       shrinkResources true
@@ -72,6 +75,8 @@ android {
     }
 
     debug {
+      buildConfigField "String", "LICENSE_KEY", "\"\""
+
       signingConfig signingConfigs.debug
       applicationIdSuffix ".dev"
       versionNameSuffix "-dev"

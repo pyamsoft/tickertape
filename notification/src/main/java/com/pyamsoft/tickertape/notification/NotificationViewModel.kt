@@ -64,11 +64,13 @@ internal constructor(
       topOffsetBus.onEvent { setState { copy(topOffset = it.height) } }
     }
 
-    setState(
-        stateChange = { copy(isTapeEnabled = tapePreferences.isTapeNotificationEnabled()) },
-        andThen = { updateTapeLauncher() })
-
     viewModelScope.launch(context = Dispatchers.Default) {
+      val isTapeEnabled = tapePreferences.isTapeNotificationEnabled()
+      setState(
+          stateChange = { copy(isTapeEnabled = isTapeEnabled) },
+          andThen = { updateTapeLauncher() },
+      )
+
       tapePreferences
           .listenForTapeNotificationChanged { enabled ->
             // Need coroutine scope here so we can use the PreferenceListener.scope
@@ -88,13 +90,13 @@ internal constructor(
           }
     }
 
-    setState(
-        stateChange = {
-          copy(isBigMoverEnabled = bigMoverPreferences.isBigMoverNotificationEnabled())
-        },
-        andThen = { updateBigMoverAlerts() })
-
     viewModelScope.launch(context = Dispatchers.Default) {
+      val isBigMoverEnabled = bigMoverPreferences.isBigMoverNotificationEnabled()
+      setState(
+          stateChange = { copy(isBigMoverEnabled = isBigMoverEnabled) },
+          andThen = { updateBigMoverAlerts() },
+      )
+
       bigMoverPreferences
           .listenForBigMoverNotificationChanged { enabled ->
             // Need coroutine scope here so we can use the PreferenceListener.scope

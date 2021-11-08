@@ -36,7 +36,7 @@ buildscript {
         // Needed by pydroid-protection
         includeGroup("com.github.javiersantos")
 
-        // pyamsoft Cachify and Highlander
+        // pyamsoft Cachify and Highlander and Spark
         includeGroup("com.github.pyamsoft")
       }
     }
@@ -170,7 +170,7 @@ allprojects {
         // Needed by pydroid-protection
         includeGroup("com.github.javiersantos")
 
-        // pyamsoft Cachify and Highlander
+        // pyamsoft Cachify and Highlander and Spark
         includeGroup("com.github.pyamsoft")
       }
     }

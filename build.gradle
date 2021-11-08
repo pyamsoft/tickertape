@@ -29,6 +29,16 @@ buildscript {
 
     maven {
       url "https://jitpack.io"
+      content {
+        // PYDroid
+        includeGroup("com.github.pyamsoft.pydroid")
+
+        // Needed by pydroid-protection
+        includeGroup("com.github.javiersantos")
+
+        // pyamsoft Cachify and Highlander
+        includeGroup("com.github.pyamsoft")
+      }
     }
 
     maven {
@@ -41,7 +51,7 @@ buildscript {
     maxSdk = 31
 
     // Us
-    pydroid = "24.0.0"
+    pydroid = "24.1.1"
     cachify = "0.0.23"
     highlander = "0.0.18"
     spark = "2.0.0"
@@ -91,7 +101,7 @@ buildscript {
     classpath 'com.android.tools.build:gradle:7.0.3'
 
     // Gradle version checker
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.38.0'
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.39.0'
 
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
@@ -153,6 +163,16 @@ allprojects {
 
     maven {
       url "https://jitpack.io"
+      content {
+        // PYDroid
+        includeGroup("com.github.pyamsoft.pydroid")
+
+        // Needed by pydroid-protection
+        includeGroup("com.github.javiersantos")
+
+        // pyamsoft Cachify and Highlander
+        includeGroup("com.github.pyamsoft")
+      }
     }
 
     maven {

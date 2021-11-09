@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Singleton
 internal class BottomOffsetBus @Inject internal constructor() : EventBus<BottomOffset> {
 
-  private val bus = EventBus.create<BottomOffset>(emitOnlyWhenActive = false, replayCount = 1)
+  private val bus = EventBus.create<BottomOffset>(replayCount = 1)
 
   override suspend fun onEvent(emitter: suspend (event: BottomOffset) -> Unit) {
     Enforcer.assertOffMainThread()

@@ -29,7 +29,7 @@ internal abstract class BaseDbImpl<
     D : DbDelete<*>,
 > protected constructor() : BaseDb<R, Q, I, D> {
 
-  private val bus = EventBus.create<ChangeEvent>(emitOnlyWhenActive = true)
+  private val bus = EventBus.create<ChangeEvent>()
 
   protected suspend fun onEvent(onEvent: suspend (event: ChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) {

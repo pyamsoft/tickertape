@@ -43,7 +43,7 @@ abstract class MainModule {
     @Singleton
     @CheckResult
     internal fun provideMainPageBus(): EventBus<MainPage> {
-      return EventBus.create(emitOnlyWhenActive = false)
+      return EventBus.create()
     }
 
     @Provides
@@ -51,7 +51,7 @@ abstract class MainModule {
     @Singleton
     @CheckResult
     internal fun provideAddNewBus(): EventBus<AddNew> {
-      return EventBus.create(emitOnlyWhenActive = false)
+      return EventBus.create()
     }
   }
 }

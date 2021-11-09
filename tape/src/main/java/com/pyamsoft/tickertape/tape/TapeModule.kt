@@ -69,7 +69,7 @@ abstract class TapeModule {
     @CheckResult
     @TapeInternalApi
     internal fun provideTapeStopBus(): EventBus<TapeRemote.StopCommand> {
-      return EventBus.create(emitOnlyWhenActive = false)
+      return EventBus.create()
     }
   }
 }

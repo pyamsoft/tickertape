@@ -45,7 +45,7 @@ abstract class PositionsDateModule {
     @InternalApi
     @Singleton
     internal fun provideBus(): EventBus<DateSelectPayload> {
-      return EventBus.create(emitOnlyWhenActive = false)
+      return EventBus.create()
     }
   }
 }

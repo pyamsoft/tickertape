@@ -82,7 +82,7 @@ buildscript {
 
     // AndroidX
     core = "1.7.0"
-    constraintLayout = "2.1.1"
+    constraintLayout = "2.1.2"
     preference = "1.1.1"
     recyclerView = "1.2.1"
     fragment = "1.4.0"

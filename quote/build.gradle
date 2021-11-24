@@ -44,6 +44,11 @@ android {
 
   buildFeatures {
     buildConfig false
+    compose true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion "$compose_version"
   }
 }
 
@@ -65,7 +70,9 @@ dependencies {
 
   kapt "com.google.dagger:dagger-compiler:$dagger"
 
+  api "com.github.pyamsoft:spark:$spark"
+
   implementation project(':db')
   implementation project(':stocks')
-  api project(':core')
+  api project(':ui')
 }

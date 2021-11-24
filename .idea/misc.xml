@@ -3,9 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../layout/compose-model-1637725332085.xml" value="0.1675084175084175" />
+        <entry key="../../../../../layout/compose-model-1637725967865.xml" value="0.1675084175084175" />
+        <entry key="../../../../../layout/compose-model-1637726222568.xml" value="0.55" />
+        <entry key="../../../../../layout/compose-model-1637726494389.xml" value="0.375" />
         <entry key="app/src/main/res/drawable/dialog_background.xml" value="0.12129629629629629" />
         <entry key="home/src/main/res/layout/top_spacer.xml" value="0.1" />
         <entry key="portfolio/src/main/res/layout/holding_quote.xml" value="0.1947463768115942" />
+        <entry key="ui/src/main/res/drawable/floater_background.xml" value="0.19739583333333333" />
         <entry key="watchlist/src/main/res/layout/watchlist_item.xml" value="0.1" />
       </map>
     </option>

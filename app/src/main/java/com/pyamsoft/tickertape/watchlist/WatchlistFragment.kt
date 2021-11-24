@@ -147,8 +147,6 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   companion object {
 
-    const val TAG = "WatchlistFragment"
-
     @JvmStatic
     @CheckResult
     fun newInstance(): Fragment {

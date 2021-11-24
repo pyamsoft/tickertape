@@ -152,8 +152,6 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
 
   companion object {
 
-    const val TAG = "PortfolioFragment"
-
     @JvmStatic
     @CheckResult
     fun newInstance(): Fragment {

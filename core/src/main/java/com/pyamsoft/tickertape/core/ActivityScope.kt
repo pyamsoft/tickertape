@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.core
 
-import android.os.Bundle
-import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.ui.navigator.Navigator
+import javax.inject.Scope
 
-sealed class MainPage(val name: String) {
-  object Home : MainPage("Home")
-  object WatchList : MainPage("Watch List")
-  object Portfolio : MainPage("Portfolio")
-  object Settings : MainPage("Settings")
-
-  @CheckResult
-  fun asScreen(): Navigator.Screen<MainPage> {
-    val self = this
-    return object : Navigator.Screen<MainPage> {
-      override val arguments: Bundle? = null
-      override val screen: MainPage = self
-    }
-  }
-}
+@Scope @Retention(AnnotationRetention.RUNTIME) annotation class ActivityScope

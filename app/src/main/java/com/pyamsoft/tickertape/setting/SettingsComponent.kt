@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.main
+package com.pyamsoft.tickertape.setting
 
-import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
-import javax.inject.Inject
+import androidx.annotation.CheckResult
+import dagger.Subcomponent
 
-class MainContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<MainViewState, MainViewEvent>(parent)
+@Subcomponent
+internal interface SettingsComponent {
+
+  fun inject(fragment: AppSettings)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(): SettingsComponent
+  }
+}

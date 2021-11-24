@@ -36,14 +36,16 @@ import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
+  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var viewModel: HomeViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
 
@@ -68,9 +70,10 @@ class HomeFragment : Fragment() {
       savedInstanceState: Bundle?
   ): View {
     val act = requireActivity()
-    Injector.obtainFromApplication<TickerComponent>(act).plusHomeComponent().create().inject(this)
+    Injector.obtainFromActivity<MainComponent>(act).plusHome().create().inject(this)
 
     val vm = viewModel.requireNotNull()
+    val mainVM = mainViewModel.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -82,14 +85,17 @@ class HomeFragment : Fragment() {
 
       setContent {
         vm.Render { state ->
-          TickerTapeTheme(themeProvider) {
-            CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
-              HomeScreen(
-                  modifier = Modifier.fillMaxSize(),
-                  state = state,
-                  onRefresh = { handleRefresh(true) },
-                  onChartClicked = { handleOpenDigDialog(it) },
-              )
+          mainVM.Render { mainState ->
+            TickerTapeTheme(themeProvider) {
+              CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+                HomeScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    navBarBottomHeight = mainState.bottomNavHeight,
+                    onRefresh = { handleRefresh(true) },
+                    onChartClicked = { handleOpenDigDialog(it) },
+                )
+              }
             }
           }
         }
@@ -100,6 +106,7 @@ class HomeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     viewModel.requireNotNull().restoreState(savedInstanceState)
+    mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onStart() {
@@ -110,6 +117,7 @@ class HomeFragment : Fragment() {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
+    mainViewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -126,11 +134,10 @@ class HomeFragment : Fragment() {
 
     theming = null
     viewModel = null
+    mainViewModel = null
   }
 
   companion object {
-
-    const val TAG = "HomeFragment"
 
     @JvmStatic
     @CheckResult

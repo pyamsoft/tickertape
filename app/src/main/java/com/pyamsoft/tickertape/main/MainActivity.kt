@@ -17,16 +17,20 @@
 package com.pyamsoft.tickertape.main
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.android.material.appbar.AppBarLayout
-import com.pyamsoft.pydroid.arch.StateSaver
-import com.pyamsoft.pydroid.arch.UiController
-import com.pyamsoft.pydroid.arch.asFactory
-import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.AppBarActivity
@@ -36,23 +40,20 @@ import com.pyamsoft.pydroid.ui.app.ToolbarActivity
 import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
-import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.util.commitNow
-import com.pyamsoft.pydroid.ui.util.show
+import com.pyamsoft.pydroid.ui.navigator.Navigator
+import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
-import com.pyamsoft.tickertape.home.HomeFragment
+import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.initOnAppStart
-import com.pyamsoft.tickertape.portfolio.PortfolioFragment
-import com.pyamsoft.tickertape.setting.AppSettings
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -61,169 +62,150 @@ import timber.log.Timber
 
 internal class MainActivity :
     PYDroidActivity(),
-    UiController<MainControllerEvent>,
-    AppBarActivity,
-    AppBarActivityProvider,
     ToolbarActivity,
-    ToolbarActivityProvider {
+    ToolbarActivityProvider,
+    AppBarActivity,
+    AppBarActivityProvider {
 
   override val applicationIcon = R.mipmap.ic_launcher
 
   override val changelog: ChangeLogBuilder = buildChangeLog {}
 
-  private val fragmentContainerId: Int
-    get() = container.requireNotNull().id()
+  private var viewBinding: ActivityMainBinding? = null
+  private var injector: MainComponent? = null
 
-  private var rootBinding: LayoutCoordinatorBinding? = null
-  private var stateSaver: StateSaver? = null
-
+  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var notificationCanceller: NotificationCanceller? = null
-
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
-
-  @JvmField @Inject internal var factory: MainViewModel.Factory? = null
-  private val viewModel by viewModels<MainViewModel> { factory.requireNotNull().asFactory(this) }
-
-  @JvmField @Inject internal var container: MainContainer? = null
-
-  @JvmField @Inject internal var bottomBar: MainBar? = null
-
-  @JvmField @Inject internal var addNew: MainBarAdd? = null
-
-  @JvmField @Inject internal var toolbar: MainToolbar? = null
-
   @JvmField @Inject internal var alerter: Alerter? = null
-
   @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
+  @JvmField @Inject internal var viewModel: MainViewModeler? = null
 
-  private var capturedAppBar: AppBarLayout? = null
-
-  private var capturedToolbar: Toolbar? = null
-
-  override fun setAppBar(bar: AppBarLayout?) {
-    capturedAppBar = bar
+  private fun navigate(page: MainPage) {
+    if (navigator.requireNotNull().select(page.asScreen(), force = false)) {
+      Timber.d("Loaded page: $page")
+    } else {
+      Timber.w("Could not push page: $page")
+    }
   }
 
+  override fun setAppBar(bar: AppBarLayout?) {}
+
   override fun <T> requireAppBar(func: (AppBarLayout) -> T): T {
-    return capturedAppBar.requireNotNull().let(func)
+    return func(AppBarLayout(this))
   }
 
   override fun <T> withAppBar(func: (AppBarLayout) -> T): T? {
-    return capturedAppBar?.let(func)
+    return null
   }
 
-  override fun setToolbar(toolbar: Toolbar?) {
-    capturedToolbar = toolbar
-  }
+  override fun setToolbar(toolbar: Toolbar?) {}
 
   override fun <T> requireToolbar(func: (Toolbar) -> T): T {
-    return capturedToolbar.requireNotNull().let(func)
+    return func(Toolbar(this))
   }
 
   override fun <T> withToolbar(func: (Toolbar) -> T): T? {
-    return capturedToolbar?.let(func)
+    return null
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    setTheme(R.style.Theme_TickerTape)
-    super.onCreate(savedInstanceState)
-    val binding = LayoutCoordinatorBinding.inflate(layoutInflater).apply { rootBinding = this }
+    // NOTE(Peter):
+    // Not full Compose yet
+    // Compose has an issue handling Fragments.
+    //
+    // We need an AndroidView to handle a Fragment, but a Fragment outlives the Activity via the
+    // FragmentManager keeping state. The Compose render does not, so when an activity dies from
+    // configuration change, the Fragment is headless somewhere in the great beyond. This leads to
+    // memory leaks and other issues like Disposable hooks not being called on DisposeEffect blocks.
+    // To avoid these growing pains, we use an Activity layout file and then host the ComposeViews
+    // from it that are then used to render Activity level views. Fragment transactions happen as
+    // normal and then Fragments host ComposeViews too.
+    val binding = ActivityMainBinding.inflate(layoutInflater).apply { viewBinding = this }
     setContentView(binding.root)
 
-    Injector.obtainFromApplication<TickerComponent>(this)
-        .plusMainComponent()
-        .create(this, this, this, binding.layoutCoordinator, this, this)
-        .inject(this)
-
-    lifecycleScope
-
+    injector =
+        Injector.obtainFromApplication<TickerComponent>(this)
+            .plusMainComponent()
+            .create(
+                this,
+                binding.mainFragmentContainerView.id,
+                this,
+                this,
+            )
+            .also { c -> c.inject(this) }
+    setTheme(R.style.Theme_TickerTape)
+    super.onCreate(savedInstanceState)
     stableLayoutHideNavigation()
 
-    inflateComponents(savedInstanceState)
     beginWork()
     handleLaunchIntent()
 
-    viewModel.handleLoadDefaultPage()
-  }
+    // Snackbar respects window offsets and hosts snackbar composables
+    // Because these are not in a nice Scaffold, we cannot take advantage of Coordinator style
+    // actions (a FAB will not move out of the way for example)
+    val navi = navigator.requireNotNull()
+    val vm = viewModel.requireNotNull()
 
-  private fun inflateComponents(savedInstanceState: Bundle?) {
-    stateSaver =
-        createComponent(
-            savedInstanceState,
-            this,
-            viewModel,
-            this,
-            container.requireNotNull(),
-            bottomBar.requireNotNull(),
-            addNew.requireNotNull(),
-            toolbar.requireNotNull(),
-        ) {
-          return@createComponent when (it) {
-            is MainViewEvent.BottomBarMeasured -> viewModel.handleConsumeBottomBarHeight(it.height)
-            is MainViewEvent.TopBarMeasured -> viewModel.handleConsumeTopBarHeight(it.height)
-            is MainViewEvent.OpenHome -> viewModel.handleSelectPage(MainPage.Home, force = false)
-            is MainViewEvent.OpenPortfolio ->
-                viewModel.handleSelectPage(MainPage.Portfolio, force = false)
-            is MainViewEvent.OpenWatchList ->
-                viewModel.handleSelectPage(MainPage.WatchList, force = false)
-            is MainViewEvent.OpenNotifications ->
-                viewModel.handleSelectPage(MainPage.Notifications, force = false)
-            is MainViewEvent.AddRequest -> viewModel.handleAddNewRequest()
-            is MainViewEvent.OpenAdd -> viewModel.handleOpenAdd(it.type, it.side)
-            is MainViewEvent.OpenSettings -> handleOpenSettings()
-            is MainViewEvent.StopAdd -> viewModel.handleStopAdd()
+    vm.restoreState(savedInstanceState)
+
+    binding.mainComposeBottom.setContent {
+      val page by navi.currentScreenState()
+      val snackbarHostState = remember { SnackbarHostState() }
+
+      vm.Render { state ->
+        val density = LocalDensity.current
+        val height = state.bottomNavHeight
+        val navBottomOffset = remember(density, height) { density.run { height.toDp() } }
+
+        val theme = state.theme
+        SystemBars(theme)
+        TickerTapeTheme(theme) {
+          ProvideWindowInsets {
+            // Need a box here or else the snackbars push up other content
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+              MainBottomNav(
+                  page = page,
+                  onLoadHome = { navigate(MainPage.Home) },
+                  onLoadWatchList = { navigate(MainPage.WatchList) },
+                  onLoadPortfolio = { navigate(MainPage.Portfolio) },
+                  onLoadSettings = { navigate(MainPage.Settings) },
+                  onHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+              )
+              RatingScreen(
+                  modifier = Modifier.padding(bottom = navBottomOffset),
+                  snackbarHostState = snackbarHostState,
+              )
+              VersionCheckScreen(
+                  modifier = Modifier.padding(bottom = navBottomOffset),
+                  snackbarHostState = snackbarHostState,
+              )
+            }
           }
         }
+      }
+    }
+
+    vm.handleSyncDarkTheme(this)
+
+    navi.restore {
+      if (it.select(MainPage.Home.asScreen())) {
+        Timber.d("Loaded default Home screen")
+      }
+    }
   }
 
   override fun onStart() {
     super.onStart()
-    lifecycleScope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
+    lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
   }
-
-  private fun handleOpenSettings() {}
 
   private fun beginWork() {
-    lifecycleScope.launch(context = Dispatchers.Default) {
+    lifecycleScope.launch(context = Dispatchers.Main) {
       alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
     }
-  }
-
-  override fun onControllerEvent(event: MainControllerEvent) {
-    return when (event) {
-      is MainControllerEvent.PushPage -> handlePushPage(event.newPage, event.oldPage, event.force)
-    }
-  }
-
-  private fun handlePushPage(newPage: MainPage, oldPage: MainPage?, force: Boolean) {
-    val fragment: Fragment
-    val tag: String
-    when (newPage) {
-      is MainPage.Home -> {
-        fragment = HomeFragment.newInstance()
-        tag = HomeFragment.TAG
-      }
-      is MainPage.Notifications -> {
-        fragment = AppSettings.newInstance()
-        tag = AppSettings.TAG
-      }
-      is MainPage.WatchList -> {
-        fragment = WatchlistFragment.newInstance()
-        tag = WatchlistFragment.TAG
-      }
-      is MainPage.Portfolio -> {
-        fragment = PortfolioFragment.newInstance()
-        tag = PortfolioFragment.TAG
-      }
-    }
-
-    supportFragmentManager.commitNow(this) { replace(fragmentContainerId, fragment, tag) }
-  }
-
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    setIntent(intent)
-    handleLaunchIntent()
   }
 
   private fun handleLaunchIntent() {
@@ -258,24 +240,43 @@ internal class MainActivity :
     }
   }
 
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    handleLaunchIntent()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    viewModel?.handleSyncDarkTheme(this)
+    viewBinding?.apply { mainComposeBottom.recompose() }
+  }
+
   override fun onSaveInstanceState(outState: Bundle) {
-    stateSaver?.saveState(outState)
     super.onSaveInstanceState(outState)
+    viewModel?.saveState(outState)
+  }
+
+  override fun getSystemService(name: String): Any? {
+    return when (name) {
+      // Must be defined before super.onCreate or throws npe
+      MainComponent::class.java.name -> injector.requireNotNull()
+      else -> super.getSystemService(name)
+    }
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    stateSaver = null
-    factory = null
+    viewBinding?.apply { this.mainComposeBottom.disposeComposition() }
+    viewBinding = null
+
     notificationCanceller = null
-
-    capturedAppBar = null
-    capturedToolbar = null
-    rootBinding = null
-
-    container = null
-    bottomBar = null
-    addNew = null
-    toolbar = null
+    alarmFactory = null
+    alerter = null
+    notificationCanceller = null
+    navigator = null
+    tapeLauncher = null
+    viewModel = null
+    injector = null
   }
 }

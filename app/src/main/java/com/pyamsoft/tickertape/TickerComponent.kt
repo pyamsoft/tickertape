@@ -29,7 +29,6 @@ import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
-import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.home.HomeModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
@@ -71,12 +70,12 @@ import javax.inject.Singleton
             RoomModule::class,
             TapeModule::class,
             AlertModule::class,
-            MainModule::class,
             WorkManagerModule::class,
             UiModule::class,
             PositionsDateModule::class,
             TickerModule::class,
             HomeModule::class,
+            MainModule::class,
         ],
 )
 internal interface TickerComponent {
@@ -108,8 +107,6 @@ internal interface TickerComponent {
   @CheckResult fun plusManageComponent(): BaseManageComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
-
-  @CheckResult fun plusHomeComponent(): HomeComponent.Factory
 
   @CheckResult fun plusWatchlistComponent(): BaseWatchlistComponent.Factory
 

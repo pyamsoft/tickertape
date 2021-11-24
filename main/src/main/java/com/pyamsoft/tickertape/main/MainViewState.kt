@@ -16,22 +16,19 @@
 
 package com.pyamsoft.tickertape.main
 
-import android.os.Bundle
-import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.ui.navigator.Navigator
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.pydroid.ui.theme.Theming
+import javax.inject.Inject
 
-sealed class MainPage(val name: String) {
-  object Home : MainPage("Home")
-  object WatchList : MainPage("Watch List")
-  object Portfolio : MainPage("Portfolio")
-  object Settings : MainPage("Settings")
+interface MainViewState : UiViewState {
+  val theme: Theming.Mode
+  val bottomNavHeight: Int
+}
 
-  @CheckResult
-  fun asScreen(): Navigator.Screen<MainPage> {
-    val self = this
-    return object : Navigator.Screen<MainPage> {
-      override val arguments: Bundle? = null
-      override val screen: MainPage = self
-    }
-  }
+internal class MutableMainViewState @Inject internal constructor() : MainViewState {
+  override var theme by mutableStateOf(Theming.Mode.SYSTEM)
+  override var bottomNavHeight by mutableStateOf(0)
 }

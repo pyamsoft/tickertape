@@ -85,6 +85,7 @@ dependencies {
     api "androidx.compose.material:material:$compose_version"
     api "androidx.compose.animation:animation:$compose_version"
     api "androidx.compose.ui:ui-tooling:$compose_version"
+    api "androidx.compose.material:material-icons-extended:$compose_version"
 
     api "com.google.accompanist:accompanist-swiperefresh:$accompanist"
     api "com.google.accompanist:accompanist-insets:$accompanist"

@@ -48,9 +48,8 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
-import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
-import com.pyamsoft.tickertape.setting.SettingsDialog
+import com.pyamsoft.tickertape.setting.AppSettings
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
@@ -182,9 +181,7 @@ internal class MainActivity :
     lifecycleScope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
   }
 
-  private fun handleOpenSettings() {
-    SettingsDialog.newInstance().show(this, SettingsDialog.TAG)
-  }
+  private fun handleOpenSettings() {}
 
   private fun beginWork() {
     lifecycleScope.launch(context = Dispatchers.Default) {
@@ -207,8 +204,8 @@ internal class MainActivity :
         tag = HomeFragment.TAG
       }
       is MainPage.Notifications -> {
-        fragment = NotificationFragment.newInstance()
-        tag = NotificationFragment.TAG
+        fragment = AppSettings.newInstance()
+        tag = AppSettings.TAG
       }
       is MainPage.WatchList -> {
         fragment = WatchlistFragment.newInstance()

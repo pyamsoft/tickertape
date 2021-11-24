@@ -17,7 +17,6 @@
 rootProject.name = "TickerTape"
 include ':app'
 include ':core'
-include ':setting'
 include ':ui'
 include ':stocks'
 include ':main'

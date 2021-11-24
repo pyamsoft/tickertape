@@ -138,7 +138,6 @@ dependencies {
   implementation project(':portfolio')
   implementation project(':quote')
   implementation project(':quote-ui')
-  implementation project(':setting')
   implementation project(':stocks')
   implementation project(':tape')
   implementation project(':ui')

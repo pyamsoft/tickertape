@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.quote.ui.component.chart
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -29,7 +29,7 @@ data class StockChartViewState
 internal constructor(
     val symbol: StockSymbol,
     val isLoading: Boolean,
-    val stock: PackedData<QuotedChart>?,
+    val stock: PackedData<Ticker>?,
     val currentRange: StockChart.IntervalRange,
     val ranges: List<StockChart.IntervalRange>,
     val scrub: ChartData?

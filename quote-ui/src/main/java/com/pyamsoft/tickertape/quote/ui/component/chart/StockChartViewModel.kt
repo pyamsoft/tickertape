@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.ui.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -49,7 +49,7 @@ internal constructor(interactor: StockChartInteractor, thisSymbol: StockSymbol) 
                 scrub = null)) {
 
   private val quoteFetcher =
-      highlander<ResultWrapper<QuotedChart>, Boolean, StockChart.IntervalRange> { force, range ->
+      highlander<ResultWrapper<Ticker>, Boolean, StockChart.IntervalRange> { force, range ->
         interactor.getQuoteWithChart(force, thisSymbol, range)
       }
 
@@ -101,7 +101,7 @@ internal constructor(interactor: StockChartInteractor, thisSymbol: StockSymbol) 
     @JvmStatic
     @CheckResult
     private fun latestChartDataFromQuote(
-        chart: QuotedChart,
+        chart: Ticker,
         range: StockChart.IntervalRange
     ): ChartData? {
       val c = chart.chart ?: return null

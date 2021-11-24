@@ -33,7 +33,7 @@ import com.pyamsoft.pydroid.util.asDp
 import com.pyamsoft.tickertape.home.index.HomeIndexAdapter
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
 import com.pyamsoft.tickertape.home.index.HomeIndexViewState
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.DecorationLookup
 import io.cabriole.decorator.LinearMarginDecoration
@@ -143,7 +143,7 @@ protected constructor(
     return modelAdapter.requireNotNull()
   }
 
-  private fun setList(list: List<QuotedChart>) {
+  private fun setList(list: List<Ticker>) {
     val data =
         list.map { HomeIndexViewState(symbol = it.symbol, chart = it.chart, quote = it.quote) }
     usingAdapter().submitList(data)
@@ -161,7 +161,7 @@ protected constructor(
     provideEmpty().isVisible = true
   }
 
-  protected fun handleList(list: List<QuotedChart>) {
+  protected fun handleList(list: List<Ticker>) {
     if (list.isEmpty()) {
       clearList()
     } else {

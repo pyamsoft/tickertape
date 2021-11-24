@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.home.databinding.HomeIndexesBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.PackedData
 import javax.inject.Inject
 
@@ -67,7 +67,7 @@ internal constructor(
     state.mapChanged { it.indexes }.render(viewScope) { handleIndexesChanged(it) }
   }
 
-  private fun handleIndexesChanged(indexes: PackedData<List<QuotedChart>>) {
+  private fun handleIndexesChanged(indexes: PackedData<List<Ticker>>) {
     return when (indexes) {
       is PackedData.Data -> {
         handleList(indexes.value)

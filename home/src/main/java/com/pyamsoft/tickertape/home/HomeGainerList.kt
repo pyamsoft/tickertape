@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.tickertape.home.databinding.HomeGainersBinding
 import com.pyamsoft.tickertape.home.index.HomeIndexComponent
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.PackedData
 import javax.inject.Inject
 
@@ -72,7 +72,7 @@ internal constructor(
       is PackedData.Data -> {
         val list =
             gainers.value.map {
-              QuotedChart(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart)
+              Ticker(symbol = it.quote.symbol(), quote = it.quote, chart = it.chart)
             }
         handleList(list)
       }

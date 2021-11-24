@@ -20,7 +20,6 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.PackedData
@@ -30,7 +29,7 @@ internal constructor(
     val isLoading: Boolean,
     internal val portfolio: PackedData<List<PortfolioStock>>,
     internal val watchlist: PackedData<List<Ticker>>,
-    val indexes: PackedData<List<QuotedChart>>,
+    val indexes: PackedData<List<Ticker>>,
     val gainers: PackedData<List<TopDataWithChart>>,
     val losers: PackedData<List<TopDataWithChart>>,
     val trending: PackedData<List<TopDataWithChart>>,

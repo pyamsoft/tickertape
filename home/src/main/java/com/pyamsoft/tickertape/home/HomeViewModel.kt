@@ -25,9 +25,8 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
-import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotedChart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -47,10 +46,10 @@ import timber.log.Timber
 class HomeViewModel
 @Inject
 internal constructor(
-    private val interactor: HomeInteractor,
+    private val homeInteractor: HomeInteractor,
     private val portfolioInteractor: PortfolioInteractor,
     private val watchlistInteractor: WatchlistInteractor,
-    private val quoteInteractor: QuoteInteractor,
+    private val tickerInteractor: TickerInteractor,
     private val mainPageBus: EventBus<MainPage>,
     topOffsetBus: EventConsumer<TopOffset>,
     bottomOffsetBus: EventConsumer<BottomOffset>,
@@ -61,7 +60,7 @@ internal constructor(
                 isLoading = false,
                 portfolio = emptyList<PortfolioStock>().pack(),
                 watchlist = emptyList<Ticker>().pack(),
-                indexes = emptyList<QuotedChart>().pack(),
+                indexes = emptyList<Ticker>().pack(),
                 gainers = emptyList<TopDataWithChart>().pack(),
                 losers = emptyList<TopDataWithChart>().pack(),
                 trending = emptyList<TopDataWithChart>().pack(),
@@ -116,19 +115,19 @@ internal constructor(
   }
 
   private suspend fun fetchIndexes(force: Boolean) {
-    quoteInteractor
+    tickerInteractor
         .getCharts(
             force = force,
             symbols = INDEXES,
             range = StockChart.IntervalRange.ONE_DAY,
-            includeQuote = true)
+        )
         .onSuccess { setState { copy(indexes = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch indexes") }
         .onFailure { setState { copy(indexes = it.packError()) } }
   }
 
   private suspend fun fetchGainers(force: Boolean) {
-    interactor
+    homeInteractor
         .getDayGainers(force, WATCHLIST_COUNT)
         .onSuccess { setState { copy(gainers = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch gainers") }
@@ -136,7 +135,7 @@ internal constructor(
   }
 
   private suspend fun fetchLosers(force: Boolean) {
-    interactor
+    homeInteractor
         .getDayLosers(force, WATCHLIST_COUNT)
         .onSuccess { setState { copy(losers = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch losers") }
@@ -144,7 +143,7 @@ internal constructor(
   }
 
   private suspend fun fetchMostShorted(force: Boolean) {
-    interactor
+    homeInteractor
         .getMostShorted(force, WATCHLIST_COUNT)
         .onSuccess { setState { copy(mostShorted = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch most shorted") }
@@ -152,7 +151,7 @@ internal constructor(
   }
 
   private suspend fun fetchTrending(force: Boolean) {
-    interactor
+    homeInteractor
         .getDayTrending(force, TRENDING_COUNT)
         .onSuccess { setState { copy(trending = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch trending") }
@@ -196,7 +195,7 @@ internal constructor(
           when (type) {
             HomeChartType.INDEX -> {
               val chart = state.indexes
-              if (chart is PackedData.Data<List<QuotedChart>>) chart.value[index].quote
+              if (chart is PackedData.Data<List<Ticker>>) chart.value[index].quote
               else {
                 Timber.w("Cannot dig symbol in error state: $chart")
                 return@launch

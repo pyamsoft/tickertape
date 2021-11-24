@@ -19,8 +19,8 @@ package com.pyamsoft.tickertape.quote.ui.component.chart
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotedChart
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -33,7 +33,7 @@ import timber.log.Timber
 internal class StockChartInteractor
 @Inject
 internal constructor(
-    private val interactor: QuoteInteractor,
+    private val interactor: TickerInteractor,
 ) {
 
   @CheckResult
@@ -41,13 +41,13 @@ internal constructor(
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange
-  ): ResultWrapper<QuotedChart> =
+  ): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
           interactor
-              .getCharts(force, listOf(symbol), range, includeQuote = true)
+              .getCharts(force, listOf(symbol), range)
               .onFailure { Timber.e(it, "Error getting chart $symbol") }
               .map { it.first() }
         } catch (e: Throwable) {

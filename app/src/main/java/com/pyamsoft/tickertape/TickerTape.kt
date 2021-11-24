@@ -23,6 +23,7 @@ import androidx.annotation.CheckResult
 import coil.Coil
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.loader.LoaderModule
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
@@ -74,7 +75,11 @@ class TickerTape : Application() {
             this,
             isDebugMode(),
             provider.get().theming(),
-            provider.get().imageLoader(),
+            LoaderModule(
+                    LoaderModule.Parameters(
+                        context = this.applicationContext,
+                    ))
+                .provideLoader(),
         )
         .also { addLibraries() }
   }

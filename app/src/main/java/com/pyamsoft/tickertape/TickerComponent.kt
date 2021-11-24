@@ -74,7 +74,9 @@ import javax.inject.Singleton
             MainModule::class,
             WorkManagerModule::class,
             UiModule::class,
-            PositionsDateModule::class])
+            PositionsDateModule::class,
+        ],
+)
 internal interface TickerComponent {
 
   // ===============================================

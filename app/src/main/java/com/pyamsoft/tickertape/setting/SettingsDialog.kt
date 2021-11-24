@@ -22,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -37,7 +36,6 @@ import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.commitNow
 import com.pyamsoft.pydroid.ui.util.layout
-import com.pyamsoft.pydroid.util.valueFromCurrentTheme
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.ui.correctBackground
@@ -112,7 +110,7 @@ internal class SettingsDialog : AppCompatDialogFragment(), UiController<UnitCont
 
     // Add fragment for settings
     childFragmentManager.commitNow(viewLifecycleOwner) {
-      replace(container.id(), SettingsFragment.newInstance(), SettingsFragment.TAG)
+      replace(container.id(), AppSettings.newInstance(), AppSettings.TAG)
     }
   }
 

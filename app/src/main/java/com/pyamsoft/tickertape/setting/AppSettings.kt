@@ -18,18 +18,37 @@ package com.pyamsoft.tickertape.setting
 
 import android.os.Bundle
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import com.pyamsoft.pydroid.ui.settings.AppSettingsFragment
-import com.pyamsoft.pydroid.ui.settings.AppSettingsPreferenceFragment
+import com.pyamsoft.pydroid.ui.preference.Preferences
+import com.pyamsoft.pydroid.ui.settings.SettingsFragment
 
-internal class SettingsFragment : AppSettingsFragment() {
+internal class AppSettings : SettingsFragment() {
 
-  override fun provideSettingsFragment(): AppSettingsPreferenceFragment {
-    return SettingsPreferenceFragment()
+  override val hideClearAll: Boolean = false
+
+  override val hideUpgradeInformation: Boolean = true
+
+  @Composable
+  override fun customBottomItemMargin(): Dp {
+    return 0.dp
   }
 
-  override fun provideSettingsTag(): String {
-    return SettingsPreferenceFragment.TAG
+  @Composable
+  override fun customPostPreferences(): List<Preferences> {
+    return emptyList()
+  }
+
+  @Composable
+  override fun customPrePreferences(): List<Preferences> {
+    return emptyList()
+  }
+
+  @Composable
+  override fun customTopItemMargin(): Dp {
+    return 0.dp
   }
 
   companion object {
@@ -39,19 +58,7 @@ internal class SettingsFragment : AppSettingsFragment() {
     @JvmStatic
     @CheckResult
     fun newInstance(): Fragment {
-      return SettingsFragment().apply { arguments = Bundle().apply {} }
-    }
-  }
-
-  internal class SettingsPreferenceFragment : AppSettingsPreferenceFragment() {
-
-    override val preferenceXmlResId = 0
-
-    override val hideUpgradeInformation = true
-
-    companion object {
-
-      const val TAG = "SettingsPreferenceFragment"
+      return AppSettings().apply { arguments = Bundle.EMPTY }
     }
   }
 }

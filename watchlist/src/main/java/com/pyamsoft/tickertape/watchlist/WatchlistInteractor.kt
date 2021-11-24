@@ -23,8 +23,8 @@ import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
-import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +39,7 @@ internal constructor(
     private val symbolQueryDao: SymbolQueryDao,
     private val symbolDeleteDao: SymbolDeleteDao,
     private val symbolRealtime: SymbolRealtime,
-    private val interactor: QuoteInteractor
+    private val interactor: TickerInteractor
 ) {
 
   suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
@@ -49,11 +49,13 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun getQuotes(force: Boolean): ResultWrapper<List<QuotedStock>> =
+  suspend fun getQuotes(force: Boolean): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+
         return@withContext try {
-          interactor.getWatchlistQuotes(force)
+          val watchList = symbolQueryDao.query(force).map { it.symbol() }
+          interactor.getQuotes(force, watchList)
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quotes")
           ResultWrapper.failure(e)

@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pyamsoft.pydroid.arch.UiRender
 import com.pyamsoft.pydroid.arch.asUiRender
 import com.pyamsoft.pydroid.util.asDp
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.watchlist.BaseWatchlistList
 import com.pyamsoft.tickertape.watchlist.WatchListViewState
 import com.pyamsoft.tickertape.watchlist.WatchlistTabSection
@@ -109,7 +109,7 @@ internal constructor(
     state.mapChanged { it.watchlistState }.render(viewScope) { handleWatchlistChanged(it) }
   }
 
-  private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<QuotedStock>>) {
+  private fun handleWatchlistChanged(state: HomeViewState.RenderState<List<Ticker>>) {
     handleRender(
         WatchListViewState(
                 embedded = true,

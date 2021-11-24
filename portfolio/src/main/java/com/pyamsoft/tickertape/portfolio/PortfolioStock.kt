@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -35,7 +35,7 @@ data class PortfolioStock
 internal constructor(
     val holding: DbHolding,
     val positions: List<DbPosition>,
-    val quote: QuotedStock?,
+    val quote: Ticker?,
 ) {
 
   val todayDirection: StockDirection

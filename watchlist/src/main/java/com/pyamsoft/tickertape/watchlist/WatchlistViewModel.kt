@@ -26,7 +26,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.main.AddNew
 import com.pyamsoft.tickertape.main.MainAdderViewModel
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
@@ -64,14 +64,14 @@ internal constructor(
                 query = "",
                 section = DEFAULT_SECTION,
                 isLoading = false,
-                watchlist = emptyList<QuotedStock>().pack(),
+                watchlist = emptyList<Ticker>().pack(),
                 topOffset = 0,
                 bottomOffset = 0,
             ),
     ) {
 
   private val quoteFetcher =
-      highlander<ResultWrapper<List<QuotedStock>>, Boolean> { interactor.getQuotes(it) }
+      highlander<ResultWrapper<List<Ticker>>, Boolean> { interactor.getQuotes(it) }
 
   init {
     viewModelScope.launch(context = Dispatchers.Default) {
@@ -154,7 +154,7 @@ internal constructor(
               }
               .onSuccess {
                 setState {
-                  copy(watchlist = it.sortedWith(QuotedStock.COMPARATOR).pack(), isLoading = false)
+                  copy(watchlist = it.sortedWith(Ticker.COMPARATOR).pack(), isLoading = false)
                 }
               }
               .onFailure { Timber.e(it, "Failed to fetch quotes") }
@@ -173,7 +173,7 @@ internal constructor(
   }
 
   @CheckResult
-  private fun getDisplayedItem(index: Int): QuotedStock? {
+  private fun getDisplayedItem(index: Int): Ticker? {
     val data = state.displayWatchlist
     if (data !is PackedData.Data<List<WatchListViewState.DisplayWatchlist>>) {
       Timber.w("displayWatchlist is not Data: $data")
@@ -209,7 +209,7 @@ internal constructor(
   override fun handleShowStocks() {
     setState(
         stateChange = {
-          copy(section = WatchlistTabSection.STOCK, watchlist = emptyList<QuotedStock>().pack())
+          copy(section = WatchlistTabSection.STOCK, watchlist = emptyList<Ticker>().pack())
         },
         andThen = { fetchQuotes(false) })
   }
@@ -217,7 +217,7 @@ internal constructor(
   override fun handleShowOptions() {
     setState(
         stateChange = {
-          copy(section = WatchlistTabSection.OPTION, watchlist = emptyList<QuotedStock>().pack())
+          copy(section = WatchlistTabSection.OPTION, watchlist = emptyList<Ticker>().pack())
         },
         andThen = { fetchQuotes(false) })
   }
@@ -225,7 +225,7 @@ internal constructor(
   override fun handleShowCrypto() {
     setState(
         stateChange = {
-          copy(section = WatchlistTabSection.CRYPTO, watchlist = emptyList<QuotedStock>().pack())
+          copy(section = WatchlistTabSection.CRYPTO, watchlist = emptyList<Ticker>().pack())
         },
         andThen = { fetchQuotes(false) })
   }

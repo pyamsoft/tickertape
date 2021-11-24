@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.watchlist
 import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.PackedData
@@ -32,7 +32,7 @@ data class WatchListViewState(
     val query: String,
     val section: WatchlistTabSection,
     val isLoading: Boolean,
-    val watchlist: PackedData<List<QuotedStock>>,
+    val watchlist: PackedData<List<Ticker>>,
     val topOffset: Int,
     val bottomOffset: Int,
 ) : UiViewState {
@@ -59,7 +59,7 @@ data class WatchListViewState(
 
   sealed class DisplayWatchlist {
 
-    data class Item internal constructor(val stock: QuotedStock) : DisplayWatchlist()
+    data class Item internal constructor(val stock: Ticker) : DisplayWatchlist()
   }
 }
 
@@ -82,7 +82,7 @@ sealed class WatchListViewEvent : UiViewEvent {
 
 sealed class WatchListControllerEvent : UiControllerEvent {
 
-  data class ManageSymbol internal constructor(val quote: QuotedStock) : WatchListControllerEvent()
+  data class ManageSymbol internal constructor(val quote: Ticker) : WatchListControllerEvent()
 
   data class AddNewSymbol
   internal constructor(

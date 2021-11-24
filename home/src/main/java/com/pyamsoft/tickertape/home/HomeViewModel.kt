@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuoteInteractor
 import com.pyamsoft.tickertape.quote.QuotedChart
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -60,7 +60,7 @@ internal constructor(
             HomeViewState(
                 isLoading = false,
                 portfolio = emptyList<PortfolioStock>().pack(),
-                watchlist = emptyList<QuotedStock>().pack(),
+                watchlist = emptyList<Ticker>().pack(),
                 indexes = emptyList<QuotedChart>().pack(),
                 gainers = emptyList<TopDataWithChart>().pack(),
                 losers = emptyList<TopDataWithChart>().pack(),
@@ -98,7 +98,7 @@ internal constructor(
   private suspend fun fetchWatchlist(force: Boolean) {
     watchlistInteractor
         .getQuotes(force)
-        .map { quotes -> quotes.sortedWith(QuotedStock.COMPARATOR) }
+        .map { quotes -> quotes.sortedWith(Ticker.COMPARATOR) }
         .map { quotes -> quotes.take(WATCHLIST_COUNT) }
         .onSuccess { setState { copy(watchlist = it.pack()) } }
         .onFailure { Timber.e(it, "Failed to fetch watchlist") }
@@ -180,7 +180,7 @@ internal constructor(
   fun handleDigWatchlistSymbol(index: Int) {
     viewModelScope.launch(context = Dispatchers.Default) {
       val data = state.watchlist
-      if (data !is PackedData.Data<List<QuotedStock>>) {
+      if (data !is PackedData.Data<List<Ticker>>) {
         Timber.w("Cannot dig symbol in error state: $data")
         return@launch
       }

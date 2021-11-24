@@ -29,8 +29,9 @@ import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.mover.JsonMappableBigMoverReport
-import com.pyamsoft.tickertape.quote.QuoteInteractor
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.currentSession
@@ -50,13 +51,15 @@ internal constructor(
     private val bigMoverQueryDao: BigMoverQueryDao,
     private val bigMoverInsertDao: BigMoverInsertDao,
     private val idMap: NotificationIdMap,
-    private val quoteInteractor: QuoteInteractor,
+    private val symbolQueryDao: SymbolQueryDao,
+    private val interactor: TickerInteractor,
 ) : BaseRunner<BigMoverParameters>() {
 
   override suspend fun performWork(params: BigMoverParameters) = coroutineScope {
     val force = params.forceRefresh
-    quoteInteractor
-        .getWatchlistQuotes(force)
+    val watchList = symbolQueryDao.query(force).map { it.symbol() }
+    interactor
+        .getQuotes(force, watchList)
         .onFailure { Timber.e(it, "Error refreshing quotes") }
         .recover { emptyList() }
         .map { it.filterBigMovers() }
@@ -128,7 +131,7 @@ internal constructor(
   }
 
   @CheckResult
-  private fun List<QuotedStock>.filterBigMovers(): List<StockQuote> {
+  private fun List<Ticker>.filterBigMovers(): List<StockQuote> {
     return this.asSequence()
         .mapNotNull { it.quote }
         .filter { quote ->

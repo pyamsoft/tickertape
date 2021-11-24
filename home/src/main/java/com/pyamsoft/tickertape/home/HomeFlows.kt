@@ -21,7 +21,7 @@ import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.QuotedChart
-import com.pyamsoft.tickertape.quote.QuotedStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.ui.PackedData
 
@@ -29,7 +29,7 @@ data class HomeViewState
 internal constructor(
     val isLoading: Boolean,
     internal val portfolio: PackedData<List<PortfolioStock>>,
-    internal val watchlist: PackedData<List<QuotedStock>>,
+    internal val watchlist: PackedData<List<Ticker>>,
     val indexes: PackedData<List<QuotedChart>>,
     val gainers: PackedData<List<TopDataWithChart>>,
     val losers: PackedData<List<TopDataWithChart>>,
@@ -64,7 +64,7 @@ sealed class HomeViewEvent : UiViewEvent {
 
 sealed class HomeControllerEvent : UiControllerEvent {
 
-  data class DigWatchlistSymbol internal constructor(val quote: QuotedStock) :
+  data class DigWatchlistSymbol internal constructor(val quote: Ticker) :
       HomeControllerEvent()
 
   data class DigChartSymbol internal constructor(val quote: StockQuote) : HomeControllerEvent()

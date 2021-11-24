@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
@@ -35,4 +36,13 @@ interface TickerInteractor {
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): ResultWrapper<List<Ticker>>
+}
+
+@CheckResult
+suspend fun TickerInteractor.getWatchListQuotes(
+    force: Boolean,
+    dao: SymbolQueryDao
+): ResultWrapper<List<Ticker>> {
+  val watchList = dao.query(force).map { it.symbol() }
+  return this.getQuotes(force, watchList)
 }

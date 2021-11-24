@@ -20,7 +20,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
 import com.pyamsoft.tickertape.main.add.SymbolAddInteractor
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
-import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.TradeSide
@@ -34,7 +34,7 @@ class PortfolioAddViewModel
 internal constructor(
     @Assisted savedState: UiSavedState,
     private val interactor: PortfolioAddInteractor,
-    quoteInteractor: QuoteInteractor,
+    tickerInteractor: TickerInteractor,
     addInteractor: SymbolAddInteractor,
     thisType: EquityType,
     thisSide: TradeSide,
@@ -42,7 +42,7 @@ internal constructor(
     SymbolAddViewModel(
         savedState,
         addInteractor,
-        quoteInteractor,
+        tickerInteractor,
         thisType,
         thisSide,
     ) {

@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.getWatchListQuotes
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,8 +55,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val watchList = symbolQueryDao.query(force).map { it.symbol() }
-          interactor.getQuotes(force, watchList)
+          interactor.getWatchListQuotes(force, symbolQueryDao)
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quotes")
           ResultWrapper.failure(e)

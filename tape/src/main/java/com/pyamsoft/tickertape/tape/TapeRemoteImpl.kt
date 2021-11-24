@@ -25,7 +25,9 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
-import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.getWatchListQuotes
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +41,8 @@ internal class TapeRemoteImpl
 internal constructor(
     @param:TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
     @param:TapeInternalApi private val notifier: Notifier,
-    private val interactor: QuoteInteractor,
+    private val symbolQueryDao: SymbolQueryDao,
+    private val interactor: TickerInteractor,
 ) : TapeRemote {
 
   override suspend fun onStopReceived(onStop: () -> Unit) =
@@ -59,7 +62,7 @@ internal constructor(
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
     return try {
       interactor
-          .getWatchlistQuotes(force)
+          .getWatchListQuotes(force, symbolQueryDao)
           .map { quotes ->
             quotes
                 .asSequence()

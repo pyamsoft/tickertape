@@ -17,7 +17,9 @@
 package com.pyamsoft.tickertape.alert.runner
 
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.getWatchListQuotes
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,16 +30,18 @@ import timber.log.Timber
 internal class RefresherRunner
 @Inject
 internal constructor(
-    private val quoteInteractor: QuoteInteractor,
+    private val symbolQueryDao: SymbolQueryDao,
+    private val interactor: TickerInteractor,
     private val tapeLauncher: TapeLauncher
 ) : BaseRunner<RefreshParameters>() {
 
   override suspend fun performWork(params: RefreshParameters) = coroutineScope {
     val force = params.forceRefresh
 
-    quoteInteractor.getWatchlistQuotes(force).onSuccess { tapeLauncher.start() }.onFailure {
-      Timber.e(it, "Error refreshing quotes")
-    }
+    interactor
+        .getWatchListQuotes(force, symbolQueryDao)
+        .onSuccess { tapeLauncher.start() }
+        .onFailure { Timber.e(it, "Error refreshing quotes") }
 
     return@coroutineScope
   }

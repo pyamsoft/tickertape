@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.db.mover.JsonMappableBigMoverReport
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.getWatchListQuotes
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.currentSession
@@ -57,9 +58,8 @@ internal constructor(
 
   override suspend fun performWork(params: BigMoverParameters) = coroutineScope {
     val force = params.forceRefresh
-    val watchList = symbolQueryDao.query(force).map { it.symbol() }
     interactor
-        .getQuotes(force, watchList)
+        .getWatchListQuotes(force, symbolQueryDao)
         .onFailure { Timber.e(it, "Error refreshing quotes") }
         .recover { emptyList() }
         .map { it.filterBigMovers() }

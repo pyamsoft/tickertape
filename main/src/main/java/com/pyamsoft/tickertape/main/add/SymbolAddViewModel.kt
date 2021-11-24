@@ -22,7 +22,7 @@ import com.pyamsoft.pydroid.arch.UiSavedState
 import com.pyamsoft.pydroid.arch.UiSavedStateViewModel
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.quote.QuoteInteractor
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -43,7 +43,7 @@ abstract class SymbolAddViewModel
 protected constructor(
     savedState: UiSavedState,
     private val interactor: SymbolAddInteractor,
-    quoteInteractor: QuoteInteractor,
+    tickerInteractor: TickerInteractor,
     private val equityType: EquityType,
     side: TradeSide,
 ) :
@@ -59,7 +59,7 @@ protected constructor(
 
   private val quoteFetcher =
       highlander<ResultWrapper<StockQuote>, StockSymbol> { symbol ->
-        quoteInteractor.getQuotes(false, listOf(symbol)).map { it.first() }.map {
+        tickerInteractor.getQuotes(false, listOf(symbol)).map { it.first() }.map {
           it.quote.requireNotNull()
         }
       }

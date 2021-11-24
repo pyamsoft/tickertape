@@ -41,6 +41,7 @@ import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddCompone
 import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsDateComponent
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateModule
 import com.pyamsoft.tickertape.preference.PreferencesImpl
+import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.setting.SettingsFragmentComponent
@@ -75,6 +76,7 @@ import javax.inject.Singleton
             WorkManagerModule::class,
             UiModule::class,
             PositionsDateModule::class,
+            TickerModule::class,
         ],
 )
 internal interface TickerComponent {

@@ -21,13 +21,17 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.currentSession
 
-data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
+data class Ticker(
+    val symbol: StockSymbol,
+    val quote: StockQuote?,
+    val chart: StockChart?,
+) {
 
   companion object {
 
     @JvmField
     val COMPARATOR =
-        Comparator<QuotedStock> { s1, s2 ->
+        Comparator<Ticker> { s1, s2 ->
           val q1 = s1.quote
           val q2 = s2.quote
 
@@ -54,10 +58,3 @@ data class QuotedStock(val symbol: StockSymbol, val quote: StockQuote?) {
         }
   }
 }
-
-data class QuotedChart(
-    val symbol: StockSymbol,
-    val chart: StockChart?,
-    val quote: StockQuote?,
-)
-

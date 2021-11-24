@@ -245,7 +245,7 @@ internal class MainActivity :
 
     Timber.d("Launch intent with symbol: $symbol")
     notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
-    WatchlistDigDialog.newInstance(symbol).show(this, WatchlistDigDialog.TAG)
+    WatchlistDigDialog.show(this, symbol)
   }
 
   override fun onBackPressed() {

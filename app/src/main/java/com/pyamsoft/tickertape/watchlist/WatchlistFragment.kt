@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import com.pyamsoft.pydroid.ui.R as R2
 import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,6 +31,7 @@ import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
 import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
 import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
@@ -47,9 +47,8 @@ import javax.inject.Inject
 class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
 
   @JvmField @Inject internal var factory: WatchlistViewModel.Factory? = null
-  private val viewModel by activityViewModels<WatchlistViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  private val viewModel by
+      activityViewModels<WatchlistViewModel> { factory.requireNotNull().asFactory(this) }
 
   private var stateSaver: StateSaver? = null
 
@@ -119,7 +118,7 @@ class WatchlistFragment : Fragment(), UiController<WatchListControllerEvent> {
   }
 
   private fun handleOpenDigDialog(symbol: StockSymbol) {
-    WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
+    WatchlistDigDialog.show(requireActivity(), symbol)
   }
 
   private fun handleOpenSymbolAddDialog(type: EquityType, side: TradeSide) {

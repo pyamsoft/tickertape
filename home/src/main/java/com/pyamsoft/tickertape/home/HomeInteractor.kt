@@ -17,99 +17,32 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
-import timber.log.Timber
+import com.pyamsoft.tickertape.quote.Ticker
 
-@Singleton
-internal class HomeInteractor
-@Inject
-internal constructor(private val interactor: StockInteractor) {
+internal interface HomeInteractor {
 
   @CheckResult
-  private suspend fun pairWithChart(
+  suspend fun getDayGainers(
       force: Boolean,
-      quotes: List<StockQuote>,
-  ): ResultWrapper<List<TopDataWithChart>> {
-    return try {
-      coroutineScope {
-        val charts =
-            interactor.getCharts(
-                force, quotes.map { it.symbol() }, StockChart.IntervalRange.ONE_DAY)
-        return@coroutineScope ResultWrapper.success(
-            quotes.map { quote ->
-              val chart = charts.firstOrNull { it.symbol() == quote.symbol() }
-              TopDataWithChart(quote = quote, chart = chart)
-            })
-      }
-    } catch (e: Throwable) {
-      Timber.e(e, "Error paring charts with tops")
-      ResultWrapper.failure(e)
-    }
-  }
+      count: Int,
+  ): ResultWrapper<List<Ticker>>
 
   @CheckResult
-  suspend fun getDayGainers(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val top = interactor.getDayGainers(force, count)
-          pairWithChart(force, top.quotes())
-        } catch (e: Throwable) {
-          Timber.e(e, "Error getting day gainers")
-          ResultWrapper.failure(e)
-        }
-      }
+  suspend fun getDayLosers(
+      force: Boolean,
+      count: Int,
+  ): ResultWrapper<List<Ticker>>
 
   @CheckResult
-  suspend fun getDayLosers(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val top = interactor.getDayLosers(force, count)
-          pairWithChart(force, top.quotes())
-        } catch (e: Throwable) {
-          Timber.e(e, "Error getting day losers")
-          ResultWrapper.failure(e)
-        }
-      }
+  suspend fun getDayShorted(
+      force: Boolean,
+      count: Int,
+  ): ResultWrapper<List<Ticker>>
 
   @CheckResult
-  suspend fun getMostShorted(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val top = interactor.getMostShorted(force, count)
-          pairWithChart(force, top.quotes())
-        } catch (e: Throwable) {
-          Timber.e(e, "Error getting most shorted")
-          ResultWrapper.failure(e)
-        }
-      }
-
-  @CheckResult
-  suspend fun getDayTrending(force: Boolean, count: Int): ResultWrapper<List<TopDataWithChart>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val trend = interactor.getTrending(force, count)
-          val quotes = interactor.getQuotes(force, trend.symbols())
-          pairWithChart(force, quotes)
-        } catch (e: Throwable) {
-          Timber.e(e, "Error getting day trending")
-          ResultWrapper.failure(e)
-        }
-      }
+  suspend fun getDayTrending(
+      force: Boolean,
+      count: Int,
+  ): ResultWrapper<List<Ticker>>
 }

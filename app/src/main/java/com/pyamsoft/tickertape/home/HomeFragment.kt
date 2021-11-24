@@ -16,110 +16,116 @@
 
 package com.pyamsoft.tickertape.home
 
-import android.animation.LayoutTransition
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import com.pyamsoft.pydroid.arch.StateSaver
-import com.pyamsoft.pydroid.arch.UiController
-import com.pyamsoft.pydroid.arch.createComponent
+import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
-import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
-import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.util.show
+import com.pyamsoft.pydroid.ui.theme.ThemeProvider
+import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
-import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
-import com.pyamsoft.pydroid.ui.R as R2
 import javax.inject.Inject
 
-class HomeFragment : Fragment(), UiController<HomeControllerEvent> {
+class HomeFragment : Fragment() {
 
-  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by activityViewModels<HomeViewModel> {
-    factory.requireNotNull().create(requireActivity())
+  @JvmField @Inject internal var viewModel: HomeViewModeler? = null
+  @JvmField @Inject internal var theming: Theming? = null
+
+  private var windowInsetObserver: ViewWindowInsetObserver? = null
+
+  private fun handleOpenDigDialog(ticker: Ticker) {
+    WatchlistDigDialog.show(requireActivity(), ticker.symbol)
   }
 
-  @Inject @JvmField internal var container: HomeScrollContainer? = null
-
-  private var stateSaver: StateSaver? = null
+  private fun handleRefresh(force: Boolean) {
+    viewModel
+        .requireNotNull()
+        .handleRefreshList(
+            scope = viewLifecycleOwner.lifecycleScope,
+            force = force,
+        )
+  }
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R2.layout.layout_coordinator, container, false)
+  ): View {
+    val act = requireActivity()
+    Injector.obtainFromApplication<TickerComponent>(act).plusHomeComponent().create().inject(this)
+
+    val vm = viewModel.requireNotNull()
+
+    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
+    return ComposeView(act).apply {
+      id = R.id.screen_home
+
+      val observer = ViewWindowInsetObserver(this)
+      val windowInsets = observer.start()
+      windowInsetObserver = observer
+
+      setContent {
+        vm.Render { state ->
+          TickerTapeTheme(themeProvider) {
+            CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+              HomeScreen(
+                  modifier = Modifier.fillMaxSize(),
+                  state = state,
+                  onRefresh = { handleRefresh(true) },
+                  onChartClicked = { handleOpenDigDialog(it) },
+              )
+            }
+          }
+        }
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    // Animate layout changes
-    val binding =
-        LayoutCoordinatorBinding.bind(view).apply {
-          layoutCoordinator.layoutTransition = LayoutTransition()
-        }
-
-    Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusHomeComponent()
-        .create(
-            requireAppBarActivity(),
-            requireToolbarActivity(),
-            requireActivity(),
-            viewLifecycleOwner)
-        .plusHomeComponent()
-        .create(binding.layoutCoordinator)
-        .inject(this)
-
-    stateSaver =
-        createComponent(
-            savedInstanceState, viewLifecycleOwner, viewModel, this, container.requireNotNull()) {
-          return@createComponent when (it) {
-            is HomeViewEvent.OpenPortfolio -> viewModel.handleOpenPage(MainPage.Portfolio)
-            is HomeViewEvent.OpenWatchlist -> viewModel.handleOpenPage(MainPage.WatchList)
-            is HomeViewEvent.DigDeeperWatchlist -> viewModel.handleDigWatchlistSymbol(it.index)
-            is HomeViewEvent.DigDeeperChart -> viewModel.handleDigChart(it.index, it.type)
-            is HomeViewEvent.Refresh -> viewModel.handleLoad(true)
-          }
-        }
-  }
-
-  override fun onControllerEvent(event: HomeControllerEvent) {
-    return when (event) {
-      is HomeControllerEvent.DigWatchlistSymbol -> handleOpenDigDialog(event.quote.symbol)
-      is HomeControllerEvent.DigChartSymbol -> handleOpenDigDialog(event.quote.symbol())
-    }
-  }
-
-  private fun handleOpenDigDialog(symbol: StockSymbol) {
-    WatchlistDigDialog.newInstance(symbol).show(requireActivity(), WatchlistDigDialog.TAG)
+    viewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onStart() {
     super.onStart()
-    viewModel.handleLoad(false)
+    handleRefresh(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    stateSaver?.saveState(outState)
+    viewModel?.saveState(outState)
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    recompose()
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-    stateSaver = null
-    factory = null
+    (view as? ComposeView)?.disposeComposition()
 
-    container = null
+    windowInsetObserver?.stop()
+    windowInsetObserver = null
+
+    theming = null
+    viewModel = null
   }
 
   companion object {

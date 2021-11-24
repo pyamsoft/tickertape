@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -40,10 +41,9 @@ import com.pyamsoft.spark.SparkView
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
+import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
@@ -54,10 +54,10 @@ import java.time.LocalDateTime
 fun Chart(
     modifier: Modifier = Modifier,
     chart: StockChart,
-    onScrub: ((ChartData?) -> Unit)? = null,
+    onScrub: ((Chart.Data?) -> Unit)? = null,
 ) {
   Box(
-      modifier = modifier.height(160.dp),
+      modifier = modifier,
   ) {
     SparkChart(
         modifier = Modifier.padding(start = 8.dp),
@@ -72,10 +72,13 @@ fun Chart(
 }
 
 @Composable
-private fun Bounds(modifier: Modifier = Modifier, chart: StockChart) {
+private fun Bounds(
+    modifier: Modifier = Modifier,
+    chart: StockChart,
+) {
   val highMoney = remember(chart) { chart.periodHigh().asMoneyValue() }
   val lowMoney = remember(chart) { chart.periodLow().asMoneyValue() }
-    
+
   Column(
       modifier = modifier,
   ) {
@@ -117,7 +120,7 @@ private fun ChartBound(
 private fun SparkChart(
     modifier: Modifier = Modifier,
     chart: StockChart,
-    onScrub: ((ChartData?) -> Unit)?,
+    onScrub: ((Chart.Data?) -> Unit)?,
 ) {
   val density = LocalDensity.current
 
@@ -132,7 +135,7 @@ private fun SparkChart(
 
   val onScrubListener =
       if (onScrub == null) null
-      else remember(onScrub) { SparkView.OnScrubListener { onScrub(it as? ChartData) } }
+      else remember(onScrub) { SparkView.OnScrubListener { onScrub(it as? Chart.Data) } }
 
   AndroidView(
       modifier = modifier,
@@ -216,51 +219,46 @@ private class ChartAdapter(
     low: StockMoneyValue,
 ) : SparkAdapter() {
 
-  private val chartData: List<ChartData>
+  private val chartData: List<Chart.Data>
   private val baselineValue: Float
 
   init {
-    val dates = chart.dates()
     val closes = chart.close()
-
-    val data = mutableListOf<ChartData>()
     val baseline = chart.startingPrice()
 
-    for (i in dates.indices) {
-      val date = dates[i]
-      val close = closes[i]
-      data.add(
-          ChartData(
+    val data =
+        chart.dates().mapIndexed { index, date ->
+          val close = closes[index]
+          return@mapIndexed Chart.Data(
               high = high,
               low = low,
               baseline = baseline,
               range = chart.range(),
               date = date,
               price = close,
-          ),
-      )
-    }
+          )
+        }
 
     baselineValue = baseline.value().toFloat()
     chartData = data
   }
 
   @CheckResult
-  private fun getValue(item: ChartData): Double {
-    return item.price.value()
+  private fun getValue(item: Chart.Data): Float {
+    return item.price.value().toFloat()
   }
 
   override fun getCount(): Int {
     return chartData.size
   }
 
-  override fun getItem(index: Int): ChartData {
+  override fun getItem(index: Int): Chart.Data {
     return chartData[index]
   }
 
   override fun getY(index: Int): Float {
     // Offset the Y based on the baseline value which is either previous close or day's open
-    return getValue(getItem(index)).toFloat() - baselineValue
+    return getValue(getItem(index)) - baselineValue
   }
 
   override fun getBaseLine(): Float {
@@ -274,44 +272,21 @@ private class ChartAdapter(
 private fun PreviewChart() {
   Surface {
     Chart(
-        chart =
-            object : StockChart {
-              override fun symbol(): StockSymbol {
-                return "TEST".asSymbol()
-              }
-
-              override fun range(): StockChart.IntervalRange {
-                return StockChart.IntervalRange.ONE_DAY
-              }
-
-              override fun interval(): StockChart.IntervalTime {
-                return StockChart.IntervalTime.ONE_DAY
-              }
-
-              override fun startingPrice(): StockMoneyValue {
-                return 0.5.asMoney()
-              }
-
-              override fun currentPrice(): StockMoneyValue {
-                return 1.0.asMoney()
-              }
-
-              override fun currentDate(): LocalDateTime {
-                return LocalDateTime.now()
-              }
-
-              override fun dates(): List<LocalDateTime> {
-                return listOf(currentDate().minusDays(2), currentDate().minusDays(1), currentDate())
-              }
-
-              override fun close(): List<StockMoneyValue> {
-                return listOf(
-                    0.7.asMoney(),
-                    0.2.asMoney(),
-                    1.0.asMoney(),
-                )
-              }
-            },
+        modifier = Modifier.width(320.dp).height(160.dp),
+        chart = newTestChart("MSFT".asSymbol()),
     )
   }
+}
+
+interface Chart {
+
+  data class Data
+  internal constructor(
+      val high: StockMoneyValue,
+      val low: StockMoneyValue,
+      val baseline: StockMoneyValue,
+      val date: LocalDateTime,
+      val price: StockMoneyValue,
+      val range: StockChart.IntervalRange,
+  )
 }

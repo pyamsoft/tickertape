@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
@@ -37,6 +38,7 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
@@ -181,7 +183,7 @@ internal class WatchlistDigDialog :
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
-    const val TAG = "WatchlistDigDialog"
+    private const val TAG = "WatchlistDigDialog"
 
     @JvmStatic
     @CheckResult
@@ -197,10 +199,15 @@ internal class WatchlistDigDialog :
 
     @JvmStatic
     @CheckResult
-    fun newInstance(symbol: StockSymbol): DialogFragment {
+    private fun newInstance(symbol: StockSymbol): DialogFragment {
       return WatchlistDigDialog().apply {
         arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
       }
     }
+
+      @JvmStatic
+      fun show(activity: FragmentActivity, symbol: StockSymbol) {
+          newInstance(symbol).show(activity, TAG)
+      }
   }
 }

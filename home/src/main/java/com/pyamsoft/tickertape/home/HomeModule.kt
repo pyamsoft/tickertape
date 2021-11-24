@@ -16,10 +16,12 @@
 
 package com.pyamsoft.tickertape.home
 
-enum class HomeChartType {
-  INDEX,
-  GAINER,
-  LOSER,
-  TRENDING,
-  MOST_SHORTED
+import androidx.annotation.CheckResult
+import dagger.Binds
+import dagger.Module
+
+@Module
+abstract class HomeModule {
+
+  @Binds @CheckResult internal abstract fun bindInteractor(impl: HomeInteractorImpl): HomeInteractor
 }

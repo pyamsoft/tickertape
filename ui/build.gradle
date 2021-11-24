@@ -86,6 +86,7 @@ dependencies {
     api "androidx.compose.animation:animation:$compose_version"
     api "androidx.compose.ui:ui-tooling:$compose_version"
 
+    api "com.google.accompanist:accompanist-swiperefresh:$accompanist"
     api "com.google.accompanist:accompanist-insets:$accompanist"
     api "io.coil-kt:coil:$coil"
 

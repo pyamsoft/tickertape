@@ -16,27 +16,10 @@
 
 package com.pyamsoft.tickertape.home
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.RecyclerView
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            HomeComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
+@Subcomponent
 internal interface HomeComponent {
 
   fun inject(fragment: HomeFragment)
@@ -44,29 +27,6 @@ internal interface HomeComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance parent: ViewGroup,
-    ): HomeComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(HomeViewModel::class)
-    internal abstract fun bindViewModel(impl: HomeViewModel): ViewModel
-
-    @Module
-    companion object {
-
-      @Provides
-      @JvmStatic
-      @CheckResult
-      internal fun provideRecyclerPool(): RecyclerView.RecycledViewPool {
-        return RecyclerView.RecycledViewPool()
-      }
-    }
+    @CheckResult fun create(): HomeComponent
   }
 }

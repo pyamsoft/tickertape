@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AppBarDefaults
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,9 +47,10 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 
 @Composable
-fun MainBottomNav(
+internal fun MainBottomNav(
     modifier: Modifier = Modifier,
     page: MainPage,
+    cutoutShape: Shape,
     onHeightMeasured: (Int) -> Unit,
     onLoadHome: () -> Unit,
     onLoadWatchList: () -> Unit,
@@ -58,18 +60,19 @@ fun MainBottomNav(
   // Can't use BottomAppBar since we can't modify its Shape
   val padding = 16.dp
   val density = LocalDensity.current
-  val paddingInPx = remember(density) { density.run { padding.toPx().toInt() } }
+  val paddingInPx = remember(density) { density.run { padding.roundToPx() } }
 
-  Surface(
-      modifier = modifier.padding(padding),
-      shape = MaterialTheme.shapes.medium,
-      color = MaterialTheme.colors.primary,
-      contentColor = Color.White,
-      elevation = AppBarDefaults.BottomAppBarElevation,
-  ) {
-    Column {
+  Column {
+    BottomAppBar(
+        modifier =
+            modifier.padding(bottom = padding).onSizeChanged {
+              onHeightMeasured(it.height + paddingInPx)
+            },
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = Color.White,
+        cutoutShape = cutoutShape,
+    ) {
       BottomNavigation(
-          modifier = Modifier.onSizeChanged { onHeightMeasured(it.height + paddingInPx) },
           backgroundColor = Color.Transparent,
           contentColor = LocalContentColor.current,
           elevation = 0.dp,
@@ -95,8 +98,10 @@ fun MainBottomNav(
             onClick = onLoadSettings,
         )
       }
-      Spacer(modifier = Modifier.navigationBarsHeight())
     }
+    Spacer(
+        modifier = Modifier.navigationBarsHeight(),
+    )
   }
 }
 
@@ -133,6 +138,7 @@ private fun RowScope.Item(current: MainPage, target: MainPage, onClick: () -> Un
 @Composable
 private fun PreviewMainBottomNav() {
   MainBottomNav(
+      cutoutShape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
       page = MainPage.Home,
       onHeightMeasured = {},
       onLoadHome = {},

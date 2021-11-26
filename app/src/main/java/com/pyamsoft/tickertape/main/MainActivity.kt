@@ -20,14 +20,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.android.material.appbar.AppBarLayout
@@ -151,36 +148,35 @@ internal class MainActivity :
 
     binding.mainComposeBottom.setContent {
       val page by navi.currentScreenState()
-      val snackbarHostState = remember { SnackbarHostState() }
 
       vm.Render { state ->
-        val density = LocalDensity.current
-        val height = state.bottomNavHeight
-        val navBottomOffset = remember(density, height) { density.run { height.toDp() } }
-
         val theme = state.theme
         SystemBars(theme)
         TickerTapeTheme(theme) {
           ProvideWindowInsets {
-            // Need a box here or else the snackbars push up other content
-            Box(
-                contentAlignment = Alignment.BottomCenter,
+            val scaffoldState = rememberScaffoldState()
+            // Enforce a height for the scaffold or else it takes over the screen
+            // Why do we need a scaffold instead of a box?
+            // Because using a FAB with a BottomAppBar doesn't actually work unless its inside a
+            // scaffold.
+            //
+            // yeah.
+            MainScreen(
+                modifier = Modifier.height(220.dp),
+                scaffoldState = scaffoldState,
+                page = page,
+                onLoadHome = { navigate(MainPage.Home) },
+                onLoadWatchList = { navigate(MainPage.WatchList) },
+                onLoadPortfolio = { navigate(MainPage.Portfolio) },
+                onLoadSettings = { navigate(MainPage.Settings) },
+                onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                onFabClicked = { Timber.d("FAB Clicked!!!") },
             ) {
-              MainBottomNav(
-                  page = page,
-                  onLoadHome = { navigate(MainPage.Home) },
-                  onLoadWatchList = { navigate(MainPage.WatchList) },
-                  onLoadPortfolio = { navigate(MainPage.Portfolio) },
-                  onLoadSettings = { navigate(MainPage.Settings) },
-                  onHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-              )
               RatingScreen(
-                  modifier = Modifier.padding(bottom = navBottomOffset),
-                  snackbarHostState = snackbarHostState,
+                  scaffoldState = scaffoldState,
               )
               VersionCheckScreen(
-                  modifier = Modifier.padding(bottom = navBottomOffset),
-                  snackbarHostState = snackbarHostState,
+                  scaffoldState = scaffoldState,
               )
             }
           }

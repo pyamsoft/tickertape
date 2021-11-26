@@ -87,6 +87,7 @@ internal fun MainBottomNav(
             target = MainPage.WatchList,
             onClick = onLoadWatchList,
         )
+        Placeholder()
         Item(
             current = page,
             target = MainPage.Portfolio,
@@ -106,8 +107,27 @@ internal fun MainBottomNav(
 }
 
 @Composable
-private fun RowScope.Item(current: MainPage, target: MainPage, onClick: () -> Unit) {
+private fun RowScope.Placeholder(
+    modifier: Modifier = Modifier,
+) {
   BottomNavigationItem(
+      modifier = modifier,
+      enabled = false,
+      selected = false,
+      onClick = {},
+      icon = {},
+  )
+}
+
+@Composable
+private fun RowScope.Item(
+    modifier: Modifier = Modifier,
+    current: MainPage,
+    target: MainPage,
+    onClick: () -> Unit,
+) {
+  BottomNavigationItem(
+      modifier = modifier,
       selected = current == target,
       onClick = onClick,
       icon = {

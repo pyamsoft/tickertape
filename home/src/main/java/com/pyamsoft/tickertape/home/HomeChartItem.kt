@@ -18,14 +18,9 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -39,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -151,15 +147,32 @@ private fun ChartList(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    items(
+    itemsIndexed(
         items = onlyChartTickers,
-        key = { it.symbol.symbol() },
-    ) { item ->
+        key = { _, item -> item.symbol.symbol() },
+    ) { index, item ->
       // We can assume here the chart is not null
-      Chart(
-          modifier = Modifier.clickable { onClick(item) }.height(160.dp).width(320.dp),
-          chart = item.chart.requireNotNull(),
-      )
+      Column(
+          modifier =
+              Modifier.clickable { onClick(item) }.height(160.dp).width(320.dp).run {
+                when (index) {
+                  0 -> padding(start = 16.dp)
+                  onlyChartTickers.lastIndex -> padding(end = 16.dp)
+                  else -> this
+                }
+              },
+      ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          TickerName(
+              ticker = item,
+          )
+        }
+        Chart(
+            chart = item.chart.requireNotNull(),
+        )
+      }
     }
   }
 }

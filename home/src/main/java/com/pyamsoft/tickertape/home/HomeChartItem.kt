@@ -21,6 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
+import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -47,6 +50,8 @@ internal fun HomeIndexes(
 ) {
   HomeChartItem(
       modifier = modifier,
+      name = "USA Indexes",
+      isLoading = state.isLoading,
       tickers = state.indexes,
       error = state.indexesError,
       onChartClicked = onChartClicked,
@@ -61,6 +66,8 @@ internal fun HomeGainers(
 ) {
   HomeChartItem(
       modifier = modifier,
+      name = "Today's Top Gainers (USA)",
+      isLoading = state.isLoading,
       tickers = state.gainers,
       error = state.gainersError,
       onChartClicked = onChartClicked,
@@ -75,6 +82,8 @@ internal fun HomeLosers(
 ) {
   HomeChartItem(
       modifier = modifier,
+      name = "Today's Top Losers (USA)",
+      isLoading = state.isLoading,
       tickers = state.losers,
       error = state.losersError,
       onChartClicked = onChartClicked,
@@ -89,6 +98,8 @@ internal fun HomeTrending(
 ) {
   HomeChartItem(
       modifier = modifier,
+      name = "Today's Top Trending Stocks (USA)",
+      isLoading = state.isLoading,
       tickers = state.trending,
       error = state.trendingError,
       onChartClicked = onChartClicked,
@@ -103,6 +114,8 @@ internal fun HomeMostShorted(
 ) {
   HomeChartItem(
       modifier = modifier,
+      name = "Today's Most Shorted Stocks",
+      isLoading = state.isLoading,
       tickers = state.mostShorted,
       error = state.mostShortedError,
       onChartClicked = onChartClicked,
@@ -112,6 +125,8 @@ internal fun HomeMostShorted(
 @Composable
 private fun HomeChartItem(
     modifier: Modifier = Modifier,
+    name: String,
+    isLoading: Boolean,
     tickers: List<Ticker>,
     error: Throwable?,
     onChartClicked: (Ticker) -> Unit,
@@ -121,11 +136,32 @@ private fun HomeChartItem(
       targetState = error,
   ) { err ->
     if (err == null) {
-      ChartList(
-          modifier = Modifier.fillMaxWidth(),
-          tickers = tickers,
-          onClick = onChartClicked,
-      )
+      Column {
+        Text(
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+            text = name,
+            style =
+                MaterialTheme.typography.h6.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+        )
+        Crossfade(
+            targetState = isLoading,
+            modifier = Modifier.fillMaxWidth(),
+        ) { loading ->
+          if (loading) {
+            Loading(
+                modifier = Modifier.fillMaxWidth(),
+            )
+          } else {
+            ChartList(
+                modifier = Modifier.fillMaxWidth(),
+                tickers = tickers,
+                onClick = onChartClicked,
+            )
+          }
+        }
+      }
     } else {
       Error(
           modifier = Modifier.fillMaxWidth(),
@@ -133,6 +169,16 @@ private fun HomeChartItem(
       )
     }
   }
+}
+
+@Composable
+private fun Loading(
+    modifier: Modifier = Modifier,
+) {
+  Box(
+      modifier = modifier.padding(16.dp),
+      contentAlignment = Alignment.Center,
+  ) { CircularProgressIndicator() }
 }
 
 @Composable
@@ -163,9 +209,14 @@ private fun ChartList(
               },
       ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 8.dp),
         ) {
           TickerName(
+              modifier = Modifier.weight(1F),
+              ticker = item,
+          )
+          TickerPrice(
+              modifier = Modifier.padding(start = 16.dp),
               ticker = item,
           )
         }
@@ -219,6 +270,8 @@ private fun PreviewHomeChartItem() {
                     chart = newTestChart(symbol),
                 ),
             ),
+        isLoading = false,
+        name = "TEST STOCKS CHARTS",
         error = null,
         onChartClicked = {},
     )

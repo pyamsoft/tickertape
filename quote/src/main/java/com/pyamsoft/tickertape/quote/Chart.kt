@@ -16,14 +16,8 @@
 
 package com.pyamsoft.tickertape.quote
 
-import android.graphics.Color
 import androidx.annotation.CheckResult
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -38,15 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.spark.SparkView
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.periodHigh
-import com.pyamsoft.tickertape.stocks.api.periodLow
+import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDateTime
 
 @Composable
@@ -137,6 +126,13 @@ private fun SparkChart(
       if (onScrub == null) null
       else remember(onScrub) { SparkView.OnScrubListener { onScrub(it as? Chart.Data) } }
 
+  val baseColor =
+      if (MaterialTheme.colors.isLight) {
+        android.graphics.Color.BLACK
+      } else {
+        android.graphics.Color.WHITE
+      }
+
   AndroidView(
       modifier = modifier,
       factory = { context ->
@@ -144,43 +140,49 @@ private fun SparkChart(
           isFilled = true
 
           positiveLineColor =
-              Color.argb(
+              android.graphics.Color.argb(
                   255,
-                  Color.red(DEFAULT_STOCK_UP_COLOR),
-                  Color.green(DEFAULT_STOCK_UP_COLOR),
-                  Color.blue(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.red(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.green(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.blue(DEFAULT_STOCK_UP_COLOR),
               )
 
           positiveFillColor =
-              Color.argb(
+              android.graphics.Color.argb(
                   (0.5 * 255).toInt(),
-                  Color.red(DEFAULT_STOCK_UP_COLOR),
-                  Color.green(DEFAULT_STOCK_UP_COLOR),
-                  Color.blue(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.red(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.green(DEFAULT_STOCK_UP_COLOR),
+                  android.graphics.Color.blue(DEFAULT_STOCK_UP_COLOR),
               )
 
           negativeLineColor =
-              Color.argb(
+              android.graphics.Color.argb(
                   255,
-                  Color.red(DEFAULT_STOCK_DOWN_COLOR),
-                  Color.green(DEFAULT_STOCK_DOWN_COLOR),
-                  Color.blue(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.red(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.green(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.blue(DEFAULT_STOCK_DOWN_COLOR),
               )
 
           negativeFillColor =
-              Color.argb(
+              android.graphics.Color.argb(
                   (0.5 * 255).toInt(),
-                  Color.red(DEFAULT_STOCK_DOWN_COLOR),
-                  Color.green(DEFAULT_STOCK_DOWN_COLOR),
-                  Color.blue(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.red(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.green(DEFAULT_STOCK_DOWN_COLOR),
+                  android.graphics.Color.blue(DEFAULT_STOCK_DOWN_COLOR),
               )
-
-          scrubLineColor = DEFAULT_STOCK_COLOR
-          baseLineColor = DEFAULT_STOCK_COLOR
         }
       },
       update = { sparkView ->
         sparkView.apply {
+          // Guard to avoid Android View invalidate
+          if (scrubLineColor != baseColor) {
+            scrubLineColor = baseColor
+          }
+
+          // Guard to avoid Android View invalidate
+          if (baseLineColor != baseColor) {
+            baseLineColor = baseColor
+          }
 
           // Guard to avoid Android View invalidate
           if (baseLineWidth != baseLineSize) {

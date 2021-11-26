@@ -24,37 +24,41 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
-interface HomePortfolioViewState : UiViewState {
+interface LoadingState : UiViewState {
+  val isLoading: Boolean
+}
+
+interface HomePortfolioViewState : LoadingState {
   val portfolio: List<PortfolioStock>
   val portfolioError: Throwable?
 }
 
-interface HomeWatchListViewState : UiViewState {
+interface HomeWatchListViewState : LoadingState {
   val watchlist: List<Ticker>
   val watchlistError: Throwable?
 }
 
-interface HomeIndexesViewState : UiViewState {
+interface HomeIndexesViewState : LoadingState {
   val indexes: List<Ticker>
   val indexesError: Throwable?
 }
 
-interface HomeGainersViewState : UiViewState {
+interface HomeGainersViewState : LoadingState {
   val gainers: List<Ticker>
   val gainersError: Throwable?
 }
 
-interface HomeLosersViewState : UiViewState {
+interface HomeLosersViewState : LoadingState {
   val losers: List<Ticker>
   val losersError: Throwable?
 }
 
-interface HomeTrendingViewState : UiViewState {
+interface HomeTrendingViewState : LoadingState {
   val trending: List<Ticker>
   val trendingError: Throwable?
 }
 
-interface HomeShortedViewState : UiViewState {
+interface HomeShortedViewState : LoadingState {
   val mostShorted: List<Ticker>
   val mostShortedError: Throwable?
 }
@@ -67,9 +71,7 @@ interface HomeViewState :
     HomeGainersViewState,
     HomeLosersViewState,
     HomeTrendingViewState,
-    HomeShortedViewState {
-  val isLoading: Boolean
-}
+    HomeShortedViewState {}
 
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
   override var isLoading by mutableStateOf(false)

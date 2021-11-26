@@ -6,6 +6,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -18,6 +19,7 @@ fun TickerName(
     ticker: Ticker,
 ) {
   val symbol = ticker.symbol
+  val quote = ticker.quote
 
   Column(
       modifier = modifier,
@@ -26,6 +28,15 @@ fun TickerName(
         text = symbol.symbol(),
         style = MaterialTheme.typography.body1,
     )
+
+    if (quote != null) {
+      Text(
+          text = quote.company().company(),
+          style = MaterialTheme.typography.body2,
+          overflow = TextOverflow.Ellipsis,
+          maxLines = 1,
+      )
+    }
   }
 }
 

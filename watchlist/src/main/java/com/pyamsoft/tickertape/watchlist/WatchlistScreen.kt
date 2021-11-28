@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.Quote
@@ -103,6 +104,12 @@ private fun Watchlist(
       contentPadding = PaddingValues(horizontal = 8.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp),
   ) {
+    item {
+      Spacer(
+          modifier = Modifier.statusBarsHeight(),
+      )
+    }
+
     items(items = tickers, key = { it.symbol.symbol() }) { ticker ->
       Quote(
           ticker = ticker,

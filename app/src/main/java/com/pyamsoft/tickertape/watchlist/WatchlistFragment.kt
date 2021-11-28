@@ -74,10 +74,6 @@ class WatchlistFragment : Fragment() {
         )
   }
 
-  private fun handleSearchChanged(search: String) {
-    viewModel.requireNotNull().handleSearch(query = search)
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -109,7 +105,7 @@ class WatchlistFragment : Fragment() {
                     onRefresh = { handleRefresh(true) },
                     onSelectTicker = { handleOpenDigDialog(it) },
                     onDeleteTicker = { handleDeleteTicker(it) },
-                    onSearchChanged = { handleSearchChanged(it) })
+                    onSearchChanged = { vm.handleSearch(it) })
               }
             }
           }

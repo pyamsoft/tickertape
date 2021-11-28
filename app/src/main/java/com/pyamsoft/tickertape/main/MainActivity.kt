@@ -30,16 +30,13 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.android.material.appbar.AppBarLayout
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.AppBarActivity
-import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
-import com.pyamsoft.pydroid.ui.app.PYDroidActivity
-import com.pyamsoft.pydroid.ui.app.ToolbarActivity
-import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
+import com.pyamsoft.pydroid.ui.app.*
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
@@ -50,8 +47,12 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.initOnAppStart
+import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +85,18 @@ internal class MainActivity :
       Timber.d("Loaded page: $page")
     } else {
       Timber.w("Could not push page: $page")
+    }
+  }
+
+  private fun handleFabClicked(page: MainPage) {
+    when (page) {
+      MainPage.WatchList ->
+          WatchlistAddDialog.newInstance(EquityType.STOCK, TradeSide.BUY)
+              .show(this, WatchlistAddDialog.TAG)
+      MainPage.Portfolio ->
+          PortfolioAddDialog.newInstance(EquityType.STOCK, TradeSide.BUY)
+              .show(this, PortfolioAddDialog.TAG)
+      else -> Timber.w("FAB clicked but not Watchlist or Portfolio: $page")
     }
   }
 
@@ -171,7 +184,7 @@ internal class MainActivity :
                 onLoadPortfolio = { navigate(MainPage.Portfolio) },
                 onLoadSettings = { navigate(MainPage.Settings) },
                 onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                onFabClicked = { Timber.d("FAB Clicked!!!") },
+                onFabClicked = { handleFabClicked(page) },
             ) {
               RatingScreen(
                   scaffoldState = scaffoldState,

@@ -138,7 +138,7 @@ internal constructor(
     val cleanSearch = if (query.isBlank()) query.trim() else query
     state.apply {
       this.query = cleanSearch
-      regenerateTickers(this.watchlist)
+      regenerateTickers(allTickers)
     }
   }
 

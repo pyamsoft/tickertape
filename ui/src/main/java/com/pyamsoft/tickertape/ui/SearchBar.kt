@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 @Composable
 @JvmOverloads
@@ -22,11 +23,16 @@ fun SearchBar(
       shape = MaterialTheme.shapes.medium,
   ) {
     OutlinedTextField(
-        modifier = Modifier.padding(AppBarDefaults.ContentPadding),
+        modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp),
         value = search,
         onValueChange = onSearchChanged,
         singleLine = true,
         shape = MaterialTheme.shapes.medium,
+        label = {
+          Text(
+              text = "Search for something...",
+          )
+        },
         colors =
             TextFieldDefaults.outlinedTextFieldColors(
                 leadingIconColor =

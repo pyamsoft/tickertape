@@ -134,10 +134,12 @@ internal constructor(
     }
   }
 
-  fun handleSearch(scope: CoroutineScope, query: String) {
+  fun handleSearch(query: String) {
     val cleanSearch = if (query.isBlank()) query.trim() else query
-    state.query = cleanSearch
-    handleRefreshList(scope = scope, force = false)
+    state.apply {
+      this.query = cleanSearch
+      regenerateTickers(this.watchlist)
+    }
   }
 
   fun handleRemove(scope: CoroutineScope, ticker: Ticker) {

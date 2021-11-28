@@ -74,6 +74,10 @@ class WatchlistFragment : Fragment() {
         )
   }
 
+  private fun handleSearchChanged(search: String) {
+    viewModel.requireNotNull().handleSearch(query = search)
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -105,7 +109,7 @@ class WatchlistFragment : Fragment() {
                     onRefresh = { handleRefresh(true) },
                     onSelectTicker = { handleOpenDigDialog(it) },
                     onDeleteTicker = { handleDeleteTicker(it) },
-                )
+                    onSearchChanged = { handleSearchChanged(it) })
               }
             }
           }
@@ -141,7 +145,7 @@ class WatchlistFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
-      dispose()
+    dispose()
 
     viewModel = null
     mainViewModel = null

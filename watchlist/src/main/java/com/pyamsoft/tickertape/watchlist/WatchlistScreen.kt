@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.watchlist
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.ui.SearchBar
 
 @Composable
 @JvmOverloads
@@ -29,6 +31,7 @@ fun WatchlistScreen(
     onRefresh: () -> Unit,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
+    onSearchChanged: (String) -> Unit,
 ) {
   val loading = state.isLoading
 
@@ -48,6 +51,7 @@ fun WatchlistScreen(
           onRefresh = onRefresh,
           onSelectTicker = onSelectTicker,
           onDeleteTicker = onDeleteTicker,
+          onSearchChanged = onSearchChanged,
       )
     }
   }
@@ -60,10 +64,12 @@ private fun Content(
     navBarBottomHeight: Int,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
+    onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
 ) {
   val error = state.error
   val tickers = state.watchlist
+  val search = state.query
 
   Crossfade(
       modifier = modifier,
@@ -76,6 +82,8 @@ private fun Content(
           navBarBottomHeight = navBarBottomHeight,
           onSelectTicker = onSelectTicker,
           onDeleteTicker = onDeleteTicker,
+          search = search,
+          onSearchChanged = onSearchChanged,
       )
     } else {
       Error(
@@ -88,12 +96,15 @@ private fun Content(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun Watchlist(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
+    search: String,
     navBarBottomHeight: Int,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
+    onSearchChanged: (String) -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =
@@ -110,8 +121,17 @@ private fun Watchlist(
       )
     }
 
+    stickyHeader {
+      SearchBar(
+          modifier = Modifier.fillMaxWidth(),
+          search = search,
+          onSearchChanged = onSearchChanged,
+      )
+    }
+
     items(items = tickers, key = { it.symbol.symbol() }) { ticker ->
       Quote(
+          modifier = Modifier.fillMaxWidth(),
           ticker = ticker,
           onClick = onSelectTicker,
           onLongClick = onDeleteTicker,
@@ -172,5 +192,6 @@ private fun PreviewWatchlistScreen() {
       onRefresh = {},
       onDeleteTicker = {},
       onSelectTicker = {},
+      onSearchChanged = {},
   )
 }

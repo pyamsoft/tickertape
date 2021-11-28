@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.pydroid.arch.UiViewModel
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.watchlist.WatchlistPages
 import javax.inject.Inject
 
 class BaseWatchlistDigViewModel @Inject internal constructor(thisSymbol: StockSymbol) :
@@ -31,16 +30,16 @@ class BaseWatchlistDigViewModel @Inject internal constructor(thisSymbol: StockSy
 
   private fun publishPage() {
     return when (state.page) {
-      WatchlistPages.QUOTE -> publish(BaseWatchListDigControllerEvent.PushQuote)
+      WatchlistDigPages.QUOTE -> publish(BaseWatchListDigControllerEvent.PushQuote)
     }
   }
 
-  private fun loadPage(page: WatchlistPages) {
+  private fun loadPage(page: WatchlistDigPages) {
     setState(stateChange = { copy(page = page) }, andThen = { publishPage() })
   }
 
   companion object {
 
-    private val DEFAULT_PAGE = WatchlistPages.QUOTE
+    private val DEFAULT_PAGE = WatchlistDigPages.QUOTE
   }
 }

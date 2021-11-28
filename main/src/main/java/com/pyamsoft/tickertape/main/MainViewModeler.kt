@@ -24,7 +24,6 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.core.ActivityScope
 import javax.inject.Inject
 
-@ActivityScope
 class MainViewModeler
 @Inject
 internal constructor(

@@ -34,6 +34,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
@@ -127,7 +128,7 @@ class HomeFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
-    (view as? ComposeView)?.disposeComposition()
+      dispose()
 
     windowInsetObserver?.stop()
     windowInsetObserver = null

@@ -67,8 +67,9 @@ private fun HomeContent(
     navBarBottomHeight: Int,
     onChartClicked: (Ticker) -> Unit,
 ) {
-    val density = LocalDensity.current
-    val bottomPaddingDp = remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() }}
+  val density = LocalDensity.current
+  val bottomPaddingDp =
+      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
 
   Column(
       modifier = modifier,
@@ -98,9 +99,9 @@ private fun HomeContent(
         onChartClicked = onChartClicked,
     )
 
-      Spacer(
-          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp),
-      )
+    Spacer(
+        modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp),
+    )
   }
 }
 

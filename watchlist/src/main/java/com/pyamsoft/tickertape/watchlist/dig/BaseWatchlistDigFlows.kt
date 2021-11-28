@@ -20,11 +20,10 @@ import com.pyamsoft.pydroid.arch.UiControllerEvent
 import com.pyamsoft.pydroid.arch.UiViewEvent
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.watchlist.WatchlistPages
 
 data class BaseWatchListDigViewState
 internal constructor(
-    val page: WatchlistPages,
+    val page: WatchlistDigPages,
     val symbol: StockSymbol,
 ) : UiViewState
 

@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.setting.SettingsComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
+import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -35,6 +36,8 @@ import dagger.Subcomponent
 internal interface MainComponent {
 
   @CheckResult fun plusHome(): HomeComponent.Factory
+
+  @CheckResult fun plusWatchlist(): WatchlistComponent.Factory
 
   @CheckResult fun plusSettings(): SettingsComponent.Factory
 

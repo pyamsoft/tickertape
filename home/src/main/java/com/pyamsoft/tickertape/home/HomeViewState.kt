@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
@@ -71,8 +72,9 @@ interface HomeViewState :
     HomeGainersViewState,
     HomeLosersViewState,
     HomeTrendingViewState,
-    HomeShortedViewState {}
+    HomeShortedViewState
 
+@ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
   override var isLoading by mutableStateOf(false)
   override var portfolio by mutableStateOf(emptyList<PortfolioStock>())

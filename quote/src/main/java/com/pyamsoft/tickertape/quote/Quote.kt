@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,16 +22,22 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @JvmOverloads
+@OptIn(ExperimentalFoundationApi::class)
 fun Quote(
     modifier: Modifier = Modifier,
     ticker: Ticker,
     onClick: (Ticker) -> Unit,
+    onLongClick: (Ticker) -> Unit,
     content: @Composable () -> Unit = {},
 ) {
   val quote = ticker.quote
 
   Card(
-      modifier = modifier.clickable { onClick(ticker) },
+      modifier =
+          modifier.combinedClickable(
+              onClick = { onClick(ticker) },
+              onLongClick = { onLongClick(ticker) },
+          ),
       elevation = 2.dp,
   ) {
     Column(
@@ -133,5 +140,6 @@ private fun PreviewQuote() {
               chart = null,
           ),
       onClick = {},
+      onLongClick = {},
   )
 }

@@ -16,4 +16,5 @@
 
 <resources>
     <item name="screen_home" type="id" />
+    <item name="screen_watchlist" type="id" />
 </resources>

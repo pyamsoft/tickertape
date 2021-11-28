@@ -16,26 +16,10 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            WatchlistComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
+@Subcomponent
 internal interface WatchlistComponent {
 
   fun inject(fragment: WatchlistFragment)
@@ -43,20 +27,6 @@ internal interface WatchlistComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance parent: ViewGroup,
-    ): WatchlistComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(WatchlistViewModel::class)
-    internal abstract fun bindViewModel(
-        impl: WatchlistViewModel.Factory
-    ): UiSavedStateViewModelProvider<out ViewModel>
+    @CheckResult fun create(): WatchlistComponent
   }
 }

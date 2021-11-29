@@ -26,11 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 class HomeViewModeler
@@ -57,6 +53,7 @@ internal constructor(
       }
 
   private suspend fun fetchWatchlist(force: Boolean) {
+    state.isLoadingWatchlist = true
     watchlistInteractor
         .getQuotes(force)
         .map { it.sortedWith(Ticker.COMPARATOR) }
@@ -74,9 +71,11 @@ internal constructor(
             watchlistError = it
           }
         }
+        .onFinally { state.isLoadingWatchlist = false }
   }
 
   private suspend fun fetchPortfolio(force: Boolean) {
+    state.isLoadingPortfolio = true
     portfolioInteractor
         .getPortfolio(force)
         // Make sure we only show value of stocks in the home portfolio
@@ -94,9 +93,11 @@ internal constructor(
             portfolioError = it
           }
         }
+        .onFinally { state.isLoadingPortfolio = false }
   }
 
   private suspend fun fetchIndexes(force: Boolean) {
+    state.isLoadingIndexes = true
     tickerInteractor
         .getCharts(
             force = force,
@@ -116,9 +117,11 @@ internal constructor(
             indexesError = null
           }
         }
+        .onFinally { state.isLoadingIndexes = false }
   }
 
   private suspend fun fetchGainers(force: Boolean) {
+    state.isLoadingGainers = true
     homeInteractor
         .getDayGainers(force, WATCHLIST_COUNT)
         .onSuccess {
@@ -134,9 +137,11 @@ internal constructor(
             gainersError = it
           }
         }
+        .onFinally { state.isLoadingGainers = false }
   }
 
   private suspend fun fetchLosers(force: Boolean) {
+    state.isLoadingLosers = true
     homeInteractor
         .getDayLosers(force, WATCHLIST_COUNT)
         .onSuccess {
@@ -152,9 +157,11 @@ internal constructor(
             losersError = it
           }
         }
+        .onFinally { state.isLoadingLosers = false }
   }
 
   private suspend fun fetchMostShorted(force: Boolean) {
+    state.isLoadingMostShorted = true
     homeInteractor
         .getDayShorted(force, WATCHLIST_COUNT)
         .onSuccess {
@@ -170,9 +177,11 @@ internal constructor(
             mostShortedError = null
           }
         }
+        .onFinally { state.isLoadingMostShorted = false }
   }
 
   private suspend fun fetchTrending(force: Boolean) {
+    state.isLoadingTrending = true
     homeInteractor
         .getDayTrending(force, TRENDING_COUNT)
         .onSuccess {
@@ -188,6 +197,7 @@ internal constructor(
             trendingError = it
           }
         }
+        .onFinally { state.isLoadingTrending = false }
   }
 
   fun handleRefreshList(
@@ -196,7 +206,11 @@ internal constructor(
   ) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
-      homeFetcher.call(force).also { state.isLoading = false }
+      try {
+        homeFetcher.call(force)
+      } finally {
+        state.isLoading = false
+      }
     }
   }
 

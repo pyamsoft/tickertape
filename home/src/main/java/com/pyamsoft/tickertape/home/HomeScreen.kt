@@ -82,6 +82,10 @@ private fun HomeContent(
         state = state,
         onChartClicked = onChartClicked,
     )
+    HomeWatchlist(
+        state = state,
+        onClicked = onChartClicked,
+    )
     HomeTrending(
         state = state,
         onChartClicked = onChartClicked,

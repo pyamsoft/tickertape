@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -33,104 +32,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.home.item.HomeWatchlistItem
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.TickerName
-import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-internal fun HomeIndexes(
+internal fun HomeWatchlist(
     modifier: Modifier = Modifier,
-    state: HomeIndexesViewState,
-    onChartClicked: (Ticker) -> Unit,
+    state: HomeWatchListViewState,
+    onClicked: (Ticker) -> Unit,
 ) {
-  HomeChartItem(
-      modifier = modifier,
-      name = "USA Indexes",
-      isLoading = state.isLoading,
-      tickers = state.indexes,
-      error = state.indexesError,
-      onChartClicked = onChartClicked,
-  )
-}
+  val isLoading = state.isLoadingWatchlist
+  val tickers = state.watchlist
+  val error = state.watchlistError
 
-@Composable
-internal fun HomeGainers(
-    modifier: Modifier = Modifier,
-    state: HomeGainersViewState,
-    onChartClicked: (Ticker) -> Unit,
-) {
-  HomeChartItem(
-      modifier = modifier,
-      name = "Today's Top Gainers (USA)",
-      isLoading = state.isLoading,
-      tickers = state.gainers,
-      error = state.gainersError,
-      onChartClicked = onChartClicked,
-  )
-}
+  val count = remember(tickers) { tickers.size }
 
-@Composable
-internal fun HomeLosers(
-    modifier: Modifier = Modifier,
-    state: HomeLosersViewState,
-    onChartClicked: (Ticker) -> Unit,
-) {
-  HomeChartItem(
-      modifier = modifier,
-      name = "Today's Top Losers (USA)",
-      isLoading = state.isLoading,
-      tickers = state.losers,
-      error = state.losersError,
-      onChartClicked = onChartClicked,
-  )
-}
-
-@Composable
-internal fun HomeTrending(
-    modifier: Modifier = Modifier,
-    state: HomeTrendingViewState,
-    onChartClicked: (Ticker) -> Unit,
-) {
-  HomeChartItem(
-      modifier = modifier,
-      name = "Today's Top Trending Stocks (USA)",
-      isLoading = state.isLoading,
-      tickers = state.trending,
-      error = state.trendingError,
-      onChartClicked = onChartClicked,
-  )
-}
-
-@Composable
-internal fun HomeMostShorted(
-    modifier: Modifier = Modifier,
-    state: HomeShortedViewState,
-    onChartClicked: (Ticker) -> Unit,
-) {
-  HomeChartItem(
-      modifier = modifier,
-      name = "Today's Most Shorted Stocks",
-      isLoading = state.isLoading,
-      tickers = state.mostShorted,
-      error = state.mostShortedError,
-      onChartClicked = onChartClicked,
-  )
-}
-
-@Composable
-private fun HomeChartItem(
-    modifier: Modifier = Modifier,
-    name: String,
-    isLoading: Boolean,
-    tickers: List<Ticker>,
-    error: Throwable?,
-    onChartClicked: (Ticker) -> Unit,
-) {
   Crossfade(
       modifier = modifier,
       targetState = error,
@@ -139,7 +58,7 @@ private fun HomeChartItem(
       Column {
         Text(
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-            text = name,
+            text = "My Watchlist${if (count > 0) "Top $count" else ""}",
             style =
                 MaterialTheme.typography.h6.copy(
                     fontWeight = FontWeight.Bold,
@@ -154,10 +73,10 @@ private fun HomeChartItem(
                 modifier = Modifier.fillMaxWidth(),
             )
           } else {
-            ChartList(
+            TickerList(
                 modifier = Modifier.fillMaxWidth(),
                 tickers = tickers,
-                onClick = onChartClicked,
+                onClick = onClicked,
             )
           }
         }
@@ -182,48 +101,35 @@ private fun Loading(
 }
 
 @Composable
-private fun ChartList(
+private fun TickerList(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
     onClick: (Ticker) -> Unit,
 ) {
-  val onlyChartTickers = remember(tickers) { tickers.filter { it.chart != null } }
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
     itemsIndexed(
-        items = onlyChartTickers,
+        items = tickers,
         key = { _, item -> item.symbol.symbol() },
     ) { index, item ->
       // We can assume here the chart is not null
-      Column(
+      HomeWatchlistItem(
           modifier =
-              Modifier.clickable { onClick(item) }.height(160.dp).width(320.dp).run {
-                when (index) {
-                  0 -> padding(start = 16.dp)
-                  onlyChartTickers.lastIndex -> padding(end = 16.dp)
-                  else -> this
-                }
-              },
-      ) {
-        Row(
-            modifier = Modifier.padding(bottom = 8.dp),
-        ) {
-          TickerName(
-              modifier = Modifier.weight(1F),
-              ticker = item,
-          )
-          TickerPrice(
-              modifier = Modifier.padding(start = 16.dp),
-              ticker = item,
-          )
-        }
-        Chart(
-            chart = item.chart.requireNotNull(),
-        )
-      }
+              Modifier.height(HomeScreenDefaults.ITEM_HEIGHT_DP.dp)
+                  .width(HomeScreenDefaults.ITEM_WIDTH_DP.dp)
+                  .run {
+                    when (index) {
+                      0 -> padding(start = 16.dp)
+                      tickers.lastIndex -> padding(end = 16.dp)
+                      else -> this
+                    }
+                  },
+          ticker = item,
+          onClick = onClick,
+      )
     }
   }
 }
@@ -258,22 +164,24 @@ private fun Error(
 
 @Preview
 @Composable
-private fun PreviewHomeChartItem() {
+private fun PreviewHomeCharts() {
   val symbol = "MSFT".asSymbol()
   Surface {
-    HomeChartItem(
-        tickers =
-            listOf(
-                Ticker(
-                    symbol = symbol,
-                    quote = newTestQuote(symbol),
-                    chart = newTestChart(symbol),
-                ),
-            ),
-        isLoading = false,
-        name = "TEST STOCKS CHARTS",
-        error = null,
-        onChartClicked = {},
+    HomeWatchlist(
+        state =
+            object : HomeWatchListViewState {
+              override val watchlist: List<Ticker> =
+                  listOf(
+                      Ticker(
+                          symbol = symbol,
+                          quote = newTestQuote(symbol),
+                          chart = newTestChart(symbol),
+                      ),
+                  )
+              override val watchlistError: Throwable? = null
+              override val isLoadingWatchlist: Boolean = false
+            },
+        onClicked = {},
     )
   }
 }

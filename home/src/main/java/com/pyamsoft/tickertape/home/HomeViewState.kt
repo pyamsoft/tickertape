@@ -25,41 +25,46 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
-interface LoadingState : UiViewState {
-  val isLoading: Boolean
-}
+interface BaseState : UiViewState
 
-interface HomePortfolioViewState : LoadingState {
+interface HomePortfolioViewState : BaseState {
+  val isLoadingPortfolio: Boolean
   val portfolio: List<PortfolioStock>
   val portfolioError: Throwable?
 }
 
-interface HomeWatchListViewState : LoadingState {
+interface HomeWatchListViewState : BaseState {
+  val isLoadingWatchlist: Boolean
   val watchlist: List<Ticker>
   val watchlistError: Throwable?
 }
 
-interface HomeIndexesViewState : LoadingState {
+interface HomeIndexesViewState : BaseState {
+  val isLoadingIndexes: Boolean
   val indexes: List<Ticker>
   val indexesError: Throwable?
 }
 
-interface HomeGainersViewState : LoadingState {
+interface HomeGainersViewState : BaseState {
+  val isLoadingGainers: Boolean
   val gainers: List<Ticker>
   val gainersError: Throwable?
 }
 
-interface HomeLosersViewState : LoadingState {
+interface HomeLosersViewState : BaseState {
+  val isLoadingLosers: Boolean
   val losers: List<Ticker>
   val losersError: Throwable?
 }
 
-interface HomeTrendingViewState : LoadingState {
+interface HomeTrendingViewState : BaseState {
+  val isLoadingTrending: Boolean
   val trending: List<Ticker>
   val trendingError: Throwable?
 }
 
-interface HomeShortedViewState : LoadingState {
+interface HomeShortedViewState : BaseState {
+  val isLoadingMostShorted: Boolean
   val mostShorted: List<Ticker>
   val mostShortedError: Throwable?
 }
@@ -72,23 +77,39 @@ interface HomeViewState :
     HomeGainersViewState,
     HomeLosersViewState,
     HomeTrendingViewState,
-    HomeShortedViewState
+    HomeShortedViewState {
+  val isLoading: Boolean
+}
 
 @ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
   override var isLoading by mutableStateOf(false)
+
+  override var isLoadingPortfolio by mutableStateOf(false)
   override var portfolio by mutableStateOf(emptyList<PortfolioStock>())
   override var portfolioError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingWatchlist by mutableStateOf(false)
   override var watchlist by mutableStateOf(emptyList<Ticker>())
   override var watchlistError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingIndexes by mutableStateOf(false)
   override var indexes by mutableStateOf(emptyList<Ticker>())
   override var indexesError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingGainers by mutableStateOf(false)
   override var gainers by mutableStateOf(emptyList<Ticker>())
   override var gainersError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingLosers by mutableStateOf(false)
   override var losers by mutableStateOf(emptyList<Ticker>())
   override var losersError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingTrending by mutableStateOf(false)
   override var trending by mutableStateOf(emptyList<Ticker>())
   override var trendingError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingMostShorted by mutableStateOf(false)
   override var mostShorted by mutableStateOf(emptyList<Ticker>())
   override var mostShortedError by mutableStateOf<Throwable?>(null)
 }

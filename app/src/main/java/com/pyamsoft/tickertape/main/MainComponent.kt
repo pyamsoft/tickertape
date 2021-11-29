@@ -23,6 +23,7 @@ import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
+import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.setting.SettingsComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
@@ -40,6 +41,8 @@ internal interface MainComponent {
   @CheckResult fun plusWatchlist(): WatchlistComponent.Factory
 
   @CheckResult fun plusSettings(): SettingsComponent.Factory
+
+  @CheckResult fun plusPortfolio(): PortfolioComponent.Factory
 
   fun inject(activity: MainActivity)
 

@@ -29,14 +29,14 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class PortfolioInteractor
@@ -93,7 +93,7 @@ internal constructor(
                         PortfolioStock(
                             holding = holding,
                             positions = holdingPositions,
-                            quote = quote,
+                            ticker = quote,
                         )
                     result.add(stock)
                   }
@@ -108,22 +108,15 @@ internal constructor(
       }
 
   @CheckResult
-  suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean> =
+  suspend fun removeHolding(holding: DbHolding): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
           // TODO move this query into the DAO layer
-          val dbHolding = holdingQueryDao.query(true).firstOrNull { it.id() == id }
-          if (dbHolding == null) {
-            val err = IllegalStateException("Holding does not exist in DB: $id")
-            Timber.e(err)
-            return@withContext ResultWrapper.failure(err)
-          }
-
-          ResultWrapper.success(holdingDeleteDao.delete(dbHolding, offerUndo = true))
+          ResultWrapper.success(holdingDeleteDao.delete(holding, offerUndo = true))
         } catch (e: Throwable) {
-          Timber.e(e, "Error removing holding $id")
+          Timber.e(e, "Error removing holding $holding")
           ResultWrapper.failure(e)
         }
       }

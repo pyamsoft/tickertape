@@ -14,30 +14,29 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerTabs
 import javax.inject.Inject
 
-interface WatchlistViewState : UiViewState {
+interface PortfolioViewState : UiViewState {
   val query: String
   val section: TickerTabs
   val isLoading: Boolean
-  val watchlist: List<Ticker>
+  val portfolio: PortfolioStockList
   val error: Throwable?
 }
 
 @ActivityScope
-internal class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewState {
+internal class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
   override var query by mutableStateOf("")
   override var section by mutableStateOf(TickerTabs.STOCKS)
   override var isLoading by mutableStateOf(false)
-  override var watchlist by mutableStateOf(emptyList<Ticker>())
+  override var portfolio by mutableStateOf(PortfolioStockList.empty())
   override var error by mutableStateOf<Throwable?>(null)
 }

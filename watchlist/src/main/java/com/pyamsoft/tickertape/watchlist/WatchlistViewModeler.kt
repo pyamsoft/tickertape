@@ -22,14 +22,15 @@ import com.pyamsoft.pydroid.arch.*
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class WatchlistViewModeler
 @Inject
@@ -90,9 +91,9 @@ internal constructor(
           // If the quote is null, always show this because it was a bad network fetch
           val type = qs.quote?.type() ?: return@filter true
           return@filter when (section) {
-            WatchlistTabs.STOCKS -> type == EquityType.STOCK
-            WatchlistTabs.OPTIONS -> type == EquityType.OPTION
-            WatchlistTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
+            TickerTabs.STOCKS -> type == EquityType.STOCK
+            TickerTabs.OPTIONS -> type == EquityType.OPTION
+            TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
           }
         }
         .sortedWith(Ticker.COMPARATOR)

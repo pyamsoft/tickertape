@@ -16,26 +16,10 @@
 
 package com.pyamsoft.tickertape.portfolio
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.pydroid.arch.UiSavedStateViewModelProvider
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            PortfolioComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
+@Subcomponent
 internal interface PortfolioComponent {
 
   fun inject(fragment: PortfolioFragment)
@@ -43,20 +27,6 @@ internal interface PortfolioComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance parent: ViewGroup,
-    ): PortfolioComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(PortfolioViewModel::class)
-    internal abstract fun bindViewModel(
-        impl: PortfolioViewModel.Factory
-    ): UiSavedStateViewModelProvider<out ViewModel>
+    @CheckResult fun create(): PortfolioComponent
   }
 }

@@ -16,138 +16,137 @@
 
 package com.pyamsoft.tickertape.portfolio
 
-import android.animation.LayoutTransition
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.pyamsoft.pydroid.arch.StateSaver
-import com.pyamsoft.pydroid.arch.UiController
-import com.pyamsoft.pydroid.arch.asFactory
-import com.pyamsoft.pydroid.arch.createComponent
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.R as R2
-import com.pyamsoft.pydroid.ui.app.requireAppBarActivity
-import com.pyamsoft.pydroid.ui.app.requireToolbarActivity
-import com.pyamsoft.pydroid.ui.databinding.LayoutCoordinatorBinding
-import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
+import com.pyamsoft.pydroid.ui.theme.ThemeProvider
+import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.pydroid.ui.util.dispose
+import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.portfolio.manage.PositionManageDialog
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 
-class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
+class PortfolioFragment : Fragment() {
 
-  @JvmField @Inject internal var factory: PortfolioViewModel.Factory? = null
-  private val viewModel by
-      activityViewModels<PortfolioViewModel> { factory.requireNotNull().asFactory(this) }
+  @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
+  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
+  @JvmField @Inject internal var theming: Theming? = null
 
-  private var stateSaver: StateSaver? = null
+  private var windowInsetObserver: ViewWindowInsetObserver? = null
 
-  @JvmField @Inject internal var toolbar: PortfolioToolbar? = null
+  private fun handleOpenManageDialog(stock: PortfolioStock) {
+    val session = stock.ticker?.quote?.currentSession()
+    PositionManageDialog.show(requireActivity(), stock, session?.price())
+  }
 
-  @JvmField @Inject internal var tabs: PortfolioTabs? = null
+  private fun handleDeleteStock(stock: PortfolioStock) {
+    viewModel
+        .requireNotNull()
+        .handleRemove(
+            scope = viewLifecycleOwner.lifecycleScope,
+            stock = stock,
+        )
+  }
 
-  @JvmField @Inject internal var container: PortfolioScrollContainer? = null
+  private fun handleRefresh(force: Boolean) {
+    viewModel
+        .requireNotNull()
+        .handleRefreshList(
+            scope = viewLifecycleOwner.lifecycleScope,
+            force = force,
+        )
+  }
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R2.layout.layout_coordinator, container, false)
+  ): View {
+    val act = requireActivity()
+    Injector.obtainFromActivity<MainComponent>(act).plusPortfolio().create().inject(this)
+
+    val vm = viewModel.requireNotNull()
+    val mainVM = mainViewModel.requireNotNull()
+
+    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
+    return ComposeView(act).apply {
+      id = R.id.screen_portfolio
+
+      val observer = ViewWindowInsetObserver(this)
+      val windowInsets = observer.start()
+      windowInsetObserver = observer
+
+      setContent {
+        vm.Render { state ->
+          mainVM.Render { mainState ->
+            TickerTapeTheme(themeProvider) {
+              CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+                PortfolioScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    navBarBottomHeight = mainState.bottomNavHeight,
+                    onRefresh = { handleRefresh(true) },
+                    onSelect = { handleOpenManageDialog(it) },
+                    onDelete = { handleDeleteStock(it) },
+                    onSearchChanged = { vm.handleSearch(it) })
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    // Animate layout changes
-    val binding =
-        LayoutCoordinatorBinding.bind(view).apply {
-          layoutCoordinator.layoutTransition = LayoutTransition()
-        }
-
-    Injector.obtainFromApplication<TickerComponent>(view.context)
-        .plusPortfolioComponent()
-        .create(
-            requireToolbarActivity(),
-            requireAppBarActivity(),
-            requireActivity(),
-            viewLifecycleOwner,
-        )
-        .plusPortfolioComponent()
-        .create(binding.layoutCoordinator)
-        .inject(this)
-
-    stateSaver =
-        createComponent(
-            savedInstanceState,
-            viewLifecycleOwner,
-            viewModel,
-            this,
-            tabs.requireNotNull(),
-            toolbar.requireNotNull(),
-            container.requireNotNull(),
-        ) {
-          return@createComponent when (it) {
-            is PortfolioViewEvent.ForceRefresh -> viewModel.handleFetchPortfolio(true)
-            is PortfolioViewEvent.Remove -> viewModel.handleRemove(it.index)
-            is PortfolioViewEvent.Manage -> viewModel.handleManageHolding(it.index)
-            is PortfolioViewEvent.ShowOptions -> viewModel.handleShowOptions()
-            is PortfolioViewEvent.ShowStocks -> viewModel.handleShowStocks()
-            is PortfolioViewEvent.ShowCrypto -> viewModel.handleShowCrypto()
-            is PortfolioViewEvent.Search -> viewModel.handleSearch(it.query)
-          }
-        }
-
-    viewModel.handleListenForAddEvents(viewLifecycleOwner.lifecycleScope)
-  }
-
-  override fun onControllerEvent(event: PortfolioControllerEvent) {
-    return when (event) {
-      is PortfolioControllerEvent.AddNewHolding ->
-          handleOpenHoldingAddDialog(event.type, event.side)
-      is PortfolioControllerEvent.ManageHolding -> handleOpenHoldingManageDialog(event.stock)
+    viewModel.requireNotNull().also { vm ->
+      vm.restoreState(savedInstanceState)
+      vm.bind(scope = viewLifecycleOwner.lifecycleScope)
     }
-  }
-
-  private fun handleOpenHoldingManageDialog(stock: PortfolioStock) {
-    val q = stock.quote?.quote
-    val session = q?.currentSession()
-    PositionManageDialog.newInstance(stock, session?.price())
-        .show(requireActivity(), PositionManageDialog.TAG)
-  }
-
-  private fun handleOpenHoldingAddDialog(type: EquityType, side: TradeSide) {
-    PortfolioAddDialog.newInstance(type, side).show(requireActivity(), PortfolioAddDialog.TAG)
+    mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onStart() {
     super.onStart()
-    viewModel.handleFetchPortfolio(false)
+    handleRefresh(force = false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    stateSaver?.saveState(outState)
+    viewModel?.saveState(outState)
+    mainViewModel?.saveState(outState)
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    recompose()
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-    stateSaver = null
-    factory = null
+    dispose()
 
-    container = null
-    toolbar = null
-    tabs = null
+    viewModel = null
+    mainViewModel = null
+    theming = null
   }
 
   companion object {
@@ -155,7 +154,7 @@ class PortfolioFragment : Fragment(), UiController<PortfolioControllerEvent> {
     @JvmStatic
     @CheckResult
     fun newInstance(): Fragment {
-      return PortfolioFragment().apply { arguments = Bundle().apply {} }
+      return PortfolioFragment().apply { arguments = Bundle.EMPTY }
     }
   }
 }

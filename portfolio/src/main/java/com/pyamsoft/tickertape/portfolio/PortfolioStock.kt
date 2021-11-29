@@ -20,22 +20,13 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockPercent
-import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
-import com.pyamsoft.tickertape.stocks.api.asShares
+import com.pyamsoft.tickertape.stocks.api.*
 
 data class PortfolioStock
 internal constructor(
     val holding: DbHolding,
     val positions: List<DbPosition>,
-    val quote: Ticker?,
+    val ticker: Ticker?,
 ) {
 
   val todayDirection: StockDirection
@@ -67,7 +58,7 @@ internal constructor(
       tempTodayChange = 0.0
       tempTodayNumber = 0.0
     } else {
-      val q = quote?.quote
+      val q = ticker?.quote
       if (q == null) {
         tempTodayChange = 0.0
         tempTodayNumber = 0.0
@@ -121,5 +112,31 @@ internal constructor(
         if (isNoTodayChange) StockMoneyValue.none()
         else (tempTodayChange * sellSideModifier * optionsModifier).asMoney()
     changeTodayDisplayString = "${todayDirection.sign()}${todayChange.asMoneyValue()}"
+  }
+
+  companion object {
+
+    @JvmField
+    val COMPARATOR =
+        Comparator<PortfolioStock> { s1, s2 ->
+          val t1 = s1.ticker
+          val t2 = s2.ticker
+          if (t1 !== null && t2 !== null) {
+            return@Comparator Ticker.COMPARATOR.compare(t1, t2)
+          }
+
+          if (t1 == null) {
+            return@Comparator -1
+          }
+
+          if (t2 == null) {
+            return@Comparator 1
+          }
+
+          return@Comparator s1.holding
+              .symbol()
+              .symbol()
+              .compareTo(s2.holding.symbol().symbol(), ignoreCase = true)
+        }
   }
 }

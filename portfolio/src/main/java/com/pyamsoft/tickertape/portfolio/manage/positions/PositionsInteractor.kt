@@ -126,7 +126,7 @@ internal constructor(
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
             return@coroutineScope ResultWrapper.success(
-                PortfolioStock(holding = holding, positions = positions, quote = null))
+                PortfolioStock(holding = holding, positions = positions, ticker = null))
           }
         } catch (e: Throwable) {
           Timber.e(e, "Failed to fetch holding")

@@ -16,15 +16,11 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.isZero
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.*
 
-data class PortfolioStockList(val list: List<PortfolioStock>) {
+class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
 
   val sumTotalAmount: StockMoneyValue
   val sumTotalDirection: StockDirection
@@ -78,5 +74,22 @@ data class PortfolioStockList(val list: List<PortfolioStock>) {
     val sign = sumTodayDirection.sign()
     changeTodayDisplayString =
         "${sign}${sumTodayChange.asMoneyValue()} (${sign}${sumTodayPercentNumber.asPercent().asPercentValue()})"
+  }
+
+  companion object {
+
+    private val EMPTY = PortfolioStockList(emptyList())
+
+    @JvmStatic
+    @CheckResult
+    fun empty(): PortfolioStockList {
+      return EMPTY
+    }
+
+    @JvmStatic
+    @CheckResult
+    fun of(list: List<PortfolioStock>): PortfolioStockList {
+      return if (list.isEmpty()) EMPTY else PortfolioStockList(list)
+    }
   }
 }

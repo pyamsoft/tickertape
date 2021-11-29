@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import android.app.Dialog
-import com.pyamsoft.pydroid.ui.R as R2
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +27,7 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import com.pyamsoft.pydroid.arch.StateSaver
 import com.pyamsoft.pydroid.arch.UiController
@@ -38,7 +38,6 @@ import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.core.isNegative
@@ -55,6 +54,7 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.correctBackground
 import javax.inject.Inject
+import com.pyamsoft.pydroid.ui.R as R2
 
 internal class PositionManageDialog :
     AppCompatDialogFragment(), UiController<ManagePortfolioControllerEvent> {
@@ -238,7 +238,7 @@ internal class PositionManageDialog :
     private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_HOLDING_SIDE = "key_holding_side"
     private const val KEY_CURRENT_STOCK_PRICE = "key_current_stock_price"
-    const val TAG = "PositionManageDialog"
+    private const val TAG = "PositionManageDialog"
 
     @JvmStatic
     @CheckResult
@@ -254,7 +254,7 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    fun newInstance(stock: PortfolioStock, currentSharePrice: StockMoneyValue?): DialogFragment {
+    private fun newInstance(stock: PortfolioStock, currentSharePrice: StockMoneyValue?): DialogFragment {
       return PositionManageDialog().apply {
         arguments =
             Bundle().apply {
@@ -267,5 +267,10 @@ internal class PositionManageDialog :
             }
       }
     }
+
+      @JvmStatic
+      fun show(activity: FragmentActivity, stock: PortfolioStock, currentSharePrice: StockMoneyValue?) {
+          return newInstance(stock, currentSharePrice).show(activity, TAG)
+      }
   }
 }

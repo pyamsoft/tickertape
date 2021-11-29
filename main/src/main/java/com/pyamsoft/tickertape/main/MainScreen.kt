@@ -21,16 +21,25 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FabPosition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarData
+import androidx.compose.material.SnackbarDefaults
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -74,6 +83,16 @@ fun MainScreen(
           )
         }
       },
+      snackbarHost = { hostState ->
+        SnackbarHost(
+            hostState = hostState,
+            snackbar = { data ->
+              CustomSnackbar(
+                  snackbarData = data,
+              )
+            },
+        )
+      },
       floatingActionButtonPosition = FabPosition.Center,
       isFloatingActionButtonDocked = true,
       bottomBar = {
@@ -89,6 +108,45 @@ fun MainScreen(
       },
       content = content,
   )
+}
+
+// We copy this literally so that we can remove horizontal padding.
+// Ye.
+@Composable
+private fun CustomSnackbar(
+    modifier: Modifier = Modifier,
+    snackbarData: SnackbarData,
+    actionOnNewLine: Boolean = false,
+    shape: Shape = MaterialTheme.shapes.small,
+    backgroundColor: Color = SnackbarDefaults.backgroundColor,
+    contentColor: Color = MaterialTheme.colors.surface,
+    actionColor: Color = SnackbarDefaults.primaryActionColor,
+    elevation: Dp = 6.dp
+) {
+  val actionLabel = snackbarData.actionLabel
+  val actionComposable: (@Composable () -> Unit)? =
+      if (actionLabel != null) {
+        @Composable
+        {
+          TextButton(
+              colors = ButtonDefaults.textButtonColors(contentColor = actionColor),
+              onClick = { snackbarData.performAction() },
+              content = { Text(actionLabel) })
+        }
+      } else {
+        null
+      }
+
+  // No horizontal padding, the Scaffold is already padded for us
+  Snackbar(
+      modifier = modifier.padding(vertical = 12.dp),
+      content = { Text(snackbarData.message) },
+      action = actionComposable,
+      actionOnNewLine = actionOnNewLine,
+      shape = shape,
+      backgroundColor = backgroundColor,
+      contentColor = contentColor,
+      elevation = elevation)
 }
 
 @Preview

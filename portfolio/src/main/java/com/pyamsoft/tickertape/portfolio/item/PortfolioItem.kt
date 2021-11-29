@@ -58,7 +58,7 @@ internal fun PortfolioItem(
         onLongClick = { onDelete(stock) },
     ) {
       Column(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
       ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

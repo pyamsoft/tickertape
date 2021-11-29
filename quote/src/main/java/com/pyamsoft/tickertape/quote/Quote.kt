@@ -2,13 +2,17 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,6 +20,81 @@ import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+
+interface QuoteScope {
+
+  @Composable
+  fun Info(
+      name: String,
+      value: String,
+  ) {
+    Info(
+        modifier = Modifier,
+        name = name,
+        value = value,
+        valueColor = Color.Unspecified,
+    )
+  }
+
+  @Composable
+  fun Info(
+      modifier: Modifier,
+      name: String,
+      value: String,
+  ) {
+    Info(
+        modifier = modifier,
+        name = name,
+        value = value,
+        valueColor = Color.Unspecified,
+    )
+  }
+
+  @Composable
+  fun Info(
+      name: String,
+      value: String,
+      valueColor: Color,
+  ) {
+    Info(
+        modifier = Modifier,
+        name = name,
+        value = value,
+        valueColor = valueColor,
+    )
+  }
+
+  @Composable fun Info(modifier: Modifier, name: String, value: String, valueColor: Color)
+}
+
+private object QuoteScopeInstance : QuoteScope {
+
+  @Composable
+  override fun Info(
+      modifier: Modifier,
+      name: String,
+      value: String,
+      valueColor: Color,
+  ) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+          text = name,
+          style = MaterialTheme.typography.caption,
+      )
+      Text(
+          modifier = Modifier.padding(start = 4.dp),
+          color = valueColor,
+          text = value,
+          style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+      )
+    }
+  }
+}
 
 @Composable
 @JvmOverloads
@@ -25,7 +104,7 @@ fun Quote(
     ticker: Ticker,
     onClick: (Ticker) -> Unit,
     onLongClick: (Ticker) -> Unit,
-    content: @Composable () -> Unit = {},
+    content: @Composable QuoteScope.() -> Unit = {},
 ) {
   val quote = ticker.quote
 
@@ -50,18 +129,18 @@ fun Quote(
         )
       }
       if (quote != null) {
-        QuoteInfo(
+        QuoteScopeInstance.QuoteInfo(
             modifier = Modifier.fillMaxWidth(),
             quote = quote,
         )
       }
-      content()
+      QuoteScopeInstance.content()
     }
   }
 }
 
 @Composable
-private fun QuoteInfo(modifier: Modifier = Modifier, quote: StockQuote) {
+private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuote) {
   Column(
       modifier = modifier,
   ) {
@@ -102,26 +181,6 @@ private fun QuoteInfo(modifier: Modifier = Modifier, quote: StockQuote) {
           value = quote.dayVolume().asVolumeValue(),
       )
     }
-  }
-}
-
-@Composable
-private fun Info(modifier: Modifier = Modifier, name: String, value: String) {
-  Row(
-      modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.caption,
-    )
-    Text(
-        modifier = Modifier.padding(start = 4.dp),
-        text = value,
-        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
   }
 }
 

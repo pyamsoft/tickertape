@@ -40,10 +40,7 @@ fun TickerPrice(
           if (direction.isZero()) {
             MaterialTheme.typography.caption.color
           } else {
-            remember(direction) {
-              val color = session.direction().color()
-              Color(color)
-            }
+            remember(direction) { Color(direction.color()) }
           }
 
       Text(

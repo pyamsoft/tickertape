@@ -28,8 +28,8 @@ import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.quote.Quote
+import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
+import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.ui.SearchBar
 
 @Composable
@@ -133,6 +133,13 @@ private fun Portfolio(
       )
     }
 
+    item {
+      PorfolioSummaryItem(
+          modifier = Modifier.fillMaxWidth(),
+          portfolio = portfolio,
+      )
+    }
+
     stickyHeader {
       SearchBar(
           modifier = Modifier.fillMaxWidth(),
@@ -142,11 +149,11 @@ private fun Portfolio(
     }
 
     items(items = portfolioTickers, key = { it.holding.symbol().symbol() }) { ps ->
-      Quote(
+      PortfolioItem(
           modifier = Modifier.fillMaxWidth(),
-          ticker = ps.ticker.requireNotNull(),
-          onClick = { onSelect(ps) },
-          onLongClick = { onDelete(ps) },
+          stock = ps,
+          onSelect = onSelect,
+          onDelete = onDelete,
       )
     }
 

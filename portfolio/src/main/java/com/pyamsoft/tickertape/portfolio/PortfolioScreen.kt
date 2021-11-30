@@ -44,8 +44,8 @@ fun PortfolioScreen(
     onSearchChanged: (String) -> Unit,
 ) {
   val loading = state.isLoading
-
   val scaffoldState = rememberScaffoldState()
+
   Scaffold(
       modifier = modifier,
       scaffoldState = scaffoldState,

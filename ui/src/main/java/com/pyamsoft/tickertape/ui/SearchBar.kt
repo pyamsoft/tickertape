@@ -1,13 +1,19 @@
 package com.pyamsoft.tickertape.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +26,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 @JvmOverloads
+@OptIn(ExperimentalAnimationApi::class)
 fun SearchBar(
     modifier: Modifier = Modifier,
     search: String,
@@ -42,6 +49,18 @@ fun SearchBar(
           Text(
               text = "Search for something...",
           )
+        },
+        trailingIcon = {
+          AnimatedVisibility(visible = search.isNotBlank()) {
+            IconButton(
+                onClick = { onSearchChanged("") },
+            ) {
+              Icon(
+                  imageVector = Icons.Filled.Close,
+                  contentDescription = "Clear Search",
+              )
+            }
+          }
         },
         colors =
             TextFieldDefaults.outlinedTextFieldColors(

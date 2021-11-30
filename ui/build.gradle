@@ -51,6 +51,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "$compose_version"
     }
+
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    }
 }
 
 // Kapt flags

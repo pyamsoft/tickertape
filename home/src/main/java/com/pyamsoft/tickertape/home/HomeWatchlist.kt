@@ -170,7 +170,7 @@ private fun Error(
 
 @Preview
 @Composable
-private fun PreviewHomeCharts() {
+private fun PreviewWatchlist() {
   val symbol = "MSFT".asSymbol()
   Surface {
     HomeWatchlist(

@@ -27,18 +27,16 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.tape.TapeLauncher
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
 internal constructor(
     private val state: MutablePortfolioViewState,
-    private val tapeLauncher: TapeLauncher,
     private val interactor: PortfolioInteractor,
 ) : AbstractViewModeler<PortfolioViewState>(state) {
 
@@ -118,7 +116,8 @@ internal constructor(
 
   private fun MutablePortfolioViewState.regeneratePortfolio(tickers: List<PortfolioStock>) {
     fullPortfolio = preparePortfolio(tickers)
-    this.portfolio = PortfolioStockList.of(asVisible(fullPortfolio))
+    this.portfolio = PortfolioStockList.of(fullPortfolio)
+    this.stocks = asVisible(fullPortfolio)
   }
 
   @CheckResult

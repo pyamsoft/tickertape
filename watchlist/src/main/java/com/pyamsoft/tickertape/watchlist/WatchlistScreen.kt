@@ -132,11 +132,18 @@ private fun Watchlist(
     }
 
     stickyHeader {
-      SearchBar(
+      Column(
           modifier = Modifier.fillMaxWidth(),
-          search = search,
-          onSearchChanged = onSearchChanged,
-      )
+      ) {
+        Spacer(
+            modifier = Modifier.statusBarsHeight(),
+        )
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
+            search = search,
+            onSearchChanged = onSearchChanged,
+        )
+      }
     }
 
     items(items = tickers, key = { it.symbol.symbol() }) { ticker ->

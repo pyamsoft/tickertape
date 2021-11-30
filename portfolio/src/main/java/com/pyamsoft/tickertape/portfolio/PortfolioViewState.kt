@@ -29,6 +29,7 @@ interface PortfolioViewState : UiViewState {
   val section: TickerTabs
   val isLoading: Boolean
   val portfolio: PortfolioStockList
+  val stocks: List<PortfolioStock>
   val error: Throwable?
 }
 
@@ -38,5 +39,6 @@ internal class MutablePortfolioViewState @Inject internal constructor() : Portfo
   override var section by mutableStateOf(TickerTabs.STOCKS)
   override var isLoading by mutableStateOf(false)
   override var portfolio by mutableStateOf(PortfolioStockList.empty())
+  override var stocks by mutableStateOf(emptyList<PortfolioStock>())
   override var error by mutableStateOf<Throwable?>(null)
 }

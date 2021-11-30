@@ -79,6 +79,7 @@ private fun Content(
 ) {
   val error = state.error
   val portfolio = state.portfolio
+  val stocks = state.stocks
   val search = state.query
 
   Crossfade(
@@ -89,6 +90,7 @@ private fun Content(
       Portfolio(
           modifier = Modifier.fillMaxSize(),
           portfolio = portfolio,
+          stocks = stocks,
           navBarBottomHeight = navBarBottomHeight,
           onSelect = onSelect,
           onDelete = onDelete,
@@ -110,6 +112,7 @@ private fun Content(
 private fun Portfolio(
     modifier: Modifier = Modifier,
     portfolio: PortfolioStockList,
+    stocks: List<PortfolioStock>,
     search: String,
     navBarBottomHeight: Int,
     onSelect: (PortfolioStock) -> Unit,
@@ -120,7 +123,7 @@ private fun Portfolio(
   val bottomPaddingDp =
       remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
 
-  val portfolioTickers = remember(portfolio.list) { portfolio.list.filter { it.ticker != null } }
+  val portfolioTickers = remember(stocks) { stocks.filter { it.ticker != null } }
 
   LazyColumn(
       modifier = modifier,
@@ -141,11 +144,18 @@ private fun Portfolio(
     }
 
     stickyHeader {
-      SearchBar(
+      Column(
           modifier = Modifier.fillMaxWidth(),
-          search = search,
-          onSearchChanged = onSearchChanged,
-      )
+      ) {
+        Spacer(
+            modifier = Modifier.statusBarsHeight(),
+        )
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
+            search = search,
+            onSearchChanged = onSearchChanged,
+        )
+      }
     }
 
     items(items = portfolioTickers, key = { it.holding.symbol().symbol() }) { ps ->

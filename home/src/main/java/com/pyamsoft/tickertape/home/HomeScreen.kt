@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Surface
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -46,17 +46,20 @@ fun HomeScreen(
 ) {
   val isLoading = state.isLoading
 
-  SwipeRefresh(
+  Scaffold(
       modifier = modifier,
-      state = rememberSwipeRefreshState(isRefreshing = isLoading),
-      onRefresh = onRefresh,
   ) {
-    HomeContent(
-        modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState()),
-        state = state,
-        navBarBottomHeight = navBarBottomHeight,
-        onChartClicked = onChartClicked,
-    )
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isLoading),
+        onRefresh = onRefresh,
+    ) {
+      HomeContent(
+          modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState()),
+          state = state,
+          navBarBottomHeight = navBarBottomHeight,
+          onChartClicked = onChartClicked,
+      )
+    }
   }
 }
 
@@ -112,11 +115,9 @@ private fun HomeContent(
 @Preview
 @Composable
 private fun PreviewHomeScreen() {
-  Surface {
-    HomeScreen(
-        state = MutableHomeViewState(),
-        onChartClicked = {},
-        onRefresh = {},
-    )
-  }
+  HomeScreen(
+      state = MutableHomeViewState(),
+      onChartClicked = {},
+      onRefresh = {},
+  )
 }

@@ -17,7 +17,12 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -37,6 +42,10 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDateTime
+import android.graphics.Color as ViewColor
+
+private const val FILL_ALPHA = (0.2 * 255).toInt()
+private const val LINE_ALPHA = 255
 
 @Composable
 @JvmOverloads
@@ -140,35 +149,35 @@ private fun SparkChart(
           isFilled = true
 
           positiveLineColor =
-              android.graphics.Color.argb(
-                  255,
-                  android.graphics.Color.red(DEFAULT_STOCK_UP_COLOR),
-                  android.graphics.Color.green(DEFAULT_STOCK_UP_COLOR),
-                  android.graphics.Color.blue(DEFAULT_STOCK_UP_COLOR),
+              ViewColor.argb(
+                  LINE_ALPHA,
+                  ViewColor.red(DEFAULT_STOCK_UP_COLOR),
+                  ViewColor.green(DEFAULT_STOCK_UP_COLOR),
+                  ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
               )
 
           positiveFillColor =
-              android.graphics.Color.argb(
-                  (0.5 * 255).toInt(),
-                  android.graphics.Color.red(DEFAULT_STOCK_UP_COLOR),
-                  android.graphics.Color.green(DEFAULT_STOCK_UP_COLOR),
-                  android.graphics.Color.blue(DEFAULT_STOCK_UP_COLOR),
+              ViewColor.argb(
+                  FILL_ALPHA,
+                  ViewColor.red(DEFAULT_STOCK_UP_COLOR),
+                  ViewColor.green(DEFAULT_STOCK_UP_COLOR),
+                  ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
               )
 
           negativeLineColor =
-              android.graphics.Color.argb(
-                  255,
-                  android.graphics.Color.red(DEFAULT_STOCK_DOWN_COLOR),
-                  android.graphics.Color.green(DEFAULT_STOCK_DOWN_COLOR),
-                  android.graphics.Color.blue(DEFAULT_STOCK_DOWN_COLOR),
+              ViewColor.argb(
+                  LINE_ALPHA,
+                  ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
+                  ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
+                  ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
               )
 
           negativeFillColor =
-              android.graphics.Color.argb(
-                  (0.5 * 255).toInt(),
-                  android.graphics.Color.red(DEFAULT_STOCK_DOWN_COLOR),
-                  android.graphics.Color.green(DEFAULT_STOCK_DOWN_COLOR),
-                  android.graphics.Color.blue(DEFAULT_STOCK_DOWN_COLOR),
+              ViewColor.argb(
+                  FILL_ALPHA,
+                  ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
+                  ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
+                  ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
               )
         }
       },

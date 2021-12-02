@@ -60,13 +60,18 @@ kapt {
   }
 }
 
+room {
+  schemaLocationDir.set(file("schemas"))
+}
+
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
 
   // Room
-  implementation "androidx.room:room-runtime:$room"
-  implementation "androidx.room:room-ktx:$room"
-  kapt "androidx.room:room-compiler:$room"
+  // Need this format for variable resolution for AGP cache plugin fix
+  implementation "androidx.room:room-runtime:${rootProject.ext.room}"
+  implementation "androidx.room:room-ktx:${rootProject.ext.room}"
+  kapt "androidx.room:room-compiler:${rootProject.ext.room}"
 
   kapt "com.google.dagger:dagger-compiler:$dagger"
 

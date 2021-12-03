@@ -46,7 +46,6 @@ import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.TapeService
-import com.pyamsoft.tickertape.ui.UiModule
 import com.pyamsoft.tickertape.watchlist.add.BaseWatchlistAddComponent
 import com.pyamsoft.tickertape.watchlist.dig.BaseWatchlistDigComponent
 import dagger.Binds
@@ -68,7 +67,6 @@ import javax.inject.Singleton
             TapeModule::class,
             AlertModule::class,
             WorkManagerModule::class,
-            UiModule::class,
             PositionsDateModule::class,
             TickerModule::class,
             HomeModule::class,

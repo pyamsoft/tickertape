@@ -32,6 +32,8 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.SearchBar
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
 
+private const val FAB_OFFSET = 28
+
 @Composable
 @JvmOverloads
 fun WatchlistScreen(
@@ -123,7 +125,7 @@ private fun Watchlist(
   LazyColumn(
       modifier = modifier,
       contentPadding = PaddingValues(horizontal = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
     item {
       Spacer(
@@ -146,7 +148,10 @@ private fun Watchlist(
       }
     }
 
-    items(items = tickers, key = { it.symbol.symbol() }) { ticker ->
+    items(
+        items = tickers,
+        key = { it.symbol.symbol() },
+    ) { ticker ->
       WatchlistItem(
           modifier = Modifier.fillMaxWidth(),
           ticker = ticker,
@@ -157,7 +162,7 @@ private fun Watchlist(
 
     item {
       Spacer(
-          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp),
+          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp + FAB_OFFSET.dp),
       )
     }
   }

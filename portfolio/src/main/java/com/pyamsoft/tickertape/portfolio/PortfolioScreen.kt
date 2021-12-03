@@ -32,6 +32,8 @@ import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.ui.SearchBar
 
+private const val FAB_OFFSET = 28
+
 @Composable
 @JvmOverloads
 fun PortfolioScreen(
@@ -128,7 +130,7 @@ private fun Portfolio(
   LazyColumn(
       modifier = modifier,
       contentPadding = PaddingValues(horizontal = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
     item {
       Spacer(
@@ -158,7 +160,10 @@ private fun Portfolio(
       }
     }
 
-    items(items = portfolioTickers, key = { it.holding.symbol().symbol() }) { ps ->
+    items(
+        items = portfolioTickers,
+        key = { it.holding.symbol().symbol() },
+    ) { ps ->
       PortfolioItem(
           modifier = Modifier.fillMaxWidth(),
           stock = ps,
@@ -169,7 +174,7 @@ private fun Portfolio(
 
     item {
       Spacer(
-          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp),
+          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp + FAB_OFFSET.dp),
       )
     }
   }

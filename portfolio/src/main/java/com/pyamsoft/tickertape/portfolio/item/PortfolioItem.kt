@@ -75,6 +75,7 @@ internal fun PortfolioItem(
           )
         }
         Row(
+            modifier = Modifier.padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Info(

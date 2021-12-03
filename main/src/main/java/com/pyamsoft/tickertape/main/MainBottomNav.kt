@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -32,12 +31,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
@@ -55,16 +52,9 @@ internal fun MainBottomNav(
     onLoadSettings: () -> Unit,
 ) {
   // Can't use BottomAppBar since we can't modify its Shape
-  val padding = 16.dp
-  val density = LocalDensity.current
-  val paddingInPx = remember(density) { density.run { padding.roundToPx() } }
-
   Column {
     Surface(
-        modifier =
-            modifier.padding(bottom = padding).onSizeChanged {
-              onHeightMeasured(it.height + paddingInPx)
-            },
+        modifier = modifier.onSizeChanged { onHeightMeasured(it.height) },
         contentColor = Color.White,
         color = MaterialTheme.colors.primary,
         shape = MaterialTheme.shapes.medium,

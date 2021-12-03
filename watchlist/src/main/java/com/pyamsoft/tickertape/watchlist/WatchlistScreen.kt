@@ -29,10 +29,9 @@ import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.ui.SearchBar
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
-
-private const val FAB_OFFSET = 28
 
 @Composable
 @JvmOverloads
@@ -162,7 +161,10 @@ private fun Watchlist(
 
     item {
       Spacer(
-          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp + FAB_OFFSET.dp),
+          modifier =
+              Modifier.navigationBarsHeight(
+                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET.dp,
+              ),
       )
     }
   }

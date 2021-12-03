@@ -19,11 +19,12 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -142,32 +143,35 @@ internal class MainActivity : PYDroidActivity() {
         val bottomNavHeight = state.bottomNavHeight
         val density = LocalDensity.current
         val bottomOffset =
-            remember(density, bottomNavHeight) { density.run { bottomNavHeight.toDp() } }
+            remember(density, bottomNavHeight) { density.run { bottomNavHeight.toDp() + 16.dp } }
+        val snackbarHostState = remember { SnackbarHostState() }
 
         SystemBars(theme)
         TickerTapeTheme(theme) {
           ProvideWindowInsets {
-            val snackbarHostState = remember { SnackbarHostState() }
 
-            MainScreen(
-                modifier = Modifier.height(220.dp),
-                page = page,
-                onLoadHome = { navigate(MainPage.Home) },
-                onLoadWatchList = { navigate(MainPage.WatchList) },
-                onLoadPortfolio = { navigate(MainPage.Portfolio) },
-                onLoadSettings = { navigate(MainPage.Settings) },
-                onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                onFabClicked = { handleFabClicked(page) },
-            )
-
-            RatingScreen(
-                modifier = Modifier.padding(bottom = bottomOffset),
-                snackbarHostState = snackbarHostState,
-            )
-            VersionCheckScreen(
-                modifier = Modifier.padding(bottom = bottomOffset),
-                snackbarHostState = snackbarHostState,
-            )
+            // Need to have box or snackbars push up bottom bar
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+              MainScreen(
+                  page = page,
+                  onLoadHome = { navigate(MainPage.Home) },
+                  onLoadWatchList = { navigate(MainPage.WatchList) },
+                  onLoadPortfolio = { navigate(MainPage.Portfolio) },
+                  onLoadSettings = { navigate(MainPage.Settings) },
+                  onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                  onFabClicked = { handleFabClicked(page) },
+              )
+              RatingScreen(
+                  modifier = Modifier.padding(bottom = bottomOffset),
+                  snackbarHostState = snackbarHostState,
+              )
+              VersionCheckScreen(
+                  modifier = Modifier.padding(bottom = bottomOffset),
+                  snackbarHostState = snackbarHostState,
+              )
+            }
           }
         }
       }

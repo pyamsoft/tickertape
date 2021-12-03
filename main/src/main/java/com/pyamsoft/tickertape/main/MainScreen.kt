@@ -19,11 +19,13 @@ package com.pyamsoft.tickertape.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 @Composable
 @JvmOverloads
@@ -49,6 +51,7 @@ fun MainScreen(
       modifier = modifier,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
+      // Causes pop in.
     AnimatedVisibility(
         visible = isFabEnabled,
     ) {
@@ -57,6 +60,7 @@ fun MainScreen(
       )
     }
     MainBottomNav(
+        modifier = Modifier.padding(16.dp),
         page = page,
         onLoadHome = onLoadHome,
         onLoadWatchList = onLoadWatchList,

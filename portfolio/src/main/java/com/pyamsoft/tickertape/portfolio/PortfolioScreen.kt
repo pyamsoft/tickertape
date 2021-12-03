@@ -30,9 +30,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
+import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.ui.SearchBar
-
-private const val FAB_OFFSET = 28
 
 @Composable
 @JvmOverloads
@@ -174,7 +173,10 @@ private fun Portfolio(
 
     item {
       Spacer(
-          modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp + FAB_OFFSET.dp),
+          modifier =
+              Modifier.navigationBarsHeight(
+                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET.dp,
+              ),
       )
     }
   }

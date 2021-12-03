@@ -18,8 +18,6 @@ package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
-import com.pyamsoft.pydroid.ui.app.AppBarActivityProvider
-import com.pyamsoft.pydroid.ui.app.ToolbarActivityProvider
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
@@ -53,8 +51,6 @@ internal interface MainComponent {
     fun create(
         @BindsInstance activity: MainActivity,
         @BindsInstance @IdRes fragmentContainerId: Int,
-        @BindsInstance toolbarProvider: ToolbarActivityProvider,
-        @BindsInstance appBarActivityProvider: AppBarActivityProvider,
     ): MainComponent
   }
 

@@ -21,13 +21,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -37,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +48,6 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
     page: MainPage,
-    cutoutShape: Shape,
     onHeightMeasured: (Int) -> Unit,
     onLoadHome: () -> Unit,
     onLoadWatchList: () -> Unit,
@@ -63,14 +60,14 @@ internal fun MainBottomNav(
   val paddingInPx = remember(density) { density.run { padding.roundToPx() } }
 
   Column {
-    BottomAppBar(
+    Surface(
         modifier =
             modifier.padding(bottom = padding).onSizeChanged {
               onHeightMeasured(it.height + paddingInPx)
             },
-        backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
-        cutoutShape = cutoutShape,
+        color = MaterialTheme.colors.primary,
+        shape = MaterialTheme.shapes.medium,
     ) {
       BottomNavigation(
           backgroundColor = Color.Transparent,
@@ -158,7 +155,6 @@ private fun RowScope.Item(
 @Composable
 private fun PreviewMainBottomNav() {
   MainBottomNav(
-      cutoutShape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
       page = MainPage.Home,
       onHeightMeasured = {},
       onLoadHome = {},

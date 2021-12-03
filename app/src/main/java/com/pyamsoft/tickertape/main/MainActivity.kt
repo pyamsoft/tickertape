@@ -19,18 +19,19 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.android.material.appbar.AppBarLayout
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.*
+import com.pyamsoft.pydroid.ui.app.PYDroidActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
@@ -54,17 +55,12 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-internal class MainActivity :
-    PYDroidActivity(),
-    ToolbarActivity,
-    ToolbarActivityProvider,
-    AppBarActivity,
-    AppBarActivityProvider {
+internal class MainActivity : PYDroidActivity() {
 
   override val applicationIcon = R.mipmap.ic_launcher
 
@@ -100,26 +96,6 @@ internal class MainActivity :
     }
   }
 
-  override fun setAppBar(bar: AppBarLayout?) {}
-
-  override fun <T> requireAppBar(func: (AppBarLayout) -> T): T {
-    return func(AppBarLayout(this))
-  }
-
-  override fun <T> withAppBar(func: (AppBarLayout) -> T): T? {
-    return null
-  }
-
-  override fun setToolbar(toolbar: Toolbar?) {}
-
-  override fun <T> requireToolbar(func: (Toolbar) -> T): T {
-    return func(Toolbar(this))
-  }
-
-  override fun <T> withToolbar(func: (Toolbar) -> T): T? {
-    return null
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     // NOTE(Peter):
     // Not full Compose yet
@@ -141,8 +117,6 @@ internal class MainActivity :
             .create(
                 this,
                 binding.mainFragmentContainerView.id,
-                this,
-                this,
             )
             .also { c -> c.inject(this) }
     setTheme(R.style.Theme_TickerTape)
@@ -165,19 +139,18 @@ internal class MainActivity :
 
       vm.Render { state ->
         val theme = state.theme
+        val bottomNavHeight = state.bottomNavHeight
+        val density = LocalDensity.current
+        val bottomOffset =
+            remember(density, bottomNavHeight) { density.run { bottomNavHeight.toDp() } }
+
         SystemBars(theme)
         TickerTapeTheme(theme) {
           ProvideWindowInsets {
-            val scaffoldState = rememberScaffoldState()
-            // Enforce a height for the scaffold or else it takes over the screen
-            // Why do we need a scaffold instead of a box?
-            // Because using a FAB with a BottomAppBar doesn't actually work unless its inside a
-            // scaffold.
-            //
-            // yeah.
+            val snackbarHostState = remember { SnackbarHostState() }
+
             MainScreen(
                 modifier = Modifier.height(220.dp),
-                scaffoldState = scaffoldState,
                 page = page,
                 onLoadHome = { navigate(MainPage.Home) },
                 onLoadWatchList = { navigate(MainPage.WatchList) },
@@ -185,14 +158,16 @@ internal class MainActivity :
                 onLoadSettings = { navigate(MainPage.Settings) },
                 onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
                 onFabClicked = { handleFabClicked(page) },
-            ) {
-              RatingScreen(
-                  scaffoldState = scaffoldState,
-              )
-              VersionCheckScreen(
-                  scaffoldState = scaffoldState,
-              )
-            }
+            )
+
+            RatingScreen(
+                modifier = Modifier.padding(bottom = bottomOffset),
+                snackbarHostState = snackbarHostState,
+            )
+            VersionCheckScreen(
+                modifier = Modifier.padding(bottom = bottomOffset),
+                snackbarHostState = snackbarHostState,
+            )
           }
         }
       }

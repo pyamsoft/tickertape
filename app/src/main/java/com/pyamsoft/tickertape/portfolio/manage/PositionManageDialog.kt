@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.manage
 
 import android.app.Dialog
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +35,7 @@ import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
@@ -54,7 +56,6 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.correctBackground
 import javax.inject.Inject
-import com.pyamsoft.pydroid.ui.R as R2
 
 internal class PositionManageDialog :
     AppCompatDialogFragment(), UiController<ManagePortfolioControllerEvent> {
@@ -64,9 +65,8 @@ internal class PositionManageDialog :
   @JvmField @Inject internal var container: ManagePortfolioContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by viewModels<ManagePortfolioViewModel> {
-    factory.requireNotNull().create(this)
-  }
+  private val viewModel by
+      viewModels<ManagePortfolioViewModel> { factory.requireNotNull().create(this) }
 
   private var component: BaseManageComponent? = null
 
@@ -113,7 +113,7 @@ internal class PositionManageDialog :
       savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
-        correctBackground(this)
+      correctBackground(this)
     }
   }
 
@@ -158,6 +158,11 @@ internal class PositionManageDialog :
         }
 
     viewModel.handleLoadDefaultPage()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    makeFullscreen()
   }
 
   private fun eatBackButtonPress() {
@@ -254,7 +259,10 @@ internal class PositionManageDialog :
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(stock: PortfolioStock, currentSharePrice: StockMoneyValue?): DialogFragment {
+    private fun newInstance(
+        stock: PortfolioStock,
+        currentSharePrice: StockMoneyValue?
+    ): DialogFragment {
       return PositionManageDialog().apply {
         arguments =
             Bundle().apply {
@@ -268,9 +276,13 @@ internal class PositionManageDialog :
       }
     }
 
-      @JvmStatic
-      fun show(activity: FragmentActivity, stock: PortfolioStock, currentSharePrice: StockMoneyValue?) {
-          return newInstance(stock, currentSharePrice).show(activity, TAG)
-      }
+    @JvmStatic
+    fun show(
+        activity: FragmentActivity,
+        stock: PortfolioStock,
+        currentSharePrice: StockMoneyValue?
+    ) {
+      return newInstance(stock, currentSharePrice).show(activity, TAG)
+    }
   }
 }

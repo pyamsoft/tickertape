@@ -16,8 +16,8 @@
 
 package com.pyamsoft.tickertape.portfolio.manage.position.add
 
-import com.pyamsoft.pydroid.ui.R as R2
 import android.app.Dialog
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,10 +34,10 @@ import com.pyamsoft.pydroid.arch.asFactory
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionAddToolbar
@@ -61,9 +61,8 @@ internal class PositionsAddDialog :
   @JvmField @Inject internal var toolbar: PositionAddToolbar? = null
 
   @JvmField @Inject internal var factory: PositionsAddViewModel.Factory? = null
-  private val viewModel by viewModels<PositionsAddViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  private val viewModel by
+      viewModels<PositionsAddViewModel> { factory.requireNotNull().asFactory(this) }
 
   private var stateSaver: StateSaver? = null
 
@@ -102,7 +101,7 @@ internal class PositionsAddDialog :
       savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
-        correctBackground(this)
+      correctBackground(this)
     }
   }
 
@@ -145,6 +144,11 @@ internal class PositionsAddDialog :
             is PositionsAddViewEvent.OpenDatePicker -> viewModel.handleDatePicker()
           }
         }
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    makeFullWidth()
   }
 
   private fun eatBackButtonPress() {

@@ -16,8 +16,8 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import com.pyamsoft.pydroid.ui.R as R2
 import android.app.Dialog
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,11 +35,11 @@ import com.pyamsoft.pydroid.arch.UiController
 import com.pyamsoft.pydroid.arch.createComponent
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
 import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
 import com.pyamsoft.pydroid.ui.util.commit
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.core.TickerViewModelFactory
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -56,9 +56,8 @@ internal class WatchlistDigDialog :
   @JvmField @Inject internal var container: BaseWatchlistDigContainer? = null
 
   @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by viewModels<BaseWatchlistDigViewModel> {
-    factory.requireNotNull().create(this)
-  }
+  private val viewModel by
+      viewModels<BaseWatchlistDigViewModel> { factory.requireNotNull().create(this) }
 
   private var component: BaseWatchlistDigComponent? = null
 
@@ -104,7 +103,7 @@ internal class WatchlistDigDialog :
       savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
-        correctBackground(this)
+      correctBackground(this)
     }
   }
 
@@ -138,6 +137,11 @@ internal class WatchlistDigDialog :
         }
 
     viewModel.handleLoadDefaultPage()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    makeFullscreen()
   }
 
   private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
@@ -205,9 +209,9 @@ internal class WatchlistDigDialog :
       }
     }
 
-      @JvmStatic
-      fun show(activity: FragmentActivity, symbol: StockSymbol) {
-          newInstance(symbol).show(activity, TAG)
-      }
+    @JvmStatic
+    fun show(activity: FragmentActivity, symbol: StockSymbol) {
+      newInstance(symbol).show(activity, TAG)
+    }
   }
 }

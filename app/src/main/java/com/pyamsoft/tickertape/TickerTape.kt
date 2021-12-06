@@ -32,10 +32,10 @@ import com.pyamsoft.tickertape.alert.inject.AlertComponent
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -49,7 +49,6 @@ class TickerTape : Application() {
     val url = "https://github.com/pyamsoft/tickertape"
     val parameters =
         PYDroid.Parameters(
-            googlePlayLicenseVerificationKey = BuildConfig.LICENSE_KEY,
             viewSourceUrl = url,
             bugReportUrl = "$url/issues",
             privacyPolicyUrl = PRIVACY_POLICY_URL,

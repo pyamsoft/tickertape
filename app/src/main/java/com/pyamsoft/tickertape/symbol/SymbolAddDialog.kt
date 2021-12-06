@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.symbol
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -170,6 +171,11 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
       }
     }
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    makeFullWidth()
   }
 
   protected abstract fun onInject(

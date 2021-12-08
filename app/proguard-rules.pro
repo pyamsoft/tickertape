@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Avoids this line from Retrofit network requests
+# java.lang.ClassCastException: java.lang.Class cannot be cast to java.lang.reflect.ParameterizedTyp
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation

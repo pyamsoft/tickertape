@@ -16,94 +16,85 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CheckResult
-import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.viewModels
-import com.pyamsoft.pydroid.arch.StateSaver
-import com.pyamsoft.pydroid.arch.UiController
-import com.pyamsoft.pydroid.arch.createComponent
+import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.app.makeFullscreen
-import com.pyamsoft.pydroid.ui.databinding.LayoutLinearVerticalBinding
-import com.pyamsoft.pydroid.ui.util.commit
+import com.pyamsoft.pydroid.ui.theme.ThemeProvider
+import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.pydroid.ui.util.dispose
+import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
+import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.core.TickerViewModelFactory
+import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.ui.correctBackground
-import com.pyamsoft.tickertape.watchlist.dig.chart.WatchlistDigChartFragment
 import javax.inject.Inject
 
-internal class WatchlistDigDialog :
-    AppCompatDialogFragment(), UiController<BaseWatchListDigControllerEvent> {
+internal class WatchlistDigDialog : AppCompatDialogFragment() {
 
-  @JvmField @Inject internal var toolbar: BaseWatchlistDigToolbar? = null
-
-  @JvmField @Inject internal var container: BaseWatchlistDigContainer? = null
-
-  @JvmField @Inject internal var factory: TickerViewModelFactory? = null
-  private val viewModel by
-      viewModels<BaseWatchlistDigViewModel> { factory.requireNotNull().create(this) }
-
-  private var component: BaseWatchlistDigComponent? = null
-
-  private var stateSaver: StateSaver? = null
+  @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
+  @JvmField @Inject internal var theming: Theming? = null
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
-    return requireArguments().getString(KEY_SYMBOL).requireNotNull().asSymbol()
+    return requireArguments()
+        .getString(KEY_SYMBOL)
+        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
+        .asSymbol()
   }
 
-  private fun eatBackButtonPress() {
-    requireActivity()
-        .onBackPressedDispatcher
-        .addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-              override fun handleOnBackPressed() {
-                val fm = childFragmentManager
-                if (fm.backStackEntryCount > 0) {
-                  fm.popBackStack()
-
-                  // Upon popping, we now restore the default page toolbar state
-                  viewModel.handleLoadDefaultPage()
-                } else {
-                  dismiss()
-                }
-              }
-            })
-  }
-
-  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-    return object : AppCompatDialog(requireActivity(), theme) {
-
-      override fun onBackPressed() {
-        requireActivity().onBackPressed()
-      }
-    }
+  private fun handleRefresh(force: Boolean) {
+    viewModel
+        .requireNotNull()
+        .handleLoadTicker(
+            scope = viewLifecycleOwner.lifecycleScope,
+            force = force,
+        )
   }
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?,
-  ): View? {
-    return inflater.inflate(R2.layout.layout_linear_vertical, container, false).apply {
-      correctBackground(this)
+  ): View {
+    val act = requireActivity()
+    Injector.obtainFromActivity<TickerComponent>(act)
+        .plusWatchlistDigComponent()
+        .create(getSymbol())
+        .inject(this)
+
+    val vm = viewModel.requireNotNull()
+
+    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
+    return ComposeView(act).apply {
+      id = R.id.dialog_watchlist_dig
+
+      setContent {
+        vm.Render { state ->
+          TickerTapeTheme(themeProvider) {
+            WatchlistDigScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                onRefresh = { handleRefresh(true) },
+                onClose = { dismiss() },
+            )
+          }
+        }
+      }
     }
   }
 
@@ -113,93 +104,34 @@ internal class WatchlistDigDialog :
   ) {
     super.onViewCreated(view, savedInstanceState)
     makeFullscreen()
-    eatBackButtonPress()
 
-    val binding = LayoutLinearVerticalBinding.bind(view)
-    component =
-        Injector.obtainFromApplication<TickerComponent>(view.context)
-            .plusWatchlistDigComponent()
-            .create(getSymbol())
-            .also { c -> c.plusDigComponent().create(binding.layoutLinearV).inject(this) }
-
-    stateSaver =
-        createComponent(
-            savedInstanceState,
-            viewLifecycleOwner,
-            viewModel,
-            this,
-            toolbar.requireNotNull(),
-            container.requireNotNull(),
-        ) {
-          return@createComponent when (it) {
-            is BaseWatchListDigViewEvent.Close -> requireActivity().onBackPressed()
-          }
-        }
-
-    viewModel.handleLoadDefaultPage()
+    viewModel.requireNotNull().restoreState(savedInstanceState)
+    handleRefresh(false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     makeFullscreen()
-  }
-
-  private fun pushFragment(fragment: Fragment, tag: String, appendBackStack: Boolean) {
-    val fm = childFragmentManager
-    val containerId = container.requireNotNull().id()
-    val existing = fm.findFragmentById(containerId)
-    if (existing == null || existing.tag !== tag) {
-      fm.commit(viewLifecycleOwner) {
-        if (appendBackStack) {
-          addToBackStack(null)
-        }
-
-        replace(containerId, fragment, tag)
-      }
-    }
-  }
-
-  override fun onControllerEvent(event: BaseWatchListDigControllerEvent) {
-    return when (event) {
-      is BaseWatchListDigControllerEvent.PushQuote ->
-          pushFragment(
-              fragment = WatchlistDigChartFragment.newInstance(),
-              tag = WatchlistDigChartFragment.TAG,
-              appendBackStack = false)
-    }
+    recompose()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    stateSaver?.saveState(outState)
+    viewModel?.saveState(outState)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-    stateSaver = null
-    factory = null
+    dispose()
 
-    container = null
-    toolbar = null
-    component = null
+    viewModel = null
+    theming = null
   }
 
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
     private const val TAG = "WatchlistDigDialog"
-
-    @JvmStatic
-    @CheckResult
-    fun getInjector(fragment: Fragment): BaseWatchlistDigComponent {
-      val parent = fragment.parentFragment
-      if (parent is WatchlistDigDialog) {
-        return parent.component.requireNotNull()
-      }
-
-      throw AssertionError(
-          "Cannot call getInjector() from a fragment that does not use WatchlistDigDialog as it's parent.")
-    }
 
     @JvmStatic
     @CheckResult

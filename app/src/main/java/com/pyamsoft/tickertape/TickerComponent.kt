@@ -46,8 +46,9 @@ import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.TapeService
+import com.pyamsoft.tickertape.watchlist.WatchlistModule
 import com.pyamsoft.tickertape.watchlist.add.BaseWatchlistAddComponent
-import com.pyamsoft.tickertape.watchlist.dig.BaseWatchlistDigComponent
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -70,6 +71,7 @@ import javax.inject.Singleton
             PositionsDateModule::class,
             TickerModule::class,
             HomeModule::class,
+            WatchlistModule::class,
         ],
 )
 internal interface TickerComponent {
@@ -102,7 +104,7 @@ internal interface TickerComponent {
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
-  @CheckResult fun plusWatchlistDigComponent(): BaseWatchlistDigComponent.Factory
+  @CheckResult fun plusWatchlistDigComponent(): WatchlistDigComponent.Factory
 
   @Component.Factory
   interface Factory {

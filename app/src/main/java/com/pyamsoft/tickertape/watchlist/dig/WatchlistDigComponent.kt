@@ -16,25 +16,11 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.lifecycle.ViewModel
-import com.pyamsoft.tickertape.core.ViewModelFactoryModule
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.Subcomponent
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
 
-@Subcomponent(
-    modules =
-        [
-            WatchlistDigComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
+@Subcomponent
 internal interface WatchlistDigComponent {
 
   fun inject(dialog: WatchlistDigDialog)
@@ -42,15 +28,9 @@ internal interface WatchlistDigComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): WatchlistDigComponent
-  }
-
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(BaseWatchlistDigViewModel::class)
-    internal abstract fun bindViewModel(impl: BaseWatchlistDigViewModel): ViewModel
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+    ): WatchlistDigComponent
   }
 }

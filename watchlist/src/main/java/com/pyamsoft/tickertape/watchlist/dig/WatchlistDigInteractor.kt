@@ -16,9 +16,12 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
-import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiFragmentContainer
-import javax.inject.Inject
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-class BaseWatchlistDigContainer @Inject internal constructor(parent: ViewGroup) :
-    UiFragmentContainer<BaseWatchListDigViewState, BaseWatchListDigViewEvent>(parent)
+interface WatchlistDigInteractor {
+
+  @CheckResult suspend fun getQuote(force: Boolean, symbol: StockSymbol): ResultWrapper<Ticker>
+}

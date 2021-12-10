@@ -58,6 +58,22 @@ internal constructor(
               error = null
             }
           }
+          .onSuccess { ticker ->
+            ticker.chart?.also { c ->
+              if (c.dates().isEmpty()) {
+                Timber.w("No dates, can't pick currentDate and currentPrice")
+                return@also
+              }
+
+              val price = state.currentPrice
+              if (price == null) {
+                state.apply {
+                  currentDate = c.currentDate()
+                  currentPrice = c.currentPrice()
+                }
+              }
+            }
+          }
           .onFailure { Timber.e(it, "Failed to load Ticker") }
           .onFailure { e ->
             state.apply {
@@ -66,6 +82,7 @@ internal constructor(
               error = e
             }
           }
+          .onFailure { state.currentPrice = null }
           .onFinally { state.isLoading = false }
     }
   }
@@ -80,9 +97,14 @@ internal constructor(
     handleLoadTicker(scope = scope, force = true)
   }
 
-  fun handleDateScrubbed(scope: CoroutineScope, data: Chart.Data?) {
+  fun handleDateScrubbed(data: Chart.Data?) {
     if (data == null) {
       return
+    }
+
+    state.apply {
+      currentDate = data.date
+      currentPrice = data.price
     }
   }
 }

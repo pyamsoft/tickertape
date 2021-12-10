@@ -81,12 +81,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
                 modifier = Modifier.fillMaxSize(),
                 state = state,
                 onClose = { dismiss() },
-                onScrub = { data ->
-                  vm.handleDateScrubbed(
-                      scope = viewLifecycleOwner.lifecycleScope,
-                      data = data,
-                  )
-                },
+                onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = {
                   vm.handleRangeSelected(
                       scope = viewLifecycleOwner.lifecycleScope,

@@ -23,7 +23,6 @@ import com.pyamsoft.tickertape.core.ViewModelFactoryModule
 import com.pyamsoft.tickertape.portfolio.manage.chart.PositionChartFragment
 import com.pyamsoft.tickertape.quote.ui.component.chart.StockChartViewModel
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import com.pyamsoft.tickertape.watchlist.dig.chart.WatchlistDigChartFragment
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -33,29 +32,29 @@ import dagger.multibindings.IntoMap
 
 @Subcomponent(
     modules =
-        [
-            ChartComponent.ComponentModule::class,
-            ViewModelFactoryModule::class,
-            ThemeProviderModule::class,
-        ])
+    [
+        ChartComponent.ComponentModule::class,
+        ViewModelFactoryModule::class,
+        ThemeProviderModule::class,
+    ]
+)
 internal interface ChartComponent {
 
-  fun inject(dialog: WatchlistDigChartFragment)
+    fun inject(dialog: PositionChartFragment)
 
-  fun inject(dialog: PositionChartFragment)
+    @Subcomponent.Factory
+    interface Factory {
 
-  @Subcomponent.Factory
-  interface Factory {
+        @CheckResult
+        fun create(@BindsInstance parent: ViewGroup): ChartComponent
+    }
 
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): ChartComponent
-  }
+    @Module
+    abstract class ComponentModule {
 
-  @Module
-  abstract class ComponentModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(StockChartViewModel::class)
-    internal abstract fun bindViewModel(impl: StockChartViewModel): ViewModel
-  }
+        @Binds
+        @IntoMap
+        @ClassKey(StockChartViewModel::class)
+        internal abstract fun bindViewModel(impl: StockChartViewModel): ViewModel
+    }
 }

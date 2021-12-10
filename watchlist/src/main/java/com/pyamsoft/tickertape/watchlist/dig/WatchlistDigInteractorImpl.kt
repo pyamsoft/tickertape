@@ -20,12 +20,13 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class WatchlistDigInteractorImpl
@@ -34,12 +35,21 @@ internal constructor(
     private val interactor: TickerInteractor,
 ) : WatchlistDigInteractor {
 
-  override suspend fun getQuote(force: Boolean, symbol: StockSymbol): ResultWrapper<Ticker> =
+  override suspend fun getChart(
+      force: Boolean,
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+  ): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          interactor.getQuotes(force, listOf(symbol)).map { it.first() }
+          interactor.getCharts(
+                  force = force,
+                  symbols = listOf(symbol),
+                  range = range,
+              )
+              .map { it.first() }
         } catch (e: Throwable) {
           Timber.e(e, "Error getting quote: $symbol")
           ResultWrapper.failure(e)

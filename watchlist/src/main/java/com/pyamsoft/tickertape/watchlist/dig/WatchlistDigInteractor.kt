@@ -19,9 +19,15 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface WatchlistDigInteractor {
 
-  @CheckResult suspend fun getQuote(force: Boolean, symbol: StockSymbol): ResultWrapper<Ticker>
+    @CheckResult
+    suspend fun getChart(
+      force: Boolean,
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+    ): ResultWrapper<Ticker>
 }

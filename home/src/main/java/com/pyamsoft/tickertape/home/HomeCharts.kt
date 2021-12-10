@@ -16,7 +16,9 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -119,6 +121,7 @@ internal fun HomeMostShorted(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun HomeCharts(
     modifier: Modifier = Modifier,
     name: String,
@@ -141,19 +144,23 @@ private fun HomeCharts(
                     fontWeight = FontWeight.Bold,
                 ),
         )
-        Crossfade(
-            targetState = isLoading,
-            modifier = Modifier.fillMaxWidth(),
-        ) { loading ->
-          if (loading) {
+
+        val columnScope = this
+        Box(
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.CHART_HEIGHT_DP.dp),
+        ) {
+          ChartList(
+              modifier = Modifier.matchParentSize(),
+              tickers = tickers,
+              onClick = onChartClicked,
+          )
+
+          columnScope.AnimatedVisibility(
+              modifier = Modifier.matchParentSize(),
+              visible = isLoading,
+          ) {
             Loading(
-                modifier = Modifier.fillMaxWidth(),
-            )
-          } else {
-            ChartList(
-                modifier = Modifier.fillMaxWidth(),
-                tickers = tickers,
-                onClick = onChartClicked,
+                modifier = Modifier.matchParentSize(),
             )
           }
         }
@@ -196,15 +203,13 @@ private fun ChartList(
       // We can assume here the chart is not null
       HomeChartItem(
           modifier =
-              Modifier.height(HomeScreenDefaults.ITEM_HEIGHT_DP.dp)
-                  .width(HomeScreenDefaults.ITEM_WIDTH_DP.dp)
-                  .run {
-                    when (index) {
-                      0 -> padding(start = 16.dp)
-                      onlyChartTickers.lastIndex -> padding(end = 16.dp)
-                      else -> this
-                    }
-                  },
+              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP.dp).run {
+                when (index) {
+                  0 -> padding(start = 16.dp)
+                  onlyChartTickers.lastIndex -> padding(end = 16.dp)
+                  else -> this
+                }
+              },
           ticker = item,
           onClick = onClick,
       )

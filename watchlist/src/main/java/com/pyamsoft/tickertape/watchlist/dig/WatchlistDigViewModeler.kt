@@ -20,11 +20,11 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchlistDigViewModeler
 @Inject
@@ -35,9 +35,10 @@ internal constructor(
 
   private val loadRunner =
       highlander<ResultWrapper<Ticker>, Boolean> { force ->
-        interactor.getQuote(
-            force,
-            state.ticker.symbol,
+        interactor.getChart(
+            force = force,
+            symbol = state.ticker.symbol,
+            range = state.range,
         )
       }
 

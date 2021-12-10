@@ -72,7 +72,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
       savedInstanceState: Bundle?,
   ): View {
     val act = requireActivity()
-    Injector.obtainFromActivity<TickerComponent>(act)
+    Injector.obtainFromApplication<TickerComponent>(act)
         .plusWatchlistDigComponent()
         .create(getSymbol())
         .inject(this)
@@ -91,6 +91,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
                 state = state,
                 onRefresh = { handleRefresh(true) },
                 onClose = { dismiss() },
+                onScrub = {},
             )
           }
         }

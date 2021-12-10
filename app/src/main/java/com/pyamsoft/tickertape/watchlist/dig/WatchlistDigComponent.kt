@@ -18,19 +18,20 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
 internal interface WatchlistDigComponent {
 
-  fun inject(dialog: WatchlistDigDialog)
+    fun inject(dialog: WatchlistDigDialog)
 
-  @Subcomponent.Factory
-  interface Factory {
+    @Subcomponent.Factory
+    interface Factory {
 
-    @CheckResult
-    fun create(
-        symbol: StockSymbol,
-    ): WatchlistDigComponent
-  }
+        @CheckResult
+        fun create(
+            @BindsInstance symbol: StockSymbol,
+        ): WatchlistDigComponent
+    }
 }

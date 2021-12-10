@@ -16,14 +16,10 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
@@ -45,6 +41,7 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 internal fun HomeWatchlist(
     modifier: Modifier = Modifier,
     state: HomeWatchListViewState,
@@ -70,19 +67,23 @@ internal fun HomeWatchlist(
                     fontWeight = FontWeight.Bold,
                 ),
         )
-        Crossfade(
-            targetState = isLoading,
-            modifier = Modifier.fillMaxWidth(),
-        ) { loading ->
-          if (loading) {
+
+        val columnScope = this
+        Box(
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP.dp),
+        ) {
+          TickerList(
+              modifier = Modifier.matchParentSize(),
+              tickers = tickers,
+              onClick = onClicked,
+          )
+
+          columnScope.AnimatedVisibility(
+              visible = isLoading,
+              modifier = Modifier.matchParentSize(),
+          ) {
             Loading(
-                modifier = Modifier.fillMaxWidth(),
-            )
-          } else {
-            TickerList(
-                modifier = Modifier.fillMaxWidth(),
-                tickers = tickers,
-                onClick = onClicked,
+                modifier = Modifier.matchParentSize(),
             )
           }
         }
@@ -124,15 +125,13 @@ private fun TickerList(
       // We can assume here the chart is not null
       HomeWatchlistItem(
           modifier =
-              Modifier.height(HomeScreenDefaults.ITEM_HEIGHT_DP.dp)
-                  .width(HomeScreenDefaults.ITEM_WIDTH_DP.dp)
-                  .run {
-                    when (index) {
-                      0 -> padding(start = 16.dp)
-                      tickers.lastIndex -> padding(end = 16.dp)
-                      else -> this
-                    }
-                  },
+              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP.dp).run {
+                when (index) {
+                  0 -> padding(start = 16.dp)
+                  tickers.lastIndex -> padding(end = 16.dp)
+                  else -> this
+                }
+              },
           ticker = item,
           onClick = onClick,
       )

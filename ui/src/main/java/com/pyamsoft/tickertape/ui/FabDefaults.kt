@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.ui
 
 object FabDefaults {
-  const val FAB_OFFSET = 56 + 16
+  // FAB size plus vertical padding
+  const val FAB_OFFSET_DP = 56 + 16 * 2
 }

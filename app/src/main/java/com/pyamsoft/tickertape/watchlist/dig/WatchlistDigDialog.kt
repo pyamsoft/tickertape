@@ -57,15 +57,6 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         .asSymbol()
   }
 
-  private fun handleRefresh(force: Boolean) {
-    viewModel
-        .requireNotNull()
-        .handleLoadTicker(
-            scope = viewLifecycleOwner.lifecycleScope,
-            force = force,
-        )
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -89,9 +80,19 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
             WatchlistDigScreen(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
-                onRefresh = { handleRefresh(true) },
                 onClose = { dismiss() },
-                onScrub = {},
+                onScrub = { data ->
+                  vm.handleDateScrubbed(
+                      scope = viewLifecycleOwner.lifecycleScope,
+                      data = data,
+                  )
+                },
+                onRangeSelected = {
+                  vm.handleRangeSelected(
+                      scope = viewLifecycleOwner.lifecycleScope,
+                      range = it,
+                  )
+                },
             )
           }
         }
@@ -106,8 +107,13 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     super.onViewCreated(view, savedInstanceState)
     makeFullscreen()
 
-    viewModel.requireNotNull().restoreState(savedInstanceState)
-    handleRefresh(false)
+    viewModel.requireNotNull().also { vm ->
+      vm.restoreState(savedInstanceState)
+      vm.handleLoadTicker(
+          scope = viewLifecycleOwner.lifecycleScope,
+          force = false,
+      )
+    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

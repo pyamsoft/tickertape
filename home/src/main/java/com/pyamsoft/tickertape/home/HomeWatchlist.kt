@@ -41,7 +41,6 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 internal fun HomeWatchlist(
     modifier: Modifier = Modifier,
     state: HomeWatchListViewState,
@@ -68,7 +67,6 @@ internal fun HomeWatchlist(
                 ),
         )
 
-        val columnScope = this
         Box(
             modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP.dp),
         ) {
@@ -78,14 +76,10 @@ internal fun HomeWatchlist(
               onClick = onClicked,
           )
 
-          columnScope.AnimatedVisibility(
-              visible = isLoading,
+          Loading(
+              isLoading = isLoading,
               modifier = Modifier.matchParentSize(),
-          ) {
-            Loading(
-                modifier = Modifier.matchParentSize(),
-            )
-          }
+          )
         }
       }
     } else {
@@ -98,13 +92,20 @@ internal fun HomeWatchlist(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun Loading(
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
-  Box(
-      modifier = modifier.padding(16.dp),
-      contentAlignment = Alignment.Center,
-  ) { CircularProgressIndicator() }
+  AnimatedVisibility(
+      visible = isLoading,
+      modifier = modifier,
+  ) {
+    Box(
+        modifier = Modifier.padding(16.dp),
+        contentAlignment = Alignment.Center,
+    ) { CircularProgressIndicator() }
+  }
 }
 
 @Composable

@@ -163,7 +163,7 @@ private fun Watchlist(
       Spacer(
           modifier =
               Modifier.navigationBarsHeight(
-                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET.dp,
+                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET_DP.dp,
               ),
       )
     }

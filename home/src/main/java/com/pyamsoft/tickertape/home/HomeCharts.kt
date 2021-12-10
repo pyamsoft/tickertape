@@ -121,7 +121,6 @@ internal fun HomeMostShorted(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun HomeCharts(
     modifier: Modifier = Modifier,
     name: String,
@@ -145,7 +144,6 @@ private fun HomeCharts(
                 ),
         )
 
-        val columnScope = this
         Box(
             modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.CHART_HEIGHT_DP.dp),
         ) {
@@ -155,14 +153,10 @@ private fun HomeCharts(
               onClick = onChartClicked,
           )
 
-          columnScope.AnimatedVisibility(
+          Loading(
+              isLoading = isLoading,
               modifier = Modifier.matchParentSize(),
-              visible = isLoading,
-          ) {
-            Loading(
-                modifier = Modifier.matchParentSize(),
-            )
-          }
+          )
         }
       }
     } else {
@@ -175,13 +169,20 @@ private fun HomeCharts(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun Loading(
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
-  Box(
-      modifier = modifier.padding(16.dp),
-      contentAlignment = Alignment.Center,
-  ) { CircularProgressIndicator() }
+  AnimatedVisibility(
+      modifier = modifier,
+      visible = isLoading,
+  ) {
+    Box(
+        modifier = Modifier.padding(16.dp),
+        contentAlignment = Alignment.Center,
+    ) { CircularProgressIndicator() }
+  }
 }
 
 @Composable

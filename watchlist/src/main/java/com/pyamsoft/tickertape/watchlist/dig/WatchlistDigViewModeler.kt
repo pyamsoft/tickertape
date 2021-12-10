@@ -19,7 +19,9 @@ package com.pyamsoft.tickertape.watchlist.dig
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +67,22 @@ internal constructor(
             }
           }
           .onFinally { state.isLoading = false }
+    }
+  }
+
+  fun handleRangeSelected(scope: CoroutineScope, range: StockChart.IntervalRange) {
+    val oldRange = state.range
+    if (oldRange == range) {
+      return
+    }
+
+    state.range = range
+    handleLoadTicker(scope = scope, force = true)
+  }
+
+  fun handleDateScrubbed(scope: CoroutineScope, data: Chart.Data?) {
+    if (data == null) {
+      return
     }
   }
 }

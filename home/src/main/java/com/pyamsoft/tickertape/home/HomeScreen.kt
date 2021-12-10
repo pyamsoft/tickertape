@@ -107,7 +107,10 @@ private fun HomeContent(
     )
 
     Spacer(
-        modifier = Modifier.navigationBarsHeight(additional = bottomPaddingDp),
+        modifier =
+            Modifier.navigationBarsHeight(
+                additional = bottomPaddingDp + HomeScreenDefaults.BOTTOM_PADDING_DP.dp,
+            ),
     )
   }
 }

@@ -32,11 +32,9 @@ import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.home.HomeModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
-import com.pyamsoft.tickertape.portfolio.manage.BaseManageComponent
-import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsAddComponent
-import com.pyamsoft.tickertape.portfolio.manage.position.add.PositionsDateComponent
-import com.pyamsoft.tickertape.portfolio.manage.positions.add.PositionsDateModule
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -49,11 +47,7 @@ import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
 import com.pyamsoft.tickertape.watchlist.add.BaseWatchlistAddComponent
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
+import dagger.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -68,10 +62,10 @@ import javax.inject.Singleton
             TapeModule::class,
             AlertModule::class,
             WorkManagerModule::class,
-            PositionsDateModule::class,
             TickerModule::class,
             HomeModule::class,
             WatchlistModule::class,
+            PortfolioModule::class,
         ],
 )
 internal interface TickerComponent {
@@ -90,21 +84,17 @@ internal interface TickerComponent {
 
   fun inject(application: TickerTape)
 
-  @CheckResult fun plusPositionAddComponent(): PositionsAddComponent.Factory
-
-  @CheckResult fun plusPositionDateComponent(): PositionsDateComponent.Factory
-
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 
   @CheckResult fun plusWatchlistAddComponent(): BaseWatchlistAddComponent.Factory
 
   @CheckResult fun plusPortfolioAddComponent(): BasePortfolioAddComponent.Factory
 
-  @CheckResult fun plusManageComponent(): BaseManageComponent.Factory
-
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
   @CheckResult fun plusWatchlistDigComponent(): WatchlistDigComponent.Factory
+
+  @CheckResult fun plusPortfolioDigComponent(): PortfolioDigComponent.Factory
 
   @Component.Factory
   interface Factory {

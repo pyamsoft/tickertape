@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.add
+package com.pyamsoft.tickertape.portfolio.dig
 
-import android.view.ViewGroup
-import com.pyamsoft.tickertape.ui.UiScrollingContainer
+import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class PositionsAddContainer
+@Singleton
+internal class PortfolioDigInteractorImpl
 @Inject
 internal constructor(
-    parent: ViewGroup,
-    nestedPriceEntry: PositionsPriceEntry,
-    nestedNumberOfSharesEntry: PositionsShareCountEntry,
-    nestedDate: PositionsPurchaseDate,
-    nestedCommit: PositionsCommit,
-) : UiScrollingContainer<PositionsAddViewState, PositionsAddViewEvent>(parent) {
-
-  init {
-    nest(nestedNumberOfSharesEntry, nestedPriceEntry, nestedDate, nestedCommit)
-  }
-}
+    interactor: TickerInteractor,
+) : DigInteractorImpl(interactor), PortfolioDigInteractor

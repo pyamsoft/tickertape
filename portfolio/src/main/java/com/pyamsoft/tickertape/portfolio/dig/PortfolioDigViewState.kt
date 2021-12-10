@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,17 +8,17 @@ import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
-interface WatchlistDigViewState : DigViewState {
+interface PortfolioDigViewState : DigViewState {
   val isLoading: Boolean
   val error: Throwable?
 }
 
-// Public for WatchlistDigViewModeler constructor
-class MutableWatchlistDigViewState
+// Public for PortfolioDigViewModeler constructor
+class MutablePortfolioDigViewState
 @Inject
 internal constructor(
     symbol: StockSymbol,
-) : MutableDigViewState(symbol), WatchlistDigViewState {
+) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var error by mutableStateOf<Throwable?>(null)
 }

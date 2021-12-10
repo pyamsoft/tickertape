@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.item
+package com.pyamsoft.tickertape.portfolio.dig
 
-import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import dagger.BindsInstance
-import dagger.Subcomponent
+import com.pyamsoft.tickertape.quote.dig.DigInteractor
 
-@Subcomponent
-interface PositionItemComponent {
-
-  fun inject(holder: PositionItemViewHolder)
-
-  fun inject(holder: PositionFooterViewHolder)
-
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(@BindsInstance parent: ViewGroup): PositionItemComponent
-  }
-}
+interface PortfolioDigInteractor : DigInteractor

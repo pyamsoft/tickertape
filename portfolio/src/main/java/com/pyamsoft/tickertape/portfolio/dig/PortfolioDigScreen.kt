@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
@@ -19,14 +19,13 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @JvmOverloads
-fun WatchlistDigScreen(
+fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
-    state: WatchlistDigViewState,
+    state: PortfolioDigViewState,
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  val isLoading = state.isLoading
   val ticker = state.ticker
 
   Surface(
@@ -35,28 +34,45 @@ fun WatchlistDigScreen(
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-      WatchlistDigToolbar(
+      PortfolioDigToolbar(
           ticker = ticker,
           onClose = onClose,
       )
 
-      Crossfade(
+      ChartPage(
           modifier = Modifier.fillMaxWidth(),
-          targetState = isLoading,
-      ) { loading ->
-        if (loading) {
-          Loading(
-              modifier = Modifier.fillMaxWidth(),
-          )
-        } else {
-          DigChart(
-              modifier = Modifier.fillMaxWidth(),
-              state = state,
-              onScrub = onScrub,
-              onRangeSelected = onRangeSelected,
-          )
-        }
-      }
+          state = state,
+          onScrub = onScrub,
+          onRangeSelected = onRangeSelected,
+      )
+    }
+  }
+}
+
+@Composable
+private fun ChartPage(
+    modifier: Modifier = Modifier,
+    state: PortfolioDigViewState,
+    onScrub: (Chart.Data?) -> Unit,
+    onRangeSelected: (StockChart.IntervalRange) -> Unit,
+) {
+  val isLoading = state.isLoading
+
+  Crossfade(
+      modifier = modifier,
+      targetState = isLoading,
+  ) { loading ->
+    if (loading) {
+      Loading(
+          modifier = Modifier.fillMaxWidth(),
+      )
+    } else {
+      DigChart(
+          modifier = Modifier.fillMaxWidth(),
+          state = state,
+          onScrub = onScrub,
+          onRangeSelected = onRangeSelected,
+      )
     }
   }
 }
@@ -73,10 +89,10 @@ private fun Loading(
 
 @Preview
 @Composable
-private fun PreviewWatchlistDigScreen() {
-  WatchlistDigScreen(
+private fun PreviewPortfolioDigScreen() {
+  PortfolioDigScreen(
       state =
-          MutableWatchlistDigViewState(
+          MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
           ),
       onClose = {},

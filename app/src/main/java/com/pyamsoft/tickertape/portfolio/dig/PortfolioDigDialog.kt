@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.portfolio.dig
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -45,9 +44,9 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class WatchlistDigDialog : AppCompatDialogFragment() {
+internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
-  @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
+  @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
 
   @CheckResult
@@ -65,7 +64,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   ): View {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
-        .plusWatchlistDigComponent()
+        .plusPortfolioDigComponent()
         .create(getSymbol())
         .inject(this)
 
@@ -78,7 +77,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
       setContent {
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {
-            WatchlistDigScreen(
+            PortfolioDigScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 onClose = { dismiss() },
@@ -139,7 +138,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     @JvmStatic
     @CheckResult
     private fun newInstance(symbol: StockSymbol): DialogFragment {
-      return WatchlistDigDialog().apply {
+      return PortfolioDigDialog().apply {
         arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
       }
     }

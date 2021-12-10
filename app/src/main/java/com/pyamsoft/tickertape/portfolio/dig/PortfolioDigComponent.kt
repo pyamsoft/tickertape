@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.manage.positions.add
+package com.pyamsoft.tickertape.portfolio.dig
 
-import java.time.LocalDateTime
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-data class DateSelectPayload(val date: LocalDateTime)
+@Subcomponent
+internal interface PortfolioDigComponent {
+
+  fun inject(dialog: PortfolioDigDialog)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult
+    fun create(
+        @BindsInstance symbol: StockSymbol,
+    ): PortfolioDigComponent
+  }
+}

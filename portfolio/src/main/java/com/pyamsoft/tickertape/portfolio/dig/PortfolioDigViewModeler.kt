@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.portfolio.dig
 
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
@@ -22,13 +22,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class WatchlistDigViewModeler
+class PortfolioDigViewModeler
 @Inject
 internal constructor(
-    private val state: MutableWatchlistDigViewState,
-    interactor: WatchlistDigInteractor,
+    private val state: MutablePortfolioDigViewState,
+    interactor: PortfolioDigInteractor,
 ) :
-    DigViewModeler<MutableWatchlistDigViewState>(
+    DigViewModeler<MutablePortfolioDigViewState>(
         state,
         interactor,
     ) {

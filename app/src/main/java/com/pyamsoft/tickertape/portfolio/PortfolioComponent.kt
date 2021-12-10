@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
 import dagger.Subcomponent
 
 @Subcomponent

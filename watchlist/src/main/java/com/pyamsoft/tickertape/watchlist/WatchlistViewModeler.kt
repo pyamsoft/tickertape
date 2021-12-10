@@ -26,11 +26,11 @@ import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchlistViewModeler
 @Inject
@@ -79,14 +79,22 @@ internal constructor(
   }
 
   private fun MutableWatchlistViewState.regenerateTickers(tickers: List<Ticker>) {
-    allTickers = prepareTickers(tickers)
+    allTickers = tickers.sortedWith(Ticker.COMPARATOR)
     this.watchlist = asVisible(allTickers)
   }
 
   @CheckResult
-  private fun WatchlistViewState.prepareTickers(tickers: List<Ticker>): List<Ticker> {
+  private fun WatchlistViewState.asVisible(tickers: List<Ticker>): List<Ticker> {
+    val search = this.query
     val section = this.section
     return tickers
+        .asSequence()
+        .filter { qs ->
+          val symbol = qs.symbol.symbol()
+          val name = qs.quote?.company()?.company()
+          return@filter if (symbol.contains(search, ignoreCase = true)) true
+          else name?.contains(search, ignoreCase = true) ?: false
+        }
         .filter { qs ->
           // If the quote is null, always show this because it was a bad network fetch
           val type = qs.quote?.type() ?: return@filter true
@@ -95,20 +103,6 @@ internal constructor(
             TickerTabs.OPTIONS -> type == EquityType.OPTION
             TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
           }
-        }
-        .sortedWith(Ticker.COMPARATOR)
-  }
-
-  @CheckResult
-  private fun WatchlistViewState.asVisible(tickers: List<Ticker>): List<Ticker> {
-    val search = this.query
-    return tickers
-        .asSequence()
-        .filter { qs ->
-          val symbol = qs.symbol.symbol()
-          val name = qs.quote?.company()?.company()
-          return@filter if (symbol.contains(search, ignoreCase = true)) true
-          else name?.contains(search, ignoreCase = true) ?: false
         }
         .toList()
   }
@@ -149,6 +143,13 @@ internal constructor(
           .removeQuote(ticker.symbol)
           .onSuccess { Timber.d("Removed ticker $ticker") }
           .onFailure { Timber.e(it, "Error removing ticker: $ticker") }
+    }
+  }
+
+  fun handleSectionChanged(tab: TickerTabs) {
+    state.apply {
+      this.section = tab
+      regenerateTickers(allTickers)
     }
   }
 

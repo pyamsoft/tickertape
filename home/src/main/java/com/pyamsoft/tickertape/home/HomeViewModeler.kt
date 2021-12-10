@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.home
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -82,14 +83,14 @@ internal constructor(
         .map { tickers -> tickers.filter { it.holding.type() == EquityType.STOCK } }
         .onSuccess {
           state.apply {
-            portfolio = it
+            portfolio = PortfolioStockList.of(it)
             portfolioError = null
           }
         }
         .onFailure { Timber.e(it, "Failed to fetch portfolio") }
         .onFailure {
           state.apply {
-            portfolio = emptyList()
+            portfolio = PortfolioStockList.empty()
             portfolioError = it
           }
         }

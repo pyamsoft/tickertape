@@ -2,20 +2,10 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,12 +16,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
+import com.pyamsoft.tickertape.quote.SearchBar
+import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.ui.FabDefaults
-import com.pyamsoft.tickertape.ui.SearchBar
 
 @Composable
 @JvmOverloads
@@ -43,6 +35,7 @@ fun PortfolioScreen(
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
+    onTabUpdated: (TickerTabs) -> Unit,
 ) {
   val loading = state.isLoading
   val scaffoldState = rememberScaffoldState()
@@ -63,6 +56,7 @@ fun PortfolioScreen(
           onSelect = onSelect,
           onDelete = onDelete,
           onSearchChanged = onSearchChanged,
+          onTabUpdated = onTabUpdated,
       )
     }
   }
@@ -77,11 +71,13 @@ private fun Content(
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
+    onTabUpdated: (TickerTabs) -> Unit,
 ) {
   val error = state.error
   val portfolio = state.portfolio
   val stocks = state.stocks
   val search = state.query
+  val tab = state.section
 
   Crossfade(
       modifier = modifier,
@@ -93,10 +89,12 @@ private fun Content(
           portfolio = portfolio,
           stocks = stocks,
           navBarBottomHeight = navBarBottomHeight,
+          search = search,
+          tab = tab,
           onSelect = onSelect,
           onDelete = onDelete,
-          search = search,
           onSearchChanged = onSearchChanged,
+          onTabUpdated = onTabUpdated,
       )
     } else {
       Error(
@@ -116,9 +114,11 @@ private fun Portfolio(
     stocks: List<PortfolioStock>,
     search: String,
     navBarBottomHeight: Int,
+    tab: TickerTabs,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
+    onTabUpdated: (TickerTabs) -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =
@@ -132,14 +132,8 @@ private fun Portfolio(
       verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
     item {
-      Spacer(
-          modifier = Modifier.statusBarsHeight(),
-      )
-    }
-
-    item {
       PorfolioSummaryItem(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.statusBarsPadding().fillMaxWidth(),
           portfolio = portfolio,
       )
     }
@@ -154,7 +148,9 @@ private fun Portfolio(
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
             search = search,
+            currentTab = tab,
             onSearchChanged = onSearchChanged,
+            onTabUpdated = onTabUpdated,
         )
       }
     }
@@ -229,5 +225,6 @@ private fun PreviewPortfolioScreen() {
       onDelete = {},
       onSelect = {},
       onSearchChanged = {},
+      onTabUpdated = {},
   )
 }

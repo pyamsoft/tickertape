@@ -109,7 +109,9 @@ class PortfolioFragment : Fragment() {
                     onRefresh = { handleRefresh(true) },
                     onSelect = { handleOpenManageDialog(it) },
                     onDelete = { handleDeleteStock(it) },
-                    onSearchChanged = { vm.handleSearch(it) })
+                    onSearchChanged = { vm.handleSearch(it) },
+                    onTabUpdated = { vm.handleSectionChanged(it) },
+                )
               }
             }
           }

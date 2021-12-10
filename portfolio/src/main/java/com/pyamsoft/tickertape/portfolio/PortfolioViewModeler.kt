@@ -27,11 +27,11 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -115,31 +115,15 @@ internal constructor(
   }
 
   private fun MutablePortfolioViewState.regeneratePortfolio(tickers: List<PortfolioStock>) {
-    fullPortfolio = preparePortfolio(tickers)
+    fullPortfolio = tickers.sortedWith(PortfolioStock.COMPARATOR)
     this.portfolio = PortfolioStockList.of(fullPortfolio)
     this.stocks = asVisible(fullPortfolio)
   }
 
   @CheckResult
-  private fun PortfolioViewState.preparePortfolio(
-      tickers: List<PortfolioStock>
-  ): List<PortfolioStock> {
-    val section = this.section
-    return tickers
-        .filter { ps ->
-          val type = ps.holding.type()
-          return@filter when (section) {
-            TickerTabs.STOCKS -> type == EquityType.STOCK
-            TickerTabs.OPTIONS -> type == EquityType.OPTION
-            TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
-          }
-        }
-        .sortedWith(PortfolioStock.COMPARATOR)
-  }
-
-  @CheckResult
   private fun PortfolioViewState.asVisible(tickers: List<PortfolioStock>): List<PortfolioStock> {
     val search = this.query
+    val section = this.section
     return tickers
         .asSequence()
         .filter { ps ->
@@ -147,6 +131,14 @@ internal constructor(
           val name = ps.ticker?.quote?.company()?.company()
           return@filter if (symbol.contains(search, ignoreCase = true)) true
           else name?.contains(search, ignoreCase = true) ?: false
+        }
+        .filter { ps ->
+          val type = ps.holding.type()
+          return@filter when (section) {
+            TickerTabs.STOCKS -> type == EquityType.STOCK
+            TickerTabs.OPTIONS -> type == EquityType.OPTION
+            TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
+          }
         }
         .toList()
   }
@@ -205,6 +197,13 @@ internal constructor(
   fun handleSearch(query: String) {
     state.apply {
       this.query = query
+      regeneratePortfolio(fullPortfolio)
+    }
+  }
+
+  fun handleSectionChanged(tab: TickerTabs) {
+    state.apply {
+      this.section = tab
       regeneratePortfolio(fullPortfolio)
     }
   }

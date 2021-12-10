@@ -21,15 +21,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
-import com.pyamsoft.tickertape.portfolio.PortfolioStock
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
 interface BaseState : UiViewState
 
-interface HomePortfolioViewState : BaseState {
+interface HomePortfolioViewState : UiViewState {
   val isLoadingPortfolio: Boolean
-  val portfolio: List<PortfolioStock>
+  val portfolio: PortfolioStockList
   val portfolioError: Throwable?
 }
 
@@ -86,7 +86,7 @@ internal class MutableHomeViewState @Inject internal constructor() : HomeViewSta
   override var isLoading by mutableStateOf(false)
 
   override var isLoadingPortfolio by mutableStateOf(false)
-  override var portfolio by mutableStateOf(emptyList<PortfolioStock>())
+  override var portfolio by mutableStateOf(PortfolioStockList.empty())
   override var portfolioError by mutableStateOf<Throwable?>(null)
 
   override var isLoadingWatchlist by mutableStateOf(false)

@@ -81,6 +81,9 @@ private fun HomeContent(
     Spacer(
         modifier = Modifier.statusBarsHeight(),
     )
+    HomePortfolio(
+        state = state,
+    )
     HomeIndexes(
         state = state,
         onChartClicked = onChartClicked,

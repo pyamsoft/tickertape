@@ -40,6 +40,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
@@ -48,6 +49,15 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
+
+  private fun handleRangeSelected(range: StockChart.IntervalRange) {
+    viewModel
+        .requireNotNull()
+        .handleRangeSelected(
+            scope = viewLifecycleOwner.lifecycleScope,
+            range = range,
+        )
+  }
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
@@ -82,12 +92,8 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
                 state = state,
                 onClose = { dismiss() },
                 onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = {
-                  vm.handleRangeSelected(
-                      scope = viewLifecycleOwner.lifecycleScope,
-                      range = it,
-                  )
-                },
+                onRangeSelected = { handleRangeSelected(it) },
+                onTabUpdated = { vm.handleTabUpdated(it) },
             )
           }
         }

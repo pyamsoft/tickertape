@@ -25,8 +25,11 @@ fun PortfolioDigScreen(
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
   val ticker = state.ticker
+  val isLoading = state.isLoading
+  val section = state.section
 
   Surface(
       modifier = modifier,
@@ -36,43 +39,60 @@ fun PortfolioDigScreen(
     ) {
       PortfolioDigToolbar(
           ticker = ticker,
+          section = section,
           onClose = onClose,
+          onTabUpdated = onTabUpdated,
       )
 
-      ChartPage(
-          modifier = Modifier.fillMaxWidth(),
-          state = state,
-          onScrub = onScrub,
-          onRangeSelected = onRangeSelected,
-      )
+      Crossfade(
+          modifier = modifier,
+          targetState = isLoading,
+      ) { loading ->
+        if (loading) {
+          Loading(
+              modifier = Modifier.fillMaxWidth(),
+          )
+        } else {
+          Content(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              onScrub = onScrub,
+              onRangeSelected = onRangeSelected,
+          )
+        }
+      }
     }
   }
 }
 
 @Composable
-private fun ChartPage(
+private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  val isLoading = state.isLoading
-
   Crossfade(
       modifier = modifier,
-      targetState = isLoading,
-  ) { loading ->
-    if (loading) {
-      Loading(
-          modifier = Modifier.fillMaxWidth(),
-      )
-    } else {
-      DigChart(
-          modifier = Modifier.fillMaxWidth(),
-          state = state,
-          onScrub = onScrub,
-          onRangeSelected = onRangeSelected,
-      )
+      targetState = state.section,
+  ) { section ->
+    return@Crossfade when (section) {
+      PortfolioDigSections.CHART -> {
+        DigChart(
+            modifier = Modifier.fillMaxWidth(),
+            state = state,
+            onScrub = onScrub,
+            onRangeSelected = onRangeSelected,
+        )
+      }
+      PortfolioDigSections.POSITIONS -> {
+        DigChart(
+            modifier = Modifier.fillMaxWidth(),
+            state = state,
+            onScrub = onScrub,
+            onRangeSelected = onRangeSelected,
+        )
+      }
     }
   }
 }
@@ -98,5 +118,6 @@ private fun PreviewPortfolioDigScreen() {
       onClose = {},
       onScrub = {},
       onRangeSelected = {},
+      onTabUpdated = {},
   )
 }

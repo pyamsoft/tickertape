@@ -43,7 +43,7 @@ fun SearchBar(
           backgroundColor = Color.Transparent,
           selectedTabIndex = currentTab.ordinal,
       ) {
-        for (tab in TickerTabs.values()) {
+        TickerTabs.values().forEach { tab ->
           TickerTab(
               current = currentTab,
               tab = tab,

@@ -11,6 +11,7 @@ import javax.inject.Inject
 interface PortfolioDigViewState : DigViewState {
   val isLoading: Boolean
   val error: Throwable?
+  val section: PortfolioDigSections
 }
 
 // Public for PortfolioDigViewModeler constructor
@@ -21,4 +22,5 @@ internal constructor(
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var error by mutableStateOf<Throwable?>(null)
+  override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
 }

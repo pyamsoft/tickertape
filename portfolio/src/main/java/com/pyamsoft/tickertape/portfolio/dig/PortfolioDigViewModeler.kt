@@ -48,4 +48,8 @@ internal constructor(
           .onFinally { state.isLoading = false }
     }
   }
+
+  fun handleTabUpdated(section: PortfolioDigSections) {
+    state.section = section
+  }
 }

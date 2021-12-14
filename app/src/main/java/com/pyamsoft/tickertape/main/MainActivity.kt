@@ -56,10 +56,10 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 internal class MainActivity : PYDroidActivity() {
 

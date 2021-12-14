@@ -106,8 +106,7 @@ class WatchlistFragment : Fragment() {
                     onSelectTicker = { handleOpenDigDialog(it) },
                     onDeleteTicker = { handleDeleteTicker(it) },
                     onSearchChanged = { vm.handleSearch(it) },
-                    onTabUpdated = { vm.handleSectionChanged(it) }
-                )
+                    onTabUpdated = { vm.handleSectionChanged(it) })
               }
             }
           }

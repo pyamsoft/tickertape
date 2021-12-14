@@ -33,9 +33,8 @@ import javax.inject.Inject
 internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
 
   @JvmField @Inject internal var factory: PortfolioAddViewModel.Factory? = null
-  override val viewModel by viewModels<PortfolioAddViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  override val viewModel by
+      viewModels<PortfolioAddViewModel> { factory.requireNotNull().asFactory(this) }
 
   override fun onInject(
       view: ViewGroup,

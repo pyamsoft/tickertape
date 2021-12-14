@@ -24,14 +24,14 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface WatchlistDigComponent {
 
-    fun inject(dialog: WatchlistDigDialog)
+  fun inject(dialog: WatchlistDigDialog)
 
-    @Subcomponent.Factory
-    interface Factory {
+  @Subcomponent.Factory
+  interface Factory {
 
-        @CheckResult
-        fun create(
-            @BindsInstance symbol: StockSymbol,
-        ): WatchlistDigComponent
-    }
+    @CheckResult
+    fun create(
+        @BindsInstance symbol: StockSymbol,
+    ): WatchlistDigComponent
+  }
 }

@@ -21,9 +21,9 @@ import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
+import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.setting.AppSettings
@@ -57,7 +57,8 @@ internal constructor(
         MainPage.Settings to createFragmentTag("AppSettings") { AppSettings.newInstance() },
         MainPage.Portfolio to
             createFragmentTag("PortfolioFragment") { PortfolioFragment.newInstance() },
-        MainPage.WatchList to createFragmentTag("WatchListFragment") { WatchlistFragment.newInstance() },
+        MainPage.WatchList to
+            createFragmentTag("WatchListFragment") { WatchlistFragment.newInstance() },
     )
   }
 

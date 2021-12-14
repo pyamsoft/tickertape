@@ -39,7 +39,6 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.currentSession
-import com.pyamsoft.tickertape.tape.R
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Singleton

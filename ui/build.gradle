@@ -20,91 +20,91 @@ apply plugin: "kotlin-kapt"
 
 //noinspection GroovyMissingReturnStatement
 android {
-    compileSdkVersion rootProject.ext.maxSdk
+  compileSdkVersion rootProject.ext.maxSdk
 
-    //noinspection GroovyMissingReturnStatement
-    defaultConfig {
-        minSdkVersion rootProject.ext.minSdk
-        targetSdkVersion rootProject.ext.maxSdk
+  //noinspection GroovyMissingReturnStatement
+  defaultConfig {
+    minSdkVersion rootProject.ext.minSdk
+    targetSdkVersion rootProject.ext.maxSdk
 
-        resConfigs "en"
-    }
+    resConfigs "en"
+  }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
 
-        // Flag to enable support for the new language APIs
-        coreLibraryDesugaringEnabled true
-    }
+    // Flag to enable support for the new language APIs
+    coreLibraryDesugaringEnabled true
+  }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+  kotlinOptions {
+    jvmTarget = "11"
+  }
 
-    buildFeatures {
-        viewBinding true
-        compose true
-        buildConfig false
-    }
+  buildFeatures {
+    viewBinding true
+    compose true
+    buildConfig false
+  }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion "$compose_version"
-    }
+  composeOptions {
+    kotlinCompilerExtensionVersion "$compose_version"
+  }
 
-    kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-    }
+  kotlinOptions {
+    freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+  }
 }
 
 // Kapt flags
 kapt {
-    correctErrorTypes = true
-    useBuildCache = true
-    mapDiagnosticLocations = true
+  correctErrorTypes = true
+  useBuildCache = true
+  mapDiagnosticLocations = true
 
-    javacOptions {
-        option("-Xlint:unchecked")
-        option("-Xlint:deprecation")
-        option("-Xmaxerrs", 10000)
-    }
+  javacOptions {
+    option("-Xlint:unchecked")
+    option("-Xlint:deprecation")
+    option("-Xmaxerrs", 10000)
+  }
 }
 
 dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
 
-    kapt "com.google.dagger:dagger-compiler:$dagger"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
 
-    // AndroidX
-    api "androidx.fragment:fragment-ktx:$fragment"
-    api "androidx.recyclerview:recyclerview:$recyclerView"
-    api "androidx.constraintlayout:constraintlayout:$constraintLayout"
-    api "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefresh"
-    api "androidx.appcompat:appcompat:$appCompat"
+  // AndroidX
+  api "androidx.fragment:fragment-ktx:$fragment"
+  api "androidx.recyclerview:recyclerview:$recyclerView"
+  api "androidx.constraintlayout:constraintlayout:$constraintLayout"
+  api "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefresh"
+  api "androidx.appcompat:appcompat:$appCompat"
 
-    // Compose
-    api "androidx.activity:activity-compose:$composeActivity"
-    api "androidx.compose.compiler:compiler:$compose_version"
-    api "androidx.compose.ui:ui:$compose_version"
-    api "androidx.compose.material:material:$compose_version"
-    api "androidx.compose.animation:animation:$compose_version"
-    api "androidx.compose.ui:ui-tooling:$compose_version"
-//    api "androidx.compose.material:material-icons-extended:$compose_version"
+  // Compose
+  api "androidx.activity:activity-compose:$composeActivity"
+  api "androidx.compose.compiler:compiler:$compose_version"
+  api "androidx.compose.ui:ui:$compose_version"
+  api "androidx.compose.material:material:$compose_version"
+  api "androidx.compose.animation:animation:$compose_version"
+  api "androidx.compose.ui:ui-tooling:$compose_version"
+  //    api "androidx.compose.material:material-icons-extended:$compose_version"
 
-    api "com.google.accompanist:accompanist-swiperefresh:$accompanist"
-    api "com.google.accompanist:accompanist-insets:$accompanist"
-    api "io.coil-kt:coil:$coil"
+  api "com.google.accompanist:accompanist-swiperefresh:$accompanist"
+  api "com.google.accompanist:accompanist-insets:$accompanist"
+  api "io.coil-kt:coil:$coil"
 
-    // Material Design
-    api "com.google.android.material:material:$materialDesign"
+  // Material Design
+  api "com.google.android.material:material:$materialDesign"
 
-    // RecyclerView decorations
-    api "io.cabriole:decorator:$decorator"
-    api "me.zhanghai.android.fastscroll:library:$fastscroll"
+  // RecyclerView decorations
+  api "io.cabriole:decorator:$decorator"
+  api "me.zhanghai.android.fastscroll:library:$fastscroll"
 
-    // PYDroid
-    api "com.github.pyamsoft.pydroid:ui:$pydroid"
-    api "com.github.pyamsoft.pydroid:loader:$pydroid"
+  // PYDroid
+  api "com.github.pyamsoft.pydroid:ui:$pydroid"
+  api "com.github.pyamsoft.pydroid:loader:$pydroid"
 
-    api project(':core')
+  api project(':core')
 }

@@ -21,7 +21,6 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.inject.AlertComponent
@@ -104,7 +103,6 @@ internal interface TickerComponent {
         @BindsInstance application: Application,
         @Named("debug") @BindsInstance debug: Boolean,
         @BindsInstance theming: Theming,
-        @BindsInstance imageLoader: ImageLoader,
     ): TickerComponent
   }
 

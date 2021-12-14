@@ -41,7 +41,6 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
-import com.pyamsoft.tickertape.stocks.api.currentSession
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {
@@ -53,7 +52,7 @@ class PortfolioFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenManageDialog(stock: PortfolioStock) {
-//    val session = stock.ticker?.quote?.currentSession()
+    //    val session = stock.ticker?.quote?.currentSession()
     PortfolioDigDialog.show(
         requireActivity(),
         symbol = stock.holding.symbol(),

@@ -77,8 +77,8 @@ dependencies {
 
   implementation project(':db')
   implementation project(':main')
+  implementation project(':quote')
   implementation project(':stocks')
   implementation project(':tape')
-  implementation project(':quote-ui')
   api project(':ui')
 }

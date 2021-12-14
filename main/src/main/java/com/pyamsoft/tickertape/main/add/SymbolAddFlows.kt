@@ -22,15 +22,13 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.ui.PackedData
-import com.pyamsoft.tickertape.ui.UiEditTextDelegate
 
 data class SymbolAddViewState
 internal constructor(
     val error: Throwable?,
     val quote: StockQuote?,
-    val query: UiEditTextDelegate.Data,
-    val searchResults: PackedData<List<SearchResult>>,
+    val query: String,
+    val searchResults: List<SearchResult>,
     val side: TradeSide,
 ) : UiViewState
 

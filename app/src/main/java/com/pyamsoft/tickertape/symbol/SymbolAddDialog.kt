@@ -32,15 +32,12 @@ import com.pyamsoft.pydroid.ui.R
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.databinding.LayoutConstraintBinding
 import com.pyamsoft.pydroid.ui.util.layout
-import com.pyamsoft.pydroid.ui.widget.shadow.DropshadowView
 import com.pyamsoft.tickertape.main.add.SymbolAddControllerEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewEvent
 import com.pyamsoft.tickertape.main.add.SymbolAddViewModel
-import com.pyamsoft.tickertape.main.add.SymbolAddViewState
 import com.pyamsoft.tickertape.main.add.SymbolLookup
 import com.pyamsoft.tickertape.main.add.SymbolOptionSides
 import com.pyamsoft.tickertape.main.add.SymbolResultList
-import com.pyamsoft.tickertape.main.add.SymbolToolbar
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.correctBackground
@@ -51,8 +48,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {
 
   @JvmField @Inject internal var lookup: SymbolLookup? = null
-
-  @JvmField @Inject internal var toolbar: SymbolToolbar? = null
 
   @JvmField @Inject internal var list: SymbolResultList? = null
 
@@ -102,16 +97,11 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
 
     val list = list.requireNotNull()
     val lookup = lookup.requireNotNull()
-    val toolbar = toolbar.requireNotNull()
-    val shadow =
-        DropshadowView.createTyped<SymbolAddViewState, SymbolAddViewEvent>(binding.layoutConstraint)
 
     val views =
         mutableListOf(
             lookup,
             list,
-            toolbar,
-            shadow,
         )
 
     val sides =
@@ -134,22 +124,8 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
         }
 
     binding.layoutConstraint.layout {
-      toolbar.also {
-        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-      }
-
-      shadow.also {
-        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
-        connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
-      }
-
       sides?.also {
-        connect(it.id(), ConstraintSet.TOP, toolbar.id(), ConstraintSet.BOTTOM)
+        connect(it.id(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -157,7 +133,11 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
       }
 
       lookup.also {
-        connect(it.id(), ConstraintSet.TOP, sides?.id() ?: toolbar.id(), ConstraintSet.BOTTOM)
+        connect(
+            it.id(),
+            ConstraintSet.TOP,
+            sides?.id() ?: ConstraintSet.PARENT_ID,
+            ConstraintSet.BOTTOM)
         connect(it.id(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
         connect(it.id(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
         constrainWidth(it.id(), ConstraintSet.MATCH_CONSTRAINT)
@@ -204,7 +184,6 @@ internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
     stateSaver = null
 
     lookup = null
-    toolbar = null
     list = null
 
     onTeardown()

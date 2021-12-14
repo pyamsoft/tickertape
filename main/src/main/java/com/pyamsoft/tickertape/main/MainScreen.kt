@@ -51,7 +51,7 @@ fun MainScreen(
       modifier = modifier,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-      // Causes pop in.
+    // Causes pop in.
     AnimatedVisibility(
         visible = isFabEnabled,
     ) {

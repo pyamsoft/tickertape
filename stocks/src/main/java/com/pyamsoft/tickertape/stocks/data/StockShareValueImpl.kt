@@ -21,21 +21,22 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 internal data class StockShareValueImpl(private val value: Double) : StockShareValue {
 
-  private val share by lazy(LazyThreadSafetyMode.NONE) {
-    if (isZero()) {
-      return@lazy "0"
-    }
+  private val share by
+      lazy(LazyThreadSafetyMode.NONE) {
+        if (isZero()) {
+          return@lazy "0"
+        }
 
-    // Parse to int to remove the decimals, then back to float for comparison ability
-    val intValue = value.toInt()
-    val valueWithoutDecimal = intValue.toDouble()
-    if (valueWithoutDecimal.compareTo(value) == 0) {
-      // This is a number without any decimals, return the int value as a String
-      return@lazy intValue.toString()
-    } else {
-      return@lazy value.toString()
-    }
-  }
+        // Parse to int to remove the decimals, then back to float for comparison ability
+        val intValue = value.toInt()
+        val valueWithoutDecimal = intValue.toDouble()
+        if (valueWithoutDecimal.compareTo(value) == 0) {
+          // This is a number without any decimals, return the int value as a String
+          return@lazy intValue.toString()
+        } else {
+          return@lazy value.toString()
+        }
+      }
 
   override fun asShareValue(): String {
     return share

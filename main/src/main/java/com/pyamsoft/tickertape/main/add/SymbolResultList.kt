@@ -33,7 +33,6 @@ import com.pyamsoft.tickertape.main.add.result.SearchResultComponent
 import com.pyamsoft.tickertape.main.add.result.SearchResultViewState
 import com.pyamsoft.tickertape.main.databinding.SymbolAddResultListBinding
 import com.pyamsoft.tickertape.stocks.api.SearchResult
-import com.pyamsoft.tickertape.ui.PackedData
 import com.pyamsoft.tickertape.ui.getUserMessage
 import io.cabriole.decorator.LinearMarginDecoration
 import javax.inject.Inject
@@ -121,9 +120,7 @@ internal constructor(
     publish(SymbolAddViewEvent.SelectResult(index))
   }
 
-  override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.searchResults }.render(viewScope) { handleData(it) }
-  }
+  override fun onRender(state: UiRender<SymbolAddViewState>) {}
 
   private fun clearList() {
     usingAdapter().submitList(null)
@@ -143,13 +140,6 @@ internal constructor(
       symbolAddResultError.isGone = true
       symbolAddResultEmpty.isGone = true
       symbolAddResultList.isVisible = true
-    }
-  }
-
-  private fun handleData(data: PackedData<List<SearchResult>>) {
-    return when (data) {
-      is PackedData.Data -> handleList(data.value)
-      is PackedData.Error -> handleError(data.throwable)
     }
   }
 

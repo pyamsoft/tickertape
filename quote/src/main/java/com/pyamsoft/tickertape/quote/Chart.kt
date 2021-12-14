@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote
 
+import android.graphics.Color as ViewColor
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,6 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDateTime
-import android.graphics.Color as ViewColor
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
 private const val LINE_ALPHA = 255

@@ -33,9 +33,8 @@ import javax.inject.Inject
 internal class WatchlistAddDialog : SymbolAddDialog<WatchlistAddViewModel>() {
 
   @JvmField @Inject internal var factory: WatchlistAddViewModel.Factory? = null
-  override val viewModel by viewModels<WatchlistAddViewModel> {
-    factory.requireNotNull().asFactory(this)
-  }
+  override val viewModel by
+      viewModels<WatchlistAddViewModel> { factory.requireNotNull().asFactory(this) }
 
   override fun onInject(
       view: ViewGroup,

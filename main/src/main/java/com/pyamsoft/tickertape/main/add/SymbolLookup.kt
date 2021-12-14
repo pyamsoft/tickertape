@@ -19,39 +19,18 @@ package com.pyamsoft.tickertape.main.add
 import android.view.ViewGroup
 import com.pyamsoft.pydroid.arch.BaseUiView
 import com.pyamsoft.pydroid.arch.UiRender
-import com.pyamsoft.pydroid.loader.ImageLoader
 import com.pyamsoft.pydroid.ui.util.setOnDebouncedClickListener
-import com.pyamsoft.tickertape.main.R
 import com.pyamsoft.tickertape.main.databinding.SymbolAddLookupBinding
-import com.pyamsoft.tickertape.ui.UiEditTextDelegate
-import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 
-class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent: ViewGroup) :
+class SymbolLookup @Inject internal constructor(parent: ViewGroup) :
     BaseUiView<SymbolAddViewState, SymbolAddViewEvent, SymbolAddLookupBinding>(parent) {
 
   override val viewBinding = SymbolAddLookupBinding::inflate
 
   override val layoutRoot by boundView { symbolAddLookupRoot }
 
-  private val delegate by lazy(LazyThreadSafetyMode.NONE) {
-    UiEditTextDelegate.create(binding.symbolAddLookupEdit) { symbol ->
-      publish(SymbolAddViewEvent.UpdateSymbol(symbol))
-      return@create true
-    }
-  }
-
   init {
-    doOnTeardown { delegate.handleTeardown() }
-
-    doOnInflate {
-      imageLoader
-          .asDrawable()
-          .load(R2.drawable.ic_search_24dp)
-          .into(binding.symbolAddSearchTriggerImage)
-          .also { doOnTeardown { it.dispose() } }
-    }
-
     doOnInflate {
       binding.symbolAddSearchTrigger.setOnDebouncedClickListener {
         publish(SymbolAddViewEvent.TriggerSearch)
@@ -59,24 +38,7 @@ class SymbolLookup @Inject internal constructor(imageLoader: ImageLoader, parent
     }
 
     doOnTeardown { binding.symbolAddSearchTrigger.setOnDebouncedClickListener(null) }
-
-    doOnInflate { delegate.handleCreate() }
   }
 
-  override fun onRender(state: UiRender<SymbolAddViewState>) {
-    state.mapChanged { it.query }.render(viewScope) { handleQueryChanged(it) }
-  }
-
-  private fun handleQueryChanged(query: UiEditTextDelegate.Data) {
-    handleLookupTextChanged(query)
-    handleTriggerEnabledState(query)
-  }
-
-  private fun handleTriggerEnabledState(query: UiEditTextDelegate.Data) {
-    binding.symbolAddSearchTrigger.apply { isEnabled = query.text.isNotBlank() }
-  }
-
-  private fun handleLookupTextChanged(query: UiEditTextDelegate.Data) {
-    delegate.handleTextChanged(query)
-  }
+  override fun onRender(state: UiRender<SymbolAddViewState>) {}
 }

@@ -21,7 +21,6 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.core.ActivityScope
 import javax.inject.Inject
 
 class MainViewModeler

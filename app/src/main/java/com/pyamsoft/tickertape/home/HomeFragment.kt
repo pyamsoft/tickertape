@@ -128,7 +128,7 @@ class HomeFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
-      dispose()
+    dispose()
 
     windowInsetObserver?.stop()
     windowInsetObserver = null

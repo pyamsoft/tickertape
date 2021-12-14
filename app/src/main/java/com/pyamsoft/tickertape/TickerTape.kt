@@ -23,7 +23,6 @@ import androidx.annotation.CheckResult
 import coil.Coil
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.loader.LoaderModule
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
@@ -32,10 +31,10 @@ import com.pyamsoft.tickertape.alert.inject.AlertComponent
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -74,11 +73,6 @@ class TickerTape : Application() {
             this,
             isDebugMode(),
             provider.get().theming(),
-            LoaderModule(
-                    LoaderModule.Parameters(
-                        context = this.applicationContext,
-                    ))
-                .provideLoader(),
         )
         .also { addLibraries() }
   }

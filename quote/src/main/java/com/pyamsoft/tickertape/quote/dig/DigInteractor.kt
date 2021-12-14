@@ -24,10 +24,10 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DigInteractor {
 
-    @CheckResult
-    suspend fun getChart(
+  @CheckResult
+  suspend fun getChart(
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
-    ): ResultWrapper<Ticker>
+  ): ResultWrapper<Ticker>
 }

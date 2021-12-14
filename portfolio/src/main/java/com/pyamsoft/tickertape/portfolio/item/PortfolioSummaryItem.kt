@@ -47,7 +47,7 @@ fun PorfolioSummaryItem(
     Text(
         modifier = Modifier.padding(bottom = 8.dp),
         text = totalAmount.asMoneyValue(),
-        style = MaterialTheme.typography.h4,
+        style = MaterialTheme.typography.h3,
     )
 
     Text(
@@ -60,7 +60,7 @@ fun PorfolioSummaryItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
       Text(
-          text = "Change Today",
+          text = "Today",
           style = MaterialTheme.typography.h6,
       )
 

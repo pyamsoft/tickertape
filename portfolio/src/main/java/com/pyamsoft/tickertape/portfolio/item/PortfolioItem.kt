@@ -69,7 +69,7 @@ internal fun PortfolioItem(
               value = stock.totalShares.asShareValue(),
           )
           Info(
-              name = "Gain Today",
+              name = "Today",
               value = stock.changeTodayDisplayString,
               valueColor = todayComposeColor,
           )
@@ -83,7 +83,7 @@ internal fun PortfolioItem(
               name = "Current",
               value = stock.current.asMoneyValue())
           Info(
-              name = "Total Gain",
+              name = "Total",
               value = stock.gainLossDisplayString,
               valueColor = totalComposeColor,
           )

@@ -49,7 +49,7 @@ buildscript {
     pydroid = "24.3.0"
     cachify = "0.0.24"
     highlander = "0.0.19"
-    spark = "2.0.0"
+    spark = "2.0.1"
 
     // Jobs
     workmanager = "2.7.1"

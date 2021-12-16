@@ -74,7 +74,6 @@ internal fun MainBottomNav(
             target = MainPage.WatchList,
             onClick = onLoadWatchList,
         )
-        Placeholder()
         Item(
             current = page,
             target = MainPage.Portfolio,
@@ -91,19 +90,6 @@ internal fun MainBottomNav(
         modifier = Modifier.navigationBarsHeight(),
     )
   }
-}
-
-@Composable
-private fun RowScope.Placeholder(
-    modifier: Modifier = Modifier,
-) {
-  BottomNavigationItem(
-      modifier = modifier,
-      enabled = false,
-      selected = false,
-      onClick = {},
-      icon = {},
-  )
 }
 
 @Composable

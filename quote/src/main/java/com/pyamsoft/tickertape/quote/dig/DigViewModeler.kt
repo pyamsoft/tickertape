@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.quote.dig
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
@@ -29,24 +28,19 @@ import timber.log.Timber
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
     private val state: S,
-    interactor: DigInteractor,
+    private val interactor: DigInteractor,
 ) : AbstractViewModeler<S>(state) {
-
-  private val loadRunner =
-      highlander<ResultWrapper<Ticker>, Boolean> { force ->
-        interactor.getChart(
-            force = force,
-            symbol = state.ticker.symbol,
-            range = state.range,
-        )
-      }
 
   @CheckResult
   protected suspend fun onLoadTicker(
       force: Boolean,
   ): ResultWrapper<Ticker> =
-      loadRunner
-          .call(force)
+      interactor
+          .getChart(
+              force = force,
+              symbol = state.ticker.symbol,
+              range = state.range,
+          )
           .onSuccess { t -> state.apply { ticker = t } }
           .onSuccess { ticker ->
             ticker.chart?.also { c ->

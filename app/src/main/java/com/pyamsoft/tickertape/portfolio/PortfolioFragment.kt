@@ -55,7 +55,7 @@ class PortfolioFragment : Fragment() {
     //    val session = stock.ticker?.quote?.currentSession()
     PortfolioDigDialog.show(
         requireActivity(),
-        symbol = stock.holding.symbol(),
+        holding = stock.holding,
     )
   }
 

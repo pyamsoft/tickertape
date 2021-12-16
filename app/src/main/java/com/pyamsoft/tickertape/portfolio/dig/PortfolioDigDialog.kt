@@ -40,6 +40,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -67,6 +68,14 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         .asSymbol()
   }
 
+  @CheckResult
+  private fun getHoldingId(): DbHolding.Id {
+    return requireArguments()
+        .getString(KEY_HOLDING_ID)
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_ID" } }
+        .let { DbHolding.Id(it) }
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -75,7 +84,10 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
         .plusPortfolioDigComponent()
-        .create(getSymbol())
+        .create(
+            getSymbol(),
+            getHoldingId(),
+        )
         .inject(this)
 
     val vm = viewModel.requireNotNull()
@@ -139,19 +151,27 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_HOLDING_ID = "key_holding_id"
     private const val TAG = "WatchlistDigDialog"
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(symbol: StockSymbol): DialogFragment {
+    private fun newInstance(holding: DbHolding): DialogFragment {
       return PortfolioDigDialog().apply {
-        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
+        arguments =
+            Bundle().apply {
+              putString(KEY_SYMBOL, holding.symbol().symbol())
+              putString(KEY_HOLDING_ID, holding.id().id)
+            }
       }
     }
 
     @JvmStatic
-    fun show(activity: FragmentActivity, symbol: StockSymbol) {
-      newInstance(symbol).show(activity, TAG)
+    fun show(
+        activity: FragmentActivity,
+        holding: DbHolding,
+    ) {
+      newInstance(holding).show(activity, TAG)
     }
   }
 }

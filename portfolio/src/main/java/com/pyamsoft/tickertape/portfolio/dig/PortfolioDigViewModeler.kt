@@ -16,36 +16,94 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.annotation.CheckResult
+import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class PortfolioDigViewModeler
 @Inject
 internal constructor(
     private val state: MutablePortfolioDigViewState,
-    interactor: PortfolioDigInteractor,
+    private val holdingId: DbHolding.Id,
+    private val interactor: PortfolioDigInteractor,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
         interactor,
     ) {
 
+  private val loadRunner =
+      highlander<Unit, Boolean> { force ->
+        awaitAll(
+            async { loadTicker(force) },
+            async { loadHolding(force) },
+            async { loadPositions(force) },
+        )
+      }
+
+  @CheckResult
+  private suspend fun loadTicker(force: Boolean): ResultWrapper<Ticker> {
+    return onLoadTicker(force)
+        .onSuccess {
+          // Clear the error on load success
+          state.chartError = null
+        }
+        .onFailure {
+          // Don't need to clear the ticker since last loaded state was valid
+          state.chartError = it
+        }
+  }
+
+  @CheckResult
+  private suspend fun loadHolding(force: Boolean): ResultWrapper<DbHolding> {
+    return interactor
+        .getHolding(force, holdingId)
+        .onSuccess { h ->
+          // Clear the error on load success
+          state.apply {
+            holding = h
+            holdingError = null
+          }
+        }
+        .onFailure { e ->
+          // Clear holding on load fail
+          state.apply {
+            holding = null
+            holdingError = e
+          }
+        }
+  }
+
+  @CheckResult
+  private suspend fun loadPositions(force: Boolean): ResultWrapper<List<DbPosition>> {
+    return interactor
+        .getPositions(force, holdingId)
+        .onSuccess { p ->
+          // Clear the error on load success
+          state.apply {
+            positions = p
+            positionsError = null
+          }
+        }
+        .onFailure { e ->
+          // Clear positions on load fail
+          state.apply {
+            positions = emptyList()
+            positionsError = e
+          }
+        }
+  }
+
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
-      onLoadTicker(force)
-          .onSuccess {
-            // Clear the error on load success
-            state.error = null
-          }
-          .onFailure {
-            // Don't need to clear the ticker since last loaded state was valid
-            state.error = it
-          }
-          .onFinally { state.isLoading = false }
+      loadRunner.call(force).also { state.isLoading = false }
     }
   }
 

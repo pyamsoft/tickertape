@@ -16,6 +16,9 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import com.pyamsoft.highlander.highlander
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -33,10 +36,14 @@ internal constructor(
         interactor,
     ) {
 
+  private val loadRunner =
+      highlander<ResultWrapper<Ticker>, Boolean> { force -> onLoadTicker(force) }
+
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
-      onLoadTicker(force)
+      loadRunner
+          .call(force)
           .onSuccess {
             // Clear the error on load success
             state.error = null

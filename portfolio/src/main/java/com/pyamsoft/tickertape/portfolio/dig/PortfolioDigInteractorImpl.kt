@@ -16,14 +16,59 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
+import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 internal class PortfolioDigInteractorImpl
 @Inject
 internal constructor(
     interactor: TickerInteractor,
-) : DigInteractorImpl(interactor), PortfolioDigInteractor
+    private val holdingQueryDao: HoldingQueryDao,
+    private val positionQueryDao: PositionQueryDao,
+) : DigInteractorImpl(interactor), PortfolioDigInteractor {
+
+  override suspend fun getHolding(
+      force: Boolean,
+      id: DbHolding.Id,
+  ): ResultWrapper<DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext try {
+          val holding = holdingQueryDao.query(force).firstOrNull { it.id() == id }
+          ResultWrapper.success(holding.requireNotNull { "Unable to find holding with id: $id" })
+        } catch (e: Throwable) {
+          Timber.e(e, "Failed to get db holding: $id")
+          ResultWrapper.failure(e)
+        }
+      }
+
+  override suspend fun getPositions(
+      force: Boolean,
+      id: DbHolding.Id,
+  ): ResultWrapper<List<DbPosition>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext try {
+          val positions = positionQueryDao.query(force).filter { it.holdingId() == id }
+          ResultWrapper.success(positions)
+        } catch (e: Throwable) {
+          Timber.e(e, "Failed to get db positions: $id")
+          ResultWrapper.failure(e)
+        }
+      }
+}

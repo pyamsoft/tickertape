@@ -26,6 +26,8 @@ fun PortfolioDigScreen(
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
+    onRefresh: () -> Unit,
+    onAddPosition: () -> Unit,
 ) {
   val ticker = state.ticker
   val isLoading = state.isLoading
@@ -58,6 +60,8 @@ fun PortfolioDigScreen(
               state = state,
               onScrub = onScrub,
               onRangeSelected = onRangeSelected,
+              onRefresh = onRefresh,
+              onAddPosition = onAddPosition,
           )
         }
       }
@@ -71,6 +75,8 @@ private fun Content(
     state: PortfolioDigViewState,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onRefresh: () -> Unit,
+    onAddPosition: () -> Unit,
 ) {
   Crossfade(
       modifier = modifier,
@@ -86,11 +92,11 @@ private fun Content(
         )
       }
       PortfolioDigSections.POSITIONS -> {
-        DigChart(
+        PositionScreen(
             modifier = Modifier.fillMaxWidth(),
             state = state,
-            onScrub = onScrub,
-            onRangeSelected = onRangeSelected,
+            onRefresh = onRefresh,
+            onAddPosition = onAddPosition,
         )
       }
     }
@@ -119,5 +125,7 @@ private fun PreviewPortfolioDigScreen() {
       onScrub = {},
       onRangeSelected = {},
       onTabUpdated = {},
+      onRefresh = {},
+      onAddPosition = {},
   )
 }

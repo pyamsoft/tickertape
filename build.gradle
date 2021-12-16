@@ -47,8 +47,8 @@ buildscript {
 
     // Us
     pydroid = "24.3.0"
-    cachify = "0.0.24"
-    highlander = "0.0.19"
+    cachify = "0.0.25"
+    highlander = "0.0.20"
     spark = "2.0.1"
 
     // Jobs

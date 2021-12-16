@@ -53,6 +53,7 @@ fun MainScreen(
   ) {
     // Causes pop in.
     AnimatedVisibility(
+        modifier = Modifier.padding(bottom = 16.dp),
         visible = isFabEnabled,
     ) {
       MainFab(
@@ -60,7 +61,7 @@ fun MainScreen(
       )
     }
     MainBottomNav(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
         page = page,
         onLoadHome = onLoadHome,
         onLoadWatchList = onLoadWatchList,

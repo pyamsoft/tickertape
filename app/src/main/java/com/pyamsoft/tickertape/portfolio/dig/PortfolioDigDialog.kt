@@ -45,6 +45,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
@@ -58,6 +59,21 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
             scope = viewLifecycleOwner.lifecycleScope,
             range = range,
         )
+  }
+
+  private fun handleRefresh(force: Boolean) {
+    viewModel
+        .requireNotNull()
+        .handleLoadTicker(
+            scope = viewLifecycleOwner.lifecycleScope,
+            force = force,
+        )
+  }
+
+  private fun handleAddPosition() {
+    val holdingId = getHoldingId()
+    Timber.d("Add new position to holding: $holdingId")
+    // TODO
   }
 
   @CheckResult
@@ -106,6 +122,8 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
                 onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = { handleRangeSelected(it) },
                 onTabUpdated = { vm.handleTabUpdated(it) },
+                onRefresh = { handleRefresh(true) },
+                onAddPosition = { handleAddPosition() },
             )
           }
         }
@@ -120,13 +138,8 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     super.onViewCreated(view, savedInstanceState)
     makeFullWidth()
 
-    viewModel.requireNotNull().also { vm ->
-      vm.restoreState(savedInstanceState)
-      vm.handleLoadTicker(
-          scope = viewLifecycleOwner.lifecycleScope,
-          force = false,
-      )
-    }
+    viewModel.requireNotNull().restoreState(savedInstanceState)
+    handleRefresh(false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

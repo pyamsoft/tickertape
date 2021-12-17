@@ -2,14 +2,11 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -56,17 +53,25 @@ private fun PositionsList(
     onRefresh: () -> Unit,
 ) {
   val isLoading = state.isLoading
+  val positions = state.positions
   SwipeRefresh(
       modifier = modifier,
       state = rememberSwipeRefreshState(isRefreshing = isLoading),
       onRefresh = onRefresh,
   ) {
-    LazyColumn {
-      item { Box { Text(text = "Placeholder 1!") } }
-
-      item { Box { Text(text = "Placeholder 2!") } }
-
-      item { Box { Text(text = "Placeholder 3!") } }
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+      items(
+          items = positions,
+          key = { it.id().id },
+      ) { item ->
+        PositionItem(
+            modifier = Modifier.fillMaxWidth(),
+            position = item,
+        )
+      }
     }
   }
 }

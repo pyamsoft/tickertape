@@ -3,11 +3,17 @@ package com.pyamsoft.tickertape.quote.dig
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -21,7 +27,12 @@ import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import java.time.LocalDateTime
 
 @Composable
@@ -164,23 +175,25 @@ private fun Error(
 @Composable
 private fun PreviewDigChart() {
   val symbol = "MSFT".asSymbol()
-  DigChart(
-      state =
-          object : DigViewState {
-            override val ticker =
-                Ticker(
-                    symbol = symbol,
-                    quote = newTestQuote(symbol),
-                    chart = newTestChart(symbol),
-                )
+  Surface {
+    DigChart(
+        state =
+            object : DigViewState {
+              override val ticker =
+                  Ticker(
+                      symbol = symbol,
+                      quote = newTestQuote(symbol),
+                      chart = newTestChart(symbol),
+                  )
 
-            override val range = StockChart.IntervalRange.ONE_DAY
+              override val range = StockChart.IntervalRange.ONE_DAY
 
-            override val currentDate = LocalDateTime.now()
+              override val currentDate = LocalDateTime.now()
 
-            override val currentPrice = 1.0.asMoney()
-          },
-      onScrub = {},
-      onRangeSelected = {},
-  )
+              override val currentPrice = 1.0.asMoney()
+            },
+        onScrub = {},
+        onRangeSelected = {},
+    )
+  }
 }

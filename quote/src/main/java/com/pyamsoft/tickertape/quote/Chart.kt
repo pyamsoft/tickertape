@@ -41,7 +41,11 @@ import com.pyamsoft.spark.SparkView
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.periodHigh
+import com.pyamsoft.tickertape.stocks.api.periodLow
 import java.time.LocalDateTime
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()

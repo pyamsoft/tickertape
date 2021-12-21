@@ -20,7 +20,16 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockDirection
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.asShares
 
 data class PortfolioStock
 internal constructor(

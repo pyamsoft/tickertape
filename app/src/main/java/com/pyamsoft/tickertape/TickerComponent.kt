@@ -46,7 +46,11 @@ import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
 import com.pyamsoft.tickertape.watchlist.add.BaseWatchlistAddComponent
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
-import dagger.*
+import dagger.Binds
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
 

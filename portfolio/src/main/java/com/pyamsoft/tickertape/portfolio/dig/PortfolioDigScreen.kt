@@ -12,8 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.portfolio.dig.chart.PorfolioChart
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.quote.Chart
-import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -88,7 +89,7 @@ private fun Content(
   ) { section ->
     return@Crossfade when (section) {
       PortfolioDigSections.CHART -> {
-        DigChart(
+        PorfolioChart(
             modifier = Modifier.fillMaxWidth(),
             state = state,
             onScrub = onScrub,

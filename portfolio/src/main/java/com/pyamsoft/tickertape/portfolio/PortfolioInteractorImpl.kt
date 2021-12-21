@@ -19,15 +19,23 @@ package com.pyamsoft.tickertape.portfolio
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.db.holding.*
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
+import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
+import com.pyamsoft.tickertape.db.holding.HoldingRealtime
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.*
 import timber.log.Timber
 
 @Singleton

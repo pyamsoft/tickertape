@@ -42,7 +42,11 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 import timber.log.Timber
 

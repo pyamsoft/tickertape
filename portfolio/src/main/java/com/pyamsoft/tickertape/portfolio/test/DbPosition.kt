@@ -2,7 +2,10 @@ package com.pyamsoft.tickertape.portfolio.test
 
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShares
 import java.time.LocalDateTime
 
 internal fun newTestPosition(): DbPosition {

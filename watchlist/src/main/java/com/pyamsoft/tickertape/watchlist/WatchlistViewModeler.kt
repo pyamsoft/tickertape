@@ -18,14 +18,15 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.*
+import com.pyamsoft.pydroid.arch.AbstractViewModeler
+import com.pyamsoft.pydroid.arch.UiSavedStateReader
+import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.tape.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,6 @@ class WatchlistViewModeler
 @Inject
 internal constructor(
     private val state: MutableWatchlistViewState,
-    private val tapeLauncher: TapeLauncher,
     private val interactor: WatchlistInteractor,
 ) : AbstractViewModeler<WatchlistViewState>(state) {
 

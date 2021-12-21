@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.dig
+package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asPercent
 
 private data class DisplayValues(
     val cost: String,

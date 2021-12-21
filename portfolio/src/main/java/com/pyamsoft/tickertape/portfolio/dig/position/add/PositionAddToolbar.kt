@@ -17,10 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 internal fun PositionAddToolbar(
     modifier: Modifier = Modifier,
+    symbol: StockSymbol,
     onClose: () -> Unit,
 ) {
   Surface(
@@ -42,7 +45,7 @@ internal fun PositionAddToolbar(
           elevation = 0.dp,
           title = {
             Text(
-                text = "Add Position",
+                text = "New Position: ${symbol.symbol()}",
             )
           },
           navigationIcon = {
@@ -63,7 +66,9 @@ internal fun PositionAddToolbar(
 @Preview
 @Composable
 private fun PreviewPositionAddToolbar() {
+  val symbol = "MSFT".asSymbol()
   PositionAddToolbar(
+      symbol = symbol,
       onClose = {},
   )
 }

@@ -16,11 +16,16 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PositionAddViewModeler
 @Inject
@@ -29,27 +34,49 @@ internal constructor(
     private val holdingId: DbHolding.Id,
 ) : AbstractViewModeler<PositionAddViewState>(state) {
 
+  private fun checkSubmittable() {
+    state.apply {
+      val isAllValuesDefined =
+          pricePerShareNumber() != null && numberOfSharesNumber() != null && dateOfPurchase != null
+      isSubmittable = isAllValuesDefined
+    }
+  }
+
+  fun handleSubmit(scope: CoroutineScope) {
+    state.apply {
+      if (isSubmitting || !isSubmittable) {
+        return
+      }
+    }
+
+    state.isSubmitting = true
+    scope.launch(context = Dispatchers.Main) {
+      state.apply {
+        val price = pricePerShareNumber().requireNotNull()
+        val shareCount = numberOfSharesNumber().requireNotNull()
+        val date = dateOfPurchase.requireNotNull()
+        Timber.d("Submit new position: ", price, shareCount, date)
+
+        // TODO
+        delay(1000)
+
+        isSubmitting = false
+      }
+    }
+  }
+
   fun handlePriceChanged(pricePerShare: String) {
     state.pricePerShare = pricePerShare
+    checkSubmittable()
   }
 
   fun handleNumberChanged(numberOfShares: String) {
     state.numberOfShares = numberOfShares
+    checkSubmittable()
   }
 
   fun handleDateChanged(dateOfPurchase: LocalDateTime) {
     state.dateOfPurchase = dateOfPurchase
-  }
-
-  companion object {
-
-    // Removes anything that isn't a number or the decimal point
-    private val DECIMAL_NUMBER_REGEX = Regex("[^0-9.]")
-
-    @JvmStatic
-    @CheckResult
-    private fun textToDecimalNumber(text: String): Double {
-      return text.trim().replace(DECIMAL_NUMBER_REGEX, "").toDoubleOrNull() ?: 0.0
-    }
+    checkSubmittable()
   }
 }

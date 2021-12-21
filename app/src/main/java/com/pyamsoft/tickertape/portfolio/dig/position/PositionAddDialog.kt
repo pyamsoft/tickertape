@@ -24,10 +24,12 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
@@ -44,7 +46,9 @@ import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import java.time.LocalDateTime
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class PositionAddDialog : AppCompatDialogFragment() {
 
@@ -65,6 +69,14 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         .getString(KEY_HOLDING_ID)
         .let { it.requireNotNull { "Must be created with $KEY_HOLDING_ID" } }
         .let { DbHolding.Id(it) }
+  }
+
+  private fun handleSubmit() {
+    viewModel.requireNotNull().handleSubmit(scope = viewLifecycleOwner.lifecycleScope)
+  }
+
+  private fun handleDateOfPurchaseClicked(date: LocalDateTime?) {
+    Timber.d("Handle DoP clicked: $date")
   }
 
   override fun onCreateView(
@@ -88,13 +100,18 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
       id = R.id.dialog_position_add
 
       setContent {
+        val symbol = remember { getSymbol() }
+
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {
             PositionAddScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
+                symbol = symbol,
                 onPriceChanged = { vm.handlePriceChanged(it) },
                 onNumberChanged = { vm.handleNumberChanged(it) },
+                onDateOfPurchaseClicked = { handleDateOfPurchaseClicked(it) },
+                onSubmit = { handleSubmit() },
                 onClose = { dismiss() },
             )
           }

@@ -8,13 +8,13 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 interface PositionAddViewState : UiViewState {
-  val pricePerShare: Double
-  val numberOfShares: Double
+  val pricePerShare: String
+  val numberOfShares: String
   val dateOfPurchase: LocalDateTime?
 }
 
 internal class MutablePositionAddViewState @Inject internal constructor() : PositionAddViewState {
-  override var pricePerShare by mutableStateOf(0.0)
-  override var numberOfShares by mutableStateOf(0.0)
+  override var pricePerShare by mutableStateOf("")
+  override var numberOfShares by mutableStateOf("")
   override var dateOfPurchase by mutableStateOf<LocalDateTime?>(null)
 }

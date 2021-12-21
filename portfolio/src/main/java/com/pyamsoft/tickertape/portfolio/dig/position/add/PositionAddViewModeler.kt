@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import java.time.LocalDateTime
@@ -28,15 +29,27 @@ internal constructor(
     private val holdingId: DbHolding.Id,
 ) : AbstractViewModeler<PositionAddViewState>(state) {
 
-  fun handlePriceChanged(pricePerShare: Double) {
+  fun handlePriceChanged(pricePerShare: String) {
     state.pricePerShare = pricePerShare
   }
 
-  fun handleNumberChanged(numberOfShares: Double) {
+  fun handleNumberChanged(numberOfShares: String) {
     state.numberOfShares = numberOfShares
   }
 
   fun handleDateChanged(dateOfPurchase: LocalDateTime) {
     state.dateOfPurchase = dateOfPurchase
+  }
+
+  companion object {
+
+    // Removes anything that isn't a number or the decimal point
+    private val DECIMAL_NUMBER_REGEX = Regex("[^0-9.]")
+
+    @JvmStatic
+    @CheckResult
+    private fun textToDecimalNumber(text: String): Double {
+      return text.trim().replace(DECIMAL_NUMBER_REGEX, "").toDoubleOrNull() ?: 0.0
+    }
   }
 }

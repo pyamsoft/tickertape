@@ -65,9 +65,11 @@ internal constructor(
         return@withContext try {
           coroutineScope {
             // Run both queries in parallel
-            val holdingQueryJob = async { holdingQueryDao.query(force) }
-            val positionQueryJob = async { positionQueryDao.query(force) }
-            val jobResult = awaitAll(holdingQueryJob, positionQueryJob)
+            val jobResult =
+                awaitAll(
+                    async { holdingQueryDao.query(force) },
+                    async { positionQueryDao.query(force) },
+                )
 
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val holdings = jobResult[0] as List<DbHolding>

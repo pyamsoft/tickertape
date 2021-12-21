@@ -1,10 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.item
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -47,6 +43,14 @@ internal fun PortfolioItem(
       } else {
         remember(todayDirection) { Color(todayDirection.color()) }
       }
+  val totalChangeTitle =
+      remember(totalDirection) {
+        when {
+          totalDirection.isUp() -> "Overall Gain"
+          totalDirection.isDown() -> "Overall Loss"
+          else -> "Overall Change"
+        }
+      }
 
   Box(
       modifier = modifier,
@@ -69,7 +73,7 @@ internal fun PortfolioItem(
               value = stock.totalShares.asShareValue(),
           )
           Info(
-              name = "Today",
+              name = "Change Today",
               value = stock.changeTodayDisplayString,
               valueColor = todayComposeColor,
           )
@@ -80,10 +84,11 @@ internal fun PortfolioItem(
         ) {
           Info(
               modifier = Modifier.padding(end = 8.dp),
-              name = "Current",
+              name = "Value",
               value = stock.current.asMoneyValue())
+
           Info(
-              name = "Total",
+              name = totalChangeTitle,
               value = stock.gainLossDisplayString,
               valueColor = totalComposeColor,
           )

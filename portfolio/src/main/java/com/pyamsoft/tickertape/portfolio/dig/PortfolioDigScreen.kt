@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -22,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    currentPrice: StockMoneyValue?,
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
@@ -58,6 +60,7 @@ fun PortfolioDigScreen(
           Content(
               modifier = Modifier.fillMaxWidth(),
               state = state,
+              currentPrice = currentPrice,
               onScrub = onScrub,
               onRangeSelected = onRangeSelected,
               onRefresh = onRefresh,
@@ -73,6 +76,7 @@ fun PortfolioDigScreen(
 private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    currentPrice: StockMoneyValue?,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRefresh: () -> Unit,
@@ -97,6 +101,7 @@ private fun Content(
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,
+            currentPrice = currentPrice,
         )
       }
     }
@@ -121,6 +126,7 @@ private fun PreviewPortfolioDigScreen() {
           MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
           ),
+      currentPrice = null,
       onClose = {},
       onScrub = {},
       onRangeSelected = {},

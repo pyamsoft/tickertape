@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 private const val POSITIONS_LIST_MAX_HEIGHT = 360
@@ -26,6 +27,7 @@ private const val POSITIONS_LIST_MAX_HEIGHT = 360
 internal fun PositionScreen(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
 ) {
@@ -36,6 +38,7 @@ internal fun PositionScreen(
     PositionsList(
         modifier = Modifier.fillMaxWidth().heightIn(max = POSITIONS_LIST_MAX_HEIGHT.dp),
         state = state,
+        currentPrice = currentPrice,
         onRefresh = onRefresh,
     )
 
@@ -50,6 +53,7 @@ internal fun PositionScreen(
 private fun PositionsList(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
 ) {
   val isLoading = state.isLoading
@@ -70,6 +74,7 @@ private fun PositionsList(
         PositionItem(
             modifier = Modifier.fillMaxWidth(),
             position = item,
+            currentPrice = currentPrice,
         )
       }
     }
@@ -117,6 +122,7 @@ private fun PreviewPositionScreen() {
           MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
           ),
+      currentPrice = null,
       onAddPosition = {},
       onRefresh = {},
   )

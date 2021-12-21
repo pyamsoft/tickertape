@@ -133,7 +133,7 @@ private fun Portfolio(
   ) {
     item {
       PorfolioSummaryItem(
-          modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+          modifier = Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 8.dp),
           portfolio = portfolio,
       )
     }

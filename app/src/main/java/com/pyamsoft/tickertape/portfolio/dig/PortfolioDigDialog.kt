@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -41,9 +42,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.*
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -92,6 +91,17 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         .let { DbHolding.Id(it) }
   }
 
+  @CheckResult
+  private fun getCurrentPrice(): StockMoneyValue? {
+    return requireArguments().getDouble(KEY_CURRENT_PRICE, -1.0).let { v ->
+      if (v.compareTo(0) >= 0) {
+        v.asMoney()
+      } else {
+        null
+      }
+    }
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -113,11 +123,14 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
       id = R.id.dialog_watchlist_dig
 
       setContent {
+        val currentPrice = remember { getCurrentPrice() }
+
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {
             PortfolioDigScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
+                currentPrice = currentPrice,
                 onClose = { dismiss() },
                 onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = { handleRangeSelected(it) },
@@ -165,16 +178,21 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
+    private const val KEY_CURRENT_PRICE = "key_current_price"
     private const val TAG = "WatchlistDigDialog"
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(holding: DbHolding): DialogFragment {
+    private fun newInstance(
+        holding: DbHolding,
+        currentPrice: StockMoneyValue?,
+    ): DialogFragment {
       return PortfolioDigDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, holding.symbol().symbol())
               putString(KEY_HOLDING_ID, holding.id().id)
+              currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
             }
       }
     }
@@ -183,8 +201,9 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     fun show(
         activity: FragmentActivity,
         holding: DbHolding,
+        currentPrice: StockMoneyValue?,
     ) {
-      newInstance(holding).show(activity, TAG)
+      newInstance(holding, currentPrice).show(activity, TAG)
     }
   }
 }

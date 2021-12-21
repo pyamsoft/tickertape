@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.dig
+package com.pyamsoft.tickertape.portfolio.dig.position
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -24,12 +24,10 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
@@ -42,47 +40,16 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
+import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
-import timber.log.Timber
 
-internal class PortfolioDigDialog : AppCompatDialogFragment() {
+internal class PositionAddDialog : AppCompatDialogFragment() {
 
-  @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
+  @JvmField @Inject internal var viewModel: PositionAddViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
-
-  private fun handleRangeSelected(range: StockChart.IntervalRange) {
-    viewModel
-        .requireNotNull()
-        .handleRangeSelected(
-            scope = viewLifecycleOwner.lifecycleScope,
-            range = range,
-        )
-  }
-
-  private fun handleRefresh(force: Boolean) {
-    viewModel
-        .requireNotNull()
-        .handleLoadTicker(
-            scope = viewLifecycleOwner.lifecycleScope,
-            force = force,
-        )
-  }
-
-  private fun handleAddPosition() {
-    val holdingId = getHoldingId()
-    Timber.d("Add new position to holding: $holdingId")
-    PositionAddDialog.show(
-        activity = requireActivity(),
-        symbol = getSymbol(),
-        holdingId = holdingId,
-    )
-  }
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
@@ -100,17 +67,6 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         .let { DbHolding.Id(it) }
   }
 
-  @CheckResult
-  private fun getCurrentPrice(): StockMoneyValue? {
-    return requireArguments().getDouble(KEY_CURRENT_PRICE, -1.0).let { v ->
-      if (v.compareTo(0) >= 0) {
-        v.asMoney()
-      } else {
-        null
-      }
-    }
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -118,7 +74,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   ): View {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
-        .plusPortfolioDigComponent()
+        .plusPositionAddComponent()
         .create(
             getSymbol(),
             getHoldingId(),
@@ -129,23 +85,17 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
-      id = R.id.dialog_portfolio_dig
+      id = R.id.dialog_position_add
 
       setContent {
-        val currentPrice = remember { getCurrentPrice() }
-
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {
-            PortfolioDigScreen(
+            PositionAddScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
-                currentPrice = currentPrice,
+                onPriceChanged = { vm.handlePriceChanged(it) },
+                onNumberChanged = { vm.handleNumberChanged(it) },
                 onClose = { dismiss() },
-                onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = { handleRangeSelected(it) },
-                onTabUpdated = { vm.handleTabUpdated(it) },
-                onRefresh = { handleRefresh(true) },
-                onAddPosition = { handleAddPosition() },
             )
           }
         }
@@ -161,7 +111,6 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     makeFullWidth()
 
     viewModel.requireNotNull().restoreState(savedInstanceState)
-    handleRefresh(false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -187,21 +136,19 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
-    private const val KEY_CURRENT_PRICE = "key_current_price"
-    private const val TAG = "PortfolioDigDialog"
+    private const val TAG = "PositionAddDialog"
 
     @JvmStatic
     @CheckResult
     private fun newInstance(
-        holding: DbHolding,
-        currentPrice: StockMoneyValue?,
+        symbol: StockSymbol,
+        holdingId: DbHolding.Id,
     ): DialogFragment {
-      return PortfolioDigDialog().apply {
+      return PositionAddDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, holding.symbol().symbol())
-              putString(KEY_HOLDING_ID, holding.id().id)
-              currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
+              putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_HOLDING_ID, holdingId.id)
             }
       }
     }
@@ -209,10 +156,10 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     @JvmStatic
     fun show(
         activity: FragmentActivity,
-        holding: DbHolding,
-        currentPrice: StockMoneyValue?,
+        symbol: StockSymbol,
+        holdingId: DbHolding.Id,
     ) {
-      newInstance(holding, currentPrice).show(activity, TAG)
+      newInstance(symbol, holdingId).show(activity, TAG)
     }
   }
 }

@@ -34,6 +34,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -98,6 +99,8 @@ internal interface TickerComponent {
   @CheckResult fun plusWatchlistDigComponent(): WatchlistDigComponent.Factory
 
   @CheckResult fun plusPortfolioDigComponent(): PortfolioDigComponent.Factory
+
+  @CheckResult fun plusPositionAddComponent(): PositionAddComponent.Factory
 
   @Component.Factory
   interface Factory {

@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 private const val POSITIONS_LIST_MAX_HEIGHT = 360
+private const val FAB_OFFSET = 56 + 16
 
 @Composable
 @JvmOverloads
@@ -75,6 +76,12 @@ private fun PositionsList(
             modifier = Modifier.fillMaxWidth(),
             position = item,
             currentPrice = currentPrice,
+        )
+      }
+
+      item {
+        Spacer(
+            modifier = Modifier.height(FAB_OFFSET.dp),
         )
       }
     }

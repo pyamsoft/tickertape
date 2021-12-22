@@ -42,11 +42,13 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.portfolio.add.date.PositionAddDateDialog
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.LocalDateTime
+import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -75,8 +77,16 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
     viewModel.requireNotNull().handleSubmit(scope = viewLifecycleOwner.lifecycleScope)
   }
 
-  private fun handleDateOfPurchaseClicked(date: LocalDateTime?) {
+  private fun handleDateOfPurchaseClicked(
+      positionId: DbPosition.Id,
+      date: LocalDate?,
+  ) {
     Timber.d("Handle DoP clicked: $date")
+    PositionAddDateDialog.show(
+        activity = requireActivity(),
+        positionId = positionId,
+        purchaseDate = date,
+    )
   }
 
   override fun onCreateView(
@@ -103,6 +113,8 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         val symbol = remember { getSymbol() }
 
         vm.Render { state ->
+          val positionId = state.positionId
+
           TickerTapeTheme(themeProvider) {
             PositionAddScreen(
                 modifier = Modifier.fillMaxWidth(),
@@ -110,9 +122,14 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
                 symbol = symbol,
                 onPriceChanged = { vm.handlePriceChanged(it) },
                 onNumberChanged = { vm.handleNumberChanged(it) },
-                onDateOfPurchaseClicked = { handleDateOfPurchaseClicked(it) },
                 onSubmit = { handleSubmit() },
                 onClose = { dismiss() },
+                onDateOfPurchaseClicked = {
+                  handleDateOfPurchaseClicked(
+                      positionId = positionId,
+                      date = it,
+                  )
+                },
             )
           }
         }

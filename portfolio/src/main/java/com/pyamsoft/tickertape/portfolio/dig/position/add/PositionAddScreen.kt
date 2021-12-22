@@ -28,7 +28,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.Paid
 import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -38,7 +38,7 @@ fun PositionAddScreen(
     symbol: StockSymbol,
     onPriceChanged: (String) -> Unit,
     onNumberChanged: (String) -> Unit,
-    onDateOfPurchaseClicked: (LocalDateTime?) -> Unit,
+    onDateOfPurchaseClicked: (LocalDate?) -> Unit,
     onSubmit: () -> Unit,
     onClose: () -> Unit,
 ) {

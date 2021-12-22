@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 class PositionAddViewModeler
 @Inject
@@ -80,7 +81,7 @@ internal constructor(
     }
   }
 
-  fun handleDateChanged(dateOfPurchase: LocalDateTime) {
+  fun handleDateChanged(dateOfPurchase: LocalDate) {
     state.dateOfPurchase = dateOfPurchase
     checkSubmittable()
   }

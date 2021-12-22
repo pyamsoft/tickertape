@@ -59,25 +59,24 @@ internal constructor(
   }
 
   fun handleSubmit(scope: CoroutineScope) {
-    state.apply {
+    val s = state
+    s.apply {
       if (isSubmitting || !isSubmittable) {
         return
       }
     }
 
-    state.isSubmitting = true
+    s.isSubmitting = true
     scope.launch(context = Dispatchers.Main) {
-      state.apply {
-        val price = pricePerShare.toDouble()
-        val shareCount = numberOfShares.toDouble()
-        val date = dateOfPurchase.requireNotNull()
-        Timber.d("Submit new position: ", price, shareCount, date)
+      val price = s.pricePerShare.toDouble()
+      val shareCount = s.numberOfShares.toDouble()
+      val date = s.dateOfPurchase.requireNotNull()
 
-        // TODO
-        delay(1000)
+      // TODO
+      Timber.d("Submit new position: ", s.positionId, holdingId, price, shareCount, date)
+      delay(1000)
 
-        isSubmitting = false
-      }
+      s.isSubmitting = false
     }
   }
 

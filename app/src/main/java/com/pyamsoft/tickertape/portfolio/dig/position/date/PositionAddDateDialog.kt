@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.add.date
+package com.pyamsoft.tickertape.portfolio.dig.position.date
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -9,16 +9,24 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.util.valueFromCurrentTheme
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
 import java.time.LocalDate
 import java.time.Month
+import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 internal class PositionAddDateDialog : AppCompatDialogFragment() {
+
+  @JvmField @Inject internal var datePickerEventBus: EventBus<DatePickerEvent>? = null
 
   @CheckResult
   private fun getPositionId(): DbPosition.Id {
@@ -78,9 +86,23 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
     val initialDay = getDay()
 
     val listener =
-        DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+        DatePickerDialog.OnDateSetListener { _, year, monthValue, dayOfMonth ->
+          // Calendar month is 0-11, but LDT month is 1-12
+          val month = Month.of(monthValue + 1)
+
           // Make sure we use the ActivityScope for this operation
-          // TODO fire date picked
+          requireActivity().lifecycleScope.launch(context = Dispatchers.Default) {
+            datePickerEventBus
+                .requireNotNull()
+                .send(
+                    DatePickerEvent(
+                        positionId = getPositionId(),
+                        year = year,
+                        month = month,
+                        dayOfMonth = dayOfMonth,
+                    ),
+                )
+          }
         }
 
     return DatePickerDialog(
@@ -96,6 +118,7 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
 
   override fun onDestroy() {
     super.onDestroy()
+    datePickerEventBus = null
   }
 
   companion object {

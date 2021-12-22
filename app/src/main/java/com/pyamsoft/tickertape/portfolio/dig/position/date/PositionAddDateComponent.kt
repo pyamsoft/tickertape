@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.add.date
+package com.pyamsoft.tickertape.portfolio.dig.position.date
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.position.DbPosition

@@ -18,29 +18,43 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import java.time.LocalDateTime
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
 
 class PositionAddViewModeler
 @Inject
 internal constructor(
     private val state: MutablePositionAddViewState,
+    private val datePickerEventBus: EventConsumer<DatePickerEvent>,
     private val holdingId: DbHolding.Id,
 ) : AbstractViewModeler<PositionAddViewState>(state) {
 
   private fun checkSubmittable() {
     state.apply {
       val isAllValuesDefined =
-          pricePerShare.toDoubleOrNull() != null && numberOfShares.toDoubleOrNull() != null && dateOfPurchase != null
+          pricePerShare.toDoubleOrNull() != null &&
+              numberOfShares.toDoubleOrNull() != null &&
+              dateOfPurchase != null
       isSubmittable = isAllValuesDefined
+    }
+  }
+
+  fun bind(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Default) {
+      datePickerEventBus.onEvent { e ->
+        if (e.positionId == state.positionId) {
+          val dateOfPurchase = LocalDate.of(e.year, e.month, e.dayOfMonth)
+          handleDateChanged(dateOfPurchase)
+        }
+      }
     }
   }
 
@@ -81,7 +95,7 @@ internal constructor(
     }
   }
 
-  fun handleDateChanged(dateOfPurchase: LocalDate) {
+  private fun handleDateChanged(dateOfPurchase: LocalDate) {
     state.dateOfPurchase = dateOfPurchase
     checkSubmittable()
   }

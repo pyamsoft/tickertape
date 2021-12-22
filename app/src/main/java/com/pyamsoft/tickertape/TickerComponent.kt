@@ -21,6 +21,8 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.inject.AlertComponent
@@ -33,7 +35,8 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
-import com.pyamsoft.tickertape.portfolio.add.date.PositionAddDateComponent
+import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
+import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
@@ -125,29 +128,46 @@ internal interface TickerComponent {
     @CheckResult
     abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
 
+    @Binds
+    @CheckResult
+    abstract fun bindDatePickerEventConsumer(
+        bus: EventBus<DatePickerEvent>
+    ): EventConsumer<DatePickerEvent>
+
     @Module
     companion object {
 
       @Provides
       @JvmStatic
+      @Singleton
       internal fun provideActivityClass(): Class<out Activity> {
         return MainActivity::class.java
       }
 
       @Provides
       @JvmStatic
+      @Singleton
       internal fun provideServiceClass(): Class<out Service> {
         return TapeService::class.java
       }
 
       @Provides
       @JvmStatic
+      @Singleton
       internal fun provideContext(application: Application): Context {
         return application
       }
 
       @Provides
       @JvmStatic
+      @Singleton
+      internal fun provideDatePickerEventBus(): EventBus<DatePickerEvent> {
+        return EventBus.create()
+      }
+
+      @Provides
+      @JvmStatic
+      @Singleton
       @Named("app_name")
       internal fun provideAppNameRes(): Int {
         return R.string.app_name

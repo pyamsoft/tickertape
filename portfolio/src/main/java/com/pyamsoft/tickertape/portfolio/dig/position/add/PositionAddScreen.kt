@@ -1,7 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,19 +8,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.icon.Paid
+import com.pyamsoft.tickertape.ui.icon.Tag
+import com.pyamsoft.tickertape.ui.icon.Today
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -67,7 +73,7 @@ fun PositionAddScreen(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             enabled = isTextEntryEnabled,
-            readOnly = isTextEntryEnabled,
+            readOnly = !isTextEntryEnabled,
             value = pricePerShare,
             onValueChange = onPriceChanged,
             keyboardOptions =
@@ -79,12 +85,19 @@ fun PositionAddScreen(
                   text = "Price per share",
               )
             },
+            leadingIcon = {
+              Icon(
+                  modifier = Modifier.padding(end = 4.dp),
+                  imageVector = Icons.Filled.Paid,
+                  contentDescription = "Price per share",
+              )
+            },
         )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             enabled = isTextEntryEnabled,
-            readOnly = isTextEntryEnabled,
+            readOnly = !isTextEntryEnabled,
             value = numberOfShares,
             onValueChange = onNumberChanged,
             keyboardOptions =
@@ -96,12 +109,28 @@ fun PositionAddScreen(
                   text = "Number of shares",
               )
             },
+            leadingIcon = {
+              Icon(
+                  modifier = Modifier.padding(end = 4.dp),
+                  imageVector = Icons.Filled.Tag,
+                  contentDescription = "Number of shares",
+              )
+            },
         )
 
-        Box(
+        Row(
             modifier =
-                Modifier.clickable { onDateOfPurchaseClicked(dateOfPurchase) }.padding(16.dp),
+                Modifier.clickable { onDateOfPurchaseClicked(dateOfPurchase) }
+                    .padding(top = 8.dp)
+                    .padding(bottom = 16.dp)
+                    .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+          Icon(
+              modifier = Modifier.padding(end = 20.dp).alpha(TextFieldDefaults.IconOpacity),
+              imageVector = Icons.Filled.Today,
+              contentDescription = "Number of shares",
+          )
           Text(
               text = displayDate,
               style = MaterialTheme.typography.body1,

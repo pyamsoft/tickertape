@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -37,7 +38,7 @@ internal constructor(
   private fun checkSubmittable() {
     state.apply {
       val isAllValuesDefined =
-          pricePerShareNumber() != null && numberOfSharesNumber() != null && dateOfPurchase != null
+          pricePerShare.toDoubleOrNull() != null && numberOfShares.toDoubleOrNull() != null && dateOfPurchase != null
       isSubmittable = isAllValuesDefined
     }
   }
@@ -52,8 +53,8 @@ internal constructor(
     state.isSubmitting = true
     scope.launch(context = Dispatchers.Main) {
       state.apply {
-        val price = pricePerShareNumber().requireNotNull()
-        val shareCount = numberOfSharesNumber().requireNotNull()
+        val price = pricePerShare.toDouble()
+        val shareCount = numberOfShares.toDouble()
         val date = dateOfPurchase.requireNotNull()
         Timber.d("Submit new position: ", price, shareCount, date)
 
@@ -66,17 +67,53 @@ internal constructor(
   }
 
   fun handlePriceChanged(pricePerShare: String) {
-    state.pricePerShare = pricePerShare
-    checkSubmittable()
+    if (isSafe(pricePerShare)) {
+      state.pricePerShare = pricePerShare
+      checkSubmittable()
+    }
   }
 
   fun handleNumberChanged(numberOfShares: String) {
-    state.numberOfShares = numberOfShares
-    checkSubmittable()
+    if (isSafe(numberOfShares)) {
+      state.numberOfShares = numberOfShares
+      checkSubmittable()
+    }
   }
 
   fun handleDateChanged(dateOfPurchase: LocalDateTime) {
     state.dateOfPurchase = dateOfPurchase
     checkSubmittable()
+  }
+
+  companion object {
+
+    private val WHITESPACE_REGEX = Regex("\\s+")
+
+    @JvmStatic
+    @CheckResult
+    private fun isSafe(numberString: String): Boolean {
+      // Only one decimal is valid
+      if (numberString.count { it == '.' } > 1) {
+        return false
+      }
+
+      // No whitespace
+      if (numberString.contains(WHITESPACE_REGEX)) {
+        return false
+      }
+
+      // No negative sign
+      if (numberString.contains('-')) {
+        return false
+      }
+
+      // No commas
+      if (numberString.contains(',')) {
+        return false
+      }
+
+      // Finally, attempt a cast
+      return numberString.toDoubleOrNull() != null
+    }
   }
 }

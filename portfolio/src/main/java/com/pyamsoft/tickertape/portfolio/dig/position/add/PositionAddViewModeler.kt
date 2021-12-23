@@ -90,18 +90,14 @@ internal constructor(
       val position = createPosition()
       interactor
           .addNewPosition(position)
-          // Map instead of onSuccess because map catches errors and onSuccess does not
-          .map { result ->
-            return@map when (result) {
-              is DbInsert.InsertResult.Insert<DbPosition> -> {
-                Timber.d("Position was inserted: ${result.data}")
-                result.data
-              }
-              is DbInsert.InsertResult.Update<DbPosition> -> {
-                Timber.w("Position was updated but should not exist previously! ${result.data}")
-                // NOTE(Peter): Do we throw an error? I guess it's harmless
-                result.data
-              }
+          .onFailure { Timber.e(it, "Error when adding position: $position") }
+          .onSuccess { result ->
+            when (result) {
+              is DbInsert.InsertResult.Insert<DbPosition> ->
+                  Timber.d("Position was inserted: ${result.data}")
+              // NOTE(Peter): Do we throw an error? I guess it's harmless
+              is DbInsert.InsertResult.Update<DbPosition> ->
+                  Timber.w("Position was updated but should not exist previously! ${result.data}")
               is DbInsert.InsertResult.Fail -> {
                 Timber.e(result.error, "Failed to insert new position: $position")
                 // Caught by the onFailure below
@@ -109,7 +105,6 @@ internal constructor(
               }
             }
           }
-          .onFailure { Timber.e(it, "Error when adding position: $position") }
           .onFailure {
             // TODO handle position add error
           }

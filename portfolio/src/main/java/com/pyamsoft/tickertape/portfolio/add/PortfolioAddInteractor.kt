@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
@@ -59,12 +58,7 @@ internal constructor(
           }
 
           val newHolding = JsonMappableDbHolding.create(symbol, type, realEquityType, side)
-          return@withContext when (holdingInsertDao.insert(newHolding)) {
-            DbInsert.InsertResult.INSERT -> Timber.d("New portfolio holding inserted: $newHolding")
-            DbInsert.InsertResult.UPDATE ->
-                Timber.d("Existing portfolio holding updated: $newHolding")
-            DbInsert.InsertResult.FAIL -> Timber.w("Failed to insert/update portfolio holdings")
-          }.run { ResultWrapper.success(Unit) }
+          return@withContext holdingInsertDao.insert(newHolding).run { ResultWrapper.success(Unit) }
         } catch (e: Throwable) {
           Timber.e(e, "Error committing symbol: $symbol")
           ResultWrapper.failure(e)

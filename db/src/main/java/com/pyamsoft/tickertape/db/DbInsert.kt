@@ -20,11 +20,11 @@ import androidx.annotation.CheckResult
 
 interface DbInsert<T : Any> {
 
-  @CheckResult suspend fun insert(o: T): InsertResult
+  @CheckResult suspend fun insert(o: T): InsertResult<T>
 
-  enum class InsertResult {
-    INSERT,
-    UPDATE,
-    FAIL
+  sealed class InsertResult<T : Any> {
+    data class Insert<T : Any>(val data: T) : InsertResult<T>()
+    data class Update<T : Any>(val data: T) : InsertResult<T>()
+    data class Fail<T : Any>(val error: Throwable) : InsertResult<T>()
   }
 }

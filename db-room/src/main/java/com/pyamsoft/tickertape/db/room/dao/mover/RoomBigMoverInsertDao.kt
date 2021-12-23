@@ -34,20 +34,22 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomBigMoverInsertDao : BigMoverInsertDao {
 
-  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult =
+  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
       withContext(context = Dispatchers.IO) {
         val roomBigMover = RoomBigMoverReport.create(o)
         return@withContext if (daoQuery(roomBigMover.id()) == null) {
           if (daoInsert(roomBigMover) != ROOM_ROW_ID_INSERT_INVALID) {
-            DbInsert.InsertResult.INSERT
+            DbInsert.InsertResult.Insert(roomBigMover)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(
+                IllegalStateException("Unable to insert bigmover $roomBigMover"))
           }
         } else {
           if (daoUpdate(roomBigMover) > ROOM_ROW_COUNT_UPDATE_INVALID) {
-            DbInsert.InsertResult.UPDATE
+            DbInsert.InsertResult.Update(roomBigMover)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(
+                IllegalStateException("Unable to update bigmover $roomBigMover"))
           }
         }
       }

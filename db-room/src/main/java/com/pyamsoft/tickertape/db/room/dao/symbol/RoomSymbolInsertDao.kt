@@ -34,20 +34,20 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
 
-  override suspend fun insert(o: DbSymbol): DbInsert.InsertResult =
+  override suspend fun insert(o: DbSymbol): DbInsert.InsertResult<DbSymbol> =
       withContext(context = Dispatchers.IO) {
         val roomSymbol = RoomDbSymbol.create(o)
         return@withContext if (daoQuery(roomSymbol.id()) == null) {
           if (daoInsert(roomSymbol) != ROOM_ROW_ID_INSERT_INVALID) {
-            DbInsert.InsertResult.INSERT
+            DbInsert.InsertResult.Insert(roomSymbol)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert symbol $roomSymbol"))
           }
         } else {
           if (daoUpdate(roomSymbol) > ROOM_ROW_COUNT_UPDATE_INVALID) {
-            DbInsert.InsertResult.UPDATE
+            DbInsert.InsertResult.Update(roomSymbol)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert symbol $roomSymbol"))
           }
         }
       }

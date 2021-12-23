@@ -34,20 +34,20 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
 
-  override suspend fun insert(o: DbHolding): DbInsert.InsertResult =
+  override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
       withContext(context = Dispatchers.IO) {
         val roomHolding = RoomDbHolding.create(o)
         return@withContext if (daoQuery(roomHolding.id()) == null) {
           if (daoInsert(roomHolding) != ROOM_ROW_ID_INSERT_INVALID) {
-            DbInsert.InsertResult.INSERT
+            DbInsert.InsertResult.Insert(roomHolding)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert holding $roomHolding"))
           }
         } else {
           if (daoUpdate(roomHolding) > ROOM_ROW_COUNT_UPDATE_INVALID) {
-            DbInsert.InsertResult.UPDATE
+            DbInsert.InsertResult.Update(roomHolding)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(IllegalStateException("Unable to update holding $roomHolding"))
           }
         }
       }

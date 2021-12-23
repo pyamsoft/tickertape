@@ -34,20 +34,22 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomPositionInsertDao : PositionInsertDao {
 
-  override suspend fun insert(o: DbPosition): DbInsert.InsertResult =
+  override suspend fun insert(o: DbPosition): DbInsert.InsertResult<DbPosition> =
       withContext(context = Dispatchers.IO) {
         val roomPosition = RoomDbPosition.create(o)
         return@withContext if (daoQuery(roomPosition.id()) == null) {
           if (daoInsert(roomPosition) != ROOM_ROW_ID_INSERT_INVALID) {
-            DbInsert.InsertResult.INSERT
+            DbInsert.InsertResult.Insert(roomPosition)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(
+                IllegalStateException("Unable to insert position $roomPosition"))
           }
         } else {
           if (daoUpdate(roomPosition) > ROOM_ROW_COUNT_UPDATE_INVALID) {
-            DbInsert.InsertResult.UPDATE
+            DbInsert.InsertResult.Update(roomPosition)
           } else {
-            DbInsert.InsertResult.FAIL
+            DbInsert.InsertResult.Fail(
+                IllegalStateException("Unable to insert position $roomPosition"))
           }
         }
       }

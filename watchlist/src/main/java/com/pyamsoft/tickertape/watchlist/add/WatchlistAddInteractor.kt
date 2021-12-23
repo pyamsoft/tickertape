@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.watchlist.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -52,12 +51,7 @@ internal constructor(
           }
 
           val newSymbol = JsonMappableDbSymbol.create(symbol)
-          return@withContext when (symbolInsertDao.insert(newSymbol)) {
-            DbInsert.InsertResult.INSERT -> Timber.d("New watchlist symbol inserted: $newSymbol")
-            DbInsert.InsertResult.UPDATE ->
-                Timber.d("Existing watchlist symbol updated: $newSymbol")
-            DbInsert.InsertResult.FAIL -> Timber.w("Failed to insert/update watchlist symbols")
-          }.run { ResultWrapper.success(Unit) }
+          return@withContext symbolInsertDao.insert(newSymbol).run { ResultWrapper.success(Unit) }
         } catch (e: Throwable) {
           Timber.e(e, "Error committing symbol: $symbol")
           ResultWrapper.failure(e)

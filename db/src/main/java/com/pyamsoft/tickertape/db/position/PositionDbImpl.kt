@@ -87,14 +87,14 @@ internal constructor(
         return@withContext queryCache.call()
       }
 
-  override suspend fun insert(o: DbPosition): DbInsert.InsertResult =
+  override suspend fun insert(o: DbPosition): DbInsert.InsertResult<DbPosition> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            DbInsert.InsertResult.INSERT -> publish(PositionChangeEvent.Insert(o))
-            DbInsert.InsertResult.UPDATE -> publish(PositionChangeEvent.Update(o))
-            DbInsert.InsertResult.FAIL -> Timber.w("Insert attempt failed: $o")
+            is DbInsert.InsertResult.Insert -> publish(PositionChangeEvent.Insert(result.data))
+            is DbInsert.InsertResult.Update -> publish(PositionChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Fail -> Timber.e(result.error, "Insert attempt failed: $o")
           }
         }
       }

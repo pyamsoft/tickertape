@@ -20,12 +20,16 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.JsonMappableDbPosition
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShares
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -35,6 +39,7 @@ internal constructor(
     private val state: MutablePositionAddViewState,
     private val datePickerEventBus: EventConsumer<DatePickerEvent>,
     private val holdingId: DbHolding.Id,
+    private val interactor: PositionAddInteractor,
 ) : AbstractViewModeler<PositionAddViewState>(state) {
 
   private fun checkSubmittable() {
@@ -58,6 +63,20 @@ internal constructor(
     }
   }
 
+  @CheckResult
+  private fun createPosition(): DbPosition {
+    val s = state
+    val price = s.pricePerShare.toDouble()
+    val shareCount = s.numberOfShares.toDouble()
+    val date = s.dateOfPurchase.requireNotNull()
+
+    return JsonMappableDbPosition.create(
+        holdingId = holdingId,
+        shareCount = shareCount.asShares(),
+        price = price.asMoney(),
+        purchaseDate = date.atTime(0, 0))
+  }
+
   fun handleSubmit(scope: CoroutineScope) {
     val s = state
     s.apply {
@@ -68,15 +87,33 @@ internal constructor(
 
     s.isSubmitting = true
     scope.launch(context = Dispatchers.Main) {
-      val price = s.pricePerShare.toDouble()
-      val shareCount = s.numberOfShares.toDouble()
-      val date = s.dateOfPurchase.requireNotNull()
-
-      // TODO
-      Timber.d("Submit new position: ", s.positionId, holdingId, price, shareCount, date)
-      delay(1000)
-
-      s.isSubmitting = false
+      val position = createPosition()
+      interactor
+          .addNewPosition(position)
+          // Map instead of onSuccess because map catches errors and onSuccess does not
+          .map { result ->
+            return@map when (result) {
+              is DbInsert.InsertResult.Insert<DbPosition> -> {
+                Timber.d("Position was inserted: ${result.data}")
+                result.data
+              }
+              is DbInsert.InsertResult.Update<DbPosition> -> {
+                Timber.w("Position was updated but should not exist previously! ${result.data}")
+                // NOTE(Peter): Do we throw an error? I guess it's harmless
+                result.data
+              }
+              is DbInsert.InsertResult.Fail -> {
+                Timber.e(result.error, "Failed to insert new position: $position")
+                // Caught by the onFailure below
+                throw result.error
+              }
+            }
+          }
+          .onFailure { Timber.e(it, "Error when adding position: $position") }
+          .onFailure {
+            // TODO handle position add error
+          }
+          .onFinally { s.isSubmitting = false }
     }
   }
 

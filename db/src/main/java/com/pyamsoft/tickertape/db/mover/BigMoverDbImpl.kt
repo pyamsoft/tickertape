@@ -88,14 +88,14 @@ internal constructor(
         return@withContext queryCache.call()
       }
 
-  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult =
+  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            DbInsert.InsertResult.INSERT -> publish(BigMoverChangeEvent.Insert(o))
-            DbInsert.InsertResult.UPDATE -> publish(BigMoverChangeEvent.Update(o))
-            DbInsert.InsertResult.FAIL -> Timber.w("Insert attempt failed: $o")
+            is DbInsert.InsertResult.Insert -> publish(BigMoverChangeEvent.Insert(result.data))
+            is DbInsert.InsertResult.Update -> publish(BigMoverChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Fail -> Timber.e(result.error, "Insert attempt failed: $o")
           }
         }
       }

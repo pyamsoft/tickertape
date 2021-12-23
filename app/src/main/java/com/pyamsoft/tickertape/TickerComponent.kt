@@ -128,46 +128,29 @@ internal interface TickerComponent {
     @CheckResult
     abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
 
-    @Binds
-    @CheckResult
-    abstract fun bindDatePickerEventConsumer(
-        bus: EventBus<DatePickerEvent>
-    ): EventConsumer<DatePickerEvent>
-
     @Module
     companion object {
 
       @Provides
       @JvmStatic
-      @Singleton
       internal fun provideActivityClass(): Class<out Activity> {
         return MainActivity::class.java
       }
 
       @Provides
       @JvmStatic
-      @Singleton
       internal fun provideServiceClass(): Class<out Service> {
         return TapeService::class.java
       }
 
       @Provides
       @JvmStatic
-      @Singleton
       internal fun provideContext(application: Application): Context {
         return application
       }
 
       @Provides
       @JvmStatic
-      @Singleton
-      internal fun provideDatePickerEventBus(): EventBus<DatePickerEvent> {
-        return EventBus.create()
-      }
-
-      @Provides
-      @JvmStatic
-      @Singleton
       @Named("app_name")
       internal fun provideAppNameRes(): Int {
         return R.string.app_name

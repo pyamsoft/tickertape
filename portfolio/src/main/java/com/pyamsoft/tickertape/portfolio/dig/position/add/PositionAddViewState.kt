@@ -19,15 +19,14 @@ interface PositionAddViewState : UiViewState {
 }
 
 internal class MutablePositionAddViewState @Inject internal constructor() : PositionAddViewState {
-  // This is a constant for the life of the VM
-  override var positionId = DbPosition.Id(IdGenerator.generate())
-    private set
-
   override var isSubmitting by mutableStateOf(false)
   override var isSubmittable by mutableStateOf(false)
   override var pricePerShare by mutableStateOf("")
   override var numberOfShares by mutableStateOf("")
   override var dateOfPurchase by mutableStateOf<LocalDate?>(null)
+  override var positionId by mutableStateOf(DbPosition.Id(IdGenerator.generate()))
+    // Private set because we don't want someone changing this outside of the newPosition() function
+    private set
 
   fun newPosition() {
     positionId = DbPosition.Id(IdGenerator.generate())

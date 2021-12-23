@@ -106,10 +106,7 @@ internal constructor(
           }
           .onSuccess {
             s.apply {
-              // Must go before the other calls, since this is not backed by a State<T>
-              // so on its own it will not cause a recompose
               newPosition()
-
               dateOfPurchase = null
               numberOfShares = ""
               pricePerShare = ""

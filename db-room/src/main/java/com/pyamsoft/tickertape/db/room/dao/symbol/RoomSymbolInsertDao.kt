@@ -41,13 +41,19 @@ internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
           if (daoInsert(roomSymbol) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.Insert(roomSymbol)
           } else {
-            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert symbol $roomSymbol"))
+            DbInsert.InsertResult.Fail(
+                data = roomSymbol,
+                error = IllegalStateException("Unable to insert symbol $roomSymbol"),
+            )
           }
         } else {
           if (daoUpdate(roomSymbol) > ROOM_ROW_COUNT_UPDATE_INVALID) {
             DbInsert.InsertResult.Update(roomSymbol)
           } else {
-            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert symbol $roomSymbol"))
+            DbInsert.InsertResult.Fail(
+                data = roomSymbol,
+                error = IllegalStateException("Unable to insert symbol $roomSymbol"),
+            )
           }
         }
       }

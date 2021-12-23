@@ -93,10 +93,9 @@ internal constructor(
           .onFailure { Timber.e(it, "Error when adding position: $position") }
           .onSuccess { result ->
             when (result) {
-              is DbInsert.InsertResult.Insert<DbPosition> ->
-                  Timber.d("Position was inserted: ${result.data}")
+              is DbInsert.InsertResult.Insert -> Timber.d("Position was inserted: ${result.data}")
               // NOTE(Peter): Do we throw an error? I guess it's harmless
-              is DbInsert.InsertResult.Update<DbPosition> ->
+              is DbInsert.InsertResult.Update ->
                   Timber.w("Position was updated but should not exist previously! ${result.data}")
               is DbInsert.InsertResult.Fail -> {
                 Timber.e(result.error, "Failed to insert new position: $position")

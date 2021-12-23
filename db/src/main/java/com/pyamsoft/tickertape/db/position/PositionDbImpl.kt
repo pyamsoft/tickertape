@@ -94,7 +94,8 @@ internal constructor(
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> publish(PositionChangeEvent.Insert(result.data))
             is DbInsert.InsertResult.Update -> publish(PositionChangeEvent.Update(result.data))
-            is DbInsert.InsertResult.Fail -> Timber.e(result.error, "Insert attempt failed: $o")
+            is DbInsert.InsertResult.Fail ->
+                  Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
         }
       }

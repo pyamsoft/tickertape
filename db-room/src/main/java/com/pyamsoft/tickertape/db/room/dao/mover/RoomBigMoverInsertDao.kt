@@ -42,14 +42,18 @@ internal abstract class RoomBigMoverInsertDao : BigMoverInsertDao {
             DbInsert.InsertResult.Insert(roomBigMover)
           } else {
             DbInsert.InsertResult.Fail(
-                IllegalStateException("Unable to insert bigmover $roomBigMover"))
+                data = roomBigMover,
+                error = IllegalStateException("Unable to update bigmover $roomBigMover"),
+            )
           }
         } else {
           if (daoUpdate(roomBigMover) > ROOM_ROW_COUNT_UPDATE_INVALID) {
             DbInsert.InsertResult.Update(roomBigMover)
           } else {
             DbInsert.InsertResult.Fail(
-                IllegalStateException("Unable to update bigmover $roomBigMover"))
+                data = roomBigMover,
+                error = IllegalStateException("Unable to update bigmover $roomBigMover"),
+            )
           }
         }
       }

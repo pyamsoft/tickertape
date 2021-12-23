@@ -41,13 +41,19 @@ internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
           if (daoInsert(roomHolding) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.Insert(roomHolding)
           } else {
-            DbInsert.InsertResult.Fail(IllegalStateException("Unable to insert holding $roomHolding"))
+            DbInsert.InsertResult.Fail(
+              data = roomHolding,
+              error = IllegalStateException("Unable to update holding $roomHolding"),
+            )
           }
         } else {
           if (daoUpdate(roomHolding) > ROOM_ROW_COUNT_UPDATE_INVALID) {
             DbInsert.InsertResult.Update(roomHolding)
           } else {
-            DbInsert.InsertResult.Fail(IllegalStateException("Unable to update holding $roomHolding"))
+            DbInsert.InsertResult.Fail(
+                data = roomHolding,
+                error = IllegalStateException("Unable to update holding $roomHolding"),
+            )
           }
         }
       }

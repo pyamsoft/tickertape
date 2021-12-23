@@ -42,14 +42,18 @@ internal abstract class RoomPositionInsertDao : PositionInsertDao {
             DbInsert.InsertResult.Insert(roomPosition)
           } else {
             DbInsert.InsertResult.Fail(
-                IllegalStateException("Unable to insert position $roomPosition"))
+                data = roomPosition,
+                error = IllegalStateException("Unable to insert position $roomPosition"),
+            )
           }
         } else {
           if (daoUpdate(roomPosition) > ROOM_ROW_COUNT_UPDATE_INVALID) {
             DbInsert.InsertResult.Update(roomPosition)
           } else {
             DbInsert.InsertResult.Fail(
-                IllegalStateException("Unable to insert position $roomPosition"))
+                data = roomPosition,
+                error = IllegalStateException("Unable to insert position $roomPosition"),
+            )
           }
         }
       }

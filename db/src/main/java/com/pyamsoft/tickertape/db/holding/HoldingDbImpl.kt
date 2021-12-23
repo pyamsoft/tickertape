@@ -67,7 +67,7 @@ internal constructor(
         queryCache.clear()
       }
 
-  override suspend fun listenForChanges(onChange: suspend (event: HoldingChangeEvent) -> Unit) =
+  override suspend fun listenForChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         onEvent(onChange)

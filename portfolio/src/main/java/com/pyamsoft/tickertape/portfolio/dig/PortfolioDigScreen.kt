@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.chart.PorfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.quote.Chart
@@ -31,6 +33,7 @@ fun PortfolioDigScreen(
     onTabUpdated: (PortfolioDigSections) -> Unit,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
+    onDeletePosition: (DbPosition) -> Unit,
 ) {
   val ticker = state.ticker
   val isLoading = state.isLoading
@@ -66,6 +69,7 @@ fun PortfolioDigScreen(
               onRangeSelected = onRangeSelected,
               onRefresh = onRefresh,
               onAddPosition = onAddPosition,
+              onDeletePosition = onDeletePosition,
           )
         }
       }
@@ -82,6 +86,7 @@ private fun Content(
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
+    onDeletePosition: (DbPosition) -> Unit,
 ) {
   Crossfade(
       modifier = modifier,
@@ -98,11 +103,12 @@ private fun Content(
       }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.75F),
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,
             currentPrice = currentPrice,
+            onDeletePosition = onDeletePosition,
         )
       }
     }
@@ -134,5 +140,6 @@ private fun PreviewPortfolioDigScreen() {
       onTabUpdated = {},
       onRefresh = {},
       onAddPosition = {},
+      onDeletePosition = {},
   )
 }

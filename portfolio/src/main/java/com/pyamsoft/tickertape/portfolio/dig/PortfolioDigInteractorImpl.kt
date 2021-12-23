@@ -22,7 +22,10 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
+import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import javax.inject.Inject
@@ -38,7 +41,26 @@ internal constructor(
     interactor: TickerInteractor,
     private val holdingQueryDao: HoldingQueryDao,
     private val positionQueryDao: PositionQueryDao,
+    private val positionRealtime: PositionRealtime,
+    private val positionDeleteDao: PositionDeleteDao,
 ) : DigInteractorImpl(interactor), PortfolioDigInteractor {
+
+  override suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(positionDeleteDao.delete(position, offerUndo = true))
+        } catch (e: Throwable) {
+          Timber.e(e, "Failed to delete position: $position")
+          ResultWrapper.failure(e)
+        }
+      }
+
+  override suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        return@withContext positionRealtime.listenForChanges(onEvent)
+      }
 
   override suspend fun getHolding(
       force: Boolean,

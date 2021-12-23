@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,6 +43,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -49,7 +51,6 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
@@ -76,12 +77,20 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
   private fun handleAddPosition() {
     val holdingId = getHoldingId()
-    Timber.d("Add new position to holding: $holdingId")
     PositionAddDialog.show(
         activity = requireActivity(),
         symbol = getSymbol(),
         holdingId = holdingId,
     )
+  }
+
+  private fun handleDeletePosition(position: DbPosition) {
+    viewModel
+        .requireNotNull()
+        .handleDeletePosition(
+            scope = viewLifecycleOwner.lifecycleScope,
+            position = position,
+        )
   }
 
   @CheckResult
@@ -146,6 +155,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
                 onTabUpdated = { vm.handleTabUpdated(it) },
                 onRefresh = { handleRefresh(true) },
                 onAddPosition = { handleAddPosition() },
+                onDeletePosition = { handleDeletePosition(it) },
             )
           }
         }
@@ -160,7 +170,11 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     super.onViewCreated(view, savedInstanceState)
     makeFullWidth()
 
-    viewModel.requireNotNull().restoreState(savedInstanceState)
+    viewModel.requireNotNull().also { vm ->
+      vm.restoreState(savedInstanceState)
+      vm.bind(scope = viewLifecycleOwner.lifecycleScope)
+    }
+
     handleRefresh(false)
   }
 

@@ -24,9 +24,9 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 
 interface PortfolioInteractor {
 
-  suspend fun listenForHoldingChanges(onChange: suspend (event: HoldingChangeEvent) -> Unit)
+  suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit)
 
-  suspend fun listenForPositionChanges(onChange: suspend (event: PositionChangeEvent) -> Unit)
+  suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit)
 
   @CheckResult suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>>
 

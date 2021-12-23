@@ -31,10 +31,10 @@ internal abstract class BaseDbImpl<
 
   private val bus = EventBus.create<ChangeEvent>()
 
-  protected suspend fun onEvent(onEvent: suspend (event: ChangeEvent) -> Unit) =
+  protected suspend fun onEvent(onEvent: (event: ChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext bus.onEvent(onEvent)
+        return@withContext bus.onEvent { onEvent(it) }
       }
 
   protected suspend fun publish(event: ChangeEvent) =

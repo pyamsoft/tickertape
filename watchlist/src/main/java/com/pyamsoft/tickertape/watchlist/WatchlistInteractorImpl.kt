@@ -42,7 +42,7 @@ internal constructor(
     private val interactor: TickerInteractor,
 ) : WatchlistInteractor {
 
-  override suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit) =
+  override suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         return@withContext symbolRealtime.listenForChanges(onChange)

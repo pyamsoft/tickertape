@@ -18,5 +18,5 @@ package com.pyamsoft.tickertape.db
 
 interface DbRealtime<T : Any> {
 
-  suspend fun listenForChanges(onChange: suspend (event: T) -> Unit)
+  suspend fun listenForChanges(onChange: (event: T) -> Unit)
 }

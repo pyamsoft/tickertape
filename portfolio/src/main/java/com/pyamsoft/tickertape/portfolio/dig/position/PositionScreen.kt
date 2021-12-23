@@ -2,6 +2,8 @@ package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,10 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import timber.log.Timber
 
 private const val POSITIONS_LIST_MAX_HEIGHT = 360
 private const val FAB_OFFSET = 56 + 16
@@ -40,6 +44,7 @@ internal fun PositionScreen(
     currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
+    onDeletePosition: (DbPosition) -> Unit,
 ) {
   Box(
       modifier = modifier,
@@ -50,6 +55,7 @@ internal fun PositionScreen(
         state = state,
         currentPrice = currentPrice,
         onRefresh = onRefresh,
+        onDeletePosition = onDeletePosition,
     )
 
     PositionsAdd(
@@ -60,11 +66,13 @@ internal fun PositionScreen(
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun PositionsList(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
+    onDeletePosition: (DbPosition) -> Unit,
 ) {
   val isLoading = state.isLoading
   val positions = state.positions
@@ -82,7 +90,12 @@ private fun PositionsList(
           key = { it.id().id },
       ) { item ->
         PositionItem(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .combinedClickable(
+                        onClick = { Timber.d("Click on item: $item") },
+                        onLongClick = { onDeletePosition(item) },
+                    ),
             position = item,
             currentPrice = currentPrice,
         )
@@ -141,5 +154,6 @@ private fun PreviewPositionScreen() {
       currentPrice = null,
       onAddPosition = {},
       onRefresh = {},
+      onDeletePosition = {},
   )
 }

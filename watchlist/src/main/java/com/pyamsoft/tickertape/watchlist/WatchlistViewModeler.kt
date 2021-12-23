@@ -47,27 +47,27 @@ internal constructor(
 
   fun bind(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
-      interactor.listenForChanges { handleRealtimeEvent(it) }
+      interactor.listenForChanges { handleRealtimeEvent(scope, it) }
     }
   }
 
-  private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
+  private fun handleRealtimeEvent(scope: CoroutineScope, event: SymbolChangeEvent) =
       when (event) {
         is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
-        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol())
-        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
+        is SymbolChangeEvent.Insert -> handleInsertSymbol(scope, event.symbol.symbol())
+        is SymbolChangeEvent.Update -> handleUpdateSymbol(scope, event.symbol.symbol())
       }
 
-  private fun CoroutineScope.handleInsertSymbol(symbol: StockSymbol) {
+  private fun handleInsertSymbol(scope: CoroutineScope, symbol: StockSymbol) {
     // Don't actually insert anything to the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    handleRefreshList(scope = this, force = true)
+    handleRefreshList(scope = scope, force = true)
   }
 
-  private fun CoroutineScope.handleUpdateSymbol(symbol: StockSymbol) {
+  private fun handleUpdateSymbol(scope: CoroutineScope, symbol: StockSymbol) {
     // Don't actually update anything in the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    handleRefreshList(scope = this, force = true)
+    handleRefreshList(scope = scope, force = true)
   }
 
   private fun handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {

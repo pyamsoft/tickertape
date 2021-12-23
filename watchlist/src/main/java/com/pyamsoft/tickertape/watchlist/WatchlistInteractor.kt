@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface WatchlistInteractor {
 
-  suspend fun listenForChanges(onChange: suspend (event: SymbolChangeEvent) -> Unit)
+  suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit)
 
   @CheckResult suspend fun getQuotes(force: Boolean): ResultWrapper<List<Ticker>>
 

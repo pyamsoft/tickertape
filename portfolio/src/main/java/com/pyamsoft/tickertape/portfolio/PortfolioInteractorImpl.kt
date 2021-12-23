@@ -29,13 +29,13 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 import timber.log.Timber
 
 @Singleton
@@ -50,17 +50,13 @@ internal constructor(
     private val interactor: TickerInteractor,
 ) : PortfolioInteractor {
 
-  override suspend fun listenForHoldingChanges(
-      onChange: suspend (event: HoldingChangeEvent) -> Unit
-  ) =
+  override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         holdingRealtime.listenForChanges(onChange)
       }
 
-  override suspend fun listenForPositionChanges(
-      onChange: suspend (event: PositionChangeEvent) -> Unit
-  ) =
+  override suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         positionRealtime.listenForChanges(onChange)

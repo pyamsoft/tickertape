@@ -53,7 +53,7 @@ internal constructor(
   }
 
   fun bind(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Default) {
+    scope.launch(context = Dispatchers.Main) {
       datePickerEventBus.onEvent { e ->
         if (e.positionId == state.positionId) {
           val dateOfPurchase = LocalDate.of(e.year, e.month, e.dayOfMonth)

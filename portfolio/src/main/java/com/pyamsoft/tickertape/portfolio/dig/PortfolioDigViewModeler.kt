@@ -21,6 +21,7 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PortfolioDigViewModeler
 @Inject
@@ -41,6 +43,9 @@ internal constructor(
         state,
         interactor,
     ) {
+
+  private val deleteRunner =
+      highlander<ResultWrapper<Boolean>, DbPosition> { interactor.deletePositon(it) }
 
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
@@ -108,6 +113,73 @@ internal constructor(
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
       loadRunner.call(force).also { state.isLoading = false }
+    }
+  }
+
+  private fun onPositionChangeEvent(event: PositionChangeEvent) {
+    return when (event) {
+      is PositionChangeEvent.Delete -> onPostionDeleted(event.position, event.offerUndo)
+      is PositionChangeEvent.Insert -> onPositionInserted(event.position)
+      is PositionChangeEvent.Update -> onPositionUpdated(event.position)
+    }
+  }
+
+  private fun onPositionInsertOrUpdate(position: DbPosition) {
+    val s = state
+    val newPositions =
+        s.positions.toMutableList().apply {
+          val index =
+              this.indexOfFirst {
+                it.holdingId() == position.holdingId() && it.id() == position.id()
+              }
+
+          if (index < 0) {
+            // No index, this is a new item
+            add(position)
+          } else {
+            // Update existing item at index
+            set(index, position)
+          }
+        }
+    s.positions = newPositions
+  }
+
+  private fun onPositionUpdated(position: DbPosition) {
+    onPositionInsertOrUpdate(position)
+  }
+
+  private fun onPositionInserted(position: DbPosition) {
+    onPositionInsertOrUpdate(position)
+  }
+
+  private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
+    // TODO handle offerUndo?
+    val s = state
+    s.positions =
+        s.positions.filter { it.holdingId() == position.holdingId() && it.id() == position.id() }
+  }
+
+  fun bind(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      interactor.watchPositions { onPositionChangeEvent(it) }
+    }
+  }
+
+  fun handleDeletePosition(
+      scope: CoroutineScope,
+      position: DbPosition,
+  ) {
+    scope.launch(context = Dispatchers.Main) {
+      deleteRunner
+          .call(position)
+          .onFailure { Timber.e(it, "Failed to delete position: $position") }
+          .onSuccess { deleted ->
+            if (deleted) {
+              Timber.d("Position deleted: $position")
+            } else {
+              Timber.w("Position was not deleted: $position")
+            }
+          }
     }
   }
 

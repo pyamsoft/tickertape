@@ -103,7 +103,8 @@ private fun Content(
       }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.75F),
+            // At most this is slightly larger than half the screen in height
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6F),
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,

@@ -33,7 +33,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import timber.log.Timber
 
-private const val POSITIONS_LIST_MAX_HEIGHT = 360
 private const val FAB_OFFSET = 56 + 16
 
 @Composable
@@ -51,7 +50,7 @@ internal fun PositionScreen(
       contentAlignment = Alignment.BottomEnd,
   ) {
     PositionsList(
-        modifier = Modifier.fillMaxWidth().heightIn(max = POSITIONS_LIST_MAX_HEIGHT.dp),
+        modifier = Modifier.matchParentSize(),
         state = state,
         currentPrice = currentPrice,
         onRefresh = onRefresh,

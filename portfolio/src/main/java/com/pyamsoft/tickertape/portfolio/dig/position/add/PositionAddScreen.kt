@@ -50,11 +50,6 @@ fun PositionAddScreen(
 
   val isSubmitEnabled = remember(isSubmittable, isSubmitting) { isSubmittable && !isSubmitting }
   val isTextEntryEnabled = remember(isSubmitting) { !isSubmitting }
-  val displayDate =
-      remember(dateOfPurchase) {
-        if (dateOfPurchase == null) "--/--/----"
-        else dateOfPurchase.format(DateTimeFormatter.ISO_LOCAL_DATE)
-      }
 
   Column(
       modifier = modifier,
@@ -70,92 +65,151 @@ fun PositionAddScreen(
       Column(
           modifier = Modifier.fillMaxWidth().padding(16.dp),
       ) {
-        OutlinedTextField(
+        PricePerShare(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            enabled = isTextEntryEnabled,
-            readOnly = !isTextEntryEnabled,
-            value = pricePerShare,
-            onValueChange = onPriceChanged,
-            keyboardOptions =
-                KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                ),
-            label = {
-              Text(
-                  text = "Price per share",
-              )
-            },
-            leadingIcon = {
-              Icon(
-                  modifier = Modifier.padding(end = 4.dp),
-                  imageVector = Icons.Filled.Paid,
-                  contentDescription = "Price per share",
-              )
-            },
+            isEnabled = isTextEntryEnabled,
+            pricePerShare = pricePerShare,
+            onPriceChanged = onPriceChanged,
         )
 
-        OutlinedTextField(
+        NumberOfShares(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            enabled = isTextEntryEnabled,
-            readOnly = !isTextEntryEnabled,
-            value = numberOfShares,
-            onValueChange = onNumberChanged,
-            keyboardOptions =
-                KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                ),
-            label = {
-              Text(
-                  text = "Number of shares",
-              )
-            },
-            leadingIcon = {
-              Icon(
-                  modifier = Modifier.padding(end = 4.dp),
-                  imageVector = Icons.Filled.Tag,
-                  contentDescription = "Number of shares",
-              )
-            },
+            isEnabled = isTextEntryEnabled,
+            numberOfShares = numberOfShares,
+            onNumberChanged = onNumberChanged,
         )
 
-        Row(
+        DateOfPurchase(
             modifier =
-                Modifier.clickable { onDateOfPurchaseClicked(dateOfPurchase) }
-                    .padding(top = 8.dp)
-                    .padding(bottom = 16.dp)
-                    .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Icon(
-              modifier = Modifier.padding(end = 20.dp).alpha(TextFieldDefaults.IconOpacity),
-              imageVector = Icons.Filled.Today,
-              contentDescription = "Number of shares",
-          )
-          Text(
-              text = displayDate,
-              style = MaterialTheme.typography.body1,
-          )
-        }
+                Modifier.padding(top = 8.dp).padding(bottom = 16.dp).padding(horizontal = 8.dp),
+            dateOfPurchase = dateOfPurchase,
+            onDateOfPurchaseClicked = onDateOfPurchaseClicked,
+        )
 
-        Row(
+        SubmitSection(
             modifier = Modifier.padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Spacer(
-              modifier = Modifier.weight(1F),
-          )
-          Button(
-              onClick = onSubmit,
-              enabled = isSubmitEnabled,
-          ) {
-            Text(
-                text = "Submit",
-            )
-          }
-        }
+            isEnabled = isSubmitEnabled,
+            onSubmit = onSubmit,
+        )
       }
     }
   }
+}
+
+@Composable
+private fun SubmitSection(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean,
+    onSubmit: () -> Unit,
+) {
+  Row(
+      modifier = modifier,
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Spacer(
+        modifier = Modifier.weight(1F),
+    )
+    Button(
+        onClick = onSubmit,
+        enabled = isEnabled,
+    ) {
+      Text(
+          text = "Submit",
+      )
+    }
+  }
+}
+
+@Composable
+private fun DateOfPurchase(
+    modifier: Modifier = Modifier,
+    dateOfPurchase: LocalDate?,
+    onDateOfPurchaseClicked: (LocalDate?) -> Unit
+) {
+  val displayDate =
+      remember(dateOfPurchase) {
+        if (dateOfPurchase == null) "--/--/----"
+        else dateOfPurchase.format(DateTimeFormatter.ISO_LOCAL_DATE)
+      }
+
+  Row(
+      modifier = modifier.clickable { onDateOfPurchaseClicked(dateOfPurchase) },
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(
+        modifier = Modifier.padding(end = 20.dp).alpha(TextFieldDefaults.IconOpacity),
+        imageVector = Icons.Filled.Today,
+        contentDescription = "Number of shares",
+    )
+    Text(
+        text = displayDate,
+        style = MaterialTheme.typography.body1,
+    )
+  }
+}
+
+@Composable
+private fun NumberOfShares(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean,
+    numberOfShares: String,
+    onNumberChanged: (String) -> Unit,
+) {
+  OutlinedTextField(
+      modifier = modifier,
+      enabled = isEnabled,
+      readOnly = !isEnabled,
+      value = numberOfShares,
+      onValueChange = onNumberChanged,
+      keyboardOptions =
+          KeyboardOptions(
+              keyboardType = KeyboardType.Number,
+          ),
+      label = {
+        Text(
+            text = "Number of shares",
+        )
+      },
+      leadingIcon = {
+        Icon(
+            modifier = Modifier.padding(end = 4.dp),
+            imageVector = Icons.Filled.Tag,
+            contentDescription = "Number of shares",
+        )
+      },
+  )
+}
+
+@Composable
+private fun PricePerShare(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean,
+    pricePerShare: String,
+    onPriceChanged: (String) -> Unit,
+) {
+  OutlinedTextField(
+      modifier = modifier,
+      enabled = isEnabled,
+      readOnly = !isEnabled,
+      value = pricePerShare,
+      onValueChange = onPriceChanged,
+      keyboardOptions =
+          KeyboardOptions(
+              keyboardType = KeyboardType.Number,
+          ),
+      label = {
+        Text(
+            text = "Price per share",
+        )
+      },
+      leadingIcon = {
+        Icon(
+            modifier = Modifier.padding(end = 4.dp),
+            imageVector = Icons.Filled.Paid,
+            contentDescription = "Price per share",
+        )
+      },
+  )
 }
 
 @Preview

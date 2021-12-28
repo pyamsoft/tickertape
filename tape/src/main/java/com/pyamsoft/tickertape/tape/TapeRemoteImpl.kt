@@ -110,6 +110,6 @@ internal constructor(
 
     private val CHANNEL_INFO =
         NotifyChannelInfo(
-            id = "channel_tickers_foreground", title = "My Watchlist", description = "My Watchlist")
+            id = "channel_tickers_foreground_v1", title = "My Watchlist", description = "My Watchlist")
   }
 }

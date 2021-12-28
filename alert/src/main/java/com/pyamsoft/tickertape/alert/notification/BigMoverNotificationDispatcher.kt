@@ -151,6 +151,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
         .setContentIntent(getActivityPendingIntent(symbol))
         .setContentTitle(title)
         .setContentText(description)
+        .setCategory(NotificationCompat.CATEGORY_REMINDER)
         .build()
   }
 

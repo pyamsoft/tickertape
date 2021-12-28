@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -80,8 +81,10 @@ internal constructor(
             ResultWrapper.success(tickers)
           }
         } catch (e: Exception) {
-          Timber.e(e, "Error getting tickers: $symbols $range")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting tickers: $symbols $range")
+            ResultWrapper.failure(e)
+          }
         }
       }
 

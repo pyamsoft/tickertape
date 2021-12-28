@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.getWatchListQuotes
@@ -73,8 +74,10 @@ internal constructor(
           .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
           .recover { emptyList() }
     } catch (e: Throwable) {
-      Timber.e(e, "Error fetching quotes")
-      ResultWrapper.failure(e)
+      e.ifNotCancellation {
+        Timber.e(e, "Error fetching quotes")
+        ResultWrapper.failure(e)
+      }
     }
   }
 
@@ -110,6 +113,8 @@ internal constructor(
 
     private val CHANNEL_INFO =
         NotifyChannelInfo(
-            id = "channel_tickers_foreground_v1", title = "My Watchlist", description = "My Watchlist")
+            id = "channel_tickers_foreground_v1",
+            title = "My Watchlist",
+            description = "My Watchlist")
   }
 }

@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
@@ -40,8 +41,10 @@ class SymbolAddInteractor @Inject internal constructor(private val interactor: S
               val results = interactor.search(force, query)
               ResultWrapper.success(results)
             } catch (e: Throwable) {
-              Timber.e(e, "Failed to search for '$query'")
-              ResultWrapper.failure(e)
+              e.ifNotCancellation {
+                Timber.e(e, "Failed to search for '$query'")
+                ResultWrapper.failure(e)
+              }
             }
 
         return@withContext result.onFailure { Timber.e(it, "Search failed") }

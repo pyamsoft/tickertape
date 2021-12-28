@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
@@ -103,8 +104,10 @@ internal constructor(
                 }
           }
         } catch (e: Throwable) {
-          Timber.e(e, "Failed to get quotes for portfolio")
-          return@withContext ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to get quotes for portfolio")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -117,8 +120,10 @@ internal constructor(
           // TODO move this query into the DAO layer
           ResultWrapper.success(holdingDeleteDao.delete(holding, offerUndo = true))
         } catch (e: Throwable) {
-          Timber.e(e, "Error removing holding $holding")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error removing holding $holding")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

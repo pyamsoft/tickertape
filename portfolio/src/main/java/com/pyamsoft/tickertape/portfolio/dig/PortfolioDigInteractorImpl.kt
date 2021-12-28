@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -51,8 +52,10 @@ internal constructor(
         return@withContext try {
           ResultWrapper.success(positionDeleteDao.delete(position, offerUndo = true))
         } catch (e: Throwable) {
-          Timber.e(e, "Failed to delete position: $position")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to delete position: $position")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -73,8 +76,10 @@ internal constructor(
           val holding = holdingQueryDao.query(force).firstOrNull { it.id() == id }
           ResultWrapper.success(holding.requireNotNull { "Unable to find holding with id: $id" })
         } catch (e: Throwable) {
-          Timber.e(e, "Failed to get db holding: $id")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to get db holding: $id")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -89,8 +94,10 @@ internal constructor(
           val positions = positionQueryDao.query(force).filter { it.holdingId() == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
-          Timber.e(e, "Failed to get db positions: $id")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to get db positions: $id")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

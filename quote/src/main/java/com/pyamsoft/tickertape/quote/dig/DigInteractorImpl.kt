@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote.dig
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -47,8 +48,10 @@ protected constructor(
               )
               .map { it.first() }
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting quote: $symbol")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting quote: $symbol")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

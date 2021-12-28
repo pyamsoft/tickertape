@@ -83,7 +83,7 @@ class TapeService : Service() {
 
     val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
 
-    serviceScope.launch(context = Dispatchers.Default) {
+    serviceScope.launch(context = Dispatchers.Main) {
       tapeRemote
           .requireNotNull()
           .updateNotification(

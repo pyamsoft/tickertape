@@ -2,6 +2,7 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
@@ -27,8 +28,10 @@ internal constructor(
           val result = positionInsertDao.insert(position)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
-          Timber.e(e, "Error inserting new position")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error inserting new position")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

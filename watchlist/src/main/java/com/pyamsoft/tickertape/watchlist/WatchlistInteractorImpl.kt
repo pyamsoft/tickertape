@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist
 
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -55,8 +56,10 @@ internal constructor(
         return@withContext try {
           interactor.getWatchListQuotes(force, symbolQueryDao)
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting quotes")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting quotes")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -75,8 +78,10 @@ internal constructor(
 
           ResultWrapper.success(symbolDeleteDao.delete(dbSymbol, offerUndo = true))
         } catch (e: Throwable) {
-          Timber.e(e, "Error removing quote: $symbol")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error removing quote: $symbol")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

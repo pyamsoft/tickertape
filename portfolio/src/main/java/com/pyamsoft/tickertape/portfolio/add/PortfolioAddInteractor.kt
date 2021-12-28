@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
@@ -58,10 +59,12 @@ internal constructor(
           }
 
           val newHolding = JsonMappableDbHolding.create(symbol, type, realEquityType, side)
-          return@withContext holdingInsertDao.insert(newHolding).run { ResultWrapper.success(Unit) }
+          holdingInsertDao.insert(newHolding).run { ResultWrapper.success(Unit) }
         } catch (e: Throwable) {
-          Timber.e(e, "Error committing symbol: $symbol")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error committing symbol: $symbol")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

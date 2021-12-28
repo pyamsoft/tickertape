@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.home
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -73,8 +74,10 @@ internal constructor(
           val top = stockInteractor.getDayGainers(force, count)
           getCharts(force, top.quotes())
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting day gainers")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting day gainers")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -89,8 +92,10 @@ internal constructor(
           val top = stockInteractor.getDayLosers(force, count)
           getCharts(force, top.quotes())
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting day losers")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting day losers")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -106,8 +111,10 @@ internal constructor(
           val top = stockInteractor.getMostShorted(force, count)
           getCharts(force, top.quotes())
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting most shorted")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting most shorted")
+            ResultWrapper.failure(e)
+          }
         }
       }
 
@@ -123,8 +130,10 @@ internal constructor(
           val trend = stockInteractor.getTrending(force, count)
           lookupCharts(force, trend.symbols())
         } catch (e: Throwable) {
-          Timber.e(e, "Error getting day trending")
-          ResultWrapper.failure(e)
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting day trending")
+            ResultWrapper.failure(e)
+          }
         }
       }
 }

@@ -61,7 +61,7 @@ internal constructor(
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val notificationGroup = NotificationChannelGroup(channelInfo.id, channelInfo.title)
+      val notificationGroup = NotificationChannelGroup("${channelInfo.id} Group", "${channelInfo.title} Group")
       val notificationChannel =
           NotificationChannel(
                   channelInfo.id, channelInfo.title, NotificationManager.IMPORTANCE_MIN)

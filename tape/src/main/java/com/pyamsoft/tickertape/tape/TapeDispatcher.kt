@@ -75,6 +75,7 @@ internal constructor(
 
       Timber.d("Create notification channel and group: ${channelInfo.id} ${channelInfo.title}")
       channelCreator.apply {
+        deleteNotificationChannelGroup(channelInfo.id)
         createNotificationChannelGroup(notificationGroup)
         createNotificationChannel(notificationChannel)
       }

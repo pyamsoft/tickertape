@@ -191,6 +191,7 @@ internal constructor(
         .setSilent(true)
         .setContentIntent(getActivityPendingIntent())
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
+        .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_DEFERRED)
   }
 
   @CheckResult

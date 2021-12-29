@@ -53,6 +53,7 @@ internal fun HomeWatchlist(
 
   val count = remember(tickers) { tickers.size }
   val isVisible = remember(count) { count > 0 }
+  val isListVisible = remember(isVisible, isLoading) { isVisible || isLoading }
 
   Crossfade(
       modifier = modifier,
@@ -74,25 +75,22 @@ internal fun HomeWatchlist(
           )
         }
 
-        val columnScope = this
-        Box(
+        AnimatedVisibility(
             modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP.dp),
+            visible = isListVisible,
         ) {
-          columnScope.AnimatedVisibility(
-              modifier = Modifier.matchParentSize(),
-              visible = isVisible,
-          ) {
+          Box {
             TickerList(
                 modifier = Modifier.matchParentSize(),
                 tickers = tickers,
                 onClick = onClicked,
             )
-          }
 
-          Loading(
-              isLoading = isLoading,
-              modifier = Modifier.matchParentSize(),
-          )
+            Loading(
+                isLoading = isLoading,
+                modifier = Modifier.matchParentSize(),
+            )
+          }
         }
       }
     } else {

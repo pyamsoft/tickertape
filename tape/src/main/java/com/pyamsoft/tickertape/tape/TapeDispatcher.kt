@@ -71,7 +71,7 @@ internal constructor(
       channelCreator.apply {
         // Delete the group if it already exists with a bad group ID
         // Group ID and channel ID cannot match
-        if (notificationChannelGroups.first { it.id == channelInfo.id } != null) {
+        if (notificationChannelGroups.firstOrNull { it.id == channelInfo.id } != null) {
           deleteNotificationChannelGroup(channelInfo.id)
         }
         createNotificationChannelGroup(notificationGroup)

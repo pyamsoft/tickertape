@@ -16,6 +16,18 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.dig.DigInteractor
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface WatchlistDigInteractor : DigInteractor
+interface WatchlistDigInteractor : DigInteractor {
+
+  @CheckResult suspend fun modifyWatchlist(symbol: StockSymbol): ResultWrapper<Boolean>
+
+  @CheckResult
+  suspend fun isInWatchlist(
+      symbol: StockSymbol,
+      force: Boolean,
+  ): ResultWrapper<Boolean>
+}

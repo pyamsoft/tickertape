@@ -25,9 +25,9 @@ fun WatchlistDigScreen(
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onModifyWatchlist: () -> Unit,
 ) {
   val isLoading = state.isLoading
-  val ticker = state.ticker
 
   Surface(
       modifier = modifier,
@@ -36,8 +36,10 @@ fun WatchlistDigScreen(
         modifier = Modifier.fillMaxWidth(),
     ) {
       WatchlistDigToolbar(
-          ticker = ticker,
+          modifier = Modifier.fillMaxWidth(),
+          state = state,
           onClose = onClose,
+          onModifyWatchlist = onModifyWatchlist,
       )
 
       Crossfade(
@@ -78,9 +80,11 @@ private fun PreviewWatchlistDigScreen() {
       state =
           MutableWatchlistDigViewState(
               symbol = "MSFT".asSymbol(),
+              allowModifyWatchlist = true,
           ),
       onClose = {},
       onScrub = {},
       onRangeSelected = {},
+      onModifyWatchlist = {},
   )
 }

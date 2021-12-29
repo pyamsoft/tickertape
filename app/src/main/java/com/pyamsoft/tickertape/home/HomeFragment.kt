@@ -53,7 +53,11 @@ class HomeFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenDigDialog(ticker: Ticker) {
-    WatchlistDigDialog.show(requireActivity(), ticker.symbol)
+    WatchlistDigDialog.show(
+        requireActivity(),
+        ticker.symbol,
+        allowModifyWatchlist = true,
+    )
   }
 
   private fun handleRefresh(force: Boolean) {

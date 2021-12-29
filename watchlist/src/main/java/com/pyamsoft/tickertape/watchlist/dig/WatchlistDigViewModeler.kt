@@ -18,18 +18,16 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 class WatchlistDigViewModeler
 @Inject
 internal constructor(
     private val state: MutableWatchlistDigViewState,
-    interactor: WatchlistDigInteractor,
+    private val interactor: WatchlistDigInteractor,
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
         state,
@@ -37,22 +35,74 @@ internal constructor(
     ) {
 
   private val loadRunner =
-      highlander<ResultWrapper<Ticker>, Boolean> { force -> onLoadTicker(force) }
+      highlander<Unit, Boolean> { force ->
+        awaitAll(
+            async { handleLoadTicker(force) },
+            async { handleIsInWatchlist(force) },
+        )
+      }
+
+  private val watchlistModifyRunner =
+      highlander<ResultWrapper<Boolean>> {
+        interactor.modifyWatchlist(
+            symbol = state.ticker.symbol,
+        )
+      }
+
+  private suspend fun handleIsInWatchlist(force: Boolean) {
+    interactor
+        .isInWatchlist(symbol = state.ticker.symbol, force)
+        .onSuccess { s ->
+          Timber.d("Symbol is in watchlist: $s")
+          state.isInWatchlist = s
+        }
+        .onFailure { e ->
+          Timber.e(e, "Error loading symbol in watchlist")
+          // Don't need to clear the ticker since last loaded state was valid
+          state.error = e
+        }
+  }
+
+  private suspend fun handleLoadTicker(force: Boolean) {
+    onLoadTicker(force)
+        .onSuccess {
+          // Clear the error on load success
+          state.error = null
+        }
+        .onFailure {
+          // Don't need to clear the ticker since last loaded state was valid
+          state.error = it
+        }
+  }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
-      loadRunner
-          .call(force)
-          .onSuccess {
-            // Clear the error on load success
-            state.error = null
+      try {
+        loadRunner.call(force)
+      } finally {
+        state.isLoading = false
+      }
+    }
+  }
+
+  fun handleModifyWatchlist(scope: CoroutineScope) {
+    val s = state
+    if (!s.isAllowModifyWatchlist) {
+      throw IllegalStateException("Add to watchlist handler called but not allowed here!")
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      watchlistModifyRunner
+          .call()
+          .onFailure { Timber.e(it, "Error adding symbol to watchlist") }
+          .onSuccess { s ->
+            Timber.d("Add symbol to watchlist: $s")
+            state.isInWatchlist = s
           }
           .onFailure {
-            // Don't need to clear the ticker since last loaded state was valid
-            state.error = it
+            // TODO handle error
           }
-          .onFinally { state.isLoading = false }
     }
   }
 }

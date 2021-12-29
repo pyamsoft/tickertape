@@ -209,7 +209,11 @@ internal class MainActivity : PYDroidActivity() {
 
     Timber.d("Launch intent with symbol: $symbol")
     notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
-    WatchlistDigDialog.show(this, symbol)
+    WatchlistDigDialog.show(
+        this,
+        symbol,
+        allowModifyWatchlist = false,
+    )
   }
 
   override fun onBackPressed() {

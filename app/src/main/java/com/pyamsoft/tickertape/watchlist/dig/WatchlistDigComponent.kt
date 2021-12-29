@@ -32,6 +32,7 @@ internal interface WatchlistDigComponent {
     @CheckResult
     fun create(
         @BindsInstance symbol: StockSymbol,
+        @BindsInstance allowAddToWatchlist: Boolean,
     ): WatchlistDigComponent
   }
 }

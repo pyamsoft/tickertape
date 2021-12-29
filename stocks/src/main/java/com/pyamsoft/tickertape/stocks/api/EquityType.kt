@@ -19,8 +19,8 @@ package com.pyamsoft.tickertape.stocks.api
 import androidx.annotation.CheckResult
 
 enum class EquityType(val display: String) {
-  STOCK("Stocks"),
-  OPTION("Options"),
+  STOCK("Stock"),
+  OPTION("Option"),
   CRYPTOCURRENCY("Cryptocurrency");
 
   companion object {

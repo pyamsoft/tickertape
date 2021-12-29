@@ -57,6 +57,16 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         .asSymbol()
   }
 
+  @CheckResult
+  private fun getAllowModifyWatchlist(): Boolean {
+    val args = requireArguments()
+    if (!args.containsKey(KEY_ALLOW_MODIFY)) {
+      throw IllegalArgumentException("Must be created with $KEY_ALLOW_MODIFY")
+    }
+
+    return args.getBoolean(KEY_ALLOW_MODIFY, false)
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -65,7 +75,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
         .plusWatchlistDigComponent()
-        .create(getSymbol())
+        .create(getSymbol(), getAllowModifyWatchlist())
         .inject(this)
 
     val vm = viewModel.requireNotNull()
@@ -86,6 +96,11 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
                   vm.handleRangeSelected(
                       scope = viewLifecycleOwner.lifecycleScope,
                       range = it,
+                  )
+                },
+                onModifyWatchlist = {
+                  vm.handleModifyWatchlist(
+                      scope = viewLifecycleOwner.lifecycleScope,
                   )
                 },
             )
@@ -133,19 +148,31 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_ALLOW_MODIFY = "key_allow_modify"
     private const val TAG = "WatchlistDigDialog"
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(symbol: StockSymbol): DialogFragment {
+    private fun newInstance(
+        symbol: StockSymbol,
+        allowModifyWatchlist: Boolean,
+    ): DialogFragment {
       return WatchlistDigDialog().apply {
-        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
+        arguments =
+            Bundle().apply {
+              putString(KEY_SYMBOL, symbol.symbol())
+              putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
+            }
       }
     }
 
     @JvmStatic
-    fun show(activity: FragmentActivity, symbol: StockSymbol) {
-      newInstance(symbol).show(activity, TAG)
+    fun show(
+        activity: FragmentActivity,
+        symbol: StockSymbol,
+        allowModifyWatchlist: Boolean,
+    ) {
+      newInstance(symbol, allowModifyWatchlist).show(activity, TAG)
     }
   }
 }

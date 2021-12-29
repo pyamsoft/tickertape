@@ -1,27 +1,28 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 internal fun WatchlistDigToolbar(
     modifier: Modifier = Modifier,
-    ticker: Ticker,
+    state: WatchlistDigViewState,
     onClose: () -> Unit,
+    onModifyWatchlist: () -> Unit,
 ) {
+  val isLoading = state.isLoading
+  val ticker = state.ticker
+  val isInWatchlist = state.isInWatchlist
+  val isAllowedToModifyWatchlist = state.isAllowModifyWatchlist
   val title = ticker.quote?.company()?.company() ?: ticker.symbol.symbol()
 
   TopAppBar(
@@ -45,7 +46,18 @@ internal fun WatchlistDigToolbar(
           )
         }
       },
-  )
+      actions = {
+        if (!isLoading && isAllowedToModifyWatchlist) {
+          IconButton(
+              onClick = onModifyWatchlist,
+          ) {
+            Icon(
+                imageVector = if (isInWatchlist) Icons.Filled.Star else Icons.Filled.StarBorder,
+                contentDescription = "${if (isInWatchlist) "Add to" else "Remove from"} Watchlist",
+            )
+          }
+        }
+      })
 }
 
 @Preview
@@ -53,12 +65,12 @@ internal fun WatchlistDigToolbar(
 private fun PreviewWatchlistDigToolbar() {
   val symbol = "MSFT".asSymbol()
   WatchlistDigToolbar(
-      ticker =
-          Ticker(
+      state =
+          MutableWatchlistDigViewState(
               symbol = symbol,
-              quote = newTestQuote(symbol),
-              chart = null,
+              allowModifyWatchlist = true,
           ),
       onClose = {},
+      onModifyWatchlist = {},
   )
 }

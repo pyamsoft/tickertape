@@ -19,17 +19,13 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +39,7 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 internal fun HomePortfolio(
     modifier: Modifier = Modifier,
     state: HomePortfolioViewState,
@@ -51,33 +48,44 @@ internal fun HomePortfolio(
   val portfolio = state.portfolio
   val error = state.portfolioError
 
+  val count = remember(portfolio) { portfolio.list.size }
+  val isVisible = remember(count) { count > 0 }
+  val isListVisible = remember(isVisible, isLoading) { isVisible || isLoading }
+
   Crossfade(
       modifier = modifier,
       targetState = error,
   ) { err ->
     if (err == null) {
       Column {
-        Text(
+        AnimatedVisibility(
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-            text = "My Portfolio Summary",
-            style =
-                MaterialTheme.typography.h6.copy(
-                    fontWeight = FontWeight.Bold,
-                ),
-        )
-
-        Box(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT_DP.dp),
+            visible = isVisible,
         ) {
-          HomePortfolioSummaryItem(
-              modifier = Modifier.matchParentSize().padding(horizontal = 16.dp),
-              portfolio = portfolio,
+          Text(
+              text = "My Portfolio Summary",
+              style =
+                  MaterialTheme.typography.h6.copy(
+                      fontWeight = FontWeight.Bold,
+                  ),
           )
+        }
 
-          Loading(
-              isLoading = isLoading,
-              modifier = Modifier.matchParentSize(),
-          )
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT_DP.dp),
+            visible = isListVisible,
+        ) {
+          Box {
+            HomePortfolioSummaryItem(
+                modifier = Modifier.matchParentSize().padding(horizontal = 16.dp),
+                portfolio = portfolio,
+            )
+
+            Loading(
+                isLoading = isLoading,
+                modifier = Modifier.matchParentSize(),
+            )
+          }
         }
       }
     } else {

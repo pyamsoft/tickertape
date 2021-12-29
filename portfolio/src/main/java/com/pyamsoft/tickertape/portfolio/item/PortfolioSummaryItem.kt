@@ -1,7 +1,10 @@
 package com.pyamsoft.tickertape.portfolio.item
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -17,6 +20,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 
 @Composable
 @JvmOverloads
+@OptIn(ExperimentalAnimationApi::class)
 fun PorfolioSummaryItem(
     modifier: Modifier = Modifier,
     portfolio: PortfolioStockList,
@@ -26,6 +30,7 @@ fun PorfolioSummaryItem(
   val changeToday = portfolio.changeTodayDisplayString
   val todayDirection = portfolio.sumTodayDirection
   val gainLoss = portfolio.gainLossDisplayString
+  val isVisible = remember(portfolio) { !portfolio.isEmpty }
 
   val totalComposeColor =
       if (totalDirection.isZero()) {
@@ -41,34 +46,39 @@ fun PorfolioSummaryItem(
         remember(todayDirection) { Color(todayDirection.color()) }
       }
 
-  Column(
+  AnimatedVisibility(
       modifier = modifier,
+      visible = isVisible,
   ) {
-    Text(
-        modifier = Modifier.padding(bottom = 8.dp),
-        text = totalAmount.asMoneyValue(),
-        style = MaterialTheme.typography.h3,
-    )
-
-    Text(
-        modifier = Modifier.padding(bottom = 8.dp),
-        text = gainLoss,
-        style = MaterialTheme.typography.h5.copy(color = totalComposeColor),
-    )
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        modifier = Modifier.fillMaxWidth(),
     ) {
       Text(
-          text = "Today",
-          style = MaterialTheme.typography.h6,
+          modifier = Modifier.padding(bottom = 8.dp),
+          text = totalAmount.asMoneyValue(),
+          style = MaterialTheme.typography.h3,
       )
 
       Text(
-          modifier = Modifier.padding(start = 8.dp),
-          text = changeToday,
-          style = MaterialTheme.typography.h6.copy(color = todayComposeColor),
+          modifier = Modifier.padding(bottom = 8.dp),
+          text = gainLoss,
+          style = MaterialTheme.typography.h5.copy(color = totalComposeColor),
       )
+
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+            text = "Today",
+            style = MaterialTheme.typography.h6,
+        )
+
+        Text(
+            modifier = Modifier.padding(start = 8.dp),
+            text = changeToday,
+            style = MaterialTheme.typography.h6.copy(color = todayComposeColor),
+        )
+      }
     }
   }
 }

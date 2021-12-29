@@ -18,12 +18,7 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.isZero
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.*
 
 class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
 
@@ -32,12 +27,12 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
   val sumTodayDirection: StockDirection
   val gainLossDisplayString: String
   val changeTodayDisplayString: String
+  val isEmpty = list.isEmpty()
 
   init {
     val filterOptions = { h: PortfolioStock -> h.holding.type() == EquityType.OPTION }
     val sumCostNumber =
-        if (list.isEmpty()) 0.0
-        else list.asSequence().filterNot(filterOptions).map { it.costNumber }.sum()
+        if (isEmpty) 0.0 else list.asSequence().filterNot(filterOptions).map { it.costNumber }.sum()
 
     val todays = list.asSequence().filterNot(filterOptions).map { it.todayNumber }.toList()
     val isAnyDayInvalid = todays.any { it == null }

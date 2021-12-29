@@ -30,7 +30,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.SearchBar
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.TickerTabs
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
 
@@ -44,7 +44,7 @@ fun WatchlistScreen(
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val loading = state.isLoading
 
@@ -80,7 +80,7 @@ private fun Content(
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val error = state.error
   val tickers = state.watchlist
@@ -119,12 +119,12 @@ private fun Watchlist(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
     search: String,
-    tab: TickerTabs,
+    tab: EquityType,
     navBarBottomHeight: Int,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =

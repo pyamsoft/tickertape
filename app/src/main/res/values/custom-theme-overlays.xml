@@ -29,4 +29,10 @@
         <item name="android:windowBackground">@drawable/dialog_background</item>
     </style>
 
+    <style name="Custom.ThemeOverlay.TickerTape.Dialog.DatePicker" parent="@style/Base.ThemeOverlay.TickerTape.Dialog.DatePicker">
+        <item name="dialogCornerRadius">16dp</item>
+
+        <item name="android:windowBackground">@drawable/datepicker_dialog_background</item>
+    </style>
+
 </resources>

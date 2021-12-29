@@ -22,12 +22,12 @@ import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.TickerTabs
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 
 interface WatchlistViewState : UiViewState {
   val query: String
-  val section: TickerTabs
+  val section: EquityType
   val isLoading: Boolean
   val watchlist: List<Ticker>
   val error: Throwable?
@@ -36,7 +36,7 @@ interface WatchlistViewState : UiViewState {
 @ActivityScope
 internal class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewState {
   override var query by mutableStateOf("")
-  override var section by mutableStateOf(TickerTabs.STOCKS)
+  override var section by mutableStateOf(EquityType.STOCK)
   override var isLoading by mutableStateOf(false)
   override var watchlist by mutableStateOf(emptyList<Ticker>())
   override var error by mutableStateOf<Throwable?>(null)

@@ -15,11 +15,16 @@
   -->
 
 <resources>
-    <item name="screen_home" type="id" />
-    <item name="screen_watchlist" type="id" />
-    <item name="screen_portfolio" type="id" />
-    <item name="dialog_watchlist_dig" type="id" />
-    <item name="dialog_portfolio_dig" type="id" />
-    <item name="dialog_position_add" type="id" />
-    <item name="bottom_sheet_add" type="id" />
+
+    <style name="Shape" />
+
+    <style name="Shape.TickerTape" />
+
+    <style name="Shape.TickerTape.BottomSheet" parent="">
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyTopRight">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+    </style>
+
 </resources>

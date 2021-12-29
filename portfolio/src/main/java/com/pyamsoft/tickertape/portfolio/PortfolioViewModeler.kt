@@ -27,7 +27,6 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
-import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -137,9 +136,9 @@ internal constructor(
         .filter { ps ->
           val type = ps.holding.type()
           return@filter when (section) {
-            TickerTabs.STOCKS -> type == EquityType.STOCK
-            TickerTabs.OPTIONS -> type == EquityType.OPTION
-            TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
+            EquityType.STOCK -> type == EquityType.STOCK
+            EquityType.OPTION -> type == EquityType.OPTION
+            EquityType.CRYPTOCURRENCY -> type == EquityType.CRYPTOCURRENCY
           }
         }
         .toList()
@@ -203,7 +202,7 @@ internal constructor(
     }
   }
 
-  fun handleSectionChanged(tab: TickerTabs) {
+  fun handleSectionChanged(tab: EquityType) {
     state.apply {
       this.section = tab
       regeneratePortfolio(fullPortfolio)

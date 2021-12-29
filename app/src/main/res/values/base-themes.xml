@@ -15,11 +15,9 @@
   -->
 
 <resources>
-    <item name="screen_home" type="id" />
-    <item name="screen_watchlist" type="id" />
-    <item name="screen_portfolio" type="id" />
-    <item name="dialog_watchlist_dig" type="id" />
-    <item name="dialog_portfolio_dig" type="id" />
-    <item name="dialog_position_add" type="id" />
-    <item name="bottom_sheet_add" type="id" />
+
+    <style name="Base.Theme.TickerTape" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <style name="Base.Theme.TickerTape.BottomSheet" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog" />
+
 </resources>

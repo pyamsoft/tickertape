@@ -20,4 +20,6 @@
 
     <style name="Base.ThemeOverlay.TickerTape.Dialog.Alert" parent="@style/ThemeOverlay.MaterialComponents.Dialog.Alert"/>
 
+    <style name="Base.ThemeOverlay.TickerTape.Dialog.DatePicker" parent="@style/ThemeOverlay.MaterialComponents.Dialog"/>
+
 </resources>

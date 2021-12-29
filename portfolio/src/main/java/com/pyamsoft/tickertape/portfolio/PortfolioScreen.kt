@@ -32,7 +32,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.SearchBar
-import com.pyamsoft.tickertape.quote.TickerTabs
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.FabDefaults
 
 @Composable
@@ -45,7 +45,7 @@ fun PortfolioScreen(
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val loading = state.isLoading
   val scaffoldState = rememberScaffoldState()
@@ -81,7 +81,7 @@ private fun Content(
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val error = state.error
   val portfolio = state.portfolio
@@ -124,11 +124,11 @@ private fun Portfolio(
     stocks: List<PortfolioStock>,
     search: String,
     navBarBottomHeight: Int,
-    tab: TickerTabs,
+    tab: EquityType,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =

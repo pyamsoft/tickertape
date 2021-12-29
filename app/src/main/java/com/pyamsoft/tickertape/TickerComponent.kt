@@ -21,8 +21,6 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.bus.EventBus
-import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.inject.AlertComponent
@@ -35,11 +33,11 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
-import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
-import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
+import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
+import com.pyamsoft.tickertape.quote.TickerAddComponent
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
@@ -107,6 +105,8 @@ internal interface TickerComponent {
   @CheckResult fun plusPortfolioDigComponent(): PortfolioDigComponent.Factory
 
   @CheckResult fun plusPositionAddComponent(): PositionAddComponent.Factory
+
+  @CheckResult fun plusTickerAddComponent(): TickerAddComponent.Factory
 
   @Component.Factory
   interface Factory {

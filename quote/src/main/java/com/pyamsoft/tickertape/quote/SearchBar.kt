@@ -23,15 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
 @JvmOverloads
 fun SearchBar(
     modifier: Modifier = Modifier,
     search: String,
-    currentTab: TickerTabs,
+    currentTab: EquityType,
     onSearchChanged: (String) -> Unit,
-    onTabUpdated: (TickerTabs) -> Unit,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   Surface(
       modifier = modifier.padding(horizontal = 8.dp),
@@ -53,7 +54,7 @@ fun SearchBar(
           backgroundColor = Color.Transparent,
           selectedTabIndex = currentTab.ordinal,
       ) {
-        TickerTabs.values().forEach { tab ->
+        EquityType.values().forEach { tab ->
           TickerTab(
               current = currentTab,
               tab = tab,
@@ -67,9 +68,9 @@ fun SearchBar(
 
 @Composable
 private fun TickerTab(
-    tab: TickerTabs,
-    current: TickerTabs,
-    onTabUpdated: (TickerTabs) -> Unit,
+    tab: EquityType,
+    current: EquityType,
+    onTabUpdated: (EquityType) -> Unit,
 ) {
   Tab(
       selected = tab == current,
@@ -132,7 +133,7 @@ private fun PreviewSearchBar() {
   SearchBar(
       search = "",
       onSearchChanged = {},
-      currentTab = TickerTabs.STOCKS,
+      currentTab = EquityType.STOCK,
       onTabUpdated = {},
   )
 }

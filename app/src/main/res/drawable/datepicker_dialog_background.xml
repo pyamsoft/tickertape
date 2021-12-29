@@ -13,13 +13,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<resources>
-    <item name="screen_home" type="id" />
-    <item name="screen_watchlist" type="id" />
-    <item name="screen_portfolio" type="id" />
-    <item name="dialog_watchlist_dig" type="id" />
-    <item name="dialog_portfolio_dig" type="id" />
-    <item name="dialog_position_add" type="id" />
-    <item name="bottom_sheet_add" type="id" />
-</resources>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:inset="16dp">
+    <shape android:shape="rectangle">
+        <corners android:radius="16dp" />
+        <solid android:color="@color/datePickerDialogBackgroundColor" />
+    </shape>
+</inset>

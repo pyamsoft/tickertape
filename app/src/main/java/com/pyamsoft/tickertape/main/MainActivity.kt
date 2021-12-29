@@ -38,7 +38,6 @@ import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
-import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
@@ -49,12 +48,10 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.initOnAppStart
-import com.pyamsoft.tickertape.portfolio.add.PortfolioAddDialog
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.quote.TickerAddSheet
+import com.pyamsoft.tickertape.quote.add.TickerAddDestination
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.watchlist.add.WatchlistAddDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -87,12 +84,8 @@ internal class MainActivity : PYDroidActivity() {
 
   private fun handleFabClicked(page: MainPage) {
     when (page) {
-      MainPage.WatchList ->
-          WatchlistAddDialog.newInstance(EquityType.STOCK, TradeSide.BUY)
-              .show(this, WatchlistAddDialog.TAG)
-      MainPage.Portfolio ->
-          PortfolioAddDialog.newInstance(EquityType.STOCK, TradeSide.BUY)
-              .show(this, PortfolioAddDialog.TAG)
+      MainPage.WatchList -> TickerAddSheet.show(this, TickerAddDestination.WATCHLIST)
+      MainPage.Portfolio -> TickerAddSheet.show(this, TickerAddDestination.PORTFOLIO)
       else -> Timber.w("FAB clicked but not Watchlist or Portfolio: $page")
     }
   }

@@ -24,7 +24,6 @@ import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.TickerTabs
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -99,9 +98,9 @@ internal constructor(
           // If the quote is null, always show this because it was a bad network fetch
           val type = qs.quote?.type() ?: return@filter true
           return@filter when (section) {
-            TickerTabs.STOCKS -> type == EquityType.STOCK
-            TickerTabs.OPTIONS -> type == EquityType.OPTION
-            TickerTabs.CRYPTO -> type == EquityType.CRYPTOCURRENCY
+            EquityType.STOCK -> type == EquityType.STOCK
+            EquityType.OPTION -> type == EquityType.OPTION
+            EquityType.CRYPTOCURRENCY -> type == EquityType.CRYPTOCURRENCY
           }
         }
         .toList()
@@ -146,7 +145,7 @@ internal constructor(
     }
   }
 
-  fun handleSectionChanged(tab: TickerTabs) {
+  fun handleSectionChanged(tab: EquityType) {
     state.apply {
       this.section = tab
       regenerateTickers(allTickers)

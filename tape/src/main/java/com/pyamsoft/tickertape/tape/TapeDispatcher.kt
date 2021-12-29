@@ -16,13 +16,7 @@
 
 package com.pyamsoft.tickertape.tape
 
-import android.app.Activity
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationChannelGroup
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -61,10 +55,10 @@ internal constructor(
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val notificationGroup = NotificationChannelGroup("${channelInfo.id} Group", "${channelInfo.title} Group")
+      val notificationGroup =
+          NotificationChannelGroup("${channelInfo.id} Group", "${channelInfo.title} Group")
       val notificationChannel =
-          NotificationChannel(
-                  channelInfo.id, channelInfo.title, NotificationManager.IMPORTANCE_MIN)
+          NotificationChannel(channelInfo.id, channelInfo.title, NotificationManager.IMPORTANCE_MIN)
               .apply {
                 group = notificationGroup.id
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -75,7 +69,11 @@ internal constructor(
 
       Timber.d("Create notification channel and group: ${channelInfo.id} ${channelInfo.title}")
       channelCreator.apply {
-        deleteNotificationChannelGroup(channelInfo.id)
+        // Delete the group if it already exists with a bad group ID
+        // Group ID and channel ID cannot match
+        if (notificationChannelGroups.first { it.id == channelInfo.id } != null) {
+          deleteNotificationChannelGroup(channelInfo.id)
+        }
         createNotificationChannelGroup(notificationGroup)
         createNotificationChannel(notificationChannel)
       }

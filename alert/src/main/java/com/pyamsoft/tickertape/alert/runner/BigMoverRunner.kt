@@ -144,11 +144,14 @@ internal constructor(
 
   companion object {
 
-    // Notify once every PERIOD hours
-    private const val NOTIFY_PERIOD = 2L
+    // Don't notify between periods
+    private const val NOTIFY_PERIOD = 6L
 
     private val CHANNEL_INFO =
         NotifyChannelInfo(
-            id = "channel_big_movers", title = "Big Movers", description = "Big Mover Alerts")
+            id = "channel_big_movers",
+            title = "Big Movers",
+            description = "Big Mover Alerts",
+        )
   }
 }

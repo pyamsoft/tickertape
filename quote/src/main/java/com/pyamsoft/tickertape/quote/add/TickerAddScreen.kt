@@ -34,44 +34,48 @@ fun TickerAddScreen(
   Surface(
       modifier = modifier,
   ) {
-    TopAppBar(
-        modifier = Modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = 0.dp,
-        contentColor = MaterialTheme.colors.onSurface,
-        title = {},
-        navigationIcon = {
-          IconButton(
-              onClick = onClose,
-          ) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Close",
-            )
-          }
-        },
-    )
-
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-      itemsIndexed(
-          items = EquityType.values(),
-          key = { _, item -> item.name },
-      ) { index, item ->
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-          if (index > 0) {
-            Divider(
+      TopAppBar(
+          modifier = Modifier.fillMaxWidth(),
+          backgroundColor = MaterialTheme.colors.surface,
+          elevation = 0.dp,
+          contentColor = MaterialTheme.colors.onSurface,
+          title = {},
+          navigationIcon = {
+            IconButton(
+                onClick = onClose,
+            ) {
+              Icon(
+                  imageVector = Icons.Filled.Close,
+                  contentDescription = "Close",
+              )
+            }
+          },
+      )
+
+      LazyColumn(
+          modifier = Modifier.fillMaxWidth(),
+      ) {
+        itemsIndexed(
+            items = EquityType.values(),
+            key = { _, item -> item.name },
+        ) { index, item ->
+          Column(
+              modifier = Modifier.fillMaxWidth(),
+          ) {
+            if (index > 0) {
+              Divider(
+                  modifier = Modifier.fillMaxWidth(),
+              )
+            }
+            TickerAddItem(
                 modifier = Modifier.fillMaxWidth(),
+                type = item,
+                onTypeSelected = onTypeSelected,
             )
           }
-          TickerAddItem(
-              modifier = Modifier.fillMaxWidth(),
-              type = item,
-              onTypeSelected = onTypeSelected,
-          )
         }
       }
     }

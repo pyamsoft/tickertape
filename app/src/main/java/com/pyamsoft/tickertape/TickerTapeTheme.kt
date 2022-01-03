@@ -66,7 +66,7 @@ private fun themeColors(isDarkMode: Boolean): Colors {
 @CheckResult
 private fun themeShapes(): Shapes {
   return Shapes(
-      medium = RoundedCornerShape(4.dp),
+      medium = RoundedCornerShape(16.dp),
   )
 }
 

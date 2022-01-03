@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -33,6 +34,11 @@ fun TickerAddScreen(
 ) {
   Surface(
       modifier = modifier,
+      shape =
+          MaterialTheme.shapes.medium.copy(
+              bottomStart = ZeroCornerSize,
+              bottomEnd = ZeroCornerSize,
+          ),
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

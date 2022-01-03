@@ -68,6 +68,7 @@ internal class TickerAddSheet : BottomSheetDialogFragment() {
         TickerTapeTheme(themeProvider) {
           TickerAddScreen(
               modifier = Modifier.fillMaxWidth(),
+              onClose = { dismiss() },
               onTypeSelected = { handleAddTypeSelected(it) },
           )
         }

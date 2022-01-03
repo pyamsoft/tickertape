@@ -1,13 +1,22 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,27 +29,50 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 fun TickerAddScreen(
     modifier: Modifier = Modifier,
     onTypeSelected: (EquityType) -> Unit,
+    onClose: () -> Unit,
 ) {
-  LazyColumn(
+  Surface(
       modifier = modifier,
   ) {
-    itemsIndexed(
-        items = EquityType.values(),
-        key = { _, item -> item.name },
-    ) { index, item ->
-      Column(
-          modifier = Modifier.fillMaxWidth(),
-      ) {
-        if (index > 0) {
-          Divider(
+    TopAppBar(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = 0.dp,
+        contentColor = MaterialTheme.colors.onSurface,
+        title = {},
+        navigationIcon = {
+          IconButton(
+              onClick = onClose,
+          ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close",
+            )
+          }
+        },
+    )
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+      itemsIndexed(
+          items = EquityType.values(),
+          key = { _, item -> item.name },
+      ) { index, item ->
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+          if (index > 0) {
+            Divider(
+                modifier = Modifier.fillMaxWidth(),
+            )
+          }
+          TickerAddItem(
               modifier = Modifier.fillMaxWidth(),
+              type = item,
+              onTypeSelected = onTypeSelected,
           )
         }
-        TickerAddItem(
-            modifier = Modifier.fillMaxWidth(),
-            type = item,
-            onTypeSelected = onTypeSelected,
-        )
       }
     }
   }
@@ -70,9 +102,8 @@ private fun TickerAddItem(
 @Preview
 @Composable
 private fun PreviewTickerAddScreen() {
-  Surface {
-    TickerAddScreen(
-        onTypeSelected = {},
-    )
-  }
+  TickerAddScreen(
+      onClose = {},
+      onTypeSelected = {},
+  )
 }

@@ -30,7 +30,7 @@ import com.pyamsoft.tickertape.setting.AppSettings
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
 
-internal class TickerNavigator
+internal class MainNavigator
 @Inject
 internal constructor(
     activity: MainActivity,

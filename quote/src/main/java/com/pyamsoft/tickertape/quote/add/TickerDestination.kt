@@ -1,6 +1,6 @@
 package com.pyamsoft.tickertape.quote.add
 
-enum class TickerAddDestination {
+enum class TickerDestination {
   WATCHLIST,
   PORTFOLIO
 }

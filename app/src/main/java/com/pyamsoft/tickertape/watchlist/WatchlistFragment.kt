@@ -41,6 +41,8 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.add.TickerDestination
+import com.pyamsoft.tickertape.ticker.NewTickerSheet
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
@@ -78,6 +80,13 @@ class WatchlistFragment : Fragment() {
         )
   }
 
+  private fun handleFabClicked() {
+    NewTickerSheet.show(
+        requireActivity(),
+        TickerDestination.WATCHLIST,
+    )
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -110,7 +119,9 @@ class WatchlistFragment : Fragment() {
                     onSelectTicker = { handleOpenDigDialog(it) },
                     onDeleteTicker = { handleDeleteTicker(it) },
                     onSearchChanged = { vm.handleSearch(it) },
-                    onTabUpdated = { vm.handleSectionChanged(it) })
+                    onTabUpdated = { vm.handleSectionChanged(it) },
+                    onFabClick = { handleFabClicked() },
+                )
               }
             }
           }

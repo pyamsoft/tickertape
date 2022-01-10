@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.ticker
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -22,23 +22,23 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
-import com.pyamsoft.tickertape.quote.add.TickerAddDestination
-import com.pyamsoft.tickertape.quote.add.TickerAddScreen
+import com.pyamsoft.tickertape.quote.add.NewTickerScreen
+import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class TickerAddSheet : BottomSheetDialogFragment() {
+internal class NewTickerSheet : BottomSheetDialogFragment() {
 
   @JvmField @Inject internal var theming: Theming? = null
 
   @CheckResult
-  private fun getDestination(): TickerAddDestination {
+  private fun getDestination(): TickerDestination {
     val key = KEY_DESTINATION
     return requireArguments()
         .getString(key, "")
         .also { require(it.isNotBlank()) { "Must be created with key: $key" } }
-        .let { TickerAddDestination.valueOf(it) }
+        .let { TickerDestination.valueOf(it) }
   }
 
   private fun handleAddTypeSelected(type: EquityType) {
@@ -56,7 +56,7 @@ internal class TickerAddSheet : BottomSheetDialogFragment() {
   ): View {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
-        .plusTickerAddComponent()
+        .plusNewTickerComponent()
         .create()
         .inject(this)
 
@@ -66,7 +66,7 @@ internal class TickerAddSheet : BottomSheetDialogFragment() {
 
       setContent {
         TickerTapeTheme(themeProvider) {
-          TickerAddScreen(
+          NewTickerScreen(
               modifier = Modifier.fillMaxWidth(),
               onClose = { dismiss() },
               onTypeSelected = { handleAddTypeSelected(it) },
@@ -95,14 +95,17 @@ internal class TickerAddSheet : BottomSheetDialogFragment() {
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(destination: TickerAddDestination): DialogFragment {
-      return TickerAddSheet().apply {
+    private fun newInstance(destination: TickerDestination): DialogFragment {
+      return NewTickerSheet().apply {
         arguments = Bundle().apply { putString(KEY_DESTINATION, destination.name) }
       }
     }
 
     @JvmStatic
-    fun show(activity: FragmentActivity, destination: TickerAddDestination) {
+    fun show(
+        activity: FragmentActivity,
+        destination: TickerDestination,
+    ) {
       newInstance(destination).show(activity, TAG)
     }
   }

@@ -59,6 +59,6 @@ internal interface MainComponent {
 
     @Binds
     @CheckResult
-    internal abstract fun bindNavigator(impl: TickerNavigator): Navigator<MainPage>
+    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<MainPage>
   }
 }

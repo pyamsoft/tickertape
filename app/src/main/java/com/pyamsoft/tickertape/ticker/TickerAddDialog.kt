@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.symbol
+package com.pyamsoft.tickertape.ticker
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -44,7 +44,7 @@ import com.pyamsoft.tickertape.ui.correctBackground
 import javax.inject.Inject
 import javax.inject.Provider
 
-internal abstract class SymbolAddDialog<V : SymbolAddViewModel> :
+internal abstract class TickerAddDialog<V : SymbolAddViewModel> :
     AppCompatDialogFragment(), UiController<SymbolAddControllerEvent> {
 
   @JvmField @Inject internal var lookup: SymbolLookup? = null

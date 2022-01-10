@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
 @JvmOverloads
-fun TickerAddScreen(
+fun NewTickerScreen(
     modifier: Modifier = Modifier,
     onTypeSelected: (EquityType) -> Unit,
     onClose: () -> Unit,
@@ -111,8 +111,8 @@ private fun TickerAddItem(
 
 @Preview
 @Composable
-private fun PreviewTickerAddScreen() {
-  TickerAddScreen(
+private fun PreviewNewTickerScreen() {
+  NewTickerScreen(
       onClose = {},
       onTypeSelected = {},
   )

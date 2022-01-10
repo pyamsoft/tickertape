@@ -2,10 +2,21 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -13,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
@@ -21,6 +33,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.SearchBar
+import com.pyamsoft.tickertape.quote.add.NewTickerFab
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.FabDefaults
 
@@ -35,6 +48,7 @@ fun PortfolioScreen(
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onFabClick: () -> Unit,
 ) {
   val loading = state.isLoading
   val scaffoldState = rememberScaffoldState()
@@ -56,6 +70,7 @@ fun PortfolioScreen(
           onDelete = onDelete,
           onSearchChanged = onSearchChanged,
           onTabUpdated = onTabUpdated,
+          onFabClick = onFabClick,
       )
     }
   }
@@ -71,37 +86,55 @@ private fun Content(
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onFabClick: () -> Unit,
 ) {
   val error = state.error
   val portfolio = state.portfolio
   val stocks = state.stocks
   val search = state.query
   val tab = state.section
+  val isLoading = state.isLoading
 
-  Crossfade(
+  val density = LocalDensity.current
+  val bottomPaddingDp =
+      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
+  val fabBottomPadding = remember(bottomPaddingDp) { bottomPaddingDp + 16.dp }
+
+  Box(
       modifier = modifier,
-      targetState = error,
-  ) { err ->
-    if (err == null) {
-      Portfolio(
-          modifier = Modifier.fillMaxSize(),
-          portfolio = portfolio,
-          stocks = stocks,
-          navBarBottomHeight = navBarBottomHeight,
-          search = search,
-          tab = tab,
-          onSelect = onSelect,
-          onDelete = onDelete,
-          onSearchChanged = onSearchChanged,
-          onTabUpdated = onTabUpdated,
-      )
-    } else {
-      Error(
-          modifier = Modifier.fillMaxSize(),
-          error = err,
-          onRefresh = onRefresh,
-      )
+      contentAlignment = Alignment.BottomCenter,
+  ) {
+    Crossfade(
+        modifier = Modifier.fillMaxSize(),
+        targetState = error,
+    ) { err ->
+      if (err == null) {
+        Portfolio(
+            modifier = Modifier.fillMaxSize(),
+            portfolio = portfolio,
+            stocks = stocks,
+            navBarBottomHeight = bottomPaddingDp,
+            search = search,
+            tab = tab,
+            onSelect = onSelect,
+            onDelete = onDelete,
+            onSearchChanged = onSearchChanged,
+            onTabUpdated = onTabUpdated,
+        )
+      } else {
+        Error(
+            modifier = Modifier.fillMaxSize(),
+            error = err,
+            onRefresh = onRefresh,
+        )
+      }
     }
+
+    NewTickerFab(
+        visible = !isLoading,
+        modifier = Modifier.padding(16.dp).padding(bottom = fabBottomPadding),
+        onClick = onFabClick,
+    )
   }
 }
 
@@ -112,17 +145,13 @@ private fun Portfolio(
     portfolio: PortfolioStockList,
     stocks: List<PortfolioStock>,
     search: String,
-    navBarBottomHeight: Int,
+    navBarBottomHeight: Dp,
     tab: EquityType,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
 ) {
-  val density = LocalDensity.current
-  val bottomPaddingDp =
-      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
-
   val portfolioTickers = remember(stocks) { stocks.filter { it.ticker != null } }
 
   LazyColumn(
@@ -130,18 +159,19 @@ private fun Portfolio(
       contentPadding = PaddingValues(horizontal = 8.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    item {
-      Spacer(
-          modifier = Modifier.statusBarsHeight(),
-      )
-    }
-
     if (!portfolio.isEmpty) {
       item {
-        PorfolioSummaryItem(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-            portfolio = portfolio,
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+          Spacer(
+              modifier = Modifier.statusBarsHeight(),
+          )
+          PorfolioSummaryItem(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+              portfolio = portfolio,
+          )
+        }
       }
     }
 
@@ -178,7 +208,7 @@ private fun Portfolio(
       Spacer(
           modifier =
               Modifier.navigationBarsHeight(
-                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET_DP.dp,
+                  additional = navBarBottomHeight + FabDefaults.FAB_OFFSET_DP.dp,
               ),
       )
     }
@@ -233,5 +263,6 @@ private fun PreviewPortfolioScreen() {
       onSelect = {},
       onSearchChanged = {},
       onTabUpdated = {},
+      onFabClick = {},
   )
 }

@@ -48,8 +48,6 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.initOnAppStart
-import com.pyamsoft.tickertape.quote.TickerAddSheet
-import com.pyamsoft.tickertape.quote.add.TickerAddDestination
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
@@ -79,14 +77,6 @@ internal class MainActivity : PYDroidActivity() {
       Timber.d("Loaded page: $page")
     } else {
       Timber.w("Could not push page: $page")
-    }
-  }
-
-  private fun handleFabClicked(page: MainPage) {
-    when (page) {
-      MainPage.WatchList -> TickerAddSheet.show(this, TickerAddDestination.WATCHLIST)
-      MainPage.Portfolio -> TickerAddSheet.show(this, TickerAddDestination.PORTFOLIO)
-      else -> Timber.w("FAB clicked but not Watchlist or Portfolio: $page")
     }
   }
 
@@ -154,7 +144,6 @@ internal class MainActivity : PYDroidActivity() {
                   onLoadPortfolio = { navigate(MainPage.Portfolio) },
                   onLoadSettings = { navigate(MainPage.Settings) },
                   onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                  onFabClicked = { handleFabClicked(page) },
               )
               RatingScreen(
                   modifier = Modifier.padding(bottom = bottomOffset),

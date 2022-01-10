@@ -16,12 +16,10 @@
 
 package com.pyamsoft.tickertape.main
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,28 +36,11 @@ fun MainScreen(
     onLoadWatchList: () -> Unit,
     onLoadPortfolio: () -> Unit,
     onLoadSettings: () -> Unit,
-    onFabClicked: () -> Unit,
 ) {
-  // Enforce a height for the scaffold or else it takes over the screen
-  // Why do we need a scaffold instead of a box?
-  // Because using a FAB with a BottomAppBar doesn't actually work unless its inside a scaffold.
-  //
-  // yeah.
-  val isFabEnabled = remember(page) { page == MainPage.WatchList || page == MainPage.Portfolio }
-
   Column(
       modifier = modifier,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    // Causes pop in.
-    AnimatedVisibility(
-        modifier = Modifier.padding(bottom = 16.dp),
-        visible = isFabEnabled,
-    ) {
-      MainFab(
-          onClick = onFabClicked,
-      )
-    }
     MainBottomNav(
         modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
         page = page,
@@ -82,6 +63,5 @@ private fun PreviewMainScreen() {
       onLoadWatchList = {},
       onLoadPortfolio = {},
       onLoadSettings = {},
-      onFabClicked = {},
   )
 }

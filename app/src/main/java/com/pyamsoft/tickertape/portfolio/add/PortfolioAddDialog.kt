@@ -27,10 +27,10 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.symbol.SymbolAddDialog
+import com.pyamsoft.tickertape.ticker.TickerAddDialog
 import javax.inject.Inject
 
-internal class PortfolioAddDialog : SymbolAddDialog<PortfolioAddViewModel>() {
+internal class PortfolioAddDialog : TickerAddDialog<PortfolioAddViewModel>() {
 
   @JvmField @Inject internal var factory: PortfolioAddViewModel.Factory? = null
   override val viewModel by

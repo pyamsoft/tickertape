@@ -41,7 +41,9 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
+import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
+import com.pyamsoft.tickertape.ticker.NewTickerSheet
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {
@@ -79,6 +81,13 @@ class PortfolioFragment : Fragment() {
         )
   }
 
+  private fun handleFabClicked() {
+    NewTickerSheet.show(
+        requireActivity(),
+        TickerDestination.PORTFOLIO,
+    )
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -112,6 +121,7 @@ class PortfolioFragment : Fragment() {
                     onDelete = { handleDeleteStock(it) },
                     onSearchChanged = { vm.handleSearch(it) },
                     onTabUpdated = { vm.handleSectionChanged(it) },
+                    onFabClick = { handleFabClicked() },
                 )
               }
             }

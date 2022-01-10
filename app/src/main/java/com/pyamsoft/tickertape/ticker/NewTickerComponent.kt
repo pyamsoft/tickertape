@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.ticker
 
 import androidx.annotation.CheckResult
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface TickerAddComponent {
+internal interface NewTickerComponent {
 
-  fun inject(bottomSheet: TickerAddSheet)
+  fun inject(bottomSheet: NewTickerSheet)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(): TickerAddComponent
+    @CheckResult fun create(): NewTickerComponent
   }
 }

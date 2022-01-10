@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.watchlist
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
@@ -30,6 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.SearchBar
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.add.NewTickerFab
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
@@ -45,6 +48,7 @@ fun WatchlistScreen(
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onFabClick: () -> Unit,
 ) {
   val loading = state.isLoading
 
@@ -66,6 +70,7 @@ fun WatchlistScreen(
           onDeleteTicker = onDeleteTicker,
           onSearchChanged = onSearchChanged,
           onTabUpdated = onTabUpdated,
+          onFabClick = onFabClick,
       )
     }
   }
@@ -81,35 +86,53 @@ private fun Content(
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onFabClick: () -> Unit,
 ) {
   val error = state.error
   val tickers = state.watchlist
   val search = state.query
   val tab = state.section
+  val isLoading = state.isLoading
 
-  Crossfade(
+  val density = LocalDensity.current
+  val bottomPaddingDp =
+      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
+  val fabBottomPadding = remember(bottomPaddingDp) { bottomPaddingDp + 16.dp }
+
+  Box(
       modifier = modifier,
-      targetState = error,
-  ) { err ->
-    if (err == null) {
-      Watchlist(
-          modifier = Modifier.fillMaxSize(),
-          tickers = tickers,
-          navBarBottomHeight = navBarBottomHeight,
-          search = search,
-          tab = tab,
-          onSelectTicker = onSelectTicker,
-          onDeleteTicker = onDeleteTicker,
-          onSearchChanged = onSearchChanged,
-          onTabUpdated = onTabUpdated,
-      )
-    } else {
-      Error(
-          modifier = Modifier.fillMaxSize(),
-          error = err,
-          onRefresh = onRefresh,
-      )
+      contentAlignment = Alignment.BottomCenter,
+  ) {
+    Crossfade(
+        modifier = Modifier.fillMaxSize(),
+        targetState = error,
+    ) { err ->
+      if (err == null) {
+        Watchlist(
+            modifier = Modifier.fillMaxSize(),
+            tickers = tickers,
+            navBarBottomHeight = bottomPaddingDp,
+            search = search,
+            tab = tab,
+            onSelectTicker = onSelectTicker,
+            onDeleteTicker = onDeleteTicker,
+            onSearchChanged = onSearchChanged,
+            onTabUpdated = onTabUpdated,
+        )
+      } else {
+        Error(
+            modifier = Modifier.fillMaxSize(),
+            error = err,
+            onRefresh = onRefresh,
+        )
+      }
     }
+
+    NewTickerFab(
+        visible = !isLoading,
+        modifier = Modifier.padding(16.dp).padding(bottom = fabBottomPadding),
+        onClick = onFabClick,
+    )
   }
 }
 
@@ -120,27 +143,17 @@ private fun Watchlist(
     tickers: List<Ticker>,
     search: String,
     tab: EquityType,
-    navBarBottomHeight: Int,
+    navBarBottomHeight: Dp,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
 ) {
-  val density = LocalDensity.current
-  val bottomPaddingDp =
-      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
-
   LazyColumn(
       modifier = modifier,
       contentPadding = PaddingValues(horizontal = 8.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    //    item {
-    //      Spacer(
-    //          modifier = Modifier.statusBarsHeight(),
-    //      )
-    //    }
-
     stickyHeader {
       Column(
           modifier = Modifier.fillMaxWidth(),
@@ -174,7 +187,7 @@ private fun Watchlist(
       Spacer(
           modifier =
               Modifier.navigationBarsHeight(
-                  additional = bottomPaddingDp + FabDefaults.FAB_OFFSET_DP.dp,
+                  additional = navBarBottomHeight + FabDefaults.FAB_OFFSET_DP.dp,
               ),
       )
     }
@@ -229,5 +242,6 @@ private fun PreviewWatchlistScreen() {
       onSelectTicker = {},
       onSearchChanged = {},
       onTabUpdated = {},
+      onFabClick = {},
   )
 }

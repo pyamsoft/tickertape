@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -130,7 +131,10 @@ private fun Content(
 
     NewTickerFab(
         visible = !isLoading,
-        modifier = Modifier.padding(16.dp).padding(bottom = fabBottomPadding),
+        modifier =
+            Modifier.padding(16.dp)
+                .navigationBarsPadding(bottom = true)
+                .padding(bottom = fabBottomPadding),
         onClick = onFabClick,
     )
   }

@@ -43,7 +43,7 @@ import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
-import com.pyamsoft.tickertape.ticker.NewTickerSheet
+import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {

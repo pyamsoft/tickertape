@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.ticker
+package com.pyamsoft.tickertape.ticker.add
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -23,14 +23,16 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.quote.add.NewTickerScreen
+import com.pyamsoft.tickertape.quote.add.NewTickerViewModeler
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class NewTickerSheet : BottomSheetDialogFragment() {
 
   @JvmField @Inject internal var theming: Theming? = null
+
+  @JvmField @Inject internal var viewModel: NewTickerViewModeler? = null
 
   @CheckResult
   private fun getDestination(): TickerDestination {
@@ -41,12 +43,12 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .let { TickerDestination.valueOf(it) }
   }
 
-  private fun handleAddTypeSelected(type: EquityType) {
-    val destination = getDestination()
-    Timber.d("TODO: Show add flow: $type for $destination")
-
-    // Dismiss ourselves after we show the add flow
-    dismiss()
+  private fun handleCloseClicked(equityType: EquityType?) {
+    if (equityType == null) {
+      dismiss()
+    } else {
+      viewModel.requireNotNull().handleClearEquityType()
+    }
   }
 
   override fun onCreateView(
@@ -57,23 +59,40 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
         .plusNewTickerComponent()
-        .create()
+        .create(getDestination())
         .inject(this)
+
+    val vm = viewModel.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
-      id = R.id.bottom_sheet_add
+      id = R.id.bottom_sheet_new_ticker
 
       setContent {
-        TickerTapeTheme(themeProvider) {
-          NewTickerScreen(
-              modifier = Modifier.fillMaxWidth(),
-              onClose = { dismiss() },
-              onTypeSelected = { handleAddTypeSelected(it) },
-          )
+        vm.Render { state ->
+          val equityType = state.equityType
+
+          TickerTapeTheme(themeProvider) {
+            NewTickerScreen(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                onClose = { handleCloseClicked(equityType) },
+                onTypeSelected = { vm.handleEquityTypeSelected(it) },
+            )
+          }
         }
       }
     }
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    viewModel.requireNotNull().restoreState(savedInstanceState)
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    viewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -85,6 +104,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     super.onDestroyView()
     dispose()
 
+    viewModel = null
     theming = null
   }
 

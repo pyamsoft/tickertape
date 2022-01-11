@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.ticker
+package com.pyamsoft.tickertape.ticker.add
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.quote.add.TickerDestination
+import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
@@ -27,6 +29,9 @@ internal interface NewTickerComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult fun create(): NewTickerComponent
+    @CheckResult
+    fun create(
+        @BindsInstance destination: TickerDestination,
+    ): NewTickerComponent
   }
 }

@@ -42,7 +42,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.TickerDestination
-import com.pyamsoft.tickertape.ticker.NewTickerSheet
+import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 

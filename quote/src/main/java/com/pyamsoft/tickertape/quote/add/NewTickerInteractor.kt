@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.quote.add.NewTickerInteractor
-import com.pyamsoft.tickertape.quote.add.NewTickerInteractorImpl
-import dagger.Binds
-import dagger.Module
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 
-@Module
-abstract class TickerModule {
+interface NewTickerInteractor {
 
-  @Binds
-  @CheckResult
-  internal abstract fun bindNewTickerInteractor(impl: NewTickerInteractorImpl): NewTickerInteractor
-
-  @Binds
-  @CheckResult
-  internal abstract fun bindInteractor(impl: TickerInteractorImpl): TickerInteractor
+  @CheckResult suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>>
 }

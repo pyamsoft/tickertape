@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -31,18 +31,16 @@ internal fun EquitySelectionScreen(
   LazyColumn(
       modifier = modifier,
   ) {
-    itemsIndexed(
+    items(
         items = possibleTypes,
-        key = { _, item -> item.name },
-    ) { index, item ->
+        key = { it.name },
+    ) { item ->
       Column(
           modifier = Modifier.fillMaxWidth(),
       ) {
-        if (index > 0) {
-          Divider(
-              modifier = Modifier.fillMaxWidth(),
-          )
-        }
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+        )
         TickerAddItem(
             modifier = Modifier.fillMaxWidth(),
             type = item,

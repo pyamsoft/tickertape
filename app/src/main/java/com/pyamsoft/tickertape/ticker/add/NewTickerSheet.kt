@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
@@ -47,8 +49,30 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     if (equityType == null) {
       dismiss()
     } else {
-      viewModel.requireNotNull().handleClearEquityType()
+      viewModel
+          .requireNotNull()
+          .handleClearEquityType(
+              scope = viewLifecycleOwner.lifecycleScope,
+          )
     }
+  }
+
+  private fun handleSymbolChanged(symbol: String) {
+    viewModel
+        .requireNotNull()
+        .handleSymbolChanged(
+            scope = viewLifecycleOwner.lifecycleScope,
+            symbol = symbol,
+        )
+  }
+
+  private fun handleEquityTypeSelected(type: EquityType) {
+    viewModel
+        .requireNotNull()
+        .handleEquityTypeSelected(
+            scope = viewLifecycleOwner.lifecycleScope,
+            type = type,
+        )
   }
 
   override fun onCreateView(
@@ -77,8 +101,8 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 onClose = { handleCloseClicked(equityType) },
-                onTypeSelected = { vm.handleEquityTypeSelected(it) },
-                onSymbolChanged = { vm.handleSymbolChanged(it) },
+                onTypeSelected = { handleEquityTypeSelected(it) },
+                onSymbolChanged = { handleSymbolChanged(it) },
             )
           }
         }
@@ -94,6 +118,16 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    // Disable dragging
+    val d = dialog
+    if (d is BottomSheetDialog) {
+      d.behavior.isDraggable = false
+    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

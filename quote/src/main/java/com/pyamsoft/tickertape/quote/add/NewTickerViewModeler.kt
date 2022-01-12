@@ -16,25 +16,91 @@
 
 package com.pyamsoft.tickertape.quote.add
 
+import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
+import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class NewTickerViewModeler
 @Inject
 internal constructor(
     private val state: MutableNewTickerViewState,
+    interactor: NewTickerInteractor,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
-  fun handleSymbolChanged(symbol: String) {
-    state.symbol = symbol
+  private val lookupRunner =
+      highlander<ResultWrapper<List<SearchResult>>, Boolean, String> { force, query ->
+        interactor.search(force, query)
+      }
+
+  fun handleSymbolChanged(
+      scope: CoroutineScope,
+      symbol: String,
+  ) {
+    state.apply {
+      this.symbol = symbol
+      isLookup = true
+      lookupError = null
+      lookupResults = emptyList()
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      lookupRunner
+          .call(false, symbol)
+          .onFailure { Timber.e(it, "Error looking up results for $symbol") }
+          .onSuccess { Timber.d("Found search results for $symbol $it") }
+          .onSuccess { r ->
+            state.apply {
+              lookupError = null
+              lookupResults = r
+            }
+          }
+          .onFailure { e ->
+            state.apply {
+              lookupError = e
+              lookupResults = emptyList()
+            }
+          }
+          .onFinally { state.apply { isLookup = false } }
+    }
   }
 
-  fun handleEquityTypeSelected(equityType: EquityType) {
-    state.equityType = equityType
+  private fun MutableNewTickerViewState.cancelInProgressLookup(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      // Cancel any active runner first
+      lookupRunner.cancel()
+
+      // Flip all lookup bits back
+      isLookup = false
+      lookupError = null
+      lookupResults = emptyList()
+    }
   }
 
-  fun handleClearEquityType() {
-    state.equityType = null
+  fun handleEquityTypeSelected(
+      scope: CoroutineScope,
+      type: EquityType,
+  ) {
+    state.apply {
+      equityType = type
+      symbol = ""
+
+      cancelInProgressLookup(scope)
+    }
+  }
+
+  fun handleClearEquityType(scope: CoroutineScope) {
+    state.apply {
+      equityType = null
+      symbol = ""
+
+      cancelInProgressLookup(scope)
+    }
   }
 }

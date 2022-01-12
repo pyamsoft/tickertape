@@ -8,9 +8,11 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 
 interface NewTickerViewState : UiViewState {
+  val symbol: String
   val equityType: EquityType?
 }
 
 internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
   override var equityType by mutableStateOf<EquityType?>(null)
+  override var symbol by mutableStateOf("")
 }

@@ -26,6 +26,10 @@ internal constructor(
     private val state: MutableNewTickerViewState,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
+  fun handleSymbolChanged(symbol: String) {
+    state.symbol = symbol
+  }
+
   fun handleEquityTypeSelected(equityType: EquityType) {
     state.equityType = equityType
   }

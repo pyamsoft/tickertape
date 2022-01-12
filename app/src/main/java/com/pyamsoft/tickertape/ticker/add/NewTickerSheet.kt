@@ -103,6 +103,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onClose = { handleCloseClicked(equityType) },
                 onTypeSelected = { handleEquityTypeSelected(it) },
                 onSymbolChanged = { handleSymbolChanged(it) },
+                onSearchResultSelected = { vm.handleSearchResultSelected(it) },
             )
           }
         }

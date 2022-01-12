@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ internal fun LookupScreen(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
     onSymbolChanged: (String) -> Unit,
+    onSearchResultSelected: (SearchResult) -> Unit,
 ) {
   val symbol = state.symbol
 
@@ -48,6 +50,7 @@ internal fun LookupScreen(
     LookupResults(
         modifier = Modifier.fillMaxWidth().height(240.dp),
         state = state,
+        onSearchResultSelected = onSearchResultSelected,
     )
   }
 }
@@ -56,6 +59,7 @@ internal fun LookupScreen(
 private fun LookupResults(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
+    onSearchResultSelected: (SearchResult) -> Unit,
 ) {
   val isLoading = state.isLookup
   Crossfade(
@@ -70,6 +74,7 @@ private fun LookupResults(
       ResultList(
           modifier = Modifier.fillMaxSize(),
           state = state,
+          onSearchResultSelected = onSearchResultSelected,
       )
     }
   }
@@ -79,6 +84,7 @@ private fun LookupResults(
 private fun ResultList(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
+    onSearchResultSelected: (SearchResult) -> Unit,
 ) {
   val results = state.lookupResults
   LazyColumn(
@@ -95,6 +101,7 @@ private fun ResultList(
       ResultItem(
           modifier = Modifier.fillMaxWidth(),
           item = item,
+          onClick = onSearchResultSelected,
       )
     }
   }
@@ -104,12 +111,13 @@ private fun ResultList(
 private fun ResultItem(
     modifier: Modifier = Modifier,
     item: SearchResult,
+    onClick: (SearchResult) -> Unit,
 ) {
   val symbol = item.symbol()
   val company = item.name()
 
   Column(
-      modifier = modifier.padding(8.dp),
+      modifier = modifier.clickable { onClick(item) }.padding(8.dp),
       horizontalAlignment = Alignment.Start,
       verticalArrangement = Arrangement.Center,
   ) {
@@ -178,6 +186,7 @@ private fun PreviewLookupScreen() {
     LookupScreen(
         state = MutableNewTickerViewState(),
         onSymbolChanged = {},
+        onSearchResultSelected = {},
     )
   }
 }

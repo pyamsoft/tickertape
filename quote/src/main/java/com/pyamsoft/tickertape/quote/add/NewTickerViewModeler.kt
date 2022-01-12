@@ -103,4 +103,8 @@ internal constructor(
       cancelInProgressLookup(scope)
     }
   }
+
+  fun handleSearchResultSelected(result: SearchResult) {
+    state.symbol = result.symbol().symbol()
+  }
 }

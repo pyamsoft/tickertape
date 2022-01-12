@@ -125,6 +125,11 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     super.onResume()
 
     // Disable dragging
+    // If dragging is allowed we can scroll the ResultList down but not up.
+    // Scrolling down works fine, but scrolling up dismisses the bottom sheet
+    //
+    // By disabling dragging, the list works again. We can close the sheet via the close button or
+    // by clicking outside but not by swiping down.
     val d = dialog
     if (d is BottomSheetDialog) {
       d.behavior.isDraggable = false

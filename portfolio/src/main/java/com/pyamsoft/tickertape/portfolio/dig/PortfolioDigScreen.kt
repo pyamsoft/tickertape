@@ -39,38 +39,41 @@ fun PortfolioDigScreen(
   val isLoading = state.isLoading
   val section = state.section
 
-  Surface(
+  // NOTE(Peter): We need this useless box or we crash at runtime with a Compose ClassCastException.
+  Box(
       modifier = modifier,
   ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-      PortfolioDigToolbar(
-          ticker = ticker,
-          section = section,
-          onClose = onClose,
-          onTabUpdated = onTabUpdated,
-      )
+    Surface {
+      Column(
+          modifier = Modifier.fillMaxWidth(),
+      ) {
+        PortfolioDigToolbar(
+            ticker = ticker,
+            section = section,
+            onClose = onClose,
+            onTabUpdated = onTabUpdated,
+        )
 
-      Crossfade(
-          modifier = modifier,
-          targetState = isLoading,
-      ) { loading ->
-        if (loading) {
-          Loading(
-              modifier = Modifier.fillMaxWidth(),
-          )
-        } else {
-          Content(
-              modifier = Modifier.fillMaxWidth(),
-              state = state,
-              currentPrice = currentPrice,
-              onScrub = onScrub,
-              onRangeSelected = onRangeSelected,
-              onRefresh = onRefresh,
-              onAddPosition = onAddPosition,
-              onDeletePosition = onDeletePosition,
-          )
+        Crossfade(
+            modifier = modifier,
+            targetState = isLoading,
+        ) { loading ->
+          if (loading) {
+            Loading(
+                modifier = Modifier.fillMaxWidth(),
+            )
+          } else {
+            Content(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                currentPrice = currentPrice,
+                onScrub = onScrub,
+                onRangeSelected = onRangeSelected,
+                onRefresh = onRefresh,
+                onAddPosition = onAddPosition,
+                onDeletePosition = onDeletePosition,
+            )
+          }
         }
       }
     }

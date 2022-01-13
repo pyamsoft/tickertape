@@ -136,11 +136,11 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     val vm = viewModel.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
-    return ComposeView(act).apply {
+    val currentPrice = getCurrentPrice()
+      return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
       setContent {
-        val currentPrice = remember { getCurrentPrice() }
 
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {

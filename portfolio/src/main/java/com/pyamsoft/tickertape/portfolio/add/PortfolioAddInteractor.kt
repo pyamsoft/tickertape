@@ -44,7 +44,6 @@ internal constructor(
   suspend fun commitSymbol(
       symbol: StockSymbol,
       type: EquityType,
-      realEquityType: String,
       side: TradeSide
   ): ResultWrapper<Unit> =
       withContext(context = Dispatchers.IO) {
@@ -58,7 +57,7 @@ internal constructor(
             return@withContext ResultWrapper.success(Unit)
           }
 
-          val newHolding = JsonMappableDbHolding.create(symbol, type, realEquityType, side)
+          val newHolding = JsonMappableDbHolding.create(symbol, type, side)
           holdingInsertDao.insert(newHolding).run { ResultWrapper.success(Unit) }
         } catch (e: Throwable) {
           e.ifNotCancellation {

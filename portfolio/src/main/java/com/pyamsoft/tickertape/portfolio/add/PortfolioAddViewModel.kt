@@ -50,12 +50,11 @@ internal constructor(
   override suspend fun onCommitSymbol(stock: StockQuote) {
     val symbol = stock.symbol()
     val type = stock.type()
-    val realEquityType = stock.realEquityType()
     val side = state.side
 
     Timber.d("Commit symbol to DB: $symbol $type $side")
     interactor
-        .commitSymbol(symbol, type, realEquityType, side)
+        .commitSymbol(symbol, type, side)
         .onSuccess { Timber.d("Committed new symbols to db: $symbol $type $side") }
         .onSuccess { setState { copy(error = null) } }
         .onFailure { Timber.e(it, "Failed to commit symbols to db: $symbol $type $side") }

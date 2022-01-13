@@ -30,7 +30,6 @@ internal data class StockOptionsQuoteImpl(
     private val company: StockCompany,
     private val strike: StockMoneyValue,
     private val equityType: EquityType,
-    private val realEquityType: String,
     private val expireDate: LocalDateTime,
     private val regular: StockMarketSession,
     private val preMarket: StockMarketSession?,
@@ -49,10 +48,6 @@ internal data class StockOptionsQuoteImpl(
 
   override fun type(): EquityType {
     return equityType
-  }
-
-  override fun realEquityType(): String {
-    return realEquityType
   }
 
   override fun dataDelayBy(): Long {

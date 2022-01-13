@@ -19,8 +19,12 @@ package com.pyamsoft.tickertape.quote.add
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +36,19 @@ class NewTickerViewModeler
 internal constructor(
     private val state: MutableNewTickerViewState,
     interactor: NewTickerInteractor,
+    destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
+
+  private val insertRunner =
+      highlander<ResultWrapper<DbInsert.InsertResult<StockSymbol>>, String> {
+        val s = state
+        interactor.insertNewTicker(
+            symbol = it.asSymbol(),
+            destination = destination,
+            equityType = s.equityType.requireNotNull(),
+            tradeSide = s.tradeSide,
+        )
+      }
 
   private val lookupRunner =
       highlander<ResultWrapper<List<SearchResult>>, Boolean, String> { force, query ->
@@ -106,5 +122,46 @@ internal constructor(
 
   fun handleSearchResultSelected(result: SearchResult) {
     state.symbol = result.symbol().symbol()
+  }
+
+  fun handleClear(scope: CoroutineScope) {
+    state.apply {
+      symbol = ""
+      cancelInProgressLookup(scope)
+    }
+  }
+
+  fun handleSubmit(
+      scope: CoroutineScope,
+      onSubmit: () -> Unit,
+  ) {
+    val s = state
+    if (s.isSubmitting) {
+      return
+    }
+
+    s.apply {
+      val sym = symbol
+      s.isSubmitting = true
+      cancelInProgressLookup(scope)
+      scope.launch(context = Dispatchers.Main) {
+        insertRunner
+            .call(sym)
+            .onFailure { Timber.e(it, "Failed to insert new symbol: $sym") }
+            .onSuccess { result ->
+              when (result) {
+                is DbInsert.InsertResult.Fail -> {
+                  Timber.e(result.error, "Failed to insert new symbol: ${result.data}")
+                  throw result.error
+                }
+                is DbInsert.InsertResult.Insert -> Timber.d("Inserted new symbol: ${result.data}")
+                is DbInsert.InsertResult.Update ->
+                    Timber.w("UPDATE happened but none was expected: ${result.data}")
+              }
+            }
+            .onSuccess { onSubmit() }
+            .onFinally { s.isSubmitting = false }
+      }
+    }
   }
 }

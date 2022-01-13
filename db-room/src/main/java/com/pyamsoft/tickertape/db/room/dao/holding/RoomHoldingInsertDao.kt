@@ -42,8 +42,8 @@ internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
             DbInsert.InsertResult.Insert(roomHolding)
           } else {
             DbInsert.InsertResult.Fail(
-              data = roomHolding,
-              error = IllegalStateException("Unable to update holding $roomHolding"),
+                data = roomHolding,
+                error = IllegalStateException("Unable to update holding $roomHolding"),
             )
           }
         } else {

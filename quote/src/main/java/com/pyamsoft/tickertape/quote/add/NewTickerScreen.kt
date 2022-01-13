@@ -22,6 +22,8 @@ fun NewTickerScreen(
     onClose: () -> Unit,
     onSymbolChanged: (String) -> Unit,
     onSearchResultSelected: (SearchResult) -> Unit,
+    onSubmit: () -> Unit,
+    onClear: () -> Unit,
 ) {
   val equityType = state.equityType
   val hasEquitySelection = remember(equityType) { equityType != null }
@@ -53,6 +55,8 @@ fun NewTickerScreen(
               state = state,
               onSymbolChanged = onSymbolChanged,
               onSearchResultSelected = onSearchResultSelected,
+              onSubmit = onSubmit,
+              onClear = onClear,
           )
         } else {
           EquitySelectionScreen(
@@ -73,6 +77,8 @@ private fun PreviewNewTickerScreen(equityType: EquityType?) {
       onTypeSelected = {},
       onSymbolChanged = {},
       onSearchResultSelected = {},
+      onSubmit = {},
+      onClear = {},
   )
 }
 

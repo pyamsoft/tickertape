@@ -18,9 +18,21 @@ package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 interface NewTickerInteractor {
 
   @CheckResult suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>>
+
+  @CheckResult
+  suspend fun insertNewTicker(
+      symbol: StockSymbol,
+      destination: TickerDestination,
+      equityType: EquityType,
+      tradeSide: TradeSide,
+  ): ResultWrapper<DbInsert.InsertResult<StockSymbol>>
 }

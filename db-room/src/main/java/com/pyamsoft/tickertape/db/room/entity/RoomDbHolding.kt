@@ -32,8 +32,11 @@ internal constructor(
     @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_TYPE) val type: EquityType,
-    @JvmField @ColumnInfo(name = COLUMN_HOLDING_REAL_TYPE) val realEquityType: String,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_SIDE) val side: TradeSide,
+    @Deprecated("Remove this field when we migrate to the next DB version")
+    @JvmField
+    @ColumnInfo(name = COLUMN_HOLDING_REAL_TYPE)
+    val realEquityType: String,
 ) : DbHolding {
 
   @Ignore
@@ -49,11 +52,6 @@ internal constructor(
   @Ignore
   override fun type(): EquityType {
     return type
-  }
-
-  @Ignore
-  override fun realEquityType(): String {
-    return realEquityType
   }
 
   @Ignore
@@ -85,8 +83,8 @@ internal constructor(
             item.id(),
             item.symbol(),
             item.type(),
-            item.realEquityType(),
             item.side(),
+            "DEPRECATED: Remove in next migration",
         )
       }
     }

@@ -91,7 +91,7 @@ internal constructor(
             is DbInsert.InsertResult.Insert -> publish(SymbolChangeEvent.Insert(result.data))
             is DbInsert.InsertResult.Update -> publish(SymbolChangeEvent.Update(result.data))
             is DbInsert.InsertResult.Fail ->
-                  Timber.e(result.error, "Insert attempt failed: ${result.data}")
+                Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
         }
       }

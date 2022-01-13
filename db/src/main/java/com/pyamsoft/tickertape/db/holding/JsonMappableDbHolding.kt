@@ -29,7 +29,6 @@ internal constructor(
     internal val id: DbHolding.Id,
     internal val symbol: StockSymbol,
     internal val type: EquityType,
-    internal val realEquityType: String,
     internal val side: TradeSide,
 ) : DbHolding {
 
@@ -45,10 +44,6 @@ internal constructor(
     return type
   }
 
-  override fun realEquityType(): String {
-    return realEquityType
-  }
-
   override fun side(): TradeSide {
     return side
   }
@@ -60,14 +55,12 @@ internal constructor(
     fun create(
         symbol: StockSymbol,
         type: EquityType,
-        realEquityType: String,
         side: TradeSide,
     ): DbHolding {
       return JsonMappableDbHolding(
           id = DbHolding.Id(IdGenerator.generate()),
           symbol = symbol,
           type = type,
-          realEquityType = realEquityType,
           side = side,
       )
     }
@@ -81,7 +74,6 @@ internal constructor(
             item.id(),
             item.symbol(),
             item.type(),
-            item.realEquityType(),
             item.side(),
         )
       }

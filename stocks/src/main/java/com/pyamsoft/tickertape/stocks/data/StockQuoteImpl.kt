@@ -28,7 +28,6 @@ internal data class StockQuoteImpl(
     private val symbol: StockSymbol,
     private val company: StockCompany,
     private val equityType: EquityType,
-    private val realEquityType: String,
     private val regular: StockMarketSession,
     private val preMarket: StockMarketSession?,
     private val afterHours: StockMarketSession?,
@@ -46,10 +45,6 @@ internal data class StockQuoteImpl(
 
   override fun type(): EquityType {
     return equityType
-  }
-
-  override fun realEquityType(): String {
-    return realEquityType
   }
 
   override fun dataDelayBy(): Long {

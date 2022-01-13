@@ -6,22 +6,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +42,8 @@ internal fun LookupScreen(
     state: NewTickerViewState,
     onSymbolChanged: (String) -> Unit,
     onSearchResultSelected: (SearchResult) -> Unit,
+    onSubmit: () -> Unit,
+    onClear: () -> Unit,
 ) {
   val symbol = state.symbol
 
@@ -52,6 +60,53 @@ internal fun LookupScreen(
         state = state,
         onSearchResultSelected = onSearchResultSelected,
     )
+    SubmissionSection(
+        modifier = Modifier.fillMaxWidth(),
+        state = state,
+        onSubmit = onSubmit,
+        onClear = onClear,
+    )
+  }
+}
+
+@Composable
+private fun SubmissionSection(
+    modifier: Modifier = Modifier,
+    state: NewTickerViewState,
+    onSubmit: () -> Unit,
+    onClear: () -> Unit,
+) {
+  val symbol = state.symbol
+  val isSubmitting = state.isSubmitting
+  val isSubmitEnabled = remember(symbol, isSubmitting) { symbol.isNotBlank() && !isSubmitting }
+
+  Row(
+      modifier = modifier.padding(16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    OutlinedButton(
+        enabled = !isSubmitting,
+        modifier = Modifier.weight(1F),
+        onClick = onClear,
+    ) {
+      Text(
+          text = "Clear",
+      )
+    }
+
+    Spacer(
+        modifier = Modifier.width(16.dp),
+    )
+
+    Button(
+        enabled = isSubmitEnabled,
+        modifier = Modifier.weight(1F),
+        onClick = onSubmit,
+    ) {
+      Text(
+          text = "Submit",
+      )
+    }
   }
 }
 
@@ -187,6 +242,8 @@ private fun PreviewLookupScreen() {
         state = MutableNewTickerViewState(),
         onSymbolChanged = {},
         onSearchResultSelected = {},
+        onSubmit = {},
+        onClear = {},
     )
   }
 }

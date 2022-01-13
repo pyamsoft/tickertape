@@ -15,10 +15,6 @@ internal fun newTestHolding(symbol: StockSymbol): DbHolding {
       return symbol
     }
 
-    override fun realEquityType(): String {
-      return "STOCK"
-    }
-
     override fun type(): EquityType {
       return EquityType.STOCK
     }

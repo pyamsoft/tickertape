@@ -74,10 +74,6 @@ fun newTestQuote(symbol: StockSymbol): StockQuote {
       return EquityType.STOCK
     }
 
-    override fun realEquityType(): String {
-      return "STOCK"
-    }
-
     override fun regular(): StockMarketSession {
       return newSession(MarketState.REGULAR)
     }

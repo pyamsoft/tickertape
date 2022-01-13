@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier

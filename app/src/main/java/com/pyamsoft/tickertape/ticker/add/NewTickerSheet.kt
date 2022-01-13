@@ -45,9 +45,13 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .let { TickerDestination.valueOf(it) }
   }
 
+  private fun handleForceClose() {
+    dismiss()
+  }
+
   private fun handleCloseClicked(equityType: EquityType?) {
     if (equityType == null) {
-      dismiss()
+      handleForceClose()
     } else {
       viewModel
           .requireNotNull()
@@ -72,6 +76,23 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .handleEquityTypeSelected(
             scope = viewLifecycleOwner.lifecycleScope,
             type = type,
+        )
+  }
+
+  private fun handleClear() {
+    viewModel
+        .requireNotNull()
+        .handleClear(
+            scope = viewLifecycleOwner.lifecycleScope,
+        )
+  }
+
+  private fun handleSubmit() {
+    viewModel
+        .requireNotNull()
+        .handleSubmit(
+            scope = viewLifecycleOwner.lifecycleScope,
+            onSubmit = { handleForceClose() },
         )
   }
 
@@ -104,6 +125,8 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onTypeSelected = { handleEquityTypeSelected(it) },
                 onSymbolChanged = { handleSymbolChanged(it) },
                 onSearchResultSelected = { vm.handleSearchResultSelected(it) },
+                onSubmit = { handleSubmit() },
+                onClear = { handleClear() },
             )
           }
         }

@@ -77,9 +77,6 @@ dependencies {
 
   // AndroidX
   api "androidx.fragment:fragment-ktx:$fragment"
-  api "androidx.recyclerview:recyclerview:$recyclerView"
-  api "androidx.constraintlayout:constraintlayout:$constraintLayout"
-  api "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefresh"
   api "androidx.appcompat:appcompat:$appCompat"
 
   // Compose
@@ -98,13 +95,8 @@ dependencies {
   // Material Design
   api "com.google.android.material:material:$materialDesign"
 
-  // RecyclerView decorations
-  api "io.cabriole:decorator:$decorator"
-  api "me.zhanghai.android.fastscroll:library:$fastscroll"
-
   // PYDroid
   api "com.github.pyamsoft.pydroid:ui:$pydroid"
-  api "com.github.pyamsoft.pydroid:loader:$pydroid"
 
   api project(':core')
 }

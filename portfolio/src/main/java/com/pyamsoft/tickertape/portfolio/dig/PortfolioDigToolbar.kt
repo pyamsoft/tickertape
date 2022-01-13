@@ -16,24 +16,24 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 internal fun PortfolioDigToolbar(
     modifier: Modifier = Modifier,
-    section: PortfolioDigSections,
-    ticker: Ticker,
+    state: PortfolioDigViewState,
     onClose: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
-  val title = ticker.quote?.company()?.company() ?: ticker.symbol.symbol()
+  val ticker = state.ticker
+  val section = state.section
+  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
 
   Surface(
       modifier = modifier,
@@ -110,13 +110,7 @@ private fun PortfolioTab(
 private fun PreviewPortfolioDigToolbar() {
   val symbol = "MSFT".asSymbol()
   PortfolioDigToolbar(
-      ticker =
-          Ticker(
-              symbol = symbol,
-              quote = newTestQuote(symbol),
-              chart = null,
-          ),
-      section = PortfolioDigSections.POSITIONS,
+      state = MutablePortfolioDigViewState(symbol),
       onClose = {},
       onTabUpdated = {},
   )

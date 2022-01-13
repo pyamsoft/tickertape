@@ -35,9 +35,7 @@ fun PortfolioDigScreen(
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
 ) {
-  val ticker = state.ticker
   val isLoading = state.isLoading
-  val section = state.section
 
   // NOTE(Peter): We need this useless box or we crash at runtime with a Compose ClassCastException.
   Box(
@@ -48,8 +46,7 @@ fun PortfolioDigScreen(
           modifier = Modifier.fillMaxWidth(),
       ) {
         PortfolioDigToolbar(
-            ticker = ticker,
-            section = section,
+            state = state,
             onClose = onClose,
             onTabUpdated = onTabUpdated,
         )

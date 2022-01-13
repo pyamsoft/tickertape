@@ -32,7 +32,6 @@ import com.pyamsoft.tickertape.home.HomeModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
-import com.pyamsoft.tickertape.portfolio.add.BasePortfolioAddComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
@@ -47,7 +46,6 @@ import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ticker.add.NewTickerComponent
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
-import com.pyamsoft.tickertape.watchlist.add.BaseWatchlistAddComponent
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
@@ -93,10 +91,6 @@ internal interface TickerComponent {
   @CheckResult fun plusPositionAddDateComponent(): PositionAddDateComponent.Factory
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
-
-  @CheckResult fun plusWatchlistAddComponent(): BaseWatchlistAddComponent.Factory
-
-  @CheckResult fun plusPortfolioAddComponent(): BasePortfolioAddComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
+import androidx.annotation.CheckResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,11 +25,20 @@ internal class MutablePositionAddViewState @Inject internal constructor() : Posi
   override var pricePerShare by mutableStateOf("")
   override var numberOfShares by mutableStateOf("")
   override var dateOfPurchase by mutableStateOf<LocalDate?>(null)
-  override var positionId by mutableStateOf(DbPosition.Id(IdGenerator.generate()))
+  override var positionId by mutableStateOf(generateNewPositionId())
     // Private set because we don't want someone changing this outside of the newPosition() function
     private set
 
   fun newPosition() {
-    positionId = DbPosition.Id(IdGenerator.generate())
+    positionId = generateNewPositionId()
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun generateNewPositionId(): DbPosition.Id {
+      return DbPosition.Id(IdGenerator.generate())
+    }
   }
 }

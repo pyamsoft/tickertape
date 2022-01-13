@@ -49,17 +49,26 @@ protected constructor(
                 return@also
               }
 
-              val price = state.currentPrice
-              if (price == null) {
-                state.apply {
-                  currentDate = c.currentDate()
-                  currentPrice = c.currentPrice()
-                }
-              }
+              state.onInitialLoad(c)
             }
           }
           .onFailure { Timber.e(it, "Failed to load Ticker") }
-          .onFailure { state.currentPrice = null }
+          .onFailure {
+            state.apply {
+              currentPrice = null
+              mostRecentPrice = null
+            }
+          }
+
+  private fun MutableDigViewState.onInitialLoad(chart: StockChart) {
+    if (currentPrice == null) {
+      currentDate = chart.currentDate()
+      currentPrice = chart.currentPrice()
+
+      // Set the most recent price as the initial load current price (should basically be today's most recent quote)
+      mostRecentPrice = currentPrice
+    }
+  }
 
   fun handleRangeSelected(
       scope: CoroutineScope,

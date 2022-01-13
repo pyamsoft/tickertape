@@ -56,7 +56,9 @@ fun TickerPrice(
           text = session.price().asMoneyValue(),
           style = MaterialTheme.typography.body2.copy(color = composeColor),
       )
-      Row(verticalAlignment = Alignment.CenterVertically) {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
         Text(
             text = "${directionSign}${session.amount().asMoneyValue()}",
             style = MaterialTheme.typography.caption.copy(color = composeColor),

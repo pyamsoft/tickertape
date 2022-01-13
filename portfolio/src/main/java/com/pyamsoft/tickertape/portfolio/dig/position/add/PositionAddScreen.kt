@@ -65,23 +65,22 @@ fun PositionAddScreen(
       Column(
           modifier = Modifier.fillMaxWidth().padding(16.dp),
       ) {
-        PricePerShare(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            isEnabled = isTextEntryEnabled,
-            pricePerShare = pricePerShare,
-            onPriceChanged = onPriceChanged,
-        )
-
         NumberOfShares(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             isEnabled = isTextEntryEnabled,
             numberOfShares = numberOfShares,
             onNumberChanged = onNumberChanged,
         )
 
+        PricePerShare(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            isEnabled = isTextEntryEnabled,
+            pricePerShare = pricePerShare,
+            onPriceChanged = onPriceChanged,
+        )
+
         DateOfPurchase(
-            modifier =
-                Modifier.padding(top = 8.dp).padding(bottom = 16.dp).padding(horizontal = 8.dp),
+            modifier = Modifier.padding(8.dp),
             dateOfPurchase = dateOfPurchase,
             onDateOfPurchaseClicked = onDateOfPurchaseClicked,
         )

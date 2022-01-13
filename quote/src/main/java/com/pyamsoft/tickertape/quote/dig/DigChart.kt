@@ -1,38 +1,47 @@
 package com.pyamsoft.tickertape.quote.dig
 
+import androidx.annotation.CheckResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
-import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.asPercent
 import java.time.LocalDateTime
 
 @Composable
@@ -47,13 +56,17 @@ fun DigChart(
   val range = state.range
   val currentDate = state.currentDate
   val currentPrice = state.currentPrice
+  val mostRecentPrice = state.mostRecentPrice
 
   val chart = ticker.chart
 
   Column(
       modifier = modifier.padding(16.dp),
   ) {
-    Crossfade(modifier = Modifier.fillMaxWidth(), targetState = chart) { c ->
+    Crossfade(
+        modifier = Modifier.fillMaxWidth(),
+        targetState = chart,
+    ) { c ->
       if (c == null) {
         Error(
             modifier = Modifier.fillMaxWidth(),
@@ -72,6 +85,7 @@ fun DigChart(
               range = range,
               date = currentDate,
               price = currentPrice,
+              mostRecentPrice = mostRecentPrice,
           )
         }
       }
@@ -92,6 +106,7 @@ private fun CurrentScrub(
     range: StockChart.IntervalRange,
     date: LocalDateTime,
     price: StockMoneyValue?,
+    mostRecentPrice: StockMoneyValue?,
 ) {
   AnimatedVisibility(
       modifier = modifier,
@@ -99,7 +114,11 @@ private fun CurrentScrub(
   ) {
     if (price != null) {
       val dateFormatter =
-          if (range < StockChart.IntervalRange.THREE_MONTH) DATE_TIME_FORMATTER else DATE_FORMATTER
+          remember(range) {
+            if (range < StockChart.IntervalRange.THREE_MONTH) DATE_TIME_FORMATTER
+            else DATE_FORMATTER
+          }
+
       Column(
           modifier = Modifier.padding(16.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,13 +128,135 @@ private fun CurrentScrub(
             text = date.format(dateFormatter.get().requireNotNull()),
             style = MaterialTheme.typography.body1,
         )
-        Text(
+        Row(
             modifier = Modifier.padding(top = 4.dp),
-            text = price.asMoneyValue(),
-            style = MaterialTheme.typography.body1,
-        )
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+              modifier = Modifier.weight(0.8F),
+              text = price.asMoneyValue(),
+              style = MaterialTheme.typography.body1,
+          )
+
+          CurrentPriceSpacer(
+              modifier = Modifier.weight(0.2F),
+              mostRecentPrice = mostRecentPrice,
+          )
+
+          CurrentPriceDisplay(
+              modifier = Modifier.weight(1F),
+              price = price,
+              mostRecentPrice = mostRecentPrice,
+          )
+        }
       }
     }
+  }
+}
+
+@Composable
+private fun CurrentPriceSpacer(
+    modifier: Modifier = Modifier,
+    mostRecentPrice: StockMoneyValue?,
+) {
+  if (mostRecentPrice == null) {
+    return
+  }
+
+  Spacer(
+      modifier = modifier,
+  )
+  Icon(
+      imageVector = Icons.Filled.ArrowForward,
+      contentDescription = "Change",
+  )
+  Spacer(
+      modifier = modifier,
+  )
+}
+
+@Composable
+private fun CurrentPriceDisplay(
+    modifier: Modifier = Modifier,
+    price: StockMoneyValue,
+    mostRecentPrice: StockMoneyValue?,
+) {
+  if (mostRecentPrice == null) {
+    // No most recent price, dont show
+    return
+  }
+
+  val diff = remember(price, mostRecentPrice) { calculateDifferences(price, mostRecentPrice) }
+  Column(
+      modifier = modifier,
+      verticalArrangement = Arrangement.Center,
+  ) {
+    Text(
+        text = mostRecentPrice.asMoneyValue(),
+        style = MaterialTheme.typography.body1.copy(color = diff.color),
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+          text = "${diff.direction.sign()}${diff.amount.asMoneyValue()}",
+          style = MaterialTheme.typography.caption.copy(color = diff.color),
+      )
+      Text(
+          modifier = Modifier.padding(start = 8.dp),
+          text = "(${diff.direction.sign()}${diff.percent.asPercentValue()})",
+          style = MaterialTheme.typography.caption.copy(color = diff.color),
+      )
+    }
+  }
+}
+
+@CheckResult
+private fun calculateDifferences(
+    current: StockMoneyValue,
+    mostRecent: StockMoneyValue
+): ScrubDifferences {
+  val rawCurrent = current.value()
+  val rawMostRecent = mostRecent.value()
+  if (rawCurrent.compareTo(rawMostRecent) == 0) {
+    return ScrubDifferences.ZERO
+  }
+
+  val rawAmount = rawMostRecent - rawCurrent
+  val direction = rawAmount.asDirection()
+
+  // Percentage is between 0-100 not 0 and 1
+  val rawPercent = rawAmount / rawCurrent * 100
+
+  return ScrubDifferences(
+      amount = rawAmount.asMoney(),
+      percent = rawPercent.asPercent(),
+      direction = direction,
+      color =
+          if (direction.isZero()) {
+            Color.Unspecified
+          } else {
+            Color(direction.color())
+          },
+  )
+}
+
+private data class ScrubDifferences(
+    val percent: StockPercent,
+    val amount: StockMoneyValue,
+    val direction: StockDirection,
+    val color: Color,
+) {
+  companion object {
+
+    @JvmStatic
+    internal val ZERO =
+        ScrubDifferences(
+            percent = StockPercent.none(),
+            amount = StockMoneyValue.none(),
+            direction = StockDirection.none(),
+            color = Color.Unspecified,
+        )
   }
 }
 
@@ -174,24 +315,9 @@ private fun Error(
 @Preview
 @Composable
 private fun PreviewDigChart() {
-  val symbol = "MSFT".asSymbol()
   Surface {
     DigChart(
-        state =
-            object : DigViewState {
-              override val ticker =
-                  Ticker(
-                      symbol = symbol,
-                      quote = newTestQuote(symbol),
-                      chart = newTestChart(symbol),
-                  )
-
-              override val range = StockChart.IntervalRange.ONE_DAY
-
-              override val currentDate = LocalDateTime.now()
-
-              override val currentPrice = 1.0.asMoney()
-            },
+        state = newTestDigViewState(),
         onScrub = {},
         onRangeSelected = {},
     )

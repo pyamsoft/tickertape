@@ -84,11 +84,16 @@ internal constructor(
       cancelInProgressLookup(scope)
     }
 
+    performSymbolLookup(scope, symbol)
+  }
+
+  private fun performSymbolLookup(scope: CoroutineScope, symbol: String) {
     scope.launch(context = Dispatchers.Main) {
       lookupRunner
           .call(false, symbol)
           .onFailure { Timber.e(it, "Error looking up results for $symbol") }
           .onSuccess { Timber.d("Found search results for $symbol $it") }
+          .map { processLookupResults(it) }
           .onSuccess { r ->
             state.apply {
               lookupError = null
@@ -102,6 +107,22 @@ internal constructor(
             }
           }
           .onFinally { state.apply { isLookup = false } }
+    }
+  }
+
+  @CheckResult
+  private fun processLookupResults(results: List<SearchResult>): List<SearchResult> {
+    val equityType = state.equityType
+    return if (equityType == null) {
+      emptyList()
+    } else {
+      results.filter { result ->
+        when (equityType) {
+          EquityType.STOCK -> result.type() == EquityType.STOCK
+          EquityType.OPTION -> result.type() == EquityType.STOCK
+          EquityType.CRYPTOCURRENCY -> result.type() == EquityType.CRYPTOCURRENCY
+        }
+      }
     }
   }
 

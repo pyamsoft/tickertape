@@ -50,7 +50,7 @@ internal constructor(
   private val optionsMutex = Mutex()
 
   private val optionsCache =
-      mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDateTime?>>()
+      mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDate?>>()
 
   private val trendingCache =
       cachify<StockTrends, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
@@ -138,7 +138,7 @@ internal constructor(
   override suspend fun getOptions(
       force: Boolean,
       symbol: StockSymbol,
-      date: LocalDateTime?
+      date: LocalDate?
   ): StockOptions =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -151,10 +151,10 @@ internal constructor(
           }
 
           val cached = optionsCache[key]
-          val cache: Cached2<StockOptions, StockSymbol, LocalDateTime?>
+          val cache: Cached2<StockOptions, StockSymbol, LocalDate?>
           if (cached == null) {
             cache =
-                cachify<StockOptions, StockSymbol, LocalDateTime?>(
+                cachify<StockOptions, StockSymbol, LocalDate?>(
                     storage = { listOf(createNewMemoryCacheStorage()) },
                 ) { s, d -> interactor.getOptions(true, s, d) }
                     .also { c -> optionsCache[key] = c }
@@ -211,5 +211,5 @@ internal constructor(
         }
       }
 
-  private data class OptionsKey(val symbol: StockSymbol, val date: LocalDateTime?)
+  private data class OptionsKey(val symbol: StockSymbol, val date: LocalDate?)
 }

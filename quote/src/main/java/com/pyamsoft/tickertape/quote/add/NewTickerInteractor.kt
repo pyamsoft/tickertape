@@ -29,7 +29,11 @@ import java.time.LocalDate
 
 interface NewTickerInteractor {
 
-  @CheckResult suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>>
+  @CheckResult
+  suspend fun search(
+      force: Boolean,
+      query: String,
+  ): ResultWrapper<List<SearchResult>>
 
   @CheckResult
   suspend fun resolveOptionsIdentifier(
@@ -46,4 +50,10 @@ interface NewTickerInteractor {
       equityType: EquityType,
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>>
+
+  @CheckResult
+  suspend fun lookupOptionsData(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<StockOptions>
 }

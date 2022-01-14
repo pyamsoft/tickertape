@@ -31,7 +31,6 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +66,7 @@ internal constructor(
   override suspend fun getOptions(
       force: Boolean,
       symbol: StockSymbol,
-      date: LocalDateTime?
+      date: LocalDate?
   ): StockOptions =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()

@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.quote.add.NewTickerScreen
 import com.pyamsoft.tickertape.quote.add.NewTickerViewModeler
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
 
 internal class NewTickerSheet : BottomSheetDialogFragment() {
@@ -67,6 +68,15 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .handleSymbolChanged(
             scope = viewLifecycleOwner.lifecycleScope,
             symbol = symbol,
+        )
+  }
+
+  private fun handleSearchResultSelected(result: SearchResult) {
+    viewModel
+        .requireNotNull()
+        .handleSearchResultSelected(
+            scope = viewLifecycleOwner.lifecycleScope,
+            result = result,
         )
   }
 
@@ -124,7 +134,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onClose = { handleCloseClicked(equityType) },
                 onTypeSelected = { handleEquityTypeSelected(it) },
                 onSymbolChanged = { handleSymbolChanged(it) },
-                onSearchResultSelected = { vm.handleSearchResultSelected(it) },
+                onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
                 onClear = { handleClear() },
             )

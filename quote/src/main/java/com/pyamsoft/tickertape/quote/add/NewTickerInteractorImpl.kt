@@ -148,6 +148,35 @@ internal constructor(
         }
       }
 
+  @CheckResult
+  private suspend fun performLookupOptionsData(
+      force: Boolean,
+      symbol: StockSymbol,
+      date: LocalDate?,
+  ): ResultWrapper<StockOptions> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          val result = interactor.getOptions(force, symbol, date)
+          ResultWrapper.success(result)
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to lookup options data: $symbol")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
+  override suspend fun lookupOptionsData(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<StockOptions> =
+      performLookupOptionsData(
+          force = force,
+          symbol = symbol,
+          date = null,
+      )
+
   override suspend fun resolveOptionsIdentifier(
       symbol: StockSymbol,
       expirationDate: LocalDate,

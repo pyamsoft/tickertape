@@ -43,7 +43,15 @@ internal constructor(
     destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
-  private val optionsLookupRunner =
+  private val optionLookupRunner =
+      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
+        interactor.lookupOptionsData(
+            force = force,
+            symbol = symbol,
+        )
+      }
+
+  private val optionResolverRunner =
       highlander<String, StockSymbol, LocalDate, StockMoneyValue, StockOptions.Contract.Type> {
           symbol,
           expirationDate,
@@ -138,12 +146,21 @@ internal constructor(
     return if (equityType !== EquityType.OPTION) {
       symbol
     } else {
-      optionsLookupRunner.call(
+      optionResolverRunner.call(
           validSymbol.requireNotNull(),
           optionExpirationDate.requireNotNull(),
           optionStrikePrice.requireNotNull(),
           optionType.requireNotNull(),
       )
+    }
+  }
+
+  private fun performLookupOptionData(scope: CoroutineScope, symbol: StockSymbol) {
+    scope.launch(context = Dispatchers.Main) {
+      optionLookupRunner
+          .call(false, symbol)
+          .onFailure { Timber.e(it, "Error looking up options data: ${symbol.symbol()}") }
+          .onSuccess { Timber.d("Options data: $it") }
     }
   }
 
@@ -180,10 +197,20 @@ internal constructor(
     }
   }
 
-  fun handleSearchResultSelected(result: SearchResult) {
-    state.apply {
-      validSymbol = result.symbol()
-      symbol = result.symbol().symbol()
+  fun handleSearchResultSelected(
+      scope: CoroutineScope,
+      result: SearchResult,
+  ) {
+    val sym = result.symbol()
+
+    val s = state
+    s.apply {
+      validSymbol = sym
+      symbol = sym.symbol()
+    }
+
+    if (s.equityType == EquityType.OPTION) {
+      performLookupOptionData(scope, sym)
     }
   }
 

@@ -29,7 +29,7 @@ interface OptionsSource {
   suspend fun getOptions(
       force: Boolean,
       symbol: StockSymbol,
-      date: LocalDateTime? = null
+      date: LocalDate?
   ): StockOptions
 
   @CheckResult

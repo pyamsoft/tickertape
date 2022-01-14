@@ -30,9 +30,7 @@ import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -93,13 +91,13 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
   override suspend fun getOptions(
       force: Boolean,
       symbol: StockSymbol,
-      date: LocalDateTime?
+      date: LocalDate?
   ): StockOptions =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         val resp =
             if (date == null) service.getOptions(symbol.symbol())
-            else service.getOptions(symbol.symbol(), date.toEpochSecond(ZoneOffset.UTC))
+            else service.getOptions(symbol.symbol(), date.toEpochDay())
         return@withContext parseOptionsResponse(resp)
       }
 

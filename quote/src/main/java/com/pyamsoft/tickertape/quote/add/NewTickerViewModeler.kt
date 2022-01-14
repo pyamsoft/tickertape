@@ -119,6 +119,7 @@ internal constructor(
       results.filter { result ->
         when (equityType) {
           EquityType.STOCK -> result.type() == EquityType.STOCK
+          // STOCK instead of OPTION since we will use the STOCK to build the OPTION lookup
           EquityType.OPTION -> result.type() == EquityType.STOCK
           EquityType.CRYPTOCURRENCY -> result.type() == EquityType.CRYPTOCURRENCY
         }

@@ -59,6 +59,7 @@ internal constructor(
 
   internal data class ContractImpl
   internal constructor(
+      private val type: StockOptions.Contract.Type,
       private val symbol: StockSymbol,
       private val contractSymbol: StockSymbol,
       private val strike: StockMoneyValue,
@@ -77,6 +78,10 @@ internal constructor(
       val bidValue = bid.value()
       val diff = ask.value() - bidValue
       mid = (bidValue + diff).asMoney()
+    }
+
+    override fun type(): StockOptions.Contract.Type {
+      return type
     }
 
     override fun symbol(): StockSymbol {

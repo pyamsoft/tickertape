@@ -1,7 +1,10 @@
 package com.pyamsoft.tickertape.quote.add
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,11 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 
 @Composable
@@ -49,21 +55,23 @@ internal fun LookupScreen(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
 ) {
-  val symbol = state.symbol
-
   Column(
       modifier = modifier.padding(16.dp),
   ) {
     SymbolLookup(
         modifier = Modifier.fillMaxWidth(),
-        symbol = symbol,
+        state = state,
         onSymbolChanged = onSymbolChanged,
         onSubmit = onSubmit,
     )
     LookupResults(
-        modifier = Modifier.fillMaxWidth().height(240.dp),
+        modifier = Modifier.fillMaxWidth().height(160.dp).focusable(enabled = false),
         state = state,
         onSearchResultSelected = onSearchResultSelected,
+    )
+    OptionsSection(
+        modifier = Modifier.fillMaxWidth(),
+        state = state,
     )
     SubmissionSection(
         modifier = Modifier.fillMaxWidth(),
@@ -71,6 +79,25 @@ internal fun LookupScreen(
         onSubmit = onSubmit,
         onClear = onClear,
     )
+  }
+}
+
+@Composable
+@OptIn(ExperimentalAnimationApi::class)
+private fun OptionsSection(
+    modifier: Modifier = Modifier,
+    state: NewTickerViewState,
+) {
+  val show = remember(state.equityType) { state.equityType === EquityType.OPTION }
+  AnimatedVisibility(
+      modifier = modifier,
+      visible = show,
+  ) {
+    Box {
+      Text(
+          text = "Options HERE!",
+      )
+    }
   }
 }
 
@@ -212,10 +239,15 @@ private fun LoadingResults(
 @Composable
 private fun SymbolLookup(
     modifier: Modifier = Modifier,
-    symbol: String,
+    state: NewTickerViewState,
     onSymbolChanged: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
+  val symbol = state.symbol
+  val isSubmitOnEnter = remember(state.equityType) { state.equityType !== EquityType.OPTION }
+
+  val focusManager = LocalFocusManager.current
+
   Box(
       modifier = modifier.padding(16.dp),
       contentAlignment = Alignment.Center,
@@ -231,7 +263,13 @@ private fun SymbolLookup(
             ),
         keyboardActions =
             KeyboardActions(
-                onDone = { onSubmit() },
+                onDone = {
+                  if (isSubmitOnEnter) {
+                    onSubmit()
+                  } else {
+                    focusManager.moveFocus(FocusDirection.Down)
+                  }
+                },
             ),
         singleLine = true,
         label = {

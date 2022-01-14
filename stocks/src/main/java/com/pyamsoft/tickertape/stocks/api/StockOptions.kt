@@ -35,6 +35,8 @@ interface StockOptions {
 
   interface Contract {
 
+    @CheckResult fun type(): Type
+
     @CheckResult fun symbol(): StockSymbol
 
     @CheckResult fun contractSymbol(): StockSymbol
@@ -56,6 +58,11 @@ interface StockOptions {
     @CheckResult fun iv(): StockPercent
 
     @CheckResult fun itm(): Boolean
+
+    enum class Type {
+      CALL,
+      PUT
+    }
   }
 
   interface Call : Contract

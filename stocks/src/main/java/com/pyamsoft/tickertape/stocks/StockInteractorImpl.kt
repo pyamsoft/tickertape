@@ -22,6 +22,7 @@ import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -29,6 +30,7 @@ import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -162,6 +164,23 @@ internal constructor(
 
           return@withLock cache.call(symbol, date)
         }
+      }
+
+  override suspend fun resolveOptionLookupIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type
+  ): String =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext interactor.resolveOptionLookupIdentifier(
+            symbol = symbol,
+            expirationDate = expirationDate,
+            strikePrice = strikePrice,
+            contractType = contractType,
+        )
       }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =

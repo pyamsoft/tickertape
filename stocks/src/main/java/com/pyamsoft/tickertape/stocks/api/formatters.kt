@@ -27,8 +27,8 @@ val SMALL_MONEY_FORMATTER =
 
       override fun initialValue(): NumberFormat? {
         return DecimalFormat.getCurrencyInstance().apply {
-          minimumFractionDigits = 2
-          maximumFractionDigits = 4
+          minimumFractionDigits = 3
+          maximumFractionDigits = 3
         }
       }
     }

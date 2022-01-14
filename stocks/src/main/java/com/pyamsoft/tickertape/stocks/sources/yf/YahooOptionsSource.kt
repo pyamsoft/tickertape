@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.sources.yf
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.InternalApi
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -28,12 +29,15 @@ import com.pyamsoft.tickertape.stocks.data.StockOptionsImpl
 import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class YahooOptionsSource
 @Inject
@@ -41,12 +45,19 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
 
   companion object {
 
+    private const val INVALID_OPTIONS_FORMAT = ""
+    private const val MAX_STRIKE_PRICE = 100000.0
+    private const val MAX_LOOP_COUNT = 10
+    private val OPTIONS_EXPIRATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMDD")
+
     @JvmStatic
     @CheckResult
     private fun NetworkOptionResponse.Resp.OptionChain.Option.OptionContract.asContract(
-        symbol: StockSymbol
+        symbol: StockSymbol,
+        type: StockOptions.Contract.Type,
     ): StockOptionsImpl.ContractImpl {
       return StockOptionsImpl.ContractImpl(
+          type = type,
           symbol = symbol,
           contractSymbol = this.contractSymbol.asSymbol(),
           strike = this.strike.asMoney(),
@@ -66,8 +77,8 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
     val option = resp.optionChain.result.first()
     val chain = option.options.first()
     val symbol = option.underlyingSymbol.asSymbol()
-    val calls = chain.calls.map { it.asContract(symbol) }
-    val puts = chain.puts.map { it.asContract(symbol) }
+    val calls = chain.calls.map { it.asContract(symbol, StockOptions.Contract.Type.CALL) }
+    val puts = chain.puts.map { it.asContract(symbol, StockOptions.Contract.Type.PUT) }
 
     val localId = ZoneId.systemDefault()
     return StockOptionsImpl(
@@ -90,5 +101,52 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
             if (date == null) service.getOptions(symbol.symbol())
             else service.getOptions(symbol.symbol(), date.toEpochSecond(ZoneOffset.UTC))
         return@withContext parseOptionsResponse(resp)
+      }
+
+  override suspend fun resolveOptionLookupIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type
+  ): String =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        // MSFT220114P00305000
+        // MSFT 22-01-14 P $00305.000
+
+        val dateString = expirationDate.format(OPTIONS_EXPIRATION_DATE_FORMATTER)
+        val contract = if (contractType == StockOptions.Contract.Type.CALL) "C" else "P"
+
+        // Remove the dollar sign from the strike price formatting
+        val fixedStrike = strikePrice.asMoneyValue().replace("$", "")
+
+        // Options IDs can only have 3 "decimal" places, figure out how many we have currently
+        // and add more zeroes if we need more
+        val numbersAfterDecimal = fixedStrike.substringAfter(".").length
+        val neededZeroCount = 3 - numbersAfterDecimal
+
+        // Replace the . in the price
+        val zeroString = if (neededZeroCount == 0) "" else "0".repeat(neededZeroCount)
+        var strikeString = "${fixedStrike.replace("." , "")}${zeroString}"
+
+        // Here we go, time to assemble
+        var tempStrike = strikePrice.value()
+
+        // The highest number YF can support is 100,000 for a strike
+        tempStrike *= 10
+
+        // A safe guard to avoid infinite loops
+        var loopCount = 0
+        while (tempStrike.compareTo(MAX_STRIKE_PRICE) < 0) {
+          if (loopCount++ > MAX_LOOP_COUNT) {
+            Timber.w("Options loop too large!. $tempStrike (Strike: $MAX_STRIKE_PRICE)")
+            return@withContext INVALID_OPTIONS_FORMAT
+          }
+          // Pad the string with 0 until it fills to the maximum strike price
+          strikeString = "0${strikeString}"
+          tempStrike *= 10
+        }
+
+        return@withContext "${symbol.symbol()}${dateString}${contract}${strikeString}"
       }
 }

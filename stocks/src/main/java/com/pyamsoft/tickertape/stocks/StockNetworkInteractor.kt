@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -29,6 +30,7 @@ import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -112,5 +114,22 @@ internal constructor(
         return@withContext chartSource.getCharts(force, symbols, range)
             // Remove any duplicated symbols, we expect only one
             .distinctBy { it.symbol() }
+      }
+
+  override suspend fun resolveOptionLookupIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type
+  ): String =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext optionsSource.resolveOptionLookupIdentifier(
+            symbol = symbol,
+            expirationDate = expirationDate,
+            strikePrice = strikePrice,
+            contractType = contractType,
+        )
       }
 }

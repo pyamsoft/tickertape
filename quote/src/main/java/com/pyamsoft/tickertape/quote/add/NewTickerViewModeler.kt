@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote.add
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
@@ -23,8 +24,11 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +42,20 @@ internal constructor(
     interactor: NewTickerInteractor,
     destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
+
+  private val optionsLookupRunner =
+      highlander<String, StockSymbol, LocalDate, StockMoneyValue, StockOptions.Contract.Type> {
+          symbol,
+          expirationDate,
+          strikePrice,
+          contractType ->
+        interactor.resolveOptionsIdentifier(
+            symbol = symbol,
+            expirationDate = expirationDate,
+            strikePrice = strikePrice,
+            contractType = contractType,
+        )
+      }
 
   private val insertRunner =
       highlander<ResultWrapper<DbInsert.InsertResult<StockSymbol>>, String> {
@@ -131,20 +149,52 @@ internal constructor(
     }
   }
 
+  @CheckResult
+  private suspend fun NewTickerViewState.resolveSubmission(): String {
+    return if (equityType !== EquityType.OPTION) {
+      symbol
+    } else {
+      optionsLookupRunner.call(
+          symbol.asSymbol(),
+          optionExpirationDate.requireNotNull(),
+          optionStrikePrice.requireNotNull(),
+          optionType.requireNotNull(),
+      )
+    }
+  }
+
+  @CheckResult
+  private fun NewTickerViewState.canSubmit(): Boolean {
+    return when {
+      symbol.isBlank() -> false
+      equityType !== EquityType.OPTION -> true
+      else -> optionExpirationDate != null && optionStrikePrice != null && optionType != null
+    }
+  }
+
   fun handleSubmit(
       scope: CoroutineScope,
       onSubmit: () -> Unit,
   ) {
     val s = state
-    if (s.isSubmitting) {
+    if (s.isSubmitting || !s.canSubmit()) {
       return
     }
 
     s.apply {
-      val sym = symbol
       s.isSubmitting = true
       cancelInProgressLookup(scope)
       scope.launch(context = Dispatchers.Main) {
+        val sym = resolveSubmission()
+
+        // If blank, we can't do anything
+        if (sym.isBlank()) {
+          Timber.w(
+              "Invalid lookup symbol generated: $symbol $optionExpirationDate $optionStrikePrice $optionType")
+          s.isSubmitting = false
+          throw InvalidLookupException
+        }
+
         insertRunner
             .call(sym)
             .onFailure { Timber.e(it, "Failed to insert new symbol: $sym") }

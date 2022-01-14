@@ -21,12 +21,23 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import java.time.LocalDate
 
 interface NewTickerInteractor {
 
   @CheckResult suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>>
+
+  @CheckResult
+  suspend fun resolveOptionsIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type,
+  ): String
 
   @CheckResult
   suspend fun insertNewTicker(

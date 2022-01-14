@@ -17,8 +17,10 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface OptionsSource {
@@ -29,4 +31,12 @@ interface OptionsSource {
       symbol: StockSymbol,
       date: LocalDateTime? = null
   ): StockOptions
+
+  @CheckResult
+  suspend fun resolveOptionLookupIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type,
+  ): String
 }

@@ -30,8 +30,11 @@ import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -143,5 +146,21 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun resolveOptionsIdentifier(
+      symbol: StockSymbol,
+      expirationDate: LocalDate,
+      strikePrice: StockMoneyValue,
+      contractType: StockOptions.Contract.Type
+  ): String =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        return@withContext interactor.resolveOptionLookupIdentifier(
+            symbol = symbol,
+            expirationDate = expirationDate,
+            strikePrice = strikePrice,
+            contractType = contractType,
+        )
       }
 }

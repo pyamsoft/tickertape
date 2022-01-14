@@ -110,5 +110,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext chartSource.getCharts(force, symbols, range)
+            // Remove any duplicated symbols, we expect only one
+            .distinctBy { it.symbol() }
       }
 }

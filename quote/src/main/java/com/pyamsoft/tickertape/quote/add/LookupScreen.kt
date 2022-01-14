@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -31,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.stocks.api.SearchResult
@@ -54,6 +58,7 @@ internal fun LookupScreen(
         modifier = Modifier.fillMaxWidth(),
         symbol = symbol,
         onSymbolChanged = onSymbolChanged,
+        onSubmit = onSubmit,
     )
     LookupResults(
         modifier = Modifier.fillMaxWidth().height(240.dp),
@@ -209,6 +214,7 @@ private fun SymbolLookup(
     modifier: Modifier = Modifier,
     symbol: String,
     onSymbolChanged: (String) -> Unit,
+    onSubmit: () -> Unit,
 ) {
   Box(
       modifier = modifier.padding(16.dp),
@@ -218,6 +224,15 @@ private fun SymbolLookup(
         modifier = Modifier.fillMaxWidth(),
         value = symbol,
         onValueChange = onSymbolChanged,
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
+            ),
+        keyboardActions =
+            KeyboardActions(
+                onDone = { onSubmit() },
+            ),
         singleLine = true,
         label = {
           Text(

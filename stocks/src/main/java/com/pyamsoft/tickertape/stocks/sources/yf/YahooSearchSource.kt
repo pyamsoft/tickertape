@@ -50,6 +50,8 @@ internal constructor(@InternalApi private val service: SearchService) : SearchSo
           return@withContext result
               .quotes
               .asSequence()
+              // Remove duplicate listings
+              .distinctBy { it.symbol }
               .map { quote ->
                 val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
                 return@map SearchResultImpl(

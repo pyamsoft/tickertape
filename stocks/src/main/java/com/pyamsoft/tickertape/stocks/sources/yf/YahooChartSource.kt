@@ -60,6 +60,8 @@ internal constructor(@InternalApi private val service: ChartService) : ChartSour
             .result
             .asSequence()
             .filterOnlyValidCharts()
+            // Remove duplicate listings
+            .distinctBy { it.symbol }
             .map { resp ->
               val chart = resp.response.first()
               val meta = chart.meta.requireNotNull()

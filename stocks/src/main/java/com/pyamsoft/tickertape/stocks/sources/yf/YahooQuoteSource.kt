@@ -62,6 +62,8 @@ internal constructor(@InternalApi private val service: QuoteService) : QuoteSour
             .result
             .asSequence()
             .filterOnlyValidQuotes()
+            // Remove duplicate listings
+            .distinctBy { it.symbol }
             .map { stock ->
               if (stock.expireDate != null && stock.strike != null) {
                 createOptionsQuote(stock, localId)

@@ -63,6 +63,8 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                           .asSequence()
                           .filterOnlyValidTrends()
                           .map { it.symbol.requireNotNull().asSymbol() }
+                          // Remove duplicate listings
+                          .distinct()
                           .toList(),
               )
             }
@@ -106,6 +108,8 @@ internal constructor(@InternalApi private val service: TopService) : TopSource {
                           .requireNotNull()
                           .asSequence()
                           .filterOnlyValidQuotes()
+                          // Remove duplicate listings
+                          .distinctBy { it.symbol }
                           .map { stock ->
                             StockQuoteImpl(
                                 symbol = stock.symbol.asSymbol(),

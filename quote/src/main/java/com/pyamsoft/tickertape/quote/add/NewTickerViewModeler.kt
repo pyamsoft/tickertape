@@ -79,7 +79,7 @@ internal constructor(
   ) {
     state.apply {
       this.symbol = symbol
-      isValidSymbol = false
+      validSymbol = null
 
       cancelInProgressLookup(scope)
     }
@@ -146,7 +146,7 @@ internal constructor(
     state.apply {
       equityType = type
       symbol = ""
-      isValidSymbol = false
+      validSymbol = null
 
       cancelInProgressLookup(scope)
     }
@@ -156,7 +156,7 @@ internal constructor(
     state.apply {
       equityType = null
       symbol = ""
-      isValidSymbol = false
+      validSymbol = null
 
       cancelInProgressLookup(scope)
     }
@@ -164,26 +164,27 @@ internal constructor(
 
   fun handleSearchResultSelected(result: SearchResult) {
     state.apply {
+      validSymbol = result.symbol()
       symbol = result.symbol().symbol()
-      isValidSymbol = true
     }
   }
 
   fun handleClear(scope: CoroutineScope) {
     state.apply {
       symbol = ""
-      isValidSymbol = false
+      validSymbol = null
+
       cancelInProgressLookup(scope)
     }
   }
 
   @CheckResult
-  private suspend fun NewTickerViewState.resolveSubmission(): String {
+  private suspend fun MutableNewTickerViewState.resolveSubmission(): String {
     return if (equityType !== EquityType.OPTION) {
       symbol
     } else {
       optionsLookupRunner.call(
-          symbol.asSymbol(),
+          validSymbol.requireNotNull(),
           optionExpirationDate.requireNotNull(),
           optionStrikePrice.requireNotNull(),
           optionType.requireNotNull(),
@@ -209,7 +210,7 @@ internal constructor(
         // If blank, we can't do anything
         if (sym.isBlank()) {
           Timber.w(
-              "Invalid lookup symbol generated: $symbol $optionExpirationDate $optionStrikePrice $optionType")
+              "Invalid lookup symbol generated: $symbol $validSymbol $optionExpirationDate $optionStrikePrice $optionType")
           s.isSubmitting = false
           throw InvalidLookupException
         }

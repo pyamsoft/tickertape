@@ -9,6 +9,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import java.time.LocalDate
@@ -16,8 +17,6 @@ import javax.inject.Inject
 
 interface NewTickerViewState : UiViewState {
   val isLookup: Boolean
-  val isSubmitting: Boolean
-  val isValidSymbol: Boolean
 
   val symbol: String
   val optionExpirationDate: LocalDate?
@@ -30,22 +29,14 @@ interface NewTickerViewState : UiViewState {
   val lookupError: Throwable?
   val lookupResults: List<SearchResult>
 
-  @CheckResult
-  fun canSubmit(): Boolean {
-    return if (isSubmitting || symbol.isBlank() || !isValidSymbol) {
-      false
-    } else if (equityType !== EquityType.OPTION) {
-      true
-    } else {
-      optionExpirationDate != null && optionStrikePrice != null && optionType != null
-    }
-  }
+  @CheckResult fun canSubmit(): Boolean
 }
 
 internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
+  internal var isSubmitting by mutableStateOf(false)
+  internal var validSymbol by mutableStateOf<StockSymbol?>(null)
+
   override var isLookup by mutableStateOf(false)
-  override var isSubmitting by mutableStateOf(false)
-  override var isValidSymbol by mutableStateOf(false)
 
   override var equityType by mutableStateOf<EquityType?>(null)
   override var tradeSide by mutableStateOf(TradeSide.BUY)
@@ -58,6 +49,16 @@ internal class MutableNewTickerViewState @Inject internal constructor() : NewTic
 
   override var lookupError by mutableStateOf<Throwable?>(null)
   override var lookupResults by mutableStateOf(emptyList<SearchResult>())
+
+  override fun canSubmit(): Boolean {
+    return if (isSubmitting || symbol.isBlank() || validSymbol == null) {
+      false
+    } else if (equityType !== EquityType.OPTION) {
+      true
+    } else {
+      optionExpirationDate != null && optionStrikePrice != null && optionType != null
+    }
+  }
 }
 
 object InvalidLookupException : IllegalArgumentException("Invalid lookup expression")

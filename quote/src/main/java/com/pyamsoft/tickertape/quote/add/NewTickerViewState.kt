@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.quote.add
 
+import androidx.annotation.CheckResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +17,7 @@ import javax.inject.Inject
 interface NewTickerViewState : UiViewState {
   val isLookup: Boolean
   val isSubmitting: Boolean
+  val isValidSymbol: Boolean
 
   val symbol: String
   val optionExpirationDate: LocalDate?
@@ -27,11 +29,23 @@ interface NewTickerViewState : UiViewState {
 
   val lookupError: Throwable?
   val lookupResults: List<SearchResult>
+
+  @CheckResult
+  fun canSubmit(): Boolean {
+    return if (isSubmitting || symbol.isBlank() || !isValidSymbol) {
+      false
+    } else if (equityType !== EquityType.OPTION) {
+      true
+    } else {
+      optionExpirationDate != null && optionStrikePrice != null && optionType != null
+    }
+  }
 }
 
 internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
   override var isLookup by mutableStateOf(false)
   override var isSubmitting by mutableStateOf(false)
+  override var isValidSymbol by mutableStateOf(false)
 
   override var equityType by mutableStateOf<EquityType?>(null)
   override var tradeSide by mutableStateOf(TradeSide.BUY)

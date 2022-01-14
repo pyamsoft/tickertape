@@ -79,9 +79,9 @@ internal constructor(
   ) {
     state.apply {
       this.symbol = symbol
-      isLookup = true
-      lookupError = null
-      lookupResults = emptyList()
+      isValidSymbol = false
+
+      cancelInProgressLookup(scope)
     }
 
     scope.launch(context = Dispatchers.Main) {
@@ -124,6 +124,7 @@ internal constructor(
     state.apply {
       equityType = type
       symbol = ""
+      isValidSymbol = false
 
       cancelInProgressLookup(scope)
     }
@@ -133,18 +134,23 @@ internal constructor(
     state.apply {
       equityType = null
       symbol = ""
+      isValidSymbol = false
 
       cancelInProgressLookup(scope)
     }
   }
 
   fun handleSearchResultSelected(result: SearchResult) {
-    state.symbol = result.symbol().symbol()
+    state.apply {
+      symbol = result.symbol().symbol()
+      isValidSymbol = true
+    }
   }
 
   fun handleClear(scope: CoroutineScope) {
     state.apply {
       symbol = ""
+      isValidSymbol = false
       cancelInProgressLookup(scope)
     }
   }
@@ -163,21 +169,12 @@ internal constructor(
     }
   }
 
-  @CheckResult
-  private fun NewTickerViewState.canSubmit(): Boolean {
-    return when {
-      symbol.isBlank() -> false
-      equityType !== EquityType.OPTION -> true
-      else -> optionExpirationDate != null && optionStrikePrice != null && optionType != null
-    }
-  }
-
   fun handleSubmit(
       scope: CoroutineScope,
       onSubmit: () -> Unit,
   ) {
     val s = state
-    if (s.isSubmitting || !s.canSubmit()) {
+    if (!s.canSubmit()) {
       return
     }
 

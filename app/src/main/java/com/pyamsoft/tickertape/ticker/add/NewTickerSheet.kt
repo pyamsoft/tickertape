@@ -92,7 +92,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .requireNotNull()
         .handleSubmit(
             scope = viewLifecycleOwner.lifecycleScope,
-            onSubmit = { handleForceClose() },
+            onSubmit = { handleClear() },
         )
   }
 

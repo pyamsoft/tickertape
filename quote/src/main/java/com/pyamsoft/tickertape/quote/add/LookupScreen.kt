@@ -108,16 +108,14 @@ private fun SubmissionSection(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
 ) {
-  val symbol = state.symbol
-  val isSubmitting = state.isSubmitting
-  val isSubmitEnabled = remember(symbol, isSubmitting) { symbol.isNotBlank() && !isSubmitting }
+  val canSubmit = remember(state) { state.canSubmit() }
 
   Row(
       modifier = modifier.padding(16.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
     OutlinedButton(
-        enabled = !isSubmitting,
+        enabled = !canSubmit,
         modifier = Modifier.weight(1F),
         onClick = onClear,
     ) {
@@ -131,7 +129,7 @@ private fun SubmissionSection(
     )
 
     Button(
-        enabled = isSubmitEnabled,
+        enabled = canSubmit,
         modifier = Modifier.weight(1F),
         onClick = onSubmit,
     ) {

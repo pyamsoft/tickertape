@@ -48,7 +48,6 @@ internal data class NetworkOptionResponse internal constructor(val optionChain: 
             val contractSymbol: String,
             val strike: Double,
             val lastPrice: Double,
-            val volume: Long,
             val change: Double,
             val bid: Double,
             val ask: Double,

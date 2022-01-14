@@ -85,7 +85,8 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
         strikes = option.strikes.map { it.asMoney() },
         date = parseMarketTime(chain.expirationDate, localId),
         calls = calls,
-        puts = puts)
+        puts = puts,
+    )
   }
 
   override suspend fun getOptions(

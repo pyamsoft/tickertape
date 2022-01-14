@@ -73,20 +73,6 @@ internal constructor(
         interactor.search(force, query)
       }
 
-  fun handleSymbolChanged(
-      scope: CoroutineScope,
-      symbol: String,
-  ) {
-    state.apply {
-      this.symbol = symbol
-      validSymbol = null
-
-      cancelInProgressLookup(scope)
-    }
-
-    performSymbolLookup(scope, symbol)
-  }
-
   private fun performSymbolLookup(scope: CoroutineScope, symbol: String) {
     scope.launch(context = Dispatchers.Main) {
       lookupRunner
@@ -139,43 +125,12 @@ internal constructor(
     }
   }
 
-  fun handleEquityTypeSelected(
-      scope: CoroutineScope,
-      type: EquityType,
-  ) {
-    state.apply {
-      equityType = type
-      symbol = ""
-      validSymbol = null
-
-      cancelInProgressLookup(scope)
-    }
-  }
-
-  fun handleClearEquityType(scope: CoroutineScope) {
-    state.apply {
-      equityType = null
-      symbol = ""
-      validSymbol = null
-
-      cancelInProgressLookup(scope)
-    }
-  }
-
-  fun handleSearchResultSelected(result: SearchResult) {
-    state.apply {
-      validSymbol = result.symbol()
-      symbol = result.symbol().symbol()
-    }
-  }
-
-  fun handleClear(scope: CoroutineScope) {
-    state.apply {
-      symbol = ""
-      validSymbol = null
-
-      cancelInProgressLookup(scope)
-    }
+  private fun MutableNewTickerViewState.clearInput() {
+    symbol = ""
+    validSymbol = null
+    optionType = null
+    optionStrikePrice = null
+    optionExpirationDate = null
   }
 
   @CheckResult
@@ -190,6 +145,65 @@ internal constructor(
           optionType.requireNotNull(),
       )
     }
+  }
+
+  fun handleSymbolChanged(
+      scope: CoroutineScope,
+      symbol: String,
+  ) {
+    state.apply {
+      this.symbol = symbol
+      validSymbol = null
+
+      cancelInProgressLookup(scope)
+    }
+
+    performSymbolLookup(scope, symbol)
+  }
+
+  fun handleEquityTypeSelected(
+      scope: CoroutineScope,
+      type: EquityType,
+  ) {
+    state.apply {
+      equityType = type
+      clearInput()
+      cancelInProgressLookup(scope)
+    }
+  }
+
+  fun handleClearEquityType(scope: CoroutineScope) {
+    state.apply {
+      equityType = null
+      clearInput()
+      cancelInProgressLookup(scope)
+    }
+  }
+
+  fun handleSearchResultSelected(result: SearchResult) {
+    state.apply {
+      validSymbol = result.symbol()
+      symbol = result.symbol().symbol()
+    }
+  }
+
+  fun handleClear(scope: CoroutineScope) {
+    state.apply {
+      clearInput()
+      cancelInProgressLookup(scope)
+    }
+  }
+
+  fun handleOptionExpirationDate(date: LocalDate) {
+    state.optionExpirationDate = date
+  }
+
+  fun handleOptionStrikePrice(price: StockMoneyValue) {
+    state.optionStrikePrice = price
+  }
+
+  fun handleOptionType(type: StockOptions.Contract.Type) {
+    state.optionType = type
   }
 
   fun handleSubmit(

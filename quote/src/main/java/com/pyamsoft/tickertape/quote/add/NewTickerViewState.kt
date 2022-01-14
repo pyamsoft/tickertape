@@ -11,7 +11,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.stocks.api.asMoney
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -19,6 +18,7 @@ interface NewTickerViewState : UiViewState {
   val isLookup: Boolean
 
   val symbol: String
+
   val optionExpirationDate: LocalDate?
   val optionStrikePrice: StockMoneyValue?
   val optionType: StockOptions.Contract.Type?
@@ -42,10 +42,10 @@ internal class MutableNewTickerViewState @Inject internal constructor() : NewTic
   override var tradeSide by mutableStateOf(TradeSide.BUY)
 
   override var symbol by mutableStateOf("")
-  override var optionExpirationDate by mutableStateOf<LocalDate?>(LocalDate.now())
-  override var optionStrikePrice by mutableStateOf<StockMoneyValue?>(305.0.asMoney())
-  override var optionType by
-      mutableStateOf<StockOptions.Contract.Type?>(StockOptions.Contract.Type.CALL)
+
+  override var optionExpirationDate by mutableStateOf<LocalDate?>(null)
+  override var optionStrikePrice by mutableStateOf<StockMoneyValue?>(null)
+  override var optionType by mutableStateOf<StockOptions.Contract.Type?>(null)
 
   override var lookupError by mutableStateOf<Throwable?>(null)
   override var lookupResults by mutableStateOf(emptyList<SearchResult>())

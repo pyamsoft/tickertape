@@ -88,7 +88,7 @@ private fun OptionsSection(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
 ) {
-  val show = remember(state.equityType) { state.equityType === EquityType.OPTION }
+  val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
   AnimatedVisibility(
       modifier = modifier,
       visible = show,
@@ -108,7 +108,7 @@ private fun SubmissionSection(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
 ) {
-  val canSubmit = remember(state) { state.canSubmit() }
+  val canSubmit = state.canSubmit()
 
   Row(
       modifier = modifier.padding(16.dp),
@@ -242,7 +242,7 @@ private fun SymbolLookup(
     onSubmit: () -> Unit,
 ) {
   val symbol = state.symbol
-  val isSubmitOnEnter = remember(state.equityType) { state.equityType !== EquityType.OPTION }
+  val isSubmitOnEnter = remember(state.equityType) { state.equityType != EquityType.OPTION }
 
   val focusManager = LocalFocusManager.current
 

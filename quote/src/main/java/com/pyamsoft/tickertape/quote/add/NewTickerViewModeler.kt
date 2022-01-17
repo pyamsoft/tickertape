@@ -143,7 +143,7 @@ internal constructor(
 
   @CheckResult
   private suspend fun MutableNewTickerViewState.resolveSubmission(): String {
-    return if (equityType !== EquityType.OPTION) {
+    return if (equityType != EquityType.OPTION) {
       symbol
     } else {
       optionResolverRunner.call(

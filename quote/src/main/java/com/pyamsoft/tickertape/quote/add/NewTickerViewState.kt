@@ -53,7 +53,7 @@ internal class MutableNewTickerViewState @Inject internal constructor() : NewTic
   override fun canSubmit(): Boolean {
     return if (isSubmitting || symbol.isBlank() || validSymbol == null) {
       false
-    } else if (equityType !== EquityType.OPTION) {
+    } else if (equityType != EquityType.OPTION) {
       true
     } else {
       optionExpirationDate != null && optionStrikePrice != null && optionType != null

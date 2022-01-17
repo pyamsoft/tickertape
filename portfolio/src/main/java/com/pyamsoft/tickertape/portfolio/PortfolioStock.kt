@@ -130,7 +130,7 @@ internal constructor(
         Comparator<PortfolioStock> { s1, s2 ->
           val t1 = s1.ticker
           val t2 = s2.ticker
-          if (t1 !== null && t2 !== null) {
+          if (t1 != null && t2 != null) {
             return@Comparator Ticker.COMPARATOR.compare(t1, t2)
           }
 

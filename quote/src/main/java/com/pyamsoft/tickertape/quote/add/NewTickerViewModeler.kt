@@ -82,7 +82,7 @@ internal constructor(
         interactor.search(force, query)
       }
 
-  private fun performSymbolLookup(scope: CoroutineScope, symbol: String) {
+  private fun performSymbolLookup(scope: CoroutineScope, symbol: String,) {
     scope.launch(context = Dispatchers.Main) {
       lookupRunner
           .call(false, symbol)
@@ -93,6 +93,15 @@ internal constructor(
             state.apply {
               lookupError = null
               lookupResults = r
+
+              // Auto select a matching symbol if one is exact
+              r.firstOrNull { it.symbol() == symbol.asSymbol() }?.also { result ->
+                onSearchResultSelected(
+                    scope = scope,
+                    result = result,
+                    dismiss = false,
+                )
+              }
             }
           }
           .onFailure { e ->
@@ -164,11 +173,13 @@ internal constructor(
     }
   }
 
+  private fun MutableNewTickerViewState.dismissLookup() {
+    lookupResults = emptyList()
+    lookupError = null
+  }
+
   fun handleLookupDismissed() {
-    state.apply {
-      lookupResults = emptyList()
-      lookupError = null
-    }
+    state.dismissLookup()
   }
 
   fun handleSymbolChanged(
@@ -204,9 +215,10 @@ internal constructor(
     }
   }
 
-  fun handleSearchResultSelected(
+  private fun onSearchResultSelected(
       scope: CoroutineScope,
       result: SearchResult,
+      dismiss: Boolean,
   ) {
     val sym = result.symbol()
 
@@ -214,11 +226,26 @@ internal constructor(
     s.apply {
       validSymbol = sym
       symbol = sym.symbol()
+
+      if (dismiss) {
+        dismissLookup()
+      }
     }
 
     if (s.equityType == EquityType.OPTION) {
       performLookupOptionData(scope, sym)
     }
+  }
+
+  fun handleSearchResultSelected(
+      scope: CoroutineScope,
+      result: SearchResult,
+  ) {
+    onSearchResultSelected(
+        scope,
+        result,
+        dismiss = true,
+    )
   }
 
   fun handleClear(scope: CoroutineScope) {

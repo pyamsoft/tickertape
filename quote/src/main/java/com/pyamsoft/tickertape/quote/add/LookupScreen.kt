@@ -28,9 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -202,6 +205,17 @@ private fun SymbolLookup(
         modifier = Modifier.fillMaxWidth(),
         value = symbol,
         onValueChange = onSymbolChanged,
+        visualTransformation = { text ->
+          TransformedText(
+              text =
+                  AnnotatedString(
+                      text = text.text.uppercase(),
+                      spanStyles = text.spanStyles,
+                      paragraphStyles = text.paragraphStyles,
+                  ),
+              offsetMapping = OffsetMapping.Identity,
+          )
+        },
         keyboardOptions =
             KeyboardOptions(
                 keyboardType = KeyboardType.Text,

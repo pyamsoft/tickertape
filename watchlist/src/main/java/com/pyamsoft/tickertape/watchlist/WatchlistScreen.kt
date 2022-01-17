@@ -9,9 +9,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -156,7 +157,6 @@ private fun Watchlist(
   LazyColumn(
       modifier = modifier,
       contentPadding = PaddingValues(horizontal = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
     stickyHeader {
       Column(
@@ -175,15 +175,25 @@ private fun Watchlist(
       }
     }
 
-    items(
+    itemsIndexed(
         items = tickers,
-        key = { it.symbol.symbol() },
-    ) { ticker ->
+        key = { _, ticker -> ticker.symbol.symbol() },
+    ) { index, ticker ->
+      if (index == 0) {
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+      }
+
       WatchlistItem(
           modifier = Modifier.fillMaxWidth(),
           ticker = ticker,
           onSelect = onSelectTicker,
           onDelete = onDeleteTicker,
+      )
+
+      Spacer(
+          modifier = Modifier.height(16.dp),
       )
     }
 

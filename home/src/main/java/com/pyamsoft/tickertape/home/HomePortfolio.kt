@@ -19,7 +19,12 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -33,10 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
-import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
@@ -144,24 +146,15 @@ private fun Error(
 
 @Preview
 @Composable
-private fun PreviewWatchlist() {
-  val symbol = "MSFT".asSymbol()
+private fun PreviewPortfolio() {
   Surface {
-    HomeWatchlist(
+    HomePortfolio(
         state =
-            object : HomeWatchListViewState {
-              override val watchlist: List<Ticker> =
-                  listOf(
-                      Ticker(
-                          symbol = symbol,
-                          quote = newTestQuote(symbol),
-                          chart = newTestChart(symbol),
-                      ),
-                  )
-              override val watchlistError: Throwable? = null
-              override val isLoadingWatchlist: Boolean = false
+            object : HomePortfolioViewState {
+              override val portfolio: PortfolioStockList = PortfolioStockList.empty()
+              override val portfolioError: Throwable? = null
+              override val isLoadingPortfolio: Boolean = false
             },
-        onClicked = {},
     )
   }
 }

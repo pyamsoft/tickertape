@@ -9,9 +9,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -161,7 +162,6 @@ private fun Portfolio(
   LazyColumn(
       modifier = modifier,
       contentPadding = PaddingValues(horizontal = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
     if (!portfolio.isEmpty) {
       item {
@@ -196,15 +196,25 @@ private fun Portfolio(
       }
     }
 
-    items(
+    itemsIndexed(
         items = portfolioTickers,
-        key = { it.holding.symbol().symbol() },
-    ) { ps ->
+        key = { _, item -> item.holding.symbol().symbol() },
+    ) { index, ps ->
+      if (index == 0) {
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+      }
+
       PortfolioItem(
           modifier = Modifier.fillMaxWidth(),
           stock = ps,
           onSelect = onSelect,
           onDelete = onDelete,
+      )
+
+      Spacer(
+          modifier = Modifier.height(16.dp),
       )
     }
 

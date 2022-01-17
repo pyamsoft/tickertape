@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import java.time.LocalDate
 import javax.inject.Inject
@@ -135,6 +136,7 @@ internal constructor(
 
   private fun MutableNewTickerViewState.clearInput() {
     symbol = ""
+    tradeSide = TradeSide.BUY
     validSymbol = null
     optionType = null
     optionStrikePrice = null
@@ -274,5 +276,9 @@ internal constructor(
             .onFinally { s.isSubmitting = false }
       }
     }
+  }
+
+  fun handleTradeSideChanged(side: TradeSide) {
+    state.tradeSide = side
   }
 }

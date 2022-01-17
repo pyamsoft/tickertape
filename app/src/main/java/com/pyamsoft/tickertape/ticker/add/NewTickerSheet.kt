@@ -137,6 +137,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
                 onClear = { handleClear() },
+                onTradeSideSelected = { vm.handleTradeSideChanged(it ) },
             )
           }
         }

@@ -1,8 +1,6 @@
 package com.pyamsoft.tickertape.quote.add
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 @Composable
 @JvmOverloads
@@ -54,24 +53,26 @@ internal fun LookupScreen(
     onSearchResultSelected: (SearchResult) -> Unit,
     onSubmit: () -> Unit,
     onClear: () -> Unit,
+    onTradeSideSelected: (TradeSide) -> Unit,
 ) {
   Column(
       modifier = modifier.padding(16.dp),
   ) {
     SymbolLookup(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
         state = state,
         onSymbolChanged = onSymbolChanged,
         onSubmit = onSubmit,
     )
     LookupResults(
-        modifier = Modifier.fillMaxWidth().height(160.dp).focusable(enabled = false),
+        modifier = Modifier.fillMaxWidth().height(160.dp).focusable(enabled = false).padding(bottom = 16.dp),
         state = state,
         onSearchResultSelected = onSearchResultSelected,
     )
     OptionsSection(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
         state = state,
+        onTradeSideSelected = onTradeSideSelected,
     )
     SubmissionSection(
         modifier = Modifier.fillMaxWidth(),
@@ -79,25 +80,6 @@ internal fun LookupScreen(
         onSubmit = onSubmit,
         onClear = onClear,
     )
-  }
-}
-
-@Composable
-@OptIn(ExperimentalAnimationApi::class)
-private fun OptionsSection(
-    modifier: Modifier = Modifier,
-    state: NewTickerViewState,
-) {
-  val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
-  AnimatedVisibility(
-      modifier = modifier,
-      visible = show,
-  ) {
-    Box {
-      Text(
-          text = "Options HERE!",
-      )
-    }
   }
 }
 
@@ -111,7 +93,7 @@ private fun SubmissionSection(
   val canSubmit = state.canSubmit()
 
   Row(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
   ) {
     OutlinedButton(
@@ -174,7 +156,6 @@ private fun ResultList(
   val results = state.lookupResults
   LazyColumn(
       modifier = modifier,
-      contentPadding = PaddingValues(horizontal = 8.dp),
   ) {
     items(
         items = results,
@@ -247,7 +228,7 @@ private fun SymbolLookup(
   val focusManager = LocalFocusManager.current
 
   Box(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier,
       contentAlignment = Alignment.Center,
   ) {
     TextField(
@@ -295,6 +276,7 @@ private fun PreviewLookupScreen() {
         onSearchResultSelected = {},
         onSubmit = {},
         onClear = {},
+        onTradeSideSelected = {},
     )
   }
 }

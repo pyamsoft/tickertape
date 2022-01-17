@@ -1,26 +1,19 @@
 package com.pyamsoft.tickertape.quote.add
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
@@ -40,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.TradeSide
@@ -54,6 +48,7 @@ internal fun LookupScreen(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
     onTradeSideSelected: (TradeSide) -> Unit,
+    onResultsDismissed: () -> Unit,
 ) {
   Column(
       modifier = modifier.padding(16.dp),
@@ -65,9 +60,9 @@ internal fun LookupScreen(
         onSubmit = onSubmit,
     )
     LookupResults(
-        modifier = Modifier.fillMaxWidth().height(160.dp).focusable(enabled = false).padding(bottom = 16.dp),
         state = state,
         onSearchResultSelected = onSearchResultSelected,
+        onResultsDismissed = onResultsDismissed,
     )
     OptionsSection(
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
@@ -127,48 +122,35 @@ private fun LookupResults(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
     onSearchResultSelected: (SearchResult) -> Unit,
-) {
-  val isLoading = state.isLookup
-  Crossfade(
-      modifier = modifier,
-      targetState = isLoading,
-  ) { loading ->
-    if (loading) {
-      LoadingResults(
-          modifier = Modifier.fillMaxSize(),
-      )
-    } else {
-      ResultList(
-          modifier = Modifier.fillMaxSize(),
-          state = state,
-          onSearchResultSelected = onSearchResultSelected,
-      )
-    }
-  }
-}
-
-@Composable
-private fun ResultList(
-    modifier: Modifier = Modifier,
-    state: NewTickerViewState,
-    onSearchResultSelected: (SearchResult) -> Unit,
+    onResultsDismissed: () -> Unit,
 ) {
   val results = state.lookupResults
-  LazyColumn(
-      modifier = modifier,
+  val isOpen = remember(results) { results.isNotEmpty() }
+
+  DropdownMenu(
+      // Dropdown must have a max height or it goes over
+      modifier =
+          modifier.heightIn(
+              max = 160.dp,
+          ),
+      expanded = isOpen,
+      onDismissRequest = onResultsDismissed,
+      properties =
+          PopupProperties(
+              focusable = false,
+              dismissOnBackPress = false,
+              dismissOnClickOutside = true,
+          ),
   ) {
-    items(
-        items = results,
-        key = { it.symbol().symbol() },
-    ) { item ->
-      Divider(
-          modifier = Modifier.fillMaxWidth(),
-      )
-      ResultItem(
-          modifier = Modifier.fillMaxWidth(),
-          item = item,
-          onClick = onSearchResultSelected,
-      )
+    for (result in results) {
+      DropdownMenuItem(
+          onClick = { onSearchResultSelected(result) },
+      ) {
+        ResultItem(
+            modifier = Modifier.fillMaxWidth(),
+            result = result,
+        )
+      }
     }
   }
 }
@@ -176,14 +158,13 @@ private fun ResultList(
 @Composable
 private fun ResultItem(
     modifier: Modifier = Modifier,
-    item: SearchResult,
-    onClick: (SearchResult) -> Unit,
+    result: SearchResult,
 ) {
-  val symbol = item.symbol()
-  val company = item.name()
+  val symbol = result.symbol()
+  val company = result.name()
 
   Column(
-      modifier = modifier.clickable { onClick(item) }.padding(8.dp),
+      modifier = modifier.padding(8.dp),
       horizontalAlignment = Alignment.Start,
       verticalArrangement = Arrangement.Center,
   ) {
@@ -197,20 +178,6 @@ private fun ResultItem(
     Text(
         text = company.company(),
         style = MaterialTheme.typography.caption,
-    )
-  }
-}
-
-@Composable
-private fun LoadingResults(
-    modifier: Modifier = Modifier,
-) {
-  Box(
-      modifier = modifier,
-      contentAlignment = Alignment.Center,
-  ) {
-    CircularProgressIndicator(
-        modifier = Modifier.padding(16.dp),
     )
   }
 }
@@ -277,6 +244,7 @@ private fun PreviewLookupScreen() {
         onSubmit = {},
         onClear = {},
         onTradeSideSelected = {},
+        onResultsDismissed = {},
     )
   }
 }

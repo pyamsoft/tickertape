@@ -138,6 +138,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onSubmit = { handleSubmit() },
                 onClear = { handleClear() },
                 onTradeSideSelected = { vm.handleTradeSideChanged(it ) },
+                onResultsDismissed = { vm.handleLookupDismissed() },
             )
           }
         }

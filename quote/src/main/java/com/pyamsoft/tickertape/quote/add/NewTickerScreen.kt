@@ -23,6 +23,7 @@ fun NewTickerScreen(
     onClose: () -> Unit,
     onSymbolChanged: (String) -> Unit,
     onSearchResultSelected: (SearchResult) -> Unit,
+    onResultsDismissed: () -> Unit,
     onSubmit: () -> Unit,
     onClear: () -> Unit,
     onTradeSideSelected: (TradeSide) -> Unit,
@@ -60,6 +61,7 @@ fun NewTickerScreen(
               onSubmit = onSubmit,
               onClear = onClear,
               onTradeSideSelected = onTradeSideSelected,
+              onResultsDismissed = onResultsDismissed,
           )
         } else {
           EquitySelectionScreen(
@@ -83,6 +85,7 @@ private fun PreviewNewTickerScreen(equityType: EquityType?) {
       onSubmit = {},
       onClear = {},
       onTradeSideSelected = {},
+      onResultsDismissed = {},
   )
 }
 

@@ -15,8 +15,6 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 interface NewTickerViewState : UiViewState {
-  val isLookup: Boolean
-
   val symbol: String
 
   val optionExpirationDate: LocalDate?
@@ -35,8 +33,6 @@ interface NewTickerViewState : UiViewState {
 internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
   internal var isSubmitting by mutableStateOf(false)
   internal var validSymbol by mutableStateOf<StockSymbol?>(null)
-
-  override var isLookup by mutableStateOf(false)
 
   override var equityType by mutableStateOf<EquityType?>(null)
   override var tradeSide by mutableStateOf(TradeSide.BUY)

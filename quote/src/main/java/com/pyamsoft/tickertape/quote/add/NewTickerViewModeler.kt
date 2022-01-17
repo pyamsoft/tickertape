@@ -101,7 +101,6 @@ internal constructor(
               lookupResults = emptyList()
             }
           }
-          .onFinally { state.apply { isLookup = false } }
     }
   }
 
@@ -128,7 +127,6 @@ internal constructor(
       lookupRunner.cancel()
 
       // Flip all lookup bits back
-      isLookup = false
       lookupError = null
       lookupResults = emptyList()
     }
@@ -163,6 +161,13 @@ internal constructor(
           .call(false, symbol)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.symbol()}") }
           .onSuccess { Timber.d("Options data: $it") }
+    }
+  }
+
+  fun handleLookupDismissed() {
+    state.apply {
+      lookupResults = emptyList()
+      lookupError = null
     }
   }
 

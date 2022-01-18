@@ -21,7 +21,6 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -94,6 +93,7 @@ private fun SubmissionSection(
     onClear: () -> Unit,
 ) {
   val canSubmit = state.canSubmit()
+  val isSubmitting = state.isSubmitting
 
   Column(
       modifier = modifier,
@@ -108,7 +108,7 @@ private fun SubmissionSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
       OutlinedButton(
-          enabled = !canSubmit,
+          enabled = !isSubmitting,
           modifier = Modifier.weight(1F),
           onClick = onClear,
       ) {

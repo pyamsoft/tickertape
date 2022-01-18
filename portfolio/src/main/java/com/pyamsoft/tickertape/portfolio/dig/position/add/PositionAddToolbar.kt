@@ -2,6 +2,7 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -31,7 +32,10 @@ internal fun PositionAddToolbar(
       elevation = AppBarDefaults.TopAppBarElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
-      shape = MaterialTheme.shapes.medium,
+      shape = MaterialTheme.shapes.medium.copy(
+          bottomEnd = ZeroCornerSize,
+          bottomStart = ZeroCornerSize,
+      ),
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

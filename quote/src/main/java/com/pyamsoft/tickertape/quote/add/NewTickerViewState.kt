@@ -13,6 +13,7 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 interface NewTickerViewState : UiViewState {
@@ -20,7 +21,7 @@ interface NewTickerViewState : UiViewState {
 
   val symbol: String
 
-  val optionExpirationDate: LocalDate?
+  val optionExpirationDate: LocalDateTime?
   val optionStrikePrice: StockMoneyValue?
   val optionType: StockOptions.Contract.Type
 
@@ -45,7 +46,7 @@ internal class MutableNewTickerViewState @Inject internal constructor() : NewTic
   override var equityType by mutableStateOf<EquityType?>(null)
   override var tradeSide by mutableStateOf(TradeSide.BUY)
 
-  override var optionExpirationDate by mutableStateOf<LocalDate?>(null)
+  override var optionExpirationDate by mutableStateOf<LocalDateTime?>(null)
   override var optionStrikePrice by mutableStateOf<StockMoneyValue?>(null)
   override var optionType by mutableStateOf(StockOptions.Contract.Type.CALL)
 

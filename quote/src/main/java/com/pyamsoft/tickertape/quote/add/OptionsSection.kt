@@ -2,26 +2,41 @@ package com.pyamsoft.tickertape.quote.add
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import java.time.LocalDateTime
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
@@ -30,6 +45,8 @@ internal fun OptionsSection(
     state: NewTickerViewState,
     onTradeSideSelected: (TradeSide) -> Unit,
     onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
+    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
   val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
   AnimatedVisibility(
@@ -49,11 +66,56 @@ internal fun OptionsSection(
           onOptionTypeSlected = onOptionTypeSlected,
       )
 
-      Row(
+      OptionsStrikeExpiration(
           modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {}
+          state = state,
+          onExpirationDateSelected = onExpirationDateSelected,
+          onStrikeSelected = onStrikeSelected,
+      )
     }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalAnimationApi::class)
+private fun OptionsStrikeExpiration(
+    modifier: Modifier = Modifier,
+    state: NewTickerViewState,
+    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onStrikeSelected: (StockMoneyValue) -> Unit,
+) {
+  val option = state.resolvedOption ?: return
+
+  val selectedExpirationDate = state.optionExpirationDate
+  val allExpirationDates = option.expirationDates()
+  val dateFormatter = DATE_FORMATTER.get().requireNotNull()
+
+  val selectedStrikePrice = state.optionStrikePrice
+  val allStrikes = option.strikes()
+
+  Row(
+      modifier = modifier,
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    OptionsDropdown(
+        modifier = Modifier.weight(1F),
+        value = selectedExpirationDate,
+        choices = allExpirationDates,
+        onDisplayChoice = { it.format(dateFormatter) },
+        onSelect = { onExpirationDateSelected(it) },
+    )
+
+    Spacer(
+        modifier = Modifier.weight(1F),
+    )
+
+    OptionsDropdown(
+        modifier = Modifier.weight(1F),
+        value = selectedStrikePrice,
+        choices = allStrikes,
+        onDisplayChoice = { it.asMoneyValue() },
+        onSelect = { onStrikeSelected(it) },
+    )
   }
 }
 
@@ -80,6 +142,75 @@ private fun OptionsType(
         )
       },
   )
+}
+
+private data class OptionsDropdownItem<T>(
+    val display: String,
+    val value: T,
+)
+
+@Composable
+private fun <T : Any> OptionsDropdown(
+    modifier: Modifier = Modifier,
+    value: T?,
+    choices: List<T>,
+    onDisplayChoice: (T) -> String,
+    onSelect: (T) -> Unit,
+) {
+  val displayValue = remember(value) { if (value == null) "" else onDisplayChoice(value) }
+  val displayChoices =
+      remember(choices) {
+        choices.map { c ->
+          val display = onDisplayChoice(c)
+          return@map OptionsDropdownItem(
+              display = display,
+              value = c,
+          )
+        }
+      }
+  var dropdownOpen by remember { mutableStateOf(false) }
+
+  Column(
+      modifier = modifier,
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    OutlinedTextField(
+        modifier = Modifier.clickable { dropdownOpen = true },
+        enabled = false,
+        readOnly = true,
+        singleLine = true,
+        value = displayValue,
+        onValueChange = {},
+    )
+
+    DropdownMenu(
+        // Dropdown must have a max height or it goes over
+        modifier =
+            modifier.heightIn(
+                max = 160.dp,
+            ),
+        expanded = dropdownOpen,
+        onDismissRequest = { dropdownOpen = false },
+        properties =
+            PopupProperties(
+                focusable = false,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = true,
+            ),
+    ) {
+      for (choice in displayChoices) {
+        DropdownMenuItem(
+            onClick = { onSelect(choice.value) },
+        ) {
+          Text(
+              modifier = Modifier.padding(8.dp),
+              text = choice.display,
+          )
+        }
+      }
+    }
+  }
 }
 
 @Composable
@@ -171,6 +302,8 @@ private fun PreviewOptionsSection() {
         state = MutableNewTickerViewState(),
         onTradeSideSelected = {},
         onOptionTypeSlected = {},
+        onStrikeSelected = {},
+        onExpirationDateSelected = {},
     )
   }
 }

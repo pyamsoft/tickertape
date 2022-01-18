@@ -20,9 +20,28 @@ import androidx.annotation.CheckResult
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
+
+private val UTC_TIME_ZONE = ZoneId.of("UTC")
 
 private val MARKET_TIME_ZONE = ZoneId.of("US/Eastern")
+
+/**
+ * Options expiration dates are delivered in UTC time
+ *
+ * We map them over to a LDT and we do not care about the time, only the date.
+ * This is still an LDT instead of an LD object for compatibility
+ */
+@CheckResult
+internal fun parseUTCTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {
+  return Instant.ofEpochSecond(stamp)
+      .atZone(UTC_TIME_ZONE)
+      .withZoneSameLocal(localZoneId)
+      .toLocalDateTime()
+      .withHour(0)
+      .withMinute(0)
+      .withSecond(0)
+      .withNano(0)
+}
 
 /**
  * Parse market related timestamps to a local time
@@ -32,7 +51,8 @@ private val MARKET_TIME_ZONE = ZoneId.of("US/Eastern")
  */
 @CheckResult
 internal fun parseMarketTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {
-  return ZonedDateTime.ofInstant(Instant.ofEpochSecond(stamp), MARKET_TIME_ZONE)
+  return Instant.ofEpochSecond(stamp)
+      .atZone(MARKET_TIME_ZONE)
       .withZoneSameInstant(localZoneId)
       .toLocalDateTime()
 }

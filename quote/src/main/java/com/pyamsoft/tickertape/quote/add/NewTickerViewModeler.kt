@@ -38,6 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
 
 class NewTickerViewModeler
 @Inject
@@ -64,7 +65,7 @@ internal constructor(
       }
 
   private val optionResolverRunner =
-      highlander<String, StockSymbol, LocalDate, StockMoneyValue, StockOptions.Contract.Type> {
+      highlander<String, StockSymbol, LocalDateTime, StockMoneyValue, StockOptions.Contract.Type> {
           symbol,
           expirationDate,
           strikePrice,
@@ -298,7 +299,7 @@ internal constructor(
     }
   }
 
-  fun handleOptionExpirationDate(date: LocalDate) {
+  fun handleOptionExpirationDate(date: LocalDateTime) {
     state.optionExpirationDate = date
   }
 

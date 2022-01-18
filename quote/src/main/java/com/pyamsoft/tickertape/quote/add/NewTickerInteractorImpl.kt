@@ -42,6 +42,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -200,7 +201,7 @@ internal constructor(
 
   override suspend fun resolveOptionsIdentifier(
       symbol: StockSymbol,
-      expirationDate: LocalDate,
+      expirationDate: LocalDateTime,
       strikePrice: StockMoneyValue,
       contractType: StockOptions.Contract.Type
   ): String =
@@ -208,7 +209,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext stockInteractor.resolveOptionLookupIdentifier(
             symbol = symbol,
-            expirationDate = expirationDate,
+            expirationDate = expirationDate.toLocalDate(),
             strikePrice = strikePrice,
             contractType = contractType,
         )

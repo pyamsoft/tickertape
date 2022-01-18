@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface StockOptions {

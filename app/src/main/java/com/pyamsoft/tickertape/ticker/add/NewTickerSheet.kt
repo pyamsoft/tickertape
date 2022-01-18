@@ -144,6 +144,8 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onTradeSideSelected = { vm.handleTradeSideChanged(it) },
                 onResultsDismissed = { vm.handleLookupDismissed() },
                 onOptionTypeSlected = { vm.handleOptionType(it) },
+                onStrikeSelected = { vm.handleOptionStrikePrice(it) },
+                onExpirationDateSelected = { vm.handleOptionExpirationDate(it) },
             )
           }
         }

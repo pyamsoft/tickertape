@@ -40,8 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
 @JvmOverloads
@@ -55,6 +58,8 @@ internal fun LookupScreen(
     onTradeSideSelected: (TradeSide) -> Unit,
     onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
     onResultsDismissed: () -> Unit,
+    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
   Column(
       modifier = modifier.padding(16.dp),
@@ -75,6 +80,8 @@ internal fun LookupScreen(
         state = state,
         onTradeSideSelected = onTradeSideSelected,
         onOptionTypeSlected = onOptionTypeSlected,
+        onStrikeSelected = onStrikeSelected,
+        onExpirationDateSelected = onExpirationDateSelected,
     )
     SubmissionSection(
         modifier = Modifier.fillMaxWidth(),
@@ -274,6 +281,8 @@ private fun PreviewLookupScreen() {
         onTradeSideSelected = {},
         onResultsDismissed = {},
         onOptionTypeSlected = {},
+        onExpirationDateSelected = {},
+        onStrikeSelected = {},
     )
   }
 }

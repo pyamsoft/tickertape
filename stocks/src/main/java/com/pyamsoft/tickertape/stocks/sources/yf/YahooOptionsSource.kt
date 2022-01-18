@@ -46,7 +46,7 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
     private const val INVALID_OPTIONS_FORMAT = ""
     private const val MAX_STRIKE_PRICE = 100000.0
     private const val MAX_LOOP_COUNT = 10
-    private val OPTIONS_EXPIRATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMDD")
+    private val OPTIONS_EXPIRATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd")
 
     @JvmStatic
     @CheckResult
@@ -81,7 +81,7 @@ internal constructor(@InternalApi private val service: OptionsService) : Options
     val localId = ZoneId.systemDefault()
     return StockOptionsImpl(
         symbol = symbol,
-        expirationDates = option.expirationDates.map { parseMarketTime(it, localId) },
+        expirationDates = option.expirationDates.map { parseUTCTime(it, localId) },
         strikes = option.strikes.map { it.asMoney() },
         date = parseMarketTime(chain.expirationDate, localId),
         calls = calls,

@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -33,6 +34,8 @@ import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,6 +46,14 @@ internal constructor(
     interactor: NewTickerInteractor,
     destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
+
+  private val tickerResolutionRunner =
+      highlander<ResultWrapper<Ticker>, Boolean, String> { force, query ->
+        interactor.resolveTicker(
+            force = force,
+            symbol = query.asSymbol(),
+        )
+      }
 
   private val optionLookupRunner =
       highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
@@ -67,50 +78,73 @@ internal constructor(
       }
 
   private val insertRunner =
-      highlander<ResultWrapper<DbInsert.InsertResult<StockSymbol>>, String> {
+      highlander<ResultWrapper<DbInsert.InsertResult<StockSymbol>>, String> { symbol ->
         val s = state
         interactor.insertNewTicker(
-            symbol = it.asSymbol(),
+            symbol = symbol.asSymbol(),
             destination = destination,
             equityType = s.equityType.requireNotNull(),
             tradeSide = s.tradeSide,
         )
       }
 
-  private val lookupRunner =
+  private val symbolLookupRunner =
       highlander<ResultWrapper<List<SearchResult>>, Boolean, String> { force, query ->
         interactor.search(force, query)
       }
 
-  private fun performSymbolLookup(scope: CoroutineScope, symbol: String,) {
-    scope.launch(context = Dispatchers.Main) {
-      lookupRunner
-          .call(false, symbol)
-          .onFailure { Timber.e(it, "Error looking up results for $symbol") }
-          .onSuccess { Timber.d("Found search results for $symbol $it") }
-          .map { processLookupResults(it) }
-          .onSuccess { r ->
-            state.apply {
-              lookupError = null
-              lookupResults = r
+  private suspend fun CoroutineScope.performSymbolResolution(
+      symbol: String,
+  ) {
+    tickerResolutionRunner
+        .call(false, symbol)
+        .onFailure { Timber.e(it, "Error resolving ticker for $symbol") }
+        .onSuccess { Timber.d("Resolved ticker for $symbol $it") }
+        .onSuccess { state.resolvedTicker = it }
+        .onFailure { state.resolvedTicker = null }
+        .onSuccess { ticker ->
+          ticker.quote?.also { q ->
+            // Auto select the valid symbol if we found a quote for it
+            onSearchResultSelected(
+                scope = this,
+                symbol = q.symbol(),
+                dismiss = false,
+            )
+          }
+        }
+  }
 
-              // Auto select a matching symbol if one is exact
-              r.firstOrNull { it.symbol() == symbol.asSymbol() }?.also { result ->
-                onSearchResultSelected(
-                    scope = scope,
-                    result = result,
-                    dismiss = false,
-                )
-              }
-            }
+  private suspend fun CoroutineScope.performSymbolLookup(
+      symbol: String,
+  ) {
+    val scope = this
+    symbolLookupRunner
+        .call(false, symbol)
+        .onFailure { Timber.e(it, "Error looking up results for $symbol") }
+        .onSuccess { Timber.d("Found search results for $symbol $it") }
+        .map { processLookupResults(it) }
+        .onSuccess { r ->
+          state.apply {
+            lookupError = null
+            lookupResults = r
           }
-          .onFailure { e ->
-            state.apply {
-              lookupError = e
-              lookupResults = emptyList()
-            }
+        }
+        .onSuccess { r ->
+          // Auto select a matching symbol if one is exact
+          r.firstOrNull { it.symbol() == symbol.asSymbol() }?.also { result ->
+            onSearchResultSelected(
+                scope = scope,
+                symbol = result.symbol(),
+                dismiss = false,
+            )
           }
-    }
+        }
+        .onFailure { e ->
+          state.apply {
+            lookupError = e
+            lookupResults = emptyList()
+          }
+        }
   }
 
   @CheckResult
@@ -133,7 +167,7 @@ internal constructor(
   private fun MutableNewTickerViewState.cancelInProgressLookup(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
       // Cancel any active runner first
-      lookupRunner.cancel()
+      symbolLookupRunner.cancel()
 
       // Flip all lookup bits back
       lookupError = null
@@ -143,9 +177,12 @@ internal constructor(
 
   private fun MutableNewTickerViewState.clearInput() {
     symbol = ""
+
+    // Not null but these are the defaults
     tradeSide = TradeSide.BUY
+    optionType = StockOptions.Contract.Type.CALL
+
     validSymbol = null
-    optionType = null
     optionStrikePrice = null
     optionExpirationDate = null
   }
@@ -170,6 +207,8 @@ internal constructor(
           .call(false, symbol)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.symbol()}") }
           .onSuccess { Timber.d("Options data: $it") }
+          .onSuccess { state.resolvedOption = it }
+          .onFailure { state.resolvedOption = null }
     }
   }
 
@@ -193,7 +232,12 @@ internal constructor(
       cancelInProgressLookup(scope)
     }
 
-    performSymbolLookup(scope, symbol)
+    scope.launch(context = Dispatchers.Main) {
+      awaitAll(
+          async { performSymbolLookup(symbol) },
+          async { performSymbolResolution(symbol) },
+      )
+    }
   }
 
   fun handleEquityTypeSelected(
@@ -217,15 +261,13 @@ internal constructor(
 
   private fun onSearchResultSelected(
       scope: CoroutineScope,
-      result: SearchResult,
+      symbol: StockSymbol,
       dismiss: Boolean,
   ) {
-    val sym = result.symbol()
-
     val s = state
     s.apply {
-      validSymbol = sym
-      symbol = sym.symbol()
+      validSymbol = symbol
+      this.symbol = symbol.symbol()
 
       if (dismiss) {
         dismissLookup()
@@ -233,7 +275,7 @@ internal constructor(
     }
 
     if (s.equityType == EquityType.OPTION) {
-      performLookupOptionData(scope, sym)
+      performLookupOptionData(scope, symbol)
     }
   }
 
@@ -241,9 +283,10 @@ internal constructor(
       scope: CoroutineScope,
       result: SearchResult,
   ) {
+    // Manually selected so we dismiss the dropdown
     onSearchResultSelected(
-        scope,
-        result,
+        scope = scope,
+        symbol = result.symbol(),
         dismiss = true,
     )
   }

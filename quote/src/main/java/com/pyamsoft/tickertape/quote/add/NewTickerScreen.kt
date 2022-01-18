@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 @Composable
@@ -27,6 +28,7 @@ fun NewTickerScreen(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
     onTradeSideSelected: (TradeSide) -> Unit,
+    onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
 ) {
   val equityType = state.equityType
   val hasEquitySelection = remember(equityType) { equityType != null }
@@ -62,6 +64,7 @@ fun NewTickerScreen(
               onClear = onClear,
               onTradeSideSelected = onTradeSideSelected,
               onResultsDismissed = onResultsDismissed,
+              onOptionTypeSlected = onOptionTypeSlected,
           )
         } else {
           EquitySelectionScreen(
@@ -86,6 +89,7 @@ private fun PreviewNewTickerScreen(equityType: EquityType?) {
       onClear = {},
       onTradeSideSelected = {},
       onResultsDismissed = {},
+      onOptionTypeSlected = {},
   )
 }
 

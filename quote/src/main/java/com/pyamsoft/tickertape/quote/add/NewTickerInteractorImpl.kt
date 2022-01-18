@@ -27,6 +27,8 @@ import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
 import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
@@ -45,19 +47,38 @@ import timber.log.Timber
 internal class NewTickerInteractorImpl
 @Inject
 internal constructor(
-    private val interactor: StockInteractor,
+    private val tickerInteractor: TickerInteractor,
+    private val stockInteractor: StockInteractor,
     private val symbolQueryDao: SymbolQueryDao,
     private val symbolInsertDao: SymbolInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingInsertDao: HoldingInsertDao,
 ) : NewTickerInteractor {
 
+  override suspend fun resolveTicker(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<Ticker> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          tickerInteractor.getQuotes(force, listOf(symbol))
+              // Only pick out the single quote
+              .map { list -> list.first { it.symbol == symbol } }
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to resolve ticker: $symbol")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
   override suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val results = interactor.search(force, query)
+          val results = stockInteractor.search(force, query)
           ResultWrapper.success(results)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -157,7 +178,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          val result = interactor.getOptions(force, symbol, date)
+          val result = stockInteractor.getOptions(force, symbol, date)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -185,7 +206,7 @@ internal constructor(
   ): String =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
-        return@withContext interactor.resolveOptionLookupIdentifier(
+        return@withContext stockInteractor.resolveOptionLookupIdentifier(
             symbol = symbol,
             expirationDate = expirationDate,
             strikePrice = strikePrice,

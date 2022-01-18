@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -19,10 +20,13 @@ interface NewTickerViewState : UiViewState {
 
   val optionExpirationDate: LocalDate?
   val optionStrikePrice: StockMoneyValue?
-  val optionType: StockOptions.Contract.Type?
+  val optionType: StockOptions.Contract.Type
 
   val equityType: EquityType?
   val tradeSide: TradeSide
+
+  val resolvedTicker: Ticker?
+  val resolvedOption: StockOptions?
 
   val lookupError: Throwable?
   val lookupResults: List<SearchResult>
@@ -41,7 +45,10 @@ internal class MutableNewTickerViewState @Inject internal constructor() : NewTic
 
   override var optionExpirationDate by mutableStateOf<LocalDate?>(null)
   override var optionStrikePrice by mutableStateOf<StockMoneyValue?>(null)
-  override var optionType by mutableStateOf<StockOptions.Contract.Type?>(null)
+  override var optionType by mutableStateOf(StockOptions.Contract.Type.CALL)
+
+  override var resolvedTicker by mutableStateOf<Ticker?>(null)
+  override var resolvedOption by mutableStateOf<StockOptions?>(null)
 
   override var lookupError by mutableStateOf<Throwable?>(null)
   override var lookupResults by mutableStateOf(emptyList<SearchResult>())

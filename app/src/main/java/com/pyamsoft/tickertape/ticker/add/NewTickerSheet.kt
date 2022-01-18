@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
@@ -128,6 +129,9 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
           val equityType = state.equityType
 
           TickerTapeTheme(themeProvider) {
+            BackHandler(
+                onBack = { handleCloseClicked(equityType) },
+            )
             NewTickerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
@@ -137,8 +141,9 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
                 onClear = { handleClear() },
-                onTradeSideSelected = { vm.handleTradeSideChanged(it ) },
+                onTradeSideSelected = { vm.handleTradeSideChanged(it) },
                 onResultsDismissed = { vm.handleLookupDismissed() },
+                onOptionTypeSlected = { vm.handleOptionType(it) },
             )
           }
         }

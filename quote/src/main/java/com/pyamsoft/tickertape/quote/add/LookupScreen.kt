@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 @Composable
@@ -51,6 +54,7 @@ internal fun LookupScreen(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
     onTradeSideSelected: (TradeSide) -> Unit,
+    onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
     onResultsDismissed: () -> Unit,
 ) {
   Column(
@@ -71,6 +75,7 @@ internal fun LookupScreen(
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
         state = state,
         onTradeSideSelected = onTradeSideSelected,
+        onOptionTypeSlected = onOptionTypeSlected,
     )
     SubmissionSection(
         modifier = Modifier.fillMaxWidth(),
@@ -90,32 +95,41 @@ private fun SubmissionSection(
 ) {
   val canSubmit = state.canSubmit()
 
-  Row(
+  Column(
       modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
+      verticalArrangement = Arrangement.Center,
   ) {
-    OutlinedButton(
-        enabled = !canSubmit,
-        modifier = Modifier.weight(1F),
-        onClick = onClear,
-    ) {
-      Text(
-          text = "Clear",
-      )
-    }
-
-    Spacer(
-        modifier = Modifier.width(16.dp),
+    Divider(
+        modifier = Modifier.fillMaxWidth(),
     )
 
-    Button(
-        enabled = canSubmit,
-        modifier = Modifier.weight(1F),
-        onClick = onSubmit,
+    Row(
+        modifier = Modifier.padding(top = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text(
-          text = "Submit",
+      OutlinedButton(
+          enabled = !canSubmit,
+          modifier = Modifier.weight(1F),
+          onClick = onClear,
+      ) {
+        Text(
+            text = "Clear",
+        )
+      }
+
+      Spacer(
+          modifier = Modifier.width(16.dp),
       )
+
+      Button(
+          enabled = canSubmit,
+          modifier = Modifier.weight(1F),
+          onClick = onSubmit,
+      ) {
+        Text(
+            text = "Submit",
+        )
+      }
     }
   }
 }
@@ -201,7 +215,7 @@ private fun SymbolLookup(
       modifier = modifier,
       contentAlignment = Alignment.Center,
   ) {
-    TextField(
+    OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = symbol,
         onValueChange = onSymbolChanged,
@@ -259,6 +273,7 @@ private fun PreviewLookupScreen() {
         onClear = {},
         onTradeSideSelected = {},
         onResultsDismissed = {},
+        onOptionTypeSlected = {},
     )
   }
 }

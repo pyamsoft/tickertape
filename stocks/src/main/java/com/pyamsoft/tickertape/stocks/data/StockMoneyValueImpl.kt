@@ -21,14 +21,15 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.SMALL_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import kotlin.math.abs
 
 internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
 
   private val money by
       lazy(LazyThreadSafetyMode.NONE) {
         // If its a small money < $10, allow more decimals
-        val formatter = if (value.compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
-        return@lazy if (isZero()) "$0.00" else formatter.get().requireNotNull().format(value)
+        val formatter = if (abs(value).compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
+        return@lazy if (isZero()) ZERO_VAL else formatter.get().requireNotNull().format(value)
       }
 
   override fun asMoneyValue(): String {
@@ -41,5 +42,10 @@ internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyV
 
   override fun isZero(): Boolean {
     return value.isZero()
+  }
+
+  companion object {
+
+    private const val ZERO_VAL = "$0.000"
   }
 }

@@ -15,7 +15,7 @@ interface DigViewState : UiViewState {
   val range: StockChart.IntervalRange
   val currentDate: LocalDateTime
   val currentPrice: StockMoneyValue?
-  val mostRecentPrice: StockMoneyValue?
+  val openingPrice: StockMoneyValue?
 }
 
 abstract class MutableDigViewState
@@ -25,7 +25,7 @@ protected constructor(
   final override var range by mutableStateOf(StockChart.IntervalRange.ONE_DAY)
   final override var currentDate by mutableStateOf<LocalDateTime>(LocalDateTime.now())
   final override var currentPrice by mutableStateOf<StockMoneyValue?>(null)
-  final override var mostRecentPrice by mutableStateOf<StockMoneyValue?>(null)
+  final override var openingPrice by mutableStateOf<StockMoneyValue?>(null)
   final override var ticker by
       mutableStateOf(
           Ticker(

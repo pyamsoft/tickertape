@@ -56,7 +56,7 @@ fun DigChart(
   val range = state.range
   val currentDate = state.currentDate
   val currentPrice = state.currentPrice
-  val mostRecentPrice = state.mostRecentPrice
+  val openingPrice = state.openingPrice
 
   val chart = ticker.chart
 
@@ -85,7 +85,7 @@ fun DigChart(
               range = range,
               date = currentDate,
               price = currentPrice,
-              mostRecentPrice = mostRecentPrice,
+              openingPrice = openingPrice,
           )
         }
       }
@@ -106,7 +106,7 @@ private fun CurrentScrub(
     range: StockChart.IntervalRange,
     date: LocalDateTime,
     price: StockMoneyValue?,
-    mostRecentPrice: StockMoneyValue?,
+    openingPrice: StockMoneyValue?,
 ) {
   AnimatedVisibility(
       modifier = modifier,
@@ -132,21 +132,22 @@ private fun CurrentScrub(
             modifier = Modifier.padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          Text(
-              modifier = Modifier.weight(0.8F),
-              text = price.asMoneyValue(),
-              style = MaterialTheme.typography.body1,
-          )
+          if (openingPrice != null) {
+            Text(
+                modifier = Modifier.weight(0.8F),
+                text = openingPrice.asMoneyValue(),
+                style = MaterialTheme.typography.body1,
+            )
 
-          CurrentPriceSpacer(
-              modifier = Modifier.weight(0.2F),
-              mostRecentPrice = mostRecentPrice,
-          )
+            CurrentPriceSpacer(
+                modifier = Modifier.weight(0.2F),
+            )
+          }
 
           CurrentPriceDisplay(
               modifier = Modifier.weight(1F),
               price = price,
-              mostRecentPrice = mostRecentPrice,
+              openingPrice = openingPrice,
           )
         }
       }
@@ -157,12 +158,7 @@ private fun CurrentScrub(
 @Composable
 private fun CurrentPriceSpacer(
     modifier: Modifier = Modifier,
-    mostRecentPrice: StockMoneyValue?,
 ) {
-  if (mostRecentPrice == null) {
-    return
-  }
-
   Spacer(
       modifier = modifier,
   )
@@ -179,34 +175,39 @@ private fun CurrentPriceSpacer(
 private fun CurrentPriceDisplay(
     modifier: Modifier = Modifier,
     price: StockMoneyValue,
-    mostRecentPrice: StockMoneyValue?,
+    openingPrice: StockMoneyValue?,
 ) {
-  if (mostRecentPrice == null) {
-    // No most recent price, dont show
-    return
-  }
 
-  val diff = remember(price, mostRecentPrice) { calculateDifferences(price, mostRecentPrice) }
+  val diff =
+      remember(price, openingPrice) {
+        if (openingPrice == null) null else calculateDifferences(price, openingPrice)
+      }
   Column(
       modifier = modifier,
       verticalArrangement = Arrangement.Center,
   ) {
     Text(
-        text = mostRecentPrice.asMoneyValue(),
-        style = MaterialTheme.typography.body1.copy(color = diff.color),
+        text = price.asMoneyValue(),
+        style =
+            MaterialTheme.typography.body1.run {
+              if (diff == null) this else copy(color = diff.color)
+            },
     )
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(
-          text = "${diff.direction.sign()}${diff.amount.asMoneyValue()}",
-          style = MaterialTheme.typography.caption.copy(color = diff.color),
-      )
-      Text(
-          modifier = Modifier.padding(start = 8.dp),
-          text = "(${diff.direction.sign()}${diff.percent.asPercentValue()})",
-          style = MaterialTheme.typography.caption.copy(color = diff.color),
-      )
+
+    if (diff != null) {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+            text = "${diff.direction.sign()}${diff.amount.asMoneyValue()}",
+            style = MaterialTheme.typography.caption.copy(color = diff.color),
+        )
+        Text(
+            modifier = Modifier.padding(start = 8.dp),
+            text = "(${diff.direction.sign()}${diff.percent.asPercentValue()})",
+            style = MaterialTheme.typography.caption.copy(color = diff.color),
+        )
+      }
     }
   }
 }
@@ -214,15 +215,15 @@ private fun CurrentPriceDisplay(
 @CheckResult
 private fun calculateDifferences(
     current: StockMoneyValue,
-    mostRecent: StockMoneyValue
+    openingPrice: StockMoneyValue
 ): ScrubDifferences {
   val rawCurrent = current.value()
-  val rawMostRecent = mostRecent.value()
-  if (rawCurrent.compareTo(rawMostRecent) == 0) {
+  val rawOpen = openingPrice.value()
+  if (rawCurrent.compareTo(rawOpen) == 0) {
     return ScrubDifferences.ZERO
   }
 
-  val rawAmount = rawMostRecent - rawCurrent
+  val rawAmount = rawCurrent - rawOpen
   val direction = rawAmount.asDirection()
 
   // Percentage is between 0-100 not 0 and 1

@@ -49,25 +49,29 @@ protected constructor(
                 return@also
               }
 
-              state.onInitialLoad(c)
+              state.apply {
+                onInitialLoad(c)
+
+                // Set the opening price based on the current chart
+                openingPrice = c.startingPrice()
+              }
             }
           }
           .onFailure { Timber.e(it, "Failed to load Ticker") }
           .onFailure {
             state.apply {
               currentPrice = null
-              mostRecentPrice = null
+              openingPrice = null
             }
           }
 
   private fun MutableDigViewState.onInitialLoad(chart: StockChart) {
-    if (currentPrice == null) {
-      currentDate = chart.currentDate()
-      currentPrice = chart.currentPrice()
-
-      // Set the most recent price as the initial load current price (should basically be today's most recent quote)
-      mostRecentPrice = currentPrice
+    if (currentPrice != null) {
+      return
     }
+
+    currentDate = chart.currentDate()
+    currentPrice = chart.currentPrice()
   }
 
   fun handleRangeSelected(

@@ -20,14 +20,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -123,11 +117,6 @@ internal class MainActivity : PYDroidActivity() {
 
       vm.Render { state ->
         val theme = state.theme
-        val bottomNavHeight = state.bottomNavHeight
-        val density = LocalDensity.current
-        val bottomOffset =
-            remember(density, bottomNavHeight) { density.run { bottomNavHeight.toDp() + 16.dp } }
-        val snackbarHostState = remember { SnackbarHostState() }
 
         SystemBars(theme)
         TickerTapeTheme(theme) {
@@ -144,14 +133,6 @@ internal class MainActivity : PYDroidActivity() {
                   onLoadPortfolio = { navigate(MainPage.Portfolio) },
                   onLoadSettings = { navigate(MainPage.Settings) },
                   onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-              )
-              RatingScreen(
-                  modifier = Modifier.padding(bottom = bottomOffset),
-                  snackbarHostState = snackbarHostState,
-              )
-              VersionCheckScreen(
-                  modifier = Modifier.padding(bottom = bottomOffset),
-                  snackbarHostState = snackbarHostState,
               )
             }
           }

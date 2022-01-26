@@ -95,8 +95,9 @@ private fun PortfolioTab(
     current: PortfolioDigSections,
     onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
+  val isSelected = remember(tab, current) { tab == current }
   Tab(
-      selected = tab == current,
+      selected = isSelected,
       onClick = { onTabUpdated(tab) },
   ) {
     Text(

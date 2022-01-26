@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,6 +37,7 @@ import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import timber.log.Timber
 
 @Composable
 fun PositionAddScreen(
@@ -56,9 +59,10 @@ fun PositionAddScreen(
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
 
   val isSubmitEnabled = remember(isSubmittable, isSubmitting) { isSubmittable && !isSubmitting }
-  val isTextEntryEnabled = remember(isSubmitting) { !isSubmitting }
+  val isReadOnly = remember(isSubmitting) { isSubmitting }
 
   val focusManager = LocalFocusManager.current
+  val focusRequester = remember { FocusRequester() }
 
   Column(
       modifier = modifier,
@@ -75,9 +79,10 @@ fun PositionAddScreen(
           modifier = Modifier.fillMaxWidth().padding(16.dp),
       ) {
         NumberOfShares(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            modifier =
+                Modifier.fillMaxWidth().padding(bottom = 8.dp).focusRequester(focusRequester),
             isOption = isOption,
-            isEnabled = isTextEntryEnabled,
+            readOnly = isReadOnly,
             numberOfShares = numberOfShares,
             onNumberChanged = onNumberChanged,
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
@@ -86,7 +91,7 @@ fun PositionAddScreen(
         PricePerShare(
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             isOption = isOption,
-            isEnabled = isTextEntryEnabled,
+            readOnly = isReadOnly,
             pricePerShare = pricePerShare,
             onPriceChanged = onPriceChanged,
             onNext = { onDateOfPurchaseClicked(dateOfPurchase) },
@@ -94,6 +99,7 @@ fun PositionAddScreen(
 
         DateOfPurchase(
             modifier = Modifier.padding(8.dp),
+            readOnly = isReadOnly,
             dateOfPurchase = dateOfPurchase,
             onDateOfPurchaseClicked = onDateOfPurchaseClicked,
         )
@@ -101,7 +107,12 @@ fun PositionAddScreen(
         SubmitSection(
             modifier = Modifier.padding(bottom = 16.dp),
             isEnabled = isSubmitEnabled,
-            onSubmit = onSubmit,
+            onSubmit = {
+              onSubmit()
+
+              Timber.d("Re-request focus on top field")
+              focusRequester.requestFocus()
+            },
         )
       }
     }
@@ -135,6 +146,7 @@ private fun SubmitSection(
 @Composable
 private fun DateOfPurchase(
     modifier: Modifier = Modifier,
+    readOnly: Boolean,
     dateOfPurchase: LocalDate?,
     onDateOfPurchaseClicked: (LocalDate?) -> Unit
 ) {
@@ -145,7 +157,10 @@ private fun DateOfPurchase(
       }
 
   Row(
-      modifier = modifier.clickable { onDateOfPurchaseClicked(dateOfPurchase) },
+      modifier =
+          modifier.clickable(
+              enabled = !readOnly,
+          ) { onDateOfPurchaseClicked(dateOfPurchase) },
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Icon(
@@ -164,7 +179,7 @@ private fun DateOfPurchase(
 private fun NumberOfShares(
     modifier: Modifier = Modifier,
     isOption: Boolean,
-    isEnabled: Boolean,
+    readOnly: Boolean,
     numberOfShares: String,
     onNumberChanged: (String) -> Unit,
     onNext: () -> Unit,
@@ -172,8 +187,7 @@ private fun NumberOfShares(
   val what = remember(isOption) { if (isOption) "Contracts" else "Shares" }
   OutlinedTextField(
       modifier = modifier,
-      enabled = isEnabled,
-      readOnly = !isEnabled,
+      readOnly = readOnly,
       value = numberOfShares,
       onValueChange = onNumberChanged,
       keyboardOptions =
@@ -204,7 +218,7 @@ private fun NumberOfShares(
 private fun PricePerShare(
     modifier: Modifier = Modifier,
     isOption: Boolean,
-    isEnabled: Boolean,
+    readOnly: Boolean,
     pricePerShare: String,
     onPriceChanged: (String) -> Unit,
     onNext: () -> Unit,
@@ -212,8 +226,7 @@ private fun PricePerShare(
   val what = remember(isOption) { if (isOption) "Contract" else "Share" }
   OutlinedTextField(
       modifier = modifier,
-      enabled = isEnabled,
-      readOnly = !isEnabled,
+      readOnly = readOnly,
       value = pricePerShare,
       onValueChange = onPriceChanged,
       keyboardOptions =

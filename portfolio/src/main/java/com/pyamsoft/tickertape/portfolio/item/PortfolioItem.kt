@@ -20,6 +20,7 @@ import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -33,6 +34,7 @@ internal fun PortfolioItem(
   val ticker = stock.ticker
   val totalDirection = stock.totalDirection
   val todayDirection = stock.todayDirection
+  val isOption = stock.isOption
 
   val totalComposeColor =
       if (totalDirection.isZero()) {
@@ -73,7 +75,7 @@ internal fun PortfolioItem(
         ) {
           Info(
               modifier = Modifier.padding(end = 8.dp),
-              name = "Shares",
+              name = if (isOption) "Contracts" else "Shares",
               value = stock.totalShares.asShareValue(),
           )
           Info(

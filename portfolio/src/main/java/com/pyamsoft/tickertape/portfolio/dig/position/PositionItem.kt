@@ -42,6 +42,7 @@ private fun calculateDisplayValues(
     equityType: EquityType,
     currentPrice: StockMoneyValue?
 ): DisplayValues {
+  val isOptions = equityType == EquityType.OPTION
   val price = position.price()
   val shareCount = position.shareCount()
   val totalCost = (price.value() * shareCount.value()).asMoney()
@@ -58,14 +59,15 @@ private fun calculateDisplayValues(
     colorGainLoss = Color.Unspecified
   } else {
     // Current
-    val currentValue = (currentPrice.value() * shareCount.value()).asMoney()
+    val currentRaw = (currentPrice.value() * shareCount.value())
+    val currentValue = currentRaw.asMoney()
     displayCurrent = currentValue.asMoneyValue()
 
     // Gain/Loss
     val gainLossValue = currentValue.value() - totalCost.value()
     val gainLossDirection = gainLossValue.asDirection()
     val gainLossPercent = ((gainLossValue * 100) / totalCost.value()).asPercent().asPercentValue()
-    val amount = gainLossValue.asMoney().asMoneyValue()
+    val amount = (if (isOptions) (gainLossValue * 100) else gainLossValue).asMoney().asMoneyValue()
     val sign = gainLossDirection.sign()
     displayGainLoss = "${sign}${amount} (${sign}${gainLossPercent})"
 
@@ -97,14 +99,18 @@ internal fun PositionItem(
     position: DbPosition,
     currentPrice: StockMoneyValue?,
 ) {
-
+  val isOption = remember(equityType) { equityType == EquityType.OPTION }
   val purchaseDate = position.purchaseDate()
   val price = position.price()
   val shareCount = position.shareCount()
 
   val displayPurchaseDate =
       remember(purchaseDate) { purchaseDate.format(DATE_FORMATTER.get().requireNotNull()) }
-  val displayPrice = remember(price) { price.asMoneyValue() }
+  val displayPrice =
+      remember(price, isOption) {
+        val p = if (isOption) (price.value() * 100).asMoney() else price
+        return@remember p.asMoneyValue()
+      }
   val displayShares = remember(shareCount) { shareCount.asShareValue() }
   val displayValues =
       remember(position, currentPrice, equityType) {
@@ -133,7 +139,7 @@ internal fun PositionItem(
         )
         Info(
             modifier = Modifier.padding(end = 8.dp),
-            name = "Shares",
+            name = if (isOption) "Contracts" else "Shares",
             value = displayShares,
         )
       }

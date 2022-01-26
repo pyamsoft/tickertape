@@ -46,6 +46,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateDialog
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import java.time.LocalDate
@@ -71,6 +72,14 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         .getString(KEY_HOLDING_ID)
         .let { it.requireNotNull { "Must be created with $KEY_HOLDING_ID" } }
         .let { DbHolding.Id(it) }
+  }
+
+  @CheckResult
+  private fun getHoldingType(): EquityType {
+    return requireArguments()
+        .getString(KEY_HOLDING_TYPE)
+        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_TYPE}" } }
+        .let { EquityType.valueOf(it) }
   }
 
   private fun handleSubmit() {
@@ -100,6 +109,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         .create(
             getSymbol(),
             getHoldingId(),
+            getHoldingType(),
         )
         .inject(this)
 
@@ -173,6 +183,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
 
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val TAG = "PositionAddDialog"
 
     @JvmStatic
@@ -180,12 +191,14 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
     private fun newInstance(
         symbol: StockSymbol,
         holdingId: DbHolding.Id,
+        holdingType: EquityType,
     ): DialogFragment {
       return PositionAddDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, symbol.symbol())
               putString(KEY_HOLDING_ID, holdingId.id)
+              putString(KEY_HOLDING_TYPE, holdingType.name)
             }
       }
     }
@@ -195,8 +208,9 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         activity: FragmentActivity,
         symbol: StockSymbol,
         holdingId: DbHolding.Id,
+        holdingType: EquityType,
     ) {
-      newInstance(symbol, holdingId).show(activity, TAG)
+      newInstance(symbol, holdingId, holdingType).show(activity, TAG)
     }
   }
 }

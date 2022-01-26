@@ -7,10 +7,12 @@ import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import java.time.LocalDate
 import javax.inject.Inject
 
 interface PositionAddViewState : UiViewState {
+  val equityType: EquityType
   val positionId: DbPosition.Id
   val isSubmitting: Boolean
   val isSubmittable: Boolean
@@ -19,7 +21,11 @@ interface PositionAddViewState : UiViewState {
   val dateOfPurchase: LocalDate?
 }
 
-internal class MutablePositionAddViewState @Inject internal constructor() : PositionAddViewState {
+internal class MutablePositionAddViewState
+@Inject
+internal constructor(
+    override val equityType: EquityType,
+) : PositionAddViewState {
   override var isSubmitting by mutableStateOf(false)
   override var isSubmittable by mutableStateOf(false)
   override var pricePerShare by mutableStateOf("")

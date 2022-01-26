@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -38,6 +39,7 @@ private data class DisplayValues(
 @CheckResult
 private fun calculateDisplayValues(
     position: DbPosition,
+    equityType: EquityType,
     currentPrice: StockMoneyValue?
 ): DisplayValues {
   val price = position.price()
@@ -91,6 +93,7 @@ private fun calculateDisplayValues(
 @JvmOverloads
 internal fun PositionItem(
     modifier: Modifier = Modifier,
+    equityType: EquityType,
     position: DbPosition,
     currentPrice: StockMoneyValue?,
 ) {
@@ -104,7 +107,9 @@ internal fun PositionItem(
   val displayPrice = remember(price) { price.asMoneyValue() }
   val displayShares = remember(shareCount) { shareCount.asShareValue() }
   val displayValues =
-      remember(position, currentPrice) { calculateDisplayValues(position, currentPrice) }
+      remember(position, currentPrice, equityType) {
+        calculateDisplayValues(position, equityType, currentPrice)
+      }
 
   Card(
       modifier = modifier,
@@ -201,6 +206,7 @@ private fun PreviewPositionItem() {
   Surface {
     PositionItem(
         position = newTestPosition(),
+        equityType = EquityType.STOCK,
         currentPrice = null,
     )
   }

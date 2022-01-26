@@ -17,6 +17,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.chart.PorfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -133,6 +134,7 @@ private fun PreviewPortfolioDigScreen() {
       state =
           MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
+              equityType = EquityType.STOCK,
           ),
       currentPrice = null,
       onClose = {},

@@ -7,10 +7,13 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 interface PortfolioDigViewState : DigViewState {
+  val equityType: EquityType
+
   val isLoading: Boolean
   val section: PortfolioDigSections
 
@@ -26,6 +29,7 @@ interface PortfolioDigViewState : DigViewState {
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(
+    override val equityType: EquityType,
     symbol: StockSymbol,
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)

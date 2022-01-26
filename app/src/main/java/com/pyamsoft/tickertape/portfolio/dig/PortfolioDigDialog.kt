@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -44,6 +43,7 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -75,11 +75,11 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   }
 
   private fun handleAddPosition() {
-    val holdingId = getHoldingId()
     PositionAddDialog.show(
         activity = requireActivity(),
         symbol = getSymbol(),
-        holdingId = holdingId,
+        holdingId = getHoldingId(),
+        holdingType = getHoldingType(),
     )
   }
 
@@ -109,6 +109,14 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   }
 
   @CheckResult
+  private fun getHoldingType(): EquityType {
+    return requireArguments()
+        .getString(KEY_HOLDING_TYPE)
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_TYPE" } }
+        .let { EquityType.valueOf(it) }
+  }
+
+  @CheckResult
   private fun getCurrentPrice(): StockMoneyValue? {
     return requireArguments().getDouble(KEY_CURRENT_PRICE, -1.0).let { v ->
       if (v.compareTo(0) >= 0) {
@@ -130,6 +138,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         .create(
             getSymbol(),
             getHoldingId(),
+            getHoldingType(),
         )
         .inject(this)
 
@@ -137,11 +146,10 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     val currentPrice = getCurrentPrice()
-      return ComposeView(act).apply {
+    return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
       setContent {
-
         vm.Render { state ->
           TickerTapeTheme(themeProvider) {
             PortfolioDigScreen(
@@ -200,6 +208,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
+    private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_CURRENT_PRICE = "key_current_price"
     private const val TAG = "PortfolioDigDialog"
 
@@ -214,6 +223,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
             Bundle().apply {
               putString(KEY_SYMBOL, holding.symbol().symbol())
               putString(KEY_HOLDING_ID, holding.id().id)
+              putString(KEY_HOLDING_TYPE, holding.type().name)
               currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
             }
       }

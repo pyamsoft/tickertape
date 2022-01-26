@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.Paid
@@ -51,6 +52,8 @@ fun PositionAddScreen(
   val pricePerShare = state.pricePerShare
   val numberOfShares = state.numberOfShares
   val dateOfPurchase = state.dateOfPurchase
+  val equityType = state.equityType
+  val isOption = remember(equityType) { equityType == EquityType.OPTION }
 
   val isSubmitEnabled = remember(isSubmittable, isSubmitting) { isSubmittable && !isSubmitting }
   val isTextEntryEnabled = remember(isSubmitting) { !isSubmitting }
@@ -73,6 +76,7 @@ fun PositionAddScreen(
       ) {
         NumberOfShares(
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            isOption = isOption,
             isEnabled = isTextEntryEnabled,
             numberOfShares = numberOfShares,
             onNumberChanged = onNumberChanged,
@@ -81,6 +85,7 @@ fun PositionAddScreen(
 
         PricePerShare(
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            isOption = isOption,
             isEnabled = isTextEntryEnabled,
             pricePerShare = pricePerShare,
             onPriceChanged = onPriceChanged,
@@ -146,7 +151,7 @@ private fun DateOfPurchase(
     Icon(
         modifier = Modifier.padding(end = 20.dp).alpha(TextFieldDefaults.IconOpacity),
         imageVector = Icons.Filled.Today,
-        contentDescription = "Number of shares",
+        contentDescription = "Date of Purchase",
     )
     Text(
         text = displayDate,
@@ -158,11 +163,13 @@ private fun DateOfPurchase(
 @Composable
 private fun NumberOfShares(
     modifier: Modifier = Modifier,
+    isOption: Boolean,
     isEnabled: Boolean,
     numberOfShares: String,
     onNumberChanged: (String) -> Unit,
     onNext: () -> Unit,
 ) {
+  val what = remember(isOption) { if (isOption) "Contracts" else "Shares" }
   OutlinedTextField(
       modifier = modifier,
       enabled = isEnabled,
@@ -180,14 +187,14 @@ private fun NumberOfShares(
           ),
       label = {
         Text(
-            text = "Number of shares",
+            text = "Number of $what",
         )
       },
       leadingIcon = {
         Icon(
             modifier = Modifier.padding(end = 4.dp),
             imageVector = Icons.Filled.Tag,
-            contentDescription = "Number of shares",
+            contentDescription = "Number of $what",
         )
       },
   )
@@ -196,11 +203,13 @@ private fun NumberOfShares(
 @Composable
 private fun PricePerShare(
     modifier: Modifier = Modifier,
+    isOption: Boolean,
     isEnabled: Boolean,
     pricePerShare: String,
     onPriceChanged: (String) -> Unit,
     onNext: () -> Unit,
 ) {
+  val what = remember(isOption) { if (isOption) "Contract" else "Share" }
   OutlinedTextField(
       modifier = modifier,
       enabled = isEnabled,
@@ -218,14 +227,14 @@ private fun PricePerShare(
           ),
       label = {
         Text(
-            text = "Price per share",
+            text = "Price per $what",
         )
       },
       leadingIcon = {
         Icon(
             modifier = Modifier.padding(end = 4.dp),
             imageVector = Icons.Filled.Paid,
-            contentDescription = "Price per share",
+            contentDescription = "Price per $what",
         )
       },
   )
@@ -236,7 +245,7 @@ private fun PricePerShare(
 private fun PreviewPositionAddScreen() {
   val symbol = "MSFT".asSymbol()
   PositionAddScreen(
-      state = MutablePositionAddViewState(),
+      state = MutablePositionAddViewState(EquityType.STOCK),
       symbol = symbol,
       onPriceChanged = {},
       onNumberChanged = {},

@@ -28,6 +28,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import timber.log.Timber
@@ -72,6 +73,7 @@ private fun PositionsList(
     onRefresh: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
 ) {
+  val equityType = state.equityType
   val isLoading = state.isLoading
   val positions = state.positions
   SwipeRefresh(
@@ -96,6 +98,7 @@ private fun PositionsList(
                     ),
             position = item,
             currentPrice = currentPrice,
+            equityType = equityType,
         )
       }
 
@@ -148,6 +151,7 @@ private fun PreviewPositionScreen() {
       state =
           MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
+              equityType = EquityType.STOCK,
           ),
       currentPrice = null,
       onAddPosition = {},

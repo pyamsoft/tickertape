@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -110,7 +111,11 @@ private fun PortfolioTab(
 private fun PreviewPortfolioDigToolbar() {
   val symbol = "MSFT".asSymbol()
   PortfolioDigToolbar(
-      state = MutablePortfolioDigViewState(symbol),
+      state =
+          MutablePortfolioDigViewState(
+              equityType = EquityType.STOCK,
+              symbol = symbol,
+          ),
       onClose = {},
       onTabUpdated = {},
   )

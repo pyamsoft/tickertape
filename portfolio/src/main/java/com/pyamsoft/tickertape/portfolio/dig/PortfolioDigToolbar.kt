@@ -35,6 +35,7 @@ internal fun PortfolioDigToolbar(
   val ticker = state.ticker
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
+  val allTabs = remember { PortfolioDigSections.values() }
 
   Surface(
       modifier = modifier,
@@ -77,7 +78,7 @@ internal fun PortfolioDigToolbar(
           selectedTabIndex = section.ordinal,
       ) {
         // If we use forEach here, compose compiler gives a ClassCastException
-        for (tab in PortfolioDigSections.values()) {
+        for (tab in allTabs) {
           PortfolioTab(
               current = section,
               tab = tab,

@@ -19,6 +19,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +35,8 @@ fun SearchBar(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
 ) {
+  val allTypes = remember { EquityType.values() }
+
   Surface(
       modifier = modifier.padding(horizontal = 8.dp),
       elevation = AppBarDefaults.TopAppBarElevation,
@@ -54,7 +57,7 @@ fun SearchBar(
           backgroundColor = Color.Transparent,
           selectedTabIndex = currentTab.ordinal,
       ) {
-        EquityType.values().forEach { tab ->
+        allTypes.forEach { tab ->
           TickerTab(
               current = currentTab,
               tab = tab,

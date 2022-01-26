@@ -33,7 +33,7 @@ internal constructor(
     symbol: StockSymbol,
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
-  override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
+  override var section by mutableStateOf(PortfolioDigSections.CHART)
   override var holding by mutableStateOf<DbHolding?>(null)
   override var positions by mutableStateOf(emptyList<DbPosition>())
   override var chartError by mutableStateOf<Throwable?>(null)

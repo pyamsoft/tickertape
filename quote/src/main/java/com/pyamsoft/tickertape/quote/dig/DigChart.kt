@@ -267,12 +267,14 @@ private fun Ranges(
     range: StockChart.IntervalRange,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
+  val allRanges = remember { StockChart.IntervalRange.values() }
+
   LazyRow(
       modifier = modifier.padding(top = 16.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
     items(
-        items = StockChart.IntervalRange.values(),
+        items = allRanges,
         key = { it.name },
     ) { item ->
       if (item == range) {

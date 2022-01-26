@@ -53,7 +53,6 @@ fun PortfolioDigScreen(
         )
 
         Crossfade(
-            modifier = modifier,
             targetState = isLoading,
         ) { loading ->
           if (loading) {

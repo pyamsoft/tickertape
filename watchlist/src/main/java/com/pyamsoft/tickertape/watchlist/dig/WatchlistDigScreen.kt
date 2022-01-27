@@ -12,16 +12,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 @JvmOverloads
 fun WatchlistDigScreen(
     modifier: Modifier = Modifier,
     state: WatchlistDigViewState,
+    imageLoader: ImageLoader,
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
@@ -54,6 +57,7 @@ fun WatchlistDigScreen(
           DigChart(
               modifier = Modifier.fillMaxWidth(),
               state = state,
+              imageLoader = imageLoader,
               onScrub = onScrub,
               onRangeSelected = onRangeSelected,
           )
@@ -82,6 +86,7 @@ private fun PreviewWatchlistDigScreen() {
               symbol = "MSFT".asSymbol(),
               allowModifyWatchlist = true,
           ),
+      imageLoader = createNewTestImageLoader(),
       onClose = {},
       onScrub = {},
       onRangeSelected = {},

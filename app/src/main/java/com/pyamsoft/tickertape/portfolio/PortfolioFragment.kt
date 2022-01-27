@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import coil.ImageLoader
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -51,6 +52,7 @@ class PortfolioFragment : Fragment() {
   @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
+  @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
@@ -98,6 +100,7 @@ class PortfolioFragment : Fragment() {
 
     val vm = viewModel.requireNotNull()
     val mainVM = mainViewModel.requireNotNull()
+    val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -115,6 +118,7 @@ class PortfolioFragment : Fragment() {
                 PortfolioScreen(
                     modifier = Modifier.fillMaxSize(),
                     state = state,
+                    imageLoader = loader,
                     navBarBottomHeight = mainState.bottomNavHeight,
                     onRefresh = { handleRefresh(true) },
                     onSelect = { handleOpenManageDialog(it) },
@@ -163,6 +167,7 @@ class PortfolioFragment : Fragment() {
     viewModel = null
     mainViewModel = null
     theming = null
+    imageLoader = null
   }
 
   companion object {

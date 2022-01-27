@@ -22,7 +22,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
-import coil.Coil
+import coil.ImageLoader
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.ModuleProvider
@@ -49,6 +49,11 @@ class TickerTape : Application() {
 
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
+
+    // Wrap in a lazy to ensure we only ever construct one
+    val singletonLazyImageLoader by lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
+    val lazyImageLoader = { singletonLazyImageLoader }
+
     val parameters =
         PYDroid.Parameters(
             viewSourceUrl = url,
@@ -56,7 +61,7 @@ class TickerTape : Application() {
             privacyPolicyUrl = PRIVACY_POLICY_URL,
             termsConditionsUrl = TERMS_CONDITIONS_URL,
             version = BuildConfig.VERSION_CODE,
-            imageLoader = { Coil.imageLoader(this) },
+            imageLoader = lazyImageLoader,
             logger = createLogger(),
             theme = { themeProvider, content ->
               TickerTapeTheme(
@@ -66,15 +71,19 @@ class TickerTape : Application() {
             },
         )
 
-    return@lazy createComponent(PYDroid.init(this, parameters))
+    return@lazy createComponent(PYDroid.init(this, parameters), lazyImageLoader)
   }
 
   @CheckResult
-  private fun createComponent(provider: ModuleProvider): TickerComponent {
+  private fun createComponent(
+      provider: ModuleProvider,
+      lazyImageLoader: () -> ImageLoader
+  ): TickerComponent {
     return DaggerTickerComponent.factory()
         .create(
             this,
             isDebugMode(),
+            lazyImageLoader,
             provider.get().theming(),
         )
         .also { addLibraries() }

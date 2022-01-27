@@ -38,23 +38,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.dig.ChartError
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 internal fun HomeIndexes(
     modifier: Modifier = Modifier,
     state: HomeIndexesViewState,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
+      imageLoader = imageLoader,
       name = "USA Indexes",
       isLoading = state.isLoadingIndexes,
       tickers = state.indexes,
@@ -67,10 +71,12 @@ internal fun HomeIndexes(
 internal fun HomeGainers(
     modifier: Modifier = Modifier,
     state: HomeGainersViewState,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
+      imageLoader = imageLoader,
       name = "Today's Top Gainers (USA)",
       isLoading = state.isLoadingGainers,
       tickers = state.gainers,
@@ -83,10 +89,12 @@ internal fun HomeGainers(
 internal fun HomeLosers(
     modifier: Modifier = Modifier,
     state: HomeLosersViewState,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
+      imageLoader = imageLoader,
       name = "Today's Top Losers (USA)",
       isLoading = state.isLoadingLosers,
       tickers = state.losers,
@@ -99,10 +107,12 @@ internal fun HomeLosers(
 internal fun HomeTrending(
     modifier: Modifier = Modifier,
     state: HomeTrendingViewState,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
+      imageLoader = imageLoader,
       name = "Today's Top Trending Stocks (USA)",
       isLoading = state.isLoadingTrending,
       tickers = state.trending,
@@ -115,10 +125,12 @@ internal fun HomeTrending(
 internal fun HomeMostShorted(
     modifier: Modifier = Modifier,
     state: HomeShortedViewState,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
+      imageLoader = imageLoader,
       name = "Today's Most Shorted Stocks",
       isLoading = state.isLoadingMostShorted,
       tickers = state.mostShorted,
@@ -134,6 +146,7 @@ private fun HomeCharts(
     isLoading: Boolean,
     tickers: List<Ticker>,
     error: Throwable?,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   Crossfade(
@@ -167,9 +180,10 @@ private fun HomeCharts(
         }
       }
     } else {
-      Error(
+      ChartError(
           modifier = Modifier.fillMaxWidth(),
           error = err,
+          imageLoader = imageLoader,
       )
     }
   }
@@ -225,34 +239,6 @@ private fun ChartList(
   }
 }
 
-@Composable
-private fun Error(
-    modifier: Modifier = Modifier,
-    error: Throwable,
-) {
-  Column(
-      modifier = modifier.padding(16.dp),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Text(
-        textAlign = TextAlign.Center,
-        text = error.message ?: "An unexpected error occurred",
-        style =
-            MaterialTheme.typography.body1.copy(
-                color = MaterialTheme.colors.error,
-            ),
-    )
-
-    Text(
-        modifier = Modifier.padding(top = 16.dp),
-        textAlign = TextAlign.Center,
-        text = "Please try again later.",
-        style = MaterialTheme.typography.body2,
-    )
-  }
-}
-
 @Preview
 @Composable
 private fun PreviewHomeCharts() {
@@ -271,6 +257,7 @@ private fun PreviewHomeCharts() {
         name = "TEST STOCKS CHARTS",
         error = null,
         onChartClicked = {},
+        imageLoader = createNewTestImageLoader(),
     )
   }
 }

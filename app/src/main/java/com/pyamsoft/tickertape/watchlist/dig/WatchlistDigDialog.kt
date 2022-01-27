@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
@@ -48,6 +49,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
 
   @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
+  @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
@@ -79,6 +81,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         .inject(this)
 
     val vm = viewModel.requireNotNull()
+    val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -90,6 +93,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
             WatchlistDigScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
+                imageLoader = loader,
                 onClose = { dismiss() },
                 onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = {
@@ -143,6 +147,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
 
     viewModel = null
     theming = null
+    imageLoader = null
   }
 
   companion object {

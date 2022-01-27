@@ -21,6 +21,7 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
+import coil.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.inject.AlertComponent
@@ -109,6 +110,7 @@ internal interface TickerComponent {
     fun create(
         @BindsInstance application: Application,
         @Named("debug") @BindsInstance debug: Boolean,
+        @BindsInstance lazyImageLoader: () -> ImageLoader,
         @BindsInstance theming: Theming,
     ): TickerComponent
   }
@@ -141,6 +143,13 @@ internal interface TickerComponent {
       @JvmStatic
       internal fun provideContext(application: Application): Context {
         return application
+      }
+
+      @Provides
+      @JvmStatic
+      @Singleton
+      internal fun provideCoilImageLoader(lazyImageLoader: () -> ImageLoader): ImageLoader {
+        return lazyImageLoader()
       }
 
       @Provides

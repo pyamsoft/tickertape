@@ -29,17 +29,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 @JvmOverloads
 fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeViewState,
+    imageLoader: ImageLoader,
     navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
     onChartClicked: (Ticker) -> Unit,
@@ -56,6 +59,7 @@ fun HomeScreen(
       HomeContent(
           modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState()),
           state = state,
+          imageLoader = imageLoader,
           navBarBottomHeight = navBarBottomHeight,
           onChartClicked = onChartClicked,
       )
@@ -68,6 +72,7 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
     state: HomeViewState,
     navBarBottomHeight: Int,
+    imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
 ) {
   val density = LocalDensity.current
@@ -86,6 +91,7 @@ private fun HomeContent(
     )
     HomeIndexes(
         state = state,
+        imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
     HomeWatchlist(
@@ -94,18 +100,22 @@ private fun HomeContent(
     )
     HomeTrending(
         state = state,
+        imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
     HomeGainers(
         state = state,
+        imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
     HomeLosers(
         state = state,
+        imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
     HomeMostShorted(
         state = state,
+        imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
 
@@ -123,6 +133,7 @@ private fun HomeContent(
 private fun PreviewHomeScreen() {
   HomeScreen(
       state = MutableHomeViewState(),
+      imageLoader = createNewTestImageLoader(),
       onChartClicked = {},
       onRefresh = {},
   )

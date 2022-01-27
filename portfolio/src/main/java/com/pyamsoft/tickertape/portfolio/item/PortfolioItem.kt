@@ -14,13 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -61,43 +59,45 @@ internal fun PortfolioItem(
   Box(
       modifier = modifier,
   ) {
-    Quote(
-        modifier = Modifier.fillMaxWidth(),
-        ticker = ticker.requireNotNull(),
-        onClick = { onSelect(stock) },
-        onLongClick = { onDelete(stock) },
-    ) {
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+    if (ticker != null) {
+      Quote(
+          modifier = Modifier.fillMaxWidth(),
+          ticker = ticker,
+          onClick = { onSelect(stock) },
+          onLongClick = { onDelete(stock) },
       ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         ) {
-          Info(
-              modifier = Modifier.padding(end = 8.dp),
-              name = if (isOption) "Contracts" else "Shares",
-              value = stock.totalShares.asShareValue(),
-          )
-          Info(
-              name = "Change Today",
-              value = stock.changeTodayDisplayString,
-              valueColor = todayComposeColor,
-          )
-        }
-        Row(
-            modifier = Modifier.padding(top = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Info(
-              modifier = Modifier.padding(end = 8.dp),
-              name = "Value",
-              value = stock.current.asMoneyValue())
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Info(
+                modifier = Modifier.padding(end = 8.dp),
+                name = if (isOption) "Contracts" else "Shares",
+                value = stock.totalShares.asShareValue(),
+            )
+            Info(
+                name = "Change Today",
+                value = stock.changeTodayDisplayString,
+                valueColor = todayComposeColor,
+            )
+          }
+          Row(
+              modifier = Modifier.padding(top = 4.dp),
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Info(
+                modifier = Modifier.padding(end = 8.dp),
+                name = "Value",
+                value = stock.current.asMoneyValue())
 
-          Info(
-              name = totalChangeTitle,
-              value = stock.gainLossDisplayString,
-              valueColor = totalComposeColor,
-          )
+            Info(
+                name = totalChangeTitle,
+                value = stock.gainLossDisplayString,
+                valueColor = totalComposeColor,
+            )
+          }
         }
       }
     }

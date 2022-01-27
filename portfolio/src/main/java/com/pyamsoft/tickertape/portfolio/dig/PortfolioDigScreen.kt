@@ -13,20 +13,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.portfolio.dig.chart.PorfolioChart
+import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 @JvmOverloads
 fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    imageLoader: ImageLoader,
     currentPrice: StockMoneyValue?,
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
@@ -63,6 +66,7 @@ fun PortfolioDigScreen(
             Content(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
+                imageLoader = imageLoader,
                 currentPrice = currentPrice,
                 onScrub = onScrub,
                 onRangeSelected = onRangeSelected,
@@ -81,6 +85,7 @@ fun PortfolioDigScreen(
 private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    imageLoader: ImageLoader,
     currentPrice: StockMoneyValue?,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
@@ -94,9 +99,10 @@ private fun Content(
   ) { section ->
     return@Crossfade when (section) {
       PortfolioDigSections.CHART -> {
-        PorfolioChart(
+        PortfolioChart(
             modifier = Modifier.fillMaxWidth(),
             state = state,
+            imageLoader = imageLoader,
             onScrub = onScrub,
             onRangeSelected = onRangeSelected,
         )
@@ -135,6 +141,7 @@ private fun PreviewPortfolioDigScreen() {
               symbol = "MSFT".asSymbol(),
               equityType = EquityType.STOCK,
           ),
+      imageLoader = createNewTestImageLoader(),
       currentPrice = null,
       onClose = {},
       onScrub = {},

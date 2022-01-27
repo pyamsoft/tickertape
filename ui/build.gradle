@@ -90,7 +90,8 @@ dependencies {
 
   api "com.google.accompanist:accompanist-swiperefresh:$accompanist"
   api "com.google.accompanist:accompanist-insets:$accompanist"
-  api "io.coil-kt:coil:$coil"
+
+  api "io.coil-kt:coil-compose-base:$coil"
 
   // Material Design
   api "com.google.android.material:material:$materialDesign"

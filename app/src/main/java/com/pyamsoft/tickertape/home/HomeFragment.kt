@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import coil.ImageLoader
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -49,6 +50,7 @@ class HomeFragment : Fragment() {
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var viewModel: HomeViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
+  @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
@@ -79,6 +81,7 @@ class HomeFragment : Fragment() {
 
     val vm = viewModel.requireNotNull()
     val mainVM = mainViewModel.requireNotNull()
+    val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -96,6 +99,7 @@ class HomeFragment : Fragment() {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     state = state,
+                    imageLoader = loader,
                     navBarBottomHeight = mainState.bottomNavHeight,
                     onRefresh = { handleRefresh(true) },
                     onChartClicked = { handleOpenDigDialog(it) },
@@ -140,6 +144,7 @@ class HomeFragment : Fragment() {
     theming = null
     viewModel = null
     mainViewModel = null
+    imageLoader = null
   }
 
   companion object {

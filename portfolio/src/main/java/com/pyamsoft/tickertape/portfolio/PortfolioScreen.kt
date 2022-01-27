@@ -1,8 +1,6 @@
 package com.pyamsoft.tickertape.portfolio
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
@@ -37,13 +36,17 @@ import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.SearchBar
 import com.pyamsoft.tickertape.quote.add.NewTickerFab
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
+import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 @JvmOverloads
 fun PortfolioScreen(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
+    imageLoader: ImageLoader,
     navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
     onSelect: (PortfolioStock) -> Unit,
@@ -66,6 +69,7 @@ fun PortfolioScreen(
       Content(
           modifier = Modifier.fillMaxSize(),
           state = state,
+          imageLoader = imageLoader,
           navBarBottomHeight = navBarBottomHeight,
           onRefresh = onRefresh,
           onSelect = onSelect,
@@ -82,6 +86,7 @@ fun PortfolioScreen(
 private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
+    imageLoader: ImageLoader,
     navBarBottomHeight: Int,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
@@ -90,47 +95,31 @@ private fun Content(
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
 ) {
-  val error = state.error
-  val portfolio = state.portfolio
-  val stocks = state.stocks
-  val search = state.query
-  val tab = state.section
   val isLoading = state.isLoading
 
   val density = LocalDensity.current
   val bottomPaddingDp =
-      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
+      remember(
+          density,
+          navBarBottomHeight,
+      ) { density.run { navBarBottomHeight.toDp() } }
   val fabBottomPadding = remember(bottomPaddingDp) { bottomPaddingDp + 16.dp }
 
   Box(
       modifier = modifier,
       contentAlignment = Alignment.BottomCenter,
   ) {
-    Crossfade(
+    Portfolio(
         modifier = Modifier.fillMaxSize(),
-        targetState = error,
-    ) { err ->
-      if (err == null) {
-        Portfolio(
-            modifier = Modifier.fillMaxSize(),
-            portfolio = portfolio,
-            stocks = stocks,
-            navBarBottomHeight = bottomPaddingDp,
-            search = search,
-            tab = tab,
-            onSelect = onSelect,
-            onDelete = onDelete,
-            onSearchChanged = onSearchChanged,
-            onTabUpdated = onTabUpdated,
-        )
-      } else {
-        Error(
-            modifier = Modifier.fillMaxSize(),
-            error = err,
-            onRefresh = onRefresh,
-        )
-      }
-    }
+        state = state,
+        imageLoader = imageLoader,
+        navBarBottomHeight = bottomPaddingDp,
+        onSelect = onSelect,
+        onDelete = onDelete,
+        onSearchChanged = onSearchChanged,
+        onTabUpdated = onTabUpdated,
+        onRefresh = onRefresh,
+    )
 
     NewTickerFab(
         visible = !isLoading,
@@ -147,17 +136,22 @@ private fun Content(
 @OptIn(ExperimentalFoundationApi::class)
 private fun Portfolio(
     modifier: Modifier = Modifier,
-    portfolio: PortfolioStockList,
-    stocks: List<PortfolioStock>,
-    search: String,
+    state: PortfolioViewState,
+    imageLoader: ImageLoader,
     navBarBottomHeight: Dp,
-    tab: EquityType,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onRefresh: () -> Unit,
 ) {
-  val portfolioTickers = remember(stocks) { stocks.filter { it.ticker != null } }
+  val error = state.error
+  val portfolio = state.portfolio
+  val stocks = state.stocks
+  val search = state.query
+  val tab = state.section
+
+  val isEmptyList = remember(stocks) { stocks.isEmpty() }
 
   LazyColumn(
       modifier = modifier,
@@ -196,26 +190,48 @@ private fun Portfolio(
       }
     }
 
-    itemsIndexed(
-        items = portfolioTickers,
-        key = { _, item -> item.holding.symbol().symbol() },
-    ) { index, ps ->
-      if (index == 0) {
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+    when {
+      error != null -> {
+        item {
+          ErrorState(
+              modifier = Modifier.fillMaxSize(),
+              imageLoader = imageLoader,
+              error = error,
+              onRefresh = onRefresh,
+          )
+        }
       }
+      isEmptyList -> {
+        item {
+          EmptyState(
+              modifier = Modifier.fillMaxWidth(),
+              imageLoader = imageLoader,
+          )
+        }
+      }
+      else -> {
+        itemsIndexed(
+            items = stocks,
+            key = { _, item -> item.holding.symbol().symbol() },
+        ) { index, ps ->
+          if (index == 0) {
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+          }
 
-      PortfolioItem(
-          modifier = Modifier.fillMaxWidth(),
-          stock = ps,
-          onSelect = onSelect,
-          onDelete = onDelete,
-      )
+          PortfolioItem(
+              modifier = Modifier.fillMaxWidth(),
+              stock = ps,
+              onSelect = onSelect,
+              onDelete = onDelete,
+          )
 
-      Spacer(
-          modifier = Modifier.height(16.dp),
-      )
+          Spacer(
+              modifier = Modifier.height(16.dp),
+          )
+        }
+      }
     }
 
     item {
@@ -230,41 +246,61 @@ private fun Portfolio(
 }
 
 @Composable
-private fun Error(
+private fun EmptyState(
     modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
+) {
+  PolinaGolubevaScreen(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      image = R.drawable.portfolio_empty,
+      bottomContent = {
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = "Nothing in your portfolio, add a position!",
+            style = MaterialTheme.typography.h6,
+        )
+      },
+  )
+}
+
+@Composable
+private fun ErrorState(
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
     error: Throwable,
     onRefresh: () -> Unit,
 ) {
-  Column(
-      modifier = modifier.padding(16.dp),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Text(
-        textAlign = TextAlign.Center,
-        text = error.message ?: "An unexpected error occurred",
-        style =
-            MaterialTheme.typography.body1.copy(
-                color = MaterialTheme.colors.error,
-            ),
-    )
+  ErrorScreen(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      bottomContent = {
+        Text(
+            textAlign = TextAlign.Center,
+            text = error.message ?: "An unexpected error occurred",
+            style =
+                MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
 
-    Text(
-        modifier = Modifier.padding(top = 16.dp),
-        textAlign = TextAlign.Center,
-        text = "Please try again later.",
-        style = MaterialTheme.typography.body2,
-    )
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            textAlign = TextAlign.Center,
+            text = "Please try again later.",
+            style = MaterialTheme.typography.body2,
+        )
 
-    Button(
-        modifier = Modifier.padding(top = 16.dp),
-        onClick = onRefresh,
-    ) {
-      Text(
-          text = "Refresh",
-      )
-    }
-  }
+        Button(
+            modifier = Modifier.padding(top = 16.dp),
+            onClick = onRefresh,
+        ) {
+          Text(
+              text = "Refresh",
+          )
+        }
+      },
+  )
 }
 
 @Preview
@@ -272,6 +308,7 @@ private fun Error(
 private fun PreviewPortfolioScreen() {
   PortfolioScreen(
       state = MutablePortfolioViewState(),
+      imageLoader = createNewTestImageLoader(),
       onRefresh = {},
       onDelete = {},
       onSelect = {},

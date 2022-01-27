@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,11 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
+import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
@@ -42,6 +44,8 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDateTime
 
 @Composable
@@ -49,6 +53,7 @@ import java.time.LocalDateTime
 fun DigChart(
     modifier: Modifier = Modifier,
     state: DigViewState,
+    imageLoader: ImageLoader,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
@@ -67,11 +72,7 @@ fun DigChart(
         modifier = Modifier.fillMaxWidth(),
         targetState = chart,
     ) { c ->
-      if (c == null) {
-        Error(
-            modifier = Modifier.fillMaxWidth(),
-        )
-      } else {
+      if (c != null) {
         Column(
             modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP.dp),
         ) {
@@ -299,20 +300,27 @@ private fun Ranges(
 }
 
 @Composable
-private fun Error(
+@JvmOverloads
+fun ChartError(
     modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
+    error: Throwable,
 ) {
-  Box(
+  KarinaTsoyScreen(
       modifier = modifier,
-  ) {
-    Text(
-        text = "Error loading chart",
-        style =
-            MaterialTheme.typography.body1.copy(
-                color = MaterialTheme.colors.error,
-            ),
-    )
-  }
+      imageLoader = imageLoader,
+      image = R.drawable.chart_error,
+      bottomContent = {
+        Text(
+            textAlign = TextAlign.Center,
+            text = error.message ?: "An unexpected error occurred",
+            style =
+                MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
+      },
+  )
 }
 
 @Preview
@@ -321,6 +329,7 @@ private fun PreviewDigChart() {
   Surface {
     DigChart(
         state = newTestDigViewState(),
+        imageLoader = createNewTestImageLoader(),
         onScrub = {},
         onRangeSelected = {},
     )

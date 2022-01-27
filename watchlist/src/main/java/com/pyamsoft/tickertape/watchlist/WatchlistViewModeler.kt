@@ -46,27 +46,29 @@ internal constructor(
 
   fun bind(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
-      interactor.listenForChanges { handleRealtimeEvent(scope, it) }
+      interactor.listenForChanges { handleRealtimeEvent(it) }
     }
   }
 
-  private fun handleRealtimeEvent(scope: CoroutineScope, event: SymbolChangeEvent) =
+  private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
       when (event) {
         is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
-        is SymbolChangeEvent.Insert -> handleInsertSymbol(scope, event.symbol.symbol())
-        is SymbolChangeEvent.Update -> handleUpdateSymbol(scope, event.symbol.symbol())
+        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol())
+        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
       }
 
-  private fun handleInsertSymbol(scope: CoroutineScope, symbol: StockSymbol) {
+  private fun CoroutineScope.handleInsertSymbol(symbol: StockSymbol) {
     // Don't actually insert anything to the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    handleRefreshList(scope = scope, force = true)
+    Timber.d("Refresh list on symbol insert: $symbol")
+    handleRefreshList(scope = this, force = true)
   }
 
-  private fun handleUpdateSymbol(scope: CoroutineScope, symbol: StockSymbol) {
+  private fun CoroutineScope.handleUpdateSymbol(symbol: StockSymbol) {
     // Don't actually update anything in the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
-    handleRefreshList(scope = scope, force = true)
+    Timber.d("Refresh list on symbol update: $symbol")
+    handleRefreshList(scope = this, force = true)
   }
 
   private fun handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {

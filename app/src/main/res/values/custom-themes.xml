@@ -23,12 +23,12 @@
         <item name="alertDialogTheme">@style/ThemeOverlay.TickerTape.Dialog.Alert</item>
         <item name="bottomSheetDialogTheme">@style/Theme.TickerTape.BottomSheet</item>
 
-        <item name="colorPrimary">@color/blue500</item>
-        <item name="colorPrimaryVariant">@color/blue700</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary</item>
         <item name="colorOnSecondary">@color/white</item>
 
         <item name="android:statusBarColor">@color/transparent</item>
@@ -38,12 +38,12 @@
     <style name="Custom.Theme.TickerTape.BottomSheet" parent="@style/Base.Theme.TickerTape.BottomSheet">
         <item name="bottomSheetStyle">@style/Widget.TickerTape.BottomSheet</item>
 
-        <item name="colorPrimary">@color/blue500</item>
-        <item name="colorPrimaryVariant">@color/blue700</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary</item>
         <item name="colorOnSecondary">@color/white</item>
 
         <item name="android:windowIsFloating">false</item>

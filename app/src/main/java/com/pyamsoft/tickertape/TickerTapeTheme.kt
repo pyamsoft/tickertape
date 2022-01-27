@@ -36,9 +36,9 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 @Composable
 @CheckResult
 private fun themeColors(isDarkMode: Boolean): Colors {
-  val primary = colorResource(R2.color.blue500)
+  val primary = colorResource(R.color.primary)
   val onPrimary = colorResource(R2.color.white)
-  val secondary = colorResource(R.color.teal_200)
+  val secondary = colorResource(R.color.secondary)
   val onSecondary = colorResource(R2.color.white)
   return if (isDarkMode)
       darkColors(

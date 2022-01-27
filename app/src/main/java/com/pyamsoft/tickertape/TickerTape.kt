@@ -17,6 +17,8 @@
 package com.pyamsoft.tickertape
 
 import android.app.Application
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
@@ -31,6 +33,7 @@ import com.pyamsoft.tickertape.alert.inject.AlertComponent
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
+import com.pyamsoft.tickertape.receiver.BootReceiver
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -80,6 +83,7 @@ class TickerTape : Application() {
   override fun onCreate() {
     super.onCreate()
     component.inject(this)
+    ensureBootReceiverEnabled()
     beginWork()
   }
 
@@ -114,6 +118,16 @@ class TickerTape : Application() {
         else -> null
       }
     }
+  }
+
+  /** Ensure the BootReceiver is set to state enabled */
+  private fun ensureBootReceiverEnabled() {
+    val component = ComponentName(this, BootReceiver::class.java)
+    packageManager.setComponentEnabledSetting(
+        component,
+        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+        PackageManager.DONT_KILL_APP,
+    )
   }
 
   companion object {

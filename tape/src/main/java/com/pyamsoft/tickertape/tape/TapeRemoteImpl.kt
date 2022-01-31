@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.pydroid.util.ifNotCancellation
+import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -61,8 +62,8 @@ internal constructor(
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
     val result =
         try {
-          val watchlist = symbolQueryDao.query(force).map { it.symbol() }
-          ResultWrapper.success(interactor.getQuotes(force, watchlist))
+          val quotes = interactor.getWatchListQuotes(force, symbolQueryDao)
+          ResultWrapper.success(quotes)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error fetching quotes")

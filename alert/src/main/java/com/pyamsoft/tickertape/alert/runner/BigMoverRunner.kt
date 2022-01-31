@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.alert.runner
 
 import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.standalone.BigMoverStandalone
+import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import javax.inject.Inject
@@ -39,8 +40,7 @@ internal constructor(
     try {
       // Don't use TickerInteractor here since this is imported in TickerInteractor, which would
       // make a circular dependency
-      val watchList = symbolQueryDao.query(force).map { it.symbol() }
-      val quotes = stockInteractor.getQuotes(force, watchList)
+      val quotes = stockInteractor.getWatchListQuotes(force, symbolQueryDao)
       standalone.notifyForBigMovers(quotes)
     } catch (e: Throwable) {
       Timber.e(e, "Error getting watchlist quotes for big movers")

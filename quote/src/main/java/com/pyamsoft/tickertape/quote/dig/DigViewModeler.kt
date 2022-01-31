@@ -21,7 +21,6 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
@@ -35,14 +34,12 @@ protected constructor(
   @CheckResult
   protected suspend fun onLoadTicker(
       force: Boolean,
-      options: TickerInteractor.Options?,
   ): ResultWrapper<Ticker> =
       interactor
           .getChart(
               force = force,
               symbol = state.ticker.symbol,
               range = state.range,
-              options = options,
           )
           .onSuccess { t -> state.apply { ticker = t } }
           .onSuccess { ticker ->

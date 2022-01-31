@@ -36,7 +36,6 @@ protected constructor(
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
-      options: TickerInteractor.Options?,
   ): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -46,7 +45,7 @@ protected constructor(
                   force = force,
                   symbols = listOf(symbol),
                   range = range,
-                  options = options,
+                  options = null,
               )
               // Only pick out the single quote
               .map { list -> list.first { it.symbol == symbol } }

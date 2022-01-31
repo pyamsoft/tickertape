@@ -71,13 +71,8 @@ internal constructor(
   private suspend fun handleLoadTicker(force: Boolean) {
     val s = state
 
-    // If we are allowed to modify the watchlist, then this isn't on the watchlist so don't notify
-    val options =
-        if (s.isAllowModifyWatchlist) TICKER_OPTIONS_NO_BIG_MOVERS else TICKER_OPTIONS_BIG_MOVERS
-
     onLoadTicker(
-        force,
-        options = options,
+        force = force,
     )
         .onSuccess {
           // Clear the error on load success

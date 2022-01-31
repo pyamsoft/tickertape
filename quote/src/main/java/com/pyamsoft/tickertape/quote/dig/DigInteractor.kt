@@ -30,6 +30,5 @@ interface DigInteractor {
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
-      options: TickerInteractor.Options?,
   ): ResultWrapper<Ticker>
 }

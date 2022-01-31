@@ -20,6 +20,7 @@ import com.pyamsoft.cachify.Cached2
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -28,10 +29,10 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
+import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +45,7 @@ internal class StockInteractorImpl
 @Inject
 internal constructor(
     @InternalApi private val stockCache: StockCache,
+    @InternalApi private val statisticsCache: KeyStatisticsCache,
     @InternalApi private val interactor: StockInteractor,
 ) : StockInteractor {
 
@@ -53,28 +55,45 @@ internal constructor(
       mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDate?>>()
 
   private val trendingCache =
-      cachify<StockTrends, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
-        interactor.getTrending(true, it)
-      }
+      cachify<StockTrends, Int>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getTrending(true, it) }
 
   private val gainerCache =
-      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
-        interactor.getDayGainers(true, it)
-      }
+      cachify<StockTops, Int>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getDayGainers(true, it) }
 
   private val loserCache =
-      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
-        interactor.getDayLosers(true, it)
-      }
+      cachify<StockTops, Int>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getDayLosers(true, it) }
 
   private val shortedCache =
-      cachify<StockTops, Int>(storage = { listOf(createNewMemoryCacheStorage()) }) {
-        interactor.getMostShorted(true, it)
-      }
+      cachify<StockTops, Int>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getMostShorted(true, it) }
 
   private val searchCache =
       multiCachify<String, List<SearchResult>, String>(
-          storage = { listOf(createNewMemoryCacheStorage()) }) { interactor.search(true, it) }
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.search(true, it) }
+
+  override suspend fun getKeyStatistics(
+      force: Boolean,
+      symbols: List<StockSymbol>
+  ): List<KeyStatistics> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          symbols.forEach { statisticsCache.removeStatistics(it) }
+        }
+
+        return@withContext statisticsCache.getStatistics(symbols) { s ->
+          interactor.getKeyStatistics(force, s)
+        }
+      }
 
   override suspend fun search(
       force: Boolean,

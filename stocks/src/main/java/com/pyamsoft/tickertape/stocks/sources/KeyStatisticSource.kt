@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.sources
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import com.pyamsoft.tickertape.stocks.sources.TopSource
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface StockInteractor :
-    QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource, KeyStatisticSource
+interface KeyStatisticSource {
+
+  @CheckResult
+  suspend fun getKeyStatistics(force: Boolean, symbols: List<StockSymbol>): List<KeyStatistics>
+}

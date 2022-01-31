@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.service
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import com.pyamsoft.tickertape.stocks.sources.TopSource
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.network.NetworkKeyStatisticsResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-interface StockInteractor :
-    QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource, KeyStatisticSource
+internal interface KeyStatisticsService {
+
+  @CheckResult
+  @GET("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}")
+  suspend fun getStatistics(
+      @Path("symbol") symbol: String,
+      @Query("modules") modules: String
+  ): NetworkKeyStatisticsResponse
+}

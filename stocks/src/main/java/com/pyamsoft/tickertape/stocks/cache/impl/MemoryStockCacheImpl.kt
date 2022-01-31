@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.cache
+package com.pyamsoft.tickertape.stocks.cache.impl
 
 import com.pyamsoft.cachify.CacheStorage
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.cache.StockCache
+import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -125,5 +127,8 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
         }
       }
 
-  private data class ChartKey(val symbol: StockSymbol, val range: StockChart.IntervalRange)
+  private data class ChartKey(
+      val symbol: StockSymbol,
+      val range: StockChart.IntervalRange,
+  )
 }

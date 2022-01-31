@@ -19,19 +19,24 @@ package com.pyamsoft.tickertape.stocks
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.cache.MemoryStockCacheImpl
+import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
+import com.pyamsoft.tickertape.stocks.cache.impl.MemoryKeyStatisticsCacheImpl
+import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
 import com.pyamsoft.tickertape.stocks.service.ChartService
+import com.pyamsoft.tickertape.stocks.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.service.OptionsService
 import com.pyamsoft.tickertape.stocks.service.QuoteService
 import com.pyamsoft.tickertape.stocks.service.SearchService
 import com.pyamsoft.tickertape.stocks.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
+import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooChartSource
+import com.pyamsoft.tickertape.stocks.sources.yf.YahooKeyStatisticsSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooOptionsSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.sources.yf.YahooSearchSource
@@ -115,6 +120,14 @@ abstract class StockModule {
   @InternalApi
   internal abstract fun bindYFTopSource(impl: YahooTopSource): TopSource
 
+  // The YFSource uses an internal YF key statistics source
+  @Binds
+  @CheckResult
+  @InternalApi
+  internal abstract fun bindYFKeyStatisticsSource(
+      impl: YahooKeyStatisticsSource
+  ): KeyStatisticSource
+
   // The YFSource uses an internal YF search source
   @Binds
   @CheckResult
@@ -130,6 +143,13 @@ abstract class StockModule {
   @CheckResult
   @InternalApi
   internal abstract fun bindStockCache(impl: MemoryStockCacheImpl): StockCache
+
+  @Binds
+  @CheckResult
+  @InternalApi
+  internal abstract fun bindKeyStatisticsCache(
+      impl: MemoryKeyStatisticsCacheImpl
+  ): KeyStatisticsCache
 
   @Binds
   @CheckResult
@@ -212,5 +232,15 @@ abstract class StockModule {
     ): OptionsService {
       return serviceCreator.create(OptionsService::class)
     }
+
+      @Provides
+      @JvmStatic
+      @InternalApi
+      @CheckResult
+      internal fun provideKeyStatistics(
+          @InternalApi serviceCreator: NetworkServiceCreator
+      ): KeyStatisticsService {
+          return serviceCreator.create(KeyStatisticsService::class)
+      }
   }
 }

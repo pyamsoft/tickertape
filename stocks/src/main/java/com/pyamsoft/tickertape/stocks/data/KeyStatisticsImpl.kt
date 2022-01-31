@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.data
 
-import com.pyamsoft.tickertape.stocks.sources.ChartSource
-import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import com.pyamsoft.tickertape.stocks.sources.TopSource
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface StockInteractor :
-    QuoteSource, ChartSource, TopSource, OptionsSource, SearchSource, KeyStatisticSource
+internal data class KeyStatisticsImpl(
+    private val symbol: StockSymbol,
+) : KeyStatistics {
+
+  override fun symbol(): StockSymbol {
+    return symbol
+  }
+}

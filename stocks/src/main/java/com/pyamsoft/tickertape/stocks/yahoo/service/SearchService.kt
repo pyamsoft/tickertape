@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.network
+package com.pyamsoft.tickertape.stocks.yahoo.service
 
-import com.squareup.moshi.JsonClass
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkSearchResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-@JsonClass(generateAdapter = true)
-internal data class NetworkSearchResponse internal constructor(val quotes: List<Quote>) {
+internal interface SearchService {
 
-  @JsonClass(generateAdapter = true)
-  internal data class Quote
-  internal constructor(
-      val symbol: String,
-      val longname: String?,
-      val shortname: String?,
-      val score: Long,
-      val quoteType: String
-  )
+  @CheckResult
+  @GET(
+      "https://query2.finance.yahoo.com/v1/finance/search?newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
+  suspend fun performSearch(
+      @Query("q") query: String,
+      @Query("quotesCount") count: Int
+  ): NetworkSearchResponse
 }

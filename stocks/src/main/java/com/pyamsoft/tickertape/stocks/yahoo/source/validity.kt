@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.MarketState
-import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
-import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
-import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
-import com.pyamsoft.tickertape.stocks.network.NetworkTrendingResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkChartResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkTopResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkTrendingResponse
 
 @CheckResult
 internal fun Sequence<NetworkChartResponse.Resp.SymbolChart>.filterOnlyValidCharts():

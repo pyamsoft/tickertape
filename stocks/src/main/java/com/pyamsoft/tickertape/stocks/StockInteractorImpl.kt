@@ -32,6 +32,8 @@ import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
+import com.pyamsoft.tickertape.stocks.scope.InternalApi
+import com.pyamsoft.tickertape.stocks.scope.StockApi
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,7 +48,7 @@ internal class StockInteractorImpl
 internal constructor(
     @InternalApi private val stockCache: StockCache,
     @InternalApi private val statisticsCache: KeyStatisticsCache,
-    @InternalApi private val interactor: StockInteractor,
+    @StockApi private val interactor: StockInteractor,
 ) : StockInteractor {
 
   private val optionsMutex = Mutex()

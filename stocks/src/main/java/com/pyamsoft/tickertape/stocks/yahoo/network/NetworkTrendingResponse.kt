@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.service
+package com.pyamsoft.tickertape.stocks.yahoo.network
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkChartResponse
-import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.http.Url
+import com.squareup.moshi.JsonClass
 
-internal interface ChartService {
+@JsonClass(generateAdapter = true)
+internal data class NetworkTrendingResponse internal constructor(val finance: Resp) {
 
-  @GET
-  @CheckResult
-  suspend fun getCharts(
-      @Url url: String,
-      @Query("symbols", encoded = true) symbols: String,
-      @Query("includePrePost") includePrePost: Boolean,
-      @Query("range") range: String,
-      @Query("interval") interval: String,
-  ): NetworkChartResponse
+  @JsonClass(generateAdapter = true)
+  internal data class Resp internal constructor(val result: List<Trending>) {
+
+    @JsonClass(generateAdapter = true)
+    internal data class Trending internal constructor(val quotes: List<Quote>?) {
+
+      @JsonClass(generateAdapter = true)
+      internal data class Quote internal constructor(val symbol: String?)
+    }
+  }
 }

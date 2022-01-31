@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.network
+package com.pyamsoft.tickertape.stocks.yahoo.network
 
 import com.squareup.moshi.JsonClass
 

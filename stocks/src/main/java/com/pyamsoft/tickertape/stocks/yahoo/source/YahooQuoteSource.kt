@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockQuote
@@ -33,9 +32,10 @@ import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockOptionsQuoteImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
-import com.pyamsoft.tickertape.stocks.service.QuoteService
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
+import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,7 @@ import kotlinx.coroutines.withContext
 
 internal class YahooQuoteSource
 @Inject
-internal constructor(@InternalApi private val service: QuoteService) : QuoteSource {
+internal constructor(@YahooApi private val service: QuoteService) : QuoteSource {
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {

@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockTops
@@ -34,15 +33,16 @@ import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
 import com.pyamsoft.tickertape.stocks.data.StockTrendsImpl
-import com.pyamsoft.tickertape.stocks.service.TopService
+import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 internal class YahooTopSource
 @Inject
-internal constructor(@InternalApi private val service: TopService) : TopSource {
+internal constructor(@YahooApi private val service: TopService) : TopSource {
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
       withContext(context = Dispatchers.IO) {

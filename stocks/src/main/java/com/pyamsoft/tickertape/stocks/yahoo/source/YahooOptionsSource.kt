@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -26,9 +25,10 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.StockOptionsImpl
-import com.pyamsoft.tickertape.stocks.network.NetworkOptionResponse
-import com.pyamsoft.tickertape.stocks.service.OptionsService
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkOptionResponse
+import com.pyamsoft.tickertape.stocks.yahoo.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -39,7 +39,7 @@ import timber.log.Timber
 
 internal class YahooOptionsSource
 @Inject
-internal constructor(@InternalApi private val service: OptionsService) : OptionsSource {
+internal constructor(@YahooApi private val service: OptionsService) : OptionsSource {
 
   companion object {
 

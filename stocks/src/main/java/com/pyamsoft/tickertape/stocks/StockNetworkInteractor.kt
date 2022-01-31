@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,12 +44,12 @@ import kotlinx.coroutines.withContext
 internal class StockNetworkInteractor
 @Inject
 internal constructor(
-    @InternalApi private val quoteSource: QuoteSource,
-    @InternalApi private val chartSource: ChartSource,
-    @InternalApi private val topSource: TopSource,
-    @InternalApi private val optionsSource: OptionsSource,
-    @InternalApi private val searchSource: SearchSource,
-    @InternalApi private val keyStatisticSource: KeyStatisticSource,
+    @YahooApi private val quoteSource: QuoteSource,
+    @YahooApi private val chartSource: ChartSource,
+    @YahooApi private val topSource: TopSource,
+    @YahooApi private val optionsSource: OptionsSource,
+    @YahooApi private val searchSource: SearchSource,
+    @YahooApi private val keyStatisticSource: KeyStatisticSource,
 ) : StockInteractor {
 
   override suspend fun getKeyStatistics(

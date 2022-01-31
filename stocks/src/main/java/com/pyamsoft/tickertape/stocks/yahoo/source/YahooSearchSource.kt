@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
-import com.pyamsoft.tickertape.stocks.service.SearchService
+import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +32,7 @@ import retrofit2.HttpException
 
 internal class YahooSearchSource
 @Inject
-internal constructor(@InternalApi private val service: SearchService) : SearchSource {
+internal constructor(@YahooApi private val service: SearchService) : SearchSource {
 
   override suspend fun search(
       force: Boolean,

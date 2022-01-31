@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.service
+package com.pyamsoft.tickertape.stocks.yahoo.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkTopResponse
-import com.pyamsoft.tickertape.stocks.network.NetworkTrendingResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkTopResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkTrendingResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

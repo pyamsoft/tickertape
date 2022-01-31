@@ -14,21 +14,36 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.network
+package com.pyamsoft.tickertape.stocks.yahoo.network
 
 import com.squareup.moshi.JsonClass
 
+// https://query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory
+
 @JsonClass(generateAdapter = true)
-internal data class NetworkTrendingResponse internal constructor(val finance: Resp) {
+internal data class NetworkKeyStatisticsResponse internal constructor(val quoteSummary: Summary) {
 
   @JsonClass(generateAdapter = true)
-  internal data class Resp internal constructor(val result: List<Trending>) {
+  internal data class Summary internal constructor(val result: List<Statistics>) {
 
     @JsonClass(generateAdapter = true)
-    internal data class Trending internal constructor(val quotes: List<Quote>?) {
+    internal data class Statistics
+    internal constructor(
+        val defaultKeyStatistics: Info,
+    ) {
 
       @JsonClass(generateAdapter = true)
-      internal data class Quote internal constructor(val symbol: String?)
+      internal data class Info
+      internal constructor(
+          val forwardEps: YFData,
+      )
     }
   }
+
+  @JsonClass(generateAdapter = true)
+  internal data class YFData
+  internal constructor(
+      val raw: Double,
+      val fmt: String,
+  )
 }

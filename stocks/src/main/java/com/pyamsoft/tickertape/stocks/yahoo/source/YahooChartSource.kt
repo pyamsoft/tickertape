@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources.yf
+package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.stocks.InternalApi
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
-import com.pyamsoft.tickertape.stocks.service.ChartService
+import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
+import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 
 internal class YahooChartSource
 @Inject
-internal constructor(@InternalApi private val service: ChartService) : ChartSource {
+internal constructor(@YahooApi private val service: ChartService) : ChartSource {
 
   override suspend fun getCharts(
       force: Boolean,

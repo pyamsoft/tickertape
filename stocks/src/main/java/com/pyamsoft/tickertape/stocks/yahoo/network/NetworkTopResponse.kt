@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.service
+package com.pyamsoft.tickertape.stocks.yahoo.network
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkQuoteResponse
-import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.http.Url
+import com.squareup.moshi.JsonClass
 
-internal interface QuoteService {
+@JsonClass(generateAdapter = true)
+internal data class NetworkTopResponse internal constructor(val finance: Resp) {
 
-  @GET
-  @CheckResult
-  suspend fun getQuotes(
-      @Url url: String,
-      @Query("format") format: String,
-      @Query("fields", encoded = true) fields: String,
-      @Query("symbols", encoded = true) symbols: String
-  ): NetworkQuoteResponse
+  @JsonClass(generateAdapter = true)
+  internal data class Resp internal constructor(val result: List<Top>) {
+
+    @JsonClass(generateAdapter = true)
+    internal data class Top
+    internal constructor(
+        val id: String?,
+        val title: String?,
+        val description: String?,
+        val quotes: List<NetworkQuoteResponse.Resp.Quote>?
+    )
+  }
 }

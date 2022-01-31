@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.service
+package com.pyamsoft.tickertape.stocks.yahoo.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.network.NetworkSearchResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkOptionResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
-internal interface SearchService {
+internal interface OptionsService {
 
   @CheckResult
-  @GET(
-      "https://query2.finance.yahoo.com/v1/finance/search?newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
-  suspend fun performSearch(
-      @Query("q") query: String,
-      @Query("quotesCount") count: Int
-  ): NetworkSearchResponse
+  @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
+  suspend fun getOptions(@Path("symbol") symbol: String): NetworkOptionResponse
+
+  @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
+  suspend fun getOptions(
+      @Path("symbol") symbol: String,
+      @Query("date") date: Long
+  ): NetworkOptionResponse
 }

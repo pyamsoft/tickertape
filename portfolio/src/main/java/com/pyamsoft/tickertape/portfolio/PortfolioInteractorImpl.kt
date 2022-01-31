@@ -83,7 +83,11 @@ internal constructor(
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
             return@coroutineScope interactor
-                .getQuotes(force, symbols)
+                .getQuotes(
+                    force,
+                    symbols,
+                    options = TICKER_OPTIONS,
+                )
                 .onFailure { Timber.e(it, "Unable to get quotes for portfolio: $symbols") }
                 .recover { emptyList() }
                 .map { quotes ->
@@ -126,4 +130,11 @@ internal constructor(
           }
         }
       }
+
+  companion object {
+    private val TICKER_OPTIONS =
+        TickerInteractor.Options(
+            notifyBigMovers = true,
+        )
+  }
 }

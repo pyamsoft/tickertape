@@ -21,14 +21,12 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
-import com.pyamsoft.tickertape.quote.TickerInteractor
-import com.pyamsoft.tickertape.quote.getWatchListQuotes
+import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +41,7 @@ internal constructor(
     @param:TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
     @param:TapeInternalApi private val notifier: Notifier,
     private val symbolQueryDao: SymbolQueryDao,
-    private val interactor: TickerInteractor,
+    private val interactor: StockInteractor,
 ) : TapeRemote {
 
   override suspend fun onStopReceived(onStop: () -> Unit) =
@@ -61,24 +59,18 @@ internal constructor(
 
   @CheckResult
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
-    return try {
-      interactor
-          .getWatchListQuotes(force, symbolQueryDao)
-          .map { quotes ->
-            quotes
-                .asSequence()
-                .filterNot { it.quote == null }
-                .map { it.quote.requireNotNull() }
-                .toList()
+    val result =
+        try {
+          val watchlist = symbolQueryDao.query(force).map { it.symbol() }
+          ResultWrapper.success(interactor.getQuotes(force, watchlist))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Error fetching quotes")
+            ResultWrapper.failure(e)
           }
-          .onFailure { Timber.e(it, "Failed to fetch watchlist quotes") }
-          .recover { emptyList() }
-    } catch (e: Throwable) {
-      e.ifNotCancellation {
-        Timber.e(e, "Error fetching quotes")
-        ResultWrapper.failure(e)
-      }
-    }
+        }
+
+    return result.recover { emptyList() }
   }
 
   override suspend fun updateNotification(options: TapeRemote.NotificationOptions) =

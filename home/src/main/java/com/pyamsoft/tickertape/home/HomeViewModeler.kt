@@ -108,6 +108,7 @@ internal constructor(
             force = force,
             symbols = INDEXES,
             range = StockChart.IntervalRange.ONE_DAY,
+            options = null,
         )
         .onSuccess {
           state.apply {

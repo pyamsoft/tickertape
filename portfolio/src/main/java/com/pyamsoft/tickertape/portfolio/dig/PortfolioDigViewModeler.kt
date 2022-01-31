@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +59,10 @@ internal constructor(
 
   @CheckResult
   private suspend fun loadTicker(force: Boolean): ResultWrapper<Ticker> {
-    return onLoadTicker(force)
+    return onLoadTicker(
+        force,
+        options = TICKER_OPTIONS,
+    )
         .onSuccess {
           // Clear the error on load success
           state.chartError = null
@@ -185,5 +189,12 @@ internal constructor(
 
   fun handleTabUpdated(section: PortfolioDigSections) {
     state.section = section
+  }
+
+  companion object {
+    private val TICKER_OPTIONS =
+        TickerInteractor.Options(
+            notifyBigMovers = true,
+        )
   }
 }

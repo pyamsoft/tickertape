@@ -37,12 +37,12 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.LocalDateTime
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -63,7 +63,11 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          tickerInteractor.getQuotes(force, listOf(symbol))
+          tickerInteractor.getQuotes(
+                  force,
+                  listOf(symbol),
+                  options = TICKER_OPTIONS,
+              )
               // Only pick out the single quote
               .map { list -> list.first { it.symbol == symbol } }
         } catch (e: Throwable) {
@@ -214,4 +218,12 @@ internal constructor(
             contractType = contractType,
         )
       }
+
+  companion object {
+
+    private val TICKER_OPTIONS =
+        TickerInteractor.Options(
+            notifyBigMovers = true,
+        )
+  }
 }

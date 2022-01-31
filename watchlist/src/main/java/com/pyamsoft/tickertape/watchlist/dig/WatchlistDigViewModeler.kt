@@ -18,9 +18,14 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WatchlistDigViewModeler
@@ -64,14 +69,23 @@ internal constructor(
   }
 
   private suspend fun handleLoadTicker(force: Boolean) {
-    onLoadTicker(force)
+    val s = state
+
+    // If we are allowed to modify the watchlist, then this isn't on the watchlist so don't notify
+    val options =
+        if (s.isAllowModifyWatchlist) TICKER_OPTIONS_NO_BIG_MOVERS else TICKER_OPTIONS_BIG_MOVERS
+
+    onLoadTicker(
+        force,
+        options = options,
+    )
         .onSuccess {
           // Clear the error on load success
-          state.error = null
+          s.error = null
         }
         .onFailure {
           // Don't need to clear the ticker since last loaded state was valid
-          state.error = it
+          s.error = it
         }
   }
 
@@ -104,5 +118,17 @@ internal constructor(
             // TODO handle error
           }
     }
+  }
+
+  companion object {
+    private val TICKER_OPTIONS_NO_BIG_MOVERS =
+        TickerInteractor.Options(
+            notifyBigMovers = false,
+        )
+
+    private val TICKER_OPTIONS_BIG_MOVERS =
+        TickerInteractor.Options(
+            notifyBigMovers = true,
+        )
   }
 }

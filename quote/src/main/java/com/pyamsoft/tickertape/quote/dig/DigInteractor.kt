@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote.dig
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
@@ -29,5 +30,6 @@ interface DigInteractor {
       force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
+      options: TickerInteractor.Options?,
   ): ResultWrapper<Ticker>
 }

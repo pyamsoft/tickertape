@@ -76,6 +76,7 @@ dependencies {
 
   api "com.github.pyamsoft:spark:$spark"
 
+  implementation project(':alert')
   implementation project(':db')
   implementation project(':stocks')
   api project(':ui')

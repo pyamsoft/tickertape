@@ -49,6 +49,7 @@ internal constructor(
         force,
         symbols,
         StockChart.IntervalRange.ONE_DAY,
+        options = null,
     )
   }
 

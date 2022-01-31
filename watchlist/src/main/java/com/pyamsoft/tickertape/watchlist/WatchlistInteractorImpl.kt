@@ -54,7 +54,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          interactor.getWatchListQuotes(force, symbolQueryDao)
+          interactor.getWatchListQuotes(force, symbolQueryDao, options = TICKER_OPTIONS)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting quotes")
@@ -84,4 +84,11 @@ internal constructor(
           }
         }
       }
+
+  companion object {
+    private val TICKER_OPTIONS =
+        TickerInteractor.Options(
+            notifyBigMovers = true,
+        )
+  }
 }

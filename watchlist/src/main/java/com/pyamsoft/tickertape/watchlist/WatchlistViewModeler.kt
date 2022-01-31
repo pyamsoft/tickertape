@@ -131,7 +131,7 @@ internal constructor(
   }
 
   fun handleSearch(query: String) {
-    val cleanSearch = if (query.isBlank()) query.trim() else query
+    val cleanSearch = query.ifBlank { query.trim() }
     state.apply {
       this.query = cleanSearch
       regenerateTickers(allTickers)

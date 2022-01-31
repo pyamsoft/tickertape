@@ -70,7 +70,6 @@ dependencies {
 
   implementation project(':core')
   implementation project(':db')
-  implementation project(':quote')
   implementation project(':stocks')
   implementation project(':tape')
 }

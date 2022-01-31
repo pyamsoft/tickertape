@@ -20,17 +20,20 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
+import com.pyamsoft.tickertape.alert.standalone.BigMoverStandalone
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -39,6 +42,7 @@ class TickerInteractorImpl
 @Inject
 internal constructor(
     private val interactor: StockInteractor,
+    private val bigMoverStandalone: BigMoverStandalone,
 ) : TickerInteractor {
 
   @CheckResult
@@ -46,6 +50,7 @@ internal constructor(
       force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange?,
+      options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -57,13 +62,13 @@ internal constructor(
 
         return@withContext try {
           coroutineScope {
-            val jobs = mutableListOf<Deferred<Any>>()
-
-            jobs.add(async { interactor.getQuotes(force, symbols) })
-
-            if (range != null) {
-              jobs.add(async { interactor.getCharts(force, symbols, range) })
-            }
+            val jobs =
+                mutableListOf<Deferred<Any>>().apply {
+                  add(async { interactor.getQuotes(force, symbols) })
+                  if (range != null) {
+                    add(async { interactor.getCharts(force, symbols, range) })
+                  }
+                }
 
             val result = jobs.awaitAll()
             val (quotes, charts) = parseResult(result)
@@ -78,6 +83,8 @@ internal constructor(
                   )
                 }
 
+            handleTickerRefreshSideEffects(tickers, options)
+
             ResultWrapper.success(tickers)
           }
         } catch (e: Exception) {
@@ -88,9 +95,29 @@ internal constructor(
         }
       }
 
+  private fun CoroutineScope.handleTickerRefreshSideEffects(
+      tickers: List<Ticker>,
+      options: TickerInteractor.Options?,
+  ) {
+    if (options == null) {
+      return
+    }
+
+    if (options.notifyBigMovers) {
+      launch(context = Dispatchers.IO) {
+        wrapped("Error during big-mover refresh") {
+          bigMoverStandalone.notifyForBigMovers(
+              quotes = tickers.mapNotNull { it.quote },
+          )
+        }
+      }
+    }
+  }
+
   override suspend fun getQuotes(
       force: Boolean,
-      symbols: List<StockSymbol>
+      symbols: List<StockSymbol>,
+      options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -99,6 +126,7 @@ internal constructor(
             force = force,
             symbols = symbols,
             range = null,
+            options = options,
         )
       }
 
@@ -107,6 +135,7 @@ internal constructor(
       force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
+      options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -115,10 +144,22 @@ internal constructor(
             force = force,
             symbols = symbols,
             range = range,
+            options = options,
         )
       }
 
   companion object {
+
+    private inline fun wrapped(
+        errorMessage: String,
+        block: () -> Unit,
+    ) {
+      try {
+        block()
+      } catch (e: Throwable) {
+        e.ifNotCancellation { Timber.e(e, "SIDE-EFFECT: $errorMessage") }
+      }
+    }
 
     @CheckResult
     @Suppress("UNCHECKED_CAST")

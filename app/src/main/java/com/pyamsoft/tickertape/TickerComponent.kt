@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.home.HomeModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
+import com.pyamsoft.tickertape.portfolio.PortfolioRemoveDialog
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
@@ -48,6 +49,7 @@ import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ticker.add.NewTickerComponent
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
+import com.pyamsoft.tickertape.watchlist.WatchlistRemoveDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
@@ -90,6 +92,10 @@ internal interface TickerComponent {
   fun inject(receiver: ScreenReceiver)
 
   fun inject(application: TickerTape)
+
+  fun inject(watchlistRemoveDialog: WatchlistRemoveDialog)
+
+  fun inject(portfolioRemoveDialog: PortfolioRemoveDialog)
 
   @CheckResult fun plusPositionAddDateComponent(): PositionAddDateComponent.Factory
 

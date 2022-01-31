@@ -66,12 +66,10 @@ class PortfolioFragment : Fragment() {
   }
 
   private fun handleDeleteStock(stock: PortfolioStock) {
-    viewModel
-        .requireNotNull()
-        .handleRemove(
-            scope = viewLifecycleOwner.lifecycleScope,
-            stock = stock,
-        )
+    PortfolioRemoveDialog.show(
+        requireActivity(),
+        holding = stock.holding,
+    )
   }
 
   private fun handleRefresh(force: Boolean) {

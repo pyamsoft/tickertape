@@ -116,16 +116,23 @@ internal constructor(
       }
 
   @CheckResult
-  override suspend fun removeHolding(holding: DbHolding): ResultWrapper<Boolean> =
+  override suspend fun removeHolding(holdingId: DbHolding.Id): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
           // TODO move this query into the DAO layer
+          val holding = holdingQueryDao.query(true).firstOrNull { it.id() == holdingId }
+          if (holding == null) {
+            val err = IllegalStateException("Holding does not exist in DB: $holdingId")
+            Timber.e(err)
+            return@withContext ResultWrapper.failure(err)
+          }
+
           ResultWrapper.success(holdingDeleteDao.delete(holding, offerUndo = true))
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error removing holding $holding")
+            Timber.e(e, "Error removing holding $holdingId")
             ResultWrapper.failure(e)
           }
         }

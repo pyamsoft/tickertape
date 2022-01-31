@@ -59,18 +59,16 @@ class WatchlistFragment : Fragment() {
   private fun handleOpenDigDialog(ticker: Ticker) {
     WatchlistDigDialog.show(
         requireActivity(),
-        ticker.symbol,
+        symbol = ticker.symbol,
         allowModifyWatchlist = false,
     )
   }
 
   private fun handleDeleteTicker(ticker: Ticker) {
-    viewModel
-        .requireNotNull()
-        .handleRemove(
-            scope = viewLifecycleOwner.lifecycleScope,
-            ticker = ticker,
-        )
+    WatchlistRemoveDialog.show(
+        requireActivity(),
+        symbol = ticker.symbol,
+    )
   }
 
   private fun handleRefresh(force: Boolean) {

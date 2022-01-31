@@ -186,15 +186,6 @@ internal constructor(
     }
   }
 
-  fun handleRemove(scope: CoroutineScope, stock: PortfolioStock) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor
-          .removeHolding(stock.holding)
-          .onSuccess { Timber.d("Removed holding $stock") }
-          .onFailure { Timber.e(it, "Error removing holding: $stock") }
-    }
-  }
-
   fun handleSearch(query: String) {
     state.apply {
       this.query = query

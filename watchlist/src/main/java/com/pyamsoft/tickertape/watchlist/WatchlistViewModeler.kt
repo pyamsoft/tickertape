@@ -138,15 +138,6 @@ internal constructor(
     }
   }
 
-  fun handleRemove(scope: CoroutineScope, ticker: Ticker) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor
-          .removeQuote(ticker.symbol)
-          .onSuccess { Timber.d("Removed ticker $ticker") }
-          .onFailure { Timber.e(it, "Error removing ticker: $ticker") }
-    }
-  }
-
   fun handleSectionChanged(tab: EquityType) {
     state.apply {
       this.section = tab

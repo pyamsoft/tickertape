@@ -16,19 +16,30 @@
 
 package com.pyamsoft.tickertape.portfolio
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
-import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
-interface PortfolioInteractor {
+class PortfolioDeletePresenter
+@Inject
+internal constructor(
+    private val interactor: PortfolioInteractor,
+) {
 
-  suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit)
-
-  suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit)
-
-  @CheckResult suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>>
-
-  @CheckResult suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean>
+  fun handleRemove(
+      scope: CoroutineScope,
+      holding: DbHolding.Id,
+      onRemoved: () -> Unit,
+  ) {
+    scope.launch(context = Dispatchers.Main) {
+      interactor
+          .removeHolding(holding)
+          .onSuccess { Timber.d("Removed holding $holding") }
+          .onFailure { Timber.e(it, "Error removing holding: $holding") }
+          .onFinally(onRemoved)
+    }
+  }
 }

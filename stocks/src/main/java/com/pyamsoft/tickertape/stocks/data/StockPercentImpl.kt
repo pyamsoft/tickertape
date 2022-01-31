@@ -21,7 +21,9 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.PERCENT_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 
-internal data class StockPercentImpl(private val percent: Double) : StockPercent {
+internal data class StockPercentImpl(
+    private val percent: Double,
+) : StockPercent {
 
   private val stockPercent by
       lazy(LazyThreadSafetyMode.NONE) {

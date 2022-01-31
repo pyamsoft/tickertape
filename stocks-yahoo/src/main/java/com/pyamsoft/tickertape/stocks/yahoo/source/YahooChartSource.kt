@@ -24,10 +24,9 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.data.StockChartImpl
-import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
+import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.inject.Inject
@@ -52,7 +51,8 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
                 symbols = symbols.joinToString(",") { it.symbol() },
                 includePrePost = true,
                 range = range.apiValue,
-                interval = interval.apiValue)
+                interval = interval.apiValue,
+            )
 
         val localId = ZoneId.systemDefault()
         return@withContext result
@@ -87,7 +87,7 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
                 validClose.add(close.asMoney())
               }
 
-              StockChartImpl(
+              return@map StockChart.create(
                   symbol = resp.symbol.asSymbol(),
                   range = range,
                   interval = interval,

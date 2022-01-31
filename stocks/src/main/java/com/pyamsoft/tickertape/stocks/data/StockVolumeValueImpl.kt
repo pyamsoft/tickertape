@@ -21,7 +21,9 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.VOLUME_FORMATTER
 
-internal data class StockVolumeValueImpl(private val value: Long) : StockVolumeValue {
+internal data class StockVolumeValueImpl(
+    private val value: Long,
+) : StockVolumeValue {
 
   private val volume by
       lazy(LazyThreadSafetyMode.NONE) {

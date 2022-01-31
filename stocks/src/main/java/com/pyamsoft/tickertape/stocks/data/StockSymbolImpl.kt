@@ -18,7 +18,9 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-internal data class StockSymbolImpl(private val symbol: String) : StockSymbol {
+internal data class StockSymbolImpl(
+    private val symbol: String,
+) : StockSymbol {
 
   override fun symbol(): String {
     return symbol

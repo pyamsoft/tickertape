@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import java.time.LocalDate
+import com.pyamsoft.tickertape.stocks.data.StockOptionsImpl
 import java.time.LocalDateTime
 
 interface StockOptions {
@@ -64,8 +64,95 @@ interface StockOptions {
       CALL,
       PUT
     }
+
+    companion object {
+
+      @CheckResult
+      private fun createContract(
+          type: Type,
+          symbol: StockSymbol,
+          contractSymbol: StockSymbol,
+          strike: StockMoneyValue,
+          change: StockMoneyValue,
+          percent: StockPercent,
+          lastPrice: StockMoneyValue,
+          bid: StockMoneyValue,
+          ask: StockMoneyValue,
+          iv: StockPercent,
+          itm: Boolean,
+      ): StockOptionsImpl.ContractImpl {
+        return StockOptionsImpl.ContractImpl(
+            type = type,
+            symbol = symbol,
+            contractSymbol = contractSymbol,
+            strike = strike,
+            change = change,
+            percent = percent,
+            lastPrice = lastPrice,
+            bid = bid,
+            ask = ask,
+            iv = iv,
+            itm = itm,
+        )
+      }
+
+      @JvmStatic
+      @CheckResult
+      fun <T : Contract> create(
+          type: Type,
+          symbol: StockSymbol,
+          contractSymbol: StockSymbol,
+          strike: StockMoneyValue,
+          change: StockMoneyValue,
+          percent: StockPercent,
+          lastPrice: StockMoneyValue,
+          bid: StockMoneyValue,
+          ask: StockMoneyValue,
+          iv: StockPercent,
+          itm: Boolean,
+      ): T {
+        @Suppress("UNCHECKED_CAST")
+        return createContract(
+            type = type,
+            symbol = symbol,
+            contractSymbol = contractSymbol,
+            strike = strike,
+            change = change,
+            percent = percent,
+            lastPrice = lastPrice,
+            bid = bid,
+            ask = ask,
+            iv = iv,
+            itm = itm,
+        ) as
+            T
+      }
+    }
   }
 
   interface Call : Contract
   interface Put : Contract
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+        expirationDates: List<LocalDateTime>,
+        strikes: List<StockMoneyValue>,
+        date: LocalDateTime,
+        calls: List<Call>,
+        puts: List<Put>
+    ): StockOptions {
+      return StockOptionsImpl(
+          symbol = symbol,
+          expirationDates = expirationDates,
+          strikes = strikes,
+          date = date,
+          calls = calls,
+          puts = puts,
+      )
+    }
+  }
 }

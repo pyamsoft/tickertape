@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 
 interface StockQuote {
 
@@ -43,6 +44,40 @@ interface StockQuote {
   @CheckResult fun dayLow(): StockMoneyValue
 
   @CheckResult fun dayVolume(): StockVolumeValue
+
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+        company: StockCompany,
+        equityType: EquityType,
+        regular: StockMarketSession,
+        preMarket: StockMarketSession?,
+        afterHours: StockMarketSession?,
+        dataDelayBy: Long,
+        dayPreviousClose: StockMoneyValue?,
+        dayHigh: StockMoneyValue,
+        dayLow: StockMoneyValue,
+        dayOpen: StockMoneyValue,
+        dayVolume: StockVolumeValue,
+    ): StockQuote {
+      return StockQuoteImpl(
+          symbol = symbol,
+          company = company,
+          equityType = equityType,
+          regular = regular,
+          preMarket = preMarket,
+          afterHours = afterHours,
+          dataDelayBy = dataDelayBy,
+          dayPreviousClose = dayPreviousClose,
+          dayHigh = dayHigh,
+          dayLow = dayLow,
+          dayOpen = dayOpen,
+          dayVolume = dayVolume,
+      )
+    }
+  }
 }
 
 @CheckResult

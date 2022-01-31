@@ -18,7 +18,9 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 
-internal data class StockCompanyImpl(private val company: String) : StockCompany {
+internal data class StockCompanyImpl(
+    private val company: String,
+) : StockCompany {
 
   override fun company(): String {
     return company

@@ -23,12 +23,15 @@ import com.pyamsoft.tickertape.stocks.api.SMALL_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import kotlin.math.abs
 
-internal data class StockMoneyValueImpl(private val value: Double) : StockMoneyValue {
+internal data class StockMoneyValueImpl(
+    private val value: Double,
+) : StockMoneyValue {
 
   private val money by
       lazy(LazyThreadSafetyMode.NONE) {
         // If its a small money < $10, allow more decimals
-        val formatter = if (abs(value).compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
+        val formatter =
+            if (abs(value).compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
         return@lazy if (isZero()) ZERO_VAL else formatter.get().requireNotNull().format(value)
       }
 

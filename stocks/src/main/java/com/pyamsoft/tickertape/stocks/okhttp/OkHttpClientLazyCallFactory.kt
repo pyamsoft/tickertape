@@ -9,8 +9,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
-internal class OkHttpClientLazyCallFactory
-internal constructor(
+class OkHttpClientLazyCallFactory(
     debug: Boolean,
 ) : Call.Factory {
 

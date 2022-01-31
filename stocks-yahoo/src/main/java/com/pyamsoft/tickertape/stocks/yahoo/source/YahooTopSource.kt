@@ -21,6 +21,8 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
+import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -29,13 +31,9 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
-import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
-import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
-import com.pyamsoft.tickertape.stocks.data.StockTrendsImpl
-import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
+import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -55,7 +53,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
             .asSequence()
             .filterOnlyValidTrending()
             .map { trend ->
-              StockTrendsImpl(
+              StockTrends.create(
                   symbols =
                       trend
                           .quotes
@@ -100,7 +98,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
             .asSequence()
             .filterOnlyValidTops()
             .map { top ->
-              StockTopsImpl(
+              StockTops.create(
                   title = top.title.requireNotNull(),
                   description = top.description.requireNotNull(),
                   quotes =
@@ -111,7 +109,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                           // Remove duplicate listings
                           .distinctBy { it.symbol }
                           .map { stock ->
-                            StockQuoteImpl(
+                            StockQuote.create(
                                 symbol = stock.symbol.asSymbol(),
                                 equityType = EquityType.from(stock.quoteType.requireNotNull()),
                                 company =
@@ -125,7 +123,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                 dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
                                 dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
                                 regular =
-                                    StockMarketSessionImpl(
+                                    StockMarketSession.create(
                                         amount =
                                             stock.regularMarketChange.requireNotNull().asMoney(),
                                         direction =
@@ -144,7 +142,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                 afterHours =
                                     if (!hasAfterHoursData(stock)) null
                                     else {
-                                      StockMarketSessionImpl(
+                                      StockMarketSession.create(
                                           amount =
                                               stock.postMarketChange.requireNotNull().asMoney(),
                                           direction =
@@ -161,7 +159,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                 preMarket =
                                     if (!hasPreMarketData(stock)) null
                                     else {
-                                      StockMarketSessionImpl(
+                                      StockMarketSession.create(
                                           amount = stock.preMarketChange.requireNotNull().asMoney(),
                                           direction =
                                               stock.preMarketChange.requireNotNull().asDirection(),

@@ -20,11 +20,10 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.data.KeyStatisticsImpl
-import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkKeyStatisticsResponse
-import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkKeyStatisticsResponse
+import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +67,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
           }
 
           return@coroutineScope jobs.awaitAll().map { paired ->
-            return@map KeyStatisticsImpl(
+            return@map KeyStatistics.create(
                 symbol = paired.symbol,
             )
           }

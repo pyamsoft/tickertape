@@ -22,11 +22,27 @@ import com.pyamsoft.tickertape.stocks.api.StockTrends
 
 interface TopSource {
 
-  @CheckResult suspend fun getDayGainers(force: Boolean, count: Int): StockTops
+  @CheckResult
+  suspend fun getDayGainers(
+      force: Boolean,
+      count: Int,
+  ): StockTops
 
-  @CheckResult suspend fun getDayLosers(force: Boolean, count: Int): StockTops
+  @CheckResult
+  suspend fun getDayLosers(
+      force: Boolean,
+      count: Int,
+  ): StockTops
 
-  @CheckResult suspend fun getMostShorted(force: Boolean, count: Int): StockTops
+  @CheckResult
+  suspend fun getMostShorted(
+      force: Boolean,
+      count: Int,
+  ): StockTops
 
-  @CheckResult suspend fun getTrending(force: Boolean, count: Int): StockTrends
+  @CheckResult
+  suspend fun getTrending(
+      force: Boolean,
+      count: Int,
+  ): StockTrends
 }

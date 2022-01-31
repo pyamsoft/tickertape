@@ -41,7 +41,7 @@ import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
-import com.pyamsoft.tickertape.stocks.YahooFinanceModule
+import com.pyamsoft.tickertape.stocks.yahoo.YahooFinanceModule
 import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapePreferences

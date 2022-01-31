@@ -23,5 +23,8 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 interface KeyStatisticSource {
 
   @CheckResult
-  suspend fun getKeyStatistics(force: Boolean, symbols: List<StockSymbol>): List<KeyStatistics>
+  suspend fun getKeyStatistics(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+  ): List<KeyStatistics>
 }

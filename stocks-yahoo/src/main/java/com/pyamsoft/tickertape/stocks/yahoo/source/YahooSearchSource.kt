@@ -21,10 +21,9 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
-import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
+import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -54,7 +53,7 @@ internal constructor(@YahooApi private val service: SearchService) : SearchSourc
               .distinctBy { it.symbol }
               .map { quote ->
                 val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
-                return@map SearchResultImpl(
+                return@map SearchResult.create(
                     symbol = quote.symbol.asSymbol(),
                     name = company,
                     score = quote.score,

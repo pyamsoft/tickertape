@@ -22,7 +22,7 @@ import com.pyamsoft.tickertape.stocks.api.StockTops
 internal data class StockTopsImpl(
     private val title: String,
     private val description: String,
-    private val quotes: List<StockQuote>
+    private val quotes: List<StockQuote>,
 ) : StockTops {
 
   override fun title(): String {

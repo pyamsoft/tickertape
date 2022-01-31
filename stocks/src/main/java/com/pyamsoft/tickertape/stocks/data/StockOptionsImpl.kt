@@ -21,7 +21,6 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal data class StockOptionsImpl

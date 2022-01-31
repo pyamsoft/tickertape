@@ -21,6 +21,8 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
+import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -29,13 +31,10 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
-import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
-import com.pyamsoft.tickertape.stocks.data.StockOptionsQuoteImpl
-import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
-import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
-import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
+import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
+import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
 import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +81,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
         stock: NetworkQuoteResponse.Resp.Quote,
         localId: ZoneId
     ): StockQuote {
-      return StockOptionsQuoteImpl(
+      return StockOptionsQuote.create(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
           company = (stock.longName ?: stock.shortName).requireNotNull().asCompany(),
@@ -95,7 +94,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
           dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
           regular =
-              StockMarketSessionImpl(
+              StockMarketSession.create(
                   amount = stock.regularMarketChange.requireNotNull().asMoney(),
                   direction = stock.regularMarketChange.requireNotNull().asDirection(),
                   percent = stock.regularMarketChangePercent.requireNotNull().asPercent(),
@@ -105,7 +104,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           afterHours =
               if (!hasAfterHoursData(stock)) null
               else {
-                StockMarketSessionImpl(
+                StockMarketSession.create(
                     amount = stock.postMarketChange.requireNotNull().asMoney(),
                     direction = stock.postMarketChange.requireNotNull().asDirection(),
                     percent = stock.postMarketChangePercent.requireNotNull().asPercent(),
@@ -116,7 +115,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           preMarket =
               if (!hasPreMarketData(stock)) null
               else {
-                StockMarketSessionImpl(
+                StockMarketSession.create(
                     amount = stock.preMarketChange.requireNotNull().asMoney(),
                     direction = stock.preMarketChange.requireNotNull().asDirection(),
                     percent = stock.preMarketChangePercent.requireNotNull().asPercent(),
@@ -130,7 +129,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
     @JvmStatic
     @CheckResult
     private fun createQuote(stock: NetworkQuoteResponse.Resp.Quote): StockQuote {
-      return StockQuoteImpl(
+      return StockQuote.create(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
           company = (stock.longName ?: stock.shortName).requireNotNull().asCompany(),
@@ -141,7 +140,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
           dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
           regular =
-              StockMarketSessionImpl(
+              StockMarketSession.create(
                   amount = stock.regularMarketChange.requireNotNull().asMoney(),
                   direction = stock.regularMarketChange.requireNotNull().asDirection(),
                   percent = stock.regularMarketChangePercent.requireNotNull().asPercent(),
@@ -151,7 +150,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           afterHours =
               if (!hasAfterHoursData(stock)) null
               else {
-                StockMarketSessionImpl(
+                StockMarketSession.create(
                     amount = stock.postMarketChange.requireNotNull().asMoney(),
                     direction = stock.postMarketChange.requireNotNull().asDirection(),
                     percent = stock.postMarketChangePercent.requireNotNull().asPercent(),
@@ -162,7 +161,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           preMarket =
               if (!hasPreMarketData(stock)) null
               else {
-                StockMarketSessionImpl(
+                StockMarketSession.create(
                     amount = stock.preMarketChange.requireNotNull().asMoney(),
                     direction = stock.preMarketChange.requireNotNull().asDirection(),
                     percent = stock.preMarketChangePercent.requireNotNull().asPercent(),

@@ -17,8 +17,21 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.KeyStatisticsImpl
 
 interface KeyStatistics {
 
   @CheckResult fun symbol(): StockSymbol
+
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+    ): KeyStatistics {
+      return KeyStatisticsImpl(
+          symbol = symbol,
+      )
+    }
+  }
 }

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
 
 interface SearchResult {
 
@@ -27,4 +28,22 @@ interface SearchResult {
   @CheckResult fun score(): Long
 
   @CheckResult fun type(): EquityType
+
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+        name: StockCompany,
+        score: Long,
+        type: EquityType,
+    ): SearchResult {
+      return SearchResultImpl(
+          symbol = symbol,
+          name = name,
+          score = score,
+          type = type,
+      )
+    }
+  }
 }

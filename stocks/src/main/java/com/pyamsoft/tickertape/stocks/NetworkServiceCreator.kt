@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.stocks
 import androidx.annotation.CheckResult
 import kotlin.reflect.KClass
 
-internal interface NetworkServiceCreator {
+interface NetworkServiceCreator {
 
   @CheckResult fun <T : Any> create(target: KClass<T>): T
 }

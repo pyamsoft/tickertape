@@ -17,8 +17,22 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockTrendsImpl
 
 interface StockTrends {
 
   @CheckResult fun symbols(): List<StockSymbol>
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbols: List<StockSymbol>,
+    ): StockTrends {
+      return StockTrendsImpl(
+          symbols = symbols,
+      )
+    }
+  }
 }

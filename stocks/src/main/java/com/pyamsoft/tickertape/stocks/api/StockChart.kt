@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.data.StockChartImpl
 import java.time.LocalDateTime
 
 interface StockChart {
@@ -38,7 +39,7 @@ interface StockChart {
 
   @CheckResult fun close(): List<StockMoneyValue>
 
-  enum class IntervalTime(internal val apiValue: String, val display: String) {
+  enum class IntervalTime(val apiValue: String, val display: String) {
     ONE_MINUTE("1m", "1 Minute"),
     TWO_MINUTES("2m", "2 Minutes"),
     FIFTEEN_MINUTES("15m", "15 Minutes"),
@@ -49,7 +50,7 @@ interface StockChart {
     ONE_MONTH("1mo", "1 Month"),
   }
 
-  enum class IntervalRange(internal val apiValue: String, val display: String) {
+  enum class IntervalRange(val apiValue: String, val display: String) {
     ONE_DAY("1d", "1 Day"),
     FIVE_DAY("5d", "5 Days"),
     ONE_MONTH("1mo", "1 Month"),
@@ -61,6 +62,33 @@ interface StockChart {
     TEN_YEAR("10y", "10 Years"),
     YTD("ytd", "Year to Date"),
     MAX("max", "Max")
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+        range: IntervalRange,
+        interval: IntervalTime,
+        dates: List<LocalDateTime>,
+        currentPrice: StockMoneyValue,
+        startingPrice: StockMoneyValue,
+        currentDate: LocalDateTime,
+        close: List<StockMoneyValue>,
+    ): StockChart {
+      return StockChartImpl(
+          symbol = symbol,
+          range = range,
+          interval = interval,
+          dates = dates,
+          currentPrice = currentPrice,
+          startingPrice = startingPrice,
+          currentDate = currentDate,
+          close = close,
+      )
+    }
   }
 }
 

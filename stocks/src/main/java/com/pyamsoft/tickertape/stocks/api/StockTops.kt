@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
 
 interface StockTops {
 
@@ -25,4 +26,21 @@ interface StockTops {
   @CheckResult fun description(): String
 
   @CheckResult fun quotes(): List<StockQuote>
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(
+        title: String,
+        description: String,
+        quotes: List<StockQuote>,
+    ): StockTops {
+      return StockTopsImpl(
+          title = title,
+          description = description,
+          quotes = quotes,
+      )
+    }
+  }
 }

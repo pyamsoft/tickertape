@@ -19,7 +19,9 @@ package com.pyamsoft.tickertape.stocks.data
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
-internal data class StockShareValueImpl(private val value: Double) : StockShareValue {
+internal data class StockShareValueImpl(
+    private val value: Double,
+) : StockShareValue {
 
   private val share by
       lazy(LazyThreadSafetyMode.NONE) {

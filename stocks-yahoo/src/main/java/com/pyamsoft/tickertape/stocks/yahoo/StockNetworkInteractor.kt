@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.yahoo
 
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -32,7 +33,6 @@ import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton

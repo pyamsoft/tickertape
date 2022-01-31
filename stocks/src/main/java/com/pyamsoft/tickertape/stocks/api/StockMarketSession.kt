@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 
 interface StockMarketSession {
 
@@ -29,4 +30,24 @@ interface StockMarketSession {
   @CheckResult fun percent(): StockPercent
 
   @CheckResult fun state(): MarketState
+
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun create(
+        direction: StockDirection,
+        price: StockMoneyValue,
+        amount: StockMoneyValue,
+        percent: StockPercent,
+        state: MarketState,
+    ): StockMarketSession {
+      return StockMarketSessionImpl(
+          direction = direction,
+          price = price,
+          amount = amount,
+          percent = percent,
+          state = state,
+      )
+    }
+  }
 }

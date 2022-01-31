@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks
+package com.pyamsoft.tickertape.stocks.yahoo
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
+import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
@@ -25,7 +27,6 @@ import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
 import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.yahoo.service.OptionsService

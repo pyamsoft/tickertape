@@ -34,6 +34,7 @@ fun WatchlistDigScreen(
 
   Surface(
       modifier = modifier,
+      elevation = 16.dp,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

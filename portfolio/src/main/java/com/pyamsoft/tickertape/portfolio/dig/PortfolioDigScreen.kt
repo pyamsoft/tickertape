@@ -41,40 +41,38 @@ fun PortfolioDigScreen(
 ) {
   val isLoading = state.isLoading
 
-  // NOTE(Peter): We need this useless box or we crash at runtime with a Compose ClassCastException.
-  Box(
+  Surface(
       modifier = modifier,
+      elevation = 16.dp,
   ) {
-    Surface {
-      Column(
-          modifier = Modifier.fillMaxWidth(),
-      ) {
-        PortfolioDigToolbar(
-            state = state,
-            onClose = onClose,
-            onTabUpdated = onTabUpdated,
-        )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+      PortfolioDigToolbar(
+          state = state,
+          onClose = onClose,
+          onTabUpdated = onTabUpdated,
+      )
 
-        Crossfade(
-            targetState = isLoading,
-        ) { loading ->
-          if (loading) {
-            Loading(
-                modifier = Modifier.fillMaxWidth(),
-            )
-          } else {
-            Content(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                imageLoader = imageLoader,
-                currentPrice = currentPrice,
-                onScrub = onScrub,
-                onRangeSelected = onRangeSelected,
-                onRefresh = onRefresh,
-                onAddPosition = onAddPosition,
-                onDeletePosition = onDeletePosition,
-            )
-          }
+      Crossfade(
+          targetState = isLoading,
+      ) { loading ->
+        if (loading) {
+          Loading(
+              modifier = Modifier.fillMaxWidth(),
+          )
+        } else {
+          Content(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              imageLoader = imageLoader,
+              currentPrice = currentPrice,
+              onScrub = onScrub,
+              onRangeSelected = onRangeSelected,
+              onRefresh = onRefresh,
+              onAddPosition = onAddPosition,
+              onDeletePosition = onDeletePosition,
+          )
         }
       }
     }

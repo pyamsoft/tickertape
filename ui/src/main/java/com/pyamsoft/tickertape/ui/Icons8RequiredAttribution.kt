@@ -1,9 +1,9 @@
 package com.pyamsoft.tickertape.ui
 
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -59,7 +59,7 @@ fun Icons8RequiredAttribution(
           from = from,
           fromLink = fromLink,
       )
-  Surface(
+  Box(
       modifier = modifier,
   ) {
     ClickableText(

@@ -64,56 +64,59 @@ fun PositionAddScreen(
   val focusManager = LocalFocusManager.current
   val focusRequester = remember { FocusRequester() }
 
-  Column(
+  Surface(
       modifier = modifier,
+      elevation = 16.dp,
   ) {
-    PositionAddToolbar(
-        modifier = Modifier.fillMaxWidth(),
-        symbol = symbol,
-        onClose = onClose,
-    )
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(16.dp),
+    Column {
+      PositionAddToolbar(
+          modifier = Modifier.fillMaxWidth(),
+          symbol = symbol,
+          onClose = onClose,
+      )
+      Surface(
+          modifier = Modifier.fillMaxWidth(),
       ) {
-        NumberOfShares(
-            modifier =
-                Modifier.fillMaxWidth().padding(bottom = 8.dp).focusRequester(focusRequester),
-            isOption = isOption,
-            readOnly = isReadOnly,
-            numberOfShares = numberOfShares,
-            onNumberChanged = onNumberChanged,
-            onNext = { focusManager.moveFocus(FocusDirection.Down) },
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+        ) {
+          NumberOfShares(
+              modifier =
+                  Modifier.fillMaxWidth().padding(bottom = 8.dp).focusRequester(focusRequester),
+              isOption = isOption,
+              readOnly = isReadOnly,
+              numberOfShares = numberOfShares,
+              onNumberChanged = onNumberChanged,
+              onNext = { focusManager.moveFocus(FocusDirection.Down) },
+          )
 
-        PricePerShare(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-            isOption = isOption,
-            readOnly = isReadOnly,
-            pricePerShare = pricePerShare,
-            onPriceChanged = onPriceChanged,
-            onNext = { onDateOfPurchaseClicked(dateOfPurchase) },
-        )
+          PricePerShare(
+              modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+              isOption = isOption,
+              readOnly = isReadOnly,
+              pricePerShare = pricePerShare,
+              onPriceChanged = onPriceChanged,
+              onNext = { onDateOfPurchaseClicked(dateOfPurchase) },
+          )
 
-        DateOfPurchase(
-            modifier = Modifier.padding(8.dp),
-            readOnly = isReadOnly,
-            dateOfPurchase = dateOfPurchase,
-            onDateOfPurchaseClicked = onDateOfPurchaseClicked,
-        )
+          DateOfPurchase(
+              modifier = Modifier.padding(8.dp),
+              readOnly = isReadOnly,
+              dateOfPurchase = dateOfPurchase,
+              onDateOfPurchaseClicked = onDateOfPurchaseClicked,
+          )
 
-        SubmitSection(
-            modifier = Modifier.padding(bottom = 16.dp),
-            isEnabled = isSubmitEnabled,
-            onSubmit = {
-              onSubmit()
+          SubmitSection(
+              modifier = Modifier.padding(bottom = 16.dp),
+              isEnabled = isSubmitEnabled,
+              onSubmit = {
+                onSubmit()
 
-              Timber.d("Re-request focus on top field")
-              focusRequester.requestFocus()
-            },
-        )
+                Timber.d("Re-request focus on top field")
+                focusRequester.requestFocus()
+              },
+          )
+        }
       }
     }
   }

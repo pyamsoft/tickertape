@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
@@ -67,13 +67,13 @@ internal fun PortfolioItem(
           onLongClick = { onDelete(stock) },
       ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
         ) {
           Row(
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Info(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
                 name = if (isOption) "Contracts" else "Shares",
                 value = stock.totalShares.asShareValue(),
             )
@@ -84,11 +84,11 @@ internal fun PortfolioItem(
             )
           }
           Row(
-              modifier = Modifier.padding(top = 4.dp),
+              modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Info(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
                 name = "Value",
                 value = stock.current.asMoneyValue())
 

@@ -28,8 +28,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
+import com.pyamsoft.pydroid.ui.defaults.ImageDefaults
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -79,11 +80,11 @@ fun PositionAddScreen(
           modifier = Modifier.fillMaxWidth(),
       ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
         ) {
           NumberOfShares(
               modifier =
-                  Modifier.fillMaxWidth().padding(bottom = 8.dp).focusRequester(focusRequester),
+                  Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.baseline).focusRequester(focusRequester),
               isOption = isOption,
               readOnly = isReadOnly,
               numberOfShares = numberOfShares,
@@ -92,7 +93,7 @@ fun PositionAddScreen(
           )
 
           PricePerShare(
-              modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+              modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.baseline),
               isOption = isOption,
               readOnly = isReadOnly,
               pricePerShare = pricePerShare,
@@ -101,14 +102,14 @@ fun PositionAddScreen(
           )
 
           DateOfPurchase(
-              modifier = Modifier.padding(8.dp),
+              modifier = Modifier.padding(MaterialTheme.keylines.baseline),
               readOnly = isReadOnly,
               dateOfPurchase = dateOfPurchase,
               onDateOfPurchaseClicked = onDateOfPurchaseClicked,
           )
 
           SubmitSection(
-              modifier = Modifier.padding(bottom = 16.dp),
+              modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
               isEnabled = isSubmitEnabled,
               onSubmit = {
                 onSubmit()
@@ -168,7 +169,7 @@ private fun DateOfPurchase(
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Icon(
-        modifier = Modifier.padding(end = 20.dp).alpha(TextFieldDefaults.IconOpacity),
+        modifier = Modifier.padding(end = ImageDefaults.IconSize).alpha(TextFieldDefaults.IconOpacity),
         imageVector = Icons.Filled.Today,
         contentDescription = "Date of Purchase",
     )
@@ -210,7 +211,7 @@ private fun NumberOfShares(
       },
       leadingIcon = {
         Icon(
-            modifier = Modifier.padding(end = 4.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
             imageVector = Icons.Filled.Tag,
             contentDescription = "Number of $what",
         )
@@ -249,7 +250,7 @@ private fun PricePerShare(
       },
       leadingIcon = {
         Icon(
-            modifier = Modifier.padding(end = 4.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
             imageVector = Icons.Filled.Paid,
             contentDescription = "Price per $what",
         )

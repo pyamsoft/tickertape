@@ -22,7 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
@@ -58,7 +59,7 @@ internal fun PortfolioDigToolbar(
           modifier = Modifier.fillMaxWidth(),
           backgroundColor = Color.Transparent,
           contentColor = contentColor,
-          elevation = 0.dp,
+          elevation = ZeroElevation,
           title = {
             Text(
                 text = title,
@@ -107,7 +108,7 @@ private fun PortfolioTab(
       onClick = { onTabUpdated(tab) },
   ) {
     Text(
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = MaterialTheme.keylines.typography),
         text = tab.display,
     )
   }

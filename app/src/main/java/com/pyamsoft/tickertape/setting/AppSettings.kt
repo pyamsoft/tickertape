@@ -23,10 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.theme.ZeroSize
 import com.pyamsoft.pydroid.ui.preference.Preferences
 import com.pyamsoft.pydroid.ui.settings.SettingsFragment
 import com.pyamsoft.tickertape.main.MainComponent
@@ -82,7 +82,7 @@ internal class AppSettings : SettingsFragment() {
 
   @Composable
   override fun customTopItemMargin(): Dp {
-    return 0.dp
+    return ZeroSize
   }
 
   companion object {

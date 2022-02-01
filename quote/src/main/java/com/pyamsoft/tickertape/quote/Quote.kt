@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -85,7 +86,7 @@ private object QuoteScopeInstance : QuoteScope {
           style = MaterialTheme.typography.caption,
       )
       Text(
-          modifier = Modifier.padding(start = 4.dp),
+          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           color = valueColor,
           text = value,
           style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
@@ -117,9 +118,9 @@ fun Quote(
       elevation = 2.dp,
   ) {
     Column(
-        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
-      Row(modifier = Modifier.padding(bottom = 8.dp)) {
+      Row(modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline)) {
         TickerName(
             modifier = Modifier.weight(1F),
             ticker = ticker,
@@ -148,7 +149,7 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         verticalAlignment = Alignment.CenterVertically,
     ) {
       Info(
-          modifier = Modifier.padding(end = 8.dp),
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Open",
           value = quote.dayOpen().asMoneyValue(),
       )
@@ -163,21 +164,21 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
     }
 
     Row(
-        modifier = Modifier.padding(top = 4.dp),
+        modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
         verticalAlignment = Alignment.CenterVertically,
     ) {
       Info(
-          modifier = Modifier.padding(end = 8.dp),
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Low",
           value = quote.dayLow().asMoneyValue(),
       )
       Info(
-          modifier = Modifier.padding(end = 8.dp),
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "High",
           value = quote.dayHigh().asMoneyValue(),
       )
       Info(
-          modifier = Modifier.padding(end = 8.dp),
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Volume",
           value = quote.dayVolume().asVolumeValue(),
       )

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -55,19 +56,19 @@ internal fun OptionsSection(
   ) {
     Column {
       OptionsSide(
-          modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+          modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
           state = state,
           onTradeSideSelected = onTradeSideSelected,
       )
 
       OptionsType(
-          modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+          modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
           state = state,
           onOptionTypeSlected = onOptionTypeSlected,
       )
 
       OptionsStrikeExpiration(
-          modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+          modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
           state = state,
           onExpirationDateSelected = onExpirationDateSelected,
           onStrikeSelected = onStrikeSelected,
@@ -204,7 +205,7 @@ private fun <T : Any> OptionsDropdown(
             onClick = { onSelect(choice.value) },
         ) {
           Text(
-              modifier = Modifier.padding(8.dp),
+              modifier = Modifier.padding(MaterialTheme.keylines.baseline),
               text = choice.display,
           )
         }

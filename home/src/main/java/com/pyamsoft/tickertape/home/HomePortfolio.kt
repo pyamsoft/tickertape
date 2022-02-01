@@ -19,12 +19,7 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -36,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 
@@ -61,7 +56,10 @@ internal fun HomePortfolio(
     if (err == null) {
       Column {
         AnimatedVisibility(
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+            modifier =
+                Modifier.padding(
+                    start = MaterialTheme.keylines.content,
+                    bottom = MaterialTheme.keylines.baseline),
             visible = isVisible,
         ) {
           Text(
@@ -74,12 +72,13 @@ internal fun HomePortfolio(
         }
 
         AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT_DP.dp),
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT_DP),
             visible = isListVisible,
         ) {
           Box {
             HomePortfolioSummaryItem(
-                modifier = Modifier.matchParentSize().padding(horizontal = 16.dp),
+                modifier =
+                    Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
                 portfolio = portfolio,
             )
 
@@ -110,7 +109,7 @@ private fun Loading(
       modifier = modifier,
   ) {
     Box(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) { CircularProgressIndicator() }
   }
@@ -122,7 +121,7 @@ private fun Error(
     error: Throwable,
 ) {
   Column(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.content),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -136,7 +135,7 @@ private fun Error(
     )
 
     Text(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = Modifier.padding(top = MaterialTheme.keylines.content),
         textAlign = TextAlign.Center,
         text = "Please try again later.",
         style = MaterialTheme.typography.body2,

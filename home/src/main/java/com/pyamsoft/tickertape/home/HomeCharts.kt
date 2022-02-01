@@ -19,14 +19,7 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
@@ -39,8 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.ChartError
@@ -156,7 +149,10 @@ private fun HomeCharts(
     if (err == null) {
       Column {
         Text(
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+            modifier =
+                Modifier.padding(
+                    start = MaterialTheme.keylines.content,
+                    bottom = MaterialTheme.keylines.baseline),
             text = name,
             style =
                 MaterialTheme.typography.h6.copy(
@@ -165,7 +161,7 @@ private fun HomeCharts(
         )
 
         Box(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.CHART_HEIGHT_DP.dp),
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.CHART_HEIGHT_DP),
         ) {
           ChartList(
               modifier = Modifier.matchParentSize(),
@@ -200,7 +196,7 @@ private fun Loading(
       visible = isLoading,
   ) {
     Box(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) { CircularProgressIndicator() }
   }
@@ -216,7 +212,7 @@ private fun ChartList(
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
     itemsIndexed(
         items = onlyChartTickers,
@@ -225,10 +221,10 @@ private fun ChartList(
       // We can assume here the chart is not null
       HomeChartItem(
           modifier =
-              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP.dp).run {
+              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP).run {
                 when (index) {
-                  0 -> padding(start = 16.dp)
-                  onlyChartTickers.lastIndex -> padding(end = 16.dp)
+                  0 -> padding(start = MaterialTheme.keylines.content)
+                  onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
                   else -> this
                 }
               },

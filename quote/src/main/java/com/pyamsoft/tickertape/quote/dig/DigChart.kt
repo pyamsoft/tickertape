@@ -4,21 +4,10 @@ import androidx.annotation.CheckResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
@@ -28,22 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
-import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
-import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockPercent
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.*
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDateTime
@@ -66,7 +47,7 @@ fun DigChart(
   val chart = ticker.chart
 
   Column(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     Crossfade(
         modifier = Modifier.fillMaxWidth(),
@@ -74,7 +55,7 @@ fun DigChart(
     ) { c ->
       if (c != null) {
         Column(
-            modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP.dp),
+            modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP),
         ) {
           Chart(
               modifier = Modifier.fillMaxWidth().weight(1F),
@@ -121,7 +102,7 @@ private fun CurrentScrub(
           }
 
       Column(
-          modifier = Modifier.padding(16.dp),
+          modifier = Modifier.padding(MaterialTheme.keylines.content),
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center,
       ) {
@@ -130,7 +111,7 @@ private fun CurrentScrub(
             style = MaterialTheme.typography.body1,
         )
         Row(
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           if (openingPrice != null) {
@@ -204,7 +185,7 @@ private fun CurrentPriceDisplay(
             style = MaterialTheme.typography.caption.copy(color = diff.color),
         )
         Text(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
             text = "(${diff.direction.sign()}${diff.percent.asPercentValue()})",
             style = MaterialTheme.typography.caption.copy(color = diff.color),
         )
@@ -271,8 +252,8 @@ private fun Ranges(
   val allRanges = remember { StockChart.IntervalRange.values() }
 
   LazyRow(
-      modifier = modifier.padding(top = 16.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      modifier = modifier.padding(top = MaterialTheme.keylines.content),
+      horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
     items(
         items = allRanges,

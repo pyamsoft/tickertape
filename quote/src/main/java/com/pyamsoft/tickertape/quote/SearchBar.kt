@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
@@ -38,7 +38,7 @@ fun SearchBar(
   val allTypes = remember { EquityType.values() }
 
   Surface(
-      modifier = modifier.padding(horizontal = 8.dp),
+      modifier = modifier.padding(horizontal = MaterialTheme.keylines.baseline),
       elevation = AppBarDefaults.TopAppBarElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
@@ -80,7 +80,7 @@ private fun TickerTab(
       onClick = { onTabUpdated(tab) },
   ) {
     Text(
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = MaterialTheme.keylines.typography),
         text = tab.display,
     )
   }
@@ -94,7 +94,7 @@ private fun SearchInput(
     onSearchChanged: (String) -> Unit,
 ) {
   OutlinedTextField(
-      modifier = modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp),
+      modifier = modifier.padding(horizontal = MaterialTheme.keylines.baseline).padding(bottom = MaterialTheme.keylines.baseline),
       value = search,
       onValueChange = onSearchChanged,
       singleLine = true,

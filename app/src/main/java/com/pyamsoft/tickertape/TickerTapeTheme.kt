@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.PYDroidTheme
 import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
@@ -66,6 +67,7 @@ private fun themeColors(isDarkMode: Boolean): Colors {
 @CheckResult
 private fun themeShapes(): Shapes {
   return Shapes(
+      // Don't use MaterialTheme here since we are defining the theme
       medium = RoundedCornerShape(16.dp),
   )
 }
@@ -93,7 +95,7 @@ fun TickerTapeTheme(
         Theming.Mode.SYSTEM -> isSystemInDarkTheme()
       }
 
-  MaterialTheme(
+  PYDroidTheme(
       colors = themeColors(isDarkMode),
       shapes = themeShapes(),
   ) {

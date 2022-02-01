@@ -19,14 +19,7 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
@@ -40,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeWatchlistItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestChart
@@ -69,11 +62,11 @@ internal fun HomeWatchlist(
     if (err == null) {
       Column {
         AnimatedVisibility(
-            modifier = Modifier.padding(start = 16.dp),
+            modifier = Modifier.padding(start = MaterialTheme.keylines.content),
             visible = isVisible,
         ) {
           Text(
-              modifier = Modifier.padding(bottom = 8.dp),
+              modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
               text = "My Watchlist${if (count > 0) " Top $count" else ""}",
               style =
                   MaterialTheme.typography.h6.copy(
@@ -83,7 +76,7 @@ internal fun HomeWatchlist(
         }
 
         AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP.dp),
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP),
             visible = isListVisible,
         ) {
           Box {
@@ -120,7 +113,7 @@ private fun Loading(
       modifier = modifier,
   ) {
     Box(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) { CircularProgressIndicator() }
   }
@@ -135,7 +128,7 @@ private fun TickerList(
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
     itemsIndexed(
         items = tickers,
@@ -144,10 +137,10 @@ private fun TickerList(
       // We can assume here the chart is not null
       HomeWatchlistItem(
           modifier =
-              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP.dp).run {
+              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP).run {
                 when (index) {
-                  0 -> padding(start = 16.dp)
-                  tickers.lastIndex -> padding(end = 16.dp)
+                  0 -> padding(start = MaterialTheme.keylines.content)
+                  tickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
                   else -> this
                 }
               },
@@ -164,7 +157,7 @@ private fun Error(
     error: Throwable,
 ) {
   Column(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.content),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -178,7 +171,7 @@ private fun Error(
     )
 
     Text(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = Modifier.padding(top = MaterialTheme.keylines.content),
         textAlign = TextAlign.Center,
         text = "Please try again later.",
         style = MaterialTheme.typography.body2,

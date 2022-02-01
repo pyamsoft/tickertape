@@ -1,9 +1,10 @@
 package com.pyamsoft.tickertape.home
 
+import androidx.compose.ui.unit.dp
+
 internal object HomeScreenDefaults {
-  const val ITEM_WIDTH_DP = 350
-  const val CHART_HEIGHT_DP = 160
-  const val WATCHLIST_HEIGHT_DP = 108
-  const val PORTFOLIO_HEIGHT_DP = 128
-  const val BOTTOM_PADDING_DP = 16
+  val ITEM_WIDTH_DP = 350.dp
+  val CHART_HEIGHT_DP = 160.dp
+  val WATCHLIST_HEIGHT_DP = 108.dp
+  val PORTFOLIO_HEIGHT_DP = 128.dp
 }

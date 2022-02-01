@@ -20,12 +20,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
@@ -46,14 +47,14 @@ internal fun HomeChartItem(
       modifier = modifier.clickable { onClick(ticker) },
   ) {
     Row(
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
     ) {
       TickerName(
           modifier = Modifier.weight(1F),
           ticker = ticker,
       )
       TickerPrice(
-          modifier = Modifier.padding(start = 16.dp),
+          modifier = Modifier.padding(start = MaterialTheme.keylines.content),
           ticker = ticker,
       )
     }

@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 
 @Composable
@@ -46,13 +46,13 @@ fun PorfolioSummaryItem(
       modifier = modifier.fillMaxWidth(),
   ) {
     Text(
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
         text = totalAmount.asMoneyValue(),
         style = MaterialTheme.typography.h3,
     )
 
     Text(
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
         text = gainLoss,
         style = MaterialTheme.typography.h5.copy(color = totalComposeColor),
     )
@@ -66,7 +66,7 @@ fun PorfolioSummaryItem(
       )
 
       Text(
-          modifier = Modifier.padding(start = 8.dp),
+          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
           text = changeToday,
           style = MaterialTheme.typography.h6.copy(color = todayComposeColor),
       )

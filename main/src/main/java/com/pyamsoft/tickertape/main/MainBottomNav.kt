@@ -20,14 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -37,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
+import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.ui.icon.BarChart
 import com.pyamsoft.tickertape.ui.icon.PieChart
 
@@ -64,7 +57,7 @@ internal fun MainBottomNav(
       BottomNavigation(
           backgroundColor = Color.Transparent,
           contentColor = LocalContentColor.current,
-          elevation = 0.dp,
+          elevation = ZeroElevation,
       ) {
         Item(
             current = page,

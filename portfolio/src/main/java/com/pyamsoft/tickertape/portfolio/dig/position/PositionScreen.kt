@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
@@ -82,8 +84,8 @@ private fun PositionsList(
       onRefresh = onRefresh,
   ) {
     LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(MaterialTheme.keylines.content),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
       items(
           items = positions,
@@ -128,7 +130,7 @@ private fun PositionsAdd(
       }
 
   AnimatedVisibility(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.content),
       visible = isAddVisible,
   ) {
     Box {

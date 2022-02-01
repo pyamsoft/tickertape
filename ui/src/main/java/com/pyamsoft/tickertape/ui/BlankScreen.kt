@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberImagePainter
+import com.pyamsoft.pydroid.theme.keylines
 
 private val MIN_IMAGE_HEIGHT = 120.dp
 
@@ -143,7 +145,7 @@ fun BlankScreen(
         contentDescription = null,
     )
     Icons8RequiredAttribution(
-        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
+        modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content).padding(bottom = MaterialTheme.keylines.content),
         illustrationBy = illustrationBy,
         illustrationLink = illustrationLink,
         from = from,

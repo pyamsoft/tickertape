@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -62,10 +63,10 @@ internal fun LookupScreen(
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
   Column(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     SymbolLookup(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
         state = state,
         onSymbolChanged = onSymbolChanged,
         onSubmit = onSubmit,
@@ -76,7 +77,7 @@ internal fun LookupScreen(
         onResultsDismissed = onResultsDismissed,
     )
     OptionsSection(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
         state = state,
         onTradeSideSelected = onTradeSideSelected,
         onOptionTypeSlected = onOptionTypeSlected,
@@ -111,7 +112,7 @@ private fun SubmissionSection(
     )
 
     Row(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = Modifier.padding(top = MaterialTheme.keylines.content),
         verticalAlignment = Alignment.CenterVertically,
     ) {
       OutlinedButton(
@@ -125,7 +126,7 @@ private fun SubmissionSection(
       }
 
       Spacer(
-          modifier = Modifier.width(16.dp),
+          modifier = Modifier.width(MaterialTheme.keylines.content),
       )
 
       Button(
@@ -188,7 +189,7 @@ private fun ResultItem(
   val company = result.name()
 
   Column(
-      modifier = modifier.padding(8.dp),
+      modifier = modifier.padding(MaterialTheme.keylines.baseline),
       horizontalAlignment = Alignment.Start,
       verticalArrangement = Arrangement.Center,
   ) {

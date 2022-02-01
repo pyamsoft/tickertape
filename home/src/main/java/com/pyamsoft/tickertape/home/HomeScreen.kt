@@ -22,18 +22,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
@@ -81,7 +82,7 @@ private fun HomeContent(
 
   Column(
       modifier = modifier,
-      verticalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
     Spacer(
         modifier = Modifier.statusBarsHeight(),
@@ -122,7 +123,7 @@ private fun HomeContent(
     Spacer(
         modifier =
             Modifier.navigationBarsHeight(
-                additional = bottomPaddingDp + HomeScreenDefaults.BOTTOM_PADDING_DP.dp,
+                additional = bottomPaddingDp + MaterialTheme.keylines.content,
             ),
     )
   }

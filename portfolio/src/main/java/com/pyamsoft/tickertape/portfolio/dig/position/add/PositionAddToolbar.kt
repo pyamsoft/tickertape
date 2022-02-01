@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
@@ -46,7 +46,7 @@ internal fun PositionAddToolbar(
           modifier = Modifier.fillMaxWidth(),
           backgroundColor = Color.Transparent,
           contentColor = contentColor,
-          elevation = 0.dp,
+          elevation = ZeroElevation,
           title = {
             Text(
                 text = "New Position: ${symbol.symbol()}",

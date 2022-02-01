@@ -19,11 +19,12 @@ package com.pyamsoft.tickertape.main
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 
 @Composable
 @JvmOverloads
@@ -42,7 +43,7 @@ fun MainScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     MainBottomNav(
-        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
+        modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content).padding(bottom = MaterialTheme.keylines.content),
         page = page,
         onLoadHome = onLoadHome,
         onLoadWatchList = onLoadWatchList,

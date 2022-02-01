@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.defaults.ListItemDefaults
 import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
@@ -61,8 +63,8 @@ private fun TickerAddItem(
       modifier =
           modifier
               .clickable { onTypeSelected(type) }
-              .padding(horizontal = 16.dp, vertical = 8.dp)
-              .heightIn(min = 48.dp),
+              .padding(horizontal = MaterialTheme.keylines.content, vertical = MaterialTheme.keylines.baseline)
+              .heightIn(min = ListItemDefaults.DefaultSize),
       contentAlignment = Alignment.CenterStart,
   ) {
     Text(

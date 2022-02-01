@@ -19,7 +19,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -53,25 +53,25 @@ fun DeleteTicker(
       elevation = DialogDefaults.DialogElevation,
   ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
     ) {
       Text(
           text = "Are you sure?",
           style = MaterialTheme.typography.h6,
       )
       Text(
-          modifier = Modifier.padding(top = 16.dp),
+          modifier = Modifier.padding(top = MaterialTheme.keylines.content),
           text = text,
           style = MaterialTheme.typography.body1,
       )
       Text(
-          modifier = Modifier.padding(top = 16.dp),
+          modifier = Modifier.padding(top = MaterialTheme.keylines.content),
           text =
               "If you remove this ticker, you will lose all data associated with it like alerts and positions.",
           style = MaterialTheme.typography.body1,
       )
       Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.End,
       ) {
@@ -83,7 +83,7 @@ fun DeleteTicker(
           )
         }
         TextButton(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
             onClick = onConfirm,
             colors =
                 ButtonDefaults.textButtonColors(

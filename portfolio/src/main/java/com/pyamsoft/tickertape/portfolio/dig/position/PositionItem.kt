@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
@@ -121,41 +122,41 @@ internal fun PositionItem(
       modifier = modifier,
   ) {
     Column(
-        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
       Row(
           modifier = Modifier.fillMaxWidth(),
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Info(
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Date",
             value = displayPurchaseDate,
         )
         Info(
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Basis",
             value = displayPrice,
         )
         Info(
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = if (isOption) "Contracts" else "Shares",
             value = displayShares,
         )
       }
       Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.typography),
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Info(
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Cost",
             value = displayValues.cost,
         )
 
         if (displayValues.current.isNotBlank()) {
           Info(
-              modifier = Modifier.padding(end = 8.dp),
+              modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
               name = "Value",
               value = displayValues.current,
               valueColor = displayValues.color,
@@ -165,11 +166,11 @@ internal fun PositionItem(
 
       if (displayValues.gainLoss.isNotBlank()) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.typography),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Info(
-              modifier = Modifier.padding(end = 8.dp),
+              modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
               name = displayValues.titleGainLoss,
               value = displayValues.gainLoss,
               valueColor = displayValues.color,
@@ -196,7 +197,7 @@ private fun Info(
         style = MaterialTheme.typography.caption,
     )
     Text(
-        modifier = Modifier.padding(start = 4.dp),
+        modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
         color = valueColor,
         text = value,
         style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),

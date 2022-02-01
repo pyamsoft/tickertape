@@ -1,21 +1,10 @@
 package com.pyamsoft.tickertape.watchlist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,13 +13,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.SearchBar
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.NewTickerFab
@@ -103,7 +92,9 @@ private fun Content(
           density,
           navBarBottomHeight,
       ) { density.run { navBarBottomHeight.toDp() } }
-  val fabBottomPadding = remember(bottomPaddingDp) { bottomPaddingDp + 16.dp }
+  val contentPadding = MaterialTheme.keylines.content
+  val fabBottomPadding =
+      remember(bottomPaddingDp, contentPadding) { bottomPaddingDp + contentPadding }
 
   Box(
       modifier = modifier,
@@ -124,7 +115,7 @@ private fun Content(
     NewTickerFab(
         visible = !isLoading,
         modifier =
-            Modifier.padding(16.dp)
+            Modifier.padding(MaterialTheme.keylines.content)
                 .navigationBarsPadding(bottom = true)
                 .padding(bottom = fabBottomPadding),
         onClick = onFabClick,
@@ -143,7 +134,7 @@ private fun EmptyState(
       image = R.drawable.watchlist_empty,
       bottomContent = {
         Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content),
             text = "Not watching anything, add something!",
             style = MaterialTheme.typography.h6,
         )
@@ -172,7 +163,7 @@ private fun Watchlist(
 
   LazyColumn(
       modifier = modifier,
-      contentPadding = PaddingValues(horizontal = 8.dp),
+      contentPadding = PaddingValues(horizontal = MaterialTheme.keylines.baseline),
   ) {
     stickyHeader {
       Column(
@@ -217,7 +208,7 @@ private fun Watchlist(
         ) { index, ticker ->
           if (index == 0) {
             Spacer(
-                modifier = Modifier.height(16.dp),
+                modifier = Modifier.height(MaterialTheme.keylines.content),
             )
           }
 
@@ -229,7 +220,7 @@ private fun Watchlist(
           )
 
           Spacer(
-              modifier = Modifier.height(16.dp),
+              modifier = Modifier.height(MaterialTheme.keylines.content),
           )
         }
       }
@@ -239,7 +230,10 @@ private fun Watchlist(
       Spacer(
           modifier =
               Modifier.navigationBarsHeight(
-                  additional = navBarBottomHeight + FabDefaults.FAB_OFFSET_DP.dp,
+                  additional =
+                      navBarBottomHeight +
+                          FabDefaults.FAB_OFFSET_DP +
+                          (MaterialTheme.keylines.content * 2),
               ),
       )
     }
@@ -267,14 +261,14 @@ private fun ErrorState(
         )
 
         Text(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = MaterialTheme.keylines.content),
             textAlign = TextAlign.Center,
             text = "Please try again later.",
             style = MaterialTheme.typography.body2,
         )
 
         Button(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = MaterialTheme.keylines.content),
             onClick = onRefresh,
         ) {
           Text(

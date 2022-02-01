@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.MarketState
@@ -64,7 +64,7 @@ fun TickerPrice(
             style = MaterialTheme.typography.caption.copy(color = composeColor),
         )
         Text(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
             text = "(${directionSign}${session.percent().asPercentValue()})",
             style = MaterialTheme.typography.caption.copy(color = composeColor),
         )

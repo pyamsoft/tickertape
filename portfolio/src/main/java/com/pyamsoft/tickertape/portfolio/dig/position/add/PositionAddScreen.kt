@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -66,7 +67,7 @@ fun PositionAddScreen(
 
   Surface(
       modifier = modifier,
-      elevation = 16.dp,
+      elevation = DialogDefaults.DialogElevation,
   ) {
     Column {
       PositionAddToolbar(

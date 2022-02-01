@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
@@ -43,7 +44,7 @@ fun PortfolioDigScreen(
 
   Surface(
       modifier = modifier,
-      elevation = 16.dp,
+      elevation = DialogDefaults.DialogElevation,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

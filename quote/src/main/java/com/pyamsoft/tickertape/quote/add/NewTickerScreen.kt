@@ -10,13 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Composable
@@ -46,7 +45,7 @@ fun NewTickerScreen(
               bottomStart = ZeroCornerSize,
               bottomEnd = ZeroCornerSize,
           ),
-      elevation = 16.dp,
+      elevation = DialogDefaults.DialogElevation,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

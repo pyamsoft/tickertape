@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
@@ -49,8 +50,8 @@ fun DeleteTicker(
 
   Surface(
       modifier = modifier,
-      elevation = 16.dp,
-) {
+      elevation = DialogDefaults.DialogElevation,
+  ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {

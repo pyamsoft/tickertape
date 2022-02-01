@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -58,6 +59,7 @@ internal fun MainBottomNav(
         contentColor = Color.White,
         color = MaterialTheme.colors.primary,
         shape = MaterialTheme.shapes.medium,
+        elevation = AppBarDefaults.BottomAppBarElevation,
     ) {
       BottomNavigation(
           backgroundColor = Color.Transparent,

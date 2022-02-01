@@ -43,7 +43,6 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.quote.DeleteTicker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
 internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
@@ -128,7 +127,7 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
     private fun newInstance(
         symbol: StockSymbol,
     ): DialogFragment {
-      return WatchlistDigDialog().apply {
+      return WatchlistRemoveDialog().apply {
         arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
       }
     }

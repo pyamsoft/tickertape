@@ -44,7 +44,6 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.DeleteTicker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
 internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
@@ -139,7 +138,7 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
     private fun newInstance(
         holding: DbHolding,
     ): DialogFragment {
-      return WatchlistDigDialog().apply {
+      return PortfolioRemoveDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, holding.symbol().symbol())

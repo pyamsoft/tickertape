@@ -39,25 +39,37 @@ fun DeleteTicker(
   val text =
       remember(symbol) {
         buildAnnotatedString {
-          append("Really delete ticker: ")
+          append("Really remove ticker: ")
           withStyle(
               style = BOLD_STYLE,
-          ) { symbol.symbol() }
+          ) { append(symbol.symbol()) }
           append("?")
         }
       }
 
   Surface(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier,
   ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {
       Text(
+          text = "Are you sure?",
+          style = MaterialTheme.typography.h6,
+      )
+      Text(
+          modifier = Modifier.padding(top = 16.dp),
           text = text,
           style = MaterialTheme.typography.body1,
       )
+      Text(
+          modifier = Modifier.padding(top = 16.dp),
+          text =
+              "If you remove this ticker, you will lose all data associated with it like alerts and positions.",
+          style = MaterialTheme.typography.body1,
+      )
       Row(
+          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.End,
       ) {

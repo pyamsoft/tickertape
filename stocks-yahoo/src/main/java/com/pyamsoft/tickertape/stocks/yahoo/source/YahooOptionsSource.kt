@@ -49,17 +49,11 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
 
     @JvmStatic
     @CheckResult
-    private inline fun <
-        reified T : StockOptions.Contract> NetworkOptionResponse.Resp.OptionChain.Option.OptionContract.asContract(
+    private fun <
+        T : StockOptions.Contract> NetworkOptionResponse.Resp.OptionChain.Option.OptionContract.asContract(
         symbol: StockSymbol,
+        type: StockOptions.Contract.Type,
     ): T {
-      val type =
-          when (val className = T::class) {
-            is StockOptions.Call -> StockOptions.Contract.Type.CALL
-            is StockOptions.Put -> StockOptions.Contract.Type.PUT
-            else -> throw IllegalArgumentException("Invalid contract type requested: $className")
-          }
-
       return StockOptions.Contract.create(
           type = type,
           symbol = symbol,
@@ -81,8 +75,20 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
     val option = resp.optionChain.result.first()
     val chain = option.options.first()
     val symbol = option.underlyingSymbol.asSymbol()
-    val calls = chain.calls.map { it.asContract<StockOptions.Call>(symbol) }
-    val puts = chain.puts.map { it.asContract<StockOptions.Put>(symbol) }
+    val calls =
+        chain.calls.map {
+          it.asContract<StockOptions.Call>(
+              symbol = symbol,
+              type = StockOptions.Contract.Type.CALL,
+          )
+        }
+    val puts =
+        chain.puts.map {
+          it.asContract<StockOptions.Put>(
+              symbol = symbol,
+              type = StockOptions.Contract.Type.PUT,
+          )
+        }
 
     val localId = ZoneId.systemDefault()
     return StockOptions.create(

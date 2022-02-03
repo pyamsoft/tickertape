@@ -20,16 +20,17 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
-import retrofit2.http.Url
 
 internal interface QuoteService {
 
-  @GET
   @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/quote?$DEFAULT_QUOTE_OPTIONS")
   suspend fun getQuotes(
-      @Url url: String,
-      @Query("format") format: String,
       @Query("fields", encoded = true) fields: String,
       @Query("symbols", encoded = true) symbols: String
   ): NetworkQuoteResponse
+
+  companion object {
+    private const val DEFAULT_QUOTE_OPTIONS = "json"
+  }
 }

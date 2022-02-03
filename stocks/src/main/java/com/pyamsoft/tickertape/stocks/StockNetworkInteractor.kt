@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.yahoo
+package com.pyamsoft.tickertape.stocks
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -27,6 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
+import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
@@ -44,12 +44,12 @@ import kotlinx.coroutines.withContext
 internal class StockNetworkInteractor
 @Inject
 internal constructor(
-    @YahooApi private val quoteSource: QuoteSource,
-    @YahooApi private val chartSource: ChartSource,
-    @YahooApi private val topSource: TopSource,
-    @YahooApi private val optionsSource: OptionsSource,
-    @YahooApi private val searchSource: SearchSource,
-    @YahooApi private val keyStatisticSource: KeyStatisticSource,
+    @StockApi private val quoteSource: QuoteSource,
+    @StockApi private val chartSource: ChartSource,
+    @StockApi private val topSource: TopSource,
+    @StockApi private val optionsSource: OptionsSource,
+    @StockApi private val searchSource: SearchSource,
+    @StockApi private val keyStatisticSource: KeyStatisticSource,
 ) : StockInteractor {
 
   override suspend fun getKeyStatistics(

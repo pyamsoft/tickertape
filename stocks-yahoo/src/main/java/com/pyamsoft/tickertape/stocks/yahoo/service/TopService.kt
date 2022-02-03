@@ -26,20 +26,29 @@ internal interface TopService {
 
   @CheckResult
   @GET(
-      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_gainers")
+      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?$DEFAULT_GAINERS_OPTIONS")
   suspend fun getDayGainers(@Query("count") count: Int): NetworkTopResponse
 
   @CheckResult
   @GET(
-      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_losers")
+      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?$DEFAULT_LOSERS_OPTIONS")
   suspend fun getDayLosers(@Query("count") count: Int): NetworkTopResponse
 
   @CheckResult
   @GET(
-      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=most_shorted_stocks")
+      "https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?$DEFAULT_SHORTED_OPTIONS")
   suspend fun getMostShorted(@Query("count") count: Int): NetworkTopResponse
 
   @CheckResult
   @GET("https://query1.finance.yahoo.com/v1/finance/trending/US")
   suspend fun getTrending(@Query("count") count: Int): NetworkTrendingResponse
+
+  companion object {
+    private const val DEFAULT_GAINERS_OPTIONS =
+        "formatted=false&lang=en-US&region=US&scrIds=day_gainers"
+    private const val DEFAULT_LOSERS_OPTIONS =
+        "formatted=false&lang=en-US&region=US&scrIds=day_losers"
+    private const val DEFAULT_SHORTED_OPTIONS =
+        "formatted=false&lang=en-US&region=US&scrIds=most_shorted_stocks"
+  }
 }

@@ -20,17 +20,19 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkChartResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
-import retrofit2.http.Url
 
 internal interface ChartService {
 
-  @GET
   @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/spark?$DEFAULT_CHART_OPTIONS")
   suspend fun getCharts(
-      @Url url: String,
       @Query("symbols", encoded = true) symbols: String,
-      @Query("includePrePost") includePrePost: Boolean,
       @Query("range") range: String,
       @Query("interval") interval: String,
   ): NetworkChartResponse
+
+  companion object {
+
+    private const val DEFAULT_CHART_OPTIONS = "includePrePost=true"
+  }
 }

@@ -24,10 +24,14 @@ import retrofit2.http.Query
 internal interface SearchService {
 
   @CheckResult
-  @GET(
-      "https://query2.finance.yahoo.com/v1/finance/search?newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true")
+  @GET("https://query2.finance.yahoo.com/v1/finance/search?$DEFAULT_SEARCH_OPTIONS")
   suspend fun performSearch(
       @Query("q") query: String,
       @Query("quotesCount") count: Int
   ): NetworkSearchResponse
+
+  companion object {
+    private const val DEFAULT_SEARCH_OPTIONS =
+        "newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true"
+  }
 }

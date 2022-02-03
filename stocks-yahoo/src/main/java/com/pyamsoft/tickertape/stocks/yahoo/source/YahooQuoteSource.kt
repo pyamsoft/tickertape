@@ -50,10 +50,9 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
 
         val result =
             service.getQuotes(
-                url = YF_QUOTE_SOURCE,
-                format = YF_QUOTE_FORMAT,
                 fields = YF_QUOTE_FIELDS,
-                symbols = symbols.joinToString(",") { it.symbol() })
+                symbols = symbols.joinToString(",") { it.symbol() },
+            )
 
         val localId = ZoneId.systemDefault()
         return@withContext result
@@ -201,7 +200,5 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                 "preMarketChangePercent",
             )
             .joinToString(",")
-    private const val YF_QUOTE_FORMAT = "json"
-    private const val YF_QUOTE_SOURCE = "https://query1.finance.yahoo.com/v7/finance/quote"
   }
 }

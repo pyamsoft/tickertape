@@ -18,8 +18,6 @@ package com.pyamsoft.tickertape.stocks.yahoo
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
-import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
@@ -39,17 +37,9 @@ import com.pyamsoft.tickertape.stocks.yahoo.source.YahooOptionsSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooSearchSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooTopSource
-import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
-import kotlin.reflect.KClass
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-
-private const val STOCK_BASE_URL = "https://finance.yahoo.com"
-private const val STOCK_API_URL = "${STOCK_BASE_URL}/"
 
 @Module
 abstract class YahooFinanceModule {
@@ -57,81 +47,43 @@ abstract class YahooFinanceModule {
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindNetworkInteractor(impl: StockNetworkInteractor): StockInteractor
-
-  @Binds
-  @YahooApi
-  @CheckResult
   internal abstract fun bindYFQuoteSource(impl: YahooQuoteSource): QuoteSource
 
   @Binds
-  @YahooApi
+  @StockApi
   @CheckResult
   internal abstract fun bindYFOptionsSource(impl: YahooOptionsSource): OptionsSource
 
   @Binds
-  @YahooApi
+  @StockApi
   @CheckResult
   internal abstract fun bindYFChartSource(impl: YahooChartSource): ChartSource
 
   @Binds
-  @YahooApi
+  @StockApi
   @CheckResult
   internal abstract fun bindYFTopSource(impl: YahooTopSource): TopSource
 
   @Binds
-  @YahooApi
+  @StockApi
   @CheckResult
   internal abstract fun bindYFKeyStatisticsSource(
       impl: YahooKeyStatisticsSource
   ): KeyStatisticSource
 
   @Binds
-  @YahooApi
+  @StockApi
   @CheckResult
   internal abstract fun bindYFSearchSource(impl: YahooSearchSource): SearchSource
 
   @Module
   companion object {
 
-    @JvmStatic
-    @CheckResult
-    private fun createMoshi(): Moshi {
-      return Moshi.Builder().build()
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun createRetrofit(debug: Boolean, moshi: Moshi): Retrofit {
-      return Retrofit.Builder()
-          .baseUrl(STOCK_API_URL)
-          .callFactory(OkHttpClientLazyCallFactory(debug))
-          .addConverterFactory(MoshiConverterFactory.create(moshi))
-          .build()
-    }
-
     @Provides
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideNetworkCreator(
-        @Named("debug") debug: Boolean,
-    ): NetworkServiceCreator {
-      // Don't inject these to avoid needing Dagger API in build.gradle
-      val retrofit = createRetrofit(debug, createMoshi())
-      return object : NetworkServiceCreator {
-
-        override fun <T : Any> create(target: KClass<T>): T {
-          return retrofit.create(target.java)
-        }
-      }
-    }
-
-    @Provides
-    @YahooApi
-    @JvmStatic
-    @CheckResult
-    internal fun provideQuotes(@YahooApi serviceCreator: NetworkServiceCreator): QuoteService {
+    internal fun provideQuotes(@StockApi serviceCreator: NetworkServiceCreator): QuoteService {
       return serviceCreator.create(QuoteService::class)
     }
 
@@ -139,7 +91,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideCharts(@YahooApi serviceCreator: NetworkServiceCreator): ChartService {
+    internal fun provideCharts(@StockApi serviceCreator: NetworkServiceCreator): ChartService {
       return serviceCreator.create(ChartService::class)
     }
 
@@ -147,7 +99,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideTops(@YahooApi serviceCreator: NetworkServiceCreator): TopService {
+    internal fun provideTops(@StockApi serviceCreator: NetworkServiceCreator): TopService {
       return serviceCreator.create(TopService::class)
     }
 
@@ -155,7 +107,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideSearch(@YahooApi serviceCreator: NetworkServiceCreator): SearchService {
+    internal fun provideSearch(@StockApi serviceCreator: NetworkServiceCreator): SearchService {
       return serviceCreator.create(SearchService::class)
     }
 
@@ -163,7 +115,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideOptions(@YahooApi serviceCreator: NetworkServiceCreator): OptionsService {
+    internal fun provideOptions(@StockApi serviceCreator: NetworkServiceCreator): OptionsService {
       return serviceCreator.create(OptionsService::class)
     }
 
@@ -172,7 +124,7 @@ abstract class YahooFinanceModule {
     @JvmStatic
     @CheckResult
     internal fun provideKeyStatistics(
-        @YahooApi serviceCreator: NetworkServiceCreator
+        @StockApi serviceCreator: NetworkServiceCreator
     ): KeyStatisticsService {
       return serviceCreator.create(KeyStatisticsService::class)
     }

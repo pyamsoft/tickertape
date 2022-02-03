@@ -83,7 +83,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         val response: NetworkKeyStatisticsResponse,
     )
 
-    private enum class YFModules(internal val module: String) {
+    private enum class YFModules(val module: String) {
       FINANCIAL_DATA("financialData"),
       KEY_STATISTICS("defaultKeyStatistics"),
       CALENDAR_EVENTS("calendarEvents"),

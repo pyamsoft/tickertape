@@ -21,21 +21,38 @@ import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryKeyStatisticsCacheImpl
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
-import com.pyamsoft.tickertape.stocks.scope.InternalApi
+import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
+import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
+import com.pyamsoft.tickertape.stocks.scope.StockApi
+import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
+import javax.inject.Named
+import javax.inject.Qualifier
+import kotlin.reflect.KClass
+import okhttp3.Call
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+
+@Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 
 @Module
 abstract class StockModule {
 
   @Binds
   @CheckResult
-  @InternalApi
+  @InternalStockApi
+  internal abstract fun bindNetworkInteractor(impl: StockNetworkInteractor): StockInteractor
+
+  @Binds
+  @CheckResult
+  @InternalStockApi
   internal abstract fun bindStockCache(impl: MemoryStockCacheImpl): StockCache
 
   @Binds
   @CheckResult
-  @InternalApi
+  @InternalStockApi
   internal abstract fun bindKeyStatisticsCache(
       impl: MemoryKeyStatisticsCacheImpl
   ): KeyStatisticsCache
@@ -43,4 +60,63 @@ abstract class StockModule {
   @Binds
   @CheckResult
   internal abstract fun bindRealInteractor(impl: StockInteractorImpl): StockInteractor
+
+  @Module
+  companion object {
+
+    /**
+     * If this is @Provides, you will need to change moshi from implementation to api in Gradle
+     */
+    @JvmStatic
+    @CheckResult
+    private fun createMoshi(): Moshi {
+      return Moshi.Builder().build()
+    }
+
+    /**
+     * If this is @Provides, you will need to change okhttp3 from implementation to api in Gradle
+     */
+    @JvmStatic
+    @CheckResult
+    private fun createCallFactory(debug: Boolean): Call.Factory {
+      return OkHttpClientLazyCallFactory(debug)
+    }
+
+    /**
+     * If this is @Provides, you will need to change retrofit from implementation to api in Gradle
+     */
+    @JvmStatic
+    @CheckResult
+    private fun createRetrofit(
+        moshi: Moshi,
+        callFactory: Call.Factory,
+    ): Retrofit {
+      val moshiConverter = MoshiConverterFactory.create(moshi)
+
+      return Retrofit.Builder()
+          .baseUrl("https://your-service-should-be-replacing-this-url")
+          .callFactory(callFactory)
+          .addConverterFactory(moshiConverter)
+          .build()
+    }
+
+    @Provides
+    @StockApi
+    @JvmStatic
+    @CheckResult
+    internal fun provideNetworkCreator(
+        @Named("debug") debug: Boolean,
+    ): NetworkServiceCreator {
+      val retrofit =
+          createRetrofit(
+              moshi = createMoshi(),
+              callFactory = createCallFactory(debug),
+          )
+      return object : NetworkServiceCreator {
+        override fun <T : Any> create(target: KClass<T>): T {
+          return retrofit.create(target.java)
+        }
+      }
+    }
+  }
 }

@@ -47,9 +47,7 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
         val interval = getIntervalForRange(range)
         val result =
             service.getCharts(
-                url = YF_CHART_SOURCE,
                 symbols = symbols.joinToString(",") { it.symbol() },
-                includePrePost = true,
                 range = range.apiValue,
                 interval = interval.apiValue,
             )
@@ -102,8 +100,6 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
       }
 
   companion object {
-
-    private const val YF_CHART_SOURCE = "https://query1.finance.yahoo.com/v7/finance/spark"
 
     @JvmStatic
     @CheckResult

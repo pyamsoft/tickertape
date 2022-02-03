@@ -20,62 +20,66 @@ apply plugin: "kotlin-kapt"
 
 //noinspection GroovyMissingReturnStatement
 android {
-  compileSdkVersion rootProject.ext.maxSdk
+    compileSdkVersion rootProject.ext.maxSdk
 
-  //noinspection GroovyMissingReturnStatement
-  defaultConfig {
-    minSdkVersion rootProject.ext.minSdk
-    targetSdkVersion rootProject.ext.maxSdk
+    //noinspection GroovyMissingReturnStatement
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.maxSdk
 
-    resConfigs "en"
-  }
+        resConfigs "en"
+    }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
 
-    // Flag to enable support for the new language APIs
-    coreLibraryDesugaringEnabled true
-  }
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+    }
 
-  kotlinOptions {
-    jvmTarget = "11"
-  }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 
-  buildFeatures {
-    buildConfig false
-  }
+    buildFeatures {
+        buildConfig false
+    }
 }
 
 // Kapt flags
 kapt {
-  correctErrorTypes = true
-  useBuildCache = true
-  mapDiagnosticLocations = true
+    correctErrorTypes = true
+    useBuildCache = true
+    mapDiagnosticLocations = true
 
-  javacOptions {
-    option("-Xlint:unchecked")
-    option("-Xlint:deprecation")
-    option("-Xmaxerrs", 10000)
-  }
+    javacOptions {
+        option("-Xlint:unchecked")
+        option("-Xlint:deprecation")
+        option("-Xmaxerrs", 10000)
+    }
 }
 
 dependencies {
-  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
 
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
 
-  // Moshi
-  implementation "com.squareup.moshi:moshi:$moshi"
-  kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+    // Moshi
+    implementation "com.squareup.moshi:moshi:$moshi"
 
-  // Retrofit
-  implementation "com.squareup.retrofit2:retrofit:$retrofit"
-  implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
-  implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
+    implementation("com.squareup.retrofit2:converter-simplexml:$retrofit") {
+        exclude group: 'xpp3', module: 'xpp3'
+        exclude group: 'stax', module: 'stax-api'
+        exclude group: 'stax', module: 'stax'
+    }
 
-  // PYDroid
-  implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"
+    // PYDroid
+    implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"
 
-  api project(':core')
+    api project(':core')
 }

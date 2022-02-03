@@ -71,9 +71,6 @@ dependencies {
 
   // Retrofit
   implementation "com.squareup.retrofit2:retrofit:$retrofit"
-  implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
-  implementation "com.squareup.retrofit2:converter-jaxb:$retrofit"
-  implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
 
   // PYDroid
   implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"

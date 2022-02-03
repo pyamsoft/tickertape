@@ -4,10 +4,22 @@ import androidx.annotation.CheckResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
@@ -24,7 +36,15 @@ import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockDirection
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDateTime
@@ -50,7 +70,7 @@ fun DigChart(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     Crossfade(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().heightIn(min = QuoteDefaults.CHART_HEIGHT_DP),
         targetState = chart,
     ) { c ->
       if (c != null) {

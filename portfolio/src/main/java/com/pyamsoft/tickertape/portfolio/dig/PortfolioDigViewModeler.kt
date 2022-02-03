@@ -157,8 +157,7 @@ internal constructor(
   private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.positions =
-        s.positions.filter { it.holdingId() == position.holdingId() && it.id() == position.id() }
+    s.positions = s.positions.filterNot { it.id() == position.id() }
   }
 
   fun bind(scope: CoroutineScope) {

@@ -26,14 +26,12 @@ import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
 import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
 import com.pyamsoft.tickertape.stocks.scope.StockApi
-import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import okhttp3.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.reflect.KClass
@@ -86,27 +84,6 @@ abstract class StockModule {
      */
     @JvmStatic
     @CheckResult
-    private fun createMoshiConverterFactory(): Converter.Factory {
-      return MoshiConverterFactory.create()
-    }
-
-    /**
-     * If this is @Provides, you will need to change retrofit from implementation to api in Gradle
-     *
-     * This is deprecated but JAXB doesn't work on Android
-     */
-    @JvmStatic
-    @CheckResult
-    private fun createXmlConverterFactory(): Converter.Factory {
-      @Suppress("DEPRECATION")
-      return retrofit2.converter.simplexml.SimpleXmlConverterFactory.create()
-    }
-
-    /**
-     * If this is @Provides, you will need to change retrofit from implementation to api in Gradle
-     */
-    @JvmStatic
-    @CheckResult
     private fun createRetrofit(
         callFactory: Call.Factory,
         converterFactories: List<Converter.Factory>,
@@ -130,14 +107,16 @@ abstract class StockModule {
     @CheckResult
     internal fun provideNetworkCreator(
         @Named("debug") debug: Boolean,
+        @Named("moshi_converter") moshiConverter: Converter.Factory,
+        @Named("xml_converter") xmlConverter: Converter.Factory,
     ): NetworkServiceCreator {
       val retrofit =
           createRetrofit(
               callFactory = createCallFactory(debug),
               converterFactories =
                   listOf(
-                      createMoshiConverterFactory(),
-                      createXmlConverterFactory(),
+                      moshiConverter,
+                      xmlConverter,
                   ),
           )
       return object : NetworkServiceCreator {

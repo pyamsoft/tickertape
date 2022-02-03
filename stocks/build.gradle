@@ -67,13 +67,7 @@ dependencies {
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
-    implementation("com.squareup.retrofit2:converter-simplexml:$retrofit") {
-        exclude group: 'xpp3', module: 'xpp3'
-        exclude group: 'stax', module: 'stax-api'
-        exclude group: 'stax', module: 'stax'
-    }
 
     // PYDroid
     implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"

@@ -65,12 +65,14 @@ dependencies {
 
   kapt "com.google.dagger:dagger-compiler:$dagger"
 
+  // API for Dagger
+  api "com.squareup.retrofit2:retrofit:$retrofit"
+
   // Moshi
-  implementation "com.squareup.moshi:moshi:$moshi"
   kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   // Retrofit
-  implementation "com.squareup.retrofit2:retrofit:$retrofit"
+  implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
 
   // PYDroid
   implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"

@@ -25,6 +25,8 @@ import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import retrofit2.Converter
+import javax.inject.Named
 
 @Module
 abstract class GoogleNewsModule {
@@ -38,9 +40,18 @@ abstract class GoogleNewsModule {
   companion object {
 
     @Provides
-    @GoogleNewsApi
     @JvmStatic
     @CheckResult
+    @Named("xml_converter")
+    internal fun provideXmlConverterFactory(): Converter.Factory {
+      @Suppress("DEPRECATION")
+      return retrofit2.converter.simplexml.SimpleXmlConverterFactory.create()
+    }
+
+    @Provides
+    @JvmStatic
+    @CheckResult
+    @GoogleNewsApi
     internal fun provideNews(@StockApi serviceCreator: NetworkServiceCreator): NewsService {
       return serviceCreator.create(NewsService::class)
     }

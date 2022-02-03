@@ -40,6 +40,9 @@ import com.pyamsoft.tickertape.stocks.yahoo.source.YahooTopSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import retrofit2.Converter
+import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 
 @Module
 abstract class YahooFinanceModule {
@@ -78,6 +81,14 @@ abstract class YahooFinanceModule {
 
   @Module
   companion object {
+
+    @Provides
+    @JvmStatic
+    @CheckResult
+    @Named("moshi_converter")
+    internal fun provideMoshiConverterFactory(): Converter.Factory {
+      return MoshiConverterFactory.create()
+    }
 
     @Provides
     @YahooApi

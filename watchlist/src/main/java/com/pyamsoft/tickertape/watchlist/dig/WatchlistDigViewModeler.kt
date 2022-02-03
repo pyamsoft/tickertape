@@ -18,21 +18,23 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
-import javax.inject.Inject
+import com.pyamsoft.tickertape.stocks.StockInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class WatchlistDigViewModeler
 @Inject
 internal constructor(
     private val state: MutableWatchlistDigViewState,
     private val interactor: WatchlistDigInteractor,
+    private val stockInteractor: StockInteractor,
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
         state,
@@ -85,6 +87,19 @@ internal constructor(
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
+      scope.launch(context = Dispatchers.Main) {
+          val s = state.ticker.symbol
+          try {
+              stockInteractor.getNews(false, s).also { news ->
+                  Timber.d("News for $s: $news")
+              }
+          } catch (e: Throwable) {
+              e.ifNotCancellation {
+                  Timber.e(e, "Error for news")
+              }
+          }
+      }
+
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
       try {
@@ -115,15 +130,4 @@ internal constructor(
     }
   }
 
-  companion object {
-    private val TICKER_OPTIONS_NO_BIG_MOVERS =
-        TickerInteractor.Options(
-            notifyBigMovers = false,
-        )
-
-    private val TICKER_OPTIONS_BIG_MOVERS =
-        TickerInteractor.Options(
-            notifyBigMovers = true,
-        )
-  }
 }

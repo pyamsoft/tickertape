@@ -16,39 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.googlenews.network
 
-import com.squareup.moshi.JsonClass
+internal class NetworkNewsResponse {
 
-@JsonClass(generateAdapter = true)
-internal data class NetworkNewsResponse internal constructor(val spark: Resp) {
-
-  @JsonClass(generateAdapter = true)
-  internal data class Resp internal constructor(val result: List<SymbolChart>) {
-
-    @JsonClass(generateAdapter = true)
-    internal data class SymbolChart
-    internal constructor(val symbol: String, val response: List<Chart>) {
-
-      @JsonClass(generateAdapter = true)
-      internal data class Chart
-      internal constructor(
-          val meta: Meta?,
-          val timestamp: List<Long>?,
-          val indicators: Indicator?
-      ) {
-
-        @JsonClass(generateAdapter = true)
-        internal data class Meta(
-            val regularMarketTime: Long?,
-            val regularMarketPrice: Double?,
-            val chartPreviousClose: Double?
-        )
-
-        @JsonClass(generateAdapter = true)
-        internal data class Indicator(val quote: List<Quote>?) {
-
-          @JsonClass(generateAdapter = true) internal data class Quote(val close: List<Double?>?)
-        }
-      }
-    }
-  }
 }

@@ -26,16 +26,17 @@ import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
 import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
 import com.pyamsoft.tickertape.stocks.scope.StockApi
+import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
-import javax.inject.Qualifier
-import kotlin.reflect.KClass
 import okhttp3.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
+import javax.inject.Qualifier
+import kotlin.reflect.KClass
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 

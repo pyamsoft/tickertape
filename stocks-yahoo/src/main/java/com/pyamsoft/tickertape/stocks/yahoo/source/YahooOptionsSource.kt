@@ -32,7 +32,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -101,17 +104,26 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
     )
   }
 
+  @CheckResult
+  private suspend fun fetchOption(symbol: StockSymbol): StockOptions {
+    val resp = service.getOptions(symbol.symbol())
+    return parseOptionsResponse(resp)
+  }
+
   override suspend fun getOptions(
       force: Boolean,
-      symbol: StockSymbol,
-      date: LocalDate?
-  ): StockOptions =
+      symbols: List<StockSymbol>,
+  ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        val resp =
-            if (date == null) service.getOptions(symbol.symbol())
-            else service.getOptions(symbol.symbol(), date.toEpochDay())
-        return@withContext parseOptionsResponse(resp)
+
+        val jobs =
+            mutableListOf<Deferred<StockOptions>>().apply {
+              for (symbol in symbols) {
+                add(async { fetchOption(symbol) })
+              }
+            }
+        return@withContext jobs.awaitAll()
       }
 
   override suspend fun resolveOptionLookupIdentifier(

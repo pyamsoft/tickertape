@@ -17,24 +17,14 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockOptions
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
 
-interface OptionsSource {
+interface NewsSource {
 
   @CheckResult
-  suspend fun getOptions(
+  suspend fun getNews(
       force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions>
-
-  @CheckResult
-  suspend fun resolveOptionLookupIdentifier(
       symbol: StockSymbol,
-      expirationDate: LocalDate,
-      strikePrice: StockMoneyValue,
-      contractType: StockOptions.Contract.Type,
-  ): String
+  ): List<StockNews>
 }

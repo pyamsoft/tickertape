@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
+import com.pyamsoft.tickertape.stocks.data.StockNewsImpl
 
-interface OptionsSource {
+interface StockNews {
 
-  @CheckResult
-  suspend fun getOptions(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions>
+  @CheckResult fun symbol(): StockSymbol
 
-  @CheckResult
-  suspend fun resolveOptionLookupIdentifier(
-      symbol: StockSymbol,
-      expirationDate: LocalDate,
-      strikePrice: StockMoneyValue,
-      contractType: StockOptions.Contract.Type,
-  ): String
+  companion object {
+    @JvmStatic
+    @CheckResult
+    fun create(
+        symbol: StockSymbol,
+    ): StockNews {
+      return StockNewsImpl(
+          symbol = symbol,
+      )
+    }
+  }
 }

@@ -36,7 +36,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -174,16 +173,17 @@ internal constructor(
         }
       }
 
-  @CheckResult
-  private suspend fun performLookupOptionsData(
+  override suspend fun lookupOptionsData(
       force: Boolean,
       symbol: StockSymbol,
-      date: LocalDate?,
   ): ResultWrapper<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+
         return@withContext try {
-          val result = stockInteractor.getOptions(force, symbol, date)
+          val options = stockInteractor.getOptions(force, listOf(symbol))
+          // Right now we only support 1 lookup at a time in the UI
+          val result = options.first()
           ResultWrapper.success(result)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -192,16 +192,6 @@ internal constructor(
           }
         }
       }
-
-  override suspend fun lookupOptionsData(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<StockOptions> =
-      performLookupOptionsData(
-          force = force,
-          symbol = symbol,
-          date = null,
-      )
 
   override suspend fun resolveOptionsIdentifier(
       symbol: StockSymbol,

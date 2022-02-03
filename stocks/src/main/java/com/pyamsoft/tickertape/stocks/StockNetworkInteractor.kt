@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -29,6 +30,7 @@ import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
+import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
@@ -50,6 +52,7 @@ internal constructor(
     @StockApi private val optionsSource: OptionsSource,
     @StockApi private val searchSource: SearchSource,
     @StockApi private val keyStatisticSource: KeyStatisticSource,
+    @StockApi private val newsSource: NewsSource,
 ) : StockInteractor {
 
   override suspend fun getKeyStatistics(
@@ -78,12 +81,11 @@ internal constructor(
 
   override suspend fun getOptions(
       force: Boolean,
-      symbol: StockSymbol,
-      date: LocalDate?
-  ): StockOptions =
+      symbols: List<StockSymbol>,
+  ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext optionsSource.getOptions(force, symbol, date)
+        return@withContext optionsSource.getOptions(force, symbols)
       }
 
   override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
@@ -143,5 +145,11 @@ internal constructor(
             strikePrice = strikePrice,
             contractType = contractType,
         )
+      }
+
+  override suspend fun getNews(force: Boolean, symbol: StockSymbol): List<StockNews> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext newsSource.getNews(force, symbol)
       }
 }

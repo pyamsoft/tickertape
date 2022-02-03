@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks
 
-import com.pyamsoft.cachify.Cached2
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
@@ -24,12 +23,14 @@ import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
+import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
@@ -37,8 +38,6 @@ import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -46,14 +45,10 @@ internal class StockInteractorImpl
 @Inject
 internal constructor(
     @InternalStockApi private val stockCache: StockCache,
+    @InternalStockApi private val optionsCache: OptionsCache,
     @InternalStockApi private val statisticsCache: KeyStatisticsCache,
     @InternalStockApi private val interactor: StockInteractor,
 ) : StockInteractor {
-
-  private val optionsMutex = Mutex()
-
-  private val optionsCache =
-      mutableMapOf<OptionsKey, Cached2<StockOptions, StockSymbol, LocalDate?>>()
 
   private val trendingCache =
       cachify<StockTrends, Int>(
@@ -80,6 +75,11 @@ internal constructor(
           storage = { listOf(createNewMemoryCacheStorage()) },
       ) { interactor.search(true, it) }
 
+  private val newsCache =
+      multiCachify<StockSymbol, List<StockNews>, StockSymbol>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getNews(true, it) }
+
   override suspend fun getKeyStatistics(
       force: Boolean,
       symbols: List<StockSymbol>
@@ -91,8 +91,8 @@ internal constructor(
           symbols.forEach { statisticsCache.removeStatistics(it) }
         }
 
-        return@withContext statisticsCache.getStatistics(symbols) { s ->
-          interactor.getKeyStatistics(force, s)
+        return@withContext statisticsCache.getStatistics(symbols) {
+          interactor.getKeyStatistics(true, it)
         }
       }
 
@@ -157,33 +157,16 @@ internal constructor(
 
   override suspend fun getOptions(
       force: Boolean,
-      symbol: StockSymbol,
-      date: LocalDate?
-  ): StockOptions =
+      symbols: List<StockSymbol>,
+  ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        return@withContext optionsMutex.withLock {
-          val key = OptionsKey(symbol, date)
-          if (force) {
-            // Remove the cache from the options map and clear it if it exists
-            optionsCache.remove(key)?.clear()
-          }
-
-          val cached = optionsCache[key]
-          val cache: Cached2<StockOptions, StockSymbol, LocalDate?>
-          if (cached == null) {
-            cache =
-                cachify<StockOptions, StockSymbol, LocalDate?>(
-                    storage = { listOf(createNewMemoryCacheStorage()) },
-                ) { s, d -> interactor.getOptions(true, s, d) }
-                    .also { c -> optionsCache[key] = c }
-          } else {
-            cache = cached
-          }
-
-          return@withLock cache.call(symbol, date)
+        if (force) {
+          symbols.forEach { optionsCache.removeOption(it) }
         }
+
+        return@withContext optionsCache.getOptions(symbols) { interactor.getOptions(true, it) }
       }
 
   override suspend fun resolveOptionLookupIdentifier(
@@ -211,7 +194,7 @@ internal constructor(
           symbols.forEach { stockCache.removeQuote(it) }
         }
 
-        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(force, it) }
+        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(true, it) }
       }
 
   override suspend fun getCharts(
@@ -227,9 +210,19 @@ internal constructor(
         }
 
         return@withContext stockCache.getCharts(symbols, range) { s, r ->
-          interactor.getCharts(force, s, r)
+          interactor.getCharts(true, s, r)
         }
       }
 
-  private data class OptionsKey(val symbol: StockSymbol, val date: LocalDate?)
+  override suspend fun getNews(force: Boolean, symbol: StockSymbol): List<StockNews> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          // Remove the cache from the news map and clear it if it exists
+          newsCache.key(symbol).clear()
+        }
+
+        return@withContext newsCache.key(symbol).call(symbol)
+      }
 }

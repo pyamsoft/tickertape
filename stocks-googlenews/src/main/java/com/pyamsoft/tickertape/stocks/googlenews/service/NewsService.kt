@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.googlenews.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
+import com.pyamsoft.tickertape.stocks.googlenews.network.NetworkNewsResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-interface OptionsSource {
-
-  @CheckResult
-  suspend fun getOptions(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions>
+internal interface NewsService {
 
   @CheckResult
-  suspend fun resolveOptionLookupIdentifier(
-      symbol: StockSymbol,
-      expirationDate: LocalDate,
-      strikePrice: StockMoneyValue,
-      contractType: StockOptions.Contract.Type,
-  ): String
+  @GET("https://news.google.com/rss/search?$DEFAULT_NEWS_OPTIONS")
+  suspend fun getNews(
+      @Query("q") query: String,
+  ): NetworkNewsResponse
+
+  companion object {
+
+    private const val DEFAULT_NEWS_OPTIONS = "hl=en-US&gl=US&ceid=US:en"
+  }
 }

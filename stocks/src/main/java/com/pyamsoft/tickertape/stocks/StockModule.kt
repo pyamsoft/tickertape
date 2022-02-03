@@ -18,8 +18,10 @@ package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
+import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryKeyStatisticsCacheImpl
+import com.pyamsoft.tickertape.stocks.cache.impl.MemoryOptionsCacheImpl
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
 import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
@@ -34,7 +36,6 @@ import okhttp3.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 
@@ -57,6 +58,11 @@ abstract class StockModule {
   internal abstract fun bindKeyStatisticsCache(
       impl: MemoryKeyStatisticsCacheImpl
   ): KeyStatisticsCache
+
+  @Binds
+  @CheckResult
+  @InternalStockApi
+  internal abstract fun bindOptionsCache(impl: MemoryOptionsCacheImpl): OptionsCache
 
   @Binds
   @CheckResult
@@ -91,7 +97,8 @@ abstract class StockModule {
     @JvmStatic
     @CheckResult
     private fun createXmlConverterFactory(): Converter.Factory {
-      @Suppress("DEPRECATION") return SimpleXmlConverterFactory.create()
+      @Suppress("DEPRECATION")
+      return retrofit2.converter.simplexml.SimpleXmlConverterFactory.create()
     }
 
     /**

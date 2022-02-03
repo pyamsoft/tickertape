@@ -133,6 +133,7 @@ dependencies {
   implementation project(':quote')
   implementation project(':stocks')
   implementation project(':stocks-yahoo')
+  implementation project(':stocks-googlenews')
   implementation project(':tape')
   implementation project(':ui')
   implementation project(':watchlist')

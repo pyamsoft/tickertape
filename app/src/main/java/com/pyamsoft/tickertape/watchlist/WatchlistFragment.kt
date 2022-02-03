@@ -110,7 +110,7 @@ class WatchlistFragment : Fragment() {
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
-            TickerTapeTheme(themeProvider) {
+            act.TickerTapeTheme(themeProvider) {
               CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
                 WatchlistScreen(
                     modifier = Modifier.fillMaxSize(),

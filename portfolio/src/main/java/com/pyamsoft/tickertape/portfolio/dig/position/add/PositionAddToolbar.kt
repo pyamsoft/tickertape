@@ -32,10 +32,11 @@ internal fun PositionAddToolbar(
       elevation = AppBarDefaults.TopAppBarElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
-      shape = MaterialTheme.shapes.medium.copy(
-          bottomEnd = ZeroCornerSize,
-          bottomStart = ZeroCornerSize,
-      ),
+      shape =
+          MaterialTheme.shapes.medium.copy(
+              bottomEnd = ZeroCornerSize,
+              bottomStart = ZeroCornerSize,
+          ),
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

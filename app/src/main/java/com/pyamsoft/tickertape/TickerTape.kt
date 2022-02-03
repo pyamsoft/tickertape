@@ -63,8 +63,8 @@ class TickerTape : Application() {
             version = BuildConfig.VERSION_CODE,
             imageLoader = lazyImageLoader,
             logger = createLogger(),
-            theme = { themeProvider, content ->
-              TickerTapeTheme(
+            theme = { activity, themeProvider, content ->
+              activity.TickerTapeTheme(
                   themeProvider = themeProvider,
                   content = content,
               )

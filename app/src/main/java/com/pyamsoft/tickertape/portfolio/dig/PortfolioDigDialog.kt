@@ -154,7 +154,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
       setContent {
         vm.Render { state ->
-          TickerTapeTheme(themeProvider) {
+          act.TickerTapeTheme(themeProvider) {
             PortfolioDigScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,

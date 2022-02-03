@@ -94,7 +94,10 @@ private fun SearchInput(
     onSearchChanged: (String) -> Unit,
 ) {
   OutlinedTextField(
-      modifier = modifier.padding(horizontal = MaterialTheme.keylines.baseline).padding(bottom = MaterialTheme.keylines.baseline),
+      modifier =
+          modifier
+              .padding(horizontal = MaterialTheme.keylines.baseline)
+              .padding(bottom = MaterialTheme.keylines.baseline),
       value = search,
       onValueChange = onSearchChanged,
       singleLine = true,

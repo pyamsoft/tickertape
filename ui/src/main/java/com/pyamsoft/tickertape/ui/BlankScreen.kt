@@ -145,7 +145,9 @@ fun BlankScreen(
         contentDescription = null,
     )
     Icons8RequiredAttribution(
-        modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content).padding(bottom = MaterialTheme.keylines.content),
+        modifier =
+            Modifier.padding(horizontal = MaterialTheme.keylines.content)
+                .padding(bottom = MaterialTheme.keylines.content),
         illustrationBy = illustrationBy,
         illustrationLink = illustrationLink,
         from = from,

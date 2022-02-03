@@ -128,7 +128,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         vm.Render { state ->
           val equityType = state.equityType
 
-          TickerTapeTheme(themeProvider) {
+          act.TickerTapeTheme(themeProvider) {
             BackHandler(
                 onBack = { handleCloseClicked(equityType) },
             )

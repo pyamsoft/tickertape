@@ -89,7 +89,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
 
       setContent {
         vm.Render { state ->
-          TickerTapeTheme(themeProvider) {
+          act.TickerTapeTheme(themeProvider) {
             WatchlistDigScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,

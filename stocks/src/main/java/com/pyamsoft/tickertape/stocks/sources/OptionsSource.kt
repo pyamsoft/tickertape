@@ -21,16 +21,11 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 interface OptionsSource {
 
   @CheckResult
-  suspend fun getOptions(
-      force: Boolean,
-      symbol: StockSymbol,
-      date: LocalDate?
-  ): StockOptions
+  suspend fun getOptions(force: Boolean, symbol: StockSymbol, date: LocalDate?): StockOptions
 
   @CheckResult
   suspend fun resolveOptionLookupIdentifier(

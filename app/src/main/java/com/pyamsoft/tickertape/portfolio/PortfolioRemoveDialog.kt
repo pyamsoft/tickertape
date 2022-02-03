@@ -93,7 +93,7 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
       id = R.id.dialog_watchlist_dig
 
       setContent {
-        TickerTapeTheme(themeProvider) {
+        act.TickerTapeTheme(themeProvider) {
           DeleteTicker(
               modifier = Modifier.fillMaxWidth(),
               symbol = symbol,

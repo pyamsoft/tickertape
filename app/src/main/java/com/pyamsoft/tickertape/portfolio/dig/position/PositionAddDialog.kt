@@ -125,7 +125,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         vm.Render { state ->
           val positionId = state.positionId
 
-          TickerTapeTheme(themeProvider) {
+          act.TickerTapeTheme(themeProvider) {
             PositionAddScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,

@@ -28,8 +28,8 @@ private val MARKET_TIME_ZONE = ZoneId.of("US/Eastern")
 /**
  * Options expiration dates are delivered in UTC time
  *
- * We map them over to a LDT and we do not care about the time, only the date.
- * This is still an LDT instead of an LD object for compatibility
+ * We map them over to a LDT and we do not care about the time, only the date. This is still an LDT
+ * instead of an LD object for compatibility
  */
 @CheckResult
 internal fun parseUTCTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {

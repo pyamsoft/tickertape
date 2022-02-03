@@ -111,7 +111,7 @@ class PortfolioFragment : Fragment() {
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
-            TickerTapeTheme(themeProvider) {
+            act.TickerTapeTheme(themeProvider) {
               CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
                 PortfolioScreen(
                     modifier = Modifier.fillMaxSize(),

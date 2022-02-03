@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
-            TickerTapeTheme(themeProvider) {
+            act.TickerTapeTheme(themeProvider) {
               CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),

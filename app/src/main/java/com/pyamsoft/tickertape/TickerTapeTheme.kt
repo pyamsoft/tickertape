@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape
 
+import android.app.Activity
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,20 +28,34 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.google.android.material.R as R2
 import com.pyamsoft.pydroid.theme.PYDroidTheme
-import com.pyamsoft.pydroid.ui.R as R2
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.pydroid.util.valuesFromCurrentTheme
 
 @Composable
 @CheckResult
-private fun themeColors(isDarkMode: Boolean): Colors {
-  val primary = colorResource(R.color.primary)
-  val onPrimary = colorResource(R2.color.white)
-  val secondary = colorResource(R.color.secondary)
-  val onSecondary = colorResource(R2.color.white)
+private fun themeColors(
+    activity: Activity,
+    isDarkMode: Boolean,
+): Colors {
+  val colors =
+      remember(isDarkMode) {
+        activity.valuesFromCurrentTheme(
+            R2.attr.colorPrimary,
+            R2.attr.colorOnPrimary,
+            R2.attr.colorSecondary,
+            R2.attr.colorOnSecondary,
+        )
+      }
+  val primary = colorResource(colors[0])
+  val onPrimary = colorResource(colors[1])
+  val secondary = colorResource(colors[2])
+  val onSecondary = colorResource(colors[3])
   return if (isDarkMode)
       darkColors(
           primary = primary,
@@ -73,18 +88,18 @@ private fun themeShapes(): Shapes {
 }
 
 @Composable
-fun TickerTapeTheme(
+fun Activity.TickerTapeTheme(
     themeProvider: ThemeProvider,
     content: @Composable () -> Unit,
 ) {
-  TickerTapeTheme(
+  this.TickerTapeTheme(
       theme = if (themeProvider.isDarkTheme()) Theming.Mode.DARK else Theming.Mode.LIGHT,
       content = content,
   )
 }
 
 @Composable
-fun TickerTapeTheme(
+fun Activity.TickerTapeTheme(
     theme: Theming.Mode,
     content: @Composable () -> Unit,
 ) {
@@ -96,7 +111,7 @@ fun TickerTapeTheme(
       }
 
   PYDroidTheme(
-      colors = themeColors(isDarkMode),
+      colors = themeColors(this, isDarkMode),
       shapes = themeShapes(),
   ) {
     // We update the LocalContentColor to match our onBackground. This allows the default

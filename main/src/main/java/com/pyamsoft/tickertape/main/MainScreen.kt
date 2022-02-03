@@ -43,7 +43,9 @@ fun MainScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     MainBottomNav(
-        modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content).padding(bottom = MaterialTheme.keylines.content),
+        modifier =
+            Modifier.padding(horizontal = MaterialTheme.keylines.content)
+                .padding(bottom = MaterialTheme.keylines.content),
         page = page,
         onLoadHome = onLoadHome,
         onLoadWatchList = onLoadWatchList,

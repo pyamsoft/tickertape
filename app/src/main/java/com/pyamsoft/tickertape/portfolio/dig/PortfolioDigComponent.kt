@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import dagger.BindsInstance
 import dagger.Subcomponent
 
@@ -36,6 +37,7 @@ internal interface PortfolioDigComponent {
         @BindsInstance symbol: StockSymbol,
         @BindsInstance holdingId: DbHolding.Id,
         @BindsInstance holdingType: EquityType,
+        @BindsInstance tradeSide: TradeSide,
     ): PortfolioDigComponent
   }
 }

@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import timber.log.Timber
 
@@ -75,6 +76,7 @@ private fun PositionsList(
     onRefresh: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
 ) {
+  val tradeSide = state.tradeSide
   val equityType = state.equityType
   val isLoading = state.isLoading
   val positions = state.positions
@@ -101,6 +103,7 @@ private fun PositionsList(
             position = item,
             currentPrice = currentPrice,
             equityType = equityType,
+            tradeSide = tradeSide,
         )
       }
 
@@ -154,6 +157,7 @@ private fun PreviewPositionScreen() {
           MutablePortfolioDigViewState(
               symbol = "MSFT".asSymbol(),
               equityType = EquityType.STOCK,
+              tradeSide = TradeSide.BUY,
           ),
       currentPrice = null,
       onAddPosition = {},

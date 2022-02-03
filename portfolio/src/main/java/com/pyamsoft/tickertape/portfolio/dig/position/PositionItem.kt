@@ -24,9 +24,11 @@ import com.pyamsoft.tickertape.portfolio.test.newTestPosition
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.stocks.api.asShares
 
 private data class DisplayValues(
     val cost: String,
@@ -39,10 +41,10 @@ private data class DisplayValues(
 @CheckResult
 private fun calculateDisplayValues(
     position: DbPosition,
-    equityType: EquityType,
+    isOption: Boolean,
+    isSell: Boolean,
     currentPrice: StockMoneyValue?
 ): DisplayValues {
-  val isOptions = equityType == EquityType.OPTION
   val price = position.price()
   val shareCount = position.shareCount()
   val totalCost = (price.value() * shareCount.value()).asMoney()
@@ -65,10 +67,16 @@ private fun calculateDisplayValues(
 
     // Gain/Loss
     val gainLossValue = currentValue.value() - totalCost.value()
-    val gainLossDirection = gainLossValue.asDirection()
     val gainLossPercent = ((gainLossValue * 100) / totalCost.value()).asPercent().asPercentValue()
-    val amount = (if (isOptions) (gainLossValue * 100) else gainLossValue).asMoney().asMoneyValue()
+
+    val optionsScaledValue = if (isOption) (gainLossValue * 100) else gainLossValue
+    val sideScaledValue = if (isSell) optionsScaledValue * -1 else optionsScaledValue
+    val amount = sideScaledValue.asMoney().asMoneyValue()
+
+    val gainLossDirection = sideScaledValue.asDirection()
     val sign = gainLossDirection.sign()
+
+    // Final display
     displayGainLoss = "${sign}${amount} (${sign}${gainLossPercent})"
 
     // Title
@@ -96,10 +104,13 @@ private fun calculateDisplayValues(
 internal fun PositionItem(
     modifier: Modifier = Modifier,
     equityType: EquityType,
+    tradeSide: TradeSide,
     position: DbPosition,
     currentPrice: StockMoneyValue?,
 ) {
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
+  val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
+
   val purchaseDate = position.purchaseDate()
   val price = position.price()
   val shareCount = position.shareCount()
@@ -111,10 +122,17 @@ internal fun PositionItem(
         val p = if (isOption) (price.value() * 100).asMoney() else price
         return@remember p.asMoneyValue()
       }
-  val displayShares = remember(shareCount) { shareCount.asShareValue() }
+  val displayShares =
+      remember(
+          shareCount,
+          isSell,
+      ) {
+        val s = if (isSell) (shareCount.value() * -1).asShares() else shareCount
+        return@remember s.asShareValue()
+      }
   val displayValues =
-      remember(position, currentPrice, equityType) {
-        calculateDisplayValues(position, equityType, currentPrice)
+      remember(position, currentPrice, isOption, isSell) {
+        calculateDisplayValues(position, isOption, isSell, currentPrice)
       }
 
   Card(
@@ -149,7 +167,7 @@ internal fun PositionItem(
       ) {
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Cost",
+            name = if (isOption && isSell) "Premium" else "Cost",
             value = displayValues.cost,
         )
 
@@ -213,6 +231,7 @@ private fun PreviewPositionItem() {
     PositionItem(
         position = newTestPosition(),
         equityType = EquityType.STOCK,
+        tradeSide = TradeSide.BUY,
         currentPrice = null,
     )
   }

@@ -48,6 +48,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
@@ -119,6 +120,14 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   }
 
   @CheckResult
+  private fun getHoldingSide(): TradeSide {
+    return requireArguments()
+        .getString(KEY_HOLDING_SIDE)
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_SIDE" } }
+        .let { TradeSide.valueOf(it) }
+  }
+
+  @CheckResult
   private fun getCurrentPrice(): StockMoneyValue? {
     return requireArguments().getDouble(KEY_CURRENT_PRICE, -1.0).let { v ->
       if (v.compareTo(0) >= 0) {
@@ -141,6 +150,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
             getSymbol(),
             getHoldingId(),
             getHoldingType(),
+            getHoldingSide(),
         )
         .inject(this)
 
@@ -214,6 +224,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
+    private const val KEY_HOLDING_SIDE = "key_holding_side"
     private const val KEY_CURRENT_PRICE = "key_current_price"
     private const val TAG = "PortfolioDigDialog"
 
@@ -229,6 +240,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
               putString(KEY_SYMBOL, holding.symbol().symbol())
               putString(KEY_HOLDING_ID, holding.id().id)
               putString(KEY_HOLDING_TYPE, holding.type().name)
+              putString(KEY_HOLDING_SIDE, holding.side().name)
               currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
             }
       }

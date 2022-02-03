@@ -32,6 +32,7 @@ import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.reflect.KClass
 import okhttp3.Call
+import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -64,9 +65,7 @@ abstract class StockModule {
   @Module
   companion object {
 
-    /**
-     * If this is @Provides, you will need to change moshi from implementation to api in Gradle
-     */
+    /** If this is @Provides, you will need to change moshi from implementation to api in Gradle */
     @JvmStatic
     @CheckResult
     private fun createMoshi(): Moshi {
@@ -87,16 +86,29 @@ abstract class StockModule {
      */
     @JvmStatic
     @CheckResult
-    private fun createRetrofit(
-        moshi: Moshi,
-        callFactory: Call.Factory,
-    ): Retrofit {
-      val moshiConverter = MoshiConverterFactory.create(moshi)
+    private fun createMoshiConverterFactory(moshi: Moshi): Converter.Factory {
+      return MoshiConverterFactory.create(moshi)
+    }
 
+    /**
+     * If this is @Provides, you will need to change retrofit from implementation to api in Gradle
+     */
+    @JvmStatic
+    @CheckResult
+    private fun createRetrofit(
+        callFactory: Call.Factory,
+        converterFactories: List<Converter.Factory>,
+    ): Retrofit {
       return Retrofit.Builder()
           .baseUrl("https://your-service-should-be-replacing-this-url")
           .callFactory(callFactory)
-          .addConverterFactory(moshiConverter)
+          .run {
+            var self = this
+            for (factory in converterFactories) {
+              self = self.addConverterFactory(factory)
+            }
+            return@run self
+          }
           .build()
     }
 
@@ -109,8 +121,13 @@ abstract class StockModule {
     ): NetworkServiceCreator {
       val retrofit =
           createRetrofit(
-              moshi = createMoshi(),
               callFactory = createCallFactory(debug),
+              converterFactories =
+                  listOf(
+                      createMoshiConverterFactory(
+                          moshi = createMoshi(),
+                      ),
+                  ),
           )
       return object : NetworkServiceCreator {
         override fun <T : Any> create(target: KClass<T>): T {

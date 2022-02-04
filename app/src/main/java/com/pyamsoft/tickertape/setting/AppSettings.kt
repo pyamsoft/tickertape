@@ -27,10 +27,10 @@ import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.theme.ZeroSize
+import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.pydroid.ui.preference.Preferences
 import com.pyamsoft.pydroid.ui.settings.SettingsFragment
 import com.pyamsoft.tickertape.main.MainComponent
-import com.pyamsoft.tickertape.main.MainViewModeler
 import javax.inject.Inject
 
 internal class AppSettings : SettingsFragment() {
@@ -39,35 +39,34 @@ internal class AppSettings : SettingsFragment() {
 
   override val hideUpgradeInformation: Boolean = true
 
-  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
+  @Inject @JvmField internal var viewModel: SettingsViewModeler? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Injector.obtainFromActivity<MainComponent>(requireActivity())
+        .plusAppSettings()
+        .create()
+        .inject(this)
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    Injector.obtainFromActivity<MainComponent>(requireActivity())
-        .plusSettings()
-        .create()
-        .inject(this)
-
-    mainViewModel.requireNotNull().restoreState(savedInstanceState)
+    viewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    mainViewModel?.saveState(outState)
+    viewModel?.saveState(outState)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-    mainViewModel = null
+    viewModel = null
   }
 
   @Composable
-  override fun customBottomItemMargin(): Dp {
-    val state = mainViewModel.requireNotNull().state()
-
-    val density = LocalDensity.current
-    val height = state.bottomNavHeight
-    return remember(density, height) { density.run { height.toDp() } }
+  override fun customElevation(): Dp {
+    return DialogDefaults.DialogElevation
   }
 
   @Composable
@@ -82,6 +81,15 @@ internal class AppSettings : SettingsFragment() {
 
   @Composable
   override fun customTopItemMargin(): Dp {
+    val state = viewModel.requireNotNull().state()
+
+    val density = LocalDensity.current
+    val height = state.topBarOffset
+    return remember(density, height) { density.run { height.toDp() } }
+  }
+
+  @Composable
+  override fun customBottomItemMargin(): Dp {
     return ZeroSize
   }
 

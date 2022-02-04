@@ -18,20 +18,29 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.statusBarsHeight
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
@@ -43,10 +52,12 @@ import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeViewState,
+    appName: String,
     imageLoader: ImageLoader,
     navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
     onChartClicked: (Ticker) -> Unit,
+    onSettingsClicked: () -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -60,9 +71,11 @@ fun HomeScreen(
       HomeContent(
           modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState()),
           state = state,
+          appName = appName,
           imageLoader = imageLoader,
           navBarBottomHeight = navBarBottomHeight,
           onChartClicked = onChartClicked,
+          onSettingsClicked = onSettingsClicked,
       )
     }
   }
@@ -73,8 +86,10 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
     state: HomeViewState,
     navBarBottomHeight: Int,
+    appName: String,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onSettingsClicked: () -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =
@@ -84,8 +99,10 @@ private fun HomeContent(
       modifier = modifier,
       verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
-    Spacer(
-        modifier = Modifier.statusBarsHeight(),
+    HomeHeader(
+        modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+        appName = appName,
+        onSettingsClicked = onSettingsClicked,
     )
     HomePortfolio(
         state = state,
@@ -129,13 +146,41 @@ private fun HomeContent(
   }
 }
 
+@Composable
+private fun HomeHeader(
+    modifier: Modifier = Modifier,
+    appName: String,
+    onSettingsClicked: () -> Unit,
+) {
+  Row(
+      modifier = modifier.padding(MaterialTheme.keylines.content),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+        modifier = Modifier.weight(1F),
+        text = appName,
+        style = MaterialTheme.typography.h4,
+    )
+    IconButton(
+        onClick = onSettingsClicked,
+    ) {
+      Icon(
+          imageVector = Icons.Filled.Settings,
+          contentDescription = "Settings",
+      )
+    }
+  }
+}
+
 @Preview
 @Composable
 private fun PreviewHomeScreen() {
   HomeScreen(
       state = MutableHomeViewState(),
       imageLoader = createNewTestImageLoader(),
+      appName = "TEST",
       onChartClicked = {},
       onRefresh = {},
+      onSettingsClicked = {},
   )
 }

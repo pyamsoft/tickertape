@@ -24,7 +24,6 @@ sealed class MainPage(val name: String) {
   object Home : MainPage("Home")
   object WatchList : MainPage("Watch List")
   object Portfolio : MainPage("Portfolio")
-  object Settings : MainPage("Settings")
 
   @CheckResult
   fun asScreen(): Navigator.Screen<MainPage> {

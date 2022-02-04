@@ -32,11 +32,8 @@ import com.pyamsoft.pydroid.theme.keylines
 fun MainScreen(
     modifier: Modifier = Modifier,
     page: MainPage,
+    onLoadPage: (MainPage) -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
-    onLoadHome: () -> Unit,
-    onLoadWatchList: () -> Unit,
-    onLoadPortfolio: () -> Unit,
-    onLoadSettings: () -> Unit,
 ) {
   Column(
       modifier = modifier,
@@ -47,10 +44,7 @@ fun MainScreen(
             Modifier.padding(horizontal = MaterialTheme.keylines.content)
                 .padding(bottom = MaterialTheme.keylines.content),
         page = page,
-        onLoadHome = onLoadHome,
-        onLoadWatchList = onLoadWatchList,
-        onLoadPortfolio = onLoadPortfolio,
-        onLoadSettings = onLoadSettings,
+        onLoadPage = onLoadPage,
         onHeightMeasured = onBottomBarHeightMeasured,
     )
   }
@@ -62,9 +56,6 @@ private fun PreviewMainScreen() {
   MainScreen(
       page = MainPage.Home,
       onBottomBarHeightMeasured = {},
-      onLoadHome = {},
-      onLoadWatchList = {},
-      onLoadPortfolio = {},
-      onLoadSettings = {},
+      onLoadPage = {},
   )
 }

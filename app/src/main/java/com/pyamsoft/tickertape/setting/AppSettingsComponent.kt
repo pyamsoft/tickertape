@@ -17,39 +17,16 @@
 package com.pyamsoft.tickertape.setting
 
 import androidx.annotation.CheckResult
-import androidx.annotation.IdRes
-import com.pyamsoft.pydroid.ui.navigator.Navigator
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
-import javax.inject.Named
 
-@Subcomponent(
-    modules =
-        [
-            SettingsComponent.SettingsModule::class,
-        ],
-)
-internal interface SettingsComponent {
+@Subcomponent
+internal interface AppSettingsComponent {
 
-  fun inject(dialog: SettingsDialog)
+  fun inject(fragment: AppSettings)
 
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance dialog: SettingsDialog,
-        @BindsInstance @IdRes @Named("settings_container") fragmentContainerId: Int,
-    ): SettingsComponent
-  }
-
-  @Module
-  abstract class SettingsModule {
-
-    @Binds
-    @CheckResult
-    internal abstract fun bindNavigator(impl: SettingsNavigator): Navigator<SettingsPage>
+    @CheckResult fun create(): AppSettingsComponent
   }
 }

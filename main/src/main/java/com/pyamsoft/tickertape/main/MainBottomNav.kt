@@ -20,10 +20,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.*
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,11 +45,8 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
     page: MainPage,
+    onLoadPage: (MainPage) -> Unit,
     onHeightMeasured: (Int) -> Unit,
-    onLoadHome: () -> Unit,
-    onLoadWatchList: () -> Unit,
-    onLoadPortfolio: () -> Unit,
-    onLoadSettings: () -> Unit,
 ) {
   // Can't use BottomAppBar since we can't modify its Shape
   Column {
@@ -62,22 +65,17 @@ internal fun MainBottomNav(
         Item(
             current = page,
             target = MainPage.Home,
-            onClick = onLoadHome,
+            onLoadPage = onLoadPage,
         )
         Item(
             current = page,
             target = MainPage.WatchList,
-            onClick = onLoadWatchList,
+            onLoadPage = onLoadPage,
         )
         Item(
             current = page,
             target = MainPage.Portfolio,
-            onClick = onLoadPortfolio,
-        )
-        Item(
-            current = page,
-            target = MainPage.Settings,
-            onClick = onLoadSettings,
+            onLoadPage = onLoadPage,
         )
       }
     }
@@ -92,12 +90,12 @@ private fun RowScope.Item(
     modifier: Modifier = Modifier,
     current: MainPage,
     target: MainPage,
-    onClick: () -> Unit,
+    onLoadPage: (MainPage) -> Unit,
 ) {
   BottomNavigationItem(
       modifier = modifier,
       selected = current == target,
-      onClick = onClick,
+      onClick = { onLoadPage(target) },
       icon = {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -109,7 +107,6 @@ private fun RowScope.Item(
                     is MainPage.Home -> Icons.Filled.Home
                     is MainPage.WatchList -> Icons.Filled.BarChart
                     is MainPage.Portfolio -> Icons.Filled.PieChart
-                    is MainPage.Settings -> Icons.Filled.Settings
                   },
               contentDescription = target.name,
           )
@@ -128,9 +125,6 @@ private fun PreviewMainBottomNav() {
   MainBottomNav(
       page = MainPage.Home,
       onHeightMeasured = {},
-      onLoadHome = {},
-      onLoadWatchList = {},
-      onLoadPortfolio = {},
-      onLoadSettings = {},
+      onLoadPage = {},
   )
 }

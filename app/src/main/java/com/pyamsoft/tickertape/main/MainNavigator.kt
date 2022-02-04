@@ -26,7 +26,6 @@ import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
-import com.pyamsoft.tickertape.setting.AppSettings
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
 
@@ -54,7 +53,6 @@ internal constructor(
   override fun provideFragmentTagMap(): Map<MainPage, FragmentTag> {
     return mapOf(
         MainPage.Home to createFragmentTag("HomeFragment") { HomeFragment.newInstance() },
-        MainPage.Settings to createFragmentTag("AppSettings") { AppSettings.newInstance() },
         MainPage.Portfolio to
             createFragmentTag("PortfolioFragment") { PortfolioFragment.newInstance() },
         MainPage.WatchList to
@@ -71,14 +69,13 @@ internal constructor(
                 when (oldPage) {
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   is MainPage.Home -> R.anim.slide_in_right to R.anim.slide_out_left
-                  is MainPage.Portfolio, is MainPage.Settings ->
-                      R.anim.slide_in_left to R.anim.slide_out_right
+                  is MainPage.Portfolio -> R.anim.slide_in_left to R.anim.slide_out_right
                   is MainPage.WatchList -> null
                 }
             is MainPage.Home ->
                 when (oldPage) {
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.WatchList, is MainPage.Portfolio, is MainPage.Settings ->
+                  is MainPage.WatchList, is MainPage.Portfolio ->
                       R.anim.slide_in_left to R.anim.slide_out_right
                   is MainPage.Home -> null
                 }
@@ -87,15 +84,7 @@ internal constructor(
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   is MainPage.WatchList, is MainPage.Home ->
                       R.anim.slide_in_right to R.anim.slide_out_left
-                  is MainPage.Settings -> R.anim.slide_in_left to R.anim.slide_out_right
                   is MainPage.Portfolio -> null
-                }
-            is MainPage.Settings ->
-                when (oldPage) {
-                  null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.WatchList, is MainPage.Home, is MainPage.Portfolio ->
-                      R.anim.slide_in_right to R.anim.slide_out_left
-                  is MainPage.Settings -> null
                 }
           }
 

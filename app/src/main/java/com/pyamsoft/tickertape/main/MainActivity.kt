@@ -128,10 +128,7 @@ internal class MainActivity : PYDroidActivity() {
             ) {
               MainScreen(
                   page = page,
-                  onLoadHome = { navigate(MainPage.Home) },
-                  onLoadWatchList = { navigate(MainPage.WatchList) },
-                  onLoadPortfolio = { navigate(MainPage.Portfolio) },
-                  onLoadSettings = { navigate(MainPage.Settings) },
+                  onLoadPage = { navigate(it) },
                   onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
               )
             }

@@ -42,6 +42,7 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 
@@ -60,6 +61,10 @@ class HomeFragment : Fragment() {
         ticker.symbol,
         allowModifyWatchlist = true,
     )
+  }
+
+  private fun handleOpenSettingsDialog() {
+    SettingsDialog.show(requireActivity())
   }
 
   private fun handleRefresh(force: Boolean) {
@@ -91,6 +96,8 @@ class HomeFragment : Fragment() {
       val windowInsets = observer.start()
       windowInsetObserver = observer
 
+      val appName = act.getString(R.string.app_name)
+
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
@@ -99,10 +106,12 @@ class HomeFragment : Fragment() {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     state = state,
+                    appName = appName,
                     imageLoader = loader,
                     navBarBottomHeight = mainState.bottomNavHeight,
                     onRefresh = { handleRefresh(true) },
                     onChartClicked = { handleOpenDigDialog(it) },
+                    onSettingsClicked = { handleOpenSettingsDialog() },
                 )
               }
             }

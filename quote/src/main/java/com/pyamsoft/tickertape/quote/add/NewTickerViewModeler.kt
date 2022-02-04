@@ -96,12 +96,14 @@ internal constructor(
   private suspend fun CoroutineScope.performSymbolResolution(
       symbol: String,
   ) {
+    val s = state
+    s.apply { resolvedTicker = null }
     tickerResolutionRunner
         .call(false, symbol)
         .onFailure { Timber.e(it, "Error resolving ticker for $symbol") }
         .onSuccess { Timber.d("Resolved ticker for $symbol $it") }
-        .onSuccess { state.resolvedTicker = it }
-        .onFailure { state.resolvedTicker = null }
+        .onSuccess { s.resolvedTicker = it }
+        .onFailure { s.resolvedTicker = null }
         .onSuccess { ticker ->
           ticker.quote?.also { q ->
             // Auto select the valid symbol if we found a quote for it
@@ -118,13 +120,17 @@ internal constructor(
       symbol: String,
   ) {
     val scope = this
+
+    val s = state
+    s.dismissLookup()
+
     symbolLookupRunner
         .call(false, symbol)
         .onFailure { Timber.e(it, "Error looking up results for $symbol") }
         .onSuccess { Timber.d("Found search results for $symbol $it") }
         .map { processLookupResults(it) }
         .onSuccess { r ->
-          state.apply {
+          s.apply {
             lookupError = null
             lookupResults = r
           }
@@ -140,7 +146,7 @@ internal constructor(
           }
         }
         .onFailure { e ->
-          state.apply {
+          s.apply {
             lookupError = e
             lookupResults = emptyList()
           }
@@ -161,17 +167,6 @@ internal constructor(
           EquityType.CRYPTOCURRENCY -> result.type() == EquityType.CRYPTOCURRENCY
         }
       }
-    }
-  }
-
-  private fun MutableNewTickerViewState.cancelInProgressLookup(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Main) {
-      // Cancel any active runner first
-      symbolLookupRunner.cancel()
-
-      // Flip all lookup bits back
-      lookupError = null
-      lookupResults = emptyList()
     }
   }
 
@@ -221,18 +216,15 @@ internal constructor(
     state.dismissLookup()
   }
 
-  fun handleSymbolChanged(
-      scope: CoroutineScope,
-      symbol: String,
-  ) {
+  fun handleSymbolChanged(symbol: String) {
     state.apply {
       this.symbol = symbol
       validSymbol = null
-
-      cancelInProgressLookup(scope)
     }
+  }
 
-    scope.launch(context = Dispatchers.Main) {
+  fun handleOnSymbolChangedSideEffect(scope: CoroutineScope, symbol: String) {
+    scope.launch(context = Dispatchers.Default) {
       awaitAll(
           async { performSymbolLookup(symbol) },
           async { performSymbolResolution(symbol) },
@@ -240,22 +232,17 @@ internal constructor(
     }
   }
 
-  fun handleEquityTypeSelected(
-      scope: CoroutineScope,
-      type: EquityType,
-  ) {
+  fun handleEquityTypeSelected(type: EquityType) {
     state.apply {
       equityType = type
       clearInput()
-      cancelInProgressLookup(scope)
     }
   }
 
-  fun handleClearEquityType(scope: CoroutineScope) {
+  fun handleClearEquityType() {
     state.apply {
       equityType = null
       clearInput()
-      cancelInProgressLookup(scope)
     }
   }
 
@@ -291,11 +278,8 @@ internal constructor(
     )
   }
 
-  fun handleClear(scope: CoroutineScope) {
-    state.apply {
-      clearInput()
-      cancelInProgressLookup(scope)
-    }
+  fun handleClear() {
+    state.clearInput()
   }
 
   fun handleOptionExpirationDate(date: LocalDateTime) {
@@ -321,7 +305,6 @@ internal constructor(
 
     s.apply {
       s.isSubmitting = true
-      cancelInProgressLookup(scope)
       scope.launch(context = Dispatchers.Main) {
         val sym = resolveSubmission()
 

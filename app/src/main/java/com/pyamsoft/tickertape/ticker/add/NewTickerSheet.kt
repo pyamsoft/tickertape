@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 internal class NewTickerSheet : BottomSheetDialogFragment() {
 
@@ -55,19 +56,15 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     if (equityType == null) {
       handleForceClose()
     } else {
-      viewModel
-          .requireNotNull()
-          .handleClearEquityType(
-              scope = viewLifecycleOwner.lifecycleScope,
-          )
+      viewModel.requireNotNull().handleClearEquityType()
     }
   }
 
-  private fun handleSymbolChanged(symbol: String) {
+  private fun handleSymbolChangedSideEffect(scope: CoroutineScope, symbol: String) {
     viewModel
         .requireNotNull()
-        .handleSymbolChanged(
-            scope = viewLifecycleOwner.lifecycleScope,
+        .handleOnSymbolChangedSideEffect(
+            scope = scope,
             symbol = symbol,
         )
   }
@@ -81,30 +78,12 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         )
   }
 
-  private fun handleEquityTypeSelected(type: EquityType) {
-    viewModel
-        .requireNotNull()
-        .handleEquityTypeSelected(
-            scope = viewLifecycleOwner.lifecycleScope,
-            type = type,
-        )
-  }
-
-  private fun handleClear() {
-    viewModel
-        .requireNotNull()
-        .handleClear(
-            scope = viewLifecycleOwner.lifecycleScope,
-        )
-  }
-
   private fun handleSubmit() {
-    viewModel
-        .requireNotNull()
-        .handleSubmit(
-            scope = viewLifecycleOwner.lifecycleScope,
-            onSubmit = { handleClear() },
-        )
+    val vm = viewModel.requireNotNull()
+    vm.handleSubmit(
+        scope = viewLifecycleOwner.lifecycleScope,
+        onSubmit = { vm.handleClear() },
+    )
   }
 
   override fun onCreateView(
@@ -136,16 +115,19 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 onClose = { handleCloseClicked(equityType) },
-                onTypeSelected = { handleEquityTypeSelected(it) },
-                onSymbolChanged = { handleSymbolChanged(it) },
+                onTypeSelected = { vm.handleEquityTypeSelected(it) },
+                onSymbolChanged = { vm.handleSymbolChanged(it) },
                 onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
-                onClear = { handleClear() },
+                onClear = { vm.handleClear() },
                 onTradeSideSelected = { vm.handleTradeSideChanged(it) },
                 onResultsDismissed = { vm.handleLookupDismissed() },
                 onOptionTypeSlected = { vm.handleOptionType(it) },
                 onStrikeSelected = { vm.handleOptionStrikePrice(it) },
                 onExpirationDateSelected = { vm.handleOptionExpirationDate(it) },
+                onSymbolChangedSideEffect = { scope, symbol ->
+                  handleSymbolChangedSideEffect(scope, symbol)
+                },
             )
           }
         }

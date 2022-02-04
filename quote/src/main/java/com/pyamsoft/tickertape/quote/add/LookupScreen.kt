@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,8 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 
 @Composable
 @JvmOverloads
@@ -60,6 +63,7 @@ internal fun LookupScreen(
     onResultsDismissed: () -> Unit,
     onExpirationDateSelected: (LocalDateTime) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
+    onSymbolChangedSideEffect: (CoroutineScope, String) -> Unit,
 ) {
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
@@ -67,8 +71,9 @@ internal fun LookupScreen(
     SymbolLookup(
         modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
         state = state,
-        onSymbolChanged = onSymbolChanged,
         onSubmit = onSubmit,
+        onSymbolChanged = onSymbolChanged,
+        onSymbolChangedSideEffect = onSymbolChangedSideEffect,
     )
     LookupResults(
         state = state,
@@ -206,17 +211,26 @@ private fun ResultItem(
   }
 }
 
+private const val INTERACTION_TIMEOUT = 200L
+
 @Composable
 private fun SymbolLookup(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
     onSymbolChanged: (String) -> Unit,
     onSubmit: () -> Unit,
+    onSymbolChangedSideEffect: (CoroutineScope, String) -> Unit,
 ) {
   val symbol = state.symbol
   val isSubmitOnEnter = remember(state.equityType) { state.equityType != EquityType.OPTION }
 
   val focusManager = LocalFocusManager.current
+
+  LaunchedEffect(symbol) {
+    // Little time to make sure we are done typing and stuff
+    delay(INTERACTION_TIMEOUT)
+    onSymbolChangedSideEffect(this, symbol)
+  }
 
   Box(
       modifier = modifier,
@@ -283,6 +297,7 @@ private fun PreviewLookupScreen() {
         onOptionTypeSlected = {},
         onExpirationDateSelected = {},
         onStrikeSelected = {},
+        onSymbolChangedSideEffect = { _, _ -> },
     )
   }
 }

@@ -45,7 +45,7 @@ fun NewTickerScreen(
               bottomStart = ZeroCornerSize,
               bottomEnd = ZeroCornerSize,
           ),
-      elevation = DialogDefaults.DialogElevation,
+      elevation = DialogDefaults.Elevation,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

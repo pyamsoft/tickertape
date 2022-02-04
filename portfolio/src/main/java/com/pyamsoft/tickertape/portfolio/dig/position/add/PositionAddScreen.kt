@@ -58,7 +58,7 @@ fun PositionAddScreen(
 
   Surface(
       modifier = modifier,
-      elevation = DialogDefaults.DialogElevation,
+      elevation = DialogDefaults.Elevation,
   ) {
     Column {
       PositionAddToolbar(

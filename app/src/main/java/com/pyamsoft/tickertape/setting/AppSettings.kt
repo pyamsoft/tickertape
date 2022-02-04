@@ -66,7 +66,7 @@ internal class AppSettings : SettingsFragment() {
 
   @Composable
   override fun customElevation(): Dp {
-    return DialogDefaults.DialogElevation
+    return DialogDefaults.Elevation
   }
 
   @Composable

@@ -31,11 +31,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.google.android.material.R as R2
+import com.google.android.material.R
 import com.pyamsoft.pydroid.theme.PYDroidTheme
+import com.pyamsoft.pydroid.theme.attributesFromCurrentTheme
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.pydroid.util.valuesFromCurrentTheme
 
 @Composable
 @CheckResult
@@ -45,11 +45,11 @@ private fun themeColors(
 ): Colors {
   val colors =
       remember(isDarkMode) {
-        activity.valuesFromCurrentTheme(
-            R2.attr.colorPrimary,
-            R2.attr.colorOnPrimary,
-            R2.attr.colorSecondary,
-            R2.attr.colorOnSecondary,
+        activity.attributesFromCurrentTheme(
+            R.attr.colorPrimary,
+            R.attr.colorOnPrimary,
+            R.attr.colorSecondary,
+            R.attr.colorOnSecondary,
         )
       }
   val primary = colorResource(colors[0])

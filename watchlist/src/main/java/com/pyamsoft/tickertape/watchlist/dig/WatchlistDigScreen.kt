@@ -36,7 +36,7 @@ fun WatchlistDigScreen(
 
   Surface(
       modifier = modifier,
-      elevation = DialogDefaults.DialogElevation,
+      elevation = DialogDefaults.Elevation,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

@@ -22,7 +22,6 @@ import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
@@ -83,8 +82,6 @@ internal constructor(
     state.isLoadingPortfolio = true
     portfolioInteractor
         .getPortfolio(force)
-        // Options are a little strange, don't show them
-        .map { tickers -> tickers.filterNot { it.holding.type() == EquityType.OPTION } }
         .onSuccess {
           state.apply {
             portfolio = PortfolioStockList.of(it)

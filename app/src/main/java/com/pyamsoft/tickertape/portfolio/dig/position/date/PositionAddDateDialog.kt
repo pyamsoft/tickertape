@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.theme.attributeFromCurrentTheme
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.pydroid.util.valueFromCurrentTheme
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
@@ -68,7 +68,7 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
   @CheckResult
   private fun createDialogBackground(): Drawable {
     val act = requireActivity()
-    val backgroundId = act.valueFromCurrentTheme(android.R.attr.windowBackground)
+    val backgroundId = act.attributeFromCurrentTheme(android.R.attr.windowBackground)
     return AppCompatResources.getDrawable(act, backgroundId).requireNotNull()
   }
 

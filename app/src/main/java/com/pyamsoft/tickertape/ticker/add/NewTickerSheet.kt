@@ -31,12 +31,10 @@ import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 
 internal class NewTickerSheet : BottomSheetDialogFragment() {
 
   @JvmField @Inject internal var theming: Theming? = null
-
   @JvmField @Inject internal var viewModel: NewTickerViewModeler? = null
 
   @CheckResult
@@ -56,17 +54,12 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     if (equityType == null) {
       handleForceClose()
     } else {
-      viewModel.requireNotNull().handleClearEquityType()
+      viewModel
+          .requireNotNull()
+          .handleClearEquityType(
+              scope = viewLifecycleOwner.lifecycleScope,
+          )
     }
-  }
-
-  private fun handleSymbolChangedSideEffect(scope: CoroutineScope, symbol: String) {
-    viewModel
-        .requireNotNull()
-        .handleOnSymbolChangedSideEffect(
-            scope = scope,
-            symbol = symbol,
-        )
   }
 
   private fun handleSearchResultSelected(result: SearchResult) {
@@ -78,12 +71,47 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         )
   }
 
+  private fun handleClear() {
+    viewModel
+        .requireNotNull()
+        .handleClear(
+            scope = viewLifecycleOwner.lifecycleScope,
+        )
+  }
+
   private fun handleSubmit() {
-    val vm = viewModel.requireNotNull()
-    vm.handleSubmit(
-        scope = viewLifecycleOwner.lifecycleScope,
-        onSubmit = { vm.handleClear() },
-    )
+    viewModel
+        .requireNotNull()
+        .handleSubmit(
+            scope = viewLifecycleOwner.lifecycleScope,
+            onSubmit = { handleClear() },
+        )
+  }
+
+  private fun handleLookupDismissed() {
+    viewModel
+        .requireNotNull()
+        .handleLookupDismissed(
+            scope = viewLifecycleOwner.lifecycleScope,
+        )
+  }
+
+  private fun handleSymbolChanged(symbol: String) {
+    viewModel
+        .requireNotNull()
+        .handleSymbolChanged(
+            scope = viewLifecycleOwner.lifecycleScope,
+            symbol = symbol,
+        )
+  }
+
+  private fun handleEquityTypeSelected(type: EquityType) {
+    viewModel
+        .requireNotNull()
+        .handleEquityTypeSelected(
+            scope = viewLifecycleOwner.lifecycleScope,
+            type = type,
+        )
   }
 
   override fun onCreateView(
@@ -115,19 +143,16 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 onClose = { handleCloseClicked(equityType) },
-                onTypeSelected = { vm.handleEquityTypeSelected(it) },
-                onSymbolChanged = { vm.handleSymbolChanged(it) },
+                onTypeSelected = { handleEquityTypeSelected(it) },
+                onSymbolChanged = { handleSymbolChanged(it) },
                 onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
-                onClear = { vm.handleClear() },
+                onClear = { handleClear() },
                 onTradeSideSelected = { vm.handleTradeSideChanged(it) },
-                onResultsDismissed = { vm.handleLookupDismissed() },
+                onResultsDismissed = { handleLookupDismissed() },
                 onOptionTypeSlected = { vm.handleOptionType(it) },
                 onStrikeSelected = { vm.handleOptionStrikePrice(it) },
                 onExpirationDateSelected = { vm.handleOptionExpirationDate(it) },
-                onSymbolChangedSideEffect = { scope, symbol ->
-                  handleSymbolChangedSideEffect(scope, symbol)
-                },
             )
           }
         }

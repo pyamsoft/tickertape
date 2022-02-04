@@ -36,7 +36,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import timber.log.Timber
 
 class NewTickerViewModeler
@@ -212,37 +214,27 @@ internal constructor(
     lookupError = null
   }
 
-  fun handleLookupDismissed() {
-    state.dismissLookup()
+  private suspend fun handleCancelLookups() = coroutineScope {
+    symbolLookupRunner.cancel()
+    tickerResolutionRunner.cancel()
   }
 
-  fun handleSymbolChanged(symbol: String) {
-    state.apply {
-      this.symbol = symbol
-      validSymbol = null
-    }
+  private fun handleCancelInProgressWork(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) { handleCancelLookups() }
   }
 
-  fun handleOnSymbolChangedSideEffect(scope: CoroutineScope, symbol: String) {
-    scope.launch(context = Dispatchers.Default) {
+  private fun handleOnSymbolChangedSideEffect(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      yield()
+
+      // Cancel any existing
+      handleCancelInProgressWork(scope = this)
+
+      val symbol = state.symbol
       awaitAll(
           async { performSymbolLookup(symbol) },
           async { performSymbolResolution(symbol) },
       )
-    }
-  }
-
-  fun handleEquityTypeSelected(type: EquityType) {
-    state.apply {
-      equityType = type
-      clearInput()
-    }
-  }
-
-  fun handleClearEquityType() {
-    state.apply {
-      equityType = null
-      clearInput()
     }
   }
 
@@ -266,6 +258,39 @@ internal constructor(
     }
   }
 
+  fun handleLookupDismissed(scope: CoroutineScope) {
+    state.dismissLookup()
+
+    handleCancelInProgressWork(scope)
+  }
+
+  fun handleSymbolChanged(scope: CoroutineScope, symbol: String) {
+    state.apply {
+      this.symbol = symbol
+      validSymbol = null
+    }
+
+    handleOnSymbolChangedSideEffect(scope)
+  }
+
+  fun handleEquityTypeSelected(scope: CoroutineScope, type: EquityType) {
+    state.apply {
+      equityType = type
+      clearInput()
+    }
+
+    handleCancelInProgressWork(scope)
+  }
+
+  fun handleClearEquityType(scope: CoroutineScope) {
+    state.apply {
+      equityType = null
+      clearInput()
+    }
+
+    handleCancelInProgressWork(scope)
+  }
+
   fun handleSearchResultSelected(
       scope: CoroutineScope,
       result: SearchResult,
@@ -278,8 +303,10 @@ internal constructor(
     )
   }
 
-  fun handleClear() {
+  fun handleClear(scope: CoroutineScope) {
     state.clearInput()
+
+    handleCancelInProgressWork(scope)
   }
 
   fun handleOptionExpirationDate(date: LocalDateTime) {

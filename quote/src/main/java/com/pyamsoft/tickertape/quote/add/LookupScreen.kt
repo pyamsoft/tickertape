@@ -63,7 +63,6 @@ internal fun LookupScreen(
     onResultsDismissed: () -> Unit,
     onExpirationDateSelected: (LocalDateTime) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
-    onSymbolChangedSideEffect: (CoroutineScope, String) -> Unit,
 ) {
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
@@ -73,7 +72,6 @@ internal fun LookupScreen(
         state = state,
         onSubmit = onSubmit,
         onSymbolChanged = onSymbolChanged,
-        onSymbolChangedSideEffect = onSymbolChangedSideEffect,
     )
     LookupResults(
         state = state,
@@ -211,26 +209,17 @@ private fun ResultItem(
   }
 }
 
-private const val INTERACTION_TIMEOUT = 200L
-
 @Composable
 private fun SymbolLookup(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
     onSymbolChanged: (String) -> Unit,
     onSubmit: () -> Unit,
-    onSymbolChangedSideEffect: (CoroutineScope, String) -> Unit,
 ) {
   val symbol = state.symbol
   val isSubmitOnEnter = remember(state.equityType) { state.equityType != EquityType.OPTION }
 
   val focusManager = LocalFocusManager.current
-
-  LaunchedEffect(symbol) {
-    // Little time to make sure we are done typing and stuff
-    delay(INTERACTION_TIMEOUT)
-    onSymbolChangedSideEffect(this, symbol)
-  }
 
   Box(
       modifier = modifier,
@@ -297,7 +286,6 @@ private fun PreviewLookupScreen() {
         onOptionTypeSlected = {},
         onExpirationDateSelected = {},
         onStrikeSelected = {},
-        onSymbolChangedSideEffect = { _, _ -> },
     )
   }
 }

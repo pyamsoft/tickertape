@@ -18,19 +18,40 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockNewsImpl
+import java.time.LocalDateTime
 
 interface StockNews {
 
   @CheckResult fun symbol(): StockSymbol
+
+  @CheckResult fun publishedAt(): LocalDateTime?
+
+  @CheckResult fun title(): String
+
+  @CheckResult fun description(): String
+
+  @CheckResult fun link(): String
+
+  @CheckResult fun sourceName(): String
 
   companion object {
     @JvmStatic
     @CheckResult
     fun create(
         symbol: StockSymbol,
+        publishedAt: LocalDateTime?,
+        title: String,
+        description: String,
+        link: String,
+        sourceName: String,
     ): StockNews {
       return StockNewsImpl(
           symbol = symbol,
+          publishedAt = publishedAt,
+          title = title,
+          description = description,
+          link = link,
+          sourceName = sourceName,
       )
     }
   }

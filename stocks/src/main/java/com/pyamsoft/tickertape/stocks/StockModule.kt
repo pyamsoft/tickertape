@@ -29,12 +29,12 @@ import com.pyamsoft.tickertape.stocks.scope.StockApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import okhttp3.Call
-import retrofit2.Converter
-import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.reflect.KClass
+import okhttp3.Call
+import retrofit2.Converter
+import retrofit2.Retrofit
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 
@@ -73,9 +73,11 @@ abstract class StockModule {
     /**
      * If this is @Provides, you will need to change okhttp3 from implementation to api in Gradle
      */
+    @Provides
     @JvmStatic
     @CheckResult
-    private fun createCallFactory(debug: Boolean): Call.Factory {
+    @StockApi
+    internal fun createCallFactory(@Named("debug") debug: Boolean): Call.Factory {
       return OkHttpClientLazyCallFactory(debug)
     }
 
@@ -102,22 +104,37 @@ abstract class StockModule {
     }
 
     @Provides
-    @StockApi
     @JvmStatic
     @CheckResult
-    internal fun provideNetworkCreator(
-        @Named("debug") debug: Boolean,
+    @Named("json")
+    internal fun provideJsonNetworkCreator(
+        @StockApi callFactory: Call.Factory,
         @Named("moshi_converter") moshiConverter: Converter.Factory,
+    ): NetworkServiceCreator {
+      val retrofit =
+          createRetrofit(
+              callFactory = callFactory,
+              converterFactories = listOf(moshiConverter),
+          )
+      return object : NetworkServiceCreator {
+        override fun <T : Any> create(target: KClass<T>): T {
+          return retrofit.create(target.java)
+        }
+      }
+    }
+
+    @Provides
+    @JvmStatic
+    @CheckResult
+    @Named("xml")
+    internal fun provideXmlNetworkCreator(
+        @StockApi callFactory: Call.Factory,
         @Named("xml_converter") xmlConverter: Converter.Factory,
     ): NetworkServiceCreator {
       val retrofit =
           createRetrofit(
-              callFactory = createCallFactory(debug),
-              converterFactories =
-                  listOf(
-                      moshiConverter,
-                      xmlConverter,
-                  ),
+              callFactory = callFactory,
+              converterFactories = listOf(xmlConverter),
           )
       return object : NetworkServiceCreator {
         override fun <T : Any> create(target: KClass<T>): T {

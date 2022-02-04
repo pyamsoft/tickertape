@@ -21,13 +21,13 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchlistDigViewModeler
 @Inject
@@ -87,18 +87,14 @@ internal constructor(
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-      scope.launch(context = Dispatchers.Main) {
-          val s = state.ticker.symbol
-          try {
-              stockInteractor.getNews(false, s).also { news ->
-                  Timber.d("News for $s: $news")
-              }
-          } catch (e: Throwable) {
-              e.ifNotCancellation {
-                  Timber.e(e, "Error for news")
-              }
-          }
+    scope.launch(context = Dispatchers.Main) {
+      val s = state.ticker.symbol
+      try {
+        stockInteractor.getNews(false, s).also { news -> Timber.d("News for $s: $news") }
+      } catch (e: Throwable) {
+        e.ifNotCancellation { Timber.e(e, "Error for news") }
       }
+    }
 
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
@@ -129,5 +125,4 @@ internal constructor(
           }
     }
   }
-
 }

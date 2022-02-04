@@ -40,9 +40,9 @@ import com.pyamsoft.tickertape.stocks.yahoo.source.YahooTopSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
 
 @Module
 abstract class YahooFinanceModule {
@@ -94,7 +94,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideQuotes(@StockApi serviceCreator: NetworkServiceCreator): QuoteService {
+    internal fun provideQuotes(@Named("json") serviceCreator: NetworkServiceCreator): QuoteService {
       return serviceCreator.create(QuoteService::class)
     }
 
@@ -102,7 +102,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideCharts(@StockApi serviceCreator: NetworkServiceCreator): ChartService {
+    internal fun provideCharts(@Named("json") serviceCreator: NetworkServiceCreator): ChartService {
       return serviceCreator.create(ChartService::class)
     }
 
@@ -110,7 +110,7 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideTops(@StockApi serviceCreator: NetworkServiceCreator): TopService {
+    internal fun provideTops(@Named("json") serviceCreator: NetworkServiceCreator): TopService {
       return serviceCreator.create(TopService::class)
     }
 
@@ -118,7 +118,9 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideSearch(@StockApi serviceCreator: NetworkServiceCreator): SearchService {
+    internal fun provideSearch(
+        @Named("json") serviceCreator: NetworkServiceCreator
+    ): SearchService {
       return serviceCreator.create(SearchService::class)
     }
 
@@ -126,7 +128,9 @@ abstract class YahooFinanceModule {
     @YahooApi
     @JvmStatic
     @CheckResult
-    internal fun provideOptions(@StockApi serviceCreator: NetworkServiceCreator): OptionsService {
+    internal fun provideOptions(
+        @Named("json") serviceCreator: NetworkServiceCreator
+    ): OptionsService {
       return serviceCreator.create(OptionsService::class)
     }
 
@@ -135,7 +139,7 @@ abstract class YahooFinanceModule {
     @JvmStatic
     @CheckResult
     internal fun provideKeyStatistics(
-        @StockApi serviceCreator: NetworkServiceCreator
+        @Named("json") serviceCreator: NetworkServiceCreator
     ): KeyStatisticsService {
       return serviceCreator.create(KeyStatisticsService::class)
     }

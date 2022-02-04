@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 internal class GoogleNewsSource
 @Inject
@@ -39,7 +38,15 @@ internal constructor(@GoogleNewsApi private val service: NewsService) : NewsSour
         Enforcer.assertOffMainThread()
 
         val resp = service.getNews(query = "${symbol.symbol()} Stock")
-        Timber.d("RESPONSE ${symbol.symbol()}: $resp")
-        return@withContext emptyList()
+        return@withContext resp.news().map { article ->
+          return@map StockNews.create(
+              symbol = symbol,
+              title = article.title(),
+              description = article.description(),
+              link = article.link(),
+              publishedAt = article.publishDate(),
+              sourceName = article.newsSource(),
+          )
+        }
       }
 }

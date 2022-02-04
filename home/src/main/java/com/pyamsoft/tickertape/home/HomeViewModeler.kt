@@ -83,8 +83,8 @@ internal constructor(
     state.isLoadingPortfolio = true
     portfolioInteractor
         .getPortfolio(force)
-        // Make sure we only show value of stocks in the home portfolio
-        .map { tickers -> tickers.filter { it.holding.type() == EquityType.STOCK } }
+        // Options are a little strange, don't show them
+        .map { tickers -> tickers.filterNot { it.holding.type() == EquityType.OPTION } }
         .onSuccess {
           state.apply {
             portfolio = PortfolioStockList.of(it)

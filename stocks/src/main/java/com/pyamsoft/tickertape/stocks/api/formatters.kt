@@ -22,6 +22,18 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @JvmField
+val SHARES_FORMATTER =
+    object : ThreadLocal<NumberFormat>() {
+
+      override fun initialValue(): NumberFormat? {
+        return DecimalFormat.getNumberInstance().apply {
+          minimumFractionDigits = 0
+          maximumFractionDigits = 6
+        }
+      }
+    }
+
+@JvmField
 val SMALL_MONEY_FORMATTER =
     object : ThreadLocal<NumberFormat>() {
 

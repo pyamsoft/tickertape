@@ -16,7 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks.data
 
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.isZero
+import com.pyamsoft.tickertape.stocks.api.SHARES_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 internal data class StockShareValueImpl(
@@ -32,11 +34,12 @@ internal data class StockShareValueImpl(
         // Parse to int to remove the decimals, then back to float for comparison ability
         val intValue = value.toInt()
         val valueWithoutDecimal = intValue.toDouble()
-        if (valueWithoutDecimal.compareTo(value) == 0) {
-          // This is a number without any decimals, return the int value as a String
-          return@lazy intValue.toString()
+        val formatter = SHARES_FORMATTER.get().requireNotNull()
+
+        return@lazy if (valueWithoutDecimal.compareTo(value) == 0) {
+          formatter.format(intValue)
         } else {
-          return@lazy value.toString()
+          formatter.format(value)
         }
       }
 

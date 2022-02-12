@@ -18,7 +18,12 @@ package com.pyamsoft.tickertape.quote
 
 import android.graphics.Color as ViewColor
 import androidx.annotation.CheckResult
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -30,13 +35,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.spark.SparkView
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.stocks.api.*
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.periodHigh
+import com.pyamsoft.tickertape.stocks.api.periodLow
 import java.time.LocalDateTime
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
@@ -121,7 +131,7 @@ private fun SparkChart(
 ) {
   val density = LocalDensity.current
 
-  val baseLineSize = remember(density) { density.run { 2.dp.toPx() } }
+  val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
 
   val chartAdapter =
       remember(chart) {

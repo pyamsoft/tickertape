@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -115,7 +115,7 @@ fun Quote(
               onClick = { onClick(ticker) },
               onLongClick = { onLongClick(ticker) },
           ),
-      elevation = 2.dp,
+      elevation = CardDefaults.Elevation,
   ) {
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),

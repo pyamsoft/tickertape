@@ -22,12 +22,20 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigInteractor
+import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface PortfolioDigInteractor : DigInteractor {
 
   @CheckResult suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit)
 
   @CheckResult suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean>
+
+  @CheckResult
+  suspend fun getNews(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<List<StockNews>>
 
   @CheckResult
   suspend fun getHolding(

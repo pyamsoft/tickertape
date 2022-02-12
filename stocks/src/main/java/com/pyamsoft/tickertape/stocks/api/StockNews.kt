@@ -22,6 +22,8 @@ import java.time.LocalDateTime
 
 interface StockNews {
 
+  @CheckResult fun id(): String
+
   @CheckResult fun symbol(): StockSymbol
 
   @CheckResult fun publishedAt(): LocalDateTime?
@@ -38,6 +40,7 @@ interface StockNews {
     @JvmStatic
     @CheckResult
     fun create(
+        id: String,
         symbol: StockSymbol,
         publishedAt: LocalDateTime?,
         title: String,
@@ -46,6 +49,7 @@ interface StockNews {
         sourceName: String,
     ): StockNews {
       return StockNewsImpl(
+          id = id,
           symbol = symbol,
           publishedAt = publishedAt,
           title = title,

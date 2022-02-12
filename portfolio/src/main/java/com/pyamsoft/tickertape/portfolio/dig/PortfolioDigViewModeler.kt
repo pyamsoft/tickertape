@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,10 +52,31 @@ internal constructor(
       highlander<Unit, Boolean> { force ->
         awaitAll(
             async { loadTicker(force) },
+            async { loadNews(force) },
             async { loadHolding(force) },
             async { loadPositions(force) },
         )
       }
+
+  @CheckResult
+  private suspend fun loadNews(force: Boolean): ResultWrapper<List<StockNews>> {
+    return interactor
+        .getNews(force, symbol = state.ticker.symbol)
+        .onSuccess { n ->
+          // Clear the error on load success
+          state.apply {
+            news = n
+            newsError = null
+          }
+        }
+        .onFailure { e ->
+          // Don't need to clear the ticker since last loaded state was valid
+          state.apply {
+            news = emptyList()
+            newsError = e
+          }
+        }
+  }
 
   @CheckResult
   private suspend fun loadTicker(force: Boolean): ResultWrapper<Ticker> {

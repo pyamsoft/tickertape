@@ -18,6 +18,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
+import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -101,11 +102,20 @@ private fun Content(
     return@Crossfade when (section) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
+            // Chart will size itself
             modifier = Modifier.fillMaxWidth(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
             onRangeSelected = onRangeSelected,
+        )
+      }
+      PortfolioDigSections.NEWS -> {
+        PositionNews(
+            // At most this is slightly larger than half the screen in height
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6F),
+            state = state,
+            onRefresh = onRefresh,
         )
       }
       PortfolioDigSections.POSITIONS -> {

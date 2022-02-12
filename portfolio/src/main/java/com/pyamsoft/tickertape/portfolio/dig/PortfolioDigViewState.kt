@@ -8,6 +8,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
@@ -21,7 +22,9 @@ interface PortfolioDigViewState : DigViewState {
 
   val holding: DbHolding?
   val positions: List<DbPosition>
+  val news: List<StockNews>
 
+  val newsError: Throwable?
   val chartError: Throwable?
   val holdingError: Throwable?
   val positionsError: Throwable?
@@ -37,8 +40,12 @@ internal constructor(
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.CHART)
+
   override var holding by mutableStateOf<DbHolding?>(null)
   override var positions by mutableStateOf(emptyList<DbPosition>())
+  override var news by mutableStateOf(emptyList<StockNews>())
+
+  override var newsError by mutableStateOf<Throwable?>(null)
   override var chartError by mutableStateOf<Throwable?>(null)
   override var positionsError by mutableStateOf<Throwable?>(null)
   override var holdingError by mutableStateOf<Throwable?>(null)

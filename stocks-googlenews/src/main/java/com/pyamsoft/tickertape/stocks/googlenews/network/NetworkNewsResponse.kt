@@ -53,6 +53,9 @@ internal constructor() {
   internal constructor() {
 
     /** This needs to be a var because SimpleXML is weird yo */
+    @get:Element(name = "guid") @set:Element(name = "guid") internal var guid: String? = null
+
+    /** This needs to be a var because SimpleXML is weird yo */
     @get:Element(name = "link") @set:Element(name = "link") internal var url: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
@@ -67,6 +70,11 @@ internal constructor() {
     @get:Element(name = "pubDate")
     @set:Element(name = "pubDate")
     internal var publishedAt: String? = null
+
+    private val id by
+        lazy(LazyThreadSafetyMode.NONE) {
+          return@lazy guid.orEmpty()
+        }
 
     private val publishDate by
         lazy(LazyThreadSafetyMode.NONE) {
@@ -96,6 +104,11 @@ internal constructor() {
             spanned.toString()
           }
         }
+
+    @CheckResult
+    fun id(): String {
+      return id
+    }
 
     @CheckResult
     fun publishDate(): LocalDateTime? {

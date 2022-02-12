@@ -40,6 +40,7 @@ internal constructor(@GoogleNewsApi private val service: NewsService) : NewsSour
         val resp = service.getNews(query = "${symbol.symbol()} Stock")
         return@withContext resp.news().map { article ->
           return@map StockNews.create(
+              id = article.id(),
               symbol = symbol,
               title = article.title(),
               description = article.description(),

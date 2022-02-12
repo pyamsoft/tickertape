@@ -29,6 +29,9 @@ import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
+import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -40,11 +43,28 @@ internal class PortfolioDigInteractorImpl
 @Inject
 internal constructor(
     interactor: TickerInteractor,
+    private val stockInteractor: StockInteractor,
     private val holdingQueryDao: HoldingQueryDao,
     private val positionQueryDao: PositionQueryDao,
     private val positionRealtime: PositionRealtime,
     private val positionDeleteDao: PositionDeleteDao,
 ) : DigInteractorImpl(interactor), PortfolioDigInteractor {
+
+  override suspend fun getNews(
+      force: Boolean,
+      symbol: StockSymbol
+  ): ResultWrapper<List<StockNews>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(stockInteractor.getNews(force, symbol))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting news for symbol: ${symbol.symbol()}")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
 
   override suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {

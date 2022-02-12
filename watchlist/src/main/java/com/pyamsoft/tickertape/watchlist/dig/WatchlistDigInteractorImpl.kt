@@ -21,9 +21,14 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.db.symbol.*
+import com.pyamsoft.tickertape.db.symbol.DbSymbol
+import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
+import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
+import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
+import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,10 +41,11 @@ internal class WatchlistDigInteractorImpl
 @Inject
 internal constructor(
     interactor: TickerInteractor,
+    stockInteractor: StockInteractor,
     private val symbolQueryDao: SymbolQueryDao,
     private val symbolDeleteDao: SymbolDeleteDao,
     private val symbolInsertDao: SymbolInsertDao,
-) : DigInteractorImpl(interactor), WatchlistDigInteractor {
+) : DigInteractorImpl(interactor, stockInteractor), WatchlistDigInteractor {
 
   @CheckResult
   private suspend fun getExistingSymbol(force: Boolean, symbol: StockSymbol): DbSymbol? {

@@ -1,20 +1,16 @@
-package com.pyamsoft.tickertape.portfolio.dig.news
+package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigNews
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @JvmOverloads
-internal fun PositionNews(
+internal fun WatchlistNews(
     modifier: Modifier = Modifier,
-    state: PortfolioDigViewState,
+    state: WatchlistDigViewState,
     onRefresh: () -> Unit,
 ) {
   val isLoading = state.isLoading
@@ -30,13 +26,12 @@ internal fun PositionNews(
 
 @Preview
 @Composable
-private fun PreviewPositionNews() {
-  PositionNews(
+private fun PreviewWatchlistNews() {
+  WatchlistNews(
       state =
-          MutablePortfolioDigViewState(
+          MutableWatchlistDigViewState(
               symbol = "MSFT".asSymbol(),
-              equityType = EquityType.STOCK,
-              tradeSide = TradeSide.BUY,
+              allowModifyWatchlist = true,
           ),
       onRefresh = {},
   )

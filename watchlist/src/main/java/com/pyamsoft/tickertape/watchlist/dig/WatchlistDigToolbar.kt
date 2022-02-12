@@ -1,14 +1,30 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.StarBorder
 
@@ -18,46 +34,103 @@ internal fun WatchlistDigToolbar(
     state: WatchlistDigViewState,
     onClose: () -> Unit,
     onModifyWatchlist: () -> Unit,
+    onTabUpdated: (WatchlistDigSections) -> Unit,
 ) {
   val isLoading = state.isLoading
   val ticker = state.ticker
   val isInWatchlist = state.isInWatchlist
   val isAllowedToModifyWatchlist = state.isAllowModifyWatchlist
-  val title = ticker.quote?.company()?.company() ?: ticker.symbol.symbol()
+  val section = state.section
+  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
+  val allTabs = remember { WatchlistDigSections.values() }
+  val isInWatchlistError = state.isInWatchlistError
+  val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
 
-  TopAppBar(
+  Surface(
       modifier = modifier,
-      backgroundColor = MaterialTheme.colors.primary,
+      elevation = AppBarDefaults.TopAppBarElevation,
       contentColor = Color.White,
-      title = {
-        Text(
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-      },
-      navigationIcon = {
-        IconButton(
-            onClick = onClose,
-        ) {
-          Icon(
-              imageVector = Icons.Filled.Close,
-              contentDescription = "Close",
+      color = MaterialTheme.colors.primary,
+      shape =
+          MaterialTheme.shapes.medium.copy(
+              bottomEnd = ZeroCornerSize,
+              bottomStart = ZeroCornerSize,
+          ),
+  ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+      val contentColor = LocalContentColor.current
+      TopAppBar(
+          modifier = Modifier.fillMaxWidth(),
+          backgroundColor = Color.Transparent,
+          contentColor = contentColor,
+          elevation = ZeroElevation,
+          title = {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+          },
+          navigationIcon = {
+            IconButton(
+                onClick = onClose,
+            ) {
+              Icon(
+                  imageVector = Icons.Filled.Close,
+                  contentDescription = "Close",
+              )
+            }
+          },
+          actions = {
+            if (!isLoading && isAllowedToModifyWatchlist && !hasIsInWatchlistError) {
+              IconButton(
+                  onClick = onModifyWatchlist,
+              ) {
+                Icon(
+                    imageVector = if (isInWatchlist) Icons.Filled.Star else Icons.Filled.StarBorder,
+                    contentDescription =
+                        "${if (isInWatchlist) "Add to" else "Remove from"} Watchlist",
+                )
+              }
+            }
+          },
+      )
+
+      TabRow(
+          backgroundColor = Color.Transparent,
+          selectedTabIndex = section.ordinal,
+      ) {
+        // If we use forEach here, compose compiler gives a ClassCastException
+        for (tab in allTabs) {
+          WatchlistTab(
+              current = section,
+              tab = tab,
+              onTabUpdated = onTabUpdated,
           )
         }
-      },
-      actions = {
-        if (!isLoading && isAllowedToModifyWatchlist) {
-          IconButton(
-              onClick = onModifyWatchlist,
-          ) {
-            Icon(
-                imageVector = if (isInWatchlist) Icons.Filled.Star else Icons.Filled.StarBorder,
-                contentDescription = "${if (isInWatchlist) "Add to" else "Remove from"} Watchlist",
-            )
-          }
-        }
-      })
+      }
+    }
+  }
+}
+
+@Composable
+private fun WatchlistTab(
+    tab: WatchlistDigSections,
+    current: WatchlistDigSections,
+    onTabUpdated: (WatchlistDigSections) -> Unit,
+) {
+  val isSelected = remember(tab, current) { tab == current }
+  Tab(
+      selected = isSelected,
+      onClick = { onTabUpdated(tab) },
+  ) {
+    Text(
+        modifier = Modifier.padding(vertical = MaterialTheme.keylines.typography),
+        text = tab.display,
+    )
+  }
 }
 
 @Preview
@@ -72,5 +145,6 @@ private fun PreviewWatchlistDigToolbar() {
           ),
       onClose = {},
       onModifyWatchlist = {},
+      onTabUpdated = {},
   )
 }

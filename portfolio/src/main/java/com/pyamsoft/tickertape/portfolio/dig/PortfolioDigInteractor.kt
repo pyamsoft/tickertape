@@ -32,12 +32,6 @@ interface PortfolioDigInteractor : DigInteractor {
   @CheckResult suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean>
 
   @CheckResult
-  suspend fun getNews(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<List<StockNews>>
-
-  @CheckResult
   suspend fun getHolding(
       force: Boolean,
       id: DbHolding.Id,

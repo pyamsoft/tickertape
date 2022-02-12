@@ -4,6 +4,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -27,5 +28,11 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
     override val currentPrice = 1.0.asMoney()
 
     override val openingPrice = currentPrice
+
+    override val chartError: Throwable? = null
+
+    override val news = emptyList<StockNews>()
+
+    override val newsError: Throwable? = null
   }
 }

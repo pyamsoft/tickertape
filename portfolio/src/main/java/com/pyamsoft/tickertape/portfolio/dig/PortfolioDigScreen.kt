@@ -95,11 +95,13 @@ private fun Content(
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
 ) {
+  val section = state.section
+
   Crossfade(
       modifier = modifier,
-      targetState = state.section,
-  ) { section ->
-    return@Crossfade when (section) {
+      targetState = section,
+  ) { s ->
+    return@Crossfade when (s) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
             // Chart will size itself

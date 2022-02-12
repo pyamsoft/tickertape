@@ -9,10 +9,12 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 interface WatchlistDigViewState : DigViewState {
+  val section: WatchlistDigSections
   val isInWatchlist: Boolean
   val isAllowModifyWatchlist: Boolean
   val isLoading: Boolean
-  val error: Throwable?
+
+  val isInWatchlistError: Throwable?
 }
 
 // Public for WatchlistDigViewModeler constructor
@@ -26,7 +28,9 @@ internal constructor(
   // Not state backed since this is constant
   override val isAllowModifyWatchlist = allowModifyWatchlist
 
-  override var isInWatchlist by mutableStateOf(false)
+  override var section by mutableStateOf(WatchlistDigSections.CHART)
   override var isLoading by mutableStateOf(false)
-  override var error by mutableStateOf<Throwable?>(null)
+
+  override var isInWatchlist by mutableStateOf(false)
+  override var isInWatchlistError by mutableStateOf<Throwable?>(null)
 }

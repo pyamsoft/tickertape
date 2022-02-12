@@ -41,6 +41,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
@@ -67,6 +68,36 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     }
 
     return args.getBoolean(KEY_ALLOW_MODIFY, false)
+  }
+
+  private fun handleModifyWatchlist() {
+    viewModel
+        .requireNotNull()
+        .handleModifyWatchlist(
+            scope = viewLifecycleOwner.lifecycleScope,
+        )
+  }
+
+  private fun handleRangeSelected(range: StockChart.IntervalRange) {
+    viewModel
+        .requireNotNull()
+        .handleRangeSelected(
+            scope = viewLifecycleOwner.lifecycleScope,
+            range = range,
+        )
+  }
+
+  private fun handleTabUpdated(section: WatchlistDigSections) {
+    viewModel.requireNotNull().handleTabUpdated(section = section)
+  }
+
+  private fun handleRefresh(force: Boolean) {
+    viewModel
+        .requireNotNull()
+        .handleLoadTicker(
+            scope = viewLifecycleOwner.lifecycleScope,
+            force = force,
+        )
   }
 
   override fun onCreateView(
@@ -96,17 +127,10 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
                 imageLoader = loader,
                 onClose = { dismiss() },
                 onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = {
-                  vm.handleRangeSelected(
-                      scope = viewLifecycleOwner.lifecycleScope,
-                      range = it,
-                  )
-                },
-                onModifyWatchlist = {
-                  vm.handleModifyWatchlist(
-                      scope = viewLifecycleOwner.lifecycleScope,
-                  )
-                },
+                onRangeSelected = { handleRangeSelected(it) },
+                onModifyWatchlist = { handleModifyWatchlist() },
+                onRefresh = { handleRefresh(true) },
+                onTabUpdated = { handleTabUpdated(it) },
             )
           }
         }
@@ -121,13 +145,8 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     super.onViewCreated(view, savedInstanceState)
     makeFullWidth()
 
-    viewModel.requireNotNull().also { vm ->
-      vm.restoreState(savedInstanceState)
-      vm.handleLoadTicker(
-          scope = viewLifecycleOwner.lifecycleScope,
-          force = false,
-      )
-    }
+    viewModel.requireNotNull().restoreState(savedInstanceState)
+    handleRefresh(force = false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

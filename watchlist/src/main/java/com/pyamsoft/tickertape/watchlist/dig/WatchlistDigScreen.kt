@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
@@ -30,7 +31,9 @@ fun WatchlistDigScreen(
     onClose: () -> Unit,
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onTabUpdated: (WatchlistDigSections) -> Unit,
     onModifyWatchlist: () -> Unit,
+    onRefresh: () -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -46,6 +49,7 @@ fun WatchlistDigScreen(
           state = state,
           onClose = onClose,
           onModifyWatchlist = onModifyWatchlist,
+          onTabUpdated = onTabUpdated,
       )
 
       Crossfade(
@@ -57,14 +61,52 @@ fun WatchlistDigScreen(
               modifier = Modifier.fillMaxWidth(),
           )
         } else {
-          DigChart(
+          Content(
               modifier = Modifier.fillMaxWidth(),
               state = state,
               imageLoader = imageLoader,
               onScrub = onScrub,
               onRangeSelected = onRangeSelected,
+              onRefresh = onRefresh,
           )
         }
+      }
+    }
+  }
+}
+
+@Composable
+private fun Content(
+    modifier: Modifier = Modifier,
+    state: WatchlistDigViewState,
+    imageLoader: ImageLoader,
+    onScrub: (Chart.Data?) -> Unit,
+    onRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onRefresh: () -> Unit,
+) {
+  val section = state.section
+  Crossfade(
+      modifier = modifier,
+      targetState = section,
+  ) { s ->
+    return@Crossfade when (s) {
+      WatchlistDigSections.CHART -> {
+        DigChart(
+            // Chart will size itself
+            modifier = Modifier.fillMaxWidth(),
+            state = state,
+            imageLoader = imageLoader,
+            onScrub = onScrub,
+            onRangeSelected = onRangeSelected,
+        )
+      }
+      WatchlistDigSections.NEWS -> {
+        WatchlistNews(
+            // At most this is slightly larger than half the screen in height
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6F),
+            state = state,
+            onRefresh = onRefresh,
+        )
       }
     }
   }
@@ -94,5 +136,7 @@ private fun PreviewWatchlistDigScreen() {
       onScrub = {},
       onRangeSelected = {},
       onModifyWatchlist = {},
+      onTabUpdated = {},
+      onRefresh = {},
   )
 }

@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote.dig
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
@@ -31,8 +30,26 @@ protected constructor(
     private val interactor: DigInteractor,
 ) : AbstractViewModeler<S>(state) {
 
-  @CheckResult
-  protected suspend fun onLoadTicker(
+  protected suspend fun loadNews(force: Boolean) {
+    interactor
+        .getNews(force, symbol = state.ticker.symbol)
+        .onSuccess { n ->
+          // Clear the error on load success
+          state.apply {
+            news = n
+            newsError = null
+          }
+        }
+        .onFailure { e ->
+          // Don't need to clear the ticker since last loaded state was valid
+          state.apply {
+            news = emptyList()
+            newsError = e
+          }
+        }
+  }
+
+  protected suspend fun loadTicker(
       force: Boolean,
   ): ResultWrapper<Ticker> =
       interactor
@@ -54,14 +71,18 @@ protected constructor(
 
                 // Set the opening price based on the current chart
                 openingPrice = c.startingPrice()
+
+                // Clear the error on load success
+                chartError = null
               }
             }
           }
           .onFailure { Timber.e(it, "Failed to load Ticker") }
-          .onFailure {
+          .onFailure { e ->
             state.apply {
               currentPrice = null
               openingPrice = null
+              chartError = e
             }
           }
 

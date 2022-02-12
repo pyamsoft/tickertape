@@ -41,8 +41,9 @@ internal constructor(
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
         awaitAll(
-            async { handleLoadTicker(force) },
-            async { handleIsInWatchlist(force) },
+            async { loadTicker(force) },
+            async { loadNews(force) },
+            async { checkIsInWatchlist(force) },
         )
       }
 
@@ -53,33 +54,24 @@ internal constructor(
         )
       }
 
-  private suspend fun handleIsInWatchlist(force: Boolean) {
+  private suspend fun checkIsInWatchlist(force: Boolean) {
+    val s = state
     interactor
         .isInWatchlist(symbol = state.ticker.symbol, force)
-        .onSuccess { s ->
-          Timber.d("Symbol is in watchlist: $s")
-          state.isInWatchlist = s
+        .onSuccess { isIn ->
+          Timber.d("Symbol is in watchlist: $isIn")
+          s.apply {
+            isInWatchlist = isIn
+            isInWatchlistError = null
+          }
         }
         .onFailure { e ->
           Timber.e(e, "Error loading symbol in watchlist")
           // Don't need to clear the ticker since last loaded state was valid
-          state.error = e
-        }
-  }
-
-  private suspend fun handleLoadTicker(force: Boolean) {
-    val s = state
-
-    onLoadTicker(
-        force = force,
-    )
-        .onSuccess {
-          // Clear the error on load success
-          s.error = null
-        }
-        .onFailure {
-          // Don't need to clear the ticker since last loaded state was valid
-          s.error = it
+          s.apply {
+            isInWatchlist = false
+            isInWatchlistError = e
+          }
         }
   }
 
@@ -112,5 +104,9 @@ internal constructor(
             // TODO handle error
           }
     }
+  }
+
+  fun handleTabUpdated(section: WatchlistDigSections) {
+    state.section = section
   }
 }

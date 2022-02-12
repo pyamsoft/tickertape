@@ -16,15 +16,12 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
-import com.pyamsoft.tickertape.stocks.api.StockNews
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,44 +55,8 @@ internal constructor(
         )
       }
 
-  @CheckResult
-  private suspend fun loadNews(force: Boolean): ResultWrapper<List<StockNews>> {
-    return interactor
-        .getNews(force, symbol = state.ticker.symbol)
-        .onSuccess { n ->
-          // Clear the error on load success
-          state.apply {
-            news = n
-            newsError = null
-          }
-        }
-        .onFailure { e ->
-          // Don't need to clear the ticker since last loaded state was valid
-          state.apply {
-            news = emptyList()
-            newsError = e
-          }
-        }
-  }
-
-  @CheckResult
-  private suspend fun loadTicker(force: Boolean): ResultWrapper<Ticker> {
-    return onLoadTicker(
-        force,
-    )
-        .onSuccess {
-          // Clear the error on load success
-          state.chartError = null
-        }
-        .onFailure {
-          // Don't need to clear the ticker since last loaded state was valid
-          state.chartError = it
-        }
-  }
-
-  @CheckResult
-  private suspend fun loadHolding(force: Boolean): ResultWrapper<DbHolding> {
-    return interactor
+  private suspend fun loadHolding(force: Boolean) {
+    interactor
         .getHolding(force, holdingId)
         .onSuccess { h ->
           // Clear the error on load success
@@ -113,9 +74,8 @@ internal constructor(
         }
   }
 
-  @CheckResult
-  private suspend fun loadPositions(force: Boolean): ResultWrapper<List<DbPosition>> {
-    return interactor
+  private suspend fun loadPositions(force: Boolean) {
+    interactor
         .getPositions(force, holdingId)
         .onSuccess { p ->
           // Clear the error on load success

@@ -20,9 +20,16 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DigInteractor {
+
+  @CheckResult
+  suspend fun getNews(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<List<StockNews>>
 
   @CheckResult
   suspend fun getChart(

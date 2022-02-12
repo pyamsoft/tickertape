@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -73,15 +74,22 @@ private fun NewsItem(
     ) {
       if (source.isNotBlank()) {
         Text(
-            modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-            text = "From: $source",
-            style = MaterialTheme.typography.caption,
+            modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
+            text = source,
+            style =
+                MaterialTheme.typography.caption.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
         )
       }
       if (title.isNotBlank()) {
         Text(
+            modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
             text = title,
-            style = MaterialTheme.typography.body1,
+            style =
+                MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

@@ -56,8 +56,8 @@ fun HomeScreen(
     imageLoader: ImageLoader,
     navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
-    onChartClicked: (Ticker) -> Unit,
     onSettingsClicked: () -> Unit,
+    onChartClicked: (Ticker) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -88,8 +88,8 @@ private fun HomeContent(
     navBarBottomHeight: Int,
     appName: String,
     imageLoader: ImageLoader,
-    onChartClicked: (Ticker) -> Unit,
     onSettingsClicked: () -> Unit,
+    onChartClicked: (Ticker) -> Unit,
 ) {
   val density = LocalDensity.current
   val bottomPaddingDp =

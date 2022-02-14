@@ -42,6 +42,7 @@ import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.initOnAppStart
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
@@ -157,28 +158,39 @@ internal class MainActivity : PYDroidActivity() {
     }
   }
 
-  private fun handleLaunchIntent() {
-    val extraKey = BigMoverNotificationData.INTENT_KEY_SYMBOL
+  private inline fun <T : Any> retrieveFromIntent(key: String, cast: (String) -> T): T? {
     val launchIntent = intent
     if (launchIntent == null) {
       Timber.w("Missing launch intent")
-      return
+      return null
     }
 
-    val symbolString = launchIntent.getStringExtra(extraKey)
+    val symbolString = launchIntent.getStringExtra(key)
     if (symbolString == null) {
-      Timber.w("Missing launch key: $extraKey")
-      return
+      Timber.w("Missing launch key: $key")
+      return null
     }
 
-    launchIntent.removeExtra(extraKey)
-    val symbol = symbolString.asSymbol()
+    launchIntent.removeExtra(key)
+    return cast(symbolString)
+  }
+
+  private fun handleLaunchIntent() {
+    val symbol =
+        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_SYMBOL) { it.asSymbol() } ?: return
+
+    val equityType =
+        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE) {
+          EquityType.valueOf(it)
+        }
+            ?: return
 
     Timber.d("Launch intent with symbol: $symbol")
     notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
     WatchlistDigDialog.show(
         this,
-        symbol,
+        symbol = symbol,
+        equityType = equityType,
         allowModifyWatchlist = false,
     )
   }

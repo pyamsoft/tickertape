@@ -43,6 +43,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.TickerDestination
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
@@ -57,9 +58,13 @@ class WatchlistFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenDigDialog(ticker: Ticker) {
+    // Fallback to stock
+    val equityType = ticker.quote?.type() ?: EquityType.STOCK
+
     WatchlistDigDialog.show(
         requireActivity(),
         symbol = ticker.symbol,
+        equityType = equityType,
         allowModifyWatchlist = false,
     )
   }
@@ -118,11 +123,11 @@ class WatchlistFragment : Fragment() {
                     imageLoader = loader,
                     navBarBottomHeight = mainState.bottomNavHeight,
                     onRefresh = { handleRefresh(true) },
-                    onSelectTicker = { handleOpenDigDialog(it) },
                     onDeleteTicker = { handleDeleteTicker(it) },
                     onSearchChanged = { vm.handleSearch(it) },
                     onTabUpdated = { vm.handleSectionChanged(it) },
                     onFabClick = { handleFabClicked() },
+                    onSelectTicker = { handleOpenDigDialog(it) },
                 )
               }
             }

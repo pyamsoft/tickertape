@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
@@ -23,7 +24,8 @@ class MutableWatchlistDigViewState
 internal constructor(
     symbol: StockSymbol,
     allowModifyWatchlist: Boolean,
-) : MutableDigViewState(symbol), WatchlistDigViewState {
+    equityType: EquityType,
+) : MutableDigViewState(symbol, equityType), WatchlistDigViewState {
 
   // Not state backed since this is constant
   override val isAllowModifyWatchlist = allowModifyWatchlist

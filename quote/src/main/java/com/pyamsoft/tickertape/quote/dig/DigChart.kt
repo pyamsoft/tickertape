@@ -38,6 +38,7 @@ import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -63,6 +64,8 @@ fun DigChart(
   val currentDate = state.currentDate
   val currentPrice = state.currentPrice
   val openingPrice = state.openingPrice
+  val equityType = state.equityType
+  val isOptions = remember(equityType) { equityType == EquityType.OPTION }
 
   val chart = ticker.chart
 
@@ -96,6 +99,7 @@ fun DigChart(
     Ranges(
         modifier = Modifier.fillMaxWidth(),
         range = range,
+        isOptions = isOptions,
         onRangeSelected = onRangeSelected,
     )
   }
@@ -267,9 +271,20 @@ private data class ScrubDifferences(
 private fun Ranges(
     modifier: Modifier = Modifier,
     range: StockChart.IntervalRange,
+    isOptions: Boolean,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  val allRanges = remember { StockChart.IntervalRange.values() }
+  val allRanges =
+      remember(isOptions) {
+        StockChart.IntervalRange.values().filter { range ->
+          return@filter if (!isOptions) true
+          else {
+            // Options don't support these ranges
+            range != StockChart.IntervalRange.FIVE_DAY &&
+                range != StockChart.IntervalRange.ONE_MONTH
+          }
+        }
+      }
 
   LazyRow(
       modifier = modifier.padding(top = MaterialTheme.keylines.content),

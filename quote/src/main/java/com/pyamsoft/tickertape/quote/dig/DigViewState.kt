@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
@@ -12,6 +13,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
 interface DigViewState : UiViewState {
+  val equityType: EquityType
   val ticker: Ticker
 
   val range: StockChart.IntervalRange
@@ -28,6 +30,7 @@ interface DigViewState : UiViewState {
 abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
+    override val equityType: EquityType,
 ) : DigViewState {
   final override var news by mutableStateOf(emptyList<StockNews>())
   final override var newsError by mutableStateOf<Throwable?>(null)

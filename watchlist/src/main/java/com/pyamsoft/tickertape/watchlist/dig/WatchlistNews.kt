@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.quote.dig.DigNews
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -32,6 +33,7 @@ private fun PreviewWatchlistNews() {
           MutableWatchlistDigViewState(
               symbol = "MSFT".asSymbol(),
               allowModifyWatchlist = true,
+              equityType = EquityType.STOCK,
           ),
       onRefresh = {},
   )

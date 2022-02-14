@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable

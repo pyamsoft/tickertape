@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.BindsInstance
 import dagger.Subcomponent
@@ -33,6 +34,7 @@ internal interface WatchlistDigComponent {
     fun create(
         @BindsInstance symbol: StockSymbol,
         @BindsInstance allowAddToWatchlist: Boolean,
+        @BindsInstance equityType: EquityType,
     ): WatchlistDigComponent
   }
 }

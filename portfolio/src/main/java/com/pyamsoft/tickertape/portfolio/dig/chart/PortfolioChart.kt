@@ -9,6 +9,7 @@ import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 

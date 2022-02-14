@@ -36,6 +36,7 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.currentSession
@@ -77,12 +78,16 @@ internal constructor(private val context: Context, private val activityClass: Cl
   }
 
   @CheckResult
-  private fun getActivityPendingIntent(symbol: StockSymbol): PendingIntent {
+  private fun getActivityPendingIntent(
+      symbol: StockSymbol,
+      equityType: EquityType,
+  ): PendingIntent {
     val appContext = context.applicationContext
     val activityIntent =
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
           putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, symbol.symbol())
+          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, equityType.name)
         }
     return PendingIntent.getActivity(
         appContext,
@@ -136,6 +141,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     val symbol = quote.symbol()
+    val equityType = quote.type()
     val description = buildSpannedString {
       bold { append(symbol.symbol()) }
       append(" is $directionString ")
@@ -148,7 +154,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setShowWhen(false)
         .setAutoCancel(false)
-        .setContentIntent(getActivityPendingIntent(symbol))
+        .setContentIntent(getActivityPendingIntent(symbol, equityType))
         .setContentTitle(title)
         .setContentText(description)
         .setCategory(NotificationCompat.CATEGORY_REMINDER)

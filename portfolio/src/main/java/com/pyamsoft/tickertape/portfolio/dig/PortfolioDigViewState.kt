@@ -13,7 +13,6 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 
 interface PortfolioDigViewState : DigViewState {
-  val equityType: EquityType
   val tradeSide: TradeSide
 
   val isLoading: Boolean
@@ -29,10 +28,10 @@ interface PortfolioDigViewState : DigViewState {
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(
-    override val equityType: EquityType,
-    override val tradeSide: TradeSide,
+    equityType: EquityType,
     symbol: StockSymbol,
-) : MutableDigViewState(symbol), PortfolioDigViewState {
+    override val tradeSide: TradeSide,
+) : MutableDigViewState(symbol, equityType), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.CHART)
 

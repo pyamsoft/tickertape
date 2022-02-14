@@ -41,6 +41,7 @@ import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -58,6 +59,14 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         .getString(KEY_SYMBOL)
         .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
         .asSymbol()
+  }
+
+  @CheckResult
+  private fun getEquityType(): EquityType {
+    return requireArguments()
+        .getString(KEY_EQUITY_TYPE)
+        .let { it.requireNotNull { "Must be created with $KEY_EQUITY_TYPE" } }
+        .let { EquityType.valueOf(it) }
   }
 
   @CheckResult
@@ -108,7 +117,11 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
         .plusWatchlistDigComponent()
-        .create(getSymbol(), getAllowModifyWatchlist())
+        .create(
+            getSymbol(),
+            getAllowModifyWatchlist(),
+            getEquityType(),
+        )
         .inject(this)
 
     val vm = viewModel.requireNotNull()
@@ -172,6 +185,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_EQUITY_TYPE = "key_equity_type"
     private const val KEY_ALLOW_MODIFY = "key_allow_modify"
     private const val TAG = "WatchlistDigDialog"
 
@@ -179,12 +193,14 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     @CheckResult
     private fun newInstance(
         symbol: StockSymbol,
+        equityType: EquityType,
         allowModifyWatchlist: Boolean,
     ): DialogFragment {
       return WatchlistDigDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_EQUITY_TYPE, equityType.name)
               putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
             }
       }
@@ -194,9 +210,15 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     fun show(
         activity: FragmentActivity,
         symbol: StockSymbol,
+        equityType: EquityType,
         allowModifyWatchlist: Boolean,
     ) {
-      newInstance(symbol, allowModifyWatchlist).show(activity, TAG)
+      newInstance(
+              symbol,
+              equityType,
+              allowModifyWatchlist,
+          )
+          .show(activity, TAG)
     }
   }
 }

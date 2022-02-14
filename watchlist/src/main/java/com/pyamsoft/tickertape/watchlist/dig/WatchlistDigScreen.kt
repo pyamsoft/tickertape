@@ -18,6 +18,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.dig.DigChart
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
@@ -85,6 +86,7 @@ private fun Content(
     onRefresh: () -> Unit,
 ) {
   val section = state.section
+
   Crossfade(
       modifier = modifier,
       targetState = section,
@@ -130,6 +132,7 @@ private fun PreviewWatchlistDigScreen() {
           MutableWatchlistDigViewState(
               symbol = "MSFT".asSymbol(),
               allowModifyWatchlist = true,
+              equityType = EquityType.STOCK,
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},

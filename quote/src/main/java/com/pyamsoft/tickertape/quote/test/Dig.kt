@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.quote.test
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -20,6 +21,8 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
             quote = newTestQuote(symbol),
             chart = newTestChart(symbol),
         )
+
+    override val equityType: EquityType = EquityType.STOCK
 
     override val range = StockChart.IntervalRange.ONE_DAY
 

@@ -39,16 +39,18 @@ import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.STOCK_DIRECTION_DOWN
+import com.pyamsoft.tickertape.stocks.api.STOCK_DIRECTION_UP
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
-import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDateTime
+import kotlin.math.abs
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
@@ -225,27 +227,26 @@ private fun calculateDifferences(
 ): ScrubDifferences {
   val rawCurrent = current.value()
   val rawOpen = openingPrice.value()
-  if (rawCurrent.compareTo(rawOpen) == 0) {
+
+  val comparison = rawCurrent.compareTo(rawOpen)
+  if (comparison == 0) {
     return ScrubDifferences.ZERO
+  } else {
+    val direction = if (comparison < 0) STOCK_DIRECTION_DOWN else STOCK_DIRECTION_UP
+
+    // Amount doesn't matter which direction
+    val rawAmount = abs(rawCurrent - rawOpen)
+
+    // Percentage is between 0-100 not 0 and 1
+    val rawPercent = (rawAmount / rawOpen) * 100
+
+    return ScrubDifferences(
+        amount = rawAmount.asMoney(),
+        percent = rawPercent.asPercent(),
+        direction = direction,
+        color = Color(direction.color()),
+    )
   }
-
-  val rawAmount = rawCurrent - rawOpen
-  val direction = rawAmount.asDirection()
-
-  // Percentage is between 0-100 not 0 and 1
-  val rawPercent = rawAmount / rawCurrent * 100
-
-  return ScrubDifferences(
-      amount = rawAmount.asMoney(),
-      percent = rawPercent.asPercent(),
-      direction = direction,
-      color =
-          if (direction.isZero()) {
-            Color.Unspecified
-          } else {
-            Color(direction.color())
-          },
-  )
 }
 
 private data class ScrubDifferences(

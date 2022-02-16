@@ -46,3 +46,6 @@ interface StockDirection : StockNumberValue {
 fun Double.asDirection(): StockDirection {
   return StockDirectionImpl(this)
 }
+
+val STOCK_DIRECTION_UP = 1.0.asDirection()
+val STOCK_DIRECTION_DOWN = (-1.0).asDirection()

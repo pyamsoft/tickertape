@@ -80,10 +80,10 @@ fun DigChart(
     ) { c ->
       if (c != null) {
         Column(
-            modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP),
+            modifier = Modifier.fillMaxWidth(),
         ) {
           Chart(
-              modifier = Modifier.fillMaxWidth().weight(1F),
+              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP),
               chart = c,
               onScrub = onScrub,
           )

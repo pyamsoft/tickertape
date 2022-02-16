@@ -95,6 +95,15 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         )
   }
 
+  private fun handleTabUpdated(section: PortfolioDigSections) {
+    viewModel
+        .requireNotNull()
+        .handleTabUpdated(
+            scope = viewLifecycleOwner.lifecycleScope,
+            section = section,
+        )
+  }
+
   @CheckResult
   private fun getSymbol(): StockSymbol {
     return requireArguments()
@@ -173,7 +182,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
                 onClose = { dismiss() },
                 onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = { handleRangeSelected(it) },
-                onTabUpdated = { vm.handleTabUpdated(it) },
+                onTabUpdated = { handleTabUpdated(it) },
                 onRefresh = { handleRefresh(true) },
                 onAddPosition = { handleAddPosition() },
                 onDeletePosition = { handleDeletePosition(it) },

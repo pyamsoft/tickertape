@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -40,11 +41,22 @@ internal constructor(
 
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
-        awaitAll(
-            async { loadTicker(force) },
-            async { loadNews(force) },
-            async { checkIsInWatchlist(force) },
-        )
+        mutableListOf<Deferred<*>>()
+            .apply {
+              // Always this
+              add(async { checkIsInWatchlist(force) })
+
+              // Based on the page
+              when (state.section) {
+                WatchlistDigSections.CHART -> {
+                  add(async { loadTicker(force) })
+                }
+                WatchlistDigSections.NEWS -> {
+                  add(async { loadNews(force) })
+                }
+              }
+            }
+            .awaitAll()
       }
 
   private val watchlistModifyRunner =
@@ -106,7 +118,8 @@ internal constructor(
     }
   }
 
-  fun handleTabUpdated(section: WatchlistDigSections) {
+  fun handleTabUpdated(scope: CoroutineScope, section: WatchlistDigSections) {
     state.section = section
+    handleLoadTicker(scope, force = false)
   }
 }

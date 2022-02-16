@@ -97,7 +97,12 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   }
 
   private fun handleTabUpdated(section: WatchlistDigSections) {
-    viewModel.requireNotNull().handleTabUpdated(section = section)
+    viewModel
+        .requireNotNull()
+        .handleTabUpdated(
+            scope = viewLifecycleOwner.lifecycleScope,
+            section = section,
+        )
   }
 
   private fun handleRefresh(force: Boolean) {

@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -47,12 +48,22 @@ internal constructor(
 
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
-        awaitAll(
-            async { loadTicker(force) },
-            async { loadNews(force) },
-            async { loadHolding(force) },
-            async { loadPositions(force) },
-        )
+        mutableListOf<Deferred<*>>()
+            .apply {
+              when (state.section) {
+                PortfolioDigSections.CHART -> {
+                  add(async { loadTicker(force) })
+                }
+                PortfolioDigSections.NEWS -> {
+                  add(async { loadNews(force) })
+                }
+                PortfolioDigSections.POSITIONS -> {
+                  add(async { loadHolding(force) })
+                  add(async { loadPositions(force) })
+                }
+              }
+            }
+            .awaitAll()
       }
 
   private suspend fun loadHolding(force: Boolean) {
@@ -166,7 +177,8 @@ internal constructor(
     }
   }
 
-  fun handleTabUpdated(section: PortfolioDigSections) {
+  fun handleTabUpdated(scope: CoroutineScope, section: PortfolioDigSections) {
     state.section = section
+    handleLoadTicker(scope, force = false)
   }
 }

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
@@ -23,6 +24,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
@@ -53,6 +55,9 @@ internal constructor(
             async { fetchIndexes(force) },
             async { fetchGainers(force) },
             async { fetchMostShorted(force) },
+            async { fetchGrowthTech(force) },
+            async { fetchUndervaluedGrowth(force) },
+            async { fetchMostActive(force) },
         )
       }
 
@@ -123,70 +128,110 @@ internal constructor(
         .onFinally { state.isLoadingIndexes = false }
   }
 
-  private suspend fun fetchGainers(force: Boolean) {
-    state.isLoadingGainers = true
+  @CheckResult
+  private suspend fun fetchScreener(
+      force: Boolean,
+      screener: StockScreener,
+      onLoading: (Boolean) -> Unit,
+      onFetched: (List<Ticker>, Throwable?) -> Unit,
+  ) {
+    onLoading(true)
     homeInteractor
-        .getDayGainers(force, WATCHLIST_COUNT)
-        .onSuccess {
+        .getScreener(force, screener, WATCHLIST_COUNT)
+        .onSuccess { onFetched(it, null) }
+        .onFailure { Timber.e(it, "Failed to fetch screener: $screener") }
+        .onFailure { onFetched(emptyList(), it) }
+        .onFinally { onLoading(false) }
+  }
+
+  private suspend fun fetchGainers(force: Boolean) {
+    fetchScreener(
+        force,
+        StockScreener.DAY_GAINERS,
+        onLoading = { state.isLoadingGainers = it },
+        onFetched = { list, error ->
           state.apply {
-            gainers = it
-            gainersError = null
+            gainers = list
+            gainersError = error
           }
-        }
-        .onFailure { Timber.e(it, "Failed to fetch gainers") }
-        .onFailure {
+        },
+    )
+  }
+
+  private suspend fun fetchGrowthTech(force: Boolean) {
+    fetchScreener(
+        force,
+        StockScreener.GROWTH_TECHNOLOGY_STOCKS,
+        onLoading = { state.isLoadingGrowthTech = it },
+        onFetched = { list, error ->
           state.apply {
-            gainers = emptyList()
-            gainersError = it
+            growthTech = list
+            growthTechError = error
           }
-        }
-        .onFinally { state.isLoadingGainers = false }
+        },
+    )
+  }
+
+  private suspend fun fetchUndervaluedGrowth(force: Boolean) {
+    fetchScreener(
+        force,
+        StockScreener.UNDERVALUED_GROWTH_STOCKS,
+        onLoading = { state.isLoadingUndervaluedGrowth = it },
+        onFetched = { list, error ->
+          state.apply {
+            undervaluedGrowth = list
+            undervaluedGrowthError = error
+          }
+        },
+    )
+  }
+
+  private suspend fun fetchMostActive(force: Boolean) {
+    fetchScreener(
+        force,
+        StockScreener.MOST_ACTIVES,
+        onLoading = { state.isLoadingMostActive = it },
+        onFetched = { list, error ->
+          state.apply {
+            mostActive = list
+            mostActiveError = error
+          }
+        },
+    )
   }
 
   private suspend fun fetchLosers(force: Boolean) {
-    state.isLoadingLosers = true
-    homeInteractor
-        .getDayLosers(force, WATCHLIST_COUNT)
-        .onSuccess {
+    fetchScreener(
+        force,
+        StockScreener.DAY_LOSERS,
+        onLoading = { state.isLoadingLosers = it },
+        onFetched = { list, error ->
           state.apply {
-            losers = it
-            losersError = null
+            losers = list
+            losersError = error
           }
-        }
-        .onFailure { Timber.e(it, "Failed to fetch losers") }
-        .onFailure {
-          state.apply {
-            losers = emptyList()
-            losersError = it
-          }
-        }
-        .onFinally { state.isLoadingLosers = false }
+        },
+    )
   }
 
   private suspend fun fetchMostShorted(force: Boolean) {
-    state.isLoadingMostShorted = true
-    homeInteractor
-        .getDayShorted(force, WATCHLIST_COUNT)
-        .onSuccess {
+    fetchScreener(
+        force,
+        StockScreener.MOST_SHORTED_STOCKS,
+        onLoading = { state.isLoadingMostShorted = it },
+        onFetched = { list, error ->
           state.apply {
-            mostShorted = it
-            mostShortedError = null
+            mostShorted = list
+            mostShortedError = error
           }
-        }
-        .onFailure { Timber.e(it, "Failed to fetch most shorted") }
-        .onFailure {
-          state.apply {
-            mostShorted = emptyList()
-            mostShortedError = null
-          }
-        }
-        .onFinally { state.isLoadingMostShorted = false }
+        },
+    )
   }
 
   private suspend fun fetchTrending(force: Boolean) {
     state.isLoadingTrending = true
     homeInteractor
-        .getDayTrending(force, TRENDING_COUNT)
+        .getTrending(force, TRENDING_COUNT)
         .onSuccess {
           state.apply {
             trending = it

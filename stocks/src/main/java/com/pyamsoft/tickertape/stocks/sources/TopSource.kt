@@ -17,26 +17,16 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 
 interface TopSource {
 
   @CheckResult
-  suspend fun getDayGainers(
+  suspend fun getScreener(
       force: Boolean,
-      count: Int,
-  ): StockTops
-
-  @CheckResult
-  suspend fun getDayLosers(
-      force: Boolean,
-      count: Int,
-  ): StockTops
-
-  @CheckResult
-  suspend fun getMostShorted(
-      force: Boolean,
+      screener: StockScreener,
       count: Int,
   ): StockTops
 

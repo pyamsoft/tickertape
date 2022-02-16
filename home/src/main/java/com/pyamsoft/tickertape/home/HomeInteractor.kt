@@ -19,29 +19,19 @@ package com.pyamsoft.tickertape.home
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 
 internal interface HomeInteractor {
 
   @CheckResult
-  suspend fun getDayGainers(
+  suspend fun getScreener(
       force: Boolean,
+      screener: StockScreener,
       count: Int,
   ): ResultWrapper<List<Ticker>>
 
   @CheckResult
-  suspend fun getDayLosers(
-      force: Boolean,
-      count: Int,
-  ): ResultWrapper<List<Ticker>>
-
-  @CheckResult
-  suspend fun getDayShorted(
-      force: Boolean,
-      count: Int,
-  ): ResultWrapper<List<Ticker>>
-
-  @CheckResult
-  suspend fun getDayTrending(
+  suspend fun getTrending(
       force: Boolean,
       count: Int,
   ): ResultWrapper<List<Ticker>>

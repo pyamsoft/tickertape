@@ -69,6 +69,24 @@ interface HomeShortedViewState : BaseState {
   val mostShortedError: Throwable?
 }
 
+interface HomeGrowthTechViewState : BaseState {
+  val isLoadingGrowthTech: Boolean
+  val growthTech: List<Ticker>
+  val growthTechError: Throwable?
+}
+
+interface HomeUndervaluedGrowthViewState : BaseState {
+  val isLoadingUndervaluedGrowth: Boolean
+  val undervaluedGrowth: List<Ticker>
+  val undervaluedGrowthError: Throwable?
+}
+
+interface HomeMostActiveViewState : BaseState {
+  val isLoadingMostActive: Boolean
+  val mostActive: List<Ticker>
+  val mostActiveError: Throwable?
+}
+
 interface HomeViewState :
     UiViewState,
     HomePortfolioViewState,
@@ -77,7 +95,10 @@ interface HomeViewState :
     HomeGainersViewState,
     HomeLosersViewState,
     HomeTrendingViewState,
-    HomeShortedViewState {
+    HomeShortedViewState,
+    HomeUndervaluedGrowthViewState,
+    HomeGrowthTechViewState,
+    HomeMostActiveViewState {
   val isLoading: Boolean
 }
 
@@ -112,4 +133,16 @@ internal class MutableHomeViewState @Inject internal constructor() : HomeViewSta
   override var isLoadingMostShorted by mutableStateOf(false)
   override var mostShorted by mutableStateOf(emptyList<Ticker>())
   override var mostShortedError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingGrowthTech by mutableStateOf(false)
+  override var growthTech by mutableStateOf(emptyList<Ticker>())
+  override var growthTechError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingUndervaluedGrowth by mutableStateOf(false)
+  override var undervaluedGrowth by mutableStateOf(emptyList<Ticker>())
+  override var undervaluedGrowthError by mutableStateOf<Throwable?>(null)
+
+  override var isLoadingMostActive by mutableStateOf(false)
+  override var mostActive by mutableStateOf(emptyList<Ticker>())
+  override var mostActiveError by mutableStateOf<Throwable?>(null)
 }

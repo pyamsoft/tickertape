@@ -148,17 +148,18 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Open",
-          value = quote.dayOpen().asMoneyValue(),
-      )
+      quote.dayOpen()?.also { open ->
+        Info(
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+            name = "Open",
+            value = open.asMoneyValue(),
+        )
+      }
 
-      val previousClose = quote.dayPreviousClose()
-      if (previousClose != null) {
+      quote.dayPreviousClose()?.also { close ->
         Info(
             name = "Previous Close",
-            value = previousClose.asMoneyValue(),
+            value = close.asMoneyValue(),
         )
       }
     }
@@ -167,21 +168,27 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Low",
-          value = quote.dayLow().asMoneyValue(),
-      )
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "High",
-          value = quote.dayHigh().asMoneyValue(),
-      )
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Volume",
-          value = quote.dayVolume().asVolumeValue(),
-      )
+      quote.dayLow()?.also { low ->
+        Info(
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+            name = "Low",
+            value = low.asMoneyValue(),
+        )
+      }
+      quote.dayHigh()?.also { high ->
+        Info(
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+            name = "High",
+            value = high.asMoneyValue(),
+        )
+      }
+      quote.dayVolume()?.also { volume ->
+        Info(
+            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+            name = "Volume",
+            value = volume.asVolumeValue(),
+        )
+      }
     }
   }
 }

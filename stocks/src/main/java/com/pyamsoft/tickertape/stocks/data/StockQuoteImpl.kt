@@ -33,10 +33,10 @@ internal data class StockQuoteImpl(
     private val afterHours: StockMarketSession?,
     private val dataDelayBy: Long,
     private val dayPreviousClose: StockMoneyValue?,
-    private val dayHigh: StockMoneyValue,
-    private val dayLow: StockMoneyValue,
-    private val dayOpen: StockMoneyValue,
-    private val dayVolume: StockVolumeValue,
+    private val dayHigh: StockMoneyValue?,
+    private val dayLow: StockMoneyValue?,
+    private val dayOpen: StockMoneyValue?,
+    private val dayVolume: StockVolumeValue?,
 ) : StockQuote {
 
   override fun symbol(): StockSymbol {
@@ -71,19 +71,19 @@ internal data class StockQuoteImpl(
     return dayPreviousClose
   }
 
-  override fun dayVolume(): StockVolumeValue {
+  override fun dayVolume(): StockVolumeValue? {
     return dayVolume
   }
 
-  override fun dayOpen(): StockMoneyValue {
+  override fun dayOpen(): StockMoneyValue? {
     return dayOpen
   }
 
-  override fun dayLow(): StockMoneyValue {
+  override fun dayLow(): StockMoneyValue? {
     return dayLow
   }
 
-  override fun dayHigh(): StockMoneyValue {
+  override fun dayHigh(): StockMoneyValue? {
     return dayHigh
   }
 }

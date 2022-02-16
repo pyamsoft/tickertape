@@ -52,10 +52,9 @@ internal constructor(@YahooApi private val service: SearchService) : SearchSourc
               // Remove duplicate listings
               .distinctBy { it.symbol }
               .map { quote ->
-                val company = (quote.longname ?: quote.shortname).orEmpty().asCompany()
                 return@map SearchResult.create(
                     symbol = quote.symbol.asSymbol(),
-                    name = company,
+                    name = quote.name.orEmpty().asCompany(),
                     score = quote.score,
                     type = EquityType.from(quote.quoteType),
                 )

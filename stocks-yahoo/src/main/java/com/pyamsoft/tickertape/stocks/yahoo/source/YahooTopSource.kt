@@ -16,13 +16,13 @@
 
 package com.pyamsoft.tickertape.stocks.yahoo.source
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -69,30 +69,16 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
             .first()
       }
 
-  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops {
-    return getTops(TopType.GAINERS, count)
-  }
-
-  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops {
-    return getTops(TopType.LOSERS, count)
-  }
-
-  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops {
-    return getTops(TopType.SHORTED, count)
-  }
-
-  @CheckResult
-  private suspend fun getTops(type: TopType, count: Int): StockTops =
+  override suspend fun getScreener(
+      force: Boolean,
+      screener: StockScreener,
+      count: Int,
+  ): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val result =
-            when (type) {
-              TopType.GAINERS -> service.getDayGainers(count)
-              TopType.LOSERS -> service.getDayLosers(count)
-              TopType.SHORTED -> service.getMostShorted(count)
-            }
-        return@withContext result
+        return@withContext service
+            .getScreener(count, screener.name.lowercase())
             .finance
             .result
             .asSequence()
@@ -112,16 +98,13 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                             StockQuote.create(
                                 symbol = stock.symbol.asSymbol(),
                                 equityType = EquityType.from(stock.quoteType.requireNotNull()),
-                                company =
-                                    (stock.longName ?: stock.shortName)
-                                        .requireNotNull()
-                                        .asCompany(),
+                                company = stock.name.requireNotNull().asCompany(),
                                 dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
                                 dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
-                                dayHigh = stock.regularMarketDayHigh.requireNotNull().asMoney(),
-                                dayLow = stock.regularMarketDayLow.requireNotNull().asMoney(),
-                                dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
-                                dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
+                                dayHigh = stock.regularMarketDayHigh?.asMoney(),
+                                dayLow = stock.regularMarketDayLow?.asMoney(),
+                                dayOpen = stock.regularMarketOpen?.asMoney(),
+                                dayVolume = stock.regularMarketVolume?.asVolume(),
                                 regular =
                                     StockMarketSession.create(
                                         amount =
@@ -174,14 +157,9 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                     },
                             )
                           }
-                          .toList())
+                          .toList(),
+              )
             }
             .first()
       }
-
-  private enum class TopType {
-    GAINERS,
-    LOSERS,
-    SHORTED
-  }
 }

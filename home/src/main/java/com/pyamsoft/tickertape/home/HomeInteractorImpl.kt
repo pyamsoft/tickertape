@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,74 +53,27 @@ internal constructor(
     )
   }
 
-  @CheckResult
-  private suspend fun getCharts(
+  override suspend fun getScreener(
       force: Boolean,
-      quotes: List<StockQuote>,
-  ): ResultWrapper<List<Ticker>> {
-    return lookupCharts(
-        force,
-        quotes.map { it.symbol() },
-    )
-  }
-
-  override suspend fun getDayGainers(
-      force: Boolean,
-      count: Int,
+      screener: StockScreener,
+      count: Int
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val top = stockInteractor.getDayGainers(force, count)
-          getCharts(force, top.quotes())
+          val top = stockInteractor.getScreener(force, screener, count)
+          lookupCharts(force, top.quotes().map { it.symbol() })
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting day gainers")
-            ResultWrapper.failure(e)
-          }
-        }
-      }
-
-  override suspend fun getDayLosers(
-      force: Boolean,
-      count: Int,
-  ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val top = stockInteractor.getDayLosers(force, count)
-          getCharts(force, top.quotes())
-        } catch (e: Throwable) {
-          e.ifNotCancellation {
-            Timber.e(e, "Error getting day losers")
+            Timber.e(e, "Error getting screener: $screener")
             ResultWrapper.failure(e)
           }
         }
       }
 
   @CheckResult
-  override suspend fun getDayShorted(
-      force: Boolean,
-      count: Int,
-  ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val top = stockInteractor.getMostShorted(force, count)
-          getCharts(force, top.quotes())
-        } catch (e: Throwable) {
-          e.ifNotCancellation {
-            Timber.e(e, "Error getting most shorted")
-            ResultWrapper.failure(e)
-          }
-        }
-      }
-
-  @CheckResult
-  override suspend fun getDayTrending(
+  override suspend fun getTrending(
       force: Boolean,
       count: Int,
   ): ResultWrapper<List<Ticker>> =

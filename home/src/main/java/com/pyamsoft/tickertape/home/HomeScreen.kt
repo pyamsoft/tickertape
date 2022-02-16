@@ -131,6 +131,21 @@ private fun HomeContent(
         imageLoader = imageLoader,
         onChartClicked = onChartClicked,
     )
+    HomeMostActive(
+        state = state,
+        imageLoader = imageLoader,
+        onChartClicked = onChartClicked,
+    )
+    HomeUndervaluedGrowth(
+        state = state,
+        imageLoader = imageLoader,
+        onChartClicked = onChartClicked,
+    )
+    HomeGrowthTech(
+        state = state,
+        imageLoader = imageLoader,
+        onChartClicked = onChartClicked,
+    )
     HomeMostShorted(
         state = state,
         imageLoader = imageLoader,

@@ -56,6 +56,9 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
         val preMarketChange: Double?,
         val preMarketChangePercent: Double?,
         val preMarketPreviousClose: Double?,
-    )
+    ) {
+
+      val name = shortName ?: longName
+    }
   }
 }

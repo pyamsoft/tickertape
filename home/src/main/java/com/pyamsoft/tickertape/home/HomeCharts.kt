@@ -140,6 +140,60 @@ internal fun HomeMostShorted(
 }
 
 @Composable
+internal fun HomeMostActive(
+    modifier: Modifier = Modifier,
+    state: HomeMostActiveViewState,
+    imageLoader: ImageLoader,
+    onChartClicked: (Ticker) -> Unit,
+) {
+  HomeCharts(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      name = "Today's Most Active Stocks",
+      isLoading = state.isLoadingMostActive,
+      tickers = state.mostActive,
+      error = state.mostActiveError,
+      onChartClicked = onChartClicked,
+  )
+}
+
+@Composable
+internal fun HomeGrowthTech(
+    modifier: Modifier = Modifier,
+    state: HomeGrowthTechViewState,
+    imageLoader: ImageLoader,
+    onChartClicked: (Ticker) -> Unit,
+) {
+  HomeCharts(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      name = "Growth Tech Stocks",
+      isLoading = state.isLoadingGrowthTech,
+      tickers = state.growthTech,
+      error = state.growthTechError,
+      onChartClicked = onChartClicked,
+  )
+}
+
+@Composable
+internal fun HomeUndervaluedGrowth(
+    modifier: Modifier = Modifier,
+    state: HomeUndervaluedGrowthViewState,
+    imageLoader: ImageLoader,
+    onChartClicked: (Ticker) -> Unit,
+) {
+  HomeCharts(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      name = "Undervalued Growth Stocks",
+      isLoading = state.isLoadingUndervaluedGrowth,
+      tickers = state.undervaluedGrowth,
+      error = state.undervaluedGrowthError,
+      onChartClicked = onChartClicked,
+  )
+}
+
+@Composable
 private fun HomeCharts(
     modifier: Modifier = Modifier,
     name: String,

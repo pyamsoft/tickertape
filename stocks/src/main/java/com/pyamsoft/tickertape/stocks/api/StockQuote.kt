@@ -37,13 +37,13 @@ interface StockQuote {
 
   @CheckResult fun dayPreviousClose(): StockMoneyValue?
 
-  @CheckResult fun dayOpen(): StockMoneyValue
+  @CheckResult fun dayOpen(): StockMoneyValue?
 
-  @CheckResult fun dayHigh(): StockMoneyValue
+  @CheckResult fun dayHigh(): StockMoneyValue?
 
-  @CheckResult fun dayLow(): StockMoneyValue
+  @CheckResult fun dayLow(): StockMoneyValue?
 
-  @CheckResult fun dayVolume(): StockVolumeValue
+  @CheckResult fun dayVolume(): StockVolumeValue?
 
   companion object {
     @JvmStatic
@@ -57,10 +57,10 @@ interface StockQuote {
         afterHours: StockMarketSession?,
         dataDelayBy: Long,
         dayPreviousClose: StockMoneyValue?,
-        dayHigh: StockMoneyValue,
-        dayLow: StockMoneyValue,
-        dayOpen: StockMoneyValue,
-        dayVolume: StockVolumeValue,
+        dayHigh: StockMoneyValue?,
+        dayLow: StockMoneyValue?,
+        dayOpen: StockMoneyValue?,
+        dayVolume: StockVolumeValue?,
     ): StockQuote {
       return StockQuoteImpl(
           symbol = symbol,

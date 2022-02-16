@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
@@ -55,20 +56,10 @@ internal constructor(
           storage = { listOf(createNewMemoryCacheStorage()) },
       ) { interactor.getTrending(true, it) }
 
-  private val gainerCache =
-      cachify<StockTops, Int>(
+  private val topCaches =
+      multiCachify<StockScreener, StockTops, StockScreener, Int>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getDayGainers(true, it) }
-
-  private val loserCache =
-      cachify<StockTops, Int>(
-          storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getDayLosers(true, it) }
-
-  private val shortedCache =
-      cachify<StockTops, Int>(
-          storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getMostShorted(true, it) }
+      ) { screener, count -> interactor.getScreener(true, screener, count) }
 
   private val searchCache =
       multiCachify<String, List<SearchResult>, String>(
@@ -122,37 +113,16 @@ internal constructor(
         return@withContext trendingCache.call(count)
       }
 
-  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
+  override suspend fun getScreener(force: Boolean, screener: StockScreener, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
+        val cache = topCaches.key(screener)
         if (force) {
-          gainerCache.clear()
+          cache.clear()
         }
 
-        return@withContext gainerCache.call(count)
-      }
-
-  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        if (force) {
-          loserCache.clear()
-        }
-
-        return@withContext loserCache.call(count)
-      }
-
-  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        if (force) {
-          shortedCache.clear()
-        }
-
-        return@withContext shortedCache.call(count)
+        return@withContext cache.call(screener, count)
       }
 
   override suspend fun getOptions(

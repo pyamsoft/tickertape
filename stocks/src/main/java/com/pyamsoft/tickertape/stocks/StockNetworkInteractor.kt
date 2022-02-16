@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
@@ -94,22 +95,10 @@ internal constructor(
         return@withContext topSource.getTrending(force, count)
       }
 
-  override suspend fun getDayGainers(force: Boolean, count: Int): StockTops =
+  override suspend fun getScreener(force: Boolean, screener: StockScreener, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext topSource.getDayGainers(force, count)
-      }
-
-  override suspend fun getDayLosers(force: Boolean, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext topSource.getDayLosers(force, count)
-      }
-
-  override suspend fun getMostShorted(force: Boolean, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext topSource.getMostShorted(force, count)
+        return@withContext topSource.getScreener(force, screener, count)
       }
 
   override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =

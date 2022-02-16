@@ -83,7 +83,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
       return StockOptionsQuote.create(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
-          company = (stock.longName ?: stock.shortName).requireNotNull().asCompany(),
+          company = stock.name.requireNotNull().asCompany(),
           strike = stock.strike.requireNotNull().asMoney(),
           expireDate = parseMarketTime(stock.expireDate.requireNotNull(), localId),
           dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
@@ -131,13 +131,13 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
       return StockQuote.create(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
-          company = (stock.longName ?: stock.shortName).requireNotNull().asCompany(),
+          company = stock.name.requireNotNull().asCompany(),
           dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
-          dayHigh = stock.regularMarketDayHigh.requireNotNull().asMoney(),
-          dayLow = stock.regularMarketDayLow.requireNotNull().asMoney(),
-          dayOpen = stock.regularMarketOpen.requireNotNull().asMoney(),
-          dayVolume = stock.regularMarketVolume.requireNotNull().asVolume(),
+          dayHigh = stock.regularMarketDayHigh?.asMoney(),
+          dayLow = stock.regularMarketDayLow?.asMoney(),
+          dayOpen = stock.regularMarketOpen?.asMoney(),
+          dayVolume = stock.regularMarketVolume?.asVolume(),
           regular =
               StockMarketSession.create(
                   amount = stock.regularMarketChange.requireNotNull().asMoney(),
@@ -175,6 +175,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
         listOf(
                 "symbol",
                 "shortName",
+                "longName",
                 "exchangeDataDelayedBy",
                 "marketState",
                 // Options

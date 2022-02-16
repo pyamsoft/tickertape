@@ -266,6 +266,25 @@ internal constructor(
 
     private const val TRENDING_COUNT = 20
     private const val WATCHLIST_COUNT = 10
-    private val INDEXES = listOf("^GSPC", "^DJI", "^IXIC", "^RUT", "^VIX").map { it.asSymbol() }
+    private val INDEXES =
+        listOf(
+            "^GSPC",
+            "^DJI",
+            "^IXIC",
+            "^RUT",
+            "^VIX",
+            "^TNX",
+            "^FTSE",
+            "^N225",
+            "^CMC200",
+            "ES=F",
+            "NQ=F",
+            "YM=F",
+            "RTY=F",
+            "GC=F",
+            "SI=F",
+            "CL=F",
+        )
+            .map { it.asSymbol() }
   }
 }

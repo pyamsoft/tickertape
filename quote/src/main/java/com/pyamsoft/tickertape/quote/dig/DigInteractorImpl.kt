@@ -37,7 +37,7 @@ protected constructor(
 
   final override suspend fun getNews(
       force: Boolean,
-      symbol: StockSymbol
+      symbol: StockSymbol,
   ): ResultWrapper<List<StockNews>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -45,7 +45,7 @@ protected constructor(
           ResultWrapper.success(stockInteractor.getNews(force, symbol))
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting news for symbol: ${symbol.symbol()}")
+            Timber.e(e, "Error getting news ${symbol.symbol()}")
             ResultWrapper.failure(e)
           }
         }

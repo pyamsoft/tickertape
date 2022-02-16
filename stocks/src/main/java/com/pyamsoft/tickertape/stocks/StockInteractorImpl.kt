@@ -184,7 +184,10 @@ internal constructor(
         }
       }
 
-  override suspend fun getNews(force: Boolean, symbol: StockSymbol): List<StockNews> =
+  override suspend fun getNews(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): List<StockNews> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

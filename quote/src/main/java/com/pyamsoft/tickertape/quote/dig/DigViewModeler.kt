@@ -31,18 +31,22 @@ protected constructor(
 ) : AbstractViewModeler<S>(state) {
 
   protected suspend fun loadNews(force: Boolean) {
+    val s = state
     interactor
-        .getNews(force, symbol = state.ticker.symbol)
+        .getNews(
+            force = force,
+            symbol = s.ticker.symbol,
+        )
         .onSuccess { n ->
           // Clear the error on load success
-          state.apply {
+          s.apply {
             news = n
             newsError = null
           }
         }
         .onFailure { e ->
           // Don't need to clear the ticker since last loaded state was valid
-          state.apply {
+          s.apply {
             news = emptyList()
             newsError = e
           }

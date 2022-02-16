@@ -32,20 +32,36 @@ interface StockDirection : StockNumberValue {
 
   companion object {
 
-    private val EMPTY = 0.0.asDirection()
+    private val EMPTY = StockDirectionImpl(0.0)
+    private val UP = StockDirectionImpl(1.0)
+    private val DOWN = StockDirectionImpl(-1.0)
 
     @JvmStatic
     @CheckResult
     fun none(): StockDirection {
       return EMPTY
     }
+
+    @JvmStatic
+    @CheckResult
+    fun up(): StockDirection {
+      return UP
+    }
+
+    @JvmStatic
+    @CheckResult
+    fun down(): StockDirection {
+      return DOWN
+    }
   }
 }
 
 @CheckResult
 fun Double.asDirection(): StockDirection {
-  return StockDirectionImpl(this)
+  val comparison = this.compareTo(0)
+  return when {
+    comparison == 0 -> StockDirection.none()
+    comparison > 0 -> StockDirection.up()
+    else -> StockDirection.down()
+  }
 }
-
-val STOCK_DIRECTION_UP = 1.0.asDirection()
-val STOCK_DIRECTION_DOWN = (-1.0).asDirection()

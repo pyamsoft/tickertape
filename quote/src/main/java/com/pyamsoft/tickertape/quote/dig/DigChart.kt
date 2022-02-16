@@ -39,8 +39,6 @@ import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.STOCK_DIRECTION_DOWN
-import com.pyamsoft.tickertape.stocks.api.STOCK_DIRECTION_UP
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -142,13 +140,13 @@ private fun CurrentScrub(
         ) {
           if (openingPrice != null) {
             Text(
-                modifier = Modifier.weight(0.8F),
+                modifier = Modifier.weight(0.6F),
                 text = openingPrice.asMoneyValue(),
                 style = MaterialTheme.typography.body1,
             )
 
             CurrentPriceSpacer(
-                modifier = Modifier.weight(0.2F),
+                modifier = Modifier.weight(0.05F),
             )
           }
 
@@ -232,7 +230,7 @@ private fun calculateDifferences(
   if (comparison == 0) {
     return ScrubDifferences.ZERO
   } else {
-    val direction = if (comparison < 0) STOCK_DIRECTION_DOWN else STOCK_DIRECTION_UP
+    val direction = if (comparison < 0) StockDirection.down() else StockDirection.up()
 
     // Amount doesn't matter which direction
     val rawAmount = abs(rawCurrent - rawOpen)

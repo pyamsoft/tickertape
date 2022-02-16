@@ -12,6 +12,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
@@ -19,8 +20,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 
 @Composable
@@ -62,8 +65,11 @@ private fun NewsItem(
   val title = news.title()
   val description = news.description()
   val source = news.sourceName()
+  val date = news.publishedAt()
   val link = news.link()
   val uriHandler = LocalUriHandler.current
+
+  val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }
 
   Card(
       modifier = modifier.clickable { uriHandler.openUri(link) },
@@ -72,6 +78,15 @@ private fun NewsItem(
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline),
     ) {
+      displayDate?.also { d ->
+        Text(
+            text = d,
+            style =
+                MaterialTheme.typography.caption.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
+        )
+      }
       if (source.isNotBlank()) {
         Text(
             modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
@@ -90,7 +105,7 @@ private fun NewsItem(
                 MaterialTheme.typography.body1.copy(
                     fontWeight = FontWeight.Bold,
                 ),
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
       }
@@ -98,7 +113,7 @@ private fun NewsItem(
         Text(
             text = description,
             style = MaterialTheme.typography.body2,
-            maxLines = 3,
+            maxLines = 4,
             overflow = TextOverflow.Ellipsis,
         )
       }

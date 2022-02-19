@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol

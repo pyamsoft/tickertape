@@ -204,7 +204,7 @@ private fun Portfolio(
       else -> {
         itemsIndexed(
             items = stocks,
-            key = { _, item -> item.holding.symbol().symbol() },
+            key = { index, item -> "${item.holding.symbol().symbol()}-${index}" },
         ) { index, ps ->
           if (index == 0) {
             Spacer(

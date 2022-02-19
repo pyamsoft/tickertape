@@ -215,7 +215,7 @@ private fun Watchlist(
       else -> {
         itemsIndexed(
             items = tickers,
-            key = { _, ticker -> ticker.symbol.symbol() },
+            key = { index, ticker -> "${ticker.symbol.symbol()}-${index}" },
         ) { index, ticker ->
           if (index == 0) {
             Spacer(

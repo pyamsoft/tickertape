@@ -30,12 +30,14 @@ fun TickerName(
     )
 
     if (quote != null) {
-      Text(
-          text = quote.company().company(),
-          style = MaterialTheme.typography.body2,
-          overflow = TextOverflow.Ellipsis,
-          maxLines = 1,
-      )
+      if (quote.company().isValidCompany()) {
+        Text(
+            text = quote.company().company(),
+            style = MaterialTheme.typography.body2,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+        )
+      }
     }
   }
 }

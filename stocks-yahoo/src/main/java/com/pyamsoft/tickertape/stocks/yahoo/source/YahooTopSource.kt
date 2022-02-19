@@ -98,7 +98,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                             StockQuote.create(
                                 symbol = stock.symbol.asSymbol(),
                                 equityType = EquityType.from(stock.quoteType.requireNotNull()),
-                                company = stock.name.requireNotNull().asCompany(),
+                                company = stock.name.orEmpty().asCompany(),
                                 dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
                                 dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
                                 dayHigh = stock.regularMarketDayHigh?.asMoney(),

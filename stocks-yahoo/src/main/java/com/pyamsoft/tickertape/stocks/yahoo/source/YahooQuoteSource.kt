@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.yahoo.source
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
@@ -36,6 +37,7 @@ import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -54,6 +56,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                 symbols = symbols.joinToString(",") { it.symbol() },
             )
 
+        val formatter = DATE_FORMATTER.get().requireNotNull()
         val localId = ZoneId.systemDefault()
         return@withContext result
             .quoteResponse
@@ -64,7 +67,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
             .distinctBy { it.symbol }
             .map { stock ->
               if (stock.expireDate != null && stock.strike != null) {
-                createOptionsQuote(stock, localId)
+                createOptionsQuote(stock, localId, formatter)
               } else {
                 createQuote(stock)
               }
@@ -78,14 +81,21 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
     @CheckResult
     private fun createOptionsQuote(
         stock: NetworkQuoteResponse.Resp.Quote,
-        localId: ZoneId
+        localId: ZoneId,
+        formatter: DateTimeFormatter,
     ): StockQuote {
+      val underlyingSymbol = stock.underlyingSymbol.requireNotNull().asSymbol()
+      val strikePrice = stock.strike.requireNotNull().asMoney()
+      val expirationDate = parseMarketTime(stock.expireDate.requireNotNull(), localId)
+      val companyName =
+          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)} ${strikePrice.asMoneyValue()}"
       return StockOptionsQuote.create(
+          underlyingSymbol = underlyingSymbol,
+          strike = strikePrice,
+          expireDate = expirationDate,
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
-          company = stock.name.requireNotNull().asCompany(),
-          strike = stock.strike.requireNotNull().asMoney(),
-          expireDate = parseMarketTime(stock.expireDate.requireNotNull(), localId),
+          company = companyName.asCompany(),
           dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
           dayHigh = stock.regularMarketDayHigh.requireNotNull().asMoney(),
@@ -131,7 +141,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
       return StockQuote.create(
           symbol = stock.symbol.asSymbol(),
           equityType = EquityType.from(stock.quoteType.requireNotNull()),
-          company = stock.name.requireNotNull().asCompany(),
+          company = stock.name.orEmpty().asCompany(),
           dataDelayBy = stock.exchangeDataDelayedBy.requireNotNull(),
           dayPreviousClose = stock.regularMarketPreviousClose?.asMoney(),
           dayHigh = stock.regularMarketDayHigh?.asMoney(),
@@ -199,6 +209,8 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                 "preMarketPrice",
                 "preMarketChange",
                 "preMarketChangePercent",
+                // Options
+                "underlyingSymbol",
             )
             .joinToString(",")
   }

@@ -24,7 +24,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,8 +45,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 
 @Composable
 @JvmOverloads
@@ -202,10 +199,12 @@ private fun ResultItem(
                 fontWeight = FontWeight.SemiBold,
             ),
     )
-    Text(
-        text = company.company(),
-        style = MaterialTheme.typography.caption,
-    )
+    if (company.isValidCompany()) {
+      Text(
+          text = company.company(),
+          style = MaterialTheme.typography.caption,
+      )
+    }
   }
 }
 

@@ -22,6 +22,8 @@ import com.pyamsoft.tickertape.stocks.data.StockCompanyImpl
 interface StockCompany {
 
   @CheckResult fun company(): String
+
+  @CheckResult fun isValidCompany(): Boolean
 }
 
 @CheckResult

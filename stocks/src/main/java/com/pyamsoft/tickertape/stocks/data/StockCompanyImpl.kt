@@ -25,4 +25,8 @@ internal data class StockCompanyImpl(
   override fun company(): String {
     return company
   }
+
+  override fun isValidCompany(): Boolean {
+    return company.isNotBlank()
+  }
 }

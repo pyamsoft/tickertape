@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 
 internal data class StockOptionsQuoteImpl(
     private val symbol: StockSymbol,
+    private val underlyingSymbol: StockSymbol,
     private val company: StockCompany,
     private val strike: StockMoneyValue,
     private val equityType: EquityType,
@@ -44,6 +45,10 @@ internal data class StockOptionsQuoteImpl(
 
   override fun symbol(): StockSymbol {
     return symbol
+  }
+
+  override fun underlyingSymbol(): StockSymbol {
+    return underlyingSymbol
   }
 
   override fun type(): EquityType {

@@ -108,8 +108,7 @@ internal fun Sequence<NetworkQuoteResponse.Resp.Quote>.filterOnlyValidQuotes():
     Sequence<NetworkQuoteResponse.Resp.Quote> {
   // If the symbol does not exist, these values will return null
   // We need all of these values to have a valid ticker
-  return this.filterNot { it.name == null }
-      .filterNot { it.regularMarketChange == null }
+  return this.filterNot { it.regularMarketChange == null }
       .filterNot { it.regularMarketPrice == null }
       .filterNot { it.regularMarketChangePercent == null }
 }

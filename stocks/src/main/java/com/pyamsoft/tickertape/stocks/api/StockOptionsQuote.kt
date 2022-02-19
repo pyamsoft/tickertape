@@ -22,6 +22,8 @@ import java.time.LocalDateTime
 
 interface StockOptionsQuote : StockQuote {
 
+  @CheckResult fun underlyingSymbol(): StockSymbol
+
   @CheckResult fun strike(): StockMoneyValue
 
   @CheckResult fun expireDate(): LocalDateTime
@@ -31,6 +33,7 @@ interface StockOptionsQuote : StockQuote {
     @CheckResult
     fun create(
         symbol: StockSymbol,
+        underlyingSymbol: StockSymbol,
         company: StockCompany,
         strike: StockMoneyValue,
         equityType: EquityType,
@@ -47,6 +50,7 @@ interface StockOptionsQuote : StockQuote {
     ): StockOptionsQuote {
       return StockOptionsQuoteImpl(
           symbol = symbol,
+          underlyingSymbol = underlyingSymbol,
           company = company,
           strike = strike,
           equityType = equityType,

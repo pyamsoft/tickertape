@@ -26,12 +26,12 @@ import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import java.time.LocalDateTime
 
 internal data class StockOptionsQuoteImpl(
-    private val symbol: StockSymbol,
     private val underlyingSymbol: StockSymbol,
-    private val company: StockCompany,
-    private val strike: StockMoneyValue,
-    private val equityType: EquityType,
+    private val strike: StockMoneyValue?,
     private val expireDate: LocalDateTime,
+    private val symbol: StockSymbol,
+    private val company: StockCompany,
+    private val equityType: EquityType,
     private val regular: StockMarketSession,
     private val preMarket: StockMarketSession?,
     private val afterHours: StockMarketSession?,
@@ -59,7 +59,7 @@ internal data class StockOptionsQuoteImpl(
     return dataDelayBy
   }
 
-  override fun strike(): StockMoneyValue {
+  override fun strike(): StockMoneyValue? {
     return strike
   }
 

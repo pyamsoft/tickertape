@@ -24,7 +24,7 @@ interface StockOptionsQuote : StockQuote {
 
   @CheckResult fun underlyingSymbol(): StockSymbol
 
-  @CheckResult fun strike(): StockMoneyValue
+  @CheckResult fun strike(): StockMoneyValue?
 
   @CheckResult fun expireDate(): LocalDateTime
 
@@ -32,12 +32,12 @@ interface StockOptionsQuote : StockQuote {
     @JvmStatic
     @CheckResult
     fun create(
-        symbol: StockSymbol,
         underlyingSymbol: StockSymbol,
-        company: StockCompany,
-        strike: StockMoneyValue,
-        equityType: EquityType,
+        strike: StockMoneyValue?,
         expireDate: LocalDateTime,
+        symbol: StockSymbol,
+        company: StockCompany,
+        equityType: EquityType,
         regular: StockMarketSession,
         preMarket: StockMarketSession?,
         afterHours: StockMarketSession?,

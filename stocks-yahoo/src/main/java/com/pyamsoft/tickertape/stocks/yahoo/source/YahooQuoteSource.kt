@@ -85,10 +85,10 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
         formatter: DateTimeFormatter,
     ): StockQuote {
       val underlyingSymbol = stock.underlyingSymbol.requireNotNull().asSymbol()
-      val strikePrice = stock.strike.requireNotNull().asMoney()
+      val strikePrice = stock.strike?.asMoney()
       val expirationDate = parseMarketTime(stock.expireDate.requireNotNull(), localId)
       val companyName =
-          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)} ${strikePrice.asMoneyValue()}"
+          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)}${strikePrice?.asMoneyValue().orEmpty()}"
       return StockOptionsQuote.create(
           underlyingSymbol = underlyingSymbol,
           strike = strikePrice,

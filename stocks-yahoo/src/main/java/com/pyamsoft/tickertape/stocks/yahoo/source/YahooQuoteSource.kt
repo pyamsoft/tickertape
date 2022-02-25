@@ -88,7 +88,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
       val strikePrice = stock.strike?.asMoney()
       val expirationDate = parseMarketTime(stock.expireDate.requireNotNull(), localId)
       val companyName =
-          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)}${strikePrice?.asMoneyValue().orEmpty()}"
+          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)}${if (strikePrice == null) "" else " ${strikePrice.asMoneyValue()}"}"
       return StockOptionsQuote.create(
           underlyingSymbol = underlyingSymbol,
           strike = strikePrice,

@@ -16,11 +16,13 @@
 
 package com.pyamsoft.tickertape.quote.dig
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
@@ -30,22 +32,46 @@ protected constructor(
     private val interactor: DigInteractor,
 ) : AbstractViewModeler<S>(state) {
 
+  @CheckResult
+  private fun getLookupSymbol(): StockSymbol {
+    return state.lookupSymbol ?: state.ticker.symbol
+  }
+
+  protected suspend fun loadStatistics(force: Boolean) {
+    val s = state
+    interactor
+        .getStatistics(
+            force = force,
+            symbol = getLookupSymbol(),
+        )
+        .onSuccess { n ->
+          s.apply {
+            statistics = n
+            statisticsError = null
+          }
+        }
+        .onFailure { e ->
+          s.apply {
+            statistics = null
+            statisticsError = e
+          }
+        }
+  }
+
   protected suspend fun loadNews(force: Boolean) {
     val s = state
     interactor
         .getNews(
             force = force,
-            symbol = s.ticker.symbol,
+            symbol = getLookupSymbol(),
         )
         .onSuccess { n ->
-          // Clear the error on load success
           s.apply {
             news = n
             newsError = null
           }
         }
         .onFailure { e ->
-          // Don't need to clear the ticker since last loaded state was valid
           s.apply {
             news = emptyList()
             newsError = e

@@ -43,9 +43,20 @@ internal fun WatchlistDigToolbar(
   val isAllowedToModifyWatchlist = state.isAllowModifyWatchlist
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
-  val allTabs = remember { WatchlistDigSections.values() }
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
+  val equityType = state.equityType
+  val isOption = remember(equityType) { equityType == EquityType.OPTION }
+
+  val allTabs =
+      remember(isOption) {
+        WatchlistDigSections.values().let { sections ->
+          return@let if (!isOption) sections.toList()
+          else {
+            sections.asSequence().filter { it == WatchlistDigSections.CHART }.toList()
+          }
+        }
+      }
 
   Surface(
       modifier = modifier,
@@ -118,12 +129,15 @@ internal fun WatchlistDigToolbar(
 
 @Composable
 private fun WatchlistTab(
+    modifier: Modifier = Modifier,
     tab: WatchlistDigSections,
     current: WatchlistDigSections,
     onTabUpdated: (WatchlistDigSections) -> Unit,
 ) {
   val isSelected = remember(tab, current) { tab == current }
+
   Tab(
+      modifier = modifier,
       selected = isSelected,
       onClick = { onTabUpdated(tab) },
   ) {
@@ -142,6 +156,7 @@ private fun PreviewWatchlistDigToolbar() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
+              lookupSymbol = symbol,
               allowModifyWatchlist = true,
               equityType = EquityType.STOCK,
           ),

@@ -28,10 +28,12 @@ internal fun WatchlistNews(
 @Preview
 @Composable
 private fun PreviewWatchlistNews() {
+  val symbol = "MSFT".asSymbol()
   WatchlistNews(
       state =
           MutableWatchlistDigViewState(
-              symbol = "MSFT".asSymbol(),
+              symbol = symbol,
+              lookupSymbol = symbol,
               allowModifyWatchlist = true,
               equityType = EquityType.STOCK,
           ),

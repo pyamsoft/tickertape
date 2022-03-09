@@ -30,12 +30,64 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
     internal data class Statistics
     internal constructor(
         val defaultKeyStatistics: Info,
+        val financialData: FinancialData,
+        val calendarEvents: Calendar,
     ) {
+
+      @JsonClass(generateAdapter = true)
+      internal data class Calendar
+      internal constructor(
+          val exDividendDate: YFData?,
+          val dividendDate: YFData?,
+          val earnings: Earnings?,
+      ) {
+
+        @JsonClass(generateAdapter = true)
+        internal data class Earnings
+        internal constructor(
+            val earningsDate: List<YFData>?,
+            val earningsAverage: YFData?,
+            val earningsLow: YFData?,
+            val earningsHigh: YFData?,
+            val revenueAverage: YFData?,
+            val revenueLow: YFData?,
+            val revenueHigh: YFData?,
+        )
+      }
+
+      @JsonClass(generateAdapter = true)
+      internal data class FinancialData
+      internal constructor(
+          val targetHighPrice: YFData?,
+          val targetLowPrice: YFData?,
+          val targetMeanPrice: YFData?,
+          val recommendationMean: YFData?,
+          val recommendationKey: String?,
+          val numberOfAnalystOpinions: YFData?,
+      )
 
       @JsonClass(generateAdapter = true)
       internal data class Info
       internal constructor(
-          val forwardEps: YFData,
+          val enterpriseValud: YFData?,
+          val profitMargin: YFData?,
+          val floatShares: YFData?,
+          val sharesOutstanding: YFData?,
+          val sharesShort: YFData?,
+          val shortRatio: YFData?,
+          val heldPercentInstitutions: YFData?,
+          val shortPercentOfFloat: YFData?,
+          val beta: YFData?,
+          val impliedSharesOutstanding: YFData?,
+          val lastFiscalYearEnd: YFData?,
+          val nextFiscalYearEnd: YFData?,
+          val mostRecentQuarter: YFData?,
+          val earningsQuarterlyGrowth: YFData?,
+          val netIncomeToCommon: YFData?,
+          val lastDividendValue: YFData?,
+          val lastDividendDate: YFData?,
+          val forwardEps: YFData?,
+          val trailingEps: YFData?,
       )
     }
   }
@@ -45,5 +97,6 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
   internal constructor(
       val raw: Double,
       val fmt: String,
+      val longFmt: String?,
   )
 }

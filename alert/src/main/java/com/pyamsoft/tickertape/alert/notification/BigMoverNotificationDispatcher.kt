@@ -36,9 +36,9 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.MarketState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
@@ -79,15 +79,18 @@ internal constructor(private val context: Context, private val activityClass: Cl
 
   @CheckResult
   private fun getActivityPendingIntent(
-      symbol: StockSymbol,
-      equityType: EquityType,
+      quote: StockQuote,
   ): PendingIntent {
     val appContext = context.applicationContext
     val activityIntent =
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, symbol.symbol())
-          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, equityType.name)
+          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol().symbol())
+          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, quote.type().name)
+
+          val lookupSymbol =
+              if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
+          putExtra(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
         }
     return PendingIntent.getActivity(
         appContext,
@@ -154,7 +157,7 @@ internal constructor(private val context: Context, private val activityClass: Cl
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setShowWhen(false)
         .setAutoCancel(false)
-        .setContentIntent(getActivityPendingIntent(symbol, equityType))
+        .setContentIntent(getActivityPendingIntent(quote))
         .setContentTitle(title)
         .setContentText(description)
         .setCategory(NotificationCompat.CATEGORY_REMINDER)

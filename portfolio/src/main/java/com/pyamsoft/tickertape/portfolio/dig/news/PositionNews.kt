@@ -31,10 +31,12 @@ internal fun PositionNews(
 @Preview
 @Composable
 private fun PreviewPositionNews() {
+  val symbol = "MSFT".asSymbol()
   PositionNews(
       state =
           MutablePortfolioDigViewState(
-              symbol = "MSFT".asSymbol(),
+              symbol = symbol,
+              lookupSymbol = symbol,
               equityType = EquityType.STOCK,
               tradeSide = TradeSide.BUY,
           ),

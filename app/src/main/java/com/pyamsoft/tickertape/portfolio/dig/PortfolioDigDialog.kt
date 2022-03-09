@@ -47,6 +47,8 @@ import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
@@ -113,6 +115,11 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   }
 
   @CheckResult
+  private fun getLookupSymbol(): StockSymbol? {
+    return requireArguments().getString(KEY_LOOKUP_SYMBOL)?.asSymbol()
+  }
+
+  @CheckResult
   private fun getHoldingId(): DbHolding.Id {
     return requireArguments()
         .getString(KEY_HOLDING_ID)
@@ -157,6 +164,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
         .plusPortfolioDigComponent()
         .create(
             getSymbol(),
+            getLookupSymbol(),
             getHoldingId(),
             getHoldingType(),
             getHoldingSide(),
@@ -231,6 +239,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_LOOKUP_SYMBOL = "key_lookup_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_HOLDING_SIDE = "key_holding_side"
@@ -241,8 +250,15 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     @CheckResult
     private fun newInstance(
         holding: DbHolding,
+        quote: StockQuote?,
         currentPrice: StockMoneyValue?,
     ): DialogFragment {
+      val lookupSymbol =
+          when (quote) {
+            null -> null
+            is StockOptionsQuote -> quote.underlyingSymbol()
+            else -> quote.symbol()
+          }
       return PortfolioDigDialog().apply {
         arguments =
             Bundle().apply {
@@ -251,6 +267,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
               putString(KEY_HOLDING_TYPE, holding.type().name)
               putString(KEY_HOLDING_SIDE, holding.side().name)
               currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
+              lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.symbol()) }
             }
       }
     }
@@ -259,9 +276,10 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     fun show(
         activity: FragmentActivity,
         holding: DbHolding,
+        quote: StockQuote?,
         currentPrice: StockMoneyValue?,
     ) {
-      newInstance(holding, currentPrice).show(activity, TAG)
+      newInstance(holding, quote, currentPrice).show(activity, TAG)
     }
   }
 }

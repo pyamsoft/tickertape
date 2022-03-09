@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -34,6 +35,29 @@ protected constructor(
     private val interactor: TickerInteractor,
     private val stockInteractor: StockInteractor,
 ) : DigInteractor {
+
+  final override suspend fun getStatistics(
+      force: Boolean,
+      symbol: StockSymbol
+  ): ResultWrapper<KeyStatistics> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(
+                  stockInteractor.getKeyStatistics(
+                      force = force,
+                      symbols = listOf(symbol),
+                  ),
+              )
+              // Only pick out the single quote
+              .map { list -> list.first { it.symbol() == symbol } }
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting statistics: ${symbol.symbol()}")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
 
   final override suspend fun getNews(
       force: Boolean,

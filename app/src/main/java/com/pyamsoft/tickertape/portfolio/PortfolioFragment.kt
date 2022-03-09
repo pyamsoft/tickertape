@@ -45,6 +45,7 @@ import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
+import timber.log.Timber
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {
@@ -57,10 +58,12 @@ class PortfolioFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenManageDialog(stock: PortfolioStock) {
-    val session = stock.ticker?.quote?.currentSession()
+      val quote = stock.ticker?.quote
+    val session = quote?.currentSession()
     PortfolioDigDialog.show(
         requireActivity(),
         holding = stock.holding,
+        quote = quote,
         currentPrice = session?.price(),
     )
   }

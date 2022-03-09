@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import dagger.BindsInstance
 import dagger.Subcomponent
+import javax.inject.Named
 
 @Subcomponent
 internal interface PortfolioDigComponent {
@@ -35,6 +36,7 @@ internal interface PortfolioDigComponent {
     @CheckResult
     fun create(
         @BindsInstance symbol: StockSymbol,
+        @BindsInstance @Named("lookup") lookupSymbol: StockSymbol?,
         @BindsInstance holdingId: DbHolding.Id,
         @BindsInstance holdingType: EquityType,
         @BindsInstance tradeSide: TradeSide,

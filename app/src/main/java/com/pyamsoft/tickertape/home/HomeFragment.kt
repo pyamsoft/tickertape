@@ -43,9 +43,10 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.setting.SettingsDialog
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
+import timber.log.Timber
 
 class HomeFragment : Fragment() {
 
@@ -57,12 +58,18 @@ class HomeFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenDigDialog(ticker: Ticker) {
-    // Fallback to stock
-    val equityType = ticker.quote?.type() ?: EquityType.STOCK
+    val quote = ticker.quote
+    if (quote == null) {
+      Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}")
+      return
+    }
 
+    val equityType = quote.type()
+    val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
     WatchlistDigDialog.show(
         requireActivity(),
         symbol = ticker.symbol,
+        lookupSymbol = lookupSymbol,
         allowModifyWatchlist = true,
         equityType = equityType,
     )

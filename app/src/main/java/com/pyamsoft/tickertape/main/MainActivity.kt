@@ -176,20 +176,35 @@ internal class MainActivity : PYDroidActivity() {
   }
 
   private fun handleLaunchIntent() {
-    val symbol =
-        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_SYMBOL) { it.asSymbol() } ?: return
+    val symbol = retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_SYMBOL) { it.asSymbol() }
+    if (symbol == null) {
+      Timber.w("Cannot open Watchlist Dig Dialog without symbol")
+      return
+    }
 
     val equityType =
         retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE) {
           EquityType.valueOf(it)
         }
-            ?: return
+    if (equityType == null) {
+      Timber.w("Cannot open Watchlist Dig Dialog without equityType")
+      return
+    }
+
+    val lookupSymbol =
+        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL) { it.asSymbol() }
+    if (lookupSymbol == null) {
+      Timber.w("Cannot open Watchlist Dig Dialog without lookupSymbol")
+      return
+    }
 
     Timber.d("Launch intent with symbol: $symbol")
     notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
+
     WatchlistDigDialog.show(
         this,
         symbol = symbol,
+        lookupSymbol = lookupSymbol,
         equityType = equityType,
         allowModifyWatchlist = false,
     )

@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
@@ -98,14 +99,13 @@ private fun Content(
   val section = state.section
 
   Crossfade(
-      modifier = modifier,
+      modifier = modifier.fillMaxWidth().fillMaxHeight(0.6F),
       targetState = section,
   ) { s ->
     return@Crossfade when (s) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
-            // Chart will size itself
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
@@ -114,16 +114,14 @@ private fun Content(
       }
       PortfolioDigSections.NEWS -> {
         PositionNews(
-            // At most this is slightly larger than half the screen in height
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6F),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
-            // At most this is slightly larger than half the screen in height
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6F),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,
@@ -148,10 +146,12 @@ private fun Loading(
 @Preview
 @Composable
 private fun PreviewPortfolioDigScreen() {
+  val symbol = "MSFT".asSymbol()
   PortfolioDigScreen(
       state =
           MutablePortfolioDigViewState(
-              symbol = "MSFT".asSymbol(),
+              symbol = symbol,
+              lookupSymbol = symbol,
               equityType = EquityType.STOCK,
               tradeSide = TradeSide.BUY,
           ),

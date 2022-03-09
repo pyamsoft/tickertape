@@ -19,11 +19,18 @@ package com.pyamsoft.tickertape.quote.dig
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DigInteractor {
+
+  @CheckResult
+  suspend fun getStatistics(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<KeyStatistics>
 
   @CheckResult
   suspend fun getNews(

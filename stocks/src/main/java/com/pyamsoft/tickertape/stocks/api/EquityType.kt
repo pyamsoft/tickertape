@@ -21,10 +21,11 @@ import androidx.annotation.CheckResult
 enum class EquityType(val display: String) {
   STOCK("Stock"),
   OPTION("Option"),
-  CRYPTOCURRENCY("Cryptocurrency");
+  CRYPTOCURRENCY("Crypto");
 
   companion object {
 
+    private const val YF_STOCK_TYPE = "EQUITY"
     private val valueSet by lazy(LazyThreadSafetyMode.NONE) { values().toSet() }
 
     /**
@@ -35,6 +36,11 @@ enum class EquityType(val display: String) {
     @JvmStatic
     @CheckResult
     fun from(name: String): EquityType {
+      // Stocks are called EQUITY by the YF API, fast track
+      if (name == YF_STOCK_TYPE) {
+        return STOCK
+      }
+
       for (value in valueSet) {
         if (value.name == name) {
           return value

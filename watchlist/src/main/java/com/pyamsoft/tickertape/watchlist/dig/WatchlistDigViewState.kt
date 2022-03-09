@@ -8,6 +8,7 @@ import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
+import javax.inject.Named
 
 interface WatchlistDigViewState : DigViewState {
   val section: WatchlistDigSections
@@ -23,9 +24,10 @@ class MutableWatchlistDigViewState
 @Inject
 internal constructor(
     symbol: StockSymbol,
+    @Named("lookup") lookupSymbol: StockSymbol,
     allowModifyWatchlist: Boolean,
     equityType: EquityType,
-) : MutableDigViewState(symbol, equityType), WatchlistDigViewState {
+) : MutableDigViewState(symbol, lookupSymbol, equityType), WatchlistDigViewState {
 
   // Not state backed since this is constant
   override val isAllowModifyWatchlist = allowModifyWatchlist

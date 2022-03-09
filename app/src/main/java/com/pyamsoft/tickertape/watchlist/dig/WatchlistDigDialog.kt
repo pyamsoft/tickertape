@@ -62,6 +62,14 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   }
 
   @CheckResult
+  private fun getLookupSymbol(): StockSymbol {
+    return requireArguments()
+        .getString(KEY_LOOKUP_SYMBOL)
+        .let { it.requireNotNull { "Must be created with $KEY_LOOKUP_SYMBOL" } }
+        .asSymbol()
+  }
+
+  @CheckResult
   private fun getEquityType(): EquityType {
     return requireArguments()
         .getString(KEY_EQUITY_TYPE)
@@ -124,6 +132,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         .plusWatchlistDigComponent()
         .create(
             getSymbol(),
+            getLookupSymbol(),
             getAllowModifyWatchlist(),
             getEquityType(),
         )
@@ -190,6 +199,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_LOOKUP_SYMBOL = "key_lookup_symbol"
     private const val KEY_EQUITY_TYPE = "key_equity_type"
     private const val KEY_ALLOW_MODIFY = "key_allow_modify"
     private const val TAG = "WatchlistDigDialog"
@@ -198,6 +208,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     @CheckResult
     private fun newInstance(
         symbol: StockSymbol,
+        lookupSymbol: StockSymbol,
         equityType: EquityType,
         allowModifyWatchlist: Boolean,
     ): DialogFragment {
@@ -205,6 +216,7 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
               putString(KEY_EQUITY_TYPE, equityType.name)
               putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
             }
@@ -215,11 +227,13 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     fun show(
         activity: FragmentActivity,
         symbol: StockSymbol,
+        lookupSymbol: StockSymbol,
         equityType: EquityType,
         allowModifyWatchlist: Boolean,
     ) {
       newInstance(
               symbol,
+              lookupSymbol,
               equityType,
               allowModifyWatchlist,
           )

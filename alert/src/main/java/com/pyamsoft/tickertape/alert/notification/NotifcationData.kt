@@ -24,6 +24,7 @@ data class BigMoverNotificationData internal constructor(val quote: StockQuote) 
   companion object {
 
     const val INTENT_KEY_SYMBOL = "intent_key_symbol"
+    const val INTENT_KEY_LOOKUP_SYMBOL = "intent_key_lookup_symbol"
     const val INTENT_KEY_EQUITY_TYPE = "intent_key_equity_type"
   }
 }

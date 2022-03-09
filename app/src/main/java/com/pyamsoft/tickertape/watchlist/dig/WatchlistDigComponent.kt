@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.BindsInstance
 import dagger.Subcomponent
+import javax.inject.Named
 
 @Subcomponent
 internal interface WatchlistDigComponent {
@@ -33,6 +34,7 @@ internal interface WatchlistDigComponent {
     @CheckResult
     fun create(
         @BindsInstance symbol: StockSymbol,
+        @BindsInstance @Named("lookup") lookupSymbol: StockSymbol,
         @BindsInstance allowAddToWatchlist: Boolean,
         @BindsInstance equityType: EquityType,
     ): WatchlistDigComponent

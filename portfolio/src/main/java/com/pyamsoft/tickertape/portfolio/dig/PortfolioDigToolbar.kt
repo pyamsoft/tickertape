@@ -123,6 +123,7 @@ private fun PreviewPortfolioDigToolbar() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
+              lookupSymbol = symbol,
               equityType = EquityType.STOCK,
               tradeSide = TradeSide.BUY,
           ),

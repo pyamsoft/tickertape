@@ -152,10 +152,12 @@ private fun PositionsAdd(
 @Preview
 @Composable
 private fun PreviewPositionScreen() {
+  val symbol = "MSFT".asSymbol()
   PositionScreen(
       state =
           MutablePortfolioDigViewState(
-              symbol = "MSFT".asSymbol(),
+              symbol = symbol,
+              lookupSymbol = symbol,
               equityType = EquityType.STOCK,
               tradeSide = TradeSide.BUY,
           ),

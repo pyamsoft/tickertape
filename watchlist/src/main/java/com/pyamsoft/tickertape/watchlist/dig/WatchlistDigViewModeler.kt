@@ -47,6 +47,7 @@ internal constructor(
               add(async { checkIsInWatchlist(force) })
 
               // Based on the page
+              @Suppress("ControlFlowWithEmptyBody")
               when (state.section) {
                 WatchlistDigSections.CHART -> {
                   add(async { loadTicker(force) })
@@ -54,6 +55,11 @@ internal constructor(
                 WatchlistDigSections.NEWS -> {
                   add(async { loadNews(force) })
                 }
+                WatchlistDigSections.STATISTICS -> {
+                  add(async { loadStatistics(force) })
+                }
+              }.also {
+                // Just here for exhaustive when
               }
             }
             .awaitAll()

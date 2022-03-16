@@ -25,6 +25,8 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 abstract class DigViewModeler<S : MutableDigViewState>
@@ -39,8 +41,6 @@ protected constructor(
   }
 
   protected suspend fun loadStatistics(force: Boolean) {
-    Enforcer.assertOffMainThread()
-
     val s = state
     interactor
         .getStatistics(
@@ -62,8 +62,6 @@ protected constructor(
   }
 
   protected suspend fun loadNews(force: Boolean) {
-    Enforcer.assertOffMainThread()
-
     val s = state
     interactor
         .getNews(
@@ -71,7 +69,14 @@ protected constructor(
             symbol = getLookupSymbol(),
         )
         // Sort news articles by published date
-        .map { news -> news.sortedByDescending { it.publishedAt() } }
+        .map { news ->
+          // Run Off main thread
+          withContext(context = Dispatchers.IO) {
+            Enforcer.assertOffMainThread()
+
+            return@withContext news.sortedByDescending { it.publishedAt() }
+          }
+        }
         .onSuccess { n ->
           s.apply {
             news = n
@@ -89,8 +94,6 @@ protected constructor(
   protected suspend fun loadTicker(
       force: Boolean,
   ): ResultWrapper<Ticker> {
-    Enforcer.assertOffMainThread()
-
     val s = state
     return interactor
         .getChart(

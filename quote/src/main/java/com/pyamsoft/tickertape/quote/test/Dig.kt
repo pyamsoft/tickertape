@@ -3,12 +3,7 @@ package com.pyamsoft.tickertape.quote.test
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockNews
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDateTime
 
 /** Should only be used in tests/preview */
@@ -37,5 +32,10 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
     override val news = emptyList<StockNews>()
 
     override val newsError: Throwable? = null
+
+    override val statistics: KeyStatistics? = null
+
+    override val statisticsError: Throwable? = null
+
   }
 }

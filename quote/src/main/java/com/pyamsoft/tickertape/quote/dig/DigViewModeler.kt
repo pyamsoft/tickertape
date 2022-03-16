@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote.dig
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
+import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
@@ -38,6 +39,8 @@ protected constructor(
   }
 
   protected suspend fun loadStatistics(force: Boolean) {
+    Enforcer.assertOffMainThread()
+
     val s = state
     interactor
         .getStatistics(
@@ -59,12 +62,16 @@ protected constructor(
   }
 
   protected suspend fun loadNews(force: Boolean) {
+    Enforcer.assertOffMainThread()
+
     val s = state
     interactor
         .getNews(
             force = force,
             symbol = getLookupSymbol(),
         )
+        // Sort news articles by published date
+        .map { news -> news.sortedByDescending { it.publishedAt() } }
         .onSuccess { n ->
           s.apply {
             news = n
@@ -81,40 +88,44 @@ protected constructor(
 
   protected suspend fun loadTicker(
       force: Boolean,
-  ): ResultWrapper<Ticker> =
-      interactor
-          .getChart(
-              force = force,
-              symbol = state.ticker.symbol,
-              range = state.range,
-          )
-          .onSuccess { t -> state.apply { ticker = t } }
-          .onSuccess { ticker ->
-            ticker.chart?.also { c ->
-              if (c.dates().isEmpty()) {
-                Timber.w("No dates, can't pick currentDate and currentPrice")
-                return@also
-              }
+  ): ResultWrapper<Ticker> {
+    Enforcer.assertOffMainThread()
 
-              state.apply {
-                onInitialLoad(c)
+    val s = state
+    return interactor
+        .getChart(
+            force = force,
+            symbol = s.ticker.symbol,
+            range = s.range,
+        )
+        .onSuccess { t -> s.apply { ticker = t } }
+        .onSuccess { ticker ->
+          ticker.chart?.also { c ->
+            if (c.dates().isEmpty()) {
+              Timber.w("No dates, can't pick currentDate and currentPrice")
+              return@also
+            }
 
-                // Set the opening price based on the current chart
-                openingPrice = c.startingPrice()
+            s.apply {
+              onInitialLoad(c)
 
-                // Clear the error on load success
-                chartError = null
-              }
+              // Set the opening price based on the current chart
+              openingPrice = c.startingPrice()
+
+              // Clear the error on load success
+              chartError = null
             }
           }
-          .onFailure { Timber.e(it, "Failed to load Ticker") }
-          .onFailure { e ->
-            state.apply {
-              currentPrice = null
-              openingPrice = null
-              chartError = e
-            }
+        }
+        .onFailure { Timber.e(it, "Failed to load Ticker") }
+        .onFailure { e ->
+          s.apply {
+            currentPrice = null
+            openingPrice = null
+            chartError = e
           }
+        }
+  }
 
   private fun MutableDigViewState.onInitialLoad(chart: StockChart) {
     if (currentPrice != null) {

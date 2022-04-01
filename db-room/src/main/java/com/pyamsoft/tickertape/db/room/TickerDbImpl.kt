@@ -19,6 +19,7 @@ import com.pyamsoft.tickertape.db.TickerDb
 import com.pyamsoft.tickertape.db.holding.HoldingDb
 import com.pyamsoft.tickertape.db.mover.BigMoverDb
 import com.pyamsoft.tickertape.db.position.PositionDb
+import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,6 +32,7 @@ internal constructor(
     private val holdingDb: HoldingDb,
     private val positionDb: PositionDb,
     private val bigMoverDb: BigMoverDb,
+    private val splitDb: SplitDb,
 ) : TickerDb {
 
   override fun symbols(): SymbolDb {
@@ -49,10 +51,15 @@ internal constructor(
     return bigMoverDb
   }
 
+  override fun split(): SplitDb {
+      return splitDb
+  }
+
   override suspend fun invalidate() {
     symbolDb.invalidate()
     holdingDb.invalidate()
     positionDb.invalidate()
     bigMoverDb.invalidate()
+    splitDb.invalidate()
   }
 }

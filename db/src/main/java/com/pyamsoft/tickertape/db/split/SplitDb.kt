@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.split
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
+import com.pyamsoft.tickertape.db.BaseDb
 
-interface TickerDb : DbCache {
-
-  @CheckResult fun symbols(): SymbolDb
-
-  @CheckResult fun holdings(): HoldingDb
-
-  @CheckResult fun positions(): PositionDb
-
-  @CheckResult fun bigMover(): BigMoverDb
-
-  @CheckResult fun split(): SplitDb
-}
+interface SplitDb :
+    BaseDb<SplitRealtime, SplitQueryDao, SplitInsertDao, SplitDeleteDao>,
+    SplitRealtime,
+    SplitQueryDao,
+    SplitInsertDao,
+    SplitDeleteDao

@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.split
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import java.time.LocalDateTime
 
-interface TickerDb : DbCache {
+interface DbSplit {
 
-  @CheckResult fun symbols(): SymbolDb
+  @CheckResult fun id(): Id
 
-  @CheckResult fun holdings(): HoldingDb
+  @CheckResult fun holdingId(): DbHolding.Id
 
-  @CheckResult fun positions(): PositionDb
+  @CheckResult fun preSplitShareCount(): StockShareValue
 
-  @CheckResult fun bigMover(): BigMoverDb
+  @CheckResult fun postSplitShareCount(): StockShareValue
 
-  @CheckResult fun split(): SplitDb
+  @CheckResult fun splitDate(): LocalDateTime
+
+  data class Id(val id: String) {
+
+    @CheckResult
+    fun isEmpty(): Boolean {
+      return id.isBlank()
+    }
+
+    companion object {
+
+      @JvmField val EMPTY = Id("")
+    }
+  }
 }

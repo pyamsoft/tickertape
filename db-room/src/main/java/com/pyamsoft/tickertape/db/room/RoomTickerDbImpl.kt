@@ -16,12 +16,14 @@
 
 package com.pyamsoft.tickertape.db.room
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.pyamsoft.tickertape.db.room.converter.BigMoverReportIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbHoldingIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbPositionIdConverter
+import com.pyamsoft.tickertape.db.room.converter.DbSplitIdConverter
 import com.pyamsoft.tickertape.db.room.converter.DbSymbolIdConverter
 import com.pyamsoft.tickertape.db.room.converter.EquityTypeConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateTimeConverter
@@ -34,18 +36,28 @@ import com.pyamsoft.tickertape.db.room.converter.TradeSideConverter
 import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
 import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
 import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
+import com.pyamsoft.tickertape.db.room.entity.RoomDbSplit
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 
 @Database(
-    version = 1,
+    exportSchema = true,
+    version = 2,
     entities =
         [
             RoomDbSymbol::class,
             RoomDbHolding::class,
             RoomDbPosition::class,
             RoomBigMoverReport::class,
-        ])
+            RoomDbSplit::class,
+        ],
+    autoMigrations =
+        [
+            // Adds DbSplit table
+            AutoMigration(from = 1, to = 2),
+        ],
+)
 @TypeConverters(
+    DbSplitIdConverter::class,
     DbSymbolIdConverter::class,
     DbHoldingIdConverter::class,
     DbPositionIdConverter::class,

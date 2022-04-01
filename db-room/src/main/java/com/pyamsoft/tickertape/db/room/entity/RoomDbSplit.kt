@@ -23,34 +23,37 @@ import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import java.time.LocalDateTime
 
 @Entity(
-    tableName = RoomDbPosition.TABLE_NAME,
+    tableName = RoomDbSplit.TABLE_NAME,
     foreignKeys =
         [
             ForeignKey(
                 entity = RoomDbHolding::class,
                 parentColumns = [RoomDbHolding.COLUMN_ID],
-                childColumns = [RoomDbPosition.COLUMN_HOLDING_ID],
+                childColumns = [RoomDbSplit.COLUMN_HOLDING_ID],
                 onDelete = ForeignKey.CASCADE,
             ),
         ],
 )
-internal data class RoomDbPosition
+internal data class RoomDbSplit
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbPosition.Id,
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbSplit.Id,
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
-    @JvmField @ColumnInfo(name = COLUMN_PRICE) val price: StockMoneyValue,
-    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: StockShareValue,
-    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val purchaseDate: LocalDateTime,
-) : DbPosition {
+    @JvmField
+    @ColumnInfo(name = COLUMN_PRE_SPLIT_SHARE_COUNT)
+    val preSplitShareCount: StockShareValue,
+    @JvmField
+    @ColumnInfo(name = COLUMN_POST_SPLIT_SHARE_COUNT)
+    val postSplitShareCount: StockShareValue,
+    @JvmField @ColumnInfo(name = COLUMN_SPLIT_DATE) val splitDate: LocalDateTime,
+) : DbSplit {
 
   @Ignore
-  override fun id(): DbPosition.Id {
+  override fun id(): DbSplit.Id {
     return id
   }
 
@@ -60,46 +63,46 @@ internal constructor(
   }
 
   @Ignore
-  override fun price(): StockMoneyValue {
-    return price
+  override fun preSplitShareCount(): StockShareValue {
+    return preSplitShareCount
   }
 
   @Ignore
-  override fun shareCount(): StockShareValue {
-    return shareCount
+  override fun postSplitShareCount(): StockShareValue {
+    return postSplitShareCount
   }
 
   @Ignore
-  override fun purchaseDate(): LocalDateTime {
-    return purchaseDate
+  override fun splitDate(): LocalDateTime {
+    return splitDate
   }
 
   companion object {
 
-    @Ignore internal const val TABLE_NAME = "room_position_table"
+    @Ignore internal const val TABLE_NAME = "room_split_table"
 
     @Ignore internal const val COLUMN_ID = "_id"
 
     @Ignore internal const val COLUMN_HOLDING_ID = "holding_id"
 
-    @Ignore internal const val COLUMN_PRICE = "price"
+    @Ignore internal const val COLUMN_PRE_SPLIT_SHARE_COUNT = "pre_split_share_count"
 
-    @Ignore internal const val COLUMN_SHARE_COUNT = "share_count"
+    @Ignore internal const val COLUMN_POST_SPLIT_SHARE_COUNT = "post_split_share_count"
 
-    @Ignore internal const val COLUMN_PURCHASE_DATE = "purchase_date"
+    @Ignore internal const val COLUMN_SPLIT_DATE = "split_date"
 
     @Ignore
     @JvmStatic
     @CheckResult
-    internal fun create(item: DbPosition): RoomDbPosition {
-      return if (item is RoomDbPosition) item
+    internal fun create(item: DbSplit): RoomDbSplit {
+      return if (item is RoomDbSplit) item
       else {
-        RoomDbPosition(
+        RoomDbSplit(
             item.id(),
             item.holdingId(),
-            item.price(),
-            item.shareCount(),
-            item.purchaseDate(),
+            item.preSplitShareCount(),
+            item.postSplitShareCount(),
+            item.splitDate(),
         )
       }
     }

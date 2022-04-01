@@ -35,6 +35,12 @@ import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
+import com.pyamsoft.tickertape.db.split.SplitDb
+import com.pyamsoft.tickertape.db.split.SplitDbImpl
+import com.pyamsoft.tickertape.db.split.SplitDeleteDao
+import com.pyamsoft.tickertape.db.split.SplitInsertDao
+import com.pyamsoft.tickertape.db.split.SplitQueryDao
+import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDbImpl
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
@@ -58,6 +64,8 @@ abstract class DbModule {
   @Binds @CheckResult internal abstract fun providePositionDbImpl(impl: PositionDbImpl): PositionDb
 
   @Binds @CheckResult internal abstract fun provideBigMoverDbImpl(impl: BigMoverDbImpl): BigMoverDb
+
+  @Binds @CheckResult internal abstract fun provideSplitDbImpl(impl: SplitDbImpl): SplitDb
 
   @Module
   companion object {
@@ -203,6 +211,42 @@ abstract class DbModule {
     @Provides
     @CheckResult
     internal fun provideBigMoverDeleteDao(@InternalApi db: BigMoverDb): BigMoverDeleteDao {
+      return db.deleteDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    @InternalApi
+    internal fun provideSplitDb(db: TickerDb): SplitDb {
+      return db.split()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSplitRealtimeDao(@InternalApi db: SplitDb): SplitRealtime {
+      return db.realtime()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSplitQueryDao(@InternalApi db: SplitDb): SplitQueryDao {
+      return db.queryDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSplitInsertDao(@InternalApi db: SplitDb): SplitInsertDao {
+      return db.insertDao()
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun provideSplitDeleteDao(@InternalApi db: SplitDb): SplitDeleteDao {
       return db.deleteDao()
     }
   }

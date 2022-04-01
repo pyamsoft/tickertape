@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.split
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
+sealed class SplitChangeEvent {
 
-interface TickerDb : DbCache {
+  data class Insert(val split: DbSplit) : SplitChangeEvent()
 
-  @CheckResult fun symbols(): SymbolDb
+  data class Update(val split: DbSplit) : SplitChangeEvent()
 
-  @CheckResult fun holdings(): HoldingDb
-
-  @CheckResult fun positions(): PositionDb
-
-  @CheckResult fun bigMover(): BigMoverDb
-
-  @CheckResult fun split(): SplitDb
+  data class Delete(
+      val split: DbSplit,
+      val offerUndo: Boolean,
+  ) : SplitChangeEvent()
 }

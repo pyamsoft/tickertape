@@ -26,6 +26,9 @@ import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverQueryDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionInsertDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionQueryDao
+import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitDeleteDao
+import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitInsertDao
+import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitQueryDao
 import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolInsertDao
 import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
@@ -55,4 +58,10 @@ internal interface RoomTickerDb {
   @CheckResult fun roomBigMoverInsertDao(): RoomBigMoverInsertDao
 
   @CheckResult fun roomBigMoverDeleteDao(): RoomBigMoverDeleteDao
+
+  @CheckResult fun roomSplitQueryDao(): RoomSplitQueryDao
+
+  @CheckResult fun roomSplitInsertDao(): RoomSplitInsertDao
+
+  @CheckResult fun roomSplitDeleteDao(): RoomSplitDeleteDao
 }

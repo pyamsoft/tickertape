@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db
+package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
+import androidx.room.TypeConverter
+import com.pyamsoft.tickertape.db.split.DbSplit
 
-interface TickerDb : DbCache {
+internal object DbSplitIdConverter {
 
-  @CheckResult fun symbols(): SymbolDb
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun toId(id: String): DbSplit.Id {
+    return DbSplit.Id(id)
+  }
 
-  @CheckResult fun holdings(): HoldingDb
-
-  @CheckResult fun positions(): PositionDb
-
-  @CheckResult fun bigMover(): BigMoverDb
-
-  @CheckResult fun split(): SplitDb
+  @JvmStatic
+  @TypeConverter
+  @CheckResult
+  fun fromId(id: DbSplit.Id): String {
+    return id.id
+  }
 }

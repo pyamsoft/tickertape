@@ -18,8 +18,11 @@ package com.pyamsoft.tickertape.db.position
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asShares
 import java.time.LocalDateTime
 
 interface DbPosition {
@@ -46,4 +49,65 @@ interface DbPosition {
       @JvmField val EMPTY = Id("")
     }
   }
+}
+
+@CheckResult
+private fun DbPosition.getAffectingSplits(splits: List<DbSplit>): List<DbSplit> {
+  // No splits, no work
+  if (splits.isEmpty()) {
+    return splits
+  }
+
+  return splits
+      .asSequence()
+      .filter { s ->
+        val pd = this.purchaseDate()
+        val date = s.splitDate()
+        return@filter date.isAfter(pd) || date.isEqual(pd)
+      }
+      // Commutative property tells me that order does not matter, I think
+      // I didn't do well in math
+      //
+      // .sortedBy { it.splitDate() }
+      .toList()
+}
+
+@CheckResult
+fun DbPosition.priceWithSplits(splits: List<DbSplit>): StockMoneyValue {
+  val affectingSplits = this.getAffectingSplits(splits)
+
+  // No affecting splits, no further work
+  if (affectingSplits.isEmpty()) {
+    return this.price()
+  }
+
+  // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
+  var raw = this.price().value()
+  for (split in affectingSplits) {
+    val pre = split.preSplitShareCount()
+    val post = split.postSplitShareCount()
+    raw = (raw / post.value()) * pre.value()
+  }
+
+  return raw.asMoney()
+}
+
+@CheckResult
+fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
+  val affectingSplits = this.getAffectingSplits(splits)
+
+  // No affecting splits, no further work
+  if (affectingSplits.isEmpty()) {
+    return this.shareCount()
+  }
+
+  // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
+  var raw = this.shareCount().value()
+  for (split in affectingSplits) {
+    val pre = split.preSplitShareCount()
+    val post = split.postSplitShareCount()
+    raw = (raw / pre.value()) * post.value()
+  }
+
+  return raw.asShares()
 }

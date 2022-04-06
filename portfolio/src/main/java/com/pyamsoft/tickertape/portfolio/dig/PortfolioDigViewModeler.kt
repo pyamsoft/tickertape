@@ -57,6 +57,12 @@ internal constructor(
                 PortfolioDigSections.NEWS -> {
                   add(async { loadNews(force) })
                 }
+                PortfolioDigSections.STATISTICS -> {
+                  add(async { loadStatistics(force) })
+                }
+                PortfolioDigSections.SPLITS -> {
+                  // TODO fetch stock splits from DB
+                }
                 PortfolioDigSections.POSITIONS -> {
                   add(async { loadHolding(force) })
                   add(async { loadPositions(force) })

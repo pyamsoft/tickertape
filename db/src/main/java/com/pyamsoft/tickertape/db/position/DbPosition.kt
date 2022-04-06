@@ -55,21 +55,14 @@ interface DbPosition {
 private fun DbPosition.getAffectingSplits(splits: List<DbSplit>): List<DbSplit> {
   // No splits, no work
   if (splits.isEmpty()) {
-    return splits
+    return emptyList()
   }
 
-  return splits
-      .asSequence()
-      .filter { s ->
-        val pd = this.purchaseDate()
-        val date = s.splitDate()
-        return@filter date.isAfter(pd) || date.isEqual(pd)
-      }
-      // Commutative property tells me that order does not matter, I think
-      // I didn't do well in math
-      //
-      // .sortedBy { it.splitDate() }
-      .toList()
+  return splits.filter { s ->
+    val pd = this.purchaseDate()
+    val date = s.splitDate()
+    return@filter date.isAfter(pd) || date.isEqual(pd)
+  }
 }
 
 @CheckResult

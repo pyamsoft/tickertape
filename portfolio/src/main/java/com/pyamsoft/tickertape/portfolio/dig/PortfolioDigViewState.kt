@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -18,6 +19,8 @@ interface PortfolioDigViewState : DigViewState {
 
   val isLoading: Boolean
   val section: PortfolioDigSections
+
+  val stockSplits: List<DbSplit>
 
   val holding: DbHolding?
   val positions: List<DbPosition>
@@ -36,6 +39,8 @@ internal constructor(
 ) : MutableDigViewState(symbol, lookupSymbol, equityType), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.CHART)
+
+  override var stockSplits by mutableStateOf(emptyList<DbSplit>())
 
   override var holding by mutableStateOf<DbHolding?>(null)
   override var positions by mutableStateOf(emptyList<DbPosition>())

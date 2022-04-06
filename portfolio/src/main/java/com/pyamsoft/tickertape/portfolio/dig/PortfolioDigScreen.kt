@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -127,6 +128,16 @@ private fun Content(
             onAddPosition = onAddPosition,
             currentPrice = currentPrice,
             onDeletePosition = onDeletePosition,
+        )
+      }
+      PortfolioDigSections.STATISTICS -> {
+        Spacer(
+            modifier = Modifier.fillMaxSize(),
+        )
+      }
+      PortfolioDigSections.SPLITS -> {
+        Spacer(
+            modifier = Modifier.fillMaxSize(),
         )
       }
     }

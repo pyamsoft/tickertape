@@ -36,8 +36,6 @@ internal constructor(
     @IdRes fragmentContainerId: Int,
 ) : FragmentNavigator<MainPage>(activity, fragmentContainerId) {
 
-  override val blankScreen: MainPage = MainPage.Home
-
   override fun performFragmentTransaction(
       container: Int,
       data: FragmentTag,

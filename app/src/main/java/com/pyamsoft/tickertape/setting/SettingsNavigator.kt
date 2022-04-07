@@ -38,8 +38,6 @@ internal constructor(
         fragmentContainerId = fragmentContainerId,
     ) {
 
-  override val blankScreen: SettingsPage = SettingsPage.Settings
-
   override fun performFragmentTransaction(
       container: Int,
       data: FragmentTag,

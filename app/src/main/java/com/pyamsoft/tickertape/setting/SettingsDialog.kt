@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.databinding.DialogSettingsBinding
 import com.pyamsoft.tickertape.main.MainComponent
 import javax.inject.Inject
-import timber.log.Timber
 
 class SettingsDialog : AppCompatDialogFragment() {
 
@@ -67,11 +66,7 @@ class SettingsDialog : AppCompatDialogFragment() {
 
     viewModel.requireNotNull().restoreState(savedInstanceState)
 
-    navigator.requireNotNull().restore {
-      if (it.select(SettingsPage.Settings.asScreen())) {
-        Timber.d("Loaded default Settings screen")
-      }
-    }
+    navigator.requireNotNull().restore { SettingsPage.Settings.asScreen() }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

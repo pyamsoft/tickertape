@@ -67,14 +67,6 @@ internal class MainActivity : PYDroidActivity() {
   @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
 
-  private fun navigate(page: MainPage) {
-    if (navigator.requireNotNull().select(page.asScreen(), force = false)) {
-      Timber.d("Loaded page: $page")
-    } else {
-      Timber.w("Could not push page: $page")
-    }
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     // NOTE(Peter):
     // Not full Compose yet
@@ -127,11 +119,13 @@ internal class MainActivity : PYDroidActivity() {
             Box(
                 contentAlignment = Alignment.BottomCenter,
             ) {
-              MainScreen(
-                  page = page,
-                  onLoadPage = { navigate(it) },
-                  onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-              )
+              page?.let { p ->
+                MainScreen(
+                    page = p,
+                    onLoadPage = { navi.navigateTo(it.asScreen()) },
+                    onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                )
+              }
             }
           }
         }
@@ -140,11 +134,7 @@ internal class MainActivity : PYDroidActivity() {
 
     vm.handleSyncDarkTheme(this)
 
-    navi.restore {
-      if (it.select(MainPage.Home.asScreen())) {
-        Timber.d("Loaded default Home screen")
-      }
-    }
+    navi.restore { MainPage.Home.asScreen() }
   }
 
   override fun onStart() {

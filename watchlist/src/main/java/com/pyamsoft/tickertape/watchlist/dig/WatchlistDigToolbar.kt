@@ -9,6 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -110,7 +111,7 @@ internal fun WatchlistDigToolbar(
           },
       )
 
-      TabRow(
+      ScrollableTabRow(
           backgroundColor = Color.Transparent,
           selectedTabIndex = section.ordinal,
       ) {

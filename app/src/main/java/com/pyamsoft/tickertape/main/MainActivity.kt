@@ -134,7 +134,8 @@ internal class MainActivity : PYDroidActivity() {
 
     vm.handleSyncDarkTheme(this)
 
-    navi.restore { MainPage.Home.asScreen() }
+    navi.restoreState(savedInstanceState)
+    navi.loadIfEmpty { MainPage.Home.asScreen() }
   }
 
   override fun onStart() {
@@ -225,6 +226,7 @@ internal class MainActivity : PYDroidActivity() {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
+    navigator?.saveState(outState)
   }
 
   override fun getSystemService(name: String): Any? {

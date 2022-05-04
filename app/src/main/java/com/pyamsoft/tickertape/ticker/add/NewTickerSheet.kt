@@ -46,19 +46,11 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         .let { TickerDestination.valueOf(it) }
   }
 
-  private fun handleForceClose() {
-    dismiss()
-  }
-
-  private fun handleCloseClicked(equityType: EquityType?) {
+  private fun NewTickerViewModeler.handleCloseClicked(equityType: EquityType?) {
     if (equityType == null) {
-      handleForceClose()
+      dismiss()
     } else {
-      viewModel
-          .requireNotNull()
-          .handleClearEquityType(
-              scope = viewLifecycleOwner.lifecycleScope,
-          )
+      this.handleClearEquityType()
     }
   }
 
@@ -71,47 +63,12 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
         )
   }
 
-  private fun handleClear() {
-    viewModel
-        .requireNotNull()
-        .handleClear(
-            scope = viewLifecycleOwner.lifecycleScope,
-        )
-  }
-
   private fun handleSubmit() {
-    viewModel
-        .requireNotNull()
-        .handleSubmit(
-            scope = viewLifecycleOwner.lifecycleScope,
-            onSubmit = { handleClear() },
-        )
-  }
-
-  private fun handleLookupDismissed() {
-    viewModel
-        .requireNotNull()
-        .handleLookupDismissed(
-            scope = viewLifecycleOwner.lifecycleScope,
-        )
-  }
-
-  private fun handleSymbolChanged(symbol: String) {
-    viewModel
-        .requireNotNull()
-        .handleSymbolChanged(
-            scope = viewLifecycleOwner.lifecycleScope,
-            symbol = symbol,
-        )
-  }
-
-  private fun handleEquityTypeSelected(type: EquityType) {
-    viewModel
-        .requireNotNull()
-        .handleEquityTypeSelected(
-            scope = viewLifecycleOwner.lifecycleScope,
-            type = type,
-        )
+    val vm = viewModel.requireNotNull()
+    vm.handleSubmit(
+        scope = viewLifecycleOwner.lifecycleScope,
+        onSubmit = { vm.handleClear() },
+    )
   }
 
   override fun onCreateView(
@@ -137,22 +94,23 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
 
           act.TickerTapeTheme(themeProvider) {
             BackHandler(
-                onBack = { handleCloseClicked(equityType) },
+                onBack = { vm.handleCloseClicked(equityType) },
             )
             NewTickerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
-                onClose = { handleCloseClicked(equityType) },
-                onTypeSelected = { handleEquityTypeSelected(it) },
-                onSymbolChanged = { handleSymbolChanged(it) },
+                onClose = { vm.handleCloseClicked(equityType) },
+                onTypeSelected = { vm.handleEquityTypeSelected(it) },
+                onSymbolChanged = { vm.handleSymbolChanged(it) },
                 onSearchResultSelected = { handleSearchResultSelected(it) },
                 onSubmit = { handleSubmit() },
-                onClear = { handleClear() },
+                onClear = { vm.handleClear() },
                 onTradeSideSelected = { vm.handleTradeSideChanged(it) },
-                onResultsDismissed = { handleLookupDismissed() },
+                onResultsDismissed = { vm.handleSearchResultsDismissed() },
                 onOptionTypeSlected = { vm.handleOptionType(it) },
                 onStrikeSelected = { vm.handleOptionStrikePrice(it) },
                 onExpirationDateSelected = { vm.handleOptionExpirationDate(it) },
+                onAfterSymbolChanged = { vm.handleAfterSymbolChanged(scope = this, symbol = it) },
             )
           }
         }

@@ -17,6 +17,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -26,6 +27,7 @@ fun NewTickerScreen(
     onTypeSelected: (EquityType) -> Unit,
     onClose: () -> Unit,
     onSymbolChanged: (String) -> Unit,
+    onAfterSymbolChanged: CoroutineScope.(String) -> Unit,
     onSearchResultSelected: (SearchResult) -> Unit,
     onResultsDismissed: () -> Unit,
     onSubmit: () -> Unit,
@@ -73,6 +75,7 @@ fun NewTickerScreen(
               onOptionTypeSlected = onOptionTypeSlected,
               onExpirationDateSelected = onExpirationDateSelected,
               onStrikeSelected = onStrikeSelected,
+              onAfterSymbolChanged = onAfterSymbolChanged,
           )
         } else {
           EquitySelectionScreen(
@@ -100,6 +103,7 @@ private fun PreviewNewTickerScreen(equityType: EquityType?) {
       onOptionTypeSlected = {},
       onExpirationDateSelected = {},
       onStrikeSelected = {},
+      onAfterSymbolChanged = {},
   )
 }
 

@@ -12,7 +12,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -46,18 +45,7 @@ internal fun WatchlistDigToolbar(
   val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
-  val equityType = state.equityType
-  val isOption = remember(equityType) { equityType == EquityType.OPTION }
-
-  val allTabs =
-      remember(isOption) {
-        WatchlistDigSections.values().let { sections ->
-          return@let if (!isOption) sections.toList()
-          else {
-            sections.asSequence().filter { it == WatchlistDigSections.CHART }.toList()
-          }
-        }
-      }
+  val allTabs = remember { WatchlistDigSections.values() }
 
   Surface(
       modifier = modifier,

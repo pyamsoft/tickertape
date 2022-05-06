@@ -93,7 +93,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     // Spotless
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.5.1"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.5.2"
 
     //        classpath 'com.google.gms:google-services:4.3.2'
   }

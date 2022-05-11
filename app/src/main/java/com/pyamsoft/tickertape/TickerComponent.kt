@@ -120,7 +120,7 @@ internal interface TickerComponent {
     fun create(
         @BindsInstance application: Application,
         @Named("debug") @BindsInstance debug: Boolean,
-        @BindsInstance lazyImageLoader: () -> ImageLoader,
+        @BindsInstance lazyImageLoader: Lazy<ImageLoader>,
         @BindsInstance theming: Theming,
     ): TickerComponent
   }
@@ -158,8 +158,8 @@ internal interface TickerComponent {
       @Provides
       @JvmStatic
       @Singleton
-      internal fun provideCoilImageLoader(lazyImageLoader: () -> ImageLoader): ImageLoader {
-        return lazyImageLoader()
+      internal fun provideCoilImageLoader(lazyImageLoader: Lazy<ImageLoader>): ImageLoader {
+        return lazyImageLoader.value
       }
 
       @Provides

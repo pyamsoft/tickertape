@@ -1,7 +1,6 @@
 package com.pyamsoft.tickertape.ui
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import com.pyamsoft.pydroid.theme.keylines
 
 private val MIN_IMAGE_HEIGHT = 120.dp
@@ -134,13 +133,10 @@ fun BlankScreen(
   ) {
     topContent()
 
-    Image(
+    AsyncImage(
         modifier = Modifier.fillMaxWidth().heightIn(min = MIN_IMAGE_HEIGHT),
-        painter =
-            rememberImagePainter(
-                data = image,
-                imageLoader = imageLoader,
-            ),
+        model = image,
+        imageLoader = imageLoader,
         contentScale = ContentScale.FillWidth,
         contentDescription = null,
     )

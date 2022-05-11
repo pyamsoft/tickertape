@@ -50,18 +50,17 @@ class TickerTape : Application() {
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
 
-    // Wrap in a lazy to ensure we only ever construct one
-    val singletonLazyImageLoader by lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
-    val lazyImageLoader = { singletonLazyImageLoader }
+      val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
 
-    val parameters =
+      val parameters =
         PYDroid.Parameters(
+            // Must be lazy since Coil calls getSystemService() internally, leading to SO exception
+            lazyImageLoader = lazyImageLoader,
             viewSourceUrl = url,
             bugReportUrl = "$url/issues",
             privacyPolicyUrl = PRIVACY_POLICY_URL,
             termsConditionsUrl = TERMS_CONDITIONS_URL,
             version = BuildConfig.VERSION_CODE,
-            imageLoader = lazyImageLoader,
             logger = createLogger(),
             theme = { activity, themeProvider, content ->
               activity.TickerTapeTheme(
@@ -77,14 +76,14 @@ class TickerTape : Application() {
   @CheckResult
   private fun createComponent(
       provider: ModuleProvider,
-      lazyImageLoader: () -> ImageLoader
+      lazyImageLoader: Lazy<ImageLoader>,
   ): TickerComponent {
     return DaggerTickerComponent.factory()
         .create(
-            this,
-            isDebugMode(),
-            lazyImageLoader,
-            provider.get().theming(),
+            application = this,
+            debug = isDebugMode(),
+            lazyImageLoader = lazyImageLoader,
+            theming = provider.get().theming(),
         )
         .also { addLibraries() }
   }

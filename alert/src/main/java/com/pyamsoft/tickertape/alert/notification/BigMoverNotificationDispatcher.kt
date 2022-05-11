@@ -144,7 +144,6 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     val symbol = quote.symbol()
-    val equityType = quote.type()
     val description = buildSpannedString {
       bold { append(symbol.symbol()) }
       append(" is $directionString ")

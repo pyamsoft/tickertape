@@ -18,5 +18,8 @@
     <color name="secondary">#709EFF</color>
     <color name="primary">#460EFA</color>
 
-    <color name="datePickerDialogBackgroundColor">@color/material_light_background</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="datePickerDialogBackgroundColor">@color/white</color>
 </resources>

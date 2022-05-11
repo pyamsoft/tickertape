@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="datePickerDialogBackgroundColor">@color/material_dark_background</color>
+    <color name="datePickerDialogBackgroundColor">#121212</color>
 </resources>

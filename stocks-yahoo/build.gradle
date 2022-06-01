@@ -69,6 +69,7 @@ dependencies {
   api "com.squareup.retrofit2:retrofit:$retrofit"
 
   // Moshi
+  implementation "com.squareup.moshi:moshi:$moshi"
   kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   // Retrofit

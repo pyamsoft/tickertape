@@ -50,9 +50,9 @@ class TickerTape : Application() {
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
 
-      val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
+    val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
 
-      val parameters =
+    val parameters =
         PYDroid.Parameters(
             // Must be lazy since Coil calls getSystemService() internally, leading to SO exception
             lazyImageLoader = lazyImageLoader,
@@ -148,18 +148,38 @@ class TickerTape : Application() {
       // We are using pydroid-autopsy
       OssLibraries.usingAutopsy = true
 
-      OssLibraries.add(
-          "Room",
-          "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
-          "The AndroidX Jetpack Room library. Fluent SQLite database access.")
-      OssLibraries.add(
-          "WorkManager",
-          "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/work/",
-          "The AndroidX Jetpack WorkManager library. Schedule periodic work in a device friendly way.")
-      OssLibraries.add(
-          "Dagger",
-          "https://github.com/google/dagger",
-          "A fast dependency injector for Android and Java.")
+      OssLibraries.apply {
+        add(
+            "Retrofit",
+            "https://square.github.io/retrofit/",
+            "Type-safe HTTP client for Android and Java by Square, Inc.",
+        )
+        add(
+            "Moshi",
+            "https://github.com/square/moshi",
+            "A modern JSON library for Android and Java.",
+        )
+        add(
+            "OkHTTP",
+            "https://github.com/square/okhttp",
+            "An HTTP+HTTP/2 client for Android and Java applications.",
+        )
+        add(
+            "Room",
+            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
+            "The AndroidX Jetpack Room library. Fluent SQLite database access.",
+        )
+        add(
+            "WorkManager",
+            "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/work/",
+            "The AndroidX Jetpack WorkManager library. Schedule periodic work in a device friendly way.",
+        )
+        add(
+            "Dagger",
+            "https://github.com/google/dagger",
+            "A fast dependency injector for Android and Java.",
+        )
+      }
     }
   }
 }

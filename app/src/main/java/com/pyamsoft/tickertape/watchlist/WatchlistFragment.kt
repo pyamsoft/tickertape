@@ -173,6 +173,9 @@ class WatchlistFragment : Fragment() {
     super.onDestroyView()
     dispose()
 
+    windowInsetObserver?.stop()
+    windowInsetObserver = null
+
     viewModel = null
     mainViewModel = null
     theming = null

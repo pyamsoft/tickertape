@@ -31,12 +31,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.spark.SparkView
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
@@ -48,6 +50,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import java.time.LocalDateTime
+import timber.log.Timber
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
 private const val LINE_ALPHA = 255
@@ -151,44 +154,53 @@ private fun SparkChart(
         android.graphics.Color.WHITE
       }
 
+  val owner = LocalLifecycleOwner.current
+
   AndroidView(
       modifier = modifier,
       factory = { context ->
-        SparkView(context).apply {
-          isFilled = true
+        SparkView(context)
+            .apply {
+              isFilled = true
 
-          positiveLineColor =
-              ViewColor.argb(
-                  LINE_ALPHA,
-                  ViewColor.red(DEFAULT_STOCK_UP_COLOR),
-                  ViewColor.green(DEFAULT_STOCK_UP_COLOR),
-                  ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
-              )
+              positiveLineColor =
+                  ViewColor.argb(
+                      LINE_ALPHA,
+                      ViewColor.red(DEFAULT_STOCK_UP_COLOR),
+                      ViewColor.green(DEFAULT_STOCK_UP_COLOR),
+                      ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
+                  )
 
-          positiveFillColor =
-              ViewColor.argb(
-                  FILL_ALPHA,
-                  ViewColor.red(DEFAULT_STOCK_UP_COLOR),
-                  ViewColor.green(DEFAULT_STOCK_UP_COLOR),
-                  ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
-              )
+              positiveFillColor =
+                  ViewColor.argb(
+                      FILL_ALPHA,
+                      ViewColor.red(DEFAULT_STOCK_UP_COLOR),
+                      ViewColor.green(DEFAULT_STOCK_UP_COLOR),
+                      ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
+                  )
 
-          negativeLineColor =
-              ViewColor.argb(
-                  LINE_ALPHA,
-                  ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
-                  ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
-                  ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
-              )
+              negativeLineColor =
+                  ViewColor.argb(
+                      LINE_ALPHA,
+                      ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
+                      ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
+                      ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
+                  )
 
-          negativeFillColor =
-              ViewColor.argb(
-                  FILL_ALPHA,
-                  ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
-                  ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
-                  ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
-              )
-        }
+              negativeFillColor =
+                  ViewColor.argb(
+                      FILL_ALPHA,
+                      ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
+                      ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
+                      ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
+                  )
+            }
+            .also { sparkView ->
+              owner.doOnDestroy {
+                Timber.d("Chart teardown")
+                sparkView.teardown()
+              }
+            }
       },
       update = { sparkView ->
         sparkView.apply {

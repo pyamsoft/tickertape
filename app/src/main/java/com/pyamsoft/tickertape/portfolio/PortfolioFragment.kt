@@ -45,7 +45,6 @@ import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
-import timber.log.Timber
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {
@@ -58,7 +57,7 @@ class PortfolioFragment : Fragment() {
   private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenManageDialog(stock: PortfolioStock) {
-      val quote = stock.ticker?.quote
+    val quote = stock.ticker?.quote
     val session = quote?.currentSession()
     PortfolioDigDialog.show(
         requireActivity(),
@@ -164,6 +163,9 @@ class PortfolioFragment : Fragment() {
   override fun onDestroyView() {
     super.onDestroyView()
     dispose()
+
+    windowInsetObserver?.stop()
+    windowInsetObserver = null
 
     viewModel = null
     mainViewModel = null

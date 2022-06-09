@@ -100,13 +100,13 @@ private fun Content(
   val section = state.section
 
   Crossfade(
-      modifier = modifier.fillMaxWidth().fillMaxHeight(0.6F),
+      modifier = modifier.fillMaxWidth(),
       targetState = section,
   ) { s ->
     return@Crossfade when (s) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
@@ -115,14 +115,14 @@ private fun Content(
       }
       PortfolioDigSections.NEWS -> {
         PositionNews(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,
@@ -132,12 +132,12 @@ private fun Content(
       }
       PortfolioDigSections.STATISTICS -> {
         Spacer(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
         )
       }
       PortfolioDigSections.SPLITS -> {
         Spacer(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
         )
       }
     }

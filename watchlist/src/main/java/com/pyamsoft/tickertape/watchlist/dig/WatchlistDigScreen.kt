@@ -90,13 +90,13 @@ private fun Content(
   val section = state.section
 
   Crossfade(
-      modifier = modifier.fillMaxWidth().fillMaxHeight(0.6F),
+      modifier = modifier.fillMaxWidth(),
       targetState = section,
   ) { s ->
     return@Crossfade when (s) {
       WatchlistDigSections.CHART -> {
         DigChart(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
@@ -105,14 +105,14 @@ private fun Content(
       }
       WatchlistDigSections.NEWS -> {
         WatchlistNews(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       WatchlistDigSections.STATISTICS -> {
         Spacer(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
         )
       }
     }

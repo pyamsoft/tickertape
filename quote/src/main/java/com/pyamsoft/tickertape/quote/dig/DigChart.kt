@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -73,7 +72,7 @@ fun DigChart(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     Crossfade(
-        modifier = Modifier.fillMaxWidth().heightIn(min = QuoteDefaults.CHART_HEIGHT_DP),
+        modifier = Modifier.fillMaxWidth(),
         targetState = chart,
     ) { c ->
       if (c != null) {
@@ -81,7 +80,7 @@ fun DigChart(
             modifier = Modifier.fillMaxWidth(),
         ) {
           Chart(
-              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.CHART_HEIGHT_DP),
+              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.getChartHeight()),
               chart = c,
               onScrub = onScrub,
           )

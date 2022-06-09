@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -78,13 +77,13 @@ internal fun HomePortfolio(
         }
 
         AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT_DP),
+            modifier = Modifier.fillMaxWidth(),
             visible = isListVisible,
         ) {
           Box {
             HomePortfolioSummaryItem(
                 modifier =
-                    Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
+                    Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
                 portfolio = portfolio,
             )
 

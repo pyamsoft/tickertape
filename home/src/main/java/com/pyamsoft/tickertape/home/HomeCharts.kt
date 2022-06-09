@@ -223,7 +223,7 @@ private fun HomeCharts(
         )
 
         Box(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.CHART_HEIGHT_DP),
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.getChartHeight()),
         ) {
           ChartList(
               modifier = Modifier.matchParentSize(),
@@ -283,7 +283,7 @@ private fun ChartList(
       // We can assume here the chart is not null
       HomeChartItem(
           modifier =
-              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP).run {
+              Modifier.width(HomeScreenDefaults.getItemWidth()).run {
                 when (index) {
                   0 -> padding(start = MaterialTheme.keylines.content)
                   onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)

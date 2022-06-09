@@ -22,9 +22,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -83,12 +81,12 @@ internal fun HomeWatchlist(
         }
 
         AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.WATCHLIST_HEIGHT_DP),
+            modifier = Modifier.fillMaxWidth(),
             visible = isListVisible,
         ) {
           Box {
             TickerList(
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier.fillMaxWidth(),
                 tickers = tickers,
                 onClick = onClicked,
             )
@@ -144,7 +142,7 @@ private fun TickerList(
       // We can assume here the chart is not null
       HomeWatchlistItem(
           modifier =
-              Modifier.fillMaxHeight().width(HomeScreenDefaults.ITEM_WIDTH_DP).run {
+              Modifier.width(HomeScreenDefaults.getItemWidth()).run {
                 when (index) {
                   0 -> padding(start = MaterialTheme.keylines.content)
                   tickers.lastIndex -> padding(end = MaterialTheme.keylines.content)

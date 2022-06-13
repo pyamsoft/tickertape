@@ -68,7 +68,7 @@ buildscript {
 
     moshi = "1.13.0"
     retrofit = "2.9.0"
-    okhttp = "4.9.3"
+    okhttp = "4.10.0"
 
     // Compose
     composeActivity = "1.4.0"

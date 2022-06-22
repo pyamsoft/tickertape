@@ -37,7 +37,6 @@ internal constructor(
       tapeLauncher.start(
           options =
               TapeLauncher.Options(
-                  index = null,
                   forceRefresh = force,
               ),
       )

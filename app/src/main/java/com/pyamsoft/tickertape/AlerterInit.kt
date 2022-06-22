@@ -24,6 +24,8 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
   cancel()
 
-  scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
   scheduleAlarm(factory.bigMoverAlarm(BigMoverParameters(forceRefresh = false)))
+
+  // Don't schedule refresher alarm since the Tape may not always be active
+  // scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
 }

@@ -20,7 +20,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventBus
+import java.time.DayOfWeek
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -49,19 +52,50 @@ internal constructor(
               }
             }
 
-        if (!preferences.isTapeNotificationEnabled()) {
+        // If its market time or the client has passed alwaysStart flag
+        val canStart = options?.alwaysStart == true || itsMarketTime()
+
+        if (preferences.isTapeNotificationEnabled() && canStart) {
+          Timber.d("Starting tape notification")
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            appContext.startForegroundService(service)
+          } else {
+            appContext.startService(service)
+          }
+        } else {
           Timber.w("Stop tape notification because it is not enabled.")
           appContext.stopService(service)
           tapeStopBus.send(TapeRemote.StopCommand)
-          return@withContext
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          appContext.startForegroundService(service)
-        } else {
-          appContext.startService(service)
         }
       }
 
-  data class Options(val index: Int?, val forceRefresh: Boolean?)
+  companion object {
+
+    @CheckResult
+    private fun DayOfWeek.isWeekend(): Boolean {
+      return this == DayOfWeek.SATURDAY || this == DayOfWeek.SATURDAY
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun itsMarketTime(): Boolean {
+      val now = LocalDateTime.now()
+
+      // Weekend, no market
+      if (now.dayOfWeek.isWeekend()) {
+        return false
+      }
+
+      // TODO handle hour of day for market hours
+      return true
+    }
+  }
+
+  data class Options
+  @JvmOverloads
+  constructor(
+      val index: Int? = null,
+      val forceRefresh: Boolean? = null,
+      val alwaysStart: Boolean? = null,
+  )
 }

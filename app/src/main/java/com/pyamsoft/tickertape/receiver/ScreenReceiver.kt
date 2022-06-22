@@ -52,6 +52,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
       Timber.d("Start service on screen on")
       inject(context)
 
+      // Will refresh the Tape
       scope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
     }
   }

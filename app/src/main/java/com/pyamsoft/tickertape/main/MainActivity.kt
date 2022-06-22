@@ -140,6 +140,8 @@ internal class MainActivity : PYDroidActivity() {
 
   override fun onStart() {
     super.onStart()
+
+    // Refreshes on every start and launches on initial
     lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
   }
 

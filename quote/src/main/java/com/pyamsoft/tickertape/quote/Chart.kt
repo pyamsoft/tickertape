@@ -132,9 +132,10 @@ private fun SparkChart(
     chart: StockChart,
     onScrub: ((Chart.Data?) -> Unit)?,
 ) {
+  // Keep a ref of the constructed SparkView chart
   val chartView = remember { mutableStateOf<SparkView?>(null) }
-  val density = LocalDensity.current
 
+  val density = LocalDensity.current
   val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
 
   val chartAdapter =
@@ -155,12 +156,15 @@ private fun SparkChart(
         android.graphics.Color.WHITE
       }
 
+  // When the composable falls out of effect, dispose of the Chart view
   val cv = chartView.value
-  DisposableEffect(chartView, cv) {
-    onDispose {
-      if (cv != null) {
-        Timber.d("Dispose ChartView from effect")
+  if (cv != null) {
+    DisposableEffect(cv) {
+      onDispose {
+        Timber.d("Dispose ChartView from effect: $cv")
         cv.teardown()
+
+        // Null out the ref
         chartView.value = null
       }
     }

@@ -28,17 +28,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.util.doOnDestroy
 import com.pyamsoft.spark.SparkAdapter
 import com.pyamsoft.spark.SparkView
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
@@ -132,6 +132,7 @@ private fun SparkChart(
     chart: StockChart,
     onScrub: ((Chart.Data?) -> Unit)?,
 ) {
+  val chartView = remember { mutableStateOf<SparkView?>(null) }
   val density = LocalDensity.current
 
   val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
@@ -154,7 +155,16 @@ private fun SparkChart(
         android.graphics.Color.WHITE
       }
 
-  val owner = LocalLifecycleOwner.current
+  val cv = chartView.value
+  DisposableEffect(chartView, cv) {
+    onDispose {
+      if (cv != null) {
+        Timber.d("Dispose ChartView from effect")
+        cv.teardown()
+        chartView.value = null
+      }
+    }
+  }
 
   AndroidView(
       modifier = modifier,
@@ -196,12 +206,7 @@ private fun SparkChart(
                       ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
                   )
             }
-            .also { sparkView ->
-              owner.doOnDestroy {
-                Timber.d("Chart teardown")
-                sparkView.teardown()
-              }
-            }
+            .also { chartView.value = it }
       },
       update = { sparkView ->
         sparkView.apply {

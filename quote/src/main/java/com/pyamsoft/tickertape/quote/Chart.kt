@@ -161,6 +161,7 @@ private fun SparkChart(
       factory = { context ->
         SparkView(context)
             .apply {
+              setLogger(createChartLogger())
               isFilled = true
 
               positiveLineColor =

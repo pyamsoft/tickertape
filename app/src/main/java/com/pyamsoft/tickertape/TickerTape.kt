@@ -52,6 +52,8 @@ class TickerTape : Application() {
 
     val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
 
+    installLogger()
+
     val parameters =
         PYDroid.Parameters(
             // Must be lazy since Coil calls getSystemService() internally, leading to SO exception

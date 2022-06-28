@@ -108,6 +108,7 @@ internal constructor(
         NotifyChannelInfo(
             id = "channel_tickers_foreground_v1",
             title = "My Watchlist",
-            description = "My Watchlist")
+            description = "My Watchlist",
+        )
   }
 }

@@ -23,7 +23,8 @@ import android.os.Build
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventBus
 import java.time.DayOfWeek
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +73,17 @@ internal constructor(
   companion object {
 
     @CheckResult
+    private fun ZonedDateTime.cleanHourTo(hour: Int, minute: Int? = null): ZonedDateTime {
+      return this.withHour(hour).withSecond(0).withNano(0).run {
+        if (minute != null) {
+          withMinute(minute)
+        } else {
+          withMinute(0)
+        }
+      }
+    }
+
+    @CheckResult
     private fun DayOfWeek.isWeekend(): Boolean {
       return this == DayOfWeek.SATURDAY || this == DayOfWeek.SATURDAY
     }
@@ -79,14 +91,27 @@ internal constructor(
     @JvmStatic
     @CheckResult
     private fun itsMarketTime(): Boolean {
-      val now = LocalDateTime.now()
+      // NYSE decides if the market is "open"
+      val marketTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
+      val preMarket = marketTime.cleanHourTo(8)
+      val postMarket = marketTime.cleanHourTo(12 + 6, 30)
 
       // Weekend, no market
-      if (now.dayOfWeek.isWeekend()) {
+      if (marketTime.dayOfWeek.isWeekend()) {
         return false
       }
 
-      // TODO handle hour of day for market hours
+      // Pre-market is from 8am
+      if (marketTime.isBefore(preMarket)) {
+        return false
+      }
+
+      // After-hours is until 6:30 ish
+      if (marketTime.isAfter(postMarket)) {
+        return false
+      }
+
+      // TODO closed on holidays
       return true
     }
   }

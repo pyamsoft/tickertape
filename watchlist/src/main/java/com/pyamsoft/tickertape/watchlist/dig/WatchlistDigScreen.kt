@@ -46,11 +46,6 @@ fun WatchlistDigScreen(
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-      // Status bar offset
-      Spacer(
-          modifier = Modifier.statusBarsHeight().fillMaxWidth(),
-      )
-
       WatchlistDigToolbar(
           modifier = Modifier.fillMaxWidth(),
           state = state,

@@ -71,7 +71,7 @@ fun DigChart(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     Ranges(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
         range = range,
         isOptions = isOptions,
         onRangeSelected = onRangeSelected,
@@ -283,7 +283,7 @@ private fun Ranges(
       }
 
   LazyRow(
-      modifier = modifier.padding(top = MaterialTheme.keylines.content),
+      modifier = modifier,
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
     items(

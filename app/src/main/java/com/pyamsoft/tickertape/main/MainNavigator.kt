@@ -26,11 +26,14 @@ import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 
+@ActivityScope
 internal class MainNavigator
 @Inject
 internal constructor(
@@ -45,6 +48,7 @@ internal constructor(
           when (s) {
             MainPage.Home::class.java.name -> MainPage.Home
             MainPage.WatchList::class.java.name -> MainPage.WatchList
+            MainPage.WatchListDig::class.java.name -> MainPage.WatchListDig
             MainPage.Portfolio::class.java.name -> MainPage.Portfolio
             else -> throw IllegalArgumentException("Unable to restore screen: $s")
           }
@@ -67,9 +71,23 @@ internal constructor(
       newScreen: Navigator.Screen<MainPage>,
       previousScreen: MainPage?
   ) {
-    commitNow {
-      decideAnimationForPage(newScreen.screen, previousScreen)
-      replace(container, data.fragment(newScreen.arguments), data.tag)
+    if (newScreen.screen == MainPage.WatchListDig) {
+      commit {
+        decideAnimationForPage(newScreen.screen, previousScreen)
+        add(container, data.fragment(newScreen.arguments), data.tag)
+        addToBackStack(data.tag)
+      }
+    } else {
+      commitNow {
+        decideAnimationForPage(newScreen.screen, previousScreen)
+        replace(container, data.fragment(newScreen.arguments), data.tag)
+
+        apply {
+          if (newScreen.screen == MainPage.WatchListDig) {
+            addToBackStack(data.tag)
+          }
+        }
+      }
     }
   }
 
@@ -80,6 +98,8 @@ internal constructor(
             createFragmentTag("PortfolioFragment") { PortfolioFragment.newInstance() },
         MainPage.WatchList to
             createFragmentTag("WatchListFragment") { WatchlistFragment.newInstance() },
+        MainPage.WatchListDig to
+            createFragmentTag("WatchListDigFragment") { WatchlistDigFragment.newInstance(it) },
     )
   }
 
@@ -93,12 +113,16 @@ internal constructor(
             is MainPage.WatchList ->
                 when (oldPage) {
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
+                  is MainPage.WatchListDig ->
+                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   is MainPage.Home -> R.anim.slide_in_right to R.anim.slide_out_left
                   is MainPage.Portfolio -> R.anim.slide_in_left to R.anim.slide_out_right
                   is MainPage.WatchList -> null
                 }
             is MainPage.Home ->
                 when (oldPage) {
+                  is MainPage.WatchListDig ->
+                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   is MainPage.WatchList, is MainPage.Portfolio ->
                       R.anim.slide_in_left to R.anim.slide_out_right
@@ -106,11 +130,14 @@ internal constructor(
                 }
             is MainPage.Portfolio ->
                 when (oldPage) {
+                  is MainPage.WatchListDig ->
+                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
                   is MainPage.WatchList, is MainPage.Home ->
                       R.anim.slide_in_right to R.anim.slide_out_left
                   is MainPage.Portfolio -> null
                 }
+            is MainPage.WatchListDig -> null
           }
 
       if (animations != null) {

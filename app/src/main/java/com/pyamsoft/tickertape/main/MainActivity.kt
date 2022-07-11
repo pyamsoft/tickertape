@@ -45,7 +45,6 @@ import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -119,7 +118,7 @@ internal class MainActivity : PYDroidActivity() {
             Box(
                 contentAlignment = Alignment.BottomCenter,
             ) {
-              page?.let { p ->
+              (page as? TopLevelScreen)?.let { p ->
                 MainScreen(
                     page = p,
                     onLoadPage = { navi.navigateTo(it.asScreen()) },
@@ -194,13 +193,16 @@ internal class MainActivity : PYDroidActivity() {
     Timber.d("Launch intent with symbol: $symbol")
     notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
 
-    WatchlistDigDialog.show(
-        this,
-        symbol = symbol,
-        lookupSymbol = lookupSymbol,
-        equityType = equityType,
-        allowModifyWatchlist = false,
-    )
+    navigator
+        .requireNotNull()
+        .navigateTo(
+            MainPage.WatchListDig.asScreen(
+                symbol = symbol,
+                lookupSymbol = lookupSymbol,
+                allowModifyWatchlist = false,
+                equityType = equityType,
+            ),
+        )
   }
 
   override fun onBackPressed() {

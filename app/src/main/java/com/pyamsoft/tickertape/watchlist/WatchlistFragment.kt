@@ -33,6 +33,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -40,17 +41,18 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigDialog
 import javax.inject.Inject
 import timber.log.Timber
 
 class WatchlistFragment : Fragment() {
 
+  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: WatchlistViewModeler? = null
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
@@ -67,13 +69,17 @@ class WatchlistFragment : Fragment() {
 
     val equityType = quote.type()
     val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
-    WatchlistDigDialog.show(
-        requireActivity(),
-        symbol = ticker.symbol,
-        lookupSymbol = lookupSymbol,
-        allowModifyWatchlist = false,
-        equityType = equityType,
-    )
+
+    navigator
+        .requireNotNull()
+        .navigateTo(
+            MainPage.WatchListDig.asScreen(
+                symbol = ticker.symbol,
+                lookupSymbol = lookupSymbol,
+                allowModifyWatchlist = false,
+                equityType = equityType,
+            ),
+        )
   }
 
   private fun handleDeleteTicker(ticker: Ticker) {
@@ -180,6 +186,7 @@ class WatchlistFragment : Fragment() {
     mainViewModel = null
     theming = null
     imageLoader = null
+    navigator = null
   }
 
   companion object {

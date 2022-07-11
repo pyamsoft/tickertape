@@ -22,69 +22,76 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
-import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class WatchlistDigDialog : AppCompatDialogFragment() {
+internal class WatchlistDigFragment : Fragment() {
 
   @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
+  private var windowInsetObserver: ViewWindowInsetObserver? = null
+
   @CheckResult
   private fun getSymbol(): StockSymbol {
     return requireArguments()
-        .getString(KEY_SYMBOL)
-        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
+        .getString(MainPage.WatchListDig.KEY_SYMBOL)
+        .let { it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_SYMBOL}" } }
         .asSymbol()
   }
 
   @CheckResult
   private fun getLookupSymbol(): StockSymbol {
     return requireArguments()
-        .getString(KEY_LOOKUP_SYMBOL)
-        .let { it.requireNotNull { "Must be created with $KEY_LOOKUP_SYMBOL" } }
+        .getString(MainPage.WatchListDig.KEY_LOOKUP_SYMBOL)
+        .let {
+          it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_LOOKUP_SYMBOL}" }
+        }
         .asSymbol()
   }
 
   @CheckResult
   private fun getEquityType(): EquityType {
     return requireArguments()
-        .getString(KEY_EQUITY_TYPE)
-        .let { it.requireNotNull { "Must be created with $KEY_EQUITY_TYPE" } }
+        .getString(MainPage.WatchListDig.KEY_EQUITY_TYPE)
+        .let {
+          it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_EQUITY_TYPE}" }
+        }
         .let { EquityType.valueOf(it) }
   }
 
   @CheckResult
   private fun getAllowModifyWatchlist(): Boolean {
     val args = requireArguments()
-    if (!args.containsKey(KEY_ALLOW_MODIFY)) {
-      throw IllegalArgumentException("Must be created with $KEY_ALLOW_MODIFY")
+    if (!args.containsKey(MainPage.WatchListDig.KEY_ALLOW_MODIFY)) {
+      throw IllegalArgumentException(
+          "Must be created with ${MainPage.WatchListDig.KEY_ALLOW_MODIFY}")
     }
 
-    return args.getBoolean(KEY_ALLOW_MODIFY, false)
+    return args.getBoolean(MainPage.WatchListDig.KEY_ALLOW_MODIFY, false)
   }
 
   private fun handleModifyWatchlist() {
@@ -145,20 +152,26 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     return ComposeView(act).apply {
       id = R.id.dialog_watchlist_dig
 
+      val observer = ViewWindowInsetObserver(this)
+      val windowInsets = observer.start()
+      windowInsetObserver = observer
+
       setContent {
         vm.Render { state ->
           act.TickerTapeTheme(themeProvider) {
-            WatchlistDigScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                imageLoader = loader,
-                onClose = { dismiss() },
-                onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = { handleRangeSelected(it) },
-                onModifyWatchlist = { handleModifyWatchlist() },
-                onRefresh = { handleRefresh(true) },
-                onTabUpdated = { handleTabUpdated(it) },
-            )
+            CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+              WatchlistDigScreen(
+                  modifier = Modifier.fillMaxWidth(),
+                  state = state,
+                  imageLoader = loader,
+                  onClose = { act.onBackPressed() },
+                  onScrub = { vm.handleDateScrubbed(it) },
+                  onRangeSelected = { handleRangeSelected(it) },
+                  onModifyWatchlist = { handleModifyWatchlist() },
+                  onRefresh = { handleRefresh(true) },
+                  onTabUpdated = { handleTabUpdated(it) },
+              )
+            }
           }
         }
       }
@@ -170,15 +183,12 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
       savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
-    makeFullWidth()
-
     viewModel.requireNotNull().restoreState(savedInstanceState)
     handleRefresh(force = false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    makeFullWidth()
     recompose()
   }
 
@@ -191,6 +201,9 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
     super.onDestroyView()
     dispose()
 
+    windowInsetObserver?.stop()
+    windowInsetObserver = null
+
     viewModel = null
     theming = null
     imageLoader = null
@@ -198,46 +211,16 @@ internal class WatchlistDigDialog : AppCompatDialogFragment() {
 
   companion object {
 
-    private const val KEY_SYMBOL = "key_symbol"
-    private const val KEY_LOOKUP_SYMBOL = "key_lookup_symbol"
-    private const val KEY_EQUITY_TYPE = "key_equity_type"
-    private const val KEY_ALLOW_MODIFY = "key_allow_modify"
-    private const val TAG = "WatchlistDigDialog"
-
     @JvmStatic
     @CheckResult
-    private fun newInstance(
-        symbol: StockSymbol,
-        lookupSymbol: StockSymbol,
-        equityType: EquityType,
-        allowModifyWatchlist: Boolean,
-    ): DialogFragment {
-      return WatchlistDigDialog().apply {
+    fun newInstance(
+        // Nullable for navigator API compat
+        bundle: Bundle?
+    ): Fragment {
+      return WatchlistDigFragment().apply {
         arguments =
-            Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
-              putString(KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
-              putString(KEY_EQUITY_TYPE, equityType.name)
-              putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
-            }
+            bundle.requireNotNull { "WatchlistDigFragment must be created with argument Bundle" }
       }
-    }
-
-    @JvmStatic
-    fun show(
-        activity: FragmentActivity,
-        symbol: StockSymbol,
-        lookupSymbol: StockSymbol,
-        equityType: EquityType,
-        allowModifyWatchlist: Boolean,
-    ) {
-      newInstance(
-              symbol,
-              lookupSymbol,
-              equityType,
-              allowModifyWatchlist,
-          )
-          .show(activity, TAG)
     }
   }
 }

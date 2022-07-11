@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.main
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -28,11 +27,10 @@ import com.pyamsoft.pydroid.theme.keylines
 
 @Composable
 @JvmOverloads
-@OptIn(ExperimentalAnimationApi::class)
 fun MainScreen(
     modifier: Modifier = Modifier,
-    page: MainPage,
-    onLoadPage: (MainPage) -> Unit,
+    page: TopLevelScreen,
+    onLoadPage: (TopLevelScreen) -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
 ) {
   Column(

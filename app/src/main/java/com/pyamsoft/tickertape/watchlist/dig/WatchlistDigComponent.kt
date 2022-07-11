@@ -26,7 +26,7 @@ import javax.inject.Named
 @Subcomponent
 internal interface WatchlistDigComponent {
 
-  fun inject(dialog: WatchlistDigDialog)
+  fun inject(dialog: WatchlistDigFragment)
 
   @Subcomponent.Factory
   interface Factory {

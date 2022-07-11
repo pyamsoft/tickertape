@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,8 +45,8 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 @Composable
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
-    page: MainPage,
-    onLoadPage: (MainPage) -> Unit,
+    page: TopLevelScreen,
+    onLoadPage: (TopLevelScreen) -> Unit,
     onHeightMeasured: (Int) -> Unit,
 ) {
   // Can't use BottomAppBar since we can't modify its Shape
@@ -88,10 +89,21 @@ internal fun MainBottomNav(
 @Composable
 private fun RowScope.Item(
     modifier: Modifier = Modifier,
-    current: MainPage,
-    target: MainPage,
-    onLoadPage: (MainPage) -> Unit,
+    current: TopLevelScreen,
+    target: TopLevelScreen,
+    onLoadPage: (TopLevelScreen) -> Unit,
 ) {
+
+  val icon =
+      remember(target) {
+        when (target) {
+          is MainPage.Home -> Icons.Filled.Home
+          is MainPage.WatchList -> Icons.Filled.BarChart
+          is MainPage.Portfolio -> Icons.Filled.PieChart
+          else -> throw IllegalArgumentException("Unhandled TopLevel page: $target")
+        }
+      }
+
   BottomNavigationItem(
       modifier = modifier,
       selected = current == target,
@@ -102,12 +114,7 @@ private fun RowScope.Item(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Icon(
-              imageVector =
-                  when (target) {
-                    is MainPage.Home -> Icons.Filled.Home
-                    is MainPage.WatchList -> Icons.Filled.BarChart
-                    is MainPage.Portfolio -> Icons.Filled.PieChart
-                  },
+              imageVector = icon,
               contentDescription = target.name,
           )
           Text(

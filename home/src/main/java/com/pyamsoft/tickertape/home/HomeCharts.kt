@@ -248,7 +248,6 @@ private fun HomeCharts(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun Loading(
     isLoading: Boolean,
     modifier: Modifier = Modifier,

@@ -13,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 @JvmOverloads
-@OptIn(ExperimentalAnimationApi::class)
 fun NewTickerFab(
     modifier: Modifier = Modifier,
     visible: Boolean,

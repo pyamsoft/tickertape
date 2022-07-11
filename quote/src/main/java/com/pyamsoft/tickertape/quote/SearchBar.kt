@@ -88,7 +88,6 @@ private fun TickerTab(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun SearchInput(
     modifier: Modifier = Modifier,
     search: String,

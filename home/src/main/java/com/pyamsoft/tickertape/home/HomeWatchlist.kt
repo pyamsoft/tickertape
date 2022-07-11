@@ -46,7 +46,6 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 internal fun HomeWatchlist(
     modifier: Modifier = Modifier,
     state: HomeWatchListViewState,
@@ -108,7 +107,6 @@ internal fun HomeWatchlist(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun Loading(
     isLoading: Boolean,
     modifier: Modifier = Modifier,

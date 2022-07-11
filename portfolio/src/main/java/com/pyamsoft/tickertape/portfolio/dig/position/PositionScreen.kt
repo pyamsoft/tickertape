@@ -117,7 +117,6 @@ private fun PositionsList(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun PositionsAdd(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,

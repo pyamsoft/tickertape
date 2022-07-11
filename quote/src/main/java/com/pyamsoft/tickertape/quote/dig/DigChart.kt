@@ -50,7 +50,6 @@ import java.time.LocalDateTime
 import kotlin.math.abs
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 fun DigChart(
     modifier: Modifier = Modifier,
     state: DigViewState,
@@ -71,6 +70,13 @@ fun DigChart(
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
+    Ranges(
+        modifier = Modifier.fillMaxWidth(),
+        range = range,
+        isOptions = isOptions,
+        onRangeSelected = onRangeSelected,
+    )
+
     Crossfade(
         modifier = Modifier.fillMaxWidth(),
         targetState = chart,
@@ -94,18 +100,10 @@ fun DigChart(
         }
       }
     }
-
-    Ranges(
-        modifier = Modifier.fillMaxWidth(),
-        range = range,
-        isOptions = isOptions,
-        onRangeSelected = onRangeSelected,
-    )
   }
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun CurrentScrub(
     modifier: Modifier = Modifier,
     range: StockChart.IntervalRange,

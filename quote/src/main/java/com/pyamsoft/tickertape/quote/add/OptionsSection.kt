@@ -40,7 +40,6 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 internal fun OptionsSection(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
@@ -78,7 +77,6 @@ internal fun OptionsSection(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun OptionsStrikeExpiration(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,

@@ -40,7 +40,6 @@ import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 internal fun HomePortfolio(
     modifier: Modifier = Modifier,
     state: HomePortfolioViewState,
@@ -104,7 +103,6 @@ internal fun HomePortfolio(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun Loading(
     isLoading: Boolean,
     modifier: Modifier = Modifier,

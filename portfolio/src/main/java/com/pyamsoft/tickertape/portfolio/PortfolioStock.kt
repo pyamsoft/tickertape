@@ -19,6 +19,9 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.priceWithSplits
+import com.pyamsoft.tickertape.db.position.shareCountWithSplits
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
@@ -36,6 +39,7 @@ internal constructor(
     val holding: DbHolding,
     val positions: List<DbPosition>,
     val ticker: Ticker?,
+    val splits: List<DbSplit>,
 ) {
 
   val todayDirection: StockDirection
@@ -57,8 +61,13 @@ internal constructor(
 
     val isNoPosition = positions.isEmpty()
     val cost =
-        if (isNoPosition) 0.0 else positions.sumOf { it.price().value() * it.shareCount().value() }
-    val totalSharesNumber = if (isNoPosition) 0.0 else positions.sumOf { it.shareCount().value() }
+        if (isNoPosition) 0.0
+        else
+            positions.sumOf {
+              it.priceWithSplits(splits).value() * it.shareCountWithSplits(splits).value()
+            }
+    val totalSharesNumber =
+        if (isNoPosition) 0.0 else positions.sumOf { it.shareCountWithSplits(splits).value() }
 
     // Avoid -0.0 as a total change number
     val tempTodayChange: Double

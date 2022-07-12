@@ -29,6 +29,8 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
+import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,6 +50,7 @@ internal constructor(
     private val positionQueryDao: PositionQueryDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingDeleteDao: HoldingDeleteDao,
+    private val splitQueryDao: SplitQueryDao,
     private val interactor: TickerInteractor,
 ) : PortfolioInteractor {
 
@@ -74,6 +77,7 @@ internal constructor(
                 awaitAll(
                     async { holdingQueryDao.query(force) },
                     async { positionQueryDao.query(force) },
+                    async { splitQueryDao.query(force) },
                 )
 
             // We can cast since we know what this one is
@@ -82,6 +86,10 @@ internal constructor(
 
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
+
+            // We can cast since we know what this one is
+            @Suppress("UNCHECKED_CAST") val splits = jobResult[2] as List<DbSplit>
+
             return@coroutineScope interactor
                 .getQuotes(
                     force,
@@ -95,11 +103,13 @@ internal constructor(
                   for (holding in holdings) {
                     val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
                     val holdingPositions = positions.filter { it.holdingId() == holding.id() }
+                    val holdingSplits = splits.filter { it.holdingId() == holding.id() }
                     val stock =
                         PortfolioStock(
                             holding = holding,
                             positions = holdingPositions,
                             ticker = quote,
+                            splits = holdingSplits,
                         )
                     result.add(stock)
                   }

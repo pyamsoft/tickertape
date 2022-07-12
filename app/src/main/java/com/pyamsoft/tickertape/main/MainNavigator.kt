@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import timber.log.Timber
 import javax.inject.Inject
 
 @ActivityScope

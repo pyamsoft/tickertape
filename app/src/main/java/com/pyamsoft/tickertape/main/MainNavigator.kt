@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.main
 
-import android.os.Bundle
+import androidx.annotation.AnimRes
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
@@ -39,122 +40,99 @@ internal class MainNavigator
 internal constructor(
     activity: MainActivity,
     @IdRes fragmentContainerId: Int,
-) : FragmentNavigator<MainPage>(activity, fragmentContainerId) {
+) : FragmentNavigator(activity, fragmentContainerId) {
 
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    val s = savedInstanceState.get<String>(KEY_SCREEN_ID)
-    if (s != null) {
-      val restored =
-          when (s) {
-            MainPage.Home::class.java.name -> MainPage.Home
-            MainPage.WatchList::class.java.name -> MainPage.WatchList
-            MainPage.WatchListDig::class.java.name -> MainPage.WatchListDig
-            MainPage.Portfolio::class.java.name -> MainPage.Portfolio
-            else -> throw IllegalArgumentException("Unable to restore screen: $s")
-          }
-      updateCurrentScreen(restored)
-    }
-  }
+  override fun onRestoreState(savedInstanceState: UiSavedStateReader) {}
 
-  override fun saveState(outState: UiSavedStateWriter) {
-    val s = currentScreen()
-    if (s != null) {
-      outState.put(KEY_SCREEN_ID, s::class.java.name)
-    } else {
-      outState.remove<String>(KEY_SCREEN_ID)
-    }
-  }
+  override fun onSaveState(outState: UiSavedStateWriter) {}
 
   override fun performFragmentTransaction(
       container: Int,
-      data: FragmentTag,
-      newScreen: Navigator.Screen<MainPage>,
-      previousScreen: MainPage?
+      newScreen: Fragment,
+      previousScreen: Fragment?
   ) {
-    if (newScreen.screen == MainPage.WatchListDig) {
-      commit {
-        decideAnimationForPage(newScreen.screen, previousScreen)
-        add(container, data.fragment(newScreen.arguments), data.tag)
-        addToBackStack(data.tag)
+    val tag = Navigator.getTagForScreen(newScreen)
+    if (isTopLevelScreen(tag)) {
+      commitNow {
+        decideAnimationForPage(newScreen, previousScreen)
+        replace(container, newScreen, tag)
       }
     } else {
-      commitNow {
-        decideAnimationForPage(newScreen.screen, previousScreen)
-        replace(container, data.fragment(newScreen.arguments), data.tag)
-
-        apply {
-          if (newScreen.screen == MainPage.WatchListDig) {
-            addToBackStack(data.tag)
-          }
-        }
+      commit {
+        decideAnimationForPage(newScreen, previousScreen)
+        add(container, newScreen, tag)
+        addToBackStack(tag)
       }
     }
-  }
-
-  override fun provideFragmentTagMap(): Map<MainPage, FragmentTag> {
-    return mapOf(
-        MainPage.Home to createFragmentTag("HomeFragment") { HomeFragment.newInstance() },
-        MainPage.Portfolio to
-            createFragmentTag("PortfolioFragment") { PortfolioFragment.newInstance() },
-        MainPage.WatchList to
-            createFragmentTag("WatchListFragment") { WatchlistFragment.newInstance() },
-        MainPage.WatchListDig to
-            createFragmentTag("WatchListDigFragment") { WatchlistDigFragment.newInstance(it) },
-    )
   }
 
   companion object {
 
-    private const val KEY_SCREEN_ID = "key_screen_id"
+    private val HOME_TAG = Navigator.getTagForScreen(HomeFragment)
+    private val WATCHLIST_TAG = Navigator.getTagForScreen(WatchlistFragment)
+    private val PORTFOLIO_TAG = Navigator.getTagForScreen(PortfolioFragment)
 
-    private fun FragmentTransaction.decideAnimationForPage(newPage: MainPage, oldPage: MainPage?) {
+    private val WATCHLIST_DIG_TAG = Navigator.getTagForScreen(WatchlistDigFragment)
+    private val PORTFOLIO_DIG_TAG = Navigator.getTagForScreen(PortfolioDigFragment)
+
+    private data class FragmentAnimation(
+        @AnimRes val enter: Int,
+        @AnimRes val exit: Int,
+    )
+
+    @CheckResult
+    private fun isTopLevelScreen(tag: String): Boolean {
+      return tag == HOME_TAG || tag == WATCHLIST_TAG || tag == PORTFOLIO_TAG
+    }
+
+    @CheckResult
+    private infix fun Int.then(exit: Int): FragmentAnimation {
+      return FragmentAnimation(
+          enter = this,
+          exit = exit,
+      )
+    }
+
+    private fun FragmentTransaction.decideAnimationForPage(
+        newPage: Fragment,
+        oldPage: Fragment?,
+    ) {
+      val newTag = Navigator.getTagForScreen(newPage)
+      val oldTag = if (oldPage == null) null else Navigator.getTagForScreen(oldPage)
+
       val animations =
-          when (newPage) {
-            is MainPage.WatchList ->
-                when (oldPage) {
-                  null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.WatchListDig ->
-                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.Home -> R.anim.slide_in_right to R.anim.slide_out_left
-                  is MainPage.Portfolio -> R.anim.slide_in_left to R.anim.slide_out_right
-                  is MainPage.WatchList -> null
+          when (newTag) {
+            HOME_TAG ->
+                when (oldTag) {
+                  WATCHLIST_TAG, PORTFOLIO_TAG -> R.anim.slide_in_left then R.anim.slide_out_right
+                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
+                  else -> null
                 }
-            is MainPage.Home ->
-                when (oldPage) {
-                  is MainPage.WatchListDig ->
-                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.WatchList, is MainPage.Portfolio ->
-                      R.anim.slide_in_left to R.anim.slide_out_right
-                  is MainPage.Home -> null
+            WATCHLIST_TAG ->
+                when (oldTag) {
+                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
+                  HOME_TAG -> R.anim.slide_in_right then R.anim.slide_out_left
+                  PORTFOLIO_TAG -> R.anim.slide_in_left then R.anim.slide_out_right
+                  else -> null
                 }
-            is MainPage.Portfolio ->
-                when (oldPage) {
-                  is MainPage.WatchListDig ->
-                      R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  null -> R.anim.fragment_open_enter to R.anim.fragment_open_exit
-                  is MainPage.WatchList, is MainPage.Home ->
-                      R.anim.slide_in_right to R.anim.slide_out_left
-                  is MainPage.Portfolio -> null
+            PORTFOLIO_TAG ->
+                when (oldTag) {
+                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
+                  WATCHLIST_TAG, HOME_TAG -> R.anim.slide_in_right then R.anim.slide_out_left
+                  else -> null
                 }
-            is MainPage.WatchListDig -> null
+            WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+                R.anim.fragment_open_enter then R.anim.fragment_open_exit
+            else -> null
           }
 
       if (animations != null) {
-        val (enter, exit) = animations
+        val enter = animations.enter
+        val exit = animations.exit
         setCustomAnimations(enter, exit, enter, exit)
-      }
-    }
-
-    @JvmStatic
-    @CheckResult
-    private inline fun createFragmentTag(
-        tag: String,
-        crossinline fragment: (arguments: Bundle?) -> Fragment,
-    ): FragmentTag {
-      return object : FragmentTag {
-        override val fragment: (arguments: Bundle?) -> Fragment = { fragment(it) }
-        override val tag: String = tag
       }
     }
   }

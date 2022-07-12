@@ -33,6 +33,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -41,7 +42,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainViewModeler
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
@@ -49,6 +50,7 @@ import javax.inject.Inject
 
 class PortfolioFragment : Fragment() {
 
+  @JvmField @Inject internal var navigator: Navigator<Fragment>? = null
   @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
@@ -59,12 +61,16 @@ class PortfolioFragment : Fragment() {
   private fun handleOpenManageDialog(stock: PortfolioStock) {
     val quote = stock.ticker?.quote
     val session = quote?.currentSession()
-    PortfolioDigDialog.show(
-        requireActivity(),
-        holding = stock.holding,
-        quote = quote,
-        currentPrice = session?.price(),
-    )
+
+    navigator
+        .requireNotNull()
+        .navigateTo(
+            PortfolioDigFragment.newInstance(
+                holding = stock.holding,
+                quote = quote,
+                currentPrice = session?.price(),
+            ),
+        )
   }
 
   private fun handleDeleteStock(stock: PortfolioStock) {

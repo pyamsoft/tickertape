@@ -105,10 +105,6 @@ internal interface TickerComponent {
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
-  @CheckResult fun plusWatchlistDigComponent(): WatchlistDigComponent.Factory
-
-  @CheckResult fun plusPortfolioDigComponent(): PortfolioDigComponent.Factory
-
   @CheckResult fun plusPositionAddComponent(): PositionAddComponent.Factory
 
   @CheckResult fun plusNewTickerComponent(): NewTickerComponent.Factory

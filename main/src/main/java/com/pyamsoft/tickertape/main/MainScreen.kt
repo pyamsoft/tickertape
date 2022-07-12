@@ -29,8 +29,10 @@ import com.pyamsoft.pydroid.theme.keylines
 @JvmOverloads
 fun MainScreen(
     modifier: Modifier = Modifier,
-    page: TopLevelScreen,
-    onLoadPage: (TopLevelScreen) -> Unit,
+    page: MainPage,
+    onLoadHome: () -> Unit,
+    onLoadWatchlist: () -> Unit,
+    onLoadPortfolio: () -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
 ) {
   Column(
@@ -42,7 +44,9 @@ fun MainScreen(
             Modifier.padding(horizontal = MaterialTheme.keylines.content)
                 .padding(bottom = MaterialTheme.keylines.content),
         page = page,
-        onLoadPage = onLoadPage,
+        onLoadHome = onLoadHome,
+        onLoadWatchlist = onLoadWatchlist,
+        onLoadPortfolio = onLoadPortfolio,
         onHeightMeasured = onBottomBarHeightMeasured,
     )
   }
@@ -52,8 +56,10 @@ fun MainScreen(
 @Composable
 private fun PreviewMainScreen() {
   MainScreen(
-      page = MainPage.Home,
+      page = MainPage.HOME,
       onBottomBarHeightMeasured = {},
-      onLoadPage = {},
+      onLoadHome = {},
+      onLoadWatchlist = {},
+      onLoadPortfolio = {},
   )
 }

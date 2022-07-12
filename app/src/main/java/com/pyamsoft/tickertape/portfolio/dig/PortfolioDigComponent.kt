@@ -28,7 +28,7 @@ import javax.inject.Named
 @Subcomponent
 internal interface PortfolioDigComponent {
 
-  fun inject(dialog: PortfolioDigDialog)
+  fun inject(dialog: PortfolioDigFragment)
 
   @Subcomponent.Factory
   interface Factory {

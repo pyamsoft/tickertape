@@ -45,8 +45,10 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 @Composable
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
-    page: TopLevelScreen,
-    onLoadPage: (TopLevelScreen) -> Unit,
+    page: MainPage,
+    onLoadHome: () -> Unit,
+    onLoadWatchlist: () -> Unit,
+    onLoadPortfolio: () -> Unit,
     onHeightMeasured: (Int) -> Unit,
 ) {
   // Can't use BottomAppBar since we can't modify its Shape
@@ -65,18 +67,18 @@ internal fun MainBottomNav(
       ) {
         Item(
             current = page,
-            target = MainPage.Home,
-            onLoadPage = onLoadPage,
+            target = MainPage.HOME,
+            onLoadPage = onLoadHome,
         )
         Item(
             current = page,
-            target = MainPage.WatchList,
-            onLoadPage = onLoadPage,
+            target = MainPage.WATCHLIST,
+            onLoadPage = onLoadWatchlist,
         )
         Item(
             current = page,
-            target = MainPage.Portfolio,
-            onLoadPage = onLoadPage,
+            target = MainPage.PORTFOLIO,
+            onLoadPage = onLoadPortfolio,
         )
       }
     }
@@ -89,25 +91,24 @@ internal fun MainBottomNav(
 @Composable
 private fun RowScope.Item(
     modifier: Modifier = Modifier,
-    current: TopLevelScreen,
-    target: TopLevelScreen,
-    onLoadPage: (TopLevelScreen) -> Unit,
+    current: MainPage,
+    target: MainPage,
+    onLoadPage: () -> Unit,
 ) {
 
   val icon =
       remember(target) {
         when (target) {
-          is MainPage.Home -> Icons.Filled.Home
-          is MainPage.WatchList -> Icons.Filled.BarChart
-          is MainPage.Portfolio -> Icons.Filled.PieChart
-          else -> throw IllegalArgumentException("Unhandled TopLevel page: $target")
+          MainPage.HOME -> Icons.Filled.Home
+          MainPage.WATCHLIST -> Icons.Filled.BarChart
+          MainPage.PORTFOLIO -> Icons.Filled.PieChart
         }
       }
 
   BottomNavigationItem(
       modifier = modifier,
       selected = current == target,
-      onClick = { onLoadPage(target) },
+      onClick = { onLoadPage() },
       icon = {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -115,10 +116,10 @@ private fun RowScope.Item(
         ) {
           Icon(
               imageVector = icon,
-              contentDescription = target.name,
+              contentDescription = target.screenName,
           )
           Text(
-              text = target.name,
+              text = target.screenName,
               style = MaterialTheme.typography.body2,
           )
         }
@@ -130,8 +131,10 @@ private fun RowScope.Item(
 @Composable
 private fun PreviewMainBottomNav() {
   MainBottomNav(
-      page = MainPage.Home,
+      page = MainPage.HOME,
       onHeightMeasured = {},
-      onLoadPage = {},
+      onLoadHome = {},
+      onLoadWatchlist = {},
+      onLoadPortfolio = {},
   )
 }

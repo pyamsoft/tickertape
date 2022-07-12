@@ -21,28 +21,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.makeFullWidth
+import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
-import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -55,11 +56,14 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class PortfolioDigDialog : AppCompatDialogFragment() {
+internal class PortfolioDigFragment : Fragment() {
 
+  @JvmField @Inject internal var navigator: BackstackNavigator<Fragment>? = null
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
+
+  private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleRangeSelected(range: StockChart.IntervalRange) {
     viewModel
@@ -110,7 +114,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   private fun getSymbol(): StockSymbol {
     return requireArguments()
         .getString(KEY_SYMBOL)
-        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
+        .let { it.requireNotNull { "Must be created with ${KEY_SYMBOL}" } }
         .asSymbol()
   }
 
@@ -123,7 +127,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   private fun getHoldingId(): DbHolding.Id {
     return requireArguments()
         .getString(KEY_HOLDING_ID)
-        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_ID" } }
+        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_ID}" } }
         .let { DbHolding.Id(it) }
   }
 
@@ -131,7 +135,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   private fun getHoldingType(): EquityType {
     return requireArguments()
         .getString(KEY_HOLDING_TYPE)
-        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_TYPE" } }
+        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_TYPE}" } }
         .let { EquityType.valueOf(it) }
   }
 
@@ -139,7 +143,7 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
   private fun getHoldingSide(): TradeSide {
     return requireArguments()
         .getString(KEY_HOLDING_SIDE)
-        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_SIDE" } }
+        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_SIDE}" } }
         .let { TradeSide.valueOf(it) }
   }
 
@@ -160,8 +164,8 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
       savedInstanceState: Bundle?,
   ): View {
     val act = requireActivity()
-    Injector.obtainFromApplication<TickerComponent>(act)
-        .plusPortfolioDigComponent()
+    Injector.obtainFromActivity<MainComponent>(act)
+        .plusPortfolioDig()
         .create(
             getSymbol(),
             getLookupSymbol(),
@@ -173,28 +177,39 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
     val vm = viewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
+    val navi = navigator.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     val currentPrice = getCurrentPrice()
     return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
+      val observer = ViewWindowInsetObserver(this)
+      val windowInsets = observer.start()
+      windowInsetObserver = observer
+
       setContent {
         vm.Render { state ->
           act.TickerTapeTheme(themeProvider) {
-            PortfolioDigScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                imageLoader = loader,
-                currentPrice = currentPrice,
-                onClose = { dismiss() },
-                onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = { handleRangeSelected(it) },
-                onTabUpdated = { handleTabUpdated(it) },
-                onRefresh = { handleRefresh(true) },
-                onAddPosition = { handleAddPosition() },
-                onDeletePosition = { handleDeletePosition(it) },
-            )
+            CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+              BackHandler(
+                  onBack = { navi.goBack() },
+              )
+
+              PortfolioDigScreen(
+                  modifier = Modifier.fillMaxWidth(),
+                  state = state,
+                  imageLoader = loader,
+                  currentPrice = currentPrice,
+                  onClose = { act.onBackPressed() },
+                  onScrub = { vm.handleDateScrubbed(it) },
+                  onRangeSelected = { handleRangeSelected(it) },
+                  onTabUpdated = { handleTabUpdated(it) },
+                  onRefresh = { handleRefresh(true) },
+                  onAddPosition = { handleAddPosition() },
+                  onDeletePosition = { handleDeletePosition(it) },
+              )
+            }
           }
         }
       }
@@ -206,8 +221,6 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
       savedInstanceState: Bundle?,
   ) {
     super.onViewCreated(view, savedInstanceState)
-    makeFullWidth()
-
     viewModel.requireNotNull().also { vm ->
       vm.restoreState(savedInstanceState)
       vm.bind(scope = viewLifecycleOwner.lifecycleScope)
@@ -218,7 +231,6 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    makeFullWidth()
     recompose()
   }
 
@@ -231,9 +243,13 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     super.onDestroyView()
     dispose()
 
+    windowInsetObserver?.stop()
+    windowInsetObserver = null
+
     viewModel = null
     theming = null
     imageLoader = null
+    navigator = null
   }
 
   companion object {
@@ -244,22 +260,23 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
     private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_HOLDING_SIDE = "key_holding_side"
     private const val KEY_CURRENT_PRICE = "key_current_price"
-    private const val TAG = "PortfolioDigDialog"
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(
+    fun newInstance(
         holding: DbHolding,
         quote: StockQuote?,
         currentPrice: StockMoneyValue?,
-    ): DialogFragment {
+    ): Fragment {
+
       val lookupSymbol =
           when (quote) {
             null -> null
             is StockOptionsQuote -> quote.underlyingSymbol()
             else -> quote.symbol()
           }
-      return PortfolioDigDialog().apply {
+
+      return PortfolioDigFragment().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, holding.symbol().symbol())
@@ -270,16 +287,6 @@ internal class PortfolioDigDialog : AppCompatDialogFragment() {
               lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.symbol()) }
             }
       }
-    }
-
-    @JvmStatic
-    fun show(
-        activity: FragmentActivity,
-        holding: DbHolding,
-        quote: StockQuote?,
-        currentPrice: StockMoneyValue?,
-    ) {
-      newInstance(holding, quote, currentPrice).show(activity, TAG)
     }
   }
 }

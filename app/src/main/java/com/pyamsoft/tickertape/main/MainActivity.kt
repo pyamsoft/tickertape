@@ -19,9 +19,12 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -41,10 +44,14 @@ import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
+import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
+import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.watchlist.WatchlistFragment
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,90 +66,12 @@ internal class MainActivity : PYDroidActivity() {
   private var viewBinding: ActivityMainBinding? = null
   private var injector: MainComponent? = null
 
-  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
+  @JvmField @Inject internal var navigator: Navigator<Fragment>? = null
   @JvmField @Inject internal var notificationCanceller: NotificationCanceller? = null
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
   @JvmField @Inject internal var alerter: Alerter? = null
   @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    // NOTE(Peter):
-    // Not full Compose yet
-    // Compose has an issue handling Fragments.
-    //
-    // We need an AndroidView to handle a Fragment, but a Fragment outlives the Activity via the
-    // FragmentManager keeping state. The Compose render does not, so when an activity dies from
-    // configuration change, the Fragment is headless somewhere in the great beyond. This leads to
-    // memory leaks and other issues like Disposable hooks not being called on DisposeEffect blocks.
-    // To avoid these growing pains, we use an Activity layout file and then host the ComposeViews
-    // from it that are then used to render Activity level views. Fragment transactions happen as
-    // normal and then Fragments host ComposeViews too.
-    val binding = ActivityMainBinding.inflate(layoutInflater).apply { viewBinding = this }
-    setContentView(binding.root)
-
-    injector =
-        Injector.obtainFromApplication<TickerComponent>(this)
-            .plusMainComponent()
-            .create(
-                this,
-                binding.mainFragmentContainerView.id,
-            )
-            .also { c -> c.inject(this) }
-    setTheme(R.style.Theme_TickerTape)
-    super.onCreate(savedInstanceState)
-    stableLayoutHideNavigation()
-
-    beginWork()
-    handleLaunchIntent()
-
-    // Snackbar respects window offsets and hosts snackbar composables
-    // Because these are not in a nice Scaffold, we cannot take advantage of Coordinator style
-    // actions (a FAB will not move out of the way for example)
-    val navi = navigator.requireNotNull()
-    val vm = viewModel.requireNotNull()
-
-    vm.restoreState(savedInstanceState)
-
-    binding.mainComposeBottom.setContent {
-      val page by navi.currentScreenState()
-
-      vm.Render { state ->
-        val theme = state.theme
-
-        SystemBars(theme)
-        TickerTapeTheme(theme) {
-          ProvideWindowInsets {
-
-            // Need to have box or snackbars push up bottom bar
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-              (page as? TopLevelScreen)?.let { p ->
-                MainScreen(
-                    page = p,
-                    onLoadPage = { navi.navigateTo(it.asScreen()) },
-                    onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                )
-              }
-            }
-          }
-        }
-      }
-    }
-
-    vm.handleSyncDarkTheme(this)
-
-    navi.restoreState(savedInstanceState)
-    navi.loadIfEmpty { MainPage.Home.asScreen() }
-  }
-
-  override fun onStart() {
-    super.onStart()
-
-    // Refreshes on every start and launches on initial
-    lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
-  }
 
   private fun beginWork() {
     lifecycleScope.launch(context = Dispatchers.Main) {
@@ -196,13 +125,94 @@ internal class MainActivity : PYDroidActivity() {
     navigator
         .requireNotNull()
         .navigateTo(
-            MainPage.WatchListDig.asScreen(
+            WatchlistDigFragment.newInstance(
                 symbol = symbol,
                 lookupSymbol = lookupSymbol,
                 allowModifyWatchlist = false,
                 equityType = equityType,
             ),
         )
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    // NOTE(Peter):
+    // Not full Compose yet
+    // Compose has an issue handling Fragments.
+    //
+    // We need an AndroidView to handle a Fragment, but a Fragment outlives the Activity via the
+    // FragmentManager keeping state. The Compose render does not, so when an activity dies from
+    // configuration change, the Fragment is headless somewhere in the great beyond. This leads to
+    // memory leaks and other issues like Disposable hooks not being called on DisposeEffect blocks.
+    // To avoid these growing pains, we use an Activity layout file and then host the ComposeViews
+    // from it that are then used to render Activity level views. Fragment transactions happen as
+    // normal and then Fragments host ComposeViews too.
+    val binding = ActivityMainBinding.inflate(layoutInflater).apply { viewBinding = this }
+    setContentView(binding.root)
+
+    injector =
+        Injector.obtainFromApplication<TickerComponent>(this)
+            .plusMainComponent()
+            .create(
+                this,
+                binding.mainFragmentContainerView.id,
+            )
+            .also { c -> c.inject(this) }
+    setTheme(R.style.Theme_TickerTape)
+    super.onCreate(savedInstanceState)
+    stableLayoutHideNavigation()
+
+    beginWork()
+    handleLaunchIntent()
+
+    // Snackbar respects window offsets and hosts snackbar composables
+    // Because these are not in a nice Scaffold, we cannot take advantage of Coordinator style
+    // actions (a FAB will not move out of the way for example)
+    val navi = navigator.requireNotNull()
+    val vm = viewModel.requireNotNull()
+
+    vm.restoreState(savedInstanceState)
+
+    binding.mainComposeBottom.setContent {
+      val page by navi.currentScreenState()
+      val screen = remember(page) { page?.let { topLevelFragmentToMainPage(it) } }
+
+      vm.Render { state ->
+        val theme = state.theme
+
+        SystemBars(theme)
+        TickerTapeTheme(theme) {
+          ProvideWindowInsets {
+
+            // Need to have box or snackbars push up bottom bar
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+              if (screen != null) {
+                MainScreen(
+                    page = screen,
+                    onLoadHome = { navi.navigateTo(HomeFragment.newInstance()) },
+                    onLoadWatchlist = { navi.navigateTo(WatchlistFragment.newInstance()) },
+                    onLoadPortfolio = { navi.navigateTo(PortfolioFragment.newInstance()) },
+                    onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+
+    vm.handleSyncDarkTheme(this)
+
+    navi.restoreState(savedInstanceState)
+    navi.loadIfEmpty { HomeFragment.newInstance() }
+  }
+
+  override fun onStart() {
+    super.onStart()
+
+    // Refreshes on every start and launches on initial
+    lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
   }
 
   override fun onBackPressed() {
@@ -254,5 +264,18 @@ internal class MainActivity : PYDroidActivity() {
     tapeLauncher = null
     viewModel = null
     injector = null
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun topLevelFragmentToMainPage(fragment: Fragment): MainPage? =
+        when (Navigator.getTagForScreen(fragment)) {
+          Navigator.getTagForScreen(HomeFragment) -> MainPage.HOME
+          Navigator.getTagForScreen(WatchlistFragment) -> MainPage.WATCHLIST
+          Navigator.getTagForScreen(PortfolioFragment) -> MainPage.PORTFOLIO
+          else -> null
+        }
   }
 }

@@ -18,14 +18,18 @@ package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
+import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.setting.AppSettingsComponent
 import com.pyamsoft.tickertape.setting.SettingsComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -45,6 +49,10 @@ internal interface MainComponent {
 
   @CheckResult fun plusPortfolio(): PortfolioComponent.Factory
 
+  @CheckResult fun plusWatchlistDig(): WatchlistDigComponent.Factory
+
+  @CheckResult fun plusPortfolioDig(): PortfolioDigComponent.Factory
+
   fun inject(activity: MainActivity)
 
   @Subcomponent.Factory
@@ -62,6 +70,10 @@ internal interface MainComponent {
 
     @Binds
     @CheckResult
-    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<MainPage>
+    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<Fragment>
+
+    @Binds
+    @CheckResult
+    internal abstract fun bindBackstackNavigator(impl: MainNavigator): BackstackNavigator<Fragment>
   }
 }

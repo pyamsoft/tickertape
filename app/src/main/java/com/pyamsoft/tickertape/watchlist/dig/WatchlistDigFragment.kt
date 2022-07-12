@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,14 +34,14 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.TickerTapeTheme
-import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -49,6 +50,7 @@ import javax.inject.Inject
 
 internal class WatchlistDigFragment : Fragment() {
 
+  @JvmField @Inject internal var navigator: BackstackNavigator<Fragment>? = null
   @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
@@ -58,40 +60,35 @@ internal class WatchlistDigFragment : Fragment() {
   @CheckResult
   private fun getSymbol(): StockSymbol {
     return requireArguments()
-        .getString(MainPage.WatchListDig.KEY_SYMBOL)
-        .let { it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_SYMBOL}" } }
+        .getString(KEY_SYMBOL)
+        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
         .asSymbol()
   }
 
   @CheckResult
   private fun getLookupSymbol(): StockSymbol {
     return requireArguments()
-        .getString(MainPage.WatchListDig.KEY_LOOKUP_SYMBOL)
-        .let {
-          it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_LOOKUP_SYMBOL}" }
-        }
+        .getString(KEY_LOOKUP_SYMBOL)
+        .let { it.requireNotNull { "Must be created with $KEY_LOOKUP_SYMBOL" } }
         .asSymbol()
   }
 
   @CheckResult
   private fun getEquityType(): EquityType {
     return requireArguments()
-        .getString(MainPage.WatchListDig.KEY_EQUITY_TYPE)
-        .let {
-          it.requireNotNull { "Must be created with ${MainPage.WatchListDig.KEY_EQUITY_TYPE}" }
-        }
+        .getString(KEY_EQUITY_TYPE)
+        .let { it.requireNotNull { "Must be created with $KEY_EQUITY_TYPE" } }
         .let { EquityType.valueOf(it) }
   }
 
   @CheckResult
   private fun getAllowModifyWatchlist(): Boolean {
     val args = requireArguments()
-    if (!args.containsKey(MainPage.WatchListDig.KEY_ALLOW_MODIFY)) {
-      throw IllegalArgumentException(
-          "Must be created with ${MainPage.WatchListDig.KEY_ALLOW_MODIFY}")
+    if (!args.containsKey(KEY_ALLOW_MODIFY)) {
+      throw IllegalArgumentException("Must be created with $KEY_ALLOW_MODIFY")
     }
 
-    return args.getBoolean(MainPage.WatchListDig.KEY_ALLOW_MODIFY, false)
+    return args.getBoolean(KEY_ALLOW_MODIFY, false)
   }
 
   private fun handleModifyWatchlist() {
@@ -135,8 +132,8 @@ internal class WatchlistDigFragment : Fragment() {
       savedInstanceState: Bundle?,
   ): View {
     val act = requireActivity()
-    Injector.obtainFromApplication<TickerComponent>(act)
-        .plusWatchlistDigComponent()
+    Injector.obtainFromActivity<MainComponent>(act)
+        .plusWatchlistDig()
         .create(
             getSymbol(),
             getLookupSymbol(),
@@ -147,6 +144,7 @@ internal class WatchlistDigFragment : Fragment() {
 
     val vm = viewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
+    val navi = navigator.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -160,6 +158,10 @@ internal class WatchlistDigFragment : Fragment() {
         vm.Render { state ->
           act.TickerTapeTheme(themeProvider) {
             CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
+              BackHandler(
+                  onBack = { navi.goBack() },
+              )
+
               WatchlistDigScreen(
                   modifier = Modifier.fillMaxWidth(),
                   state = state,
@@ -207,19 +209,32 @@ internal class WatchlistDigFragment : Fragment() {
     viewModel = null
     theming = null
     imageLoader = null
+    navigator = null
   }
 
   companion object {
 
+    private const val KEY_SYMBOL = "key_symbol"
+    private const val KEY_LOOKUP_SYMBOL = "key_lookup_symbol"
+    private const val KEY_EQUITY_TYPE = "key_equity_type"
+    private const val KEY_ALLOW_MODIFY = "key_allow_modify"
+
     @JvmStatic
     @CheckResult
     fun newInstance(
-        // Nullable for navigator API compat
-        bundle: Bundle?
+        symbol: StockSymbol,
+        lookupSymbol: StockSymbol,
+        equityType: EquityType,
+        allowModifyWatchlist: Boolean,
     ): Fragment {
       return WatchlistDigFragment().apply {
         arguments =
-            bundle.requireNotNull { "WatchlistDigFragment must be created with argument Bundle" }
+            Bundle().apply {
+              putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
+              putString(KEY_EQUITY_TYPE, equityType.name)
+              putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
+            }
       }
     }
   }

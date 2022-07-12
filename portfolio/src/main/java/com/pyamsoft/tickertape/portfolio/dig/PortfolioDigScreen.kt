@@ -69,7 +69,7 @@ fun PortfolioDigScreen(
           )
         } else {
           Content(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxSize(),
               state = state,
               imageLoader = imageLoader,
               currentPrice = currentPrice,
@@ -106,7 +106,7 @@ private fun Content(
     return@Crossfade when (s) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
@@ -115,14 +115,14 @@ private fun Content(
       }
       PortfolioDigSections.NEWS -> {
         PositionNews(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onAddPosition,
@@ -132,12 +132,12 @@ private fun Content(
       }
       PortfolioDigSections.STATISTICS -> {
         Spacer(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
         )
       }
       PortfolioDigSections.SPLITS -> {
         Spacer(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
         )
       }
     }

@@ -35,6 +35,7 @@ import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
+import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -44,6 +45,7 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -56,9 +58,9 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class PortfolioDigFragment : Fragment() {
+internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
-  @JvmField @Inject internal var navigator: BackstackNavigator<Fragment>? = null
+  @JvmField @Inject internal var navigator: BackstackNavigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
@@ -252,6 +254,54 @@ internal class PortfolioDigFragment : Fragment() {
     navigator = null
   }
 
+  override fun getScreenId(): MainPage {
+    return Screen(
+        symbol = getSymbol(),
+        lookupSymbol = getLookupSymbol(),
+        holdingId = getHoldingId(),
+        holdingType = getHoldingType(),
+        holdingSide = getHoldingSide(),
+        currentPrice = getCurrentPrice(),
+    )
+  }
+
+  data class Screen
+  internal constructor(
+      val symbol: StockSymbol,
+      val lookupSymbol: StockSymbol?,
+      val holdingId: DbHolding.Id,
+      val holdingType: EquityType,
+      val holdingSide: TradeSide,
+      val currentPrice: StockMoneyValue?,
+  ) : MainPage {
+
+    companion object {
+
+      @JvmStatic
+      @CheckResult
+      fun create(
+          holding: DbHolding,
+          quote: StockQuote?,
+          currentPrice: StockMoneyValue?,
+      ): Screen {
+        val lookupSymbol =
+            when (quote) {
+              null -> null
+              is StockOptionsQuote -> quote.underlyingSymbol()
+              else -> quote.symbol()
+            }
+        return Screen(
+            symbol = holding.symbol(),
+            lookupSymbol = lookupSymbol,
+            holdingId = holding.id(),
+            holdingType = holding.type(),
+            holdingSide = holding.side(),
+            currentPrice = currentPrice,
+        )
+      }
+    }
+  }
+
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
@@ -264,25 +314,21 @@ internal class PortfolioDigFragment : Fragment() {
     @JvmStatic
     @CheckResult
     fun newInstance(
-        holding: DbHolding,
-        quote: StockQuote?,
+        symbol: StockSymbol,
+        lookupSymbol: StockSymbol?,
+        holdingId: DbHolding.Id,
+        holdingType: EquityType,
+        holdingSide: TradeSide,
         currentPrice: StockMoneyValue?,
     ): Fragment {
-
-      val lookupSymbol =
-          when (quote) {
-            null -> null
-            is StockOptionsQuote -> quote.underlyingSymbol()
-            else -> quote.symbol()
-          }
 
       return PortfolioDigFragment().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, holding.symbol().symbol())
-              putString(KEY_HOLDING_ID, holding.id().id)
-              putString(KEY_HOLDING_TYPE, holding.type().name)
-              putString(KEY_HOLDING_SIDE, holding.side().name)
+              putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_HOLDING_ID, holdingId.id)
+              putString(KEY_HOLDING_TYPE, holdingType.name)
+              putString(KEY_HOLDING_SIDE, holdingSide.name)
               currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
               lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.symbol()) }
             }

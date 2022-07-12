@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
@@ -26,11 +25,11 @@ import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.databinding.DialogSettingsBinding
 import com.pyamsoft.tickertape.main.MainComponent
 import javax.inject.Inject
-import javax.inject.Named
 
 class SettingsDialog : AppCompatDialogFragment() {
 
-  @Inject @JvmField @Named("settings_navigator") internal var navigator: Navigator<Fragment>? = null
+  @Inject @JvmField internal var navigator: Navigator<SettingsPage>? = null
+
   @Inject @JvmField internal var theming: Theming? = null
   @Inject @JvmField internal var viewModel: SettingsViewModeler? = null
 
@@ -69,7 +68,7 @@ class SettingsDialog : AppCompatDialogFragment() {
     viewModel.requireNotNull().restoreState(savedInstanceState)
     navigator.requireNotNull().also { n ->
       n.restoreState(savedInstanceState)
-      n.loadIfEmpty { AppSettings.newInstance() }
+      n.loadIfEmpty { TopLevelSettingsPage.AppSettings }
     }
   }
 

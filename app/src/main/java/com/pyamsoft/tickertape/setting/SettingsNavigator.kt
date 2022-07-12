@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
-import com.pyamsoft.pydroid.ui.navigator.Navigator
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -31,7 +30,7 @@ internal constructor(
     dialog: SettingsDialog,
     @IdRes @Named("settings_container") fragmentContainerId: Int,
 ) :
-    FragmentNavigator(
+    FragmentNavigator<SettingsPage>(
         lifecycleOwner = dialog.viewLifecycleOwner,
         fragmentManager = dialog.childFragmentManager,
         fragmentContainerId = fragmentContainerId,
@@ -46,8 +45,12 @@ internal constructor(
       newScreen: Fragment,
       previousScreen: Fragment?
   ) {
-    val tag = Navigator.getTagForScreen(newScreen)
-
-    commitNow { replace(container, newScreen, tag) }
+    commitNow { replace(container, newScreen, newScreen::class.java.name) }
   }
+
+  override fun produceFragmentForScreen(screen: SettingsPage): Fragment =
+      when (screen) {
+        is TopLevelSettingsPage.AppSettings -> AppSettings.newInstance()
+        else -> throw IllegalArgumentException("Unhandled screen type: $screen")
+      }
 }

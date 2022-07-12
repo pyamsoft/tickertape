@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
-import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
@@ -70,10 +69,10 @@ internal interface MainComponent {
 
     @Binds
     @CheckResult
-    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<Fragment>
+    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<MainPage>
 
     @Binds
     @CheckResult
-    internal abstract fun bindBackstackNavigator(impl: MainNavigator): BackstackNavigator<Fragment>
+    internal abstract fun bindBackstackNavigator(impl: MainNavigator): BackstackNavigator<MainPage>
   }
 }

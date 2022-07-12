@@ -28,12 +28,13 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.theme.ZeroSize
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
+import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.preference.Preferences
 import com.pyamsoft.pydroid.ui.settings.SettingsFragment
 import com.pyamsoft.tickertape.main.MainComponent
 import javax.inject.Inject
 
-internal class AppSettings : SettingsFragment() {
+internal class AppSettings : SettingsFragment(), FragmentNavigator.Screen<SettingsPage> {
 
   override val hideClearAll: Boolean = false
 
@@ -91,6 +92,10 @@ internal class AppSettings : SettingsFragment() {
   @Composable
   override fun customBottomItemMargin(): Dp {
     return ZeroSize
+  }
+
+  override fun getScreenId(): SettingsPage {
+    return TopLevelSettingsPage.AppSettings
   }
 
   companion object {

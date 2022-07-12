@@ -24,7 +24,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
-import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeFragment
@@ -32,7 +31,6 @@ import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import timber.log.Timber
 import javax.inject.Inject
 
 @ActivityScope
@@ -41,19 +39,43 @@ internal class MainNavigator
 internal constructor(
     activity: MainActivity,
     @IdRes fragmentContainerId: Int,
-) : FragmentNavigator(activity, fragmentContainerId) {
+) : FragmentNavigator<MainPage>(activity, fragmentContainerId) {
 
   override fun onRestoreState(savedInstanceState: UiSavedStateReader) {}
 
   override fun onSaveState(outState: UiSavedStateWriter) {}
+
+  override fun produceFragmentForScreen(screen: MainPage): Fragment =
+      when (screen) {
+        is TopLevelMainPage.Home -> HomeFragment.newInstance()
+        is TopLevelMainPage.Watchlist -> WatchlistFragment.newInstance()
+        is TopLevelMainPage.Portfolio -> PortfolioFragment.newInstance()
+        is WatchlistDigFragment.Screen ->
+            WatchlistDigFragment.newInstance(
+                symbol = screen.symbol,
+                lookupSymbol = screen.lookupSymbol,
+                allowModifyWatchlist = screen.allowModifyWatchlist,
+                equityType = screen.equityType,
+            )
+        is PortfolioDigFragment.Screen ->
+            PortfolioDigFragment.newInstance(
+                symbol = screen.symbol,
+                lookupSymbol = screen.lookupSymbol,
+                holdingId = screen.holdingId,
+                holdingType = screen.holdingType,
+                holdingSide = screen.holdingSide,
+                currentPrice = screen.currentPrice,
+            )
+        else -> throw IllegalArgumentException("Unhandled screen type: $screen")
+      }
 
   override fun performFragmentTransaction(
       container: Int,
       newScreen: Fragment,
       previousScreen: Fragment?
   ) {
-    val tag = Navigator.getTagForScreen(newScreen)
-    if (isTopLevelScreen(tag)) {
+    val tag = newScreen::class.java.name
+    if (isTopLevelScreen(newScreen)) {
       commitNow {
         decideAnimationForPage(newScreen, previousScreen)
         replace(container, newScreen, tag)
@@ -69,21 +91,15 @@ internal constructor(
 
   companion object {
 
-    private val HOME_TAG = Navigator.getTagForScreen(HomeFragment)
-    private val WATCHLIST_TAG = Navigator.getTagForScreen(WatchlistFragment)
-    private val PORTFOLIO_TAG = Navigator.getTagForScreen(PortfolioFragment)
-
-    private val WATCHLIST_DIG_TAG = Navigator.getTagForScreen(WatchlistDigFragment)
-    private val PORTFOLIO_DIG_TAG = Navigator.getTagForScreen(PortfolioDigFragment)
-
     private data class FragmentAnimation(
         @AnimRes val enter: Int,
         @AnimRes val exit: Int,
     )
 
+    @JvmStatic
     @CheckResult
-    private fun isTopLevelScreen(tag: String): Boolean {
-      return tag == HOME_TAG || tag == WATCHLIST_TAG || tag == PORTFOLIO_TAG
+    private fun isTopLevelScreen(fragment: Fragment): Boolean {
+      return fragment is Screen<*> && fragment.getScreenId() is TopLevelMainPage
     }
 
     @CheckResult
@@ -98,34 +114,33 @@ internal constructor(
         newPage: Fragment,
         oldPage: Fragment?,
     ) {
-      val newTag = Navigator.getTagForScreen(newPage)
-      val oldTag = if (oldPage == null) null else Navigator.getTagForScreen(oldPage)
-
       val animations =
-          when (newTag) {
-            HOME_TAG ->
-                when (oldTag) {
-                  WATCHLIST_TAG, PORTFOLIO_TAG -> R.anim.slide_in_left then R.anim.slide_out_right
-                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+          when (newPage) {
+            is HomeFragment ->
+                when (oldPage) {
+                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
+                  is WatchlistFragment, is PortfolioFragment ->
+                      R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
                 }
-            WATCHLIST_TAG ->
-                when (oldTag) {
-                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+            is WatchlistFragment ->
+                when (oldPage) {
+                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  HOME_TAG -> R.anim.slide_in_right then R.anim.slide_out_left
-                  PORTFOLIO_TAG -> R.anim.slide_in_left then R.anim.slide_out_right
+                  is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
+                  is PortfolioFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
                 }
-            PORTFOLIO_TAG ->
-                when (oldTag) {
-                  null, WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+            is PortfolioFragment ->
+                when (oldPage) {
+                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  WATCHLIST_TAG, HOME_TAG -> R.anim.slide_in_right then R.anim.slide_out_left
+                  is WatchlistFragment, is HomeFragment ->
+                      R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null
                 }
-            WATCHLIST_DIG_TAG, PORTFOLIO_DIG_TAG ->
+            is WatchlistDigFragment, is PortfolioDigFragment ->
                 R.anim.fragment_open_enter then R.anim.fragment_open_exit
             else -> null
           }

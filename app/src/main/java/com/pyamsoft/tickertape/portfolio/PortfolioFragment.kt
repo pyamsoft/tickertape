@@ -33,6 +33,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
@@ -41,16 +42,18 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
+import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import javax.inject.Inject
 
-class PortfolioFragment : Fragment() {
+class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
-  @JvmField @Inject internal var navigator: Navigator<Fragment>? = null
+  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
@@ -65,7 +68,7 @@ class PortfolioFragment : Fragment() {
     navigator
         .requireNotNull()
         .navigateTo(
-            PortfolioDigFragment.newInstance(
+            PortfolioDigFragment.Screen.create(
                 holding = stock.holding,
                 quote = quote,
                 currentPrice = session?.price(),
@@ -177,6 +180,10 @@ class PortfolioFragment : Fragment() {
     mainViewModel = null
     theming = null
     imageLoader = null
+  }
+
+  override fun getScreenId(): MainPage {
+    return TopLevelMainPage.Portfolio
   }
 
   companion object {

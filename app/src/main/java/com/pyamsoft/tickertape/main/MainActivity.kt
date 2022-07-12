@@ -19,12 +19,10 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -44,13 +42,10 @@ import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
-import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.initOnAppStart
-import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
-import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +61,7 @@ internal class MainActivity : PYDroidActivity() {
   private var viewBinding: ActivityMainBinding? = null
   private var injector: MainComponent? = null
 
-  @JvmField @Inject internal var navigator: Navigator<Fragment>? = null
+  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var notificationCanceller: NotificationCanceller? = null
   @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
   @JvmField @Inject internal var alerter: Alerter? = null
@@ -125,7 +120,7 @@ internal class MainActivity : PYDroidActivity() {
     navigator
         .requireNotNull()
         .navigateTo(
-            WatchlistDigFragment.newInstance(
+            WatchlistDigFragment.Screen(
                 symbol = symbol,
                 lookupSymbol = lookupSymbol,
                 allowModifyWatchlist = false,
@@ -173,8 +168,8 @@ internal class MainActivity : PYDroidActivity() {
     vm.restoreState(savedInstanceState)
 
     binding.mainComposeBottom.setContent {
-      val page by navi.currentScreenState()
-      val screen = remember(page) { page?.let { topLevelFragmentToMainPage(it) } }
+      val screen by navi.currentScreenState()
+      val page = remember(screen) { screen as? TopLevelMainPage }
 
       vm.Render { state ->
         val theme = state.theme
@@ -187,12 +182,12 @@ internal class MainActivity : PYDroidActivity() {
             Box(
                 contentAlignment = Alignment.BottomCenter,
             ) {
-              if (screen != null) {
+              if (page != null) {
                 MainScreen(
-                    page = screen,
-                    onLoadHome = { navi.navigateTo(HomeFragment.newInstance()) },
-                    onLoadWatchlist = { navi.navigateTo(WatchlistFragment.newInstance()) },
-                    onLoadPortfolio = { navi.navigateTo(PortfolioFragment.newInstance()) },
+                    page = page,
+                    onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
+                    onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
+                    onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
                     onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
                 )
               }
@@ -205,7 +200,7 @@ internal class MainActivity : PYDroidActivity() {
     vm.handleSyncDarkTheme(this)
 
     navi.restoreState(savedInstanceState)
-    navi.loadIfEmpty { HomeFragment.newInstance() }
+    navi.loadIfEmpty { TopLevelMainPage.Home }
   }
 
   override fun onStart() {
@@ -264,18 +259,5 @@ internal class MainActivity : PYDroidActivity() {
     tapeLauncher = null
     viewModel = null
     injector = null
-  }
-
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun topLevelFragmentToMainPage(fragment: Fragment): MainPage? =
-        when (Navigator.getTagForScreen(fragment)) {
-          Navigator.getTagForScreen(HomeFragment) -> MainPage.HOME
-          Navigator.getTagForScreen(WatchlistFragment) -> MainPage.WATCHLIST
-          Navigator.getTagForScreen(PortfolioFragment) -> MainPage.PORTFOLIO
-          else -> null
-        }
   }
 }

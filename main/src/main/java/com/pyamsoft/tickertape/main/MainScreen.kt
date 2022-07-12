@@ -29,7 +29,7 @@ import com.pyamsoft.pydroid.theme.keylines
 @JvmOverloads
 fun MainScreen(
     modifier: Modifier = Modifier,
-    page: MainPage,
+    page: TopLevelMainPage,
     onLoadHome: () -> Unit,
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
@@ -56,7 +56,7 @@ fun MainScreen(
 @Composable
 private fun PreviewMainScreen() {
   MainScreen(
-      page = MainPage.HOME,
+      page = TopLevelMainPage.Home,
       onBottomBarHeightMeasured = {},
       onLoadHome = {},
       onLoadWatchlist = {},

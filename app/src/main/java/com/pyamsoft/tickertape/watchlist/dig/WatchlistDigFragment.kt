@@ -35,6 +35,7 @@ import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
+import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -42,15 +43,16 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import javax.inject.Inject
 
-internal class WatchlistDigFragment : Fragment() {
+internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
-  @JvmField @Inject internal var navigator: BackstackNavigator<Fragment>? = null
+  @JvmField @Inject internal var navigator: BackstackNavigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
@@ -211,6 +213,22 @@ internal class WatchlistDigFragment : Fragment() {
     imageLoader = null
     navigator = null
   }
+
+  override fun getScreenId(): MainPage {
+    return Screen(
+        symbol = getSymbol(),
+        lookupSymbol = getLookupSymbol(),
+        equityType = getEquityType(),
+        allowModifyWatchlist = getAllowModifyWatchlist(),
+    )
+  }
+
+  data class Screen(
+      val symbol: StockSymbol,
+      val lookupSymbol: StockSymbol,
+      val equityType: EquityType,
+      val allowModifyWatchlist: Boolean,
+  ) : MainPage
 
   companion object {
 

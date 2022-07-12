@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.setting
 
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
-import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import dagger.Binds
 import dagger.BindsInstance
@@ -51,7 +50,6 @@ internal interface SettingsComponent {
 
     @Binds
     @CheckResult
-    @Named("settings_navigator")
-    internal abstract fun bindNavigator(impl: SettingsNavigator): Navigator<Fragment>
+    internal abstract fun bindNavigator(impl: SettingsNavigator): Navigator<SettingsPage>
   }
 }

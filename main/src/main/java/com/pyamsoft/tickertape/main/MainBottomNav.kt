@@ -45,7 +45,7 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 @Composable
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
-    page: MainPage,
+    page: TopLevelMainPage,
     onLoadHome: () -> Unit,
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
@@ -67,17 +67,17 @@ internal fun MainBottomNav(
       ) {
         Item(
             current = page,
-            target = MainPage.HOME,
+            target = TopLevelMainPage.Home,
             onLoadPage = onLoadHome,
         )
         Item(
             current = page,
-            target = MainPage.WATCHLIST,
+            target = TopLevelMainPage.Watchlist,
             onLoadPage = onLoadWatchlist,
         )
         Item(
             current = page,
-            target = MainPage.PORTFOLIO,
+            target = TopLevelMainPage.Portfolio,
             onLoadPage = onLoadPortfolio,
         )
       }
@@ -91,17 +91,17 @@ internal fun MainBottomNav(
 @Composable
 private fun RowScope.Item(
     modifier: Modifier = Modifier,
-    current: MainPage,
-    target: MainPage,
+    current: TopLevelMainPage,
+    target: TopLevelMainPage,
     onLoadPage: () -> Unit,
 ) {
 
   val icon =
       remember(target) {
         when (target) {
-          MainPage.HOME -> Icons.Filled.Home
-          MainPage.WATCHLIST -> Icons.Filled.BarChart
-          MainPage.PORTFOLIO -> Icons.Filled.PieChart
+          TopLevelMainPage.Home -> Icons.Filled.Home
+          TopLevelMainPage.Watchlist -> Icons.Filled.BarChart
+          TopLevelMainPage.Portfolio -> Icons.Filled.PieChart
         }
       }
 
@@ -116,10 +116,10 @@ private fun RowScope.Item(
         ) {
           Icon(
               imageVector = icon,
-              contentDescription = target.screenName,
+              contentDescription = target.displayName,
           )
           Text(
-              text = target.screenName,
+              text = target.displayName,
               style = MaterialTheme.typography.body2,
           )
         }
@@ -131,7 +131,7 @@ private fun RowScope.Item(
 @Composable
 private fun PreviewMainBottomNav() {
   MainBottomNav(
-      page = MainPage.HOME,
+      page = TopLevelMainPage.Home,
       onHeightMeasured = {},
       onLoadHome = {},
       onLoadWatchlist = {},

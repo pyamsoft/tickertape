@@ -34,6 +34,8 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
 
+private const val NO_POSITION = 0.0
+
 data class PortfolioStock
 internal constructor(
     val holding: DbHolding,
@@ -60,36 +62,37 @@ internal constructor(
     val sellSideModifier = if (holding.side() == TradeSide.SELL) -1 else 1
 
     val isNoPosition = positions.isEmpty()
+
     val cost =
-        if (isNoPosition) 0.0
+        if (isNoPosition) NO_POSITION
         else
             positions.sumOf {
               it.priceWithSplits(splits).value() * it.shareCountWithSplits(splits).value()
             }
+
     val totalSharesNumber =
-        if (isNoPosition) 0.0 else positions.sumOf { it.shareCountWithSplits(splits).value() }
+        if (isNoPosition) NO_POSITION
+        else positions.sumOf { it.shareCountWithSplits(splits).value() }
 
     // Avoid -0.0 as a total change number
     val tempTodayChange: Double
     val tempTodayNumber: Double
     if (isNoPosition) {
-      tempTodayChange = 0.0
-      tempTodayNumber = 0.0
+      tempTodayChange = NO_POSITION
+      tempTodayNumber = NO_POSITION
     } else {
       val q = ticker?.quote
       if (q == null) {
-        tempTodayChange = 0.0
-        tempTodayNumber = 0.0
+        tempTodayChange = NO_POSITION
+        tempTodayNumber = NO_POSITION
       } else {
-        tempTodayChange = q.regular().amount().value() * totalSharesNumber
-        tempTodayNumber = q.regular().price().value() * totalSharesNumber
+        val reg = q.regular()
+        tempTodayChange = reg.amount().value() * totalSharesNumber
+        tempTodayNumber = reg.price().value() * totalSharesNumber
       }
     }
 
-    val totalGainLossNumber = tempTodayNumber - cost
-    val isNoTotalChange = totalGainLossNumber.isZero()
     val isNoTodayChange = tempTodayChange.isZero()
-
     todayChangeNumber = tempTodayChange * optionsModifier
     todayNumber = tempTodayNumber * optionsModifier
 
@@ -97,13 +100,16 @@ internal constructor(
     val totalGainLossPercent: StockPercent
     if (isNoPosition) {
       current = StockMoneyValue.none()
-      costNumber = 0.0
-      totalShares = 0.0.asShares()
+      costNumber = NO_POSITION
+      totalShares = NO_POSITION.asShares()
       totalDirection = StockDirection.none()
       todayDirection = StockDirection.none()
       totalGainLoss = StockMoneyValue.none()
       totalGainLossPercent = StockPercent.none()
     } else {
+      val totalGainLossNumber = tempTodayNumber - cost
+      val isNoTotalChange = totalGainLossNumber.isZero()
+
       totalGainLoss =
           if (isNoTotalChange) StockMoneyValue.none()
           else (totalGainLossNumber * optionsModifier * sellSideModifier).asMoney()
@@ -118,7 +124,7 @@ internal constructor(
       totalShares = (totalSharesNumber * sellSideModifier).asShares()
 
       val totalGainLossPercentNumber =
-          if (isNoTotalChange) 0.0 else totalGainLossNumber / cost * 100
+          if (isNoTotalChange) NO_POSITION else totalGainLossNumber / cost * 100
       totalGainLossPercent = (totalGainLossPercentNumber * sellSideModifier).asPercent()
     }
 

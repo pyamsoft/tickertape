@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import dagger.BindsInstance
@@ -36,6 +37,7 @@ internal interface PositionAddComponent {
         @BindsInstance symbol: StockSymbol,
         @BindsInstance holdingId: DbHolding.Id,
         @BindsInstance holdingType: EquityType,
+        @BindsInstance existingPositionId: DbPosition.Id,
     ): PositionAddComponent
   }
 }

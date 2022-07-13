@@ -40,6 +40,7 @@ internal constructor(
     private val datePickerEventBus: EventConsumer<DatePickerEvent>,
     private val holdingId: DbHolding.Id,
     private val interactor: PositionAddInteractor,
+    private val existingPositionId: DbPosition.Id,
 ) : AbstractViewModeler<PositionAddViewState>(state) {
 
   private fun checkSubmittable() {
@@ -52,7 +53,83 @@ internal constructor(
     }
   }
 
+  private fun handleDateChanged(dateOfPurchase: LocalDate) {
+    state.dateOfPurchase = dateOfPurchase
+    checkSubmittable()
+  }
+
+  @CheckResult
+  private fun resolvePosition(existing: DbPosition?): DbPosition {
+    val s = state
+    val price = s.pricePerShare.toDouble()
+    val shareCount = s.numberOfShares.toDouble()
+    val date = s.dateOfPurchase.requireNotNull()
+
+    return if (existing == null) {
+      Timber.d("No existing position, make new one for holding: $holdingId")
+      JsonMappableDbPosition.create(
+              holdingId = holdingId,
+              shareCount = shareCount.asShares(),
+              price = price.asMoney(),
+              purchaseDate = date.atTime(0, 0),
+          )
+          .also { Timber.d("Created new position: $it") }
+    } else {
+      existing
+          .price(price.asMoney())
+          .shareCount(shareCount.asShares())
+          .purchaseDate(date.atTime(0, 0))
+          .also { Timber.d("Update existing position: $it") }
+    }
+  }
+
+  private fun loadExistingPositionData(existing: DbPosition) {
+    Timber.d("Load existing position data from position: $existing")
+    state.apply {
+      // Save this full position for later
+      existingPosition = existing
+
+      // Make sure this number is good (it should be, but just to be safe)
+      existing.price().value().toString().also { p ->
+        if (isSafe(p)) {
+          pricePerShare = p
+          // We always check at the end
+          //
+          // checkSubmittable()
+        }
+      }
+
+      // Make sure this number is good (it should be, but just to be safe)
+      existing.shareCount().value().toString().also { p ->
+        if (isSafe(p)) {
+          numberOfShares = p
+          // We always check at the end
+          //
+          // checkSubmittable()
+        }
+      }
+
+      // After date, check submittable
+      dateOfPurchase = existing.purchaseDate().toLocalDate()
+      checkSubmittable()
+    }
+  }
+
   fun bind(scope: CoroutineScope) {
+    // Only if this ID is not EMPTY
+    existingPositionId.also { existingId ->
+      if (!existingId.isEmpty()) {
+        Timber.d("Existing position ID, attempt load: $existingId")
+        scope.launch(context = Dispatchers.Main) {
+          interactor
+              .loadExistingPosition(existingId)
+              .onFailure { Timber.e(it, "Failed to load existing position") }
+              .onSuccess { Timber.d("Existing position loaded: $it") }
+              .onSuccess { loadExistingPositionData(it) }
+        }
+      }
+    }
+
     scope.launch(context = Dispatchers.Main) {
       datePickerEventBus.onEvent { e ->
         if (e.positionId == state.positionId) {
@@ -63,21 +140,10 @@ internal constructor(
     }
   }
 
-  @CheckResult
-  private fun createPosition(): DbPosition {
-    val s = state
-    val price = s.pricePerShare.toDouble()
-    val shareCount = s.numberOfShares.toDouble()
-    val date = s.dateOfPurchase.requireNotNull()
-
-    return JsonMappableDbPosition.create(
-        holdingId = holdingId,
-        shareCount = shareCount.asShares(),
-        price = price.asMoney(),
-        purchaseDate = date.atTime(0, 0))
-  }
-
-  fun handleSubmit(scope: CoroutineScope) {
+  fun handleSubmit(
+      scope: CoroutineScope,
+      onClose: () -> Unit,
+  ) {
     val s = state
     s.apply {
       if (isSubmitting || !isSubmittable) {
@@ -87,18 +153,17 @@ internal constructor(
 
     s.isSubmitting = true
     scope.launch(context = Dispatchers.Main) {
-      val position = createPosition()
+      val position = resolvePosition(s.existingPosition)
       interactor
-          .addNewPosition(position)
-          .onFailure { Timber.e(it, "Error when adding position: $position") }
+          .submitPosition(position)
+          .onFailure { Timber.e(it, "Error when submitting position: $position") }
           .onSuccess { result ->
             when (result) {
               is DbInsert.InsertResult.Insert -> Timber.d("Position was inserted: ${result.data}")
-              // NOTE(Peter): Do we throw an error? I guess it's harmless
               is DbInsert.InsertResult.Update ->
-                  Timber.w("Position was updated but should not exist previously! ${result.data}")
+                  Timber.d("Position was updated: ${result.data} from ${s.existingPosition}")
               is DbInsert.InsertResult.Fail -> {
-                Timber.e(result.error, "Failed to insert new position: $position")
+                Timber.e(result.error, "Failed to submit new position: $position")
                 // Caught by the onFailure below
                 throw result.error
               }
@@ -106,10 +171,17 @@ internal constructor(
           }
           .onSuccess {
             s.apply {
-              newPosition()
               dateOfPurchase = null
               numberOfShares = ""
               pricePerShare = ""
+
+              if (existingPosition == null) {
+                Timber.d("New position created, prep for another entry")
+                newPosition()
+              } else {
+                Timber.d("Existing position updated, close screen: $existingPosition")
+                onClose()
+              }
             }
           }
           .onFailure {
@@ -131,11 +203,6 @@ internal constructor(
       state.numberOfShares = numberOfShares
       checkSubmittable()
     }
-  }
-
-  private fun handleDateChanged(dateOfPurchase: LocalDate) {
-    state.dateOfPurchase = dateOfPurchase
-    checkSubmittable()
   }
 
   companion object {

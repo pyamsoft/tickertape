@@ -33,9 +33,15 @@ interface DbPosition {
 
   @CheckResult fun price(): StockMoneyValue
 
+  @CheckResult fun price(price: StockMoneyValue): DbPosition
+
   @CheckResult fun shareCount(): StockShareValue
 
+  @CheckResult fun shareCount(shareCount: StockShareValue): DbPosition
+
   @CheckResult fun purchaseDate(): LocalDateTime
+
+  @CheckResult fun purchaseDate(purchaseDate: LocalDateTime): DbPosition
 
   data class Id(val id: String) {
 

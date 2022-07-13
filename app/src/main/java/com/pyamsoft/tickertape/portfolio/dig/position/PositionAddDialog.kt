@@ -75,22 +75,35 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
   }
 
   @CheckResult
+  private fun getExistingPositionId(): DbPosition.Id {
+    return requireArguments()
+        .getString(KEY_EXISTING_POSITION_ID)
+        .let { it.requireNotNull { "Must be created with $KEY_EXISTING_POSITION_ID" } }
+        .let { DbPosition.Id(it) }
+  }
+
+  @CheckResult
   private fun getHoldingType(): EquityType {
     return requireArguments()
         .getString(KEY_HOLDING_TYPE)
-        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_TYPE}" } }
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_TYPE" } }
         .let { EquityType.valueOf(it) }
   }
 
   private fun handleSubmit() {
-    viewModel.requireNotNull().handleSubmit(scope = viewLifecycleOwner.lifecycleScope)
+    viewModel
+        .requireNotNull()
+        .handleSubmit(
+            scope = viewLifecycleOwner.lifecycleScope,
+            onClose = { dismiss() },
+        )
   }
 
   private fun handleDateOfPurchaseClicked(
       positionId: DbPosition.Id,
       date: LocalDate?,
   ) {
-    Timber.d("Handle DoP clicked: $date")
+    Timber.d("Handle DoP clicked: $positionId $date")
     PositionAddDateDialog.show(
         activity = requireActivity(),
         positionId = positionId,
@@ -110,6 +123,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
             getSymbol(),
             getHoldingId(),
             getHoldingType(),
+            getExistingPositionId(),
         )
         .inject(this)
 
@@ -134,10 +148,10 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
                 onNumberChanged = { vm.handleNumberChanged(it) },
                 onSubmit = { handleSubmit() },
                 onClose = { dismiss() },
-                onDateOfPurchaseClicked = {
+                onDateOfPurchaseClicked = { date ->
                   handleDateOfPurchaseClicked(
                       positionId = positionId,
-                      date = it,
+                      date = date,
                   )
                 },
             )
@@ -184,6 +198,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
+    private const val KEY_EXISTING_POSITION_ID = "key_existing_position_id"
     private const val TAG = "PositionAddDialog"
 
     @JvmStatic
@@ -192,6 +207,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         symbol: StockSymbol,
         holdingId: DbHolding.Id,
         holdingType: EquityType,
+        existingPositionId: DbPosition.Id,
     ): DialogFragment {
       return PositionAddDialog().apply {
         arguments =
@@ -199,18 +215,42 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
               putString(KEY_SYMBOL, symbol.symbol())
               putString(KEY_HOLDING_ID, holdingId.id)
               putString(KEY_HOLDING_TYPE, holdingType.name)
+              putString(KEY_EXISTING_POSITION_ID, existingPositionId.id)
             }
       }
     }
 
     @JvmStatic
-    fun show(
+    fun create(
         activity: FragmentActivity,
         symbol: StockSymbol,
         holdingId: DbHolding.Id,
         holdingType: EquityType,
     ) {
-      newInstance(symbol, holdingId, holdingType).show(activity, TAG)
+      newInstance(
+              symbol,
+              holdingId,
+              holdingType,
+              existingPositionId = DbPosition.Id.EMPTY,
+          )
+          .show(activity, TAG)
+    }
+
+    @JvmStatic
+    fun update(
+        activity: FragmentActivity,
+        symbol: StockSymbol,
+        holdingId: DbHolding.Id,
+        holdingType: EquityType,
+        existingPositionId: DbPosition.Id,
+    ) {
+      newInstance(
+              symbol,
+              holdingId,
+              holdingType,
+              existingPositionId,
+          )
+          .show(activity, TAG)
     }
   }
 }

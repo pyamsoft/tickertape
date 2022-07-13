@@ -22,12 +22,24 @@ internal fun newTestPosition(): DbPosition {
       return 1.0.asMoney()
     }
 
+    override fun price(price: StockMoneyValue): DbPosition {
+      return this
+    }
+
     override fun shareCount(): StockShareValue {
       return 1.0.asShares()
     }
 
+    override fun shareCount(shareCount: StockShareValue): DbPosition {
+      return this
+    }
+
     override fun purchaseDate(): LocalDateTime {
       return LocalDateTime.now()
+    }
+
+    override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
+      return this
     }
   }
 }

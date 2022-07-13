@@ -1,7 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +33,6 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import timber.log.Timber
 
 private const val FAB_OFFSET = 56 + 16
 
@@ -47,6 +45,7 @@ internal fun PositionScreen(
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
+    onUpdatePosition: (DbPosition) -> Unit,
 ) {
   Box(
       modifier = modifier,
@@ -58,6 +57,7 @@ internal fun PositionScreen(
         currentPrice = currentPrice,
         onRefresh = onRefresh,
         onDeletePosition = onDeletePosition,
+        onUpdatePosition = onUpdatePosition,
     )
 
     PositionsAdd(
@@ -75,6 +75,7 @@ private fun PositionsList(
     currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
+    onUpdatePosition: (DbPosition) -> Unit,
 ) {
   val tradeSide = state.tradeSide
   val equityType = state.equityType
@@ -97,7 +98,7 @@ private fun PositionsList(
             modifier =
                 Modifier.fillMaxWidth()
                     .combinedClickable(
-                        onClick = { Timber.d("Click on item: $item") },
+                        onClick = { onUpdatePosition(item) },
                         onLongClick = { onDeletePosition(item) },
                     ),
             position = item,
@@ -164,5 +165,6 @@ private fun PreviewPositionScreen() {
       onAddPosition = {},
       onRefresh = {},
       onDeletePosition = {},
+      onUpdatePosition = {},
   )
 }

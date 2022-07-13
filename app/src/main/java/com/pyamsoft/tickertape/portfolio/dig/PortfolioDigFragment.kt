@@ -86,11 +86,21 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   }
 
   private fun handleAddPosition() {
-    PositionAddDialog.show(
+    PositionAddDialog.create(
         activity = requireActivity(),
         symbol = getSymbol(),
         holdingId = getHoldingId(),
         holdingType = getHoldingType(),
+    )
+  }
+
+  private fun handleUpdatePosition(position: DbPosition) {
+    PositionAddDialog.update(
+        activity = requireActivity(),
+        symbol = getSymbol(),
+        holdingId = getHoldingId(),
+        holdingType = getHoldingType(),
+        existingPositionId = position.id(),
     )
   }
 
@@ -116,7 +126,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun getSymbol(): StockSymbol {
     return requireArguments()
         .getString(KEY_SYMBOL)
-        .let { it.requireNotNull { "Must be created with ${KEY_SYMBOL}" } }
+        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
         .asSymbol()
   }
 
@@ -129,7 +139,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun getHoldingId(): DbHolding.Id {
     return requireArguments()
         .getString(KEY_HOLDING_ID)
-        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_ID}" } }
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_ID" } }
         .let { DbHolding.Id(it) }
   }
 
@@ -137,7 +147,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun getHoldingType(): EquityType {
     return requireArguments()
         .getString(KEY_HOLDING_TYPE)
-        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_TYPE}" } }
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_TYPE" } }
         .let { EquityType.valueOf(it) }
   }
 
@@ -145,7 +155,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun getHoldingSide(): TradeSide {
     return requireArguments()
         .getString(KEY_HOLDING_SIDE)
-        .let { it.requireNotNull { "Must be created with ${KEY_HOLDING_SIDE}" } }
+        .let { it.requireNotNull { "Must be created with $KEY_HOLDING_SIDE" } }
         .let { TradeSide.valueOf(it) }
   }
 
@@ -210,6 +220,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                   onRefresh = { handleRefresh(true) },
                   onAddPosition = { handleAddPosition() },
                   onDeletePosition = { handleDeletePosition(it) },
+                  onUpdatePosition = { handleUpdatePosition(it) },
               )
             }
           }

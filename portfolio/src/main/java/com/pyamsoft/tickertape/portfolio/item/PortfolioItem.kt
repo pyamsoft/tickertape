@@ -120,6 +120,7 @@ private fun PreviewPortfolioItem() {
                         quote = newTestQuote(symbol),
                         chart = null,
                     ),
+                splits = emptyList(),
             ),
         onSelect = {},
         onDelete = {},

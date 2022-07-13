@@ -65,13 +65,28 @@ internal constructor(
   }
 
   @Ignore
+  override fun price(price: StockMoneyValue): DbPosition {
+    return this.copy(price = price)
+  }
+
+  @Ignore
   override fun shareCount(): StockShareValue {
     return shareCount
   }
 
   @Ignore
+  override fun shareCount(shareCount: StockShareValue): DbPosition {
+    return this.copy(shareCount = shareCount)
+  }
+
+  @Ignore
   override fun purchaseDate(): LocalDateTime {
     return purchaseDate
+  }
+
+  @Ignore
+  override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
+    return this.copy(purchaseDate = purchaseDate)
   }
 
   companion object {

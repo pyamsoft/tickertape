@@ -7,6 +7,8 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 
 interface PositionAddInteractor {
 
+  @CheckResult suspend fun loadExistingPosition(id: DbPosition.Id): ResultWrapper<DbPosition>
+
   @CheckResult
-  suspend fun addNewPosition(position: DbPosition): ResultWrapper<DbInsert.InsertResult<DbPosition>>
+  suspend fun submitPosition(position: DbPosition): ResultWrapper<DbInsert.InsertResult<DbPosition>>
 }

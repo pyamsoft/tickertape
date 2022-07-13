@@ -44,6 +44,7 @@ fun PortfolioDigScreen(
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
+    onUpdatePosition: (DbPosition) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -78,6 +79,7 @@ fun PortfolioDigScreen(
               onRefresh = onRefresh,
               onAddPosition = onAddPosition,
               onDeletePosition = onDeletePosition,
+              onUpdatePosition = onUpdatePosition,
           )
         }
       }
@@ -96,6 +98,7 @@ private fun Content(
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
+    onUpdatePosition: (DbPosition) -> Unit,
 ) {
   val section = state.section
 
@@ -128,6 +131,7 @@ private fun Content(
             onAddPosition = onAddPosition,
             currentPrice = currentPrice,
             onDeletePosition = onDeletePosition,
+            onUpdatePosition = onUpdatePosition,
         )
       }
       PortfolioDigSections.STATISTICS -> {
@@ -175,5 +179,6 @@ private fun PreviewPortfolioDigScreen() {
       onRefresh = {},
       onAddPosition = {},
       onDeletePosition = {},
+      onUpdatePosition = {},
   )
 }

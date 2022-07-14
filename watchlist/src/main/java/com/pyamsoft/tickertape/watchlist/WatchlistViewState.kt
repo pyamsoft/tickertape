@@ -40,4 +40,7 @@ internal class MutableWatchlistViewState @Inject internal constructor() : Watchl
   override var isLoading by mutableStateOf(false)
   override var watchlist by mutableStateOf(emptyList<Ticker>())
   override var error by mutableStateOf<Throwable?>(null)
+
+  // Used in WatchlistViewModeler to track all tickers, even non visible
+  internal var allTickers by mutableStateOf(emptyList<Ticker>())
 }

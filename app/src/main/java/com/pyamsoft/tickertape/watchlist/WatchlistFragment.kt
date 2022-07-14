@@ -144,6 +144,7 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                     onTabUpdated = { vm.handleSectionChanged(it) },
                     onFabClick = { handleFabClicked() },
                     onSelectTicker = { handleOpenDigDialog(it) },
+                    onRegenerateList = { vm.handleRegenerateList(this) },
                 )
               }
             }

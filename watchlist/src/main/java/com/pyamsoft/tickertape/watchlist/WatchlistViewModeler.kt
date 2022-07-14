@@ -22,10 +22,12 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.ui.ListGenerateResult
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +41,18 @@ internal constructor(
     private val interactor: WatchlistInteractor,
 ) : AbstractViewModeler<WatchlistViewState>(state) {
 
-  private var allTickers: List<Ticker> = emptyList()
-
   private val quoteFetcher =
       highlander<ResultWrapper<List<Ticker>>, Boolean> { interactor.getQuotes(it) }
+
+  private val searchRunner =
+      highlander<ListGenerateResult<Ticker>, WatchlistViewState, List<Ticker>> { state, tickers ->
+        val all = tickers.sortedWith(Ticker.COMPARATOR)
+        val visible = state.asVisible(all)
+        return@highlander ListGenerateResult.create(
+            all = all,
+            visible = visible,
+        )
+      }
 
   fun bind(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
@@ -71,17 +81,37 @@ internal constructor(
     handleRefreshList(scope = this, force = true)
   }
 
-  private fun handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
-    val newTickers = allTickers.filterNot { it.symbol == symbol }
-    state.regenerateTickers(newTickers)
+  private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
+    val s = state
+    s.regenerateTickers(this) { s.allTickers.filterNot { it.symbol == symbol } }
 
     // TODO offer up undo ability
     // On delete, we don't need to re-fetch quotes from the network
   }
 
-  private fun MutableWatchlistViewState.regenerateTickers(tickers: List<Ticker>) {
-    allTickers = tickers.sortedWith(Ticker.COMPARATOR)
-    this.watchlist = asVisible(allTickers)
+  private inline fun MutableWatchlistViewState.regenerateTickers(
+      scope: CoroutineScope,
+      crossinline tickers: () -> List<Ticker>
+  ) {
+    val self = this
+
+    // Default dispatcher for work
+    scope.launch(context = Dispatchers.Default) {
+      // Cancel any old processing
+      try {
+        val result = searchRunner.call(self, tickers())
+        self.allTickers = result.all
+        self.watchlist = result.visible
+      } catch (e: Throwable) {
+        e.ifNotCancellation {
+          Timber.e(e, "Error occurred while regenerating list")
+
+          // Clear data on bad processing
+          self.allTickers = emptyList()
+          self.watchlist = emptyList()
+        }
+      }
+    }
   }
 
   @CheckResult
@@ -113,16 +143,16 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) {
       quoteFetcher
           .call(force)
-          .onSuccess {
+          .onSuccess { list ->
             state.apply {
-              regenerateTickers(it)
+              regenerateTickers(scope) { list }
               error = null
             }
           }
           .onFailure { Timber.e(it, "Failed to refresh entry list") }
           .onFailure {
             state.apply {
-              regenerateTickers(emptyList())
+              regenerateTickers(scope) { emptyList() }
               error = it
             }
           }
@@ -131,18 +161,16 @@ internal constructor(
   }
 
   fun handleSearch(query: String) {
-    val cleanSearch = query.ifBlank { query.trim() }
-    state.apply {
-      this.query = cleanSearch
-      regenerateTickers(allTickers)
-    }
+    state.query = query
   }
 
   fun handleSectionChanged(tab: EquityType) {
-    state.apply {
-      this.section = tab
-      regenerateTickers(allTickers)
-    }
+    state.section = tab
+  }
+
+  fun handleRegenerateList(scope: CoroutineScope) {
+    val s = state
+    s.regenerateTickers(scope) { s.allTickers }
   }
 
   override fun restoreState(savedInstanceState: UiSavedStateReader) {

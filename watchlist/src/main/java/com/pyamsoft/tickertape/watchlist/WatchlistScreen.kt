@@ -40,6 +40,7 @@ import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -54,6 +55,7 @@ fun WatchlistScreen(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val loading = state.isLoading
 
@@ -77,6 +79,7 @@ fun WatchlistScreen(
           onSearchChanged = onSearchChanged,
           onTabUpdated = onTabUpdated,
           onFabClick = onFabClick,
+          onRegenerateList = onRegenerateList,
       )
     }
   }
@@ -94,6 +97,7 @@ private fun Content(
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -121,6 +125,7 @@ private fun Content(
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
         onRefresh = onRefresh,
+        onRegenerateList = onRegenerateList,
     )
 
     NewTickerFab(
@@ -165,6 +170,7 @@ private fun Watchlist(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onRefresh: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val tickers = state.watchlist
   val search = state.query
@@ -189,6 +195,7 @@ private fun Watchlist(
             currentTab = tab,
             onSearchChanged = onSearchChanged,
             onTabUpdated = onTabUpdated,
+            onRegenerateList = onRegenerateList,
         )
       }
     }
@@ -302,5 +309,6 @@ private fun PreviewWatchlistScreen() {
       onSearchChanged = {},
       onTabUpdated = {},
       onFabClick = {},
+      onRegenerateList = {},
   )
 }

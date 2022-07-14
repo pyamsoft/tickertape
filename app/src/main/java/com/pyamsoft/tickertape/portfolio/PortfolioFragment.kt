@@ -47,6 +47,7 @@ import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.TickerDestination
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import javax.inject.Inject
@@ -135,6 +136,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                     onSearchChanged = { vm.handleSearch(it) },
                     onTabUpdated = { vm.handleSectionChanged(it) },
                     onFabClick = { handleFabClicked() },
+                    onRegenerateList = { vm.handleRegenerateList(this) },
                 )
               }
             }

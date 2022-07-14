@@ -41,4 +41,7 @@ internal class MutablePortfolioViewState @Inject internal constructor() : Portfo
   override var portfolio by mutableStateOf(PortfolioStockList.empty())
   override var stocks by mutableStateOf(emptyList<PortfolioStock>())
   override var error by mutableStateOf<Throwable?>(null)
+
+  // Used by PortfolioViewModeler
+  internal var fullPortfolio by mutableStateOf(emptyList<PortfolioStock>())
 }

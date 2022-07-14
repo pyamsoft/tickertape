@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -43,6 +44,7 @@ fun PortfolioScreen(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val loading = state.isLoading
   val scaffoldState = rememberScaffoldState()
@@ -66,6 +68,7 @@ fun PortfolioScreen(
           onSearchChanged = onSearchChanged,
           onTabUpdated = onTabUpdated,
           onFabClick = onFabClick,
+          onRegenerateList = onRegenerateList,
       )
     }
   }
@@ -83,6 +86,7 @@ private fun Content(
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -110,6 +114,7 @@ private fun Content(
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
         onRefresh = onRefresh,
+        onRegenerateList = onRegenerateList,
     )
 
     NewTickerFab(
@@ -135,6 +140,7 @@ private fun Portfolio(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onRefresh: () -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val error = state.error
   val portfolio = state.portfolio
@@ -178,6 +184,7 @@ private fun Portfolio(
             currentTab = tab,
             onSearchChanged = onSearchChanged,
             onTabUpdated = onTabUpdated,
+            onRegenerateList = onRegenerateList,
         )
       }
     }
@@ -310,5 +317,6 @@ private fun PreviewPortfolioScreen() {
       onSearchChanged = {},
       onTabUpdated = {},
       onFabClick = {},
+      onRegenerateList = {},
   )
 }

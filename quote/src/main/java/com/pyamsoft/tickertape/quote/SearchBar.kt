@@ -1,7 +1,6 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,18 +13,19 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -35,8 +35,14 @@ fun SearchBar(
     currentTab: EquityType,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
+    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val allTypes = remember { EquityType.values() }
+
+  LaunchedEffect(search, currentTab) {
+    // Fire the processing effect after the search or tab changes
+    this.onRegenerateList()
+  }
 
   Surface(
       modifier = modifier.padding(horizontal = MaterialTheme.keylines.baseline),
@@ -141,5 +147,6 @@ private fun PreviewSearchBar() {
       onSearchChanged = {},
       currentTab = EquityType.STOCK,
       onTabUpdated = {},
+      onRegenerateList = {},
   )
 }

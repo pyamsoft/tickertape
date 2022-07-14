@@ -164,9 +164,8 @@ private fun <T : Any> OptionsDropdown(
   val displayChoices =
       rememberInBackground(choices, formatToDisplayChoice) {
         choices.map { c ->
-          val display = formatToDisplayChoice(c)
-          return@map OptionsDropdownItem(
-              display = display,
+          OptionsDropdownItem(
+              display = formatToDisplayChoice(c),
               value = c,
           )
         }

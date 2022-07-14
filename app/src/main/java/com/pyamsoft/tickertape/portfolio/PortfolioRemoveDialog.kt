@@ -129,9 +129,9 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
 
   companion object {
 
+    private val TAG = PortfolioRemoveDialog::class.java.name
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING = "key_holding"
-    private const val TAG = "PortfolioRemoveDialog"
 
     @JvmStatic
     @CheckResult

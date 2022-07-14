@@ -30,7 +30,9 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
+import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,10 +48,11 @@ internal class PortfolioInteractorImpl
 @Inject
 internal constructor(
     private val holdingRealtime: HoldingRealtime,
-    private val positionRealtime: PositionRealtime,
-    private val positionQueryDao: PositionQueryDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingDeleteDao: HoldingDeleteDao,
+    private val positionRealtime: PositionRealtime,
+    private val positionQueryDao: PositionQueryDao,
+    private val splitRealtime: SplitRealtime,
     private val splitQueryDao: SplitQueryDao,
     private val interactor: TickerInteractor,
 ) : PortfolioInteractor {
@@ -64,6 +67,12 @@ internal constructor(
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
         positionRealtime.listenForChanges(onChange)
+      }
+
+  override suspend fun listenForSplitChanges(onChange: (event: SplitChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        splitRealtime.listenForChanges(onChange)
       }
 
   override suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>> =

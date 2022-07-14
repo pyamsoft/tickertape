@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.mover
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
@@ -45,10 +46,9 @@ interface BigMoverReport {
 
   @CheckResult fun lastPercent(percent: StockPercent): BigMoverReport
 
-  data class Id(val id: String) {
+  data class Id(val id: String) : IdType {
 
-    @CheckResult
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
       return id.isBlank()
     }
 

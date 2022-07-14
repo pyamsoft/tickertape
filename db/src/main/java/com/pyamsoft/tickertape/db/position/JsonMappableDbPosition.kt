@@ -75,9 +75,10 @@ internal constructor(
         shareCount: StockShareValue,
         price: StockMoneyValue,
         purchaseDate: LocalDateTime,
+        id: DbPosition.Id = DbPosition.Id(IdGenerator.generate()),
     ): DbPosition {
       return JsonMappableDbPosition(
-          id = DbPosition.Id(IdGenerator.generate()),
+          id = id,
           holdingId = holdingId,
           shareCount = shareCount,
           price = price,

@@ -21,12 +21,15 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 
 interface PortfolioInteractor {
 
   suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit)
 
   suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit)
+
+  suspend fun listenForSplitChanges(onChange: (event: SplitChangeEvent) -> Unit)
 
   @CheckResult suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>>
 

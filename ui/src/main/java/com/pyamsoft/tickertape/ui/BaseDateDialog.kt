@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.dig.position.date
+package com.pyamsoft.tickertape.ui
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -7,35 +7,14 @@ import android.os.Bundle
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.theme.attributeFromCurrentTheme
-import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
-import java.time.LocalDate
 import java.time.Month
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal class PositionAddDateDialog : AppCompatDialogFragment() {
-
-  @JvmField @Inject internal var datePickerEventBus: EventBus<DatePickerEvent>? = null
-
-  @CheckResult
-  private fun getPositionId(): DbPosition.Id {
-    val key = KEY_POSITION
-    return requireArguments()
-        .getString(key, "")
-        .also { require(it.isNotBlank()) { "Must create with key: $key" } }
-        .let { DbPosition.Id(it) }
-  }
+abstract class BaseDateDialog protected constructor() : AppCompatDialogFragment() {
 
   @CheckResult
   private fun getYear(): Int {
@@ -72,15 +51,7 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
     return AppCompatResources.getDrawable(act, backgroundId).requireNotNull()
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    Injector.obtainFromApplication<TickerComponent>(requireContext())
-        .plusPositionAddDateComponent()
-        .create(getPositionId())
-        .inject(this)
-  }
-
-  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+  final override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val initialYear = getYear()
     val initialMonth = getMonth()
     val initialDay = getDay()
@@ -92,16 +63,11 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
 
           // Make sure we use the ActivityScope for this operation
           requireActivity().lifecycleScope.launch(context = Dispatchers.Default) {
-            datePickerEventBus
-                .requireNotNull()
-                .send(
-                    DatePickerEvent(
-                        positionId = getPositionId(),
-                        year = year,
-                        month = month,
-                        dayOfMonth = dayOfMonth,
-                    ),
-                )
+            onDateSelected(
+                year = year,
+                month = month,
+                dayOfMonth = dayOfMonth,
+            )
           }
         }
 
@@ -116,52 +82,30 @@ internal class PositionAddDateDialog : AppCompatDialogFragment() {
         .apply { datePicker.background = createDialogBackground() }
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    datePickerEventBus = null
-  }
+  protected abstract suspend fun onDateSelected(
+      year: Int,
+      month: Month,
+      dayOfMonth: Int,
+  )
 
   companion object {
 
-    private const val TAG = "ExpandDateSelectDialog"
-    private const val KEY_POSITION = "item"
     private const val KEY_YEAR = "year"
     private const val KEY_MONTH = "month"
     private const val KEY_DAY = "day"
 
     @JvmStatic
     @CheckResult
-    private fun newInstance(
-        positionId: DbPosition.Id,
+    protected fun prepareBundle(
         year: Int,
         month: Month,
         day: Int,
-    ): DialogFragment {
-      return PositionAddDateDialog().apply {
-        arguments =
-            Bundle().apply {
-              putString(KEY_POSITION, positionId.id)
-              putInt(KEY_YEAR, year)
-              putString(KEY_MONTH, month.name)
-              putInt(KEY_DAY, day)
-            }
+    ): Bundle {
+      return Bundle().apply {
+        putInt(KEY_YEAR, year)
+        putString(KEY_MONTH, month.name)
+        putInt(KEY_DAY, day)
       }
-    }
-
-    @JvmStatic
-    fun show(
-        activity: FragmentActivity,
-        positionId: DbPosition.Id,
-        purchaseDate: LocalDate?,
-    ) {
-      val today = purchaseDate ?: LocalDate.now()
-      newInstance(
-              positionId,
-              today.year,
-              today.month,
-              today.dayOfMonth,
-          )
-          .show(activity, TAG)
     }
   }
 }

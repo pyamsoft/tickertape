@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.holding
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
@@ -31,10 +32,9 @@ interface DbHolding {
 
   @CheckResult fun side(): TradeSide
 
-  data class Id(val id: String) {
+  data class Id(val id: String) : IdType {
 
-    @CheckResult
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
       return id.isBlank()
     }
 

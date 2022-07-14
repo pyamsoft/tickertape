@@ -47,7 +47,8 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
+import com.pyamsoft.tickertape.portfolio.dig.split.SplitDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -87,24 +88,20 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   }
 
   private fun handleAddSplit() {
-    // TODO splits
-    //        PositionAddDialog.create(
-    //            activity = requireActivity(),
-    //            symbol = getSymbol(),
-    //            holdingId = getHoldingId(),
-    //            holdingType = getHoldingType(),
-    //        )
+    SplitDialog.create(
+        activity = requireActivity(),
+        symbol = getSymbol(),
+        holdingId = getHoldingId(),
+    )
   }
 
   private fun handleUpdateSplit(split: DbSplit) {
-    // TODO splits
-    //        PositionAddDialog.update(
-    //            activity = requireActivity(),
-    //            symbol = getSymbol(),
-    //            holdingId = getHoldingId(),
-    //            holdingType = getHoldingType(),
-    //            existingPositionId = position.id(),
-    //        )
+    SplitDialog.update(
+        activity = requireActivity(),
+        symbol = getSymbol(),
+        holdingId = getHoldingId(),
+        existingSplitId = split.id(),
+    )
   }
 
   private fun handleDeleteSplit(split: DbSplit) {
@@ -117,7 +114,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   }
 
   private fun handleAddPosition() {
-    PositionAddDialog.create(
+    PositionDialog.create(
         activity = requireActivity(),
         symbol = getSymbol(),
         holdingId = getHoldingId(),
@@ -126,7 +123,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   }
 
   private fun handleUpdatePosition(position: DbPosition) {
-    PositionAddDialog.update(
+    PositionDialog.update(
         activity = requireActivity(),
         symbol = getSymbol(),
         holdingId = getHoldingId(),

@@ -120,7 +120,7 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
   companion object {
 
     private const val KEY_SYMBOL = "key_symbol"
-    private const val TAG = "WatchlistRemoveDialog"
+    private val TAG = WatchlistRemoveDialog::class.java.name
 
     @JvmStatic
     @CheckResult

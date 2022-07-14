@@ -17,13 +17,14 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.JsonMappableDbPosition
+import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
+import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
 import java.time.LocalDate
@@ -37,26 +38,16 @@ class PositionAddViewModeler
 @Inject
 internal constructor(
     private val state: MutablePositionAddViewState,
-    private val datePickerEventBus: EventConsumer<DatePickerEvent>,
     private val holdingId: DbHolding.Id,
     private val interactor: PositionAddInteractor,
-    private val existingPositionId: DbPosition.Id,
-) : AbstractViewModeler<PositionAddViewState>(state) {
-
-  private fun checkSubmittable() {
-    state.apply {
-      val isAllValuesDefined =
-          pricePerShare.toDoubleOrNull() != null &&
-              numberOfShares.toDoubleOrNull() != null &&
-              dateOfPurchase != null
-      isSubmittable = isAllValuesDefined
-    }
-  }
-
-  private fun handleDateChanged(dateOfPurchase: LocalDate) {
-    state.dateOfPurchase = dateOfPurchase
-    checkSubmittable()
-  }
+    datePickerEventBus: EventConsumer<DateSelectedEvent<DbPosition.Id>>,
+    existingPositionId: DbPosition.Id,
+) :
+    BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
+        state = state,
+        datePickerEventBus = datePickerEventBus,
+        existingId = existingPositionId,
+    ) {
 
   @CheckResult
   private fun resolvePosition(existing: DbPosition?): DbPosition {
@@ -66,8 +57,10 @@ internal constructor(
     val date = s.dateOfPurchase.requireNotNull()
 
     return if (existing == null) {
-      Timber.d("No existing position, make new one for holding: $holdingId")
+      Timber.d("No existing position, make new one for holding: ${s.positionId} $holdingId")
       JsonMappableDbPosition.create(
+              // Use the positionId here, this will be changed if newPosition() is called
+              id = s.positionId,
               holdingId = holdingId,
               shareCount = shareCount.asShares(),
               price = price.asMoney(),
@@ -115,32 +108,21 @@ internal constructor(
     }
   }
 
-  fun bind(scope: CoroutineScope) {
-    // Only if this ID is not EMPTY
-    existingPositionId.also { existingId ->
-      if (!existingId.isEmpty()) {
-        Timber.d("Existing position ID, attempt load: $existingId")
-        scope.launch(context = Dispatchers.Main) {
-          interactor
-              .loadExistingPosition(existingId)
-              .onFailure { Timber.e(it, "Failed to load existing position") }
-              .onSuccess { Timber.d("Existing position loaded: $it") }
-              .onSuccess { loadExistingPositionData(it) }
-        }
-      }
-    }
-
-    scope.launch(context = Dispatchers.Main) {
-      datePickerEventBus.onEvent { e ->
-        if (e.positionId == state.positionId) {
-          val dateOfPurchase = LocalDate.of(e.year, e.month, e.dayOfMonth)
-          handleDateChanged(dateOfPurchase)
-        }
-      }
+  override fun checkSubmittable() {
+    state.apply {
+      val isAllValuesDefined =
+          pricePerShare.toDoubleOrNull() != null &&
+              numberOfShares.toDoubleOrNull() != null &&
+              dateOfPurchase != null
+      isSubmittable = isAllValuesDefined
     }
   }
 
-  fun handleSubmit(
+  override fun onDateChanged(date: LocalDate) {
+    state.dateOfPurchase = date
+  }
+
+  override fun handleSubmit(
       scope: CoroutineScope,
       onClose: () -> Unit,
   ) {
@@ -163,7 +145,7 @@ internal constructor(
               is DbInsert.InsertResult.Update ->
                   Timber.d("Position was updated: ${result.data} from ${s.existingPosition}")
               is DbInsert.InsertResult.Fail -> {
-                Timber.e(result.error, "Failed to submit new position: $position")
+                Timber.e(result.error, "Failed to submit position: $position")
                 // Caught by the onFailure below
                 throw result.error
               }
@@ -191,49 +173,23 @@ internal constructor(
     }
   }
 
-  fun handlePriceChanged(pricePerShare: String) {
-    if (isSafe(pricePerShare)) {
-      state.pricePerShare = pricePerShare
-      checkSubmittable()
+  fun bind(scope: CoroutineScope) {
+    onBind(scope) { existingId ->
+      scope.launch(context = Dispatchers.Main) {
+        interactor
+            .loadExistingPosition(existingId)
+            .onFailure { Timber.e(it, "Failed to load existing position") }
+            .onSuccess { Timber.d("Existing position loaded: $it") }
+            .onSuccess { loadExistingPositionData(it) }
+      }
     }
+  }
+
+  fun handlePriceChanged(pricePerShare: String) {
+    handleNumberAsStringChange(pricePerShare) { state.pricePerShare = it }
   }
 
   fun handleNumberChanged(numberOfShares: String) {
-    if (isSafe(numberOfShares)) {
-      state.numberOfShares = numberOfShares
-      checkSubmittable()
-    }
-  }
-
-  companion object {
-
-    private val WHITESPACE_REGEX = Regex("\\s+")
-
-    @JvmStatic
-    @CheckResult
-    private fun isSafe(numberString: String): Boolean {
-      // Only one decimal is valid
-      if (numberString.count { it == '.' } > 1) {
-        return false
-      }
-
-      // No whitespace
-      if (numberString.contains(WHITESPACE_REGEX)) {
-        return false
-      }
-
-      // No negative sign
-      if (numberString.contains('-')) {
-        return false
-      }
-
-      // No commas
-      if (numberString.contains(',')) {
-        return false
-      }
-
-      // Finally, attempt a cast
-      return numberString.toDoubleOrNull() != null
-    }
+    handleNumberAsStringChange(numberOfShares) { state.numberOfShares = it }
   }
 }

@@ -158,7 +158,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
 
   companion object {
 
-    private const val TAG = "TickerAddDialog"
+    private val TAG = NewTickerSheet::class.java.name
     private const val KEY_DESTINATION = "key_destination"
 
     @JvmStatic

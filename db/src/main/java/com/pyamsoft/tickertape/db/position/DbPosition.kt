@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.position
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -43,10 +44,9 @@ interface DbPosition {
 
   @CheckResult fun purchaseDate(purchaseDate: LocalDateTime): DbPosition
 
-  data class Id(val id: String) {
+  data class Id(val id: String) : IdType {
 
-    @CheckResult
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
       return id.isBlank()
     }
 

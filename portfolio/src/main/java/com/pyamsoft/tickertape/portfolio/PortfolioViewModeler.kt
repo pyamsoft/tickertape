@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
 import javax.inject.Inject
@@ -60,14 +61,9 @@ internal constructor(
         )
       }
 
-  fun bind(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForHoldingChanges { handleHoldingRealtimeEvent(it) }
-    }
-
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
-    }
+  private fun CoroutineScope.handleSplitRealtimeEvent(event: SplitChangeEvent) {
+    Timber.d("A split change has happened, re-process the entire list")
+    handleRefreshList(this, false)
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
@@ -200,6 +196,34 @@ internal constructor(
     // On delete, we don't need to re-fetch quotes from the network
   }
 
+  override fun restoreState(savedInstanceState: UiSavedStateReader) {
+    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
+  }
+
+  override fun saveState(outState: UiSavedStateWriter) {
+    state.query.also { search ->
+      if (search.isBlank()) {
+        outState.remove(KEY_SEARCH)
+      } else {
+        outState.put(KEY_SEARCH, search.trim())
+      }
+    }
+  }
+
+  fun bind(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      interactor.listenForHoldingChanges { handleHoldingRealtimeEvent(it) }
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      interactor.listenForSplitChanges { handleSplitRealtimeEvent(it) }
+    }
+  }
+
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
@@ -233,20 +257,6 @@ internal constructor(
   fun handleRegenerateList(scope: CoroutineScope) {
     val s = state
     s.regeneratePortfolio(scope) { s.fullPortfolio }
-  }
-
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { search -> state.query = search }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    state.query.also { search ->
-      if (search.isBlank()) {
-        outState.remove(KEY_SEARCH)
-      } else {
-        outState.put(KEY_SEARCH, search.trim())
-      }
-    }
   }
 
   private data class PortfolioListGenerateResult(

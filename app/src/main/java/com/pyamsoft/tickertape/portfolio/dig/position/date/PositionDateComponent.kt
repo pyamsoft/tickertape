@@ -6,9 +6,9 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface PositionAddDateComponent {
+internal interface PositionDateComponent {
 
-  fun inject(dialog: PositionAddDateDialog)
+  fun inject(dialog: PositionDateDialog)
 
   @Subcomponent.Factory
   interface Factory {
@@ -16,6 +16,6 @@ internal interface PositionAddDateComponent {
     @CheckResult
     fun create(
         @BindsInstance positionId: DbPosition.Id,
-    ): PositionAddDateComponent
+    ): PositionDateComponent
   }
 }

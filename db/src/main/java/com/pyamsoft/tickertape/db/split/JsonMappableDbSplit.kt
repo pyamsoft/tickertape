@@ -74,9 +74,10 @@ internal constructor(
         preSplitShareCount: StockShareValue,
         postSplitShareCount: StockShareValue,
         splitDate: LocalDateTime,
+        id: DbSplit.Id = DbSplit.Id(IdGenerator.generate()),
     ): DbSplit {
       return JsonMappableDbSplit(
-          id = DbSplit.Id(IdGenerator.generate()),
+          id = id,
           holdingId = holdingId,
           preSplitShareCount = preSplitShareCount,
           postSplitShareCount = postSplitShareCount,

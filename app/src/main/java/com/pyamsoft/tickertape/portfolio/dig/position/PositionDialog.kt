@@ -45,7 +45,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
-import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateDialog
+import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -53,7 +53,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class PositionAddDialog : AppCompatDialogFragment() {
+internal class PositionDialog : AppCompatDialogFragment() {
 
   @JvmField @Inject internal var viewModel: PositionAddViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
@@ -104,7 +104,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
       date: LocalDate?,
   ) {
     Timber.d("Handle DoP clicked: $positionId $date")
-    PositionAddDateDialog.show(
+    PositionDateDialog.show(
         activity = requireActivity(),
         positionId = positionId,
         purchaseDate = date,
@@ -118,7 +118,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
   ): View {
     val act = requireActivity()
     Injector.obtainFromApplication<TickerComponent>(act)
-        .plusPositionAddComponent()
+        .plusPositionComponent()
         .create(
             getSymbol(),
             getHoldingId(),
@@ -195,11 +195,11 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
 
   companion object {
 
+    private val TAG = PositionDialog::class.java.name
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_HOLDING_ID = "key_holding_id"
     private const val KEY_HOLDING_TYPE = "key_holding_type"
     private const val KEY_EXISTING_POSITION_ID = "key_existing_position_id"
-    private const val TAG = "PositionAddDialog"
 
     @JvmStatic
     @CheckResult
@@ -209,7 +209,7 @@ internal class PositionAddDialog : AppCompatDialogFragment() {
         holdingType: EquityType,
         existingPositionId: DbPosition.Id,
     ): DialogFragment {
-      return PositionAddDialog().apply {
+      return PositionDialog().apply {
         arguments =
             Bundle().apply {
               putString(KEY_SYMBOL, symbol.symbol())

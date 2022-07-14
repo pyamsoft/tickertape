@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.symbol
+package com.pyamsoft.tickertape.portfolio.dig.split
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.IdType
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import dagger.BindsInstance
+import dagger.Subcomponent
 
-interface DbSymbol {
+@Subcomponent
+internal interface SplitComponent {
 
-  @CheckResult fun id(): Id
+  fun inject(dialog: SplitDialog)
 
-  @CheckResult fun symbol(): StockSymbol
+  @Subcomponent.Factory
+  interface Factory {
 
-  data class Id(val id: String) : IdType {
-
-    override fun isEmpty(): Boolean {
-      return id.isBlank()
-    }
-
-    companion object {
-
-      @JvmField val EMPTY = Id("")
-    }
+    @CheckResult
+    fun create(
+        @BindsInstance symbol: StockSymbol,
+        @BindsInstance holdingId: DbHolding.Id,
+        @BindsInstance existingSplitId: DbSplit.Id,
+    ): SplitComponent
   }
 }

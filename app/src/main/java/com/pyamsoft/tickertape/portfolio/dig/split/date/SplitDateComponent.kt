@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.portfolio.dig.position
+package com.pyamsoft.tickertape.portfolio.dig.split.date
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.db.split.DbSplit
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
-internal interface PositionAddComponent {
+internal interface SplitDateComponent {
 
-  fun inject(dialog: PositionAddDialog)
+  fun inject(dialog: SplitDateDialog)
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance holdingId: DbHolding.Id,
-        @BindsInstance holdingType: EquityType,
-        @BindsInstance existingPositionId: DbPosition.Id,
-    ): PositionAddComponent
+        @BindsInstance splitId: DbSplit.Id,
+    ): SplitDateComponent
   }
 }

@@ -34,9 +34,10 @@ import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.PortfolioRemoveDialog
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
-import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddComponent
-import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionAddDateComponent
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionComponent
+import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateComponent
+import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
+import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
@@ -51,7 +52,6 @@ import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.ticker.add.NewTickerComponent
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
 import com.pyamsoft.tickertape.watchlist.WatchlistRemoveDialog
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -99,13 +99,17 @@ internal interface TickerComponent {
 
   fun inject(portfolioRemoveDialog: PortfolioRemoveDialog)
 
-  @CheckResult fun plusPositionAddDateComponent(): PositionAddDateComponent.Factory
+  @CheckResult fun plusPositionDateComponent(): PositionDateComponent.Factory
+
+  @CheckResult fun plusSplitDateComponent(): SplitDateComponent.Factory
 
   @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
-  @CheckResult fun plusPositionAddComponent(): PositionAddComponent.Factory
+  @CheckResult fun plusPositionComponent(): PositionComponent.Factory
+
+  @CheckResult fun plusSplitComponent(): SplitComponent.Factory
 
   @CheckResult fun plusNewTickerComponent(): NewTickerComponent.Factory
 

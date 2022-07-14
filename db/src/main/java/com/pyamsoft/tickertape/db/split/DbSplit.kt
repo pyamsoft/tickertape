@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.split
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import java.time.LocalDateTime
@@ -39,10 +40,9 @@ interface DbSplit {
 
   @CheckResult fun splitDate(date: LocalDateTime): DbSplit
 
-  data class Id(val id: String) {
+  data class Id(val id: String) : IdType {
 
-    @CheckResult
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
       return id.isBlank()
     }
 

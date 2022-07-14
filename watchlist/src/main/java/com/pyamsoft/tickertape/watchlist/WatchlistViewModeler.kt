@@ -54,12 +54,6 @@ internal constructor(
         )
       }
 
-  fun bind(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForChanges { handleRealtimeEvent(it) }
-    }
-  }
-
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
       when (event) {
         is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
@@ -138,6 +132,20 @@ internal constructor(
         .toList()
   }
 
+  override fun restoreState(savedInstanceState: UiSavedStateReader) {
+    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
+  }
+
+  override fun saveState(outState: UiSavedStateWriter) {
+    state.query.also { search ->
+      if (search.isBlank()) {
+        outState.remove(KEY_SEARCH)
+      } else {
+        outState.put(KEY_SEARCH, search.trim())
+      }
+    }
+  }
+
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
     state.isLoading = true
     scope.launch(context = Dispatchers.Main) {
@@ -160,6 +168,12 @@ internal constructor(
     }
   }
 
+  fun bind(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      interactor.listenForChanges { handleRealtimeEvent(it) }
+    }
+  }
+
   fun handleSearch(query: String) {
     state.query = query
   }
@@ -171,20 +185,6 @@ internal constructor(
   fun handleRegenerateList(scope: CoroutineScope) {
     val s = state
     s.regenerateTickers(scope) { s.allTickers }
-  }
-
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { search -> state.query = search }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    state.query.also { search ->
-      if (search.isBlank()) {
-        outState.remove(KEY_SEARCH)
-      } else {
-        outState.put(KEY_SEARCH, search.trim())
-      }
-    }
   }
 
   companion object {

@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun <T : Any> rememberInBackground(
     vararg arguments: Any?,
-    onCalculate: () -> T?,
+    onCalculate: CoroutineScope.() -> T?,
 ): T? {
   // Generate the display values in the background
   val (value, setValue) = remember { mutableStateOf<T?>(null) }

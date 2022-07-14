@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -198,6 +199,7 @@ internal fun PositionItem(
           modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
           name = "Purchase Date",
           value = displayPurchaseDate,
+          textStyle = MaterialTheme.typography.body2,
       )
 
       Column(
@@ -274,6 +276,7 @@ private fun Info(
     name: String,
     value: String,
     valueColor: Color = Color.Unspecified,
+    textStyle: TextStyle = MaterialTheme.typography.caption
 ) {
   Row(
       modifier = modifier,
@@ -281,13 +284,13 @@ private fun Info(
   ) {
     Text(
         text = name,
-        style = MaterialTheme.typography.caption,
+        style = textStyle,
     )
     Text(
         modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
         color = valueColor,
         text = value,
-        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
+        style = textStyle.copy(fontWeight = FontWeight.Bold),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )

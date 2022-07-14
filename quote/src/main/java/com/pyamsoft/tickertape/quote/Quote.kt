@@ -120,7 +120,9 @@ fun Quote(
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
-      Row(modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline)) {
+      Row(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+      ) {
         TickerName(
             modifier = Modifier.weight(1F),
             ticker = ticker,

@@ -18,11 +18,9 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,6 +32,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +48,8 @@ import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun HomeIndexes(
@@ -269,7 +271,19 @@ private fun ChartList(
     tickers: List<Ticker>,
     onClick: (Ticker) -> Unit,
 ) {
-  val onlyChartTickers = remember(tickers) { tickers.filter { it.chart != null } }
+  // Generate the chart list in the background
+  val (onlyChartTickers, setOnlyChartTickers) =
+      remember { mutableStateOf<List<Ticker>>(emptyList()) }
+  LaunchedEffect(
+      tickers,
+      setOnlyChartTickers,
+  ) {
+    // Default for computation intensive task
+    this.launch(context = Dispatchers.Default) {
+      setOnlyChartTickers(tickers.filter { it.chart != null })
+    }
+  }
+
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,

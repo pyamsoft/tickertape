@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.spark.SparkAdapter
@@ -85,10 +86,9 @@ private fun Bounds(
     modifier: Modifier = Modifier,
     chart: StockChart,
 ) {
+  // Generate the high and low points in the background when the chart changes
   val (highMoney, setHighMoney) = remember { mutableStateOf("") }
   val (lowMoney, setLowMoney) = remember { mutableStateOf("") }
-
-  // Generate the high and low points in the background when the chart changes
   LaunchedEffect(
       chart,
       setHighMoney,
@@ -295,6 +295,8 @@ private class ChartAdapter(
   private val baselineValue: Float
 
   init {
+    Enforcer.assertOffMainThread()
+
     val closes = chart.close()
     val baseline = chart.startingPrice()
 

@@ -10,6 +10,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,8 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private data class DisplayValues(
     val cost: String,
@@ -150,38 +154,48 @@ private fun CurrentPrices(
     currentPrice: StockMoneyValue?,
     splits: List<DbSplit>,
 ) {
-  val displayValues =
-      remember(
-          position,
-          currentPrice,
-          isOption,
-          isSell,
-          splits,
-      ) { calculateDisplayValues(position, isOption, isSell, splits, currentPrice) }
+  // Generate the display values in the background
+  val (displayValues, setDisplayValues) = remember { mutableStateOf<DisplayValues?>(null) }
+  LaunchedEffect(
+      position,
+      currentPrice,
+      isOption,
+      isSell,
+      splits,
+      setDisplayValues,
+  ) {
+    // Default for computation intensive task
+    this.launch(context = Dispatchers.Default) {
+      val dv = calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
+      setDisplayValues(dv)
+    }
+  }
 
   Column(
       modifier = modifier,
   ) {
-    Info(
-        name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
-        value = displayValues.cost,
-        textStyle = MaterialTheme.typography.body1,
-    )
-
-    if (displayValues.current.isNotBlank()) {
+    if (displayValues != null) {
       Info(
-          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
-          value = displayValues.current,
-          valueColor = displayValues.color,
+          name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
+          value = displayValues.cost,
           textStyle = MaterialTheme.typography.body1,
       )
-    }
 
-    if (displayValues.gainLoss.isNotBlank()) {
-      Info(
-          value = displayValues.gainLoss,
-          valueColor = displayValues.color,
-      )
+      if (displayValues.current.isNotBlank()) {
+        Info(
+            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+            value = displayValues.current,
+            valueColor = displayValues.color,
+            textStyle = MaterialTheme.typography.body1,
+        )
+      }
+
+      if (displayValues.gainLoss.isNotBlank()) {
+        Info(
+            value = displayValues.gainLoss,
+            valueColor = displayValues.color,
+        )
+      }
     }
   }
 }

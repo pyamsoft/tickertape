@@ -34,7 +34,6 @@ fun DigNews(
     news: List<StockNews>,
     onRefresh: () -> Unit,
 ) {
-
   SwipeRefresh(
       modifier = modifier,
       state = rememberSwipeRefreshState(isRefreshing = isLoading),

@@ -6,11 +6,12 @@ import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigInteractor
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigInteractorImpl
 import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEvent
-import com.pyamsoft.tickertape.portfolio.dig.position.add.DatePickerEventBus
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddInteractor
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddInteractorImpl
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 abstract class PortfolioModule {
@@ -39,7 +40,15 @@ abstract class PortfolioModule {
       bus: EventBus<DatePickerEvent>
   ): EventConsumer<DatePickerEvent>
 
-  @Binds
-  @CheckResult
-  internal abstract fun bindDatePickerEventBus(impl: DatePickerEventBus): EventBus<DatePickerEvent>
+  @Module
+  companion object {
+
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun providePositionDatePickerEventBus(): EventBus<DatePickerEvent> {
+      return EventBus.create()
+    }
+  }
 }

@@ -16,11 +16,14 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -43,8 +46,11 @@ internal constructor(
         interactor,
     ) {
 
-  private val deleteRunner =
-      highlander<ResultWrapper<Boolean>, DbPosition> { interactor.deletePositon(it) }
+  private val positionDeleteRunner =
+      highlander<ResultWrapper<Boolean>, DbPosition> { interactor.deletePosition(it) }
+
+  private val splitDeleteRunner =
+      highlander<ResultWrapper<Boolean>, DbSplit> { interactor.deleteSplit(it) }
 
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
@@ -61,7 +67,7 @@ internal constructor(
                   add(async { loadStatistics(force) })
                 }
                 PortfolioDigSections.SPLITS -> {
-                  // TODO fetch stock splits from DB
+                  add(async { loadSplits(force) })
                 }
                 PortfolioDigSections.POSITIONS -> {
                   add(async { loadHolding(force) })
@@ -72,18 +78,33 @@ internal constructor(
             .awaitAll()
       }
 
+  private suspend fun loadSplits(force: Boolean) {
+    interactor
+        .getSplits(force, holdingId)
+        .onSuccess { s ->
+          state.apply {
+            stockSplits = s
+            stockSplitError = null
+          }
+        }
+        .onFailure { e ->
+          state.apply {
+            stockSplits = emptyList()
+            stockSplitError = e
+          }
+        }
+  }
+
   private suspend fun loadHolding(force: Boolean) {
     interactor
         .getHolding(force, holdingId)
         .onSuccess { h ->
-          // Clear the error on load success
           state.apply {
             holding = h
             holdingError = null
           }
         }
         .onFailure { e ->
-          // Clear holding on load fail
           state.apply {
             holding = null
             holdingError = e
@@ -95,26 +116,17 @@ internal constructor(
     interactor
         .getPositions(force, holdingId)
         .onSuccess { p ->
-          // Clear the error on load success
           state.apply {
             positions = p
             positionsError = null
           }
         }
         .onFailure { e ->
-          // Clear positions on load fail
           state.apply {
             positions = emptyList()
             positionsError = e
           }
         }
-  }
-
-  override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-    state.isLoading = true
-    scope.launch(context = Dispatchers.Main) {
-      loadRunner.call(force).also { state.isLoading = false }
-    }
   }
 
   private fun onPositionChangeEvent(event: PositionChangeEvent) {
@@ -127,22 +139,10 @@ internal constructor(
 
   private fun onPositionInsertOrUpdate(position: DbPosition) {
     val s = state
-    val newPositions =
-        s.positions.toMutableList().apply {
-          val index =
-              this.indexOfFirst {
-                it.holdingId() == position.holdingId() && it.id() == position.id()
-              }
-
-          if (index < 0) {
-            // No index, this is a new item
-            add(position)
-          } else {
-            // Update existing item at index
-            set(index, position)
-          }
+    s.positions =
+        insertOrUpdate(s.positions, position) {
+          it.holdingId() == position.holdingId() && it.id() == position.id()
         }
-    s.positions = newPositions
   }
 
   private fun onPositionUpdated(position: DbPosition) {
@@ -159,9 +159,66 @@ internal constructor(
     s.positions = s.positions.filterNot { it.id() == position.id() }
   }
 
+  private fun onSplitChangeEvent(event: SplitChangeEvent) {
+    return when (event) {
+      is SplitChangeEvent.Delete -> onSplitDeleted(event.split, event.offerUndo)
+      is SplitChangeEvent.Insert -> onSplitInserted(event.split)
+      is SplitChangeEvent.Update -> onSplitUpdated(event.split)
+    }
+  }
+
+  private fun onSplitInsertOrUpdate(split: DbSplit) {
+    val s = state
+    s.stockSplits =
+        insertOrUpdate(s.stockSplits, split) {
+          it.holdingId() == split.holdingId() && it.id() == split.id()
+        }
+  }
+
+  private fun onSplitUpdated(split: DbSplit) {
+    onSplitInsertOrUpdate(split)
+  }
+
+  private fun onSplitInserted(split: DbSplit) {
+    onSplitInsertOrUpdate(split)
+  }
+
+  private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
+    // TODO handle offerUndo?
+    val s = state
+    s.stockSplits = s.stockSplits.filterNot { it.id() == split.id() }
+  }
+
+  override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
+    state.isLoading = true
+    scope.launch(context = Dispatchers.Main) {
+      loadRunner.call(force).also { state.isLoading = false }
+    }
+  }
+
   fun bind(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
       interactor.watchPositions { onPositionChangeEvent(it) }
+    }
+
+    scope.launch(context = Dispatchers.Main) { interactor.watchSplits { onSplitChangeEvent(it) } }
+  }
+
+  fun handleDeleteSplit(
+      scope: CoroutineScope,
+      split: DbSplit,
+  ) {
+    scope.launch(context = Dispatchers.Main) {
+      splitDeleteRunner
+          .call(split)
+          .onFailure { Timber.e(it, "Failed to delete split: $split") }
+          .onSuccess { deleted ->
+            if (deleted) {
+              Timber.d("Position split: $split")
+            } else {
+              Timber.w("Position was not split: $split")
+            }
+          }
     }
   }
 
@@ -170,7 +227,7 @@ internal constructor(
       position: DbPosition,
   ) {
     scope.launch(context = Dispatchers.Main) {
-      deleteRunner
+      positionDeleteRunner
           .call(position)
           .onFailure { Timber.e(it, "Failed to delete position: $position") }
           .onSuccess { deleted ->
@@ -186,5 +243,28 @@ internal constructor(
   fun handleTabUpdated(scope: CoroutineScope, section: PortfolioDigSections) {
     state.section = section
     handleLoadTicker(scope, force = false)
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun <T : Any> insertOrUpdate(
+        list: List<T>,
+        item: T,
+        isMatching: (item: T) -> Boolean
+    ): List<T> {
+      return list.toMutableList().apply {
+        val index = this.indexOfFirst { isMatching(it) }
+
+        if (index < 0) {
+          // No index, this is a new item
+          add(item)
+        } else {
+          // Update existing item at index
+          set(index, item)
+        }
+      }
+    }
   }
 }

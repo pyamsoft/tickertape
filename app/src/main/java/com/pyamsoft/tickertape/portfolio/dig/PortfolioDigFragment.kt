@@ -44,6 +44,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionAddDialog
@@ -82,6 +83,36 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         .handleLoadTicker(
             scope = viewLifecycleOwner.lifecycleScope,
             force = force,
+        )
+  }
+
+  private fun handleAddSplit() {
+    // TODO splits
+    //        PositionAddDialog.create(
+    //            activity = requireActivity(),
+    //            symbol = getSymbol(),
+    //            holdingId = getHoldingId(),
+    //            holdingType = getHoldingType(),
+    //        )
+  }
+
+  private fun handleUpdateSplit(split: DbSplit) {
+    // TODO splits
+    //        PositionAddDialog.update(
+    //            activity = requireActivity(),
+    //            symbol = getSymbol(),
+    //            holdingId = getHoldingId(),
+    //            holdingType = getHoldingType(),
+    //            existingPositionId = position.id(),
+    //        )
+  }
+
+  private fun handleDeleteSplit(split: DbSplit) {
+    viewModel
+        .requireNotNull()
+        .handleDeleteSplit(
+            scope = viewLifecycleOwner.lifecycleScope,
+            split = split,
         )
   }
 
@@ -221,6 +252,9 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                   onAddPosition = { handleAddPosition() },
                   onDeletePosition = { handleDeletePosition(it) },
                   onUpdatePosition = { handleUpdatePosition(it) },
+                  onAddSplit = { handleAddSplit() },
+                  onDeleteSplit = { handleDeleteSplit(it) },
+                  onUpdateSplit = { handleUpdateSplit(it) },
               )
             }
           }

@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,9 +18,11 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
+import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -45,6 +46,9 @@ fun PortfolioDigScreen(
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
     onUpdatePosition: (DbPosition) -> Unit,
+    onAddSplit: () -> Unit,
+    onDeleteSplit: (DbSplit) -> Unit,
+    onUpdateSplit: (DbSplit) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -80,6 +84,9 @@ fun PortfolioDigScreen(
               onAddPosition = onAddPosition,
               onDeletePosition = onDeletePosition,
               onUpdatePosition = onUpdatePosition,
+              onAddSplit = onAddSplit,
+              onDeleteSplit = onDeleteSplit,
+              onUpdateSplit = onUpdateSplit,
           )
         }
       }
@@ -99,6 +106,9 @@ private fun Content(
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
     onUpdatePosition: (DbPosition) -> Unit,
+    onAddSplit: () -> Unit,
+    onDeleteSplit: (DbSplit) -> Unit,
+    onUpdateSplit: (DbSplit) -> Unit,
 ) {
   val section = state.section
 
@@ -140,8 +150,13 @@ private fun Content(
         )
       }
       PortfolioDigSections.SPLITS -> {
-        Spacer(
+        SplitScreen(
             modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
+            onAddSplit = onAddSplit,
+            onDeleteSplit = onDeleteSplit,
+            onUpdateSplit = onUpdateSplit,
         )
       }
     }
@@ -180,5 +195,8 @@ private fun PreviewPortfolioDigScreen() {
       onAddPosition = {},
       onDeletePosition = {},
       onUpdatePosition = {},
+      onAddSplit = {},
+      onDeleteSplit = {},
+      onUpdateSplit = {},
   )
 }

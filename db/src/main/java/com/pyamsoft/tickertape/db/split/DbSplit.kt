@@ -29,9 +29,15 @@ interface DbSplit {
 
   @CheckResult fun preSplitShareCount(): StockShareValue
 
+  @CheckResult fun preSplitShareCount(shareCount: StockShareValue): DbSplit
+
   @CheckResult fun postSplitShareCount(): StockShareValue
 
+  @CheckResult fun postSplitShareCount(shareCount: StockShareValue): DbSplit
+
   @CheckResult fun splitDate(): LocalDateTime
+
+  @CheckResult fun splitDate(date: LocalDateTime): DbSplit
 
   data class Id(val id: String) {
 

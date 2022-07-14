@@ -45,12 +45,24 @@ internal constructor(
     return preSplitShareCount
   }
 
+  override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
+    return this.copy(preSplitShareCount = shareCount)
+  }
+
   override fun postSplitShareCount(): StockShareValue {
     return postSplitShareCount
   }
 
+  override fun postSplitShareCount(shareCount: StockShareValue): DbSplit {
+    return this.copy(postSplitShareCount = shareCount)
+  }
+
   override fun splitDate(): LocalDateTime {
     return splitDate
+  }
+
+  override fun splitDate(date: LocalDateTime): DbSplit {
+    return this.copy(splitDate = splitDate)
   }
 
   companion object {

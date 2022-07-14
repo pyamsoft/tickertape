@@ -27,6 +27,11 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
+import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
+import com.pyamsoft.tickertape.db.split.SplitDeleteDao
+import com.pyamsoft.tickertape.db.split.SplitQueryDao
+import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -46,9 +51,12 @@ internal constructor(
     private val positionQueryDao: PositionQueryDao,
     private val positionRealtime: PositionRealtime,
     private val positionDeleteDao: PositionDeleteDao,
+    private val splitQueryDao: SplitQueryDao,
+    private val splitRealtime: SplitRealtime,
+    private val splitDeleteDao: SplitDeleteDao,
 ) : DigInteractorImpl(interactor, stockInteractor), PortfolioDigInteractor {
 
-  override suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean> =
+  override suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
@@ -59,6 +67,25 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun deleteSplit(split: DbSplit): ResultWrapper<Boolean> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(splitDeleteDao.delete(split, offerUndo = true))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to delete split: $split")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
+  override suspend fun watchSplits(onEvent: (SplitChangeEvent) -> Unit) =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        return@withContext splitRealtime.listenForChanges(onEvent)
       }
 
   override suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit) =
@@ -98,6 +125,24 @@ internal constructor(
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Failed to get db positions: $id")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
+  override suspend fun getSplits(
+      force: Boolean,
+      id: DbHolding.Id,
+  ): ResultWrapper<List<DbSplit>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext try {
+          val positions = splitQueryDao.query(force).filter { it.holdingId() == id }
+          ResultWrapper.success(positions)
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to get db splits: $id")
             ResultWrapper.failure(e)
           }
         }

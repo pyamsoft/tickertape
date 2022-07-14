@@ -21,15 +21,25 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
+import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigInteractor
-import com.pyamsoft.tickertape.stocks.api.StockNews
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface PortfolioDigInteractor : DigInteractor {
 
   @CheckResult suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit)
 
-  @CheckResult suspend fun deletePositon(position: DbPosition): ResultWrapper<Boolean>
+  @CheckResult suspend fun watchSplits(onEvent: (SplitChangeEvent) -> Unit)
+
+  @CheckResult suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean>
+
+  @CheckResult suspend fun deleteSplit(split: DbSplit): ResultWrapper<Boolean>
+
+  @CheckResult
+  suspend fun getSplits(
+      force: Boolean,
+      id: DbHolding.Id,
+  ): ResultWrapper<List<DbSplit>>
 
   @CheckResult
   suspend fun getHolding(

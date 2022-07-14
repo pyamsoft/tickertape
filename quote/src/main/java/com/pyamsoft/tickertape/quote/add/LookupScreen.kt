@@ -29,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -227,12 +229,17 @@ private fun SymbolLookup(
 
   LaunchedEffect(symbol) { onAfterSymbolChanged(symbol) }
 
+  val focusRequester = remember { FocusRequester() }
+
+  // Request focus to top field on launch
+  LaunchedEffect(Unit) { focusRequester.requestFocus() }
+
   Box(
       modifier = modifier,
       contentAlignment = Alignment.Center,
   ) {
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
         value = symbol,
         onValueChange = onSymbolChanged,
         visualTransformation = { text ->

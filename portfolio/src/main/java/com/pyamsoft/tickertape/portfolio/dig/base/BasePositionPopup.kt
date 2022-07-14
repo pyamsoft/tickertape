@@ -23,6 +23,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +67,9 @@ internal fun BasePositionPopup(
 ) {
   val focusManager = LocalFocusManager.current
   val focusRequester = remember { FocusRequester() }
+
+  // Request focus to top field on launch
+  LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
   Surface(
       modifier = modifier,

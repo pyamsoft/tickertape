@@ -38,7 +38,6 @@ private data class DisplayValues(
     val cost: String,
     val current: String,
     val gainLoss: String,
-    val titleGainLoss: String,
     val color: Color,
 )
 
@@ -57,12 +56,11 @@ private fun calculateDisplayValues(
 
   val displayCurrent: String
   val displayGainLoss: String
-  val titleGainLoss: String
   val colorGainLoss: Color
+
   if (currentPrice == null) {
     displayCurrent = ""
     displayGainLoss = ""
-    titleGainLoss = ""
     colorGainLoss = Color.Unspecified
   } else {
     // Current
@@ -84,14 +82,6 @@ private fun calculateDisplayValues(
     // Final display
     displayGainLoss = "${sign}${amount} (${sign}${gainLossPercent})"
 
-    // Title
-    titleGainLoss =
-        when {
-          gainLossDirection.isUp() -> "Gain"
-          gainLossDirection.isDown() -> "Loss"
-          else -> "Change"
-        }
-
     // Color
     colorGainLoss = Color(gainLossDirection.color())
   }
@@ -100,7 +90,6 @@ private fun calculateDisplayValues(
       cost = displayTotal,
       current = displayCurrent,
       gainLoss = displayGainLoss,
-      titleGainLoss = titleGainLoss,
       color = colorGainLoss,
   )
 }
@@ -118,9 +107,106 @@ internal fun PositionItem(
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
   val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
 
+  Card(
+      modifier = modifier,
+  ) {
+    Column(
+        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
+    ) {
+      PurchaseDate(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
+          position = position,
+      )
+      NumberOfShares(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+          isOption = isOption,
+          isSell = isSell,
+          position = position,
+          splits = splits,
+      )
+      CostBasis(
+          isOption = isOption,
+          position = position,
+          splits = splits,
+      )
+      CurrentPrices(
+          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+          isOption = isOption,
+          isSell = isSell,
+          position = position,
+          currentPrice = currentPrice,
+          splits = splits,
+      )
+    }
+  }
+}
+
+@Composable
+private fun CurrentPrices(
+    modifier: Modifier = Modifier,
+    isOption: Boolean,
+    isSell: Boolean,
+    position: DbPosition,
+    currentPrice: StockMoneyValue?,
+    splits: List<DbSplit>,
+) {
+  val displayValues =
+      remember(
+          position,
+          currentPrice,
+          isOption,
+          isSell,
+          splits,
+      ) { calculateDisplayValues(position, isOption, isSell, splits, currentPrice) }
+
+  Column(
+      modifier = modifier,
+  ) {
+    Info(
+        name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
+        value = displayValues.cost,
+        textStyle = MaterialTheme.typography.body1,
+    )
+
+    if (displayValues.current.isNotBlank()) {
+      Info(
+          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+          value = displayValues.current,
+          valueColor = displayValues.color,
+          textStyle = MaterialTheme.typography.body1,
+      )
+    }
+
+    if (displayValues.gainLoss.isNotBlank()) {
+      Info(
+          value = displayValues.gainLoss,
+          valueColor = displayValues.color,
+      )
+    }
+  }
+}
+
+@Composable
+private fun PurchaseDate(
+    modifier: Modifier = Modifier,
+    position: DbPosition,
+) {
   val displayPurchaseDate =
       remember(position) { position.purchaseDate().format(DATE_FORMATTER.get().requireNotNull()) }
 
+  Info(
+      modifier = modifier,
+      value = displayPurchaseDate,
+  )
+}
+
+@Composable
+private fun CostBasis(
+    modifier: Modifier = Modifier,
+    isOption: Boolean,
+    position: DbPosition,
+    splits: List<DbSplit>,
+) {
   val displayOriginalPrice =
       remember(
           position,
@@ -142,6 +228,45 @@ internal fun PositionItem(
         return@remember p.asMoneyValue()
       }
 
+  val prefix =
+      remember(
+          displayAdjustedPrice,
+          displayOriginalPrice,
+      ) {
+        if (displayAdjustedPrice != displayOriginalPrice) {
+          // Something has undergone a split, show adjusted prices
+          return@remember "Adjusted "
+        } else {
+          // No splits, normal prices
+          return@remember ""
+        }
+      }
+
+  Column(
+      modifier = modifier,
+  ) {
+    if (prefix.isNotBlank()) {
+      Info(
+          name = "Original Cost Basis",
+          value = displayOriginalPrice,
+      )
+    }
+
+    Info(
+        name = "${prefix}Cost Basis",
+        value = displayAdjustedPrice,
+    )
+  }
+}
+
+@Composable
+private fun NumberOfShares(
+    modifier: Modifier = Modifier,
+    isOption: Boolean,
+    isSell: Boolean,
+    position: DbPosition,
+    splits: List<DbSplit>,
+) {
   val displayOriginalShares =
       remember(
           position,
@@ -163,24 +288,12 @@ internal fun PositionItem(
         return@remember s.asShareValue()
       }
 
-  val displayValues =
+  val prefix =
       remember(
-          position,
-          currentPrice,
-          isOption,
-          isSell,
-          splits,
-      ) { calculateDisplayValues(position, isOption, isSell, splits, currentPrice) }
-
-  val prefixString =
-      remember(
-          displayAdjustedPrice,
-          displayOriginalPrice,
           displayAdjustedShares,
           displayOriginalShares,
       ) {
-        if (displayAdjustedPrice != displayOriginalPrice ||
-            displayAdjustedShares != displayOriginalShares) {
+        if (displayAdjustedShares != displayOriginalShares) {
           // Something has undergone a split, show adjusted prices
           return@remember "Adjusted "
         } else {
@@ -189,108 +302,47 @@ internal fun PositionItem(
         }
       }
 
-  Card(
+  Column(
       modifier = modifier,
   ) {
-    Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
-    ) {
+    if (prefix.isNotBlank()) {
       Info(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-          name = "Purchase Date",
-          value = displayPurchaseDate,
-          textStyle = MaterialTheme.typography.body2,
+          name = "Original ${if (isOption) "Contracts" else "Shares"}",
+          value = displayOriginalShares,
       )
-
-      Column(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-      ) {
-        if (prefixString.isNotBlank()) {
-          Info(
-              name = "Original Cost Basis",
-              value = displayOriginalPrice,
-          )
-        }
-
-        Info(
-            name = "${prefixString}Cost Basis",
-            value = displayAdjustedPrice,
-        )
-      }
-
-      Column(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-      ) {
-        if (prefixString.isNotBlank()) {
-          Info(
-              name = "Original ${if (isOption) "Contracts" else "Shares"}",
-              value = displayOriginalShares,
-          )
-        }
-
-        Info(
-            name = "${prefixString}${if (isOption) "Contracts" else "Shares"}",
-            value = displayAdjustedShares,
-        )
-      }
-      Row(
-          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.typography),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
-            value = displayValues.cost,
-        )
-
-        if (displayValues.current.isNotBlank()) {
-          Info(
-              modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-              name = "Current Value",
-              value = displayValues.current,
-              valueColor = displayValues.color,
-          )
-        }
-      }
-
-      if (displayValues.gainLoss.isNotBlank()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.typography),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Info(
-              modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-              name = displayValues.titleGainLoss,
-              value = displayValues.gainLoss,
-              valueColor = displayValues.color,
-          )
-        }
-      }
     }
+
+    Info(
+        name = "${prefix}${if (isOption) "Contracts" else "Shares"}",
+        value = displayAdjustedShares,
+    )
   }
 }
 
 @Composable
 private fun Info(
     modifier: Modifier = Modifier,
-    name: String,
+    name: String = "",
     value: String,
     valueColor: Color = Color.Unspecified,
-    textStyle: TextStyle = MaterialTheme.typography.caption
+    textStyle: TextStyle = MaterialTheme.typography.body2
 ) {
   Row(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
   ) {
+    if (name.isNotBlank()) {
+      Text(
+          modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
+          text = "${name}:",
+          style = textStyle.copy(fontWeight = FontWeight.Bold),
+      )
+    }
+
     Text(
-        text = name,
-        style = textStyle,
-    )
-    Text(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
         color = valueColor,
         text = value,
-        style = textStyle.copy(fontWeight = FontWeight.Bold),
+        style = textStyle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )

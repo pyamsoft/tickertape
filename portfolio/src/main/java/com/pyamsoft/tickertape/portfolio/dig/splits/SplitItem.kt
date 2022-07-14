@@ -12,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
@@ -40,48 +38,38 @@ internal fun SplitItem(
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Date",
-          value = displaySplitDate,
+      Text(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+          text = displaySplitDate,
+          style = MaterialTheme.typography.body2,
       )
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Pre-Split Share Count",
-          value = preSplitShareCount.asShareValue(),
-      )
-      Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-          name = "Post-Split Share Count",
-          value = postSplitShareCount.asShareValue(),
-      )
-    }
-  }
-}
 
-@Composable
-private fun Info(
-    modifier: Modifier = Modifier,
-    name: String,
-    value: String,
-    valueColor: Color = Color.Unspecified,
-) {
-  Row(
-      modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.caption,
-    )
-    Text(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-        color = valueColor,
-        text = value,
-        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+            text = postSplitShareCount.asShareValue(),
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+        )
+
+        Text(
+            modifier = Modifier.padding(horizontal = MaterialTheme.keylines.typography),
+            text = "for",
+            style = MaterialTheme.typography.body2,
+        )
+
+        Text(
+            text = preSplitShareCount.asShareValue(),
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+        )
+
+        Text(
+            modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
+            text = "split",
+            style = MaterialTheme.typography.body2,
+        )
+      }
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,6 +16,7 @@ import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.BaseListScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -48,8 +50,6 @@ fun PortfolioScreen(
       list = stocks,
       search = search,
       tab = tab,
-      emptyStateImage = R.drawable.portfolio_empty,
-      emptyStateLabel = "Nothing in your portfolio, add a position!",
       onRefresh = onRefresh,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
@@ -68,6 +68,31 @@ fun PortfolioScreen(
             stock = stock,
             onSelect = onSelect,
             onDelete = onDelete,
+        )
+      },
+      renderEmptyState = {
+        EmptyState(
+            modifier = Modifier.fillMaxWidth(),
+            imageLoader = imageLoader,
+        )
+      },
+  )
+}
+
+@Composable
+private fun EmptyState(
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
+) {
+  PolinaGolubevaScreen(
+      modifier = modifier,
+      imageLoader = imageLoader,
+      image = R.drawable.portfolio_empty,
+      bottomContent = {
+        Text(
+            modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content),
+            text = "Nothing in your portfolio, add a position!",
+            style = MaterialTheme.typography.h6,
         )
       },
   )

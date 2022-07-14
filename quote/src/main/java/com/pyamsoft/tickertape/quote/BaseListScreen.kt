@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.quote
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import com.pyamsoft.tickertape.quote.add.NewTickerFab
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
-import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -51,8 +49,6 @@ fun <T : Any> BaseListScreen(
     search: String,
     tab: EquityType,
     navBarBottomHeight: Int = 0,
-    @DrawableRes emptyStateImage: Int,
-    emptyStateLabel: String,
     onRefresh: () -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
@@ -60,6 +56,7 @@ fun <T : Any> BaseListScreen(
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
     renderHeader: (@Composable () -> Unit)? = null,
+    renderEmptyState: @Composable () -> Unit,
     renderListItem: @Composable (T) -> Unit,
 ) {
   val scaffoldState = rememberScaffoldState()
@@ -82,10 +79,9 @@ fun <T : Any> BaseListScreen(
           onTabUpdated = onTabUpdated,
           onFabClick = onFabClick,
           onRegenerateList = onRegenerateList,
-          emptyStateImage = emptyStateImage,
-          emptyStateLabel = emptyStateLabel,
           itemKey = itemKey,
           renderHeader = renderHeader,
+          renderEmptyState = renderEmptyState,
           renderListItem = renderListItem,
           pageError = pageError,
           list = list,
@@ -106,26 +102,31 @@ private fun <T : Any> Content(
     tab: EquityType,
     isLoading: Boolean,
     navBarBottomHeight: Int,
-    @DrawableRes emptyStateImage: Int,
-    emptyStateLabel: String,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
+    renderEmptyState: @Composable () -> Unit,
     renderHeader: (@Composable () -> Unit)? = null,
     renderListItem: @Composable (T) -> Unit,
 ) {
   val density = LocalDensity.current
+
+  val contentPadding = MaterialTheme.keylines.content
+
   val bottomPaddingDp =
       remember(
           density,
           navBarBottomHeight,
       ) { density.run { navBarBottomHeight.toDp() } }
-  val contentPadding = MaterialTheme.keylines.content
+
   val fabBottomPadding =
-      remember(bottomPaddingDp, contentPadding) { bottomPaddingDp + contentPadding }
+      remember(
+          bottomPaddingDp,
+          contentPadding,
+      ) { bottomPaddingDp + contentPadding }
 
   Box(
       modifier = modifier,
@@ -135,8 +136,7 @@ private fun <T : Any> Content(
         modifier = Modifier.fillMaxSize(),
         imageLoader = imageLoader,
         navBarBottomHeight = bottomPaddingDp,
-        emptyStateImage = emptyStateImage,
-        emptyStateLabel = emptyStateLabel,
+        renderEmptyState = renderEmptyState,
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
         onRefresh = onRefresh,
@@ -171,8 +171,7 @@ private fun <T : Any> ListSection(
     search: String,
     tab: EquityType,
     navBarBottomHeight: Dp,
-    @DrawableRes emptyStateImage: Int,
-    emptyStateLabel: String,
+    renderEmptyState: @Composable () -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onRefresh: () -> Unit,
@@ -221,14 +220,7 @@ private fun <T : Any> ListSection(
         }
       }
       isEmptyList -> {
-        item {
-          EmptyState(
-              modifier = Modifier.fillMaxWidth(),
-              imageLoader = imageLoader,
-              image = emptyStateImage,
-              label = emptyStateLabel,
-          )
-        }
+        item { renderEmptyState() }
       }
       else -> {
         itemsIndexed(
@@ -262,27 +254,6 @@ private fun <T : Any> ListSection(
       )
     }
   }
-}
-
-@Composable
-private fun EmptyState(
-    modifier: Modifier = Modifier,
-    imageLoader: ImageLoader,
-    @DrawableRes image: Int,
-    label: String,
-) {
-  PolinaGolubevaScreen(
-      modifier = modifier,
-      imageLoader = imageLoader,
-      image = image,
-      bottomContent = {
-        Text(
-            modifier = Modifier.padding(horizontal = MaterialTheme.keylines.content),
-            text = label,
-            style = MaterialTheme.typography.h6,
-        )
-      },
-  )
 }
 
 @Composable
@@ -341,8 +312,7 @@ private fun PreviewBaseListScreen() {
       isLoading = false,
       renderListItem = {},
       renderHeader = null,
-      emptyStateImage = 0,
-      emptyStateLabel = "Empty State",
+      renderEmptyState = {},
       itemKey = { _, _ -> "" },
       search = "",
   )

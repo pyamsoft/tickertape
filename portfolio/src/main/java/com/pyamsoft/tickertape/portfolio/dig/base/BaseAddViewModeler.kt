@@ -45,7 +45,7 @@ protected constructor(
   ) {
     scope.launch(context = Dispatchers.Main) {
       datePickerEventBus.onEvent { e ->
-        if (e.id == existingId) {
+        if (isCurrentId(e.id)) {
           val dateOfPurchase = LocalDate.of(e.year, e.month, e.dayOfMonth)
           handleDateChanged(dateOfPurchase)
         }
@@ -66,6 +66,8 @@ protected constructor(
       checkSubmittable()
     }
   }
+
+  @CheckResult protected abstract fun isCurrentId(id: Id): Boolean
 
   protected abstract fun checkSubmittable()
 

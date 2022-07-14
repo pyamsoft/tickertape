@@ -121,6 +121,10 @@ internal constructor(
     }
   }
 
+  override fun isCurrentId(id: DbSplit.Id): Boolean {
+    return id == state.splitId
+  }
+
   override fun handleSubmit(
       scope: CoroutineScope,
       onClose: () -> Unit,

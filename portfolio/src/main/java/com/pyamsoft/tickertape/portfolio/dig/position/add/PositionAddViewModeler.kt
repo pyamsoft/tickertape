@@ -122,6 +122,10 @@ internal constructor(
     state.dateOfPurchase = date
   }
 
+  override fun isCurrentId(id: DbPosition.Id): Boolean {
+    return id == state.positionId
+  }
+
   override fun handleSubmit(
       scope: CoroutineScope,
       onClose: () -> Unit,

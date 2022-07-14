@@ -196,7 +196,7 @@ internal fun PositionItem(
     ) {
       Info(
           modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-          name = "Date",
+          name = "Purchase Date",
           value = displayPurchaseDate,
       )
 
@@ -205,13 +205,13 @@ internal fun PositionItem(
       ) {
         if (prefixString.isNotBlank()) {
           Info(
-              name = "Original Basis",
+              name = "Original Cost Basis",
               value = displayOriginalPrice,
           )
         }
 
         Info(
-            name = "${prefixString}Basis",
+            name = "${prefixString}Cost Basis",
             value = displayAdjustedPrice,
         )
       }
@@ -237,14 +237,14 @@ internal fun PositionItem(
       ) {
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = if (isOption && isSell) "Premium" else "Cost",
+            name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
             value = displayValues.cost,
         )
 
         if (displayValues.current.isNotBlank()) {
           Info(
               modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-              name = "Value",
+              name = "Current Value",
               value = displayValues.current,
               valueColor = displayValues.color,
           )

@@ -29,7 +29,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -51,9 +50,8 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
+import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
@@ -86,25 +84,13 @@ private fun Bounds(
     modifier: Modifier = Modifier,
     chart: StockChart,
 ) {
-  // Generate the high and low points in the background when the chart changes
-  val (highMoney, setHighMoney) = remember { mutableStateOf("") }
-  val (lowMoney, setLowMoney) = remember { mutableStateOf("") }
-  LaunchedEffect(
-      chart,
-      setHighMoney,
-      setLowMoney,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      setHighMoney(chart.periodHigh().asMoneyValue())
-      setLowMoney(chart.periodLow().asMoneyValue())
-    }
-  }
+  val highMoney = rememberInBackground(chart) { chart.periodHigh().asMoneyValue() }
+  val lowMoney = rememberInBackground(chart) { chart.periodLow().asMoneyValue() }
 
   Column(
       modifier = modifier,
   ) {
-    if (highMoney.isNotBlank()) {
+    if (!highMoney.isNullOrBlank()) {
       ChartBound(
           value = highMoney,
       )
@@ -112,7 +98,7 @@ private fun Bounds(
     Spacer(
         modifier = Modifier.weight(1F),
     )
-    if (lowMoney.isNotBlank()) {
+    if (!lowMoney.isNullOrBlank()) {
       ChartBound(
           value = lowMoney,
       )
@@ -186,19 +172,8 @@ private fun SparkChart(
     }
   }
 
-  // Generate the chart adapter in the background whenever the chart data changes
-  val (chartAdapter, setChartAdapter) = remember { mutableStateOf<ChartAdapter?>(null) }
-  LaunchedEffect(
-      chart,
-      setChartAdapter,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      val high = chart.periodHigh()
-      val low = chart.periodLow()
-      setChartAdapter(ChartAdapter(chart, high, low))
-    }
-  }
+  val chartAdapter =
+      rememberInBackground(chart) { ChartAdapter(chart, chart.periodHigh(), chart.periodLow()) }
 
   AndroidView(
       modifier = modifier,

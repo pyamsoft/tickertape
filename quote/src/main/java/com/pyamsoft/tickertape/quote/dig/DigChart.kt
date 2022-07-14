@@ -22,8 +22,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,11 +46,10 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
+import com.pyamsoft.tickertape.ui.rememberInBackground
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDateTime
 import kotlin.math.abs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun DigChart(
@@ -185,22 +182,11 @@ private fun CurrentPriceDisplay(
     price: StockMoneyValue,
     openingPrice: StockMoneyValue?,
 ) {
-  // Generate the price diff in the background
-  val (diff, setDiff) = remember { mutableStateOf<ScrubDifferences?>(null) }
-  LaunchedEffect(
-      price,
-      openingPrice,
-      setDiff,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      if (openingPrice == null) {
-        setDiff(null)
-      } else {
-        setDiff(calculateDifferences(price, openingPrice))
-      }
-    }
-  }
+  val diff =
+      rememberInBackground(
+          price,
+          openingPrice,
+      ) { if (openingPrice == null) null else calculateDifferences(price, openingPrice) }
 
   Column(
       modifier = modifier,
@@ -290,51 +276,43 @@ private fun Ranges(
     isOptions: Boolean,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  // Generate the valid ranges in the background
-  val (allRanges, setAllRanges) =
-      remember { mutableStateOf<List<StockChart.IntervalRange>>(emptyList()) }
-  LaunchedEffect(
-      isOptions,
-      setAllRanges,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      val valid =
-          StockChart.IntervalRange.values().filter { range ->
-            return@filter if (!isOptions) true
-            else {
-              // Options don't support these ranges
-              range != StockChart.IntervalRange.FIVE_DAY &&
-                  range != StockChart.IntervalRange.ONE_MONTH
-            }
+  val allRanges =
+      rememberInBackground(isOptions) {
+        StockChart.IntervalRange.values().filter { range ->
+          return@filter if (!isOptions) true
+          else {
+            // Options don't support these ranges
+            range != StockChart.IntervalRange.FIVE_DAY &&
+                range != StockChart.IntervalRange.ONE_MONTH
           }
-      setAllRanges(valid)
-    }
-  }
+        }
+      }
 
   LazyRow(
       modifier = modifier,
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
-    items(
-        items = allRanges,
-        key = { it.name },
-    ) { item ->
-      if (item == range) {
-        Button(
-            onClick = { onRangeSelected(item) },
-        ) {
-          Text(
-              text = item.display,
-          )
-        }
-      } else {
-        TextButton(
-            onClick = { onRangeSelected(item) },
-        ) {
-          Text(
-              text = item.display,
-          )
+    if (allRanges != null) {
+      items(
+          items = allRanges,
+          key = { it.name },
+      ) { item ->
+        if (item == range) {
+          Button(
+              onClick = { onRangeSelected(item) },
+          ) {
+            Text(
+                text = item.display,
+            )
+          }
+        } else {
+          TextButton(
+              onClick = { onRangeSelected(item) },
+          ) {
+            Text(
+                text = item.display,
+            )
+          }
         }
       }
     }

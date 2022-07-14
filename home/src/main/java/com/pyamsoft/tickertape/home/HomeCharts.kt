@@ -32,9 +32,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -47,9 +44,8 @@ import com.pyamsoft.tickertape.quote.dig.ChartError
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.rememberInBackground
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun HomeIndexes(
@@ -271,41 +267,32 @@ private fun ChartList(
     tickers: List<Ticker>,
     onClick: (Ticker) -> Unit,
 ) {
-  // Generate the chart list in the background
-  val (onlyChartTickers, setOnlyChartTickers) =
-      remember { mutableStateOf<List<Ticker>>(emptyList()) }
-  LaunchedEffect(
-      tickers,
-      setOnlyChartTickers,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      setOnlyChartTickers(tickers.filter { it.chart != null })
-    }
-  }
+  val onlyChartTickers = rememberInBackground(tickers) { tickers.filter { it.chart != null } }
 
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
-    itemsIndexed(
-        items = onlyChartTickers,
-        key = { index, item -> "${item.symbol.symbol()}-${index}" },
-    ) { index, item ->
-      // We can assume here the chart is not null
-      HomeChartItem(
-          modifier =
-              Modifier.width(HomeScreenDefaults.getItemWidth()).run {
-                when (index) {
-                  0 -> padding(start = MaterialTheme.keylines.content)
-                  onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
-                  else -> this
-                }
-              },
-          ticker = item,
-          onClick = onClick,
-      )
+    if (onlyChartTickers != null) {
+      itemsIndexed(
+          items = onlyChartTickers,
+          key = { index, item -> "${item.symbol.symbol()}-${index}" },
+      ) { index, item ->
+        // We can assume here the chart is not null
+        HomeChartItem(
+            modifier =
+                Modifier.width(HomeScreenDefaults.getItemWidth()).run {
+                  when (index) {
+                    0 -> padding(start = MaterialTheme.keylines.content)
+                    onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
+                    else -> this
+                  }
+                },
+            ticker = item,
+            onClick = onClick,
+        )
+      }
     }
   }
 }

@@ -10,8 +10,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +33,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.pyamsoft.tickertape.ui.rememberInBackground
 
 private data class DisplayValues(
     val cost: String,
@@ -154,22 +151,10 @@ private fun CurrentPrices(
     currentPrice: StockMoneyValue?,
     splits: List<DbSplit>,
 ) {
-  // Generate the display values in the background
-  val (displayValues, setDisplayValues) = remember { mutableStateOf<DisplayValues?>(null) }
-  LaunchedEffect(
-      position,
-      currentPrice,
-      isOption,
-      isSell,
-      splits,
-      setDisplayValues,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      val dv = calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
-      setDisplayValues(dv)
-    }
-  }
+  val displayValues =
+      rememberInBackground(position, currentPrice, isOption, isSell, splits) {
+        calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
+      }
 
   Column(
       modifier = modifier,

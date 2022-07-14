@@ -20,9 +20,10 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,9 +36,8 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun OptionsSection(
@@ -159,27 +159,18 @@ private fun <T : Any> OptionsDropdown(
   val displayValue = remember(value) { if (value == null) "" else onDisplayChoice(value) }
   val (isDropdownOpen, setDropdownOpen) = remember { mutableStateOf(false) }
 
-  // Generate the choices in the background whenever the data changes
-  val (displayChoices, setDisplayChoices) =
-      remember { mutableStateOf<List<OptionsDropdownItem<T>>?>(null) }
-  LaunchedEffect(
-      choices,
-      onDisplayChoice,
-      setDisplayChoices,
-  ) {
-    // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
-      setDisplayChoices(
-          choices.map { c ->
-            val display = onDisplayChoice(c)
-            return@map OptionsDropdownItem(
-                display = display,
-                value = c,
-            )
-          },
-      )
-    }
-  }
+  val formatToDisplayChoice by rememberUpdatedState(onDisplayChoice)
+
+  val displayChoices =
+      rememberInBackground(choices, formatToDisplayChoice) {
+        choices.map { c ->
+          val display = formatToDisplayChoice(c)
+          return@map OptionsDropdownItem(
+              display = display,
+              value = c,
+          )
+        }
+      }
 
   Column(
       modifier = modifier,

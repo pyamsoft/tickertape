@@ -33,6 +33,7 @@ internal fun PositionScreen(
   val equityType = state.equityType
   val isLoading = state.isLoading
   val positions = state.positions
+  val splits = state.stockSplits
 
   val positionError = state.positionsError
   val holdingError = state.holdingError
@@ -63,6 +64,7 @@ internal fun PositionScreen(
             currentPrice = currentPrice,
             equityType = equityType,
             tradeSide = tradeSide,
+            splits = splits,
         )
       },
   )

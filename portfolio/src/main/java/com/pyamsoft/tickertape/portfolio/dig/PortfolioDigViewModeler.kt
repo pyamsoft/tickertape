@@ -71,6 +71,7 @@ internal constructor(
                 }
                 PortfolioDigSections.POSITIONS -> {
                   add(async { loadHolding(force) })
+                  add(async { loadSplits(force) })
                   add(async { loadPositions(force) })
                 }
               }

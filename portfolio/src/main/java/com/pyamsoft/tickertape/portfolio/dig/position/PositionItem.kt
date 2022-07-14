@@ -20,6 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.priceWithSplits
+import com.pyamsoft.tickertape.db.position.shareCountWithSplits
+import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -43,10 +46,11 @@ private fun calculateDisplayValues(
     position: DbPosition,
     isOption: Boolean,
     isSell: Boolean,
+    splits: List<DbSplit>,
     currentPrice: StockMoneyValue?
 ): DisplayValues {
-  val price = position.price()
-  val shareCount = position.shareCount()
+  val price = position.priceWithSplits(splits)
+  val shareCount = position.shareCountWithSplits(splits)
   val totalCost = (price.value() * shareCount.value()).asMoney()
   val displayTotal = totalCost.asMoneyValue()
 
@@ -90,6 +94,7 @@ private fun calculateDisplayValues(
     // Color
     colorGainLoss = Color(gainLossDirection.color())
   }
+
   return DisplayValues(
       cost = displayTotal,
       current = displayCurrent,
@@ -106,33 +111,81 @@ internal fun PositionItem(
     equityType: EquityType,
     tradeSide: TradeSide,
     position: DbPosition,
+    splits: List<DbSplit>,
     currentPrice: StockMoneyValue?,
 ) {
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
   val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
 
-  val purchaseDate = position.purchaseDate()
-  val price = position.price()
-  val shareCount = position.shareCount()
-
   val displayPurchaseDate =
-      remember(purchaseDate) { purchaseDate.format(DATE_FORMATTER.get().requireNotNull()) }
-  val displayPrice =
-      remember(price, isOption) {
+      remember(position) { position.purchaseDate().format(DATE_FORMATTER.get().requireNotNull()) }
+
+  val displayOriginalPrice =
+      remember(
+          position,
+          isOption,
+      ) {
+        val price = position.price()
         val p = if (isOption) (price.value() * 100).asMoney() else price
         return@remember p.asMoneyValue()
       }
-  val displayShares =
+
+  val displayAdjustedPrice =
       remember(
-          shareCount,
+          position,
+          isOption,
+          splits,
+      ) {
+        val price = position.priceWithSplits(splits)
+        val p = if (isOption) (price.value() * 100).asMoney() else price
+        return@remember p.asMoneyValue()
+      }
+
+  val displayOriginalShares =
+      remember(
+          position,
           isSell,
       ) {
+        val shareCount = position.shareCount()
         val s = if (isSell) (shareCount.value() * -1).asShares() else shareCount
         return@remember s.asShareValue()
       }
+
+  val displayAdjustedShares =
+      remember(
+          position,
+          isSell,
+          splits,
+      ) {
+        val shareCount = position.shareCountWithSplits(splits)
+        val s = if (isSell) (shareCount.value() * -1).asShares() else shareCount
+        return@remember s.asShareValue()
+      }
+
   val displayValues =
-      remember(position, currentPrice, isOption, isSell) {
-        calculateDisplayValues(position, isOption, isSell, currentPrice)
+      remember(
+          position,
+          currentPrice,
+          isOption,
+          isSell,
+          splits,
+      ) { calculateDisplayValues(position, isOption, isSell, splits, currentPrice) }
+
+  val prefixString =
+      remember(
+          displayAdjustedPrice,
+          displayOriginalPrice,
+          displayAdjustedShares,
+          displayOriginalShares,
+      ) {
+        if (displayAdjustedPrice != displayOriginalPrice ||
+            displayAdjustedShares != displayOriginalShares) {
+          // Something has undergone a split, show adjusted prices
+          return@remember "Adjusted "
+        } else {
+          // No splits, normal prices
+          return@remember ""
+        }
       }
 
   Card(
@@ -141,24 +194,41 @@ internal fun PositionItem(
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
-      Row(
-          modifier = Modifier.fillMaxWidth(),
-          verticalAlignment = Alignment.CenterVertically,
+      Info(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+          name = "Date",
+          value = displayPurchaseDate,
+      )
+
+      Column(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
       ) {
+        if (prefixString.isNotBlank()) {
+          Info(
+              name = "Original Basis",
+              value = displayOriginalPrice,
+          )
+        }
+
         Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Date",
-            value = displayPurchaseDate,
+            name = "${prefixString}Basis",
+            value = displayAdjustedPrice,
         )
+      }
+
+      Column(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+      ) {
+        if (prefixString.isNotBlank()) {
+          Info(
+              name = "Original ${if (isOption) "Contracts" else "Shares"}",
+              value = displayOriginalShares,
+          )
+        }
+
         Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Basis",
-            value = displayPrice,
-        )
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = if (isOption) "Contracts" else "Shares",
-            value = displayShares,
+            name = "${prefixString}${if (isOption) "Contracts" else "Shares"}",
+            value = displayAdjustedShares,
         )
       }
       Row(
@@ -233,6 +303,7 @@ private fun PreviewPositionItem() {
         equityType = EquityType.STOCK,
         tradeSide = TradeSide.BUY,
         currentPrice = null,
+        splits = emptyList(),
     )
   }
 }

@@ -85,21 +85,38 @@ private fun Bounds(
     modifier: Modifier = Modifier,
     chart: StockChart,
 ) {
-  val highMoney = remember(chart) { chart.periodHigh().asMoneyValue() }
-  val lowMoney = remember(chart) { chart.periodLow().asMoneyValue() }
+  val (highMoney, setHighMoney) = remember { mutableStateOf("") }
+  val (lowMoney, setLowMoney) = remember { mutableStateOf("") }
+
+  // Generate the high and low points in the background when the chart changes
+  LaunchedEffect(
+      chart,
+      setHighMoney,
+      setLowMoney,
+  ) {
+    // Default for computation intensive task
+    this.launch(context = Dispatchers.Default) {
+      setHighMoney(chart.periodHigh().asMoneyValue())
+      setLowMoney(chart.periodLow().asMoneyValue())
+    }
+  }
 
   Column(
       modifier = modifier,
   ) {
-    ChartBound(
-        value = highMoney,
-    )
+    if (highMoney.isNotBlank()) {
+      ChartBound(
+          value = highMoney,
+      )
+    }
     Spacer(
         modifier = Modifier.weight(1F),
     )
-    ChartBound(
-        value = lowMoney,
-    )
+    if (lowMoney.isNotBlank()) {
+      ChartBound(
+          value = lowMoney,
+      )
+    }
   }
 }
 

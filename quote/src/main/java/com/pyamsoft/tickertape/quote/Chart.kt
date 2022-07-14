@@ -29,6 +29,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -50,6 +51,8 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import java.time.LocalDateTime
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
@@ -138,22 +141,18 @@ private fun SparkChart(
   val density = LocalDensity.current
   val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
 
-  val chartAdapter =
-      remember(chart) {
-        val high = chart.periodHigh()
-        val low = chart.periodLow()
-        ChartAdapter(chart, high, low)
-      }
-
   val onScrubListener =
       if (onScrub == null) null
       else remember(onScrub) { SparkView.OnScrubListener { onScrub(it as? Chart.Data) } }
 
+  val isLight = MaterialTheme.colors.isLight
   val baseColor =
-      if (MaterialTheme.colors.isLight) {
-        android.graphics.Color.BLACK
-      } else {
-        android.graphics.Color.WHITE
+      remember(isLight) {
+        if (isLight) {
+          android.graphics.Color.BLACK
+        } else {
+          android.graphics.Color.WHITE
+        }
       }
 
   // When the composable falls out of effect, dispose of the Chart view
@@ -167,6 +166,20 @@ private fun SparkChart(
         // Null out the ref
         chartView.value = null
       }
+    }
+  }
+
+  // Generate the chart adapter in the background whenever the chart data changes
+  val (chartAdapter, setChartAdapter) = remember { mutableStateOf<ChartAdapter?>(null) }
+  LaunchedEffect(
+      chart,
+      setChartAdapter,
+  ) {
+    // Default for computation intensive task
+    this.launch(context = Dispatchers.Default) {
+      val high = chart.periodHigh()
+      val low = chart.periodLow()
+      setChartAdapter(ChartAdapter(chart, high, low))
     }
   }
 

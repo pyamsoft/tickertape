@@ -140,7 +140,9 @@ private fun SearchInput(
         )
       },
       trailingIcon = {
-        AnimatedVisibility(visible = search.isNotBlank()) {
+        AnimatedVisibility(
+            visible = search.isNotBlank(),
+        ) {
           IconButton(
               onClick = handleClearSearch,
           ) {

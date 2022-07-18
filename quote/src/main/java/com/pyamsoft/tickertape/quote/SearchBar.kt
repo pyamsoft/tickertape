@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.quote
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,8 +22,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
@@ -67,7 +72,6 @@ fun SearchBar(
               color = MaterialTheme.colors.secondary,
           )
         },
-        divider = {},
     ) {
       allTypes.forEach { tab ->
         TickerTab(
@@ -107,11 +111,24 @@ private fun SearchInput(
     search: String,
     onSearchChanged: (String) -> Unit,
 ) {
+  val (isSearchFocused, setSearchFocused) = remember { mutableStateOf(false) }
+
+  val hasSearchQuery = remember(search) { search.isNotBlank() }
+  val handleClearSearch by rememberUpdatedState { onSearchChanged("") }
+
+  // If search bar is populated and focused, back gesture clears
+  if (isSearchFocused && hasSearchQuery) {
+    BackHandler(
+        onBack = handleClearSearch,
+    )
+  }
+
   OutlinedTextField(
       modifier =
           modifier
               .padding(horizontal = MaterialTheme.keylines.baseline)
-              .padding(bottom = MaterialTheme.keylines.baseline),
+              .padding(bottom = MaterialTheme.keylines.baseline)
+              .onFocusChanged { focus -> setSearchFocused(focus.isFocused) },
       value = search,
       onValueChange = onSearchChanged,
       singleLine = true,
@@ -125,7 +142,7 @@ private fun SearchInput(
       trailingIcon = {
         AnimatedVisibility(visible = search.isNotBlank()) {
           IconButton(
-              onClick = { onSearchChanged("") },
+              onClick = handleClearSearch,
           ) {
             Icon(
                 imageVector = Icons.Filled.Close,

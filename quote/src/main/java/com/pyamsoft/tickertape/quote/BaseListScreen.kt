@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -192,7 +193,7 @@ private fun <T : Any> ListSection(
 
     stickyHeader {
       Column(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colors.background),
       ) {
         Spacer(
             modifier = Modifier.statusBarsHeight(),

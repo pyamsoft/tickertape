@@ -4,17 +4,19 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AppBarDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -38,39 +40,41 @@ fun SearchBar(
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val allTypes = remember { EquityType.values() }
+  val contentColor = LocalContentColor.current
+  val selectedTabIndex = currentTab.ordinal
 
   LaunchedEffect(search, currentTab) {
     // Fire the processing effect after the search or tab changes
     this.onRegenerateList()
   }
 
-  Surface(
-      modifier = modifier.padding(horizontal = MaterialTheme.keylines.baseline),
-      elevation = AppBarDefaults.TopAppBarElevation,
-      contentColor = Color.White,
-      color = MaterialTheme.colors.primary,
-      shape = MaterialTheme.shapes.medium,
+  Column(
+      modifier = modifier.fillMaxWidth(),
   ) {
-    Column(
+    SearchInput(
         modifier = Modifier.fillMaxWidth(),
-    ) {
-      SearchInput(
-          modifier = Modifier.fillMaxWidth(),
-          search = search,
-          onSearchChanged = onSearchChanged,
-      )
+        search = search,
+        onSearchChanged = onSearchChanged,
+    )
 
-      ScrollableTabRow(
-          backgroundColor = Color.Transparent,
-          selectedTabIndex = currentTab.ordinal,
-      ) {
-        allTypes.forEach { tab ->
-          TickerTab(
-              current = currentTab,
-              tab = tab,
-              onTabUpdated = onTabUpdated,
+    ScrollableTabRow(
+        selectedTabIndex = selectedTabIndex,
+        backgroundColor = Color.Transparent,
+        contentColor = contentColor,
+        indicator = { tabPositions ->
+          TabRowDefaults.Indicator(
+              modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+              color = MaterialTheme.colors.secondary,
           )
-        }
+        },
+        divider = {},
+    ) {
+      allTypes.forEach { tab ->
+        TickerTab(
+            current = currentTab,
+            tab = tab,
+            onTabUpdated = onTabUpdated,
+        )
       }
     }
   }
@@ -82,8 +86,12 @@ private fun TickerTab(
     current: EquityType,
     onTabUpdated: (EquityType) -> Unit,
 ) {
+  val contentColor = LocalContentColor.current
+
   Tab(
       selected = tab == current,
+      selectedContentColor = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.medium),
+      unselectedContentColor = contentColor.copy(alpha = ContentAlpha.medium),
       onClick = { onTabUpdated(tab) },
   ) {
     Text(
@@ -107,9 +115,10 @@ private fun SearchInput(
       value = search,
       onValueChange = onSearchChanged,
       singleLine = true,
-      shape = MaterialTheme.shapes.medium,
+      shape = RoundedCornerShape(percent = 50),
       label = {
         Text(
+            modifier = Modifier.padding(horizontal = MaterialTheme.keylines.baseline),
             text = "Search for something...",
         )
       },
@@ -125,28 +134,19 @@ private fun SearchInput(
           }
         }
       },
-      colors =
-          TextFieldDefaults.outlinedTextFieldColors(
-              leadingIconColor =
-                  MaterialTheme.colors.onPrimary.copy(alpha = TextFieldDefaults.IconOpacity),
-              unfocusedBorderColor =
-                  MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.disabled),
-              focusedBorderColor = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.medium),
-              unfocusedLabelColor =
-                  MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.medium),
-              focusedLabelColor = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high),
-          ),
   )
 }
 
 @Preview
 @Composable
 private fun PreviewSearchBar() {
-  SearchBar(
-      search = "",
-      onSearchChanged = {},
-      currentTab = EquityType.STOCK,
-      onTabUpdated = {},
-      onRegenerateList = {},
-  )
+  Surface {
+    SearchBar(
+        search = "",
+        onSearchChanged = {},
+        currentTab = EquityType.STOCK,
+        onTabUpdated = {},
+        onRegenerateList = {},
+    )
+  }
 }

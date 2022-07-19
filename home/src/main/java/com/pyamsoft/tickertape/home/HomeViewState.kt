@@ -98,13 +98,10 @@ interface HomeViewState :
     HomeShortedViewState,
     HomeUndervaluedGrowthViewState,
     HomeGrowthTechViewState,
-    HomeMostActiveViewState {
-  val isLoading: Boolean
-}
+    HomeMostActiveViewState
 
 @ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
-  override var isLoading by mutableStateOf(false)
 
   override var isLoadingPortfolio by mutableStateOf(false)
   override var portfolio by mutableStateOf(PortfolioStockList.empty())

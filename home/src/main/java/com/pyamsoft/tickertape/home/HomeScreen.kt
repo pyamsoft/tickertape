@@ -17,14 +17,11 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -41,11 +38,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -55,109 +51,137 @@ fun HomeScreen(
     appName: String,
     imageLoader: ImageLoader,
     navBarBottomHeight: Int = 0,
-    onRefresh: () -> Unit,
     onSettingsClicked: () -> Unit,
     onChartClicked: (Ticker) -> Unit,
+    onRefreshIndexes: CoroutineScope.() -> Unit,
+    onRefreshWatchlist: CoroutineScope.() -> Unit,
+    onRefreshPortfolio: CoroutineScope.() -> Unit,
+    onRefreshGainers: CoroutineScope.() -> Unit,
+    onRefreshLosers: CoroutineScope.() -> Unit,
+    onRefreshTrending: CoroutineScope.() -> Unit,
+    onRefreshMostActive: CoroutineScope.() -> Unit,
+    onRefreshUndervaluedGrowth: CoroutineScope.() -> Unit,
+    onRefreshGrowthTech: CoroutineScope.() -> Unit,
+    onRefreshMostShorted: CoroutineScope.() -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val density = LocalDensity.current
+  val bottomPaddingDp =
+      remember(
+          density,
+          navBarBottomHeight,
+      ) { density.run { navBarBottomHeight.toDp() } }
 
   Scaffold(
       modifier = modifier,
   ) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = isLoading),
-        onRefresh = onRefresh,
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
-      HomeContent(
-          modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState()),
-          state = state,
-          appName = appName,
-          imageLoader = imageLoader,
-          navBarBottomHeight = navBarBottomHeight,
-          onChartClicked = onChartClicked,
-          onSettingsClicked = onSettingsClicked,
-      )
+      item {
+        HomeHeader(
+            modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+            appName = appName,
+            onSettingsClicked = onSettingsClicked,
+        )
+      }
+
+      item {
+        HomePortfolio(
+            state = state,
+            onRefresh = onRefreshPortfolio,
+        )
+      }
+
+      item {
+        HomeIndexes(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshIndexes,
+        )
+      }
+
+      item {
+        HomeWatchlist(
+            state = state,
+            onClicked = onChartClicked,
+            onRefresh = onRefreshWatchlist,
+        )
+      }
+
+      item {
+        HomeTrending(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshTrending,
+        )
+      }
+
+      item {
+        HomeGainers(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshGainers,
+        )
+      }
+
+      item {
+        HomeLosers(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshLosers,
+        )
+      }
+
+      item {
+        HomeMostActive(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshMostActive,
+        )
+      }
+
+      item {
+        HomeUndervaluedGrowth(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshUndervaluedGrowth,
+        )
+      }
+
+      item {
+        HomeGrowthTech(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshGrowthTech,
+        )
+      }
+
+      item {
+        HomeMostShorted(
+            state = state,
+            imageLoader = imageLoader,
+            onChartClicked = onChartClicked,
+            onRefresh = onRefreshMostShorted,
+        )
+      }
+
+      item {
+        Spacer(
+            modifier =
+                Modifier.navigationBarsHeight(
+                    additional = bottomPaddingDp + MaterialTheme.keylines.content,
+                ),
+        )
+      }
     }
-  }
-}
-
-@Composable
-private fun HomeContent(
-    modifier: Modifier = Modifier,
-    state: HomeViewState,
-    navBarBottomHeight: Int,
-    appName: String,
-    imageLoader: ImageLoader,
-    onSettingsClicked: () -> Unit,
-    onChartClicked: (Ticker) -> Unit,
-) {
-  val density = LocalDensity.current
-  val bottomPaddingDp =
-      remember(density, navBarBottomHeight) { density.run { navBarBottomHeight.toDp() } }
-
-  Column(
-      modifier = modifier,
-      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-  ) {
-    HomeHeader(
-        modifier = Modifier.statusBarsPadding().fillMaxWidth(),
-        appName = appName,
-        onSettingsClicked = onSettingsClicked,
-    )
-    HomePortfolio(
-        state = state,
-    )
-    HomeIndexes(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeWatchlist(
-        state = state,
-        onClicked = onChartClicked,
-    )
-    HomeTrending(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeGainers(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeLosers(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeMostActive(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeUndervaluedGrowth(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeGrowthTech(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-    HomeMostShorted(
-        state = state,
-        imageLoader = imageLoader,
-        onChartClicked = onChartClicked,
-    )
-
-    Spacer(
-        modifier =
-            Modifier.navigationBarsHeight(
-                additional = bottomPaddingDp + MaterialTheme.keylines.content,
-            ),
-    )
   }
 }
 
@@ -195,7 +219,16 @@ private fun PreviewHomeScreen() {
       imageLoader = createNewTestImageLoader(),
       appName = "TEST",
       onChartClicked = {},
-      onRefresh = {},
       onSettingsClicked = {},
+      onRefreshGainers = {},
+      onRefreshGrowthTech = {},
+      onRefreshIndexes = {},
+      onRefreshLosers = {},
+      onRefreshMostActive = {},
+      onRefreshMostShorted = {},
+      onRefreshPortfolio = {},
+      onRefreshTrending = {},
+      onRefreshUndervaluedGrowth = {},
+      onRefreshWatchlist = {},
   )
 }

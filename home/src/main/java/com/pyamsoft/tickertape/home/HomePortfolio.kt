@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +28,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,19 +38,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 internal fun HomePortfolio(
     modifier: Modifier = Modifier,
     state: HomePortfolioViewState,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   val isLoading = state.isLoadingPortfolio
   val portfolio = state.portfolio
   val error = state.portfolioError
 
   val count = remember(portfolio) { portfolio.list.size }
-  val isVisible = remember(count) { count > 0 }
-  val isListVisible = remember(isVisible, isLoading) { isVisible || isLoading }
+  val isVisible =
+      remember(
+          count,
+          isLoading,
+      ) { count > 0 || isLoading }
+
+  LaunchedEffect(isVisible) {
+    val scope = this
+    if (isVisible) {
+      scope.onRefresh()
+    }
+  }
 
   Crossfade(
       modifier = modifier,
@@ -75,22 +87,17 @@ internal fun HomePortfolio(
           )
         }
 
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = isListVisible,
-        ) {
-          Box {
-            HomePortfolioSummaryItem(
-                modifier =
-                    Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
-                portfolio = portfolio,
-            )
+        Box {
+          HomePortfolioSummaryItem(
+              modifier =
+                  Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
+              portfolio = portfolio,
+          )
 
-            Loading(
-                isLoading = isLoading,
-                modifier = Modifier.matchParentSize(),
-            )
-          }
+          Loading(
+              isLoading = isLoading,
+              modifier = Modifier.matchParentSize(),
+          )
         }
       }
     } else {
@@ -157,6 +164,7 @@ private fun PreviewPortfolio() {
               override val portfolioError: Throwable? = null
               override val isLoadingPortfolio: Boolean = false
             },
+        onRefresh = {},
     )
   }
 }

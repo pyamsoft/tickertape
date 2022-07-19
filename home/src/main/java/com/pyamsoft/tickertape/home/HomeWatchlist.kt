@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,20 +44,28 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 internal fun HomeWatchlist(
     modifier: Modifier = Modifier,
     state: HomeWatchListViewState,
     onClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   val isLoading = state.isLoadingWatchlist
   val tickers = state.watchlist
   val error = state.watchlistError
 
   val count = remember(tickers) { tickers.size }
-  val isVisible = remember(count) { count > 0 }
-  val isListVisible = remember(isVisible, isLoading) { isVisible || isLoading }
+  val isVisible = remember(count, isLoading) { count > 0 || isLoading }
+
+  LaunchedEffect(isVisible) {
+    val scope = this
+    if (isVisible) {
+      scope.onRefresh()
+    }
+  }
 
   Crossfade(
       modifier = modifier,
@@ -79,22 +87,17 @@ internal fun HomeWatchlist(
           )
         }
 
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = isListVisible,
-        ) {
-          Box {
-            TickerList(
-                modifier = Modifier.fillMaxWidth(),
-                tickers = tickers,
-                onClick = onClicked,
-            )
+        Box {
+          TickerList(
+              modifier = Modifier.matchParentSize(),
+              tickers = tickers,
+              onClick = onClicked,
+          )
 
-            Loading(
-                isLoading = isLoading,
-                modifier = Modifier.matchParentSize(),
-            )
-          }
+          Loading(
+              isLoading = isLoading,
+              modifier = Modifier.matchParentSize(),
+          )
         }
       }
     } else {
@@ -202,6 +205,7 @@ private fun PreviewWatchlist() {
               override val isLoadingWatchlist: Boolean = false
             },
         onClicked = {},
+        onRefresh = {},
     )
   }
 }

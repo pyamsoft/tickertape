@@ -49,8 +49,10 @@ fun SearchBar(
   val selectedTabIndex = currentTab.ordinal
 
   LaunchedEffect(search, currentTab) {
+    val scope = this
+
     // Fire the processing effect after the search or tab changes
-    this.onRegenerateList()
+    scope.onRegenerateList()
   }
 
   Column(

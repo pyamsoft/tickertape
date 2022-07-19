@@ -27,7 +27,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
@@ -87,15 +86,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     SettingsDialog.show(requireActivity())
   }
 
-  private fun handleRefresh(force: Boolean) {
-    viewModel
-        .requireNotNull()
-        .handleRefreshList(
-            scope = viewLifecycleOwner.lifecycleScope,
-            force = force,
-        )
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -129,9 +119,18 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                     appName = appName,
                     imageLoader = loader,
                     navBarBottomHeight = mainState.bottomNavHeight,
-                    onRefresh = { handleRefresh(true) },
                     onSettingsClicked = { handleOpenSettingsDialog() },
                     onChartClicked = { handleOpenDigDialog(it) },
+                    onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
+                    onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
+                    onRefreshTrending = { vm.handleFetchTrending(this, false) },
+                    onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
+                    onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
+                    onRefreshLosers = { vm.handleFetchLosers(this, false) },
+                    onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
+                    onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
+                    onRefreshGainers = { vm.handleFetchGainers(this, false) },
+                    onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
                 )
               }
             }
@@ -145,11 +144,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     super.onViewCreated(view, savedInstanceState)
     viewModel.requireNotNull().restoreState(savedInstanceState)
     mainViewModel.requireNotNull().restoreState(savedInstanceState)
-  }
-
-  override fun onStart() {
-    super.onStart()
-    handleRefresh(false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

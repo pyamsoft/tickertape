@@ -32,6 +32,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +47,7 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 internal fun HomeIndexes(
@@ -53,6 +55,7 @@ internal fun HomeIndexes(
     state: HomeIndexesViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -62,6 +65,7 @@ internal fun HomeIndexes(
       tickers = state.indexes,
       error = state.indexesError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -71,6 +75,7 @@ internal fun HomeGainers(
     state: HomeGainersViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -80,6 +85,7 @@ internal fun HomeGainers(
       tickers = state.gainers,
       error = state.gainersError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -89,6 +95,7 @@ internal fun HomeLosers(
     state: HomeLosersViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -98,6 +105,7 @@ internal fun HomeLosers(
       tickers = state.losers,
       error = state.losersError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -107,6 +115,7 @@ internal fun HomeTrending(
     state: HomeTrendingViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -116,6 +125,7 @@ internal fun HomeTrending(
       tickers = state.trending,
       error = state.trendingError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -125,6 +135,7 @@ internal fun HomeMostShorted(
     state: HomeShortedViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -134,6 +145,7 @@ internal fun HomeMostShorted(
       tickers = state.mostShorted,
       error = state.mostShortedError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -143,6 +155,7 @@ internal fun HomeMostActive(
     state: HomeMostActiveViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -152,6 +165,7 @@ internal fun HomeMostActive(
       tickers = state.mostActive,
       error = state.mostActiveError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -161,6 +175,7 @@ internal fun HomeGrowthTech(
     state: HomeGrowthTechViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -170,6 +185,7 @@ internal fun HomeGrowthTech(
       tickers = state.growthTech,
       error = state.growthTechError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -179,6 +195,7 @@ internal fun HomeUndervaluedGrowth(
     state: HomeUndervaluedGrowthViewState,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
   HomeCharts(
       modifier = modifier,
@@ -188,6 +205,7 @@ internal fun HomeUndervaluedGrowth(
       tickers = state.undervaluedGrowth,
       error = state.undervaluedGrowthError,
       onChartClicked = onChartClicked,
+      onRefresh = onRefresh,
   )
 }
 
@@ -200,7 +218,16 @@ private fun HomeCharts(
     error: Throwable?,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
+    onRefresh: CoroutineScope.() -> Unit,
 ) {
+
+  LaunchedEffect(Unit) {
+    val scope = this
+
+    // Refresh when this composable enters the visual scope
+    scope.onRefresh()
+  }
+
   Crossfade(
       modifier = modifier,
       targetState = error,
@@ -311,11 +338,12 @@ private fun PreviewHomeCharts() {
                     chart = newTestChart(symbol),
                 ),
             ),
+        imageLoader = createNewTestImageLoader(),
         isLoading = false,
         name = "TEST STOCKS CHARTS",
         error = null,
         onChartClicked = {},
-        imageLoader = createNewTestImageLoader(),
+        onRefresh = {},
     )
   }
 }

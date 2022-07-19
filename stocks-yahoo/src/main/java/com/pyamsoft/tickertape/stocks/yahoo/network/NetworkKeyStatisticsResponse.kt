@@ -16,6 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.yahoo.network
 
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.squareup.moshi.JsonClass
 
 // https://query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory
@@ -69,12 +71,13 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
       @JsonClass(generateAdapter = true)
       internal data class Info
       internal constructor(
-          val enterpriseValud: YFData?,
+          val enterpriseValue: YFData?,
           val profitMargin: YFData?,
           val floatShares: YFData?,
           val sharesOutstanding: YFData?,
           val sharesShort: YFData?,
           val shortRatio: YFData?,
+          val heldPercentInsiders: YFData?,
           val heldPercentInstitutions: YFData?,
           val shortPercentOfFloat: YFData?,
           val beta: YFData?,
@@ -84,6 +87,7 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val mostRecentQuarter: YFData?,
           val earningsQuarterlyGrowth: YFData?,
           val netIncomeToCommon: YFData?,
+          val lastSplitDate: YFData?,
           val lastDividendValue: YFData?,
           val lastDividendDate: YFData?,
           val forwardEps: YFData?,
@@ -99,4 +103,23 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
       val fmt: String,
       val longFmt: String?,
   )
+}
+
+private data class YFDataPoint(
+    override val raw: Double,
+    override val fmt: String,
+) : KeyStatistics.DataPoint {
+  override val isEmpty: Boolean = false
+}
+
+@CheckResult
+internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
+    long: Boolean = false
+): KeyStatistics.DataPoint {
+  return if (this == null) KeyStatistics.DataPoint.EMPTY
+  else
+      YFDataPoint(
+          raw = this.raw,
+          fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
+      )
 }

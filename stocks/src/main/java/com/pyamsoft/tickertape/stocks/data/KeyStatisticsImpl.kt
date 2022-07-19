@@ -21,9 +21,24 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 internal data class KeyStatisticsImpl(
     private val symbol: StockSymbol,
+    private val earnings: KeyStatistics.Earnings,
+    private val financials: KeyStatistics.Financials,
+    private val info: KeyStatistics.Info,
 ) : KeyStatistics {
 
   override fun symbol(): StockSymbol {
     return symbol
+  }
+
+  override fun earnings(): KeyStatistics.Earnings {
+    return earnings
+  }
+
+  override fun financials(): KeyStatistics.Financials {
+    return financials
+  }
+
+  override fun info(): KeyStatistics.Info {
+    return info
   }
 }

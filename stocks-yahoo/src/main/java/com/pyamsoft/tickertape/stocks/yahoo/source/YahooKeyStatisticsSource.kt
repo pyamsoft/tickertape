@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkKeyStatisticsResponse
+import com.pyamsoft.tickertape.stocks.yahoo.network.asDataPoint
 import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
@@ -31,6 +32,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class YahooKeyStatisticsSource
 @Inject
@@ -69,12 +71,137 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
           return@coroutineScope jobs.awaitAll().map { paired ->
             return@map KeyStatistics.create(
                 symbol = paired.symbol,
+                earnings = createEarnings(paired.response),
+                financials = createFinancials(paired.response),
+                info = createInfo(paired.response),
             )
           }
         }
       }
 
   companion object {
+
+    private data class YFEarnings(
+        override val earningsDate: KeyStatistics.DataPoint,
+        override val earningsAverage: KeyStatistics.DataPoint,
+        override val earningsHigh: KeyStatistics.DataPoint,
+        override val earningsLow: KeyStatistics.DataPoint,
+        override val revenueAverage: KeyStatistics.DataPoint,
+        override val revenueHigh: KeyStatistics.DataPoint,
+        override val revenueLow: KeyStatistics.DataPoint,
+    ) : KeyStatistics.Earnings
+
+    @CheckResult
+    private fun NetworkKeyStatisticsResponse.getData():
+        NetworkKeyStatisticsResponse.Summary.Statistics {
+      return this.quoteSummary.result.first()
+    }
+
+    @CheckResult
+    private fun String?.asRecommendation(): KeyStatistics.Financials.Recommendation {
+      return if (this == null) {
+        Timber.w("Missing recommendation string")
+        KeyStatistics.Financials.Recommendation.UNKNOWN
+      } else {
+        try {
+          KeyStatistics.Financials.Recommendation.valueOf(this.uppercase())
+        } catch (e: Throwable) {
+          Timber.e(e, "Unknown recommendation string: $this")
+          KeyStatistics.Financials.Recommendation.UNKNOWN
+        }
+      }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun createEarnings(response: NetworkKeyStatisticsResponse): KeyStatistics.Earnings {
+      val earnings = response.getData().calendarEvents.earnings
+      return YFEarnings(
+          earningsDate = earnings?.earningsDate?.firstOrNull().asDataPoint(),
+          earningsAverage = earnings?.earningsAverage.asDataPoint(),
+          earningsLow = earnings?.earningsLow.asDataPoint(),
+          earningsHigh = earnings?.earningsHigh.asDataPoint(),
+          revenueAverage = earnings?.revenueAverage.asDataPoint(),
+          revenueLow = earnings?.revenueLow.asDataPoint(),
+          revenueHigh = earnings?.revenueHigh.asDataPoint(),
+      )
+    }
+
+    private data class YFFinancials(
+        override val targetHighPrice: KeyStatistics.DataPoint,
+        override val targetLowPrice: KeyStatistics.DataPoint,
+        override val targetMeanPrice: KeyStatistics.DataPoint,
+        override val recommendationMean: KeyStatistics.DataPoint,
+        override val numberOfAnalystOpinions: KeyStatistics.DataPoint,
+        override val recommendationKey: KeyStatistics.Financials.Recommendation
+    ) : KeyStatistics.Financials
+
+    @JvmStatic
+    @CheckResult
+    private fun createFinancials(response: NetworkKeyStatisticsResponse): KeyStatistics.Financials {
+      val data = response.getData().financialData
+      return YFFinancials(
+          targetHighPrice = data.targetHighPrice.asDataPoint(),
+          targetLowPrice = data.targetLowPrice.asDataPoint(),
+          targetMeanPrice = data.targetMeanPrice.asDataPoint(),
+          recommendationMean = data.recommendationMean.asDataPoint(),
+          recommendationKey = data.recommendationKey.asRecommendation(),
+          numberOfAnalystOpinions = data.numberOfAnalystOpinions.asDataPoint(),
+      )
+    }
+
+    private data class YFInfo(
+        override val beta: KeyStatistics.DataPoint,
+        override val enterpriseValue: KeyStatistics.DataPoint,
+        override val profitMargin: KeyStatistics.DataPoint,
+        override val floatShares: KeyStatistics.DataPoint,
+        override val sharesOutstanding: KeyStatistics.DataPoint,
+        override val sharesShort: KeyStatistics.DataPoint,
+        override val shortRatio: KeyStatistics.DataPoint,
+        override val heldPercentInsiders: KeyStatistics.DataPoint,
+        override val heldPercentInstitutions: KeyStatistics.DataPoint,
+        override val shortPercentOfFloat: KeyStatistics.DataPoint,
+        override val impliedSharesOutstanding: KeyStatistics.DataPoint,
+        override val lastFiscalYearEnd: KeyStatistics.DataPoint,
+        override val nextFiscalYearEnd: KeyStatistics.DataPoint,
+        override val mostRecentQuarter: KeyStatistics.DataPoint,
+        override val earningsQuarterlyGrowth: KeyStatistics.DataPoint,
+        override val netIncomeToCommon: KeyStatistics.DataPoint,
+        override val lastSplitDate: KeyStatistics.DataPoint,
+        override val lastDividendValue: KeyStatistics.DataPoint,
+        override val lastDividendDate: KeyStatistics.DataPoint,
+        override val forwardEps: KeyStatistics.DataPoint,
+        override val trailingEps: KeyStatistics.DataPoint
+    ) : KeyStatistics.Info
+
+    @JvmStatic
+    @CheckResult
+    private fun createInfo(response: NetworkKeyStatisticsResponse): KeyStatistics.Info {
+      val data = response.getData().defaultKeyStatistics
+      return YFInfo(
+          beta = data.beta.asDataPoint(),
+          enterpriseValue = data.enterpriseValue.asDataPoint(),
+          profitMargin = data.profitMargin.asDataPoint(),
+          floatShares = data.floatShares.asDataPoint(),
+          sharesOutstanding = data.sharesOutstanding.asDataPoint(),
+          sharesShort = data.sharesShort.asDataPoint(),
+          shortRatio = data.shortRatio.asDataPoint(),
+          heldPercentInsiders = data.heldPercentInsiders.asDataPoint(),
+          heldPercentInstitutions = data.heldPercentInstitutions.asDataPoint(),
+          shortPercentOfFloat = data.shortPercentOfFloat.asDataPoint(),
+          impliedSharesOutstanding = data.impliedSharesOutstanding.asDataPoint(),
+          lastFiscalYearEnd = data.lastFiscalYearEnd.asDataPoint(),
+          nextFiscalYearEnd = data.nextFiscalYearEnd.asDataPoint(),
+          mostRecentQuarter = data.mostRecentQuarter.asDataPoint(),
+          earningsQuarterlyGrowth = data.earningsQuarterlyGrowth.asDataPoint(),
+          netIncomeToCommon = data.netIncomeToCommon.asDataPoint(),
+          lastSplitDate = data.lastSplitDate.asDataPoint(),
+          lastDividendDate = data.lastDividendDate.asDataPoint(),
+          lastDividendValue = data.lastDividendValue.asDataPoint(),
+          forwardEps = data.forwardEps.asDataPoint(),
+          trailingEps = data.trailingEps.asDataPoint(),
+      )
+    }
 
     private val ALL_MODULES_STRING = YFModules.values().joinToString(separator = ",") { it.module }
 

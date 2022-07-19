@@ -20,10 +20,5 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 
 internal data class StockTrendsImpl(
-    private val symbols: List<StockSymbol>,
-) : StockTrends {
-
-  override fun symbols(): List<StockSymbol> {
-    return symbols
-  }
-}
+    override val symbols: List<StockSymbol>,
+) : StockTrends

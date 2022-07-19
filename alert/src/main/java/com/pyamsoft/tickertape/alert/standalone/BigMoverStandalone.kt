@@ -30,7 +30,7 @@ import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.mover.JsonMappableBigMoverReport
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.currentSession
+import com.pyamsoft.tickertape.stocks.api.asPercent
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,9 +59,9 @@ internal constructor(
       session: StockMarketSession,
   ): BigMoverReport {
     return this.lastNotified(now)
-        .lastPercent(session.percent())
-        .lastPrice(session.price())
-        .lastState(session.state())
+        .lastPercent(session.percent)
+        .lastPrice(session.price)
+        .lastState(session.state)
   }
 
   private suspend fun postNotifications(bigMovers: List<StockQuote>) {
@@ -71,14 +71,14 @@ internal constructor(
     val allQuotes = withContext(context = Dispatchers.IO) { bigMoverQueryDao.query(false) }
 
     bigMovers.forEach { quote ->
-      val moverRecord = allQuotes.firstOrNull { it.symbol == quote.symbol() }
+      val moverRecord = allQuotes.firstOrNull { it.symbol == quote.symbol }
       val insertRecord =
           if (moverRecord == null) {
             // If no mover record exists yet, make a new one
             JsonMappableBigMoverReport.create(quote)
           } else {
-            val session = quote.currentSession()
-            if (moverRecord.lastState != session.state()) {
+            val session = quote.currentSession
+            if (moverRecord.lastState != session.state) {
               // State has changed, update the record
               moverRecord.updateToSession(now, session)
             } else {
@@ -93,7 +93,7 @@ internal constructor(
           }
 
       if (insertRecord == null) {
-        Timber.w("Not showing repeat big mover notification for: ${quote.symbol()}")
+        Timber.w("Not showing repeat big mover notification for: ${quote.symbol}")
         return@forEach
       }
 
@@ -105,7 +105,7 @@ internal constructor(
   }
 
   private fun postNotification(quote: StockQuote) {
-    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { quote.symbol() }
+    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { quote.symbol }
     notifier.show(
             id = id,
             channelInfo = CHANNEL_INFO,
@@ -118,14 +118,18 @@ internal constructor(
   private fun List<StockQuote>.filterBigMovers(): List<StockQuote> {
     return this.asSequence()
         .filter { quote ->
-          val session = quote.currentSession()
-          val value = session.percent().value
-          return@filter value.compareTo(10.0) > 0 || value.compareTo(-10.0) < 1
+          val session = quote.currentSession
+          val value = session.percent
+          return@filter value.compareTo(BIG_MOVER_UP_PERCENT) > 0 ||
+              value.compareTo(BIG_MOVER_DOWN_PERCENT) < 1
         }
         .toList()
   }
 
   companion object {
+
+    private val BIG_MOVER_DOWN_PERCENT = (-10.0).asPercent()
+    private val BIG_MOVER_UP_PERCENT = 10.0.asPercent()
 
     // Don't notify between periods
     private const val NOTIFY_PERIOD = 6L

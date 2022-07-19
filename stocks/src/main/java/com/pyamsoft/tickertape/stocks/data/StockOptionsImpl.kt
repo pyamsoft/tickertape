@@ -25,107 +25,35 @@ import java.time.LocalDateTime
 
 internal data class StockOptionsImpl
 internal constructor(
-    private val symbol: StockSymbol,
-    private val expirationDates: List<LocalDateTime>,
-    private val strikes: List<StockMoneyValue>,
-    private val date: LocalDateTime,
-    private val calls: List<StockOptions.Call>,
-    private val puts: List<StockOptions.Put>
+    override val symbol: StockSymbol,
+    override val expirationDates: List<LocalDateTime>,
+    override val strikes: List<StockMoneyValue>,
+    override val date: LocalDateTime,
+    override val calls: List<StockOptions.Call>,
+    override val puts: List<StockOptions.Put>
 ) : StockOptions {
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun expirationDates(): List<LocalDateTime> {
-    return expirationDates
-  }
-
-  override fun strikes(): List<StockMoneyValue> {
-    return strikes
-  }
-
-  override fun date(): LocalDateTime {
-    return date
-  }
-
-  override fun calls(): List<StockOptions.Call> {
-    return calls
-  }
-
-  override fun puts(): List<StockOptions.Put> {
-    return puts
-  }
 
   internal data class ContractImpl
   internal constructor(
-      private val type: StockOptions.Contract.Type,
-      private val symbol: StockSymbol,
-      private val contractSymbol: StockSymbol,
-      private val strike: StockMoneyValue,
-      private val change: StockMoneyValue,
-      private val percent: StockPercent,
-      private val lastPrice: StockMoneyValue,
-      private val bid: StockMoneyValue,
-      private val ask: StockMoneyValue,
-      private val iv: StockPercent,
-      private val itm: Boolean,
+      override val type: StockOptions.Contract.Type,
+      override val symbol: StockSymbol,
+      override val contractSymbol: StockSymbol,
+      override val strike: StockMoneyValue,
+      override val change: StockMoneyValue,
+      override val percent: StockPercent,
+      override val lastPrice: StockMoneyValue,
+      override val bid: StockMoneyValue,
+      override val ask: StockMoneyValue,
+      override val iv: StockPercent,
+      override val itm: Boolean,
   ) : StockOptions.Contract, StockOptions.Call, StockOptions.Put {
 
-    private val mid: StockMoneyValue
+    override val mid: StockMoneyValue
 
     init {
       val bidValue = bid.value
       val diff = ask.value - bidValue
       mid = (bidValue + diff).asMoney()
-    }
-
-    override fun type(): StockOptions.Contract.Type {
-      return type
-    }
-
-    override fun symbol(): StockSymbol {
-      return symbol
-    }
-
-    override fun contractSymbol(): StockSymbol {
-      return contractSymbol
-    }
-
-    override fun strike(): StockMoneyValue {
-      return strike
-    }
-
-    override fun change(): StockMoneyValue {
-      return change
-    }
-
-    override fun percent(): StockPercent {
-      return percent
-    }
-
-    override fun lastPrice(): StockMoneyValue {
-      return lastPrice
-    }
-
-    override fun bid(): StockMoneyValue {
-      return bid
-    }
-
-    override fun ask(): StockMoneyValue {
-      return ask
-    }
-
-    override fun mid(): StockMoneyValue {
-      return mid
-    }
-
-    override fun iv(): StockPercent {
-      return iv
-    }
-
-    override fun itm(): Boolean {
-      return itm
     }
   }
 }

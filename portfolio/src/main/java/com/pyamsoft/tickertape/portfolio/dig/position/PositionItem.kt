@@ -71,7 +71,7 @@ private fun calculateDisplayValues(
 
     // Gain/Loss
     val gainLossValue = currentValue.value - totalCost.value
-    val gainLossPercent = ((gainLossValue * 100) / totalCost.value).asPercent().asPercentValue()
+    val gainLossPercent = ((gainLossValue * 100) / totalCost.value).asPercent().display
 
     val optionsScaledValue = if (isOption) (gainLossValue * 100) else gainLossValue
     val sideScaledValue = if (isSell) optionsScaledValue * -1 else optionsScaledValue

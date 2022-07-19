@@ -116,13 +116,13 @@ internal constructor(
         .asSequence()
         .filter { qs ->
           val symbol = qs.symbol.raw
-          val name = qs.quote?.company()?.company()
+          val name = qs.quote?.company?.company
           return@filter if (symbol.contains(search, ignoreCase = true)) true
           else name?.contains(search, ignoreCase = true) ?: false
         }
         .filter { qs ->
           // If the quote is null, always show this because it was a bad network fetch
-          val type = qs.quote?.type() ?: return@filter true
+          val type = qs.quote?.type ?: return@filter true
           return@filter when (section) {
             EquityType.STOCK -> type == EquityType.STOCK
             EquityType.OPTION -> type == EquityType.OPTION

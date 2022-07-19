@@ -22,11 +22,11 @@ import java.time.LocalDateTime
 
 interface StockOptionsQuote : StockQuote {
 
-  @CheckResult fun underlyingSymbol(): StockSymbol
+  @get:CheckResult val underlyingSymbol: StockSymbol
 
-  @CheckResult fun strike(): StockMoneyValue?
+  @get:CheckResult val strike: StockMoneyValue?
 
-  @CheckResult fun expireDate(): LocalDateTime
+  @get:CheckResult val expireDate: LocalDateTime
 
   companion object {
     @JvmStatic
@@ -49,21 +49,21 @@ interface StockOptionsQuote : StockQuote {
         dayVolume: StockVolumeValue,
     ): StockOptionsQuote {
       return StockOptionsQuoteImpl(
-          symbol = symbol,
-          underlyingSymbol = underlyingSymbol,
-          company = company,
-          strike = strike,
-          equityType = equityType,
-          expireDate = expireDate,
-          regular = regular,
-          preMarket = preMarket,
-          afterHours = afterHours,
-          dataDelayBy = dataDelayBy,
-          dayPreviousClose = dayPreviousClose,
-          dayHigh = dayHigh,
-          dayLow = dayLow,
-          dayOpen = dayOpen,
-          dayVolume = dayVolume,
+          underlyingSymbol,
+          strike,
+          expireDate,
+          symbol,
+          company,
+          equityType,
+          regular,
+          preMarket,
+          afterHours,
+          dataDelayBy,
+          dayPreviousClose,
+          dayHigh,
+          dayLow,
+          dayOpen,
+          dayVolume,
       )
     }
   }

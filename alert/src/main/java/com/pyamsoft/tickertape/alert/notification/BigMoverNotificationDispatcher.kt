@@ -39,7 +39,6 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -85,11 +84,11 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val activityIntent =
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol().raw)
-          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, quote.type().name)
+          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol.raw)
+          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, quote.type.name)
 
           val lookupSymbol =
-              if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
+              if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol
           putExtra(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL, lookupSymbol.raw)
         }
     return PendingIntent.getActivity(
@@ -108,12 +107,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
     guaranteeNotificationChannelExists(channelInfo)
 
     val quote = notification.quote
-    val session = quote.currentSession()
+    val session = quote.currentSession
 
-    val percent = session.percent()
-    val direction = session.direction()
+    val percent = session.percent
+    val direction = session.direction
     val sessionString =
-        when (session.state()) {
+        when (session.state) {
           MarketState.REGULAR -> "so far today"
           MarketState.PRE -> "pre-market"
           MarketState.POST -> "after hours"
@@ -139,15 +138,15 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     val title = buildSpannedString {
-      bold { append(quote.symbol().raw) }
+      bold { append(quote.symbol.raw) }
       append(" is $movingString today!")
     }
 
-    val symbol = quote.symbol()
+    val symbol = quote.symbol
     val description = buildSpannedString {
       bold { append(symbol.raw) }
       append(" is $directionString ")
-      bold { append(percent.asPercentValue()) }
+      bold { append(percent.display) }
       append(" $sessionString")
     }
 

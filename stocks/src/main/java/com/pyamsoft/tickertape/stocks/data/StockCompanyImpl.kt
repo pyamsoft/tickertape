@@ -19,14 +19,8 @@ package com.pyamsoft.tickertape.stocks.data
 import com.pyamsoft.tickertape.stocks.api.StockCompany
 
 internal data class StockCompanyImpl(
-    private val company: String,
+    override val company: String,
 ) : StockCompany {
 
-  override fun company(): String {
-    return company
-  }
-
-  override fun isValidCompany(): Boolean {
-    return company.isNotBlank()
-  }
+  override val isValidCompany: Boolean = company.isNotBlank()
 }

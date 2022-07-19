@@ -329,8 +329,8 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         val lookupSymbol =
             when (quote) {
               null -> null
-              is StockOptionsQuote -> quote.underlyingSymbol()
-              else -> quote.symbol()
+              is StockOptionsQuote -> quote.underlyingSymbol
+              else -> quote.symbol
             }
         return Screen(
             symbol = holding.symbol,

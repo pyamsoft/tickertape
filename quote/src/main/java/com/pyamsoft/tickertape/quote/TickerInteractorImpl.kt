@@ -74,8 +74,8 @@ internal constructor(
             val (quotes, charts) = parseResult(result)
             val tickers =
                 symbols.map { symbol ->
-                  val chart = charts.firstOrNull { it.symbol() == symbol }
-                  val quote = quotes.firstOrNull { it.symbol() == symbol }
+                  val chart = charts.firstOrNull { it.symbol == symbol }
+                  val quote = quotes.firstOrNull { it.symbol == symbol }
                   return@map Ticker(
                       symbol = symbol,
                       quote = quote,

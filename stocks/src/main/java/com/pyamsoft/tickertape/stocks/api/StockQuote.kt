@@ -21,31 +21,34 @@ import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 
 interface StockQuote {
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun company(): StockCompany
+  @get:CheckResult val company: StockCompany
 
-  @CheckResult fun type(): EquityType
+  @get:CheckResult val type: EquityType
 
-  @CheckResult fun regular(): StockMarketSession
+  @get:CheckResult val regular: StockMarketSession
 
-  @CheckResult fun preMarket(): StockMarketSession?
+  @get:CheckResult val preMarket: StockMarketSession?
 
-  @CheckResult fun afterHours(): StockMarketSession?
+  @get:CheckResult val afterHours: StockMarketSession?
 
-  @CheckResult fun dataDelayBy(): Long
+  @get:CheckResult val dataDelayBy: Long
 
-  @CheckResult fun dayPreviousClose(): StockMoneyValue?
+  @get:CheckResult val dayPreviousClose: StockMoneyValue?
 
-  @CheckResult fun dayOpen(): StockMoneyValue?
+  @get:CheckResult val dayOpen: StockMoneyValue?
 
-  @CheckResult fun dayHigh(): StockMoneyValue?
+  @get:CheckResult val dayHigh: StockMoneyValue?
 
-  @CheckResult fun dayLow(): StockMoneyValue?
+  @get:CheckResult val dayLow: StockMoneyValue?
 
-  @CheckResult fun dayVolume(): StockVolumeValue?
+  @get:CheckResult val dayVolume: StockVolumeValue?
+
+  @get:CheckResult val currentSession: StockMarketSession
 
   companion object {
+
     @JvmStatic
     @CheckResult
     fun create(
@@ -63,24 +66,19 @@ interface StockQuote {
         dayVolume: StockVolumeValue?,
     ): StockQuote {
       return StockQuoteImpl(
-          symbol = symbol,
-          company = company,
-          equityType = equityType,
-          regular = regular,
-          preMarket = preMarket,
-          afterHours = afterHours,
-          dataDelayBy = dataDelayBy,
-          dayPreviousClose = dayPreviousClose,
-          dayHigh = dayHigh,
-          dayLow = dayLow,
-          dayOpen = dayOpen,
-          dayVolume = dayVolume,
+          symbol,
+          company,
+          equityType,
+          regular,
+          preMarket,
+          afterHours,
+          dataDelayBy,
+          dayPreviousClose,
+          dayHigh,
+          dayLow,
+          dayOpen,
+          dayVolume,
       )
     }
   }
-}
-
-@CheckResult
-fun StockQuote.currentSession(): StockMarketSession {
-  return preMarket() ?: afterHours() ?: regular()
 }

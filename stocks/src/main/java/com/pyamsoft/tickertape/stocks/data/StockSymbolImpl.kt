@@ -20,4 +20,9 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 internal data class StockSymbolImpl(
     override val raw: String,
-) : StockSymbol
+) : StockSymbol {
+
+  override fun compareTo(other: StockSymbol): Int {
+    return this.raw.compareTo(other.raw, ignoreCase = true)
+  }
+}

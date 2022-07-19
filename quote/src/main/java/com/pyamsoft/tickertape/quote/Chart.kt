@@ -272,17 +272,17 @@ private class ChartAdapter(
   init {
     Enforcer.assertOffMainThread()
 
-    val closes = chart.close()
-    val baseline = chart.startingPrice()
+    val closes = chart.close
+    val baseline = chart.startingPrice
 
     val data =
-        chart.dates().mapIndexed { index, date ->
+        chart.dates.mapIndexed { index, date ->
           val close = closes[index]
           return@mapIndexed Chart.Data(
               high = high,
               low = low,
               baseline = baseline,
-              range = chart.range(),
+              range = chart.range,
               date = date,
               price = close,
           )

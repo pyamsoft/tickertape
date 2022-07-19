@@ -50,7 +50,7 @@ protected constructor(
                   ),
               )
               // Only pick out the single quote
-              .map { list -> list.first { it.symbol() == symbol } }
+              .map { list -> list.first { it.symbol == symbol } }
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting statistics: ${symbol.raw}")

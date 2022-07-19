@@ -45,7 +45,7 @@ fun DigNews(
     ) {
       items(
           items = news,
-          key = { it.id() },
+          key = { it.id },
       ) { n ->
         NewsItem(
             modifier = Modifier.fillMaxWidth(),
@@ -61,11 +61,11 @@ private fun NewsItem(
     modifier: Modifier = Modifier,
     news: StockNews,
 ) {
-  val title = news.title()
-  val description = news.description()
-  val source = news.sourceName()
-  val date = news.publishedAt()
-  val link = news.link()
+  val title = news.title
+  val description = news.description
+  val source = news.sourceName
+  val date = news.publishedAt
+  val link = news.link
   val uriHandler = LocalUriHandler.current
 
   val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }

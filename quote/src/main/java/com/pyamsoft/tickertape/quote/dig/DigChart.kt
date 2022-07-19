@@ -210,7 +210,7 @@ private fun CurrentPriceDisplay(
         )
         Text(
             modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-            text = "(${diff.direction.sign}${diff.percent.asPercentValue()})",
+            text = "(${diff.direction.sign}${diff.percent.display})",
             style = MaterialTheme.typography.caption.copy(color = diff.color),
         )
       }

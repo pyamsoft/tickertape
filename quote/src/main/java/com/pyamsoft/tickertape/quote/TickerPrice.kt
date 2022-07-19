@@ -17,7 +17,6 @@ import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.currentSession
 
 @Composable
 @JvmOverloads
@@ -32,10 +31,10 @@ fun TickerPrice(
         modifier = modifier,
         horizontalAlignment = Alignment.End,
     ) {
-      val session = quote.currentSession()
+      val session = quote.currentSession
 
-      val direction = session.direction()
-      val directionSign = session.direction().sign
+      val direction = session.direction
+      val directionSign = session.direction.sign
       val composeColor =
           if (direction.isZero) {
             MaterialTheme.typography.caption.color
@@ -45,7 +44,7 @@ fun TickerPrice(
 
       Text(
           text =
-              when (session.state()) {
+              when (session.state) {
                 MarketState.REGULAR -> "Normal Market"
                 MarketState.POST -> "After Hours"
                 MarketState.PRE -> "Pre-Market"
@@ -53,19 +52,19 @@ fun TickerPrice(
           style = MaterialTheme.typography.caption,
       )
       Text(
-          text = session.price().display,
+          text = session.price.display,
           style = MaterialTheme.typography.body2.copy(color = composeColor),
       )
       Row(
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-            text = "${directionSign}${session.amount().display}",
+            text = "${directionSign}${session.amount.display}",
             style = MaterialTheme.typography.caption.copy(color = composeColor),
         )
         Text(
             modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-            text = "(${directionSign}${session.percent().asPercentValue()})",
+            text = "(${directionSign}${session.percent.display})",
             style = MaterialTheme.typography.caption.copy(color = composeColor),
         )
       }

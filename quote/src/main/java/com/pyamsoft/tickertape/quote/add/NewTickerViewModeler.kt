@@ -116,7 +116,7 @@ internal constructor(
               // Auto select the valid symbol if we found a quote for it
               onSearchResultSelected(
                   scope = this,
-                  symbol = q.symbol(),
+                  symbol = q.symbol,
                   dismiss = false,
               )
             }
@@ -153,10 +153,10 @@ internal constructor(
           }
           .onSuccess { r ->
             // Auto select a matching symbol if one is exact
-            r.firstOrNull { it.symbol() == symbol.asSymbol() }?.also { result ->
+            r.firstOrNull { it.symbol == symbol.asSymbol() }?.also { result ->
               onSearchResultSelected(
                   scope = scope,
-                  symbol = result.symbol(),
+                  symbol = result.symbol,
                   dismiss = false,
               )
             }
@@ -178,10 +178,10 @@ internal constructor(
     } else {
       results.filter { result ->
         when (equityType) {
-          EquityType.STOCK -> result.type() == EquityType.STOCK
+          EquityType.STOCK -> result.type == EquityType.STOCK
           // STOCK instead of OPTION since we will use the STOCK to build the OPTION lookup
-          EquityType.OPTION -> result.type() == EquityType.STOCK
-          EquityType.CRYPTOCURRENCY -> result.type() == EquityType.CRYPTOCURRENCY
+          EquityType.OPTION -> result.type == EquityType.STOCK
+          EquityType.CRYPTOCURRENCY -> result.type == EquityType.CRYPTOCURRENCY
         }
       }
     }
@@ -286,7 +286,7 @@ internal constructor(
     // Manually selected so we dismiss the dropdown
     onSearchResultSelected(
         scope = scope,
-        symbol = result.symbol(),
+        symbol = result.symbol,
         dismiss = true,
     )
   }

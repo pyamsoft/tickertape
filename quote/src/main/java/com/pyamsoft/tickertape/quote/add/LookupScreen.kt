@@ -190,8 +190,8 @@ private fun ResultItem(
     modifier: Modifier = Modifier,
     result: SearchResult,
 ) {
-  val symbol = result.symbol()
-  val company = result.name()
+  val symbol = result.symbol
+  val company = result.name
 
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.baseline),
@@ -205,9 +205,9 @@ private fun ResultItem(
                 fontWeight = FontWeight.SemiBold,
             ),
     )
-    if (company.isValidCompany()) {
+    if (company.isValidCompany) {
       Text(
-          text = company.company(),
+          text = company.company,
           style = MaterialTheme.typography.caption,
       )
     }

@@ -22,21 +22,22 @@ import java.time.LocalDateTime
 
 interface StockNews {
 
-  @CheckResult fun id(): String
+  @get:CheckResult val id: String
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun publishedAt(): LocalDateTime?
+  @get:CheckResult val publishedAt: LocalDateTime?
 
-  @CheckResult fun title(): String
+  @get:CheckResult val title: String
 
-  @CheckResult fun description(): String
+  @get:CheckResult val description: String
 
-  @CheckResult fun link(): String
+  @get:CheckResult val link: String
 
-  @CheckResult fun sourceName(): String
+  @get:CheckResult val sourceName: String
 
   companion object {
+
     @JvmStatic
     @CheckResult
     fun create(

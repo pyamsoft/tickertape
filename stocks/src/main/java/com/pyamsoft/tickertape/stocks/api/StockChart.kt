@@ -25,21 +25,21 @@ import java.time.LocalDateTime
 
 interface StockChart {
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun range(): IntervalRange
+  @get:CheckResult val range: IntervalRange
 
-  @CheckResult fun interval(): IntervalTime
+  @get:CheckResult val interval: IntervalTime
 
-  @CheckResult fun startingPrice(): StockMoneyValue
+  @get:CheckResult val startingPrice: StockMoneyValue
 
-  @CheckResult fun currentPrice(): StockMoneyValue
+  @get:CheckResult val currentPrice: StockMoneyValue
 
-  @CheckResult fun currentDate(): LocalDateTime
+  @get:CheckResult val currentDate: LocalDateTime
 
-  @CheckResult fun dates(): List<LocalDateTime>
+  @get:CheckResult val dates: List<LocalDateTime>
 
-  @CheckResult fun close(): List<StockMoneyValue>
+  @get:CheckResult val close: List<StockMoneyValue>
 
   enum class IntervalTime(val apiValue: String, val display: String) {
     ONE_MINUTE("1m", "1 Minute"),
@@ -99,7 +99,7 @@ interface StockChart {
 fun StockChart.periodHigh(): StockMoneyValue {
   Enforcer.assertOffMainThread()
 
-  return close().maxByOrNull { it.value }.requireNotNull()
+  return close.maxByOrNull { it.value }.requireNotNull()
 }
 
 @CheckResult
@@ -107,5 +107,5 @@ fun StockChart.periodHigh(): StockMoneyValue {
 fun StockChart.periodLow(): StockMoneyValue {
   Enforcer.assertOffMainThread()
 
-  return close().minByOrNull { it.value }.requireNotNull()
+  return close.minByOrNull { it.value }.requireNotNull()
 }

@@ -69,8 +69,8 @@ internal class MemoryKeyStatisticsCacheImpl @Inject internal constructor() : Key
           if (stillNeeded.isNotEmpty()) {
             val upstreamResult = resolve(stillNeeded)
             for (res in upstreamResult) {
-              statistics.getOrPut(res.symbol()) { createNewMemoryCacheStorage() }
-              statistics[res.symbol()]?.cache(res)
+              statistics.getOrPut(res.symbol) { createNewMemoryCacheStorage() }
+              statistics[res.symbol]?.cache(res)
               result.add(res)
             }
           }

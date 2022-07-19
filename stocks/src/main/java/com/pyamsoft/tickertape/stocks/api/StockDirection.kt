@@ -43,8 +43,8 @@ interface StockDirection : StockNumberValue {
 fun Double.asDirection(): StockDirection {
   val comparison = this.compareTo(0)
   return when {
-    comparison == 0 -> StockDirection.NONE
+    comparison < 0 -> StockDirection.DOWN
     comparison > 0 -> StockDirection.UP
-    else -> StockDirection.DOWN
+    else -> StockDirection.NONE
   }
 }

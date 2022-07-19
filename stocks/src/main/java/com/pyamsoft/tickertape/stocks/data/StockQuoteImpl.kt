@@ -25,65 +25,19 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 
 internal data class StockQuoteImpl(
-    private val symbol: StockSymbol,
-    private val company: StockCompany,
-    private val equityType: EquityType,
-    private val regular: StockMarketSession,
-    private val preMarket: StockMarketSession?,
-    private val afterHours: StockMarketSession?,
-    private val dataDelayBy: Long,
-    private val dayPreviousClose: StockMoneyValue?,
-    private val dayHigh: StockMoneyValue?,
-    private val dayLow: StockMoneyValue?,
-    private val dayOpen: StockMoneyValue?,
-    private val dayVolume: StockVolumeValue?,
+    override val symbol: StockSymbol,
+    override val company: StockCompany,
+    override val type: EquityType,
+    override val regular: StockMarketSession,
+    override val preMarket: StockMarketSession?,
+    override val afterHours: StockMarketSession?,
+    override val dataDelayBy: Long,
+    override val dayPreviousClose: StockMoneyValue?,
+    override val dayHigh: StockMoneyValue?,
+    override val dayLow: StockMoneyValue?,
+    override val dayOpen: StockMoneyValue?,
+    override val dayVolume: StockVolumeValue?,
 ) : StockQuote {
 
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun type(): EquityType {
-    return equityType
-  }
-
-  override fun dataDelayBy(): Long {
-    return dataDelayBy
-  }
-
-  override fun company(): StockCompany {
-    return company
-  }
-
-  override fun regular(): StockMarketSession {
-    return regular
-  }
-
-  override fun preMarket(): StockMarketSession? {
-    return preMarket
-  }
-
-  override fun afterHours(): StockMarketSession? {
-    return afterHours
-  }
-
-  override fun dayPreviousClose(): StockMoneyValue? {
-    return dayPreviousClose
-  }
-
-  override fun dayVolume(): StockVolumeValue? {
-    return dayVolume
-  }
-
-  override fun dayOpen(): StockMoneyValue? {
-    return dayOpen
-  }
-
-  override fun dayLow(): StockMoneyValue? {
-    return dayLow
-  }
-
-  override fun dayHigh(): StockMoneyValue? {
-    return dayHigh
-  }
+  override val currentSession: StockMarketSession = preMarket ?: afterHours ?: regular
 }

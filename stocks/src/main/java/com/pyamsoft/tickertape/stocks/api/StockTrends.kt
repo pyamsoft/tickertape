@@ -21,7 +21,7 @@ import com.pyamsoft.tickertape.stocks.data.StockTrendsImpl
 
 interface StockTrends {
 
-  @CheckResult fun symbols(): List<StockSymbol>
+  @get:CheckResult val symbols: List<StockSymbol>
 
   companion object {
 
@@ -31,7 +31,7 @@ interface StockTrends {
         symbols: List<StockSymbol>,
     ): StockTrends {
       return StockTrendsImpl(
-          symbols = symbols,
+          symbols,
       )
     }
   }

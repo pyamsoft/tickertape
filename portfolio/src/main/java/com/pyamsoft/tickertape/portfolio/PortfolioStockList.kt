@@ -68,12 +68,12 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
 
     val totalSign = sumTotalDirection.sign
     gainLossDisplayString =
-        "${totalSign}${sumTotalGainLossNumber.asMoney().display} (${totalSign}${sumTotalPercentNumber.asPercent().asPercentValue()})"
+        "${totalSign}${sumTotalGainLossNumber.asMoney().display} (${totalSign}${sumTotalPercentNumber.asPercent().display})"
 
     val sumTodayChange = sumTodayChangeNumber.asMoney()
     val sign = sumTodayDirection.sign
     changeTodayDisplayString =
-        "${sign}${sumTodayChange.display} (${sign}${sumTodayPercentNumber.asPercent().asPercentValue()})"
+        "${sign}${sumTodayChange.display} (${sign}${sumTodayPercentNumber.asPercent().display})"
   }
 
   companion object {

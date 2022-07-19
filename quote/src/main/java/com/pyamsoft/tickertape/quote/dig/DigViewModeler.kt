@@ -74,7 +74,7 @@ protected constructor(
           withContext(context = Dispatchers.IO) {
             Enforcer.assertOffMainThread()
 
-            return@withContext news.sortedByDescending { it.publishedAt() }
+            return@withContext news.sortedByDescending { it.publishedAt}
           }
         }
         .onSuccess { n ->
@@ -104,7 +104,7 @@ protected constructor(
         .onSuccess { t -> s.apply { ticker = t } }
         .onSuccess { ticker ->
           ticker.chart?.also { c ->
-            if (c.dates().isEmpty()) {
+            if (c.dates.isEmpty()) {
               Timber.w("No dates, can't pick currentDate and currentPrice")
               return@also
             }
@@ -113,7 +113,7 @@ protected constructor(
               onInitialLoad(c)
 
               // Set the opening price based on the current chart
-              openingPrice = c.startingPrice()
+              openingPrice = c.startingPrice
 
               // Clear the error on load success
               chartError = null
@@ -135,8 +135,8 @@ protected constructor(
       return
     }
 
-    currentDate = chart.currentDate()
-    currentPrice = chart.currentPrice()
+    currentDate = chart.currentDate
+    currentPrice = chart.currentPrice
   }
 
   fun handleRangeSelected(

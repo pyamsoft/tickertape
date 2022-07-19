@@ -150,7 +150,7 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      quote.dayOpen()?.also { open ->
+      quote.dayOpen?.also { open ->
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Open",
@@ -158,7 +158,7 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         )
       }
 
-      quote.dayPreviousClose()?.also { close ->
+      quote.dayPreviousClose?.also { close ->
         Info(
             name = "Previous Close",
             value = close.display,
@@ -170,25 +170,25 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      quote.dayLow()?.also { low ->
+      quote.dayLow?.also { low ->
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Low",
             value = low.display,
         )
       }
-      quote.dayHigh()?.also { high ->
+      quote.dayHigh?.also { high ->
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "High",
             value = high.display,
         )
       }
-      quote.dayVolume()?.also { volume ->
+      quote.dayVolume?.also { volume ->
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Volume",
-            value = volume.asVolumeValue(),
+            value = volume.display,
         )
       }
     }

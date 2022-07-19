@@ -21,7 +21,7 @@ import com.pyamsoft.tickertape.stocks.data.StockVolumeValueImpl
 
 interface StockVolumeValue : StockLongValue {
 
-  @CheckResult fun asVolumeValue(): String
+  @get:CheckResult val display: String
 
   companion object {
 

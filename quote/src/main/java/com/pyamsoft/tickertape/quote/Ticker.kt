@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.quote
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.currentSession
 
 data class Ticker(
     val symbol: StockSymbol,
@@ -37,7 +36,7 @@ data class Ticker(
 
           // If no quote, sort by symbol
           if (q1 == null && q2 == null) {
-            return@Comparator s2.symbol.raw.compareTo(s1.symbol.raw, ignoreCase = true)
+            return@Comparator s2.symbol.compareTo(s1.symbol)
           }
 
           // If either has a quote, it goes first
@@ -51,10 +50,7 @@ data class Ticker(
           }
 
           // Sort by the change percent
-          return@Comparator q2.currentSession()
-              .percent()
-              .value
-              .compareTo(q1.currentSession().percent().value)
+          return@Comparator q2.currentSession.percent.compareTo(q1.currentSession.percent)
         }
   }
 }

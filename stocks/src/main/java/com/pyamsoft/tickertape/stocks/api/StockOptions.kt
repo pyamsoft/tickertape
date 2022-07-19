@@ -22,43 +22,43 @@ import java.time.LocalDateTime
 
 interface StockOptions {
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun expirationDates(): List<LocalDateTime>
+  @get:CheckResult val expirationDates: List<LocalDateTime>
 
-  @CheckResult fun strikes(): List<StockMoneyValue>
+  @get:CheckResult val strikes: List<StockMoneyValue>
 
-  @CheckResult fun date(): LocalDateTime
+  @get:CheckResult val date: LocalDateTime
 
-  @CheckResult fun calls(): List<Call>
+  @get:CheckResult val calls: List<Call>
 
-  @CheckResult fun puts(): List<Put>
+  @get:CheckResult val puts: List<Put>
 
   interface Contract {
 
-    @CheckResult fun type(): Type
+    @get:CheckResult val type: Type
 
-    @CheckResult fun symbol(): StockSymbol
+    @get:CheckResult val symbol: StockSymbol
 
-    @CheckResult fun contractSymbol(): StockSymbol
+    @get:CheckResult val contractSymbol: StockSymbol
 
-    @CheckResult fun strike(): StockMoneyValue
+    @get:CheckResult val strike: StockMoneyValue
 
-    @CheckResult fun change(): StockMoneyValue
+    @get:CheckResult val change: StockMoneyValue
 
-    @CheckResult fun percent(): StockPercent
+    @get:CheckResult val percent: StockPercent
 
-    @CheckResult fun lastPrice(): StockMoneyValue
+    @get:CheckResult val lastPrice: StockMoneyValue
 
-    @CheckResult fun bid(): StockMoneyValue
+    @get:CheckResult val bid: StockMoneyValue
 
-    @CheckResult fun ask(): StockMoneyValue
+    @get:CheckResult val ask: StockMoneyValue
 
-    @CheckResult fun mid(): StockMoneyValue
+    @get:CheckResult val mid: StockMoneyValue
 
-    @CheckResult fun iv(): StockPercent
+    @get:CheckResult val iv: StockPercent
 
-    @CheckResult fun itm(): Boolean
+    @get:CheckResult val itm: Boolean
 
     enum class Type {
       CALL,
@@ -82,17 +82,17 @@ interface StockOptions {
           itm: Boolean,
       ): StockOptionsImpl.ContractImpl {
         return StockOptionsImpl.ContractImpl(
-            type = type,
-            symbol = symbol,
-            contractSymbol = contractSymbol,
-            strike = strike,
-            change = change,
-            percent = percent,
-            lastPrice = lastPrice,
-            bid = bid,
-            ask = ask,
-            iv = iv,
-            itm = itm,
+            type,
+            symbol,
+            contractSymbol,
+            strike,
+            change,
+            percent,
+            lastPrice,
+            bid,
+            ask,
+            iv,
+            itm,
         )
       }
 
@@ -113,17 +113,17 @@ interface StockOptions {
       ): T {
         @Suppress("UNCHECKED_CAST")
         return createContract(
-            type = type,
-            symbol = symbol,
-            contractSymbol = contractSymbol,
-            strike = strike,
-            change = change,
-            percent = percent,
-            lastPrice = lastPrice,
-            bid = bid,
-            ask = ask,
-            iv = iv,
-            itm = itm,
+            type,
+            symbol,
+            contractSymbol,
+            strike,
+            change,
+            percent,
+            lastPrice,
+            bid,
+            ask,
+            iv,
+            itm,
         ) as
             T
       }
@@ -146,12 +146,12 @@ interface StockOptions {
         puts: List<Put>
     ): StockOptions {
       return StockOptionsImpl(
-          symbol = symbol,
-          expirationDates = expirationDates,
-          strikes = strikes,
-          date = date,
-          calls = calls,
-          puts = puts,
+          symbol,
+          expirationDates,
+          strikes,
+          date,
+          calls,
+          puts,
       )
     }
   }

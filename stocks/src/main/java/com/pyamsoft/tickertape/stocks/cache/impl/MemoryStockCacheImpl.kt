@@ -72,8 +72,8 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
           if (stillNeeded.isNotEmpty()) {
             val upstreamResult = resolve(stillNeeded)
             for (res in upstreamResult) {
-              quotes.getOrPut(res.symbol()) { createNewMemoryCacheStorage() }
-              quotes[res.symbol()]?.cache(res)
+              quotes.getOrPut(res.symbol) { createNewMemoryCacheStorage() }
+              quotes[res.symbol]?.cache(res)
               result.add(res)
             }
           }
@@ -116,7 +116,7 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
           if (stillNeeded.isNotEmpty()) {
             val upstreamResult = resolve(stillNeeded, range)
             for (res in upstreamResult) {
-              val key = ChartKey(res.symbol(), range)
+              val key = ChartKey(res.symbol, range)
               charts.getOrPut(key) { createNewMemoryCacheStorage() }
               charts[key]?.cache(res)
               result.add(res)

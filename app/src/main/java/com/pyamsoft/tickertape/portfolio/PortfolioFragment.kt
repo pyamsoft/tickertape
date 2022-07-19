@@ -47,8 +47,6 @@ import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.TickerDestination
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import javax.inject.Inject
 
@@ -64,7 +62,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   private fun handleOpenManageDialog(stock: PortfolioStock) {
     val quote = stock.ticker?.quote
-    val session = quote?.currentSession()
+    val session = quote?.currentSession
 
     navigator
         .requireNotNull()
@@ -72,7 +70,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             PortfolioDigFragment.Screen.create(
                 holding = stock.holding,
                 quote = quote,
-                currentPrice = session?.price(),
+                currentPrice = session?.price,
             ),
         )
   }

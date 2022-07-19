@@ -32,7 +32,9 @@ internal data class StockPercentImpl(
 
   override val isZero: Boolean = value.isZero()
 
-  override fun asPercentValue(): String {
-    return stockPercent
+  override val display: String = stockPercent
+
+  override fun compareTo(other: StockPercent): Int {
+    return this.value.compareTo(other.value)
   }
 }

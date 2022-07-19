@@ -30,9 +30,9 @@ fun TickerName(
     )
 
     if (quote != null) {
-      if (quote.company().isValidCompany()) {
+      if (quote.company.isValidCompany) {
         Text(
-            text = quote.company().company(),
+            text = quote.company.company,
             style = MaterialTheme.typography.body2,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,

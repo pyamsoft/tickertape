@@ -21,40 +21,11 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
 internal data class StockNewsImpl(
-    private val id: String,
-    private val symbol: StockSymbol,
-    private val publishedAt: LocalDateTime?,
-    private val title: String,
-    private val description: String,
-    private val link: String,
-    private val sourceName: String,
-) : StockNews {
-
-  override fun id(): String {
-    return id
-  }
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun publishedAt(): LocalDateTime? {
-    return publishedAt
-  }
-
-  override fun title(): String {
-    return title
-  }
-
-  override fun description(): String {
-    return description
-  }
-
-  override fun link(): String {
-    return link
-  }
-
-  override fun sourceName(): String {
-    return sourceName
-  }
-}
+    override val id: String,
+    override val symbol: StockSymbol,
+    override val publishedAt: LocalDateTime?,
+    override val title: String,
+    override val description: String,
+    override val link: String,
+    override val sourceName: String,
+) : StockNews

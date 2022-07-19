@@ -32,7 +32,5 @@ internal data class StockVolumeValueImpl(
 
   override val isZero: Boolean = value.isZero()
 
-  override fun asVolumeValue(): String {
-    return volume
-  }
+  override val display: String = volume
 }

@@ -23,30 +23,9 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 
 internal data class StockMarketSessionImpl(
-    private val direction: StockDirection,
-    private val price: StockMoneyValue,
-    private val amount: StockMoneyValue,
-    private val percent: StockPercent,
-    private val state: MarketState,
-) : StockMarketSession {
-
-  override fun direction(): StockDirection {
-    return direction
-  }
-
-  override fun percent(): StockPercent {
-    return percent
-  }
-
-  override fun price(): StockMoneyValue {
-    return price
-  }
-
-  override fun amount(): StockMoneyValue {
-    return amount
-  }
-
-  override fun state(): MarketState {
-    return state
-  }
-}
+    override val direction: StockDirection,
+    override val price: StockMoneyValue,
+    override val amount: StockMoneyValue,
+    override val percent: StockPercent,
+    override val state: MarketState,
+) : StockMarketSession

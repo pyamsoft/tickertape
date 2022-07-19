@@ -22,25 +22,8 @@ import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 internal data class SearchResultImpl(
-    private val symbol: StockSymbol,
-    private val name: StockCompany,
-    private val score: Long,
-    private val type: EquityType,
-) : SearchResult {
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun name(): StockCompany {
-    return name
-  }
-
-  override fun score(): Long {
-    return score
-  }
-
-  override fun type(): EquityType {
-    return type
-  }
-}
+    override val symbol: StockSymbol,
+    override val name: StockCompany,
+    override val score: Long,
+    override val type: EquityType,
+) : SearchResult

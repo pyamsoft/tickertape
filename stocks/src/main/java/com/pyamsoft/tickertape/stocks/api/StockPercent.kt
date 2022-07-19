@@ -21,12 +21,13 @@ import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
 
 interface StockPercent : StockDoubleValue {
 
-  @CheckResult fun asPercentValue(): String
+  @get:CheckResult val display: String
+
+  @CheckResult fun compareTo(other: StockPercent): Int
 
   companion object {
 
     val NONE: StockPercent = 0.0.asPercent()
-
   }
 }
 

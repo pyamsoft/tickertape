@@ -21,13 +21,13 @@ import com.pyamsoft.tickertape.stocks.data.SearchResultImpl
 
 interface SearchResult {
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun name(): StockCompany
+  @get:CheckResult val name: StockCompany
 
-  @CheckResult fun score(): Long
+  @get:CheckResult val score: Long
 
-  @CheckResult fun type(): EquityType
+  @get:CheckResult val type: EquityType
 
   companion object {
     @JvmStatic

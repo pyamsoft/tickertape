@@ -21,11 +21,11 @@ import com.pyamsoft.tickertape.stocks.data.StockTopsImpl
 
 interface StockTops {
 
-  @CheckResult fun title(): String
+  @get:CheckResult val title: String
 
-  @CheckResult fun description(): String
+  @get:CheckResult val description: String
 
-  @CheckResult fun quotes(): List<StockQuote>
+  @get:CheckResult val quotes: List<StockQuote>
 
   companion object {
 
@@ -37,9 +37,9 @@ interface StockTops {
         quotes: List<StockQuote>,
     ): StockTops {
       return StockTopsImpl(
-          title = title,
-          description = description,
-          quotes = quotes,
+          title,
+          description,
+          quotes,
       )
     }
   }

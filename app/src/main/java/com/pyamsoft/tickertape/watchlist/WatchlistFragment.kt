@@ -70,8 +70,8 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       return
     }
 
-    val equityType = quote.type()
-    val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
+    val equityType = quote.type
+    val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol
 
     navigator
         .requireNotNull()

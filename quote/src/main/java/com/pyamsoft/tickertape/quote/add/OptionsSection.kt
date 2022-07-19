@@ -86,11 +86,11 @@ private fun OptionsStrikeExpiration(
   val option = state.resolvedOption ?: return
 
   val selectedExpirationDate = state.optionExpirationDate
-  val allExpirationDates = option.expirationDates()
+  val allExpirationDates = option.expirationDates
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
 
   val selectedStrikePrice = state.optionStrikePrice
-  val allStrikes = option.strikes()
+  val allStrikes = option.strikes
 
   Row(
       modifier = modifier,

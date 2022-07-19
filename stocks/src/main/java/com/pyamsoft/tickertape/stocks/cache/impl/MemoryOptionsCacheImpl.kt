@@ -69,8 +69,8 @@ internal class MemoryOptionsCacheImpl @Inject internal constructor() : OptionsCa
           if (stillNeeded.isNotEmpty()) {
             val upstreamResult = resolve(stillNeeded)
             for (res in upstreamResult) {
-              options.getOrPut(res.symbol()) { createNewMemoryCacheStorage() }
-              options[res.symbol()]?.cache(res)
+              options.getOrPut(res.symbol) { createNewMemoryCacheStorage() }
+              options[res.symbol]?.cache(res)
               result.add(res)
             }
           }

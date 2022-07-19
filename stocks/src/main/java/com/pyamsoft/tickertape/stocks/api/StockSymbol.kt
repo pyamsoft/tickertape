@@ -22,11 +22,13 @@ import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
 interface StockSymbol {
 
   @get:CheckResult val raw: String
+
+  @CheckResult fun compareTo(other: StockSymbol): Int
 }
 
 @CheckResult
 fun String.asSymbol(): StockSymbol {
   return StockSymbolImpl(
-      raw = this.trim().uppercase(),
+      this.trim().uppercase(),
   )
 }

@@ -20,20 +20,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockTops
 
 internal data class StockTopsImpl(
-    private val title: String,
-    private val description: String,
-    private val quotes: List<StockQuote>,
-) : StockTops {
-
-  override fun title(): String {
-    return title
-  }
-
-  override fun description(): String {
-    return description
-  }
-
-  override fun quotes(): List<StockQuote> {
-    return quotes
-  }
-}
+    override val title: String,
+    override val description: String,
+    override val quotes: List<StockQuote>,
+) : StockTops

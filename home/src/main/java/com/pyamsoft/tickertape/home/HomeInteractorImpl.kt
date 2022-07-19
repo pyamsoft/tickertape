@@ -63,7 +63,7 @@ internal constructor(
 
         return@withContext try {
           val top = stockInteractor.getScreener(force, screener, count)
-          lookupCharts(force, top.quotes().map { it.symbol() })
+          lookupCharts(force, top.quotes.map { it.symbol })
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting screener: $screener")
@@ -82,7 +82,7 @@ internal constructor(
 
         return@withContext try {
           val trend = stockInteractor.getTrending(force, count)
-          lookupCharts(force, trend.symbols())
+          lookupCharts(force, trend.symbols)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting day trending")

@@ -116,7 +116,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext chartSource.getCharts(force, symbols, range)
             // Remove any duplicated symbols, we expect only one
-            .distinctBy { it.symbol() }
+            .distinctBy { it.symbol }
       }
 
   override suspend fun resolveOptionLookupIdentifier(

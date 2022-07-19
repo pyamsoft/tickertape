@@ -85,9 +85,9 @@ internal constructor(
         tempTodayChange = NO_POSITION
         tempTodayNumber = NO_POSITION
       } else {
-        val reg = q.regular()
-        tempTodayChange = reg.amount().value * totalSharesNumber
-        tempTodayNumber = reg.price().value * totalSharesNumber
+        val reg = q.regular
+        tempTodayChange = reg.amount.value * totalSharesNumber
+        tempTodayNumber = reg.price.value * totalSharesNumber
       }
     }
 
@@ -129,7 +129,7 @@ internal constructor(
 
     val sign = totalDirection.sign
     gainLossDisplayString =
-        "${sign}${totalGainLoss.display} (${sign}${totalGainLossPercent.asPercentValue()})"
+        "${sign}${totalGainLoss.display} (${sign}${totalGainLossPercent.display})"
 
     val todayChange =
         if (isNoTodayChange) StockMoneyValue.NONE
@@ -156,8 +156,7 @@ internal constructor(
             return@Comparator 1
           }
 
-          return@Comparator s1.holding.symbol.raw.compareTo(
-              s2.holding.symbol.raw, ignoreCase = true)
+          return@Comparator s1.holding.symbol.compareTo(s2.holding.symbol)
         }
   }
 }

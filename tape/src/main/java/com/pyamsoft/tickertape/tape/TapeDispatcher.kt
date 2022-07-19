@@ -32,7 +32,6 @@ import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.currentSession
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Named
@@ -130,16 +129,16 @@ internal constructor(
       remoteViewIdGroup: RemoteViewIds
   ) {
     val quote = quotes[index]
-    val session = quote.currentSession()
-    val percent = session.percent().asPercentValue()
-    val changeAmount = session.amount().display
-    val directionSign = session.direction().sign
-    val color = session.direction().color
-    val priceText = session.price().display
+    val session = quote.currentSession
+    val percent = session.percent.display
+    val changeAmount = session.amount.display
+    val directionSign = session.direction.sign
+    val color = session.direction.color
+    val priceText = session.price.display
     val percentText = "(${directionSign}${percent})"
     val changeText = "$directionSign${changeAmount}"
 
-    remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol().raw)
+    remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol.raw)
 
     remoteViews.setTextViewText(remoteViewIdGroup.priceViewId, priceText)
     remoteViews.setTextColor(remoteViewIdGroup.priceViewId, color)

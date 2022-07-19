@@ -21,17 +21,18 @@ import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 
 interface StockMarketSession {
 
-  @CheckResult fun direction(): StockDirection
+  @get:CheckResult val direction: StockDirection
 
-  @CheckResult fun price(): StockMoneyValue
+  @get:CheckResult val price: StockMoneyValue
 
-  @CheckResult fun amount(): StockMoneyValue
+  @get:CheckResult val amount: StockMoneyValue
 
-  @CheckResult fun percent(): StockPercent
+  @get:CheckResult val percent: StockPercent
 
-  @CheckResult fun state(): MarketState
+  @get:CheckResult val state: MarketState
 
   companion object {
+
     @JvmStatic
     @CheckResult
     fun create(

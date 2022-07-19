@@ -21,13 +21,13 @@ import com.pyamsoft.tickertape.stocks.data.KeyStatisticsImpl
 
 interface KeyStatistics {
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun earnings(): Earnings
+  @get:CheckResult val earnings: Earnings
 
-  @CheckResult fun financials(): Financials
+  @get:CheckResult val financials: Financials
 
-  @CheckResult fun info(): Info
+  @get:CheckResult val info: Info
 
   interface Financials {
     val targetHighPrice: DataPoint

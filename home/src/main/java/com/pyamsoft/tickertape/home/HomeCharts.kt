@@ -33,6 +33,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -221,7 +222,10 @@ private fun HomeCharts(
     onRefresh: CoroutineScope.() -> Unit,
 ) {
 
-  LaunchedEffect(Unit) {
+  val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
+
+  // As long as we are blank
+  LaunchedEffect(isEmptyTickers) {
     val scope = this
 
     // Refresh when this composable enters the visual scope

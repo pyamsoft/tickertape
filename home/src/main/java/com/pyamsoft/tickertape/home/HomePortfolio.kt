@@ -50,18 +50,19 @@ internal fun HomePortfolio(
   val portfolio = state.portfolio
   val error = state.portfolioError
 
-  val count = remember(portfolio) { portfolio.list.size }
+  val isEmptyPortfolio = remember(portfolio) { portfolio.list.isEmpty() }
   val isVisible =
       remember(
-          count,
+          isEmptyPortfolio,
           isLoading,
-      ) { count > 0 || isLoading }
+      ) { !isEmptyPortfolio || isLoading }
 
-  LaunchedEffect(isVisible) {
+  // As long as we are blank
+  LaunchedEffect(isEmptyPortfolio) {
     val scope = this
-    if (isVisible) {
-      scope.onRefresh()
-    }
+
+    // Load even if not currently visible
+    scope.onRefresh()
   }
 
   Crossfade(
@@ -89,8 +90,9 @@ internal fun HomePortfolio(
 
         Box {
           HomePortfolioSummaryItem(
+              // Don't use matchParentSize here
               modifier =
-                  Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
+                  Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
               portfolio = portfolio,
           )
 

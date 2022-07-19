@@ -57,14 +57,14 @@ internal fun HomeWatchlist(
   val tickers = state.watchlist
   val error = state.watchlistError
 
-  val count = remember(tickers) { tickers.size }
-  val isVisible = remember(count, isLoading) { count > 0 || isLoading }
+  val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
+  val isVisible = remember(isEmptyTickers, isLoading) { !isEmptyTickers || isLoading }
 
-  LaunchedEffect(isVisible) {
+  LaunchedEffect(isEmptyTickers) {
     val scope = this
-    if (isVisible) {
-      scope.onRefresh()
-    }
+
+    // Load even if not currently visible
+    scope.onRefresh()
   }
 
   Crossfade(
@@ -79,7 +79,7 @@ internal fun HomeWatchlist(
         ) {
           Text(
               modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-              text = "My Watchlist${if (count > 0) " Top $count" else ""}",
+              text = "My Watchlist",
               style =
                   MaterialTheme.typography.h6.copy(
                       fontWeight = FontWeight.Bold,
@@ -89,7 +89,8 @@ internal fun HomeWatchlist(
 
         Box {
           TickerList(
-              modifier = Modifier.matchParentSize(),
+              // Don't use matchParentSize here
+              modifier = Modifier.fillMaxWidth(),
               tickers = tickers,
               onClick = onClicked,
           )

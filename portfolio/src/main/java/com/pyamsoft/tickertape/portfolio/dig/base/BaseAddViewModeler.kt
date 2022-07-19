@@ -53,7 +53,7 @@ protected constructor(
     }
 
     existingId.also { eid ->
-      if (!eid.isEmpty()) {
+      if (!eid.isEmpty) {
         Timber.d("Existing ID, attempt load: $eid")
         onHasExistingId(eid)
       }

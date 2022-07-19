@@ -40,7 +40,7 @@ internal constructor(
 
   @CheckResult
   private fun decideInitialSplitId(): DbSplit.Id {
-    return if (existingSplitId.isEmpty()) {
+    return if (existingSplitId.isEmpty) {
       generateNewSplitId().also { Timber.d("Initial split ID created: $it") }
     } else {
       existingSplitId.also { Timber.d("Initial existing split ID: $it") }
@@ -48,7 +48,7 @@ internal constructor(
   }
 
   fun newSplit() {
-    if (existingSplitId.isEmpty()) {
+    if (existingSplitId.isEmpty) {
       splitId = generateNewSplitId()
     } else {
       throw IllegalStateException("Do not use newPosition() with existing ID: $existingSplitId")

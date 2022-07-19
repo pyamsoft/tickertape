@@ -4,5 +4,7 @@ import androidx.annotation.CheckResult
 
 interface IdType {
 
-  @CheckResult fun isEmpty(): Boolean
+  @get:CheckResult val id: String
+
+  @get:CheckResult val isEmpty: Boolean
 }

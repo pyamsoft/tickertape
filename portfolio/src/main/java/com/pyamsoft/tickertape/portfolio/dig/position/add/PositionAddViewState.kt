@@ -43,7 +43,7 @@ internal constructor(
 
   @CheckResult
   private fun decideInitialPositionId(): DbPosition.Id {
-    return if (existingPositionId.isEmpty()) {
+    return if (existingPositionId.isEmpty) {
       generateNewPositionId().also { Timber.d("Initial position ID created: $it") }
     } else {
       existingPositionId.also { Timber.d("Initial existing position ID: $it") }
@@ -51,7 +51,7 @@ internal constructor(
   }
 
   fun newPosition() {
-    if (existingPositionId.isEmpty()) {
+    if (existingPositionId.isEmpty) {
       positionId = generateNewPositionId()
     } else {
       throw IllegalStateException("Do not use newPosition() with existing ID: $existingPositionId")

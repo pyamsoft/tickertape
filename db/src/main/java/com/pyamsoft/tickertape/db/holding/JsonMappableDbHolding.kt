@@ -37,10 +37,10 @@ internal constructor(
     @JvmStatic
     @CheckResult
     fun create(
-        id: DbHolding.Id = DbHolding.Id(IdGenerator.generate()),
         symbol: StockSymbol,
         type: EquityType,
         side: TradeSide,
+        id: DbHolding.Id = DbHolding.Id(IdGenerator.generate()),
     ): DbHolding {
       return JsonMappableDbHolding(
           id,

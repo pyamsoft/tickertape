@@ -100,7 +100,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         activity = requireActivity(),
         symbol = getSymbol(),
         holdingId = getHoldingId(),
-        existingSplitId = split.id(),
+        existingSplitId = split.id,
     )
   }
 

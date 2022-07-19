@@ -24,19 +24,19 @@ import java.time.LocalDateTime
 
 interface DbSplit {
 
-  @CheckResult fun id(): Id
+  @get:CheckResult val id: Id
 
-  @CheckResult fun holdingId(): DbHolding.Id
+  @get:CheckResult val holdingId: DbHolding.Id
 
-  @CheckResult fun preSplitShareCount(): StockShareValue
+  @get:CheckResult val preSplitShareCount: StockShareValue
+
+  @get:CheckResult val postSplitShareCount: StockShareValue
+
+  @get:CheckResult val splitDate: LocalDateTime
 
   @CheckResult fun preSplitShareCount(shareCount: StockShareValue): DbSplit
 
-  @CheckResult fun postSplitShareCount(): StockShareValue
-
   @CheckResult fun postSplitShareCount(shareCount: StockShareValue): DbSplit
-
-  @CheckResult fun splitDate(): LocalDateTime
 
   @CheckResult fun splitDate(date: LocalDateTime): DbSplit
 

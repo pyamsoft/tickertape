@@ -139,9 +139,9 @@ internal constructor(
     return if (existing == null) {
       val model =
           JsonMappableDbHolding.create(
-              symbol = symbol,
-              type = equityType,
-              side = tradeSide,
+              symbol,
+              equityType,
+              tradeSide,
           )
       val result = holdingInsertDao.insert(model)
       mapResultToSymbol(result) { it.symbol }

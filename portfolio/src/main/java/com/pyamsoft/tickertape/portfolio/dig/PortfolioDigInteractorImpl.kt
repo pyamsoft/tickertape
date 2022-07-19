@@ -138,7 +138,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val positions = splitQueryDao.query(force).filter { it.holdingId() == id }
+          val positions = splitQueryDao.query(force).filter { it.holdingId == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
           e.ifNotCancellation {

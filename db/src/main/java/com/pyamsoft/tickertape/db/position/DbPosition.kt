@@ -64,7 +64,7 @@ private fun DbPosition.getAffectingSplits(splits: List<DbSplit>): List<DbSplit> 
 
   return splits.filter { s ->
     val pd = this.purchaseDate
-    val date = s.splitDate()
+    val date = s.splitDate
     return@filter date.isAfter(pd) || date.isEqual(pd)
   }
 }
@@ -81,8 +81,8 @@ fun DbPosition.priceWithSplits(splits: List<DbSplit>): StockMoneyValue {
   // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
   var raw = this.price.value
   for (split in affectingSplits) {
-    val pre = split.preSplitShareCount()
-    val post = split.postSplitShareCount()
+    val pre = split.preSplitShareCount
+    val post = split.postSplitShareCount
     raw = (raw / post.value) * pre.value
   }
 
@@ -101,8 +101,8 @@ fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
   // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
   var raw = this.shareCount.value
   for (split in affectingSplits) {
-    val pre = split.preSplitShareCount()
-    val post = split.postSplitShareCount()
+    val pre = split.preSplitShareCount
+    val post = split.postSplitShareCount
     raw = (raw / pre.value) * post.value
   }
 

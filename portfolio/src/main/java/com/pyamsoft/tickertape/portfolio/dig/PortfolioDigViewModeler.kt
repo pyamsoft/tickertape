@@ -172,7 +172,7 @@ internal constructor(
     val s = state
     s.stockSplits =
         insertOrUpdate(s.stockSplits, split) {
-          it.holdingId() == split.holdingId() && it.id() == split.id()
+          it.holdingId == split.holdingId && it.id == split.id
         }
   }
 
@@ -187,7 +187,7 @@ internal constructor(
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.stockSplits = s.stockSplits.filterNot { it.id() == split.id() }
+    s.stockSplits = s.stockSplits.filterNot { it.id == split.id }
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {

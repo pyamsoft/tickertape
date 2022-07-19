@@ -26,39 +26,19 @@ import java.time.LocalDateTime
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbSplit
 internal constructor(
-    internal val id: DbSplit.Id,
-    internal val holdingId: DbHolding.Id,
-    internal val preSplitShareCount: StockShareValue,
-    internal val postSplitShareCount: StockShareValue,
-    internal val splitDate: LocalDateTime,
+    override val id: DbSplit.Id,
+    override val holdingId: DbHolding.Id,
+    override val preSplitShareCount: StockShareValue,
+    override val postSplitShareCount: StockShareValue,
+    override val splitDate: LocalDateTime,
 ) : DbSplit {
-
-  override fun id(): DbSplit.Id {
-    return id
-  }
-
-  override fun holdingId(): DbHolding.Id {
-    return holdingId
-  }
-
-  override fun preSplitShareCount(): StockShareValue {
-    return preSplitShareCount
-  }
 
   override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
     return this.copy(preSplitShareCount = shareCount)
   }
 
-  override fun postSplitShareCount(): StockShareValue {
-    return postSplitShareCount
-  }
-
   override fun postSplitShareCount(shareCount: StockShareValue): DbSplit {
     return this.copy(postSplitShareCount = shareCount)
-  }
-
-  override fun splitDate(): LocalDateTime {
-    return splitDate
   }
 
   override fun splitDate(date: LocalDateTime): DbSplit {
@@ -91,11 +71,11 @@ internal constructor(
       return if (item is JsonMappableDbSplit) item
       else {
         JsonMappableDbSplit(
-            item.id(),
-            item.holdingId(),
-            item.preSplitShareCount(),
-            item.postSplitShareCount(),
-            item.splitDate(),
+            item.id,
+            item.holdingId,
+            item.preSplitShareCount,
+            item.postSplitShareCount,
+            item.splitDate,
         )
       }
     }

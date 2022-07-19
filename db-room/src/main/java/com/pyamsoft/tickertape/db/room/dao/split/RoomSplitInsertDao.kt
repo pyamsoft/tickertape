@@ -37,7 +37,7 @@ internal abstract class RoomSplitInsertDao : SplitInsertDao {
   override suspend fun insert(o: DbSplit): DbInsert.InsertResult<DbSplit> =
       withContext(context = Dispatchers.IO) {
         val roomSplit = RoomDbSplit.create(o)
-        return@withContext if (daoQuery(roomSplit.id()) == null) {
+        return@withContext if (daoQuery(roomSplit.id) == null) {
           if (daoInsert(roomSplit) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.Insert(roomSplit)
           } else {

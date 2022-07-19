@@ -41,55 +41,40 @@ import java.time.LocalDateTime
 )
 internal data class RoomDbSplit
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbSplit.Id,
-    @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val dbId: DbSplit.Id,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val dbHoldingId: DbHolding.Id,
     @JvmField
     @ColumnInfo(name = COLUMN_PRE_SPLIT_SHARE_COUNT)
-    val preSplitShareCount: StockShareValue,
+    val dbPreSplitShareCount: StockShareValue,
     @JvmField
     @ColumnInfo(name = COLUMN_POST_SPLIT_SHARE_COUNT)
-    val postSplitShareCount: StockShareValue,
-    @JvmField @ColumnInfo(name = COLUMN_SPLIT_DATE) val splitDate: LocalDateTime,
+    val dbPostSplitShareCount: StockShareValue,
+    @JvmField @ColumnInfo(name = COLUMN_SPLIT_DATE) val dbSplitDate: LocalDateTime,
 ) : DbSplit {
 
-  @Ignore
-  override fun id(): DbSplit.Id {
-    return id
-  }
+  @Ignore override val id: DbSplit.Id = dbId
 
-  @Ignore
-  override fun holdingId(): DbHolding.Id {
-    return holdingId
-  }
+  @Ignore override val holdingId: DbHolding.Id = dbHoldingId
 
-  @Ignore
-  override fun preSplitShareCount(): StockShareValue {
-    return preSplitShareCount
-  }
+  @Ignore override val preSplitShareCount: StockShareValue = dbPreSplitShareCount
+
+  @Ignore override val postSplitShareCount: StockShareValue = dbPostSplitShareCount
+
+  @Ignore override val splitDate: LocalDateTime = dbSplitDate
 
   @Ignore
   override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
-    return this.copy(preSplitShareCount = shareCount)
-  }
-
-  @Ignore
-  override fun postSplitShareCount(): StockShareValue {
-    return postSplitShareCount
+    return this.copy(dbPreSplitShareCount = shareCount)
   }
 
   @Ignore
   override fun postSplitShareCount(shareCount: StockShareValue): DbSplit {
-    return this.copy(postSplitShareCount = shareCount)
-  }
-
-  @Ignore
-  override fun splitDate(): LocalDateTime {
-    return splitDate
+    return this.copy(dbPostSplitShareCount = shareCount)
   }
 
   @Ignore
   override fun splitDate(date: LocalDateTime): DbSplit {
-    return this.copy(splitDate = splitDate)
+    return this.copy(dbSplitDate = date)
   }
 
   companion object {
@@ -113,11 +98,11 @@ internal constructor(
       return if (item is RoomDbSplit) item
       else {
         RoomDbSplit(
-            item.id(),
-            item.holdingId(),
-            item.preSplitShareCount(),
-            item.postSplitShareCount(),
-            item.splitDate(),
+            item.id,
+            item.holdingId,
+            item.preSplitShareCount,
+            item.postSplitShareCount,
+            item.splitDate,
         )
       }
     }

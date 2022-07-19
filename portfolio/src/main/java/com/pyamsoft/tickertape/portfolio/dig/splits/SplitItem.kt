@@ -26,9 +26,9 @@ internal fun SplitItem(
     modifier: Modifier = Modifier,
     split: DbSplit,
 ) {
-  val preSplitShareCount = split.preSplitShareCount()
-  val postSplitShareCount = split.postSplitShareCount()
-  val splitDate = split.splitDate()
+  val preSplitShareCount = split.preSplitShareCount
+  val postSplitShareCount = split.postSplitShareCount
+  val splitDate = split.splitDate
   val displaySplitDate =
       remember(splitDate) { splitDate.format(DATE_FORMATTER.get().requireNotNull()) }
 

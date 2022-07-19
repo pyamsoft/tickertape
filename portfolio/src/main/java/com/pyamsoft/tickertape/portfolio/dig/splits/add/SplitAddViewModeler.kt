@@ -82,7 +82,7 @@ internal constructor(
       existingSplit = existing
 
       // Make sure this number is good (it should be, but just to be safe)
-      existing.preSplitShareCount().value.toString().also { p ->
+      existing.preSplitShareCount.value.toString().also { p ->
         if (isSafe(p)) {
           preSplitShareCount = p
           // We always check at the end
@@ -92,7 +92,7 @@ internal constructor(
       }
 
       // Make sure this number is good (it should be, but just to be safe)
-      existing.postSplitShareCount().value.toString().also { p ->
+      existing.postSplitShareCount.value.toString().also { p ->
         if (isSafe(p)) {
           postSplitShareCount = p
           // We always check at the end
@@ -102,7 +102,7 @@ internal constructor(
       }
 
       // After date, check submittable
-      splitDate = existing.splitDate().toLocalDate()
+      splitDate = existing.splitDate.toLocalDate()
       checkSubmittable()
     }
   }

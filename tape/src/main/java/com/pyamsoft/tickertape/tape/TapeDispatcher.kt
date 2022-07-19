@@ -132,10 +132,10 @@ internal constructor(
     val quote = quotes[index]
     val session = quote.currentSession()
     val percent = session.percent().asPercentValue()
-    val changeAmount = session.amount().asMoneyValue()
-    val directionSign = session.direction().sign()
-    val color = session.direction().color()
-    val priceText = session.price().asMoneyValue()
+    val changeAmount = session.amount().display
+    val directionSign = session.direction().sign
+    val color = session.direction().color
+    val priceText = session.price().display
     val percentText = "(${directionSign}${percent})"
     val changeText = "$directionSign${changeAmount}"
 

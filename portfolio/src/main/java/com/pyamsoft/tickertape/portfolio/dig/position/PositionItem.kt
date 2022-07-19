@@ -52,8 +52,8 @@ private fun calculateDisplayValues(
 ): DisplayValues {
   val price = position.priceWithSplits(splits)
   val shareCount = position.shareCountWithSplits(splits)
-  val totalCost = (price.value() * shareCount.value()).asMoney()
-  val displayTotal = totalCost.asMoneyValue()
+  val totalCost = (price.value * shareCount.value).asMoney()
+  val displayTotal = totalCost.display
 
   val displayCurrent: String
   val displayGainLoss: String
@@ -65,26 +65,26 @@ private fun calculateDisplayValues(
     colorGainLoss = Color.Unspecified
   } else {
     // Current
-    val currentRaw = (currentPrice.value() * shareCount.value())
+    val currentRaw = (currentPrice.value * shareCount.value)
     val currentValue = currentRaw.asMoney()
-    displayCurrent = currentValue.asMoneyValue()
+    displayCurrent = currentValue.display
 
     // Gain/Loss
-    val gainLossValue = currentValue.value() - totalCost.value()
-    val gainLossPercent = ((gainLossValue * 100) / totalCost.value()).asPercent().asPercentValue()
+    val gainLossValue = currentValue.value - totalCost.value
+    val gainLossPercent = ((gainLossValue * 100) / totalCost.value).asPercent().asPercentValue()
 
     val optionsScaledValue = if (isOption) (gainLossValue * 100) else gainLossValue
     val sideScaledValue = if (isSell) optionsScaledValue * -1 else optionsScaledValue
-    val amount = sideScaledValue.asMoney().asMoneyValue()
+    val amount = sideScaledValue.asMoney().display
 
     val gainLossDirection = sideScaledValue.asDirection()
-    val sign = gainLossDirection.sign()
+    val sign = gainLossDirection.sign
 
     // Final display
     displayGainLoss = "${sign}${amount} (${sign}${gainLossPercent})"
 
     // Color
-    colorGainLoss = Color(gainLossDirection.color())
+    colorGainLoss = Color(gainLossDirection.color)
   }
 
   return DisplayValues(
@@ -191,7 +191,7 @@ private fun PurchaseDate(
     position: DbPosition,
 ) {
   val displayPurchaseDate =
-      remember(position) { position.purchaseDate().format(DATE_FORMATTER.get().requireNotNull()) }
+      remember(position) { position.purchaseDate.format(DATE_FORMATTER.get().requireNotNull()) }
 
   Info(
       modifier = modifier,
@@ -211,9 +211,9 @@ private fun CostBasis(
           position,
           isOption,
       ) {
-        val price = position.price()
-        val p = if (isOption) (price.value() * 100).asMoney() else price
-        return@remember p.asMoneyValue()
+        val price = position.price
+        val p = if (isOption) (price.value * 100).asMoney() else price
+        return@remember p.display
       }
 
   val displayAdjustedPrice =
@@ -223,8 +223,8 @@ private fun CostBasis(
           splits,
       ) {
         val price = position.priceWithSplits(splits)
-        val p = if (isOption) (price.value() * 100).asMoney() else price
-        return@remember p.asMoneyValue()
+        val p = if (isOption) (price.value * 100).asMoney() else price
+        return@remember p.display
       }
 
   val prefix =
@@ -271,9 +271,9 @@ private fun NumberOfShares(
           position,
           isSell,
       ) {
-        val shareCount = position.shareCount()
-        val s = if (isSell) (shareCount.value() * -1).asShares() else shareCount
-        return@remember s.asShareValue()
+        val shareCount = position.shareCount
+        val s = if (isSell) (shareCount.value * -1).asShares() else shareCount
+        return@remember s.display
       }
 
   val displayAdjustedShares =
@@ -283,8 +283,8 @@ private fun NumberOfShares(
           splits,
       ) {
         val shareCount = position.shareCountWithSplits(splits)
-        val s = if (isSell) (shareCount.value() * -1).asShares() else shareCount
-        return@remember s.asShareValue()
+        val s = if (isSell) (shareCount.value * -1).asShares() else shareCount
+        return@remember s.display
       }
 
   val prefix =

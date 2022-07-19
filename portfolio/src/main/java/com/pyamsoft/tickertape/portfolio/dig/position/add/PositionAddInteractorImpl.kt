@@ -41,7 +41,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          val result = positionQueryDao.query(false).first { it.id() == id }
+          val result = positionQueryDao.query(false).first { it.id == id }
           ResultWrapper.success(result)
         } catch (e: Throwable) {
           e.ifNotCancellation {

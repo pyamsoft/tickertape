@@ -154,14 +154,14 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Open",
-            value = open.asMoneyValue(),
+            value = open.display,
         )
       }
 
       quote.dayPreviousClose()?.also { close ->
         Info(
             name = "Previous Close",
-            value = close.asMoneyValue(),
+            value = close.display,
         )
       }
     }
@@ -174,14 +174,14 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "Low",
-            value = low.asMoneyValue(),
+            value = low.display,
         )
       }
       quote.dayHigh()?.also { high ->
         Info(
             modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
             name = "High",
-            value = high.asMoneyValue(),
+            value = high.display,
         )
       }
       quote.dayVolume()?.also { volume ->

@@ -28,19 +28,19 @@ import java.time.LocalDateTime
 
 interface DbPosition {
 
-  @CheckResult fun id(): Id
+  @get:CheckResult val id: Id
 
-  @CheckResult fun holdingId(): DbHolding.Id
+  @get:CheckResult val holdingId: DbHolding.Id
 
-  @CheckResult fun price(): StockMoneyValue
+  @get:CheckResult val price: StockMoneyValue
+
+  @get:CheckResult val shareCount: StockShareValue
+
+  @get:CheckResult val purchaseDate: LocalDateTime
 
   @CheckResult fun price(price: StockMoneyValue): DbPosition
 
-  @CheckResult fun shareCount(): StockShareValue
-
   @CheckResult fun shareCount(shareCount: StockShareValue): DbPosition
-
-  @CheckResult fun purchaseDate(): LocalDateTime
 
   @CheckResult fun purchaseDate(purchaseDate: LocalDateTime): DbPosition
 
@@ -63,7 +63,7 @@ private fun DbPosition.getAffectingSplits(splits: List<DbSplit>): List<DbSplit> 
   }
 
   return splits.filter { s ->
-    val pd = this.purchaseDate()
+    val pd = this.purchaseDate
     val date = s.splitDate()
     return@filter date.isAfter(pd) || date.isEqual(pd)
   }
@@ -75,15 +75,15 @@ fun DbPosition.priceWithSplits(splits: List<DbSplit>): StockMoneyValue {
 
   // No affecting splits, no further work
   if (affectingSplits.isEmpty()) {
-    return this.price()
+    return this.price
   }
 
   // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
-  var raw = this.price().value()
+  var raw = this.price.value
   for (split in affectingSplits) {
     val pre = split.preSplitShareCount()
     val post = split.postSplitShareCount()
-    raw = (raw / post.value()) * pre.value()
+    raw = (raw / post.value) * pre.value
   }
 
   return raw.asMoney()
@@ -95,15 +95,15 @@ fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
 
   // No affecting splits, no further work
   if (affectingSplits.isEmpty()) {
-    return this.shareCount()
+    return this.shareCount
   }
 
   // For price calculations, see https://github.com/pyamsoft/tickertape/issues/84
-  var raw = this.shareCount().value()
+  var raw = this.shareCount.value
   for (split in affectingSplits) {
     val pre = split.preSplitShareCount()
     val post = split.postSplitShareCount()
-    raw = (raw / pre.value()) * post.value()
+    raw = (raw / pre.value) * post.value
   }
 
   return raw.asShares()

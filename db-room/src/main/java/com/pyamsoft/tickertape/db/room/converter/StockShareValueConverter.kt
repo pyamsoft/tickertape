@@ -34,6 +34,6 @@ internal object StockShareValueConverter {
   @TypeConverter
   @CheckResult
   fun fromShares(shares: StockShareValue): Double {
-    return shares.value()
+    return shares.value
   }
 }

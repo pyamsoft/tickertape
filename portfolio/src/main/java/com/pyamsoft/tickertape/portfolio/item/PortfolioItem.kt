@@ -35,23 +35,23 @@ internal fun PortfolioItem(
   val isOption = stock.isOption
 
   val totalComposeColor =
-      if (totalDirection.isZero()) {
+      if (totalDirection.isZero) {
         MaterialTheme.typography.caption.color
       } else {
-        remember(totalDirection) { Color(totalDirection.color()) }
+        remember(totalDirection) { Color(totalDirection.color) }
       }
 
   val todayComposeColor =
-      if (todayDirection.isZero()) {
+      if (todayDirection.isZero) {
         MaterialTheme.typography.caption.color
       } else {
-        remember(todayDirection) { Color(todayDirection.color()) }
+        remember(todayDirection) { Color(todayDirection.color) }
       }
   val totalChangeTitle =
       remember(totalDirection) {
         when {
-          totalDirection.isUp() -> "Overall Gain"
-          totalDirection.isDown() -> "Overall Loss"
+          totalDirection.isUp -> "Overall Gain"
+          totalDirection.isDown -> "Overall Loss"
           else -> "Overall Change"
         }
       }
@@ -75,7 +75,7 @@ internal fun PortfolioItem(
             Info(
                 modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
                 name = if (isOption) "Contracts" else "Shares",
-                value = stock.totalShares.asShareValue(),
+                value = stock.totalShares.display,
             )
             Info(
                 name = "Change Today",
@@ -90,7 +90,7 @@ internal fun PortfolioItem(
             Info(
                 modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
                 name = "Value",
-                value = stock.current.asMoneyValue())
+                value = stock.current.display)
 
             Info(
                 name = totalChangeTitle,

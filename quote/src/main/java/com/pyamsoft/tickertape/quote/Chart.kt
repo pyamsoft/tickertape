@@ -84,8 +84,8 @@ private fun Bounds(
     modifier: Modifier = Modifier,
     chart: StockChart,
 ) {
-  val highMoney = rememberInBackground(chart) { chart.periodHigh().asMoneyValue() }
-  val lowMoney = rememberInBackground(chart) { chart.periodLow().asMoneyValue() }
+  val highMoney = rememberInBackground(chart) { chart.periodHigh().display }
+  val lowMoney = rememberInBackground(chart) { chart.periodLow().display }
 
   Column(
       modifier = modifier,
@@ -288,13 +288,13 @@ private class ChartAdapter(
           )
         }
 
-    baselineValue = baseline.value().toFloat()
+    baselineValue = baseline.value.toFloat()
     chartData = data
   }
 
   @CheckResult
   private fun getValue(item: Chart.Data): Float {
-    return item.price.value().toFloat()
+    return item.price.value.toFloat()
   }
 
   override fun getCount(): Int {

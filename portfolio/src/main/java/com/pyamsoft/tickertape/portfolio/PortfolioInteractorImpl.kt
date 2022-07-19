@@ -111,7 +111,7 @@ internal constructor(
                   val result = mutableListOf<PortfolioStock>()
                   for (holding in holdings) {
                     val quote = quotes.firstOrNull { it.symbol == holding.symbol }
-                    val holdingPositions = positions.filter { it.holdingId() == holding.id }
+                    val holdingPositions = positions.filter { it.holdingId == holding.id }
                     val holdingSplits = splits.filter { it.holdingId() == holding.id }
                     val stock =
                         PortfolioStock(

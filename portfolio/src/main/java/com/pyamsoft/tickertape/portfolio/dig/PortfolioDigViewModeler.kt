@@ -142,7 +142,7 @@ internal constructor(
     val s = state
     s.positions =
         insertOrUpdate(s.positions, position) {
-          it.holdingId() == position.holdingId() && it.id() == position.id()
+          it.holdingId == position.holdingId && it.id == position.id
         }
   }
 
@@ -157,7 +157,7 @@ internal constructor(
   private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.positions = s.positions.filterNot { it.id() == position.id() }
+    s.positions = s.positions.filterNot { it.id == position.id }
   }
 
   private fun onSplitChangeEvent(event: SplitChangeEvent) {

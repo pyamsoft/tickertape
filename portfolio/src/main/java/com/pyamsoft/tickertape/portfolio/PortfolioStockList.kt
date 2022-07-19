@@ -66,14 +66,14 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
         if (isNoTotal) 0.0 else sumTodayChangeNumber / sumTotalAmountNumber * 100
     sumTodayDirection = sumTodayChangeNumber.asDirection()
 
-    val totalSign = sumTotalDirection.sign()
+    val totalSign = sumTotalDirection.sign
     gainLossDisplayString =
-        "${totalSign}${sumTotalGainLossNumber.asMoney().asMoneyValue()} (${totalSign}${sumTotalPercentNumber.asPercent().asPercentValue()})"
+        "${totalSign}${sumTotalGainLossNumber.asMoney().display} (${totalSign}${sumTotalPercentNumber.asPercent().asPercentValue()})"
 
     val sumTodayChange = sumTodayChangeNumber.asMoney()
-    val sign = sumTodayDirection.sign()
+    val sign = sumTodayDirection.sign
     changeTodayDisplayString =
-        "${sign}${sumTodayChange.asMoneyValue()} (${sign}${sumTodayPercentNumber.asPercent().asPercentValue()})"
+        "${sign}${sumTodayChange.display} (${sign}${sumTodayPercentNumber.asPercent().asPercentValue()})"
   }
 
   companion object {

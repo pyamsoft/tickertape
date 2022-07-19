@@ -21,17 +21,13 @@ import com.pyamsoft.tickertape.stocks.data.StockMoneyValueImpl
 
 interface StockMoneyValue : StockDoubleValue {
 
-  @CheckResult fun asMoneyValue(): String
+  @get:CheckResult val display: String
+
+  @CheckResult fun compareTo(other: StockMoneyValue): Int
 
   companion object {
 
-    private val EMPTY = 0.0.asMoney()
-
-    @JvmStatic
-    @CheckResult
-    fun none(): StockMoneyValue {
-      return EMPTY
-    }
+    val NONE: StockMoneyValue = 0.0.asMoney()
   }
 }
 

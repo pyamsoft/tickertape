@@ -48,7 +48,7 @@ internal fun SplitItem(
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-            text = postSplitShareCount.asShareValue(),
+            text = postSplitShareCount.display,
             style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
         )
 
@@ -59,7 +59,7 @@ internal fun SplitItem(
         )
 
         Text(
-            text = preSplitShareCount.asShareValue(),
+            text = preSplitShareCount.display,
             style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
         )
 

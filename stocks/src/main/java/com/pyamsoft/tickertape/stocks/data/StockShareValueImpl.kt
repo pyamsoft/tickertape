@@ -22,12 +22,12 @@ import com.pyamsoft.tickertape.stocks.api.SHARES_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 internal data class StockShareValueImpl(
-    private val value: Double,
+    override val value: Double,
 ) : StockShareValue {
 
   private val share by
       lazy(LazyThreadSafetyMode.NONE) {
-        if (isZero()) {
+        if (isZero) {
           return@lazy "0"
         }
 
@@ -43,15 +43,7 @@ internal data class StockShareValueImpl(
         }
       }
 
-  override fun asShareValue(): String {
-    return share
-  }
+  override val isZero: Boolean = value.isZero()
 
-  override fun value(): Double {
-    return value
-  }
-
-  override fun isZero(): Boolean {
-    return value.isZero()
-  }
+  override val display: String = share
 }

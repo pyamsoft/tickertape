@@ -42,51 +42,36 @@ import java.time.LocalDateTime
 )
 internal data class RoomDbPosition
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbPosition.Id,
-    @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val holdingId: DbHolding.Id,
-    @JvmField @ColumnInfo(name = COLUMN_PRICE) val price: StockMoneyValue,
-    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val shareCount: StockShareValue,
-    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val purchaseDate: LocalDateTime,
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val dbId: DbPosition.Id,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val dbHoldingId: DbHolding.Id,
+    @JvmField @ColumnInfo(name = COLUMN_PRICE) val dbPrice: StockMoneyValue,
+    @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val dbShareCount: StockShareValue,
+    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val dbPurchaseDate: LocalDateTime,
 ) : DbPosition {
 
-  @Ignore
-  override fun id(): DbPosition.Id {
-    return id
-  }
+  @Ignore override val id: DbPosition.Id = dbId
 
-  @Ignore
-  override fun holdingId(): DbHolding.Id {
-    return holdingId
-  }
+  @Ignore override val holdingId: DbHolding.Id = dbHoldingId
 
-  @Ignore
-  override fun price(): StockMoneyValue {
-    return price
-  }
+  @Ignore override val price: StockMoneyValue = dbPrice
+
+  @Ignore override val shareCount: StockShareValue = dbShareCount
+
+  @Ignore override val purchaseDate: LocalDateTime = dbPurchaseDate
 
   @Ignore
   override fun price(price: StockMoneyValue): DbPosition {
-    return this.copy(price = price)
-  }
-
-  @Ignore
-  override fun shareCount(): StockShareValue {
-    return shareCount
+    return this.copy(dbPrice = price)
   }
 
   @Ignore
   override fun shareCount(shareCount: StockShareValue): DbPosition {
-    return this.copy(shareCount = shareCount)
-  }
-
-  @Ignore
-  override fun purchaseDate(): LocalDateTime {
-    return purchaseDate
+    return this.copy(dbShareCount = shareCount)
   }
 
   @Ignore
   override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
-    return this.copy(purchaseDate = purchaseDate)
+    return this.copy(dbPurchaseDate = purchaseDate)
   }
 
   companion object {
@@ -110,11 +95,11 @@ internal constructor(
       return if (item is RoomDbPosition) item
       else {
         RoomDbPosition(
-            item.id(),
-            item.holdingId(),
-            item.price(),
-            item.shareCount(),
-            item.purchaseDate(),
+            item.id,
+            item.holdingId,
+            item.price,
+            item.shareCount,
+            item.purchaseDate,
         )
       }
     }

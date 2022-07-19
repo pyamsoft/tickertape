@@ -25,13 +25,8 @@ interface StockPercent : StockDoubleValue {
 
   companion object {
 
-    private val EMPTY = 0.0.asPercent()
+    val NONE: StockPercent = 0.0.asPercent()
 
-    @JvmStatic
-    @CheckResult
-    fun none(): StockPercent {
-      return EMPTY
-    }
   }
 }
 

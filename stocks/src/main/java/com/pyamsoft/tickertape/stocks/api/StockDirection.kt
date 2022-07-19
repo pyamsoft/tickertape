@@ -22,37 +22,20 @@ import com.pyamsoft.tickertape.stocks.data.StockDirectionImpl
 
 interface StockDirection : StockNumberValue {
 
-  @CheckResult fun sign(): String
+  @get:CheckResult val sign: String
 
-  @CheckResult fun isUp(): Boolean
+  @get:CheckResult val isUp: Boolean
 
-  @CheckResult fun isDown(): Boolean
+  @get:CheckResult val isDown: Boolean
 
-  @ColorInt @CheckResult fun color(): Int
+  @get:[ColorInt CheckResult]
+  val color: Int
 
   companion object {
 
-    private val EMPTY = StockDirectionImpl(0.0)
-    private val UP = StockDirectionImpl(1.0)
-    private val DOWN = StockDirectionImpl(-1.0)
-
-    @JvmStatic
-    @CheckResult
-    fun none(): StockDirection {
-      return EMPTY
-    }
-
-    @JvmStatic
-    @CheckResult
-    fun up(): StockDirection {
-      return UP
-    }
-
-    @JvmStatic
-    @CheckResult
-    fun down(): StockDirection {
-      return DOWN
-    }
+    val NONE: StockDirection = StockDirectionImpl(0.0)
+    val UP: StockDirection = StockDirectionImpl(1.0)
+    val DOWN: StockDirection = StockDirectionImpl(-1.0)
   }
 }
 
@@ -60,8 +43,8 @@ interface StockDirection : StockNumberValue {
 fun Double.asDirection(): StockDirection {
   val comparison = this.compareTo(0)
   return when {
-    comparison == 0 -> StockDirection.none()
-    comparison > 0 -> StockDirection.up()
-    else -> StockDirection.down()
+    comparison == 0 -> StockDirection.NONE
+    comparison > 0 -> StockDirection.UP
+    else -> StockDirection.DOWN
   }
 }

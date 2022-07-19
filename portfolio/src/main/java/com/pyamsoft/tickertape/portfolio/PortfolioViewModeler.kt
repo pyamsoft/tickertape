@@ -75,11 +75,11 @@ internal constructor(
   }
 
   private fun CoroutineScope.handleUpdatePosition(position: DbPosition) {
-    val doesPositionMatch = { p: DbPosition -> p.id() == position.id() }
+    val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        return@map if (stock.holding.id != position.holdingId()) stock
+        return@map if (stock.holding.id != position.holdingId) stock
         else {
           val newPositions = stock.positions.map { if (doesPositionMatch(it)) position else it }
           stock.copy(positions = newPositions)
@@ -92,18 +92,18 @@ internal constructor(
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        return@map if (stock.holding.id != position.holdingId()) stock
+        return@map if (stock.holding.id != position.holdingId) stock
         else stock.copy(positions = stock.positions + position)
       }
     }
   }
 
   private fun CoroutineScope.handleDeletePosition(position: DbPosition, offerUndo: Boolean) {
-    val doesPositionMatch = { p: DbPosition -> p.id() == position.id() }
+    val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        if (stock.holding.id != position.holdingId()) {
+        if (stock.holding.id != position.holdingId) {
           return@map stock
         } else {
           return@map if (!stock.positions.contains(doesPositionMatch)) stock

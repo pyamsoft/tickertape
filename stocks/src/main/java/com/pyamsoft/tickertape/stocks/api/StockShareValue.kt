@@ -21,17 +21,12 @@ import com.pyamsoft.tickertape.stocks.data.StockShareValueImpl
 
 interface StockShareValue : StockDoubleValue {
 
-  @CheckResult fun asShareValue(): String
+  @get:CheckResult val display: String
 
   companion object {
 
-    private val EMPTY = 0.0.asShares()
+    val NONE: StockShareValue = 0.0.asShares()
 
-    @JvmStatic
-    @CheckResult
-    fun none(): StockShareValue {
-      return EMPTY
-    }
   }
 }
 

@@ -35,12 +35,12 @@ fun TickerPrice(
       val session = quote.currentSession()
 
       val direction = session.direction()
-      val directionSign = session.direction().sign()
+      val directionSign = session.direction().sign
       val composeColor =
-          if (direction.isZero()) {
+          if (direction.isZero) {
             MaterialTheme.typography.caption.color
           } else {
-            remember(direction) { Color(direction.color()) }
+            remember(direction) { Color(direction.color) }
           }
 
       Text(
@@ -53,14 +53,14 @@ fun TickerPrice(
           style = MaterialTheme.typography.caption,
       )
       Text(
-          text = session.price().asMoneyValue(),
+          text = session.price().display,
           style = MaterialTheme.typography.body2.copy(color = composeColor),
       )
       Row(
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-            text = "${directionSign}${session.amount().asMoneyValue()}",
+            text = "${directionSign}${session.amount().display}",
             style = MaterialTheme.typography.caption.copy(color = composeColor),
         )
         Text(

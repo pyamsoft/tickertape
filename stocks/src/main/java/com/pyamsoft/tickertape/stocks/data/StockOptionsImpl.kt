@@ -75,8 +75,8 @@ internal constructor(
     private val mid: StockMoneyValue
 
     init {
-      val bidValue = bid.value()
-      val diff = ask.value() - bidValue
+      val bidValue = bid.value
+      val diff = ask.value - bidValue
       mid = (bidValue + diff).asMoney()
     }
 

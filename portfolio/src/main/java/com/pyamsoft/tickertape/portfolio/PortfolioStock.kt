@@ -67,12 +67,11 @@ internal constructor(
         if (isNoPosition) NO_POSITION
         else
             positions.sumOf {
-              it.priceWithSplits(splits).value() * it.shareCountWithSplits(splits).value()
+              it.priceWithSplits(splits).value * it.shareCountWithSplits(splits).value
             }
 
     val totalSharesNumber =
-        if (isNoPosition) NO_POSITION
-        else positions.sumOf { it.shareCountWithSplits(splits).value() }
+        if (isNoPosition) NO_POSITION else positions.sumOf { it.shareCountWithSplits(splits).value }
 
     // Avoid -0.0 as a total change number
     val tempTodayChange: Double
@@ -87,8 +86,8 @@ internal constructor(
         tempTodayNumber = NO_POSITION
       } else {
         val reg = q.regular()
-        tempTodayChange = reg.amount().value() * totalSharesNumber
-        tempTodayNumber = reg.price().value() * totalSharesNumber
+        tempTodayChange = reg.amount().value * totalSharesNumber
+        tempTodayNumber = reg.price().value * totalSharesNumber
       }
     }
 
@@ -99,25 +98,25 @@ internal constructor(
     val totalGainLoss: StockMoneyValue
     val totalGainLossPercent: StockPercent
     if (isNoPosition) {
-      current = StockMoneyValue.none()
+      current = StockMoneyValue.NONE
       costNumber = NO_POSITION
       totalShares = NO_POSITION.asShares()
-      totalDirection = StockDirection.none()
-      todayDirection = StockDirection.none()
-      totalGainLoss = StockMoneyValue.none()
-      totalGainLossPercent = StockPercent.none()
+      totalDirection = StockDirection.NONE
+      todayDirection = StockDirection.NONE
+      totalGainLoss = StockMoneyValue.NONE
+      totalGainLossPercent = StockPercent.NONE
     } else {
       val totalGainLossNumber = tempTodayNumber - cost
       val isNoTotalChange = totalGainLossNumber.isZero()
 
       totalGainLoss =
-          if (isNoTotalChange) StockMoneyValue.none()
+          if (isNoTotalChange) StockMoneyValue.NONE
           else (totalGainLossNumber * optionsModifier * sellSideModifier).asMoney()
       totalDirection =
-          if (isNoTotalChange) StockDirection.none()
+          if (isNoTotalChange) StockDirection.NONE
           else (totalGainLossNumber * sellSideModifier).asDirection()
       todayDirection =
-          if (isNoTodayChange) StockDirection.none()
+          if (isNoTodayChange) StockDirection.NONE
           else (tempTodayChange * sellSideModifier).asDirection()
       current = (tempTodayNumber * sellSideModifier * optionsModifier).asMoney()
       costNumber = cost
@@ -128,14 +127,14 @@ internal constructor(
       totalGainLossPercent = (totalGainLossPercentNumber * sellSideModifier).asPercent()
     }
 
-    val sign = totalDirection.sign()
+    val sign = totalDirection.sign
     gainLossDisplayString =
-        "${sign}${totalGainLoss.asMoneyValue()} (${sign}${totalGainLossPercent.asPercentValue()})"
+        "${sign}${totalGainLoss.display} (${sign}${totalGainLossPercent.asPercentValue()})"
 
     val todayChange =
-        if (isNoTodayChange) StockMoneyValue.none()
+        if (isNoTodayChange) StockMoneyValue.NONE
         else (tempTodayChange * sellSideModifier * optionsModifier).asMoney()
-    changeTodayDisplayString = "${todayDirection.sign()}${todayChange.asMoneyValue()}"
+    changeTodayDisplayString = "${todayDirection.sign}${todayChange.display}"
   }
 
   companion object {
@@ -157,10 +156,8 @@ internal constructor(
             return@Comparator 1
           }
 
-          return@Comparator s1.holding
-              .symbol
-              .raw
-              .compareTo(s2.holding.symbol.raw, ignoreCase = true)
+          return@Comparator s1.holding.symbol.raw.compareTo(
+              s2.holding.symbol.raw, ignoreCase = true)
         }
   }
 }

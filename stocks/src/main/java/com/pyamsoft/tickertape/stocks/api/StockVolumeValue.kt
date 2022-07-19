@@ -25,13 +25,8 @@ interface StockVolumeValue : StockLongValue {
 
   companion object {
 
-    private val EMPTY = 0L.asVolume()
+    val NONE: StockVolumeValue = 0L.asVolume()
 
-    @JvmStatic
-    @CheckResult
-    fun none(): StockVolumeValue {
-      return EMPTY
-    }
   }
 }
 

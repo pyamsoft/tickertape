@@ -141,7 +141,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
         val contract = if (contractType == StockOptions.Contract.Type.CALL) "C" else "P"
 
         // Remove the dollar sign from the strike price formatting
-        val fixedStrike = strikePrice.asMoneyValue().replace("$", "")
+        val fixedStrike = strikePrice.display.replace("$", "")
 
         // Options IDs can only have 3 "decimal" places, figure out how many we have currently
         // and add more zeroes if we need more
@@ -153,7 +153,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
         var strikeString = "${fixedStrike.replace("." , "")}${zeroString}"
 
         // Here we go, time to assemble
-        var tempStrike = strikePrice.value()
+        var tempStrike = strikePrice.value
 
         // The highest number YF can support is 100,000 for a strike
         tempStrike *= 10

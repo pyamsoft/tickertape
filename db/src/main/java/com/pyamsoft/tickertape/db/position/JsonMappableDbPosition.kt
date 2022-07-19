@@ -27,39 +27,19 @@ import java.time.LocalDateTime
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbPosition
 internal constructor(
-    internal val id: DbPosition.Id,
-    internal val holdingId: DbHolding.Id,
-    internal val shareCount: StockShareValue,
-    internal val price: StockMoneyValue,
-    internal val purchaseDate: LocalDateTime,
+    override val id: DbPosition.Id,
+    override val holdingId: DbHolding.Id,
+    override val shareCount: StockShareValue,
+    override val price: StockMoneyValue,
+    override val purchaseDate: LocalDateTime,
 ) : DbPosition {
-
-  override fun id(): DbPosition.Id {
-    return id
-  }
-
-  override fun holdingId(): DbHolding.Id {
-    return holdingId
-  }
-
-  override fun shareCount(): StockShareValue {
-    return shareCount
-  }
 
   override fun shareCount(shareCount: StockShareValue): DbPosition {
     return this.copy(shareCount = shareCount)
   }
 
-  override fun price(): StockMoneyValue {
-    return price
-  }
-
   override fun price(price: StockMoneyValue): DbPosition {
     return this.copy(price = price)
-  }
-
-  override fun purchaseDate(): LocalDateTime {
-    return purchaseDate
   }
 
   override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
@@ -78,11 +58,11 @@ internal constructor(
         id: DbPosition.Id = DbPosition.Id(IdGenerator.generate()),
     ): DbPosition {
       return JsonMappableDbPosition(
-          id = id,
-          holdingId = holdingId,
-          shareCount = shareCount,
-          price = price,
-          purchaseDate = purchaseDate,
+          id,
+          holdingId,
+          shareCount,
+          price,
+          purchaseDate,
       )
     }
 
@@ -92,11 +72,11 @@ internal constructor(
       return if (item is JsonMappableDbPosition) item
       else {
         JsonMappableDbPosition(
-            item.id(),
-            item.holdingId(),
-            item.shareCount(),
-            item.price(),
-            item.purchaseDate(),
+            item.id,
+            item.holdingId,
+            item.shareCount,
+            item.price,
+            item.purchaseDate,
         )
       }
     }

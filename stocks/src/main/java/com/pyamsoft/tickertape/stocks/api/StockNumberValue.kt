@@ -20,5 +20,5 @@ import androidx.annotation.CheckResult
 
 interface StockNumberValue {
 
-  @CheckResult fun isZero(): Boolean
+  @get:CheckResult val isZero: Boolean
 }

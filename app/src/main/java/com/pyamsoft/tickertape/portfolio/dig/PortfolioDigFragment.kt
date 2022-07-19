@@ -128,7 +128,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         symbol = getSymbol(),
         holdingId = getHoldingId(),
         holdingType = getHoldingType(),
-        existingPositionId = position.id(),
+        existingPositionId = position.id,
     )
   }
 
@@ -371,7 +371,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
               putString(KEY_HOLDING_ID, holdingId.raw)
               putString(KEY_HOLDING_TYPE, holdingType.name)
               putString(KEY_HOLDING_SIDE, holdingSide.name)
-              currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
+              currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value) }
               lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.raw) }
             }
       }

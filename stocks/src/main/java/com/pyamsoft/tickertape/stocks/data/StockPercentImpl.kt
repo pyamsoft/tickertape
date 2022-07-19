@@ -22,23 +22,17 @@ import com.pyamsoft.tickertape.stocks.api.PERCENT_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 
 internal data class StockPercentImpl(
-    private val percent: Double,
+    override val value: Double,
 ) : StockPercent {
 
   private val stockPercent by
       lazy(LazyThreadSafetyMode.NONE) {
-        if (isZero()) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(percent / 100)
+        if (isZero) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(value / 100)
       }
+
+  override val isZero: Boolean = value.isZero()
 
   override fun asPercentValue(): String {
     return stockPercent
-  }
-
-  override fun value(): Double {
-    return percent
-  }
-
-  override fun isZero(): Boolean {
-    return percent.isZero()
   }
 }

@@ -20,5 +20,5 @@ import androidx.annotation.CheckResult
 
 interface StockLongValue : StockNumberValue {
 
-  @CheckResult fun value(): Long
+  @get:CheckResult val value: Long
 }

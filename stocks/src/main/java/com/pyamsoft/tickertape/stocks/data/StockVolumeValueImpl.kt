@@ -22,23 +22,17 @@ import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.VOLUME_FORMATTER
 
 internal data class StockVolumeValueImpl(
-    private val value: Long,
+    override val value: Long,
 ) : StockVolumeValue {
 
   private val volume by
       lazy(LazyThreadSafetyMode.NONE) {
-        if (isZero()) "0" else VOLUME_FORMATTER.get().requireNotNull().format(value)
+        if (isZero) "0" else VOLUME_FORMATTER.get().requireNotNull().format(value)
       }
+
+  override val isZero: Boolean = value.isZero()
 
   override fun asVolumeValue(): String {
     return volume
-  }
-
-  override fun value(): Long {
-    return value
-  }
-
-  override fun isZero(): Boolean {
-    return value.isZero()
   }
 }

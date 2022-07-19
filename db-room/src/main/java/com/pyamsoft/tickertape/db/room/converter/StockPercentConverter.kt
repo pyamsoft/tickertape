@@ -34,6 +34,6 @@ internal object StockPercentConverter {
   @TypeConverter
   @CheckResult
   fun fromPercent(percent: StockPercent): Double {
-    return percent.value()
+    return percent.value
   }
 }

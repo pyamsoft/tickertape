@@ -83,7 +83,7 @@ internal constructor(
       existingPosition = existing
 
       // Make sure this number is good (it should be, but just to be safe)
-      existing.price().value().toString().also { p ->
+      existing.price.value.toString().also { p ->
         if (isSafe(p)) {
           pricePerShare = p
           // We always check at the end
@@ -93,7 +93,7 @@ internal constructor(
       }
 
       // Make sure this number is good (it should be, but just to be safe)
-      existing.shareCount().value().toString().also { p ->
+      existing.shareCount.value.toString().also { p ->
         if (isSafe(p)) {
           numberOfShares = p
           // We always check at the end
@@ -103,7 +103,7 @@ internal constructor(
       }
 
       // After date, check submittable
-      dateOfPurchase = existing.purchaseDate().toLocalDate()
+      dateOfPurchase = existing.purchaseDate.toLocalDate()
       checkSubmittable()
     }
   }

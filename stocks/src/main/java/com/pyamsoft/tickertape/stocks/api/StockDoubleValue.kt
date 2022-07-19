@@ -20,5 +20,5 @@ import androidx.annotation.CheckResult
 
 interface StockDoubleValue : StockNumberValue {
 
-  @CheckResult fun value(): Double
+  @get:CheckResult val value: Double
 }

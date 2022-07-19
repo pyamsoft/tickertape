@@ -53,8 +53,8 @@ data class Ticker(
           // Sort by the change percent
           return@Comparator q2.currentSession()
               .percent()
-              .value()
-              .compareTo(q1.currentSession().percent().value())
+              .value
+              .compareTo(q1.currentSession().percent().value)
         }
   }
 }

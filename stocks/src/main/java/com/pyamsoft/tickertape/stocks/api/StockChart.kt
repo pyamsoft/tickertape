@@ -99,7 +99,7 @@ interface StockChart {
 fun StockChart.periodHigh(): StockMoneyValue {
   Enforcer.assertOffMainThread()
 
-  return close().maxByOrNull { it.value() }.requireNotNull()
+  return close().maxByOrNull { it.value }.requireNotNull()
 }
 
 @CheckResult
@@ -107,5 +107,5 @@ fun StockChart.periodHigh(): StockMoneyValue {
 fun StockChart.periodLow(): StockMoneyValue {
   Enforcer.assertOffMainThread()
 
-  return close().minByOrNull { it.value() }.requireNotNull()
+  return close().minByOrNull { it.value }.requireNotNull()
 }

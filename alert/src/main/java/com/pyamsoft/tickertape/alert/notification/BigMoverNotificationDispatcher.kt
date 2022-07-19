@@ -124,12 +124,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val directionString: String
 
     when {
-      direction.isUp() -> {
+      direction.isUp -> {
         icon = R2.drawable.ic_chart_up_24dp
         movingString = "rising"
         directionString = "up"
       }
-      direction.isDown() -> {
+      direction.isDown -> {
         icon = R2.drawable.ic_chart_down_24dp
         movingString = "dropping"
         directionString = "down"

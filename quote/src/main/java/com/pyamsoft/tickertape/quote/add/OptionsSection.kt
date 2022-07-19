@@ -112,7 +112,7 @@ private fun OptionsStrikeExpiration(
         modifier = Modifier.weight(1F),
         value = selectedStrikePrice,
         choices = allStrikes,
-        onDisplayChoice = { it.asMoneyValue() },
+        onDisplayChoice = { it.display },
         onSelect = { onStrikeSelected(it) },
     )
   }

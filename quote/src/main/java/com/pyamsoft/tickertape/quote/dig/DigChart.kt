@@ -140,7 +140,7 @@ private fun CurrentScrub(
           if (openingPrice != null) {
             Text(
                 modifier = Modifier.weight(0.6F),
-                text = openingPrice.asMoneyValue(),
+                text = openingPrice.display,
                 style = MaterialTheme.typography.body1,
             )
 
@@ -193,7 +193,7 @@ private fun CurrentPriceDisplay(
       verticalArrangement = Arrangement.Center,
   ) {
     Text(
-        text = price.asMoneyValue(),
+        text = price.display,
         style =
             MaterialTheme.typography.body1.run {
               if (diff == null) this else copy(color = diff.color)
@@ -205,12 +205,12 @@ private fun CurrentPriceDisplay(
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-            text = "${diff.direction.sign()}${diff.amount.asMoneyValue()}",
+            text = "${diff.direction.sign}${diff.amount.display}",
             style = MaterialTheme.typography.caption.copy(color = diff.color),
         )
         Text(
             modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-            text = "(${diff.direction.sign()}${diff.percent.asPercentValue()})",
+            text = "(${diff.direction.sign}${diff.percent.asPercentValue()})",
             style = MaterialTheme.typography.caption.copy(color = diff.color),
         )
       }
@@ -226,14 +226,14 @@ private fun calculateDifferences(
 ): ScrubDifferences {
   Enforcer.assertOffMainThread()
 
-  val rawCurrent = current.value()
-  val rawOpen = openingPrice.value()
-
-  val comparison = rawCurrent.compareTo(rawOpen)
+  val comparison = current.compareTo(openingPrice)
   if (comparison == 0) {
     return ScrubDifferences.ZERO
   } else {
-    val direction = if (comparison < 0) StockDirection.down() else StockDirection.up()
+    val direction = if (comparison < 0) StockDirection.DOWN else StockDirection.UP
+
+    val rawCurrent = current.value
+    val rawOpen = openingPrice.value
 
     // Amount doesn't matter which direction
     val rawAmount = abs(rawCurrent - rawOpen)
@@ -245,7 +245,7 @@ private fun calculateDifferences(
         amount = rawAmount.asMoney(),
         percent = rawPercent.asPercent(),
         direction = direction,
-        color = Color(direction.color()),
+        color = Color(direction.color),
     )
   }
 }
@@ -261,9 +261,9 @@ private data class ScrubDifferences(
     @JvmStatic
     internal val ZERO =
         ScrubDifferences(
-            percent = StockPercent.none(),
-            amount = StockMoneyValue.none(),
-            direction = StockDirection.none(),
+            percent = StockPercent.NONE,
+            amount = StockMoneyValue.NONE,
+            direction = StockDirection.NONE,
             color = Color.Unspecified,
         )
   }

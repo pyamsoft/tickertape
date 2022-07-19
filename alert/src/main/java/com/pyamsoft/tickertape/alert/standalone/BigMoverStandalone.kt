@@ -119,7 +119,7 @@ internal constructor(
     return this.asSequence()
         .filter { quote ->
           val session = quote.currentSession()
-          val value = session.percent().value()
+          val value = session.percent().value
           return@filter value.compareTo(10.0) > 0 || value.compareTo(-10.0) < 1
         }
         .toList()

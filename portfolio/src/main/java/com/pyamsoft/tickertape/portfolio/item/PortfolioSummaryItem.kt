@@ -29,17 +29,17 @@ fun PorfolioSummaryItem(
   val gainLoss = portfolio.gainLossDisplayString
 
   val totalComposeColor =
-      if (totalDirection.isZero()) {
+      if (totalDirection.isZero) {
         MaterialTheme.typography.caption.color
       } else {
-        remember(totalDirection) { Color(totalDirection.color()) }
+        remember(totalDirection) { Color(totalDirection.color) }
       }
 
   val todayComposeColor =
-      if (todayDirection.isZero()) {
+      if (todayDirection.isZero) {
         MaterialTheme.typography.caption.color
       } else {
-        remember(todayDirection) { Color(todayDirection.color()) }
+        remember(todayDirection) { Color(todayDirection.color) }
       }
 
   Column(
@@ -47,7 +47,7 @@ fun PorfolioSummaryItem(
   ) {
     Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = totalAmount.asMoneyValue(),
+        text = totalAmount.display,
         style = MaterialTheme.typography.h3,
     )
 

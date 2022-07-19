@@ -55,7 +55,7 @@ fun PortfolioScreen(
       onTabUpdated = onTabUpdated,
       onFabClick = onFabClick,
       onRegenerateList = onRegenerateList,
-      itemKey = { index, stock -> "${stock.holding.symbol().raw}-${index}" },
+      itemKey = { index, stock -> "${stock.holding.symbol.raw}-${index}" },
       renderHeader = {
         PortfolioSummary(
             modifier = Modifier.fillMaxWidth(),

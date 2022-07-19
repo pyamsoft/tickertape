@@ -33,6 +33,6 @@ internal object DbSplitIdConverter {
   @TypeConverter
   @CheckResult
   fun fromId(id: DbSplit.Id): String {
-    return id.id
+    return id.raw
   }
 }

@@ -102,7 +102,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val holding = holdingQueryDao.query(force).firstOrNull { it.id() == id }
+          val holding = holdingQueryDao.query(force).firstOrNull { it.id == id }
           ResultWrapper.success(holding.requireNotNull { "Unable to find holding with id: $id" })
         } catch (e: Throwable) {
           e.ifNotCancellation {

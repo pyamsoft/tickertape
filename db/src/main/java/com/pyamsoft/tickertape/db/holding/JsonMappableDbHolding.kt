@@ -26,42 +26,27 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbHolding
 internal constructor(
-    internal val id: DbHolding.Id,
-    internal val symbol: StockSymbol,
-    internal val type: EquityType,
-    internal val side: TradeSide,
+    override val id: DbHolding.Id,
+    override val symbol: StockSymbol,
+    override val type: EquityType,
+    override val side: TradeSide,
 ) : DbHolding {
-
-  override fun id(): DbHolding.Id {
-    return id
-  }
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun type(): EquityType {
-    return type
-  }
-
-  override fun side(): TradeSide {
-    return side
-  }
 
   companion object {
 
     @JvmStatic
     @CheckResult
     fun create(
+        id: DbHolding.Id = DbHolding.Id(IdGenerator.generate()),
         symbol: StockSymbol,
         type: EquityType,
         side: TradeSide,
     ): DbHolding {
       return JsonMappableDbHolding(
-          id = DbHolding.Id(IdGenerator.generate()),
-          symbol = symbol,
-          type = type,
-          side = side,
+          id,
+          symbol,
+          type,
+          side,
       )
     }
 
@@ -71,10 +56,10 @@ internal constructor(
       return if (item is JsonMappableDbHolding) item
       else {
         JsonMappableDbHolding(
-            item.id(),
-            item.symbol(),
-            item.type(),
-            item.side(),
+            item.id,
+            item.symbol,
+            item.type,
+            item.side,
         )
       }
     }

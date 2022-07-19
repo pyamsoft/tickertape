@@ -24,17 +24,17 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 interface DbHolding {
 
-  @CheckResult fun id(): Id
+  @get:CheckResult val id: Id
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun type(): EquityType
+  @get:CheckResult val type: EquityType
 
-  @CheckResult fun side(): TradeSide
+  @get:CheckResult val side: TradeSide
 
-  data class Id(override val id: String) : IdType {
+  data class Id(override val raw: String) : IdType {
 
-    override val isEmpty: Boolean = id.isBlank()
+    override val isEmpty: Boolean = raw.isBlank()
 
     companion object {
 

@@ -30,7 +30,7 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
   val isEmpty = list.isEmpty()
 
   init {
-    val filterOptions = { h: PortfolioStock -> h.holding.type() == EquityType.OPTION }
+    val filterOptions = { h: PortfolioStock -> h.holding.type == EquityType.OPTION }
     val sumCostNumber =
         if (isEmpty) 0.0 else list.asSequence().filterNot(filterOptions).map { it.costNumber }.sum()
 

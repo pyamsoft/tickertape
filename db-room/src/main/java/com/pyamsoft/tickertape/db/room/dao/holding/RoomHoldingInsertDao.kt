@@ -37,7 +37,7 @@ internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
       withContext(context = Dispatchers.IO) {
         val roomHolding = RoomDbHolding.create(o)
-        return@withContext if (daoQuery(roomHolding.id()) == null) {
+        return@withContext if (daoQuery(roomHolding.id) == null) {
           if (daoInsert(roomHolding) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.Insert(roomHolding)
           } else {

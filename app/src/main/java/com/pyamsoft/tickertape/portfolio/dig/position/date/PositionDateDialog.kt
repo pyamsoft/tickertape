@@ -71,7 +71,7 @@ internal class PositionDateDialog : BaseDateDialog() {
         day: Int,
     ): DialogFragment {
       return PositionDateDialog().apply {
-        arguments = prepareBundle(year, month, day).apply { putString(KEY_POSITION, positionId.id) }
+        arguments = prepareBundle(year, month, day).apply { putString(KEY_POSITION, positionId.raw) }
       }
     }
 

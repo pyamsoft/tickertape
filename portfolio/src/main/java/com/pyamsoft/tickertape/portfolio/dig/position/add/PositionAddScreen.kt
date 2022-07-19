@@ -39,7 +39,7 @@ fun PositionAddScreen(
       modifier = modifier,
       isReadOnly = isReadOnly,
       isSubmitEnabled = isSubmitEnabled,
-      title = "Position: ${symbol.symbol()}",
+      title = "Position: ${symbol.raw}",
       topFieldLabel = "Number of ${what}s",
       topFieldValue = numberOfShares,
       onTopFieldChanged = onNumberChanged,

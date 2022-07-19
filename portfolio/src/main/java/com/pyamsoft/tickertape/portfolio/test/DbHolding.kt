@@ -7,20 +7,9 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 internal fun newTestHolding(symbol: StockSymbol): DbHolding {
   return object : DbHolding {
-    override fun id(): DbHolding.Id {
-      return DbHolding.Id("TEST")
-    }
-
-    override fun symbol(): StockSymbol {
-      return symbol
-    }
-
-    override fun type(): EquityType {
-      return EquityType.STOCK
-    }
-
-    override fun side(): TradeSide {
-      return TradeSide.BUY
-    }
+    override val id: DbHolding.Id = DbHolding.Id("TEST")
+    override val symbol: StockSymbol = symbol
+    override val type: EquityType = EquityType.STOCK
+    override val side: TradeSide = TradeSide.BUY
   }
 }

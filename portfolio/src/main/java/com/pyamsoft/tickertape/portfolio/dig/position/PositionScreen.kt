@@ -51,7 +51,7 @@ internal fun PositionScreen(
       isLoading = isLoading,
       onRefresh = onRefresh,
       onAddClicked = onAddPosition,
-      itemKey = { it.id().id },
+      itemKey = { it.id().raw },
       renderListItem = { position ->
         PositionItem(
             modifier =

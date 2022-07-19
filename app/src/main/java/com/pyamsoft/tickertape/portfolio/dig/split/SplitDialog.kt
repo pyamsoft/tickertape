@@ -200,9 +200,9 @@ internal class SplitDialog : AppCompatDialogFragment() {
       return SplitDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
-              putString(KEY_HOLDING_ID, holdingId.id)
-              putString(KEY_EXISTING_SPLIT_ID, existingSplitId.id)
+              putString(KEY_SYMBOL, symbol.raw)
+              putString(KEY_HOLDING_ID, holdingId.raw)
+              putString(KEY_EXISTING_SPLIT_ID, existingSplitId.raw)
             }
       }
     }

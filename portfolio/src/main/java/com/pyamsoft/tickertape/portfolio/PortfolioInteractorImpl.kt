@@ -91,7 +91,7 @@ internal constructor(
 
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val holdings = jobResult[0] as List<DbHolding>
-            val symbols = holdings.map { it.symbol() }
+            val symbols = holdings.map { it.symbol }
 
             // We can cast since we know what this one is
             @Suppress("UNCHECKED_CAST") val positions = jobResult[1] as List<DbPosition>
@@ -110,9 +110,9 @@ internal constructor(
                 .map { quotes ->
                   val result = mutableListOf<PortfolioStock>()
                   for (holding in holdings) {
-                    val quote = quotes.firstOrNull { it.symbol == holding.symbol() }
-                    val holdingPositions = positions.filter { it.holdingId() == holding.id() }
-                    val holdingSplits = splits.filter { it.holdingId() == holding.id() }
+                    val quote = quotes.firstOrNull { it.symbol == holding.symbol }
+                    val holdingPositions = positions.filter { it.holdingId() == holding.id }
+                    val holdingSplits = splits.filter { it.holdingId() == holding.id }
                     val stock =
                         PortfolioStock(
                             holding = holding,
@@ -141,7 +141,7 @@ internal constructor(
 
         return@withContext try {
           // TODO move this query into the DAO layer
-          val holding = holdingQueryDao.query(true).firstOrNull { it.id() == id }
+          val holding = holdingQueryDao.query(true).firstOrNull { it.id == id }
           if (holding == null) {
             val err = IllegalStateException("Holding does not exist in DB: $id")
             Timber.e(err)

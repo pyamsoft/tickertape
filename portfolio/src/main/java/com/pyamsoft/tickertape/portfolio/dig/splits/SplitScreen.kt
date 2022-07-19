@@ -46,7 +46,7 @@ internal fun SplitScreen(
       isLoading = isLoading,
       onRefresh = onRefresh,
       onAddClicked = onAddSplit,
-      itemKey = { it.id().id },
+      itemKey = { it.id().raw },
       renderListItem = { split ->
         SplitItem(
             modifier =

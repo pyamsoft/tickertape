@@ -50,7 +50,7 @@ internal constructor(
   val totalShares: StockShareValue
   val gainLossDisplayString: String
   val changeTodayDisplayString: String
-  val isOption = holding.type() == EquityType.OPTION
+  val isOption = holding.type == EquityType.OPTION
 
   // Used in PortfolioStockList
   internal val costNumber: Double
@@ -59,7 +59,7 @@ internal constructor(
 
   init {
     val optionsModifier = if (isOption) 100 else 1
-    val sellSideModifier = if (holding.side() == TradeSide.SELL) -1 else 1
+    val sellSideModifier = if (holding.side == TradeSide.SELL) -1 else 1
 
     val isNoPosition = positions.isEmpty()
 
@@ -158,9 +158,9 @@ internal constructor(
           }
 
           return@Comparator s1.holding
-              .symbol()
+              .symbol
               .raw
-              .compareTo(s2.holding.symbol().raw, ignoreCase = true)
+              .compareTo(s2.holding.symbol.raw, ignoreCase = true)
         }
   }
 }

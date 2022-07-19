@@ -29,35 +29,23 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 @Entity(tableName = RoomDbHolding.TABLE_NAME)
 internal data class RoomDbHolding
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbHolding.Id,
-    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol,
-    @JvmField @ColumnInfo(name = COLUMN_HOLDING_TYPE) val type: EquityType,
-    @JvmField @ColumnInfo(name = COLUMN_HOLDING_SIDE) val side: TradeSide,
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val dbId: DbHolding.Id,
+    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val dbSymbol: StockSymbol,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_TYPE) val dbType: EquityType,
+    @JvmField @ColumnInfo(name = COLUMN_HOLDING_SIDE) val dbSide: TradeSide,
     @Deprecated("Remove this field when we migrate to the next DB version")
     @JvmField
     @ColumnInfo(name = COLUMN_HOLDING_REAL_TYPE)
     val realEquityType: String,
 ) : DbHolding {
 
-  @Ignore
-  override fun id(): DbHolding.Id {
-    return id
-  }
+  @Ignore override val id: DbHolding.Id = dbId
 
-  @Ignore
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
+  @Ignore override val symbol: StockSymbol = dbSymbol
 
-  @Ignore
-  override fun type(): EquityType {
-    return type
-  }
+  @Ignore override val type: EquityType = dbType
 
-  @Ignore
-  override fun side(): TradeSide {
-    return side
-  }
+  @Ignore override val side: TradeSide = dbSide
 
   companion object {
 
@@ -80,10 +68,10 @@ internal constructor(
       return if (item is RoomDbHolding) item
       else {
         RoomDbHolding(
-            item.id(),
-            item.symbol(),
-            item.type(),
-            item.side(),
+            item.id,
+            item.symbol,
+            item.type,
+            item.side,
             "DEPRECATED: Remove in next migration",
         )
       }

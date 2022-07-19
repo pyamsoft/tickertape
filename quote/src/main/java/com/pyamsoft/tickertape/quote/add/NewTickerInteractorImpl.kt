@@ -135,11 +135,16 @@ internal constructor(
       tradeSide: TradeSide,
   ): DbInsert.InsertResult<StockSymbol> {
     val existing =
-        holdingQueryDao.query(false).firstOrNull { it.symbol() == symbol && it.side() == tradeSide }
+        holdingQueryDao.query(false).firstOrNull { it.symbol == symbol && it.side == tradeSide }
     return if (existing == null) {
-      val model = JsonMappableDbHolding.create(symbol, equityType, tradeSide)
+      val model =
+          JsonMappableDbHolding.create(
+              symbol = symbol,
+              type = equityType,
+              side = tradeSide,
+          )
       val result = holdingInsertDao.insert(model)
-      mapResultToSymbol(result) { it.symbol() }
+      mapResultToSymbol(result) { it.symbol }
     } else {
       val error = IllegalArgumentException("${symbol.raw} already in portfolio: $tradeSide")
       DbInsert.InsertResult.Fail(

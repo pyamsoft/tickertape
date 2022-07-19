@@ -40,9 +40,9 @@ interface DbSplit {
 
   @CheckResult fun splitDate(date: LocalDateTime): DbSplit
 
-  data class Id(override val id: String) : IdType {
+  data class Id(override val raw: String) : IdType {
 
-    override val isEmpty: Boolean = id.isBlank()
+    override val isEmpty: Boolean = raw.isBlank()
 
     companion object {
 

@@ -212,10 +212,10 @@ internal class PositionDialog : AppCompatDialogFragment() {
       return PositionDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
-              putString(KEY_HOLDING_ID, holdingId.id)
+              putString(KEY_SYMBOL, symbol.raw)
+              putString(KEY_HOLDING_ID, holdingId.raw)
               putString(KEY_HOLDING_TYPE, holdingType.name)
-              putString(KEY_EXISTING_POSITION_ID, existingPositionId.id)
+              putString(KEY_EXISTING_POSITION_ID, existingPositionId.raw)
             }
       }
     }

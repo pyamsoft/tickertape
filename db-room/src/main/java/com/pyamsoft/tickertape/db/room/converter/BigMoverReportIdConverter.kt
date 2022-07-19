@@ -33,6 +33,6 @@ internal object BigMoverReportIdConverter {
   @TypeConverter
   @CheckResult
   fun fromId(id: BigMoverReport.Id): String {
-    return id.id
+    return id.raw
   }
 }

@@ -33,6 +33,6 @@ internal object DbPositionIdConverter {
   @TypeConverter
   @CheckResult
   fun fromId(id: DbPosition.Id): String {
-    return id.id
+    return id.raw
   }
 }

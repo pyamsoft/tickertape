@@ -69,7 +69,7 @@ internal class SplitDateDialog : BaseDateDialog() {
         day: Int,
     ): DialogFragment {
       return SplitDateDialog().apply {
-        arguments = prepareBundle(year, month, day).apply { putString(KEY_SPLIT, splitId.id) }
+        arguments = prepareBundle(year, month, day).apply { putString(KEY_SPLIT, splitId.raw) }
       }
     }
 

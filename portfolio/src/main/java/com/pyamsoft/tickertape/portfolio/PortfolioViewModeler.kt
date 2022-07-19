@@ -79,7 +79,7 @@ internal constructor(
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        return@map if (stock.holding.id() != position.holdingId()) stock
+        return@map if (stock.holding.id != position.holdingId()) stock
         else {
           val newPositions = stock.positions.map { if (doesPositionMatch(it)) position else it }
           stock.copy(positions = newPositions)
@@ -92,7 +92,7 @@ internal constructor(
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        return@map if (stock.holding.id() != position.holdingId()) stock
+        return@map if (stock.holding.id != position.holdingId()) stock
         else stock.copy(positions = stock.positions + position)
       }
     }
@@ -103,7 +103,7 @@ internal constructor(
     val s = state
     s.regeneratePortfolio(this) {
       s.fullPortfolio.map { stock ->
-        if (stock.holding.id() != position.holdingId()) {
+        if (stock.holding.id != position.holdingId()) {
           return@map stock
         } else {
           return@map if (!stock.positions.contains(doesPositionMatch)) stock
@@ -160,13 +160,13 @@ internal constructor(
     return tickers
         .asSequence()
         .filter { ps ->
-          val symbol = ps.holding.symbol().raw
+          val symbol = ps.holding.symbol.raw
           val name = ps.ticker?.quote?.company()?.company()
           return@filter if (symbol.contains(search, ignoreCase = true)) true
           else name?.contains(search, ignoreCase = true) ?: false
         }
         .filter { ps ->
-          val type = ps.holding.type()
+          val type = ps.holding.type
           return@filter when (section) {
             EquityType.STOCK -> type == EquityType.STOCK
             EquityType.OPTION -> type == EquityType.OPTION
@@ -190,7 +190,7 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
     val s = state
-    s.regeneratePortfolio(this) { s.fullPortfolio.filterNot { it.holding.id() == holding.id() } }
+    s.regeneratePortfolio(this) { s.fullPortfolio.filterNot { it.holding.id == holding.id } }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network

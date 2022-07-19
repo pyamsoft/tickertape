@@ -33,6 +33,6 @@ internal object DbSymbolIdConverter {
   @TypeConverter
   @CheckResult
   fun fromId(id: DbSymbol.Id): String {
-    return id.id
+    return id.raw
   }
 }

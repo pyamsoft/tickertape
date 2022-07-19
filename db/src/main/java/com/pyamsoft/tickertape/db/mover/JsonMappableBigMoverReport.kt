@@ -30,48 +30,24 @@ import java.time.LocalDateTime
 @JsonClass(generateAdapter = true)
 data class JsonMappableBigMoverReport
 internal constructor(
-    internal val id: BigMoverReport.Id,
-    internal val symbol: StockSymbol,
-    internal val lastState: MarketState,
-    internal val lastNotified: LocalDateTime,
-    internal val lastPercent: StockPercent,
-    internal val lastPrice: StockMoneyValue,
+    override val id: BigMoverReport.Id,
+    override val symbol: StockSymbol,
+    override val lastState: MarketState,
+    override val lastNotified: LocalDateTime,
+    override val lastPercent: StockPercent,
+    override val lastPrice: StockMoneyValue,
 ) : BigMoverReport {
-
-  override fun id(): BigMoverReport.Id {
-    return id
-  }
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
-
-  override fun lastNotified(): LocalDateTime {
-    return lastNotified
-  }
 
   override fun lastNotified(notified: LocalDateTime): BigMoverReport {
     return this.copy(lastNotified = notified)
-  }
-
-  override fun lastState(): MarketState {
-    return lastState
   }
 
   override fun lastState(state: MarketState): BigMoverReport {
     return this.copy(lastState = state)
   }
 
-  override fun lastPercent(): StockPercent {
-    return lastPercent
-  }
-
   override fun lastPercent(percent: StockPercent): BigMoverReport {
     return this.copy(lastPercent = percent)
-  }
-
-  override fun lastPrice(): StockMoneyValue {
-    return lastPrice
   }
 
   override fun lastPrice(price: StockMoneyValue): BigMoverReport {
@@ -101,12 +77,12 @@ internal constructor(
       return if (item is JsonMappableBigMoverReport) item
       else {
         JsonMappableBigMoverReport(
-            item.id(),
-            item.symbol(),
-            item.lastState(),
-            item.lastNotified(),
-            item.lastPercent(),
-            item.lastPrice(),
+            item.id,
+            item.symbol,
+            item.lastState,
+            item.lastNotified,
+            item.lastPercent,
+            item.lastPrice,
         )
       }
     }

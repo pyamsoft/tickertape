@@ -71,18 +71,18 @@ internal constructor(
     val allQuotes = withContext(context = Dispatchers.IO) { bigMoverQueryDao.query(false) }
 
     bigMovers.forEach { quote ->
-      val moverRecord = allQuotes.firstOrNull { it.symbol() == quote.symbol() }
+      val moverRecord = allQuotes.firstOrNull { it.symbol == quote.symbol() }
       val insertRecord =
           if (moverRecord == null) {
             // If no mover record exists yet, make a new one
             JsonMappableBigMoverReport.create(quote)
           } else {
             val session = quote.currentSession()
-            if (moverRecord.lastState() != session.state()) {
+            if (moverRecord.lastState != session.state()) {
               // State has changed, update the record
               moverRecord.updateToSession(now, session)
             } else {
-              if (now.minusHours(NOTIFY_PERIOD).isAfter(moverRecord.lastNotified())) {
+              if (now.minusHours(NOTIFY_PERIOD).isAfter(moverRecord.lastNotified)) {
                 // Was last notified over PERIOD hours ago, notify again
                 moverRecord.updateToSession(now, session)
               } else {

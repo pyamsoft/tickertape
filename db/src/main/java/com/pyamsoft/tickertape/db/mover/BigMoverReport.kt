@@ -26,23 +26,23 @@ import java.time.LocalDateTime
 
 interface BigMoverReport {
 
-  @CheckResult fun id(): Id
+  @get:CheckResult val id: Id
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-  @CheckResult fun lastNotified(): LocalDateTime
+  @get:CheckResult val lastNotified: LocalDateTime
+
+  @get:CheckResult val lastState: MarketState
+
+  @get:CheckResult val lastPrice: StockMoneyValue
+
+  @get:CheckResult val lastPercent: StockPercent
 
   @CheckResult fun lastNotified(notified: LocalDateTime): BigMoverReport
 
-  @CheckResult fun lastState(): MarketState
-
   @CheckResult fun lastState(state: MarketState): BigMoverReport
 
-  @CheckResult fun lastPrice(): StockMoneyValue
-
   @CheckResult fun lastPrice(price: StockMoneyValue): BigMoverReport
-
-  @CheckResult fun lastPercent(): StockPercent
 
   @CheckResult fun lastPercent(percent: StockPercent): BigMoverReport
 

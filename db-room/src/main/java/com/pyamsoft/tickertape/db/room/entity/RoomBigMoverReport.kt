@@ -31,62 +31,44 @@ import java.time.LocalDateTime
 @Entity(tableName = RoomBigMoverReport.TABLE_NAME)
 internal data class RoomBigMoverReport
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: BigMoverReport.Id,
-    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol,
-    @JvmField @ColumnInfo(name = COLUMN_LAST_DATE) val lastNotified: LocalDateTime,
-    @JvmField @ColumnInfo(name = COLUMN_LAST_PERCENT) val lastPercent: StockPercent,
-    @JvmField @ColumnInfo(name = COLUMN_LAST_PRICE) val lastPrice: StockMoneyValue,
-    @JvmField @ColumnInfo(name = COLUMN_LAST_STATE) val lastState: MarketState,
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val dbId: BigMoverReport.Id,
+    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val dbSymbol: StockSymbol,
+    @JvmField @ColumnInfo(name = COLUMN_LAST_DATE) val dbLastNotified: LocalDateTime,
+    @JvmField @ColumnInfo(name = COLUMN_LAST_PERCENT) val dbLastPercent: StockPercent,
+    @JvmField @ColumnInfo(name = COLUMN_LAST_PRICE) val dbLastPrice: StockMoneyValue,
+    @JvmField @ColumnInfo(name = COLUMN_LAST_STATE) val dbLastState: MarketState,
 ) : BigMoverReport {
 
-  @Ignore
-  override fun id(): BigMoverReport.Id {
-    return id
-  }
+  @Ignore override val id: BigMoverReport.Id = dbId
 
-  @Ignore
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
+  @Ignore override val symbol: StockSymbol = dbSymbol
 
-  @Ignore
-  override fun lastNotified(): LocalDateTime {
-    return lastNotified
-  }
+  @Ignore override val lastNotified: LocalDateTime = dbLastNotified
+
+  @Ignore override val lastPercent: StockPercent = dbLastPercent
+
+  @Ignore override val lastPrice: StockMoneyValue = dbLastPrice
+
+  @Ignore override val lastState: MarketState = dbLastState
 
   @Ignore
   override fun lastNotified(notified: LocalDateTime): BigMoverReport {
-    return this.copy(lastNotified = notified)
-  }
-
-  @Ignore
-  override fun lastPercent(): StockPercent {
-    return lastPercent
+    return this.copy(dbLastNotified = notified)
   }
 
   @Ignore
   override fun lastPercent(percent: StockPercent): BigMoverReport {
-    return this.copy(lastPercent = percent)
-  }
-
-  @Ignore
-  override fun lastPrice(): StockMoneyValue {
-    return lastPrice
+    return this.copy(dbLastPercent = percent)
   }
 
   @Ignore
   override fun lastPrice(price: StockMoneyValue): BigMoverReport {
-    return this.copy(lastPrice = price)
-  }
-
-  @Ignore
-  override fun lastState(): MarketState {
-    return lastState
+    return this.copy(dbLastPrice = price)
   }
 
   @Ignore
   override fun lastState(state: MarketState): BigMoverReport {
-    return this.copy(lastState = state)
+    return this.copy(dbLastState = state)
   }
 
   companion object {
@@ -112,12 +94,12 @@ internal constructor(
       return if (item is RoomBigMoverReport) item
       else {
         RoomBigMoverReport(
-            item.id(),
-            item.symbol(),
-            item.lastNotified(),
-            item.lastPercent(),
-            item.lastPrice(),
-            item.lastState(),
+            item.id,
+            item.symbol,
+            item.lastNotified,
+            item.lastPercent,
+            item.lastPrice,
+            item.lastState,
         )
       }
     }

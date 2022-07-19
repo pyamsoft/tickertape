@@ -25,13 +25,13 @@ import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
 interface TickerDb : DbCache {
 
-  @CheckResult fun symbols(): SymbolDb
+  @get:CheckResult val symbols: SymbolDb
 
-  @CheckResult fun holdings(): HoldingDb
+  @get:CheckResult val holdings: HoldingDb
 
-  @CheckResult fun positions(): PositionDb
+  @get:CheckResult val positions: PositionDb
 
-  @CheckResult fun bigMover(): BigMoverDb
+  @get:CheckResult val bigMovers: BigMoverDb
 
-  @CheckResult fun split(): SplitDb
+  @get:CheckResult val splits: SplitDb
 }

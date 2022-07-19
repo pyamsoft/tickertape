@@ -28,38 +28,18 @@ import javax.inject.Singleton
 internal class TickerDbImpl
 @Inject
 internal constructor(
-    private val symbolDb: SymbolDb,
-    private val holdingDb: HoldingDb,
-    private val positionDb: PositionDb,
-    private val bigMoverDb: BigMoverDb,
-    private val splitDb: SplitDb,
+    override val symbols: SymbolDb,
+    override val holdings: HoldingDb,
+    override val positions: PositionDb,
+    override val bigMovers: BigMoverDb,
+    override val splits: SplitDb,
 ) : TickerDb {
 
-  override fun symbols(): SymbolDb {
-    return symbolDb
-  }
-
-  override fun holdings(): HoldingDb {
-    return holdingDb
-  }
-
-  override fun positions(): PositionDb {
-    return positionDb
-  }
-
-  override fun bigMover(): BigMoverDb {
-    return bigMoverDb
-  }
-
-  override fun split(): SplitDb {
-      return splitDb
-  }
-
   override suspend fun invalidate() {
-    symbolDb.invalidate()
-    holdingDb.invalidate()
-    positionDb.invalidate()
-    bigMoverDb.invalidate()
-    splitDb.invalidate()
+    symbols.invalidate()
+    holdings.invalidate()
+    positions.invalidate()
+    bigMovers.invalidate()
+    splits.invalidate()
   }
 }

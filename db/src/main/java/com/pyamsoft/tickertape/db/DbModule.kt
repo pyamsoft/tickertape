@@ -75,35 +75,35 @@ abstract class DbModule {
     @CheckResult
     @InternalApi
     internal fun provideSymbolDb(db: TickerDb): SymbolDb {
-      return db.symbols()
+      return db.symbols
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSymbolRealtimeDao(@InternalApi db: SymbolDb): SymbolRealtime {
-      return db.realtime()
+      return db.realtime
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSymbolQueryDao(@InternalApi db: SymbolDb): SymbolQueryDao {
-      return db.queryDao()
+      return db.queryDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSymbolInsertDao(@InternalApi db: SymbolDb): SymbolInsertDao {
-      return db.insertDao()
+      return db.insertDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSymbolDeleteDao(@InternalApi db: SymbolDb): SymbolDeleteDao {
-      return db.deleteDao()
+      return db.deleteDao
     }
 
     @JvmStatic
@@ -111,35 +111,35 @@ abstract class DbModule {
     @CheckResult
     @InternalApi
     internal fun provideHoldingDb(db: TickerDb): HoldingDb {
-      return db.holdings()
+      return db.holdings
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideHoldingRealtimeDao(@InternalApi db: HoldingDb): HoldingRealtime {
-      return db.realtime()
+      return db.realtime
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideHoldingQueryDao(@InternalApi db: HoldingDb): HoldingQueryDao {
-      return db.queryDao()
+      return db.queryDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideHoldingInsertDao(@InternalApi db: HoldingDb): HoldingInsertDao {
-      return db.insertDao()
+      return db.insertDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideHoldingDeleteDao(@InternalApi db: HoldingDb): HoldingDeleteDao {
-      return db.deleteDao()
+      return db.deleteDao
     }
 
     @JvmStatic
@@ -147,35 +147,35 @@ abstract class DbModule {
     @CheckResult
     @InternalApi
     internal fun providePositionDb(db: TickerDb): PositionDb {
-      return db.positions()
+      return db.positions
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun providePositionRealtimeDao(@InternalApi db: PositionDb): PositionRealtime {
-      return db.realtime()
+      return db.realtime
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun providePositionQueryDao(@InternalApi db: PositionDb): PositionQueryDao {
-      return db.queryDao()
+      return db.queryDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun providePositionInsertDao(@InternalApi db: PositionDb): PositionInsertDao {
-      return db.insertDao()
+      return db.insertDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun providePositionDeleteDao(@InternalApi db: PositionDb): PositionDeleteDao {
-      return db.deleteDao()
+      return db.deleteDao
     }
 
     @JvmStatic
@@ -183,35 +183,35 @@ abstract class DbModule {
     @CheckResult
     @InternalApi
     internal fun provideBigMoverDb(db: TickerDb): BigMoverDb {
-      return db.bigMover()
+      return db.bigMovers
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideBigMoverRealtimeDao(@InternalApi db: BigMoverDb): BigMoverRealtime {
-      return db.realtime()
+      return db.realtime
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideBigMoverQueryDao(@InternalApi db: BigMoverDb): BigMoverQueryDao {
-      return db.queryDao()
+      return db.queryDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideBigMoverInsertDao(@InternalApi db: BigMoverDb): BigMoverInsertDao {
-      return db.insertDao()
+      return db.insertDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideBigMoverDeleteDao(@InternalApi db: BigMoverDb): BigMoverDeleteDao {
-      return db.deleteDao()
+      return db.deleteDao
     }
 
     @JvmStatic
@@ -219,35 +219,35 @@ abstract class DbModule {
     @CheckResult
     @InternalApi
     internal fun provideSplitDb(db: TickerDb): SplitDb {
-      return db.split()
+      return db.splits
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSplitRealtimeDao(@InternalApi db: SplitDb): SplitRealtime {
-      return db.realtime()
+      return db.realtime
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSplitQueryDao(@InternalApi db: SplitDb): SplitQueryDao {
-      return db.queryDao()
+      return db.queryDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSplitInsertDao(@InternalApi db: SplitDb): SplitInsertDao {
-      return db.insertDao()
+      return db.insertDao
     }
 
     @JvmStatic
     @Provides
     @CheckResult
     internal fun provideSplitDeleteDao(@InternalApi db: SplitDb): SplitDeleteDao {
-      return db.deleteDao()
+      return db.deleteDao
     }
   }
 }

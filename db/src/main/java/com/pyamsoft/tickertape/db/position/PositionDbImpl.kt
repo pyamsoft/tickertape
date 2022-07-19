@@ -49,21 +49,13 @@ internal constructor(
         return@cachify realQueryDao.query(true)
       }
 
-  override fun realtime(): PositionRealtime {
-    return this
-  }
+  override val deleteDao: PositionDeleteDao = this
 
-  override fun queryDao(): PositionQueryDao {
-    return this
-  }
+  override val insertDao: PositionInsertDao = this
 
-  override fun insertDao(): PositionInsertDao {
-    return this
-  }
+  override val queryDao: PositionQueryDao = this
 
-  override fun deleteDao(): PositionDeleteDao {
-    return this
-  }
+  override val realtime: PositionRealtime = this
 
   override suspend fun invalidate() =
       withContext(context = Dispatchers.IO) {

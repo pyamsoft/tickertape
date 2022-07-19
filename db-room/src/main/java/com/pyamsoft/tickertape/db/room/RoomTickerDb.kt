@@ -35,33 +35,33 @@ import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
 
 internal interface RoomTickerDb {
 
-  @CheckResult fun roomSymbolQueryDao(): RoomSymbolQueryDao
+  @get:CheckResult val roomSymbolQueryDao: RoomSymbolQueryDao
 
-  @CheckResult fun roomSymbolInsertDao(): RoomSymbolInsertDao
+  @get:CheckResult val roomSymbolInsertDao: RoomSymbolInsertDao
 
-  @CheckResult fun roomSymbolDeleteDao(): RoomSymbolDeleteDao
+  @get:CheckResult val roomSymbolDeleteDao: RoomSymbolDeleteDao
 
-  @CheckResult fun roomHoldingQueryDao(): RoomHoldingQueryDao
+  @get:CheckResult val roomHoldingQueryDao: RoomHoldingQueryDao
 
-  @CheckResult fun roomHoldingInsertDao(): RoomHoldingInsertDao
+  @get:CheckResult val roomHoldingInsertDao: RoomHoldingInsertDao
 
-  @CheckResult fun roomHoldingDeleteDao(): RoomHoldingDeleteDao
+  @get:CheckResult val roomHoldingDeleteDao: RoomHoldingDeleteDao
 
-  @CheckResult fun roomPositionQueryDao(): RoomPositionQueryDao
+  @get:CheckResult val roomPositionQueryDao: RoomPositionQueryDao
 
-  @CheckResult fun roomPositionInsertDao(): RoomPositionInsertDao
+  @get:CheckResult val roomPositionInsertDao: RoomPositionInsertDao
 
-  @CheckResult fun roomPositionDeleteDao(): RoomPositionDeleteDao
+  @get:CheckResult val roomPositionDeleteDao: RoomPositionDeleteDao
 
-  @CheckResult fun roomBigMoverQueryDao(): RoomBigMoverQueryDao
+  @get:CheckResult val roomBigMoverQueryDao: RoomBigMoverQueryDao
 
-  @CheckResult fun roomBigMoverInsertDao(): RoomBigMoverInsertDao
+  @get:CheckResult val roomBigMoverInsertDao: RoomBigMoverInsertDao
 
-  @CheckResult fun roomBigMoverDeleteDao(): RoomBigMoverDeleteDao
+  @get:CheckResult val roomBigMoverDeleteDao: RoomBigMoverDeleteDao
 
-  @CheckResult fun roomSplitQueryDao(): RoomSplitQueryDao
+  @get:CheckResult val roomSplitQueryDao: RoomSplitQueryDao
 
-  @CheckResult fun roomSplitInsertDao(): RoomSplitInsertDao
+  @get:CheckResult val roomSplitInsertDao: RoomSplitInsertDao
 
-  @CheckResult fun roomSplitDeleteDao(): RoomSplitDeleteDao
+  @get:CheckResult val roomSplitDeleteDao: RoomSplitDeleteDao
 }

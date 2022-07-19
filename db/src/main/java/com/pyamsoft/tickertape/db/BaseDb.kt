@@ -25,11 +25,11 @@ interface BaseDb<
     D : DbDelete<*>,
 > : DbCache {
 
-  @CheckResult fun realtime(): R
+  @get:CheckResult val realtime: R
 
-  @CheckResult fun queryDao(): Q
+  @get:CheckResult val queryDao: Q
 
-  @CheckResult fun insertDao(): I
+  @get:CheckResult val insertDao: I
 
-  @CheckResult fun deleteDao(): D
+  @get:CheckResult val deleteDao: D
 }

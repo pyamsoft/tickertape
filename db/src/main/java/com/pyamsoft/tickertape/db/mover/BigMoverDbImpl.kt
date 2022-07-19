@@ -50,21 +50,13 @@ internal constructor(
         return@cachify realQueryDao.query(true)
       }
 
-  override fun realtime(): BigMoverRealtime {
-    return this
-  }
+  override val deleteDao: BigMoverDeleteDao = this
 
-  override fun queryDao(): BigMoverQueryDao {
-    return this
-  }
+  override val insertDao: BigMoverInsertDao = this
 
-  override fun insertDao(): BigMoverInsertDao {
-    return this
-  }
+  override val queryDao: BigMoverQueryDao = this
 
-  override fun deleteDao(): BigMoverDeleteDao {
-    return this
-  }
+  override val realtime: BigMoverRealtime = this
 
   override suspend fun invalidate() =
       withContext(context = Dispatchers.IO) {

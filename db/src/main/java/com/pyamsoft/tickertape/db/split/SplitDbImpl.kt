@@ -35,12 +35,7 @@ internal constructor(
     @param:DbApi private val realInsertDao: SplitInsertDao,
     @param:DbApi private val realDeleteDao: SplitDeleteDao,
 ) :
-    BaseDbImpl<
-        SplitChangeEvent,
-        SplitRealtime,
-        SplitQueryDao,
-        SplitInsertDao,
-        SplitDeleteDao>(),
+    BaseDbImpl<SplitChangeEvent, SplitRealtime, SplitQueryDao, SplitInsertDao, SplitDeleteDao>(),
     SplitDb {
 
   private val queryCache =
@@ -49,21 +44,13 @@ internal constructor(
         return@cachify realQueryDao.query(true)
       }
 
-  override fun realtime(): SplitRealtime {
-    return this
-  }
+  override val deleteDao: SplitDeleteDao = this
 
-  override fun queryDao(): SplitQueryDao {
-    return this
-  }
+  override val insertDao: SplitInsertDao = this
 
-  override fun insertDao(): SplitInsertDao {
-    return this
-  }
+  override val queryDao: SplitQueryDao = this
 
-  override fun deleteDao(): SplitDeleteDao {
-    return this
-  }
+  override val realtime: SplitRealtime = this
 
   override suspend fun invalidate() =
       withContext(context = Dispatchers.IO) {

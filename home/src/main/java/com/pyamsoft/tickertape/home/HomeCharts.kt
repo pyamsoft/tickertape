@@ -308,7 +308,7 @@ private fun ChartList(
     if (onlyChartTickers != null) {
       itemsIndexed(
           items = onlyChartTickers,
-          key = { index, item -> "${item.symbol.symbol()}-${index}" },
+          key = { index, item -> "${item.symbol.raw}-${index}" },
       ) { index, item ->
         // We can assume here the chart is not null
         HomeChartItem(

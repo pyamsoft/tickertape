@@ -42,7 +42,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
   private suspend fun fetchKeyStatistics(symbol: StockSymbol): PairedResponse {
     val response =
         service.getStatistics(
-            symbol = symbol.symbol(),
+            symbol = symbol.raw,
             modules = ALL_MODULES_STRING,
         )
     return PairedResponse(

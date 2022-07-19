@@ -85,12 +85,12 @@ internal constructor(private val context: Context, private val activityClass: Cl
     val activityIntent =
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol().symbol())
+          putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol().raw)
           putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE, quote.type().name)
 
           val lookupSymbol =
               if (quote is StockOptionsQuote) quote.underlyingSymbol() else quote.symbol()
-          putExtra(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
+          putExtra(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL, lookupSymbol.raw)
         }
     return PendingIntent.getActivity(
         appContext,
@@ -139,13 +139,13 @@ internal constructor(private val context: Context, private val activityClass: Cl
     }
 
     val title = buildSpannedString {
-      bold { append(quote.symbol().symbol()) }
+      bold { append(quote.symbol().raw) }
       append(" is $movingString today!")
     }
 
     val symbol = quote.symbol()
     val description = buildSpannedString {
-      bold { append(symbol.symbol()) }
+      bold { append(symbol.raw) }
       append(" is $directionString ")
       bold { append(percent.asPercentValue()) }
       append(" $sessionString")

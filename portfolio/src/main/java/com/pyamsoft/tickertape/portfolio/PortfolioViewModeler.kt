@@ -160,7 +160,7 @@ internal constructor(
     return tickers
         .asSequence()
         .filter { ps ->
-          val symbol = ps.holding.symbol().symbol()
+          val symbol = ps.holding.symbol().raw
           val name = ps.ticker?.quote?.company()?.company()
           return@filter if (symbol.contains(search, ignoreCase = true)) true
           else name?.contains(search, ignoreCase = true) ?: false

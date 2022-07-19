@@ -52,7 +52,7 @@ fun WatchlistScreen(
       onTabUpdated = onTabUpdated,
       onFabClick = onFabClick,
       onRegenerateList = onRegenerateList,
-      itemKey = { index, stock -> "${stock.symbol.symbol()}-${index}" },
+      itemKey = { index, stock -> "${stock.symbol.raw}-${index}" },
       renderListItem = { stock ->
         WatchlistItem(
             modifier = Modifier.fillMaxWidth(),

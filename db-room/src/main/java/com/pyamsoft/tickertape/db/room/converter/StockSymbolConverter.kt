@@ -34,6 +34,6 @@ internal object StockSymbolConverter {
   @TypeConverter
   @CheckResult
   fun fromSymbol(symbol: StockSymbol): String {
-    return symbol.symbol()
+    return symbol.raw
   }
 }

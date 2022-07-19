@@ -25,7 +25,7 @@ fun TickerName(
       modifier = modifier,
   ) {
     Text(
-        text = symbol.symbol(),
+        text = symbol.raw,
         style = MaterialTheme.typography.body1,
     )
 

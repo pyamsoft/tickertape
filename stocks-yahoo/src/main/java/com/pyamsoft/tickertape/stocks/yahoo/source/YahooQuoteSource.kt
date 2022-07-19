@@ -53,7 +53,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
         val result =
             service.getQuotes(
                 fields = YF_QUOTE_FIELDS,
-                symbols = symbols.joinToString(",") { it.symbol() },
+                symbols = symbols.joinToString(",") { it.raw },
             )
 
         val formatter = DATE_FORMATTER.get().requireNotNull()
@@ -88,7 +88,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
       val strikePrice = stock.strike?.asMoney()
       val expirationDate = parseMarketTime(stock.expireDate.requireNotNull(), localId)
       val companyName =
-          "${underlyingSymbol.symbol()} ${expirationDate.format(formatter)}${if (strikePrice == null) "" else " ${strikePrice.asMoneyValue()}"}"
+          "${underlyingSymbol.raw} ${expirationDate.format(formatter)}${if (strikePrice == null) "" else " ${strikePrice.asMoneyValue()}"}"
       return StockOptionsQuote.create(
           underlyingSymbol = underlyingSymbol,
           strike = strikePrice,

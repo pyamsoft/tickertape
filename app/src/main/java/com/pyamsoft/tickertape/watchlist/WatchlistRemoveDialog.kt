@@ -128,7 +128,7 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
         symbol: StockSymbol,
     ): DialogFragment {
       return WatchlistRemoveDialog().apply {
-        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.symbol()) }
+        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.raw) }
       }
     }
 

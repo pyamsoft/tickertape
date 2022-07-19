@@ -120,7 +120,7 @@ internal constructor(
       val result = symbolInsertDao.insert(model)
       mapResultToSymbol(result) { it.symbol }
     } else {
-      val error = IllegalArgumentException("${symbol.symbol()} already in watchlist")
+      val error = IllegalArgumentException("${symbol.raw} already in watchlist")
       DbInsert.InsertResult.Fail(
           data = symbol,
           error = error,
@@ -141,7 +141,7 @@ internal constructor(
       val result = holdingInsertDao.insert(model)
       mapResultToSymbol(result) { it.symbol() }
     } else {
-      val error = IllegalArgumentException("${symbol.symbol()} already in portfolio: $tradeSide")
+      val error = IllegalArgumentException("${symbol.raw} already in portfolio: $tradeSide")
       DbInsert.InsertResult.Fail(
           data = symbol,
           error = error,

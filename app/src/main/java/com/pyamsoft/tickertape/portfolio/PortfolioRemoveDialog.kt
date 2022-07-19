@@ -141,7 +141,7 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
       return PortfolioRemoveDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, holding.symbol().symbol())
+              putString(KEY_SYMBOL, holding.symbol().raw)
               putString(KEY_HOLDING, holding.id().id)
             }
       }

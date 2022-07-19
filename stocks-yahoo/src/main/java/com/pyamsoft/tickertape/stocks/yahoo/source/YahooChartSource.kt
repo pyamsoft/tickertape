@@ -47,7 +47,7 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
         val interval = getIntervalForRange(range)
         val result =
             service.getCharts(
-                symbols = symbols.joinToString(",") { it.symbol() },
+                symbols = symbols.joinToString(",") { it.raw },
                 range = range.apiValue,
                 interval = interval.apiValue,
             )

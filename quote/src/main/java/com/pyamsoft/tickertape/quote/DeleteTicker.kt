@@ -43,7 +43,7 @@ fun DeleteTicker(
           append("Really remove ticker: ")
           withStyle(
               style = BOLD_STYLE,
-          ) { append(symbol.symbol()) }
+          ) { append(symbol.raw) }
           append("?")
         }
       }

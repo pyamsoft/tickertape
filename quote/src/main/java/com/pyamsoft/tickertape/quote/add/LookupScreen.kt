@@ -199,7 +199,7 @@ private fun ResultItem(
       verticalArrangement = Arrangement.Center,
   ) {
     Text(
-        text = symbol.symbol(),
+        text = symbol.raw,
         style =
             MaterialTheme.typography.body1.copy(
                 fontWeight = FontWeight.SemiBold,

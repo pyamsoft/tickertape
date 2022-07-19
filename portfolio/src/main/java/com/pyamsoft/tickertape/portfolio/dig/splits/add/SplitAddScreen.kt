@@ -34,7 +34,7 @@ fun SplitAddScreen(
       modifier = modifier,
       isReadOnly = isReadOnly,
       isSubmitEnabled = isSubmitEnabled,
-      title = "Stock Split: ${symbol.symbol()}",
+      title = "Stock Split: ${symbol.raw}",
       topFieldLabel = "Pre-Split Share Count",
       topFieldValue = preSplitShareCount,
       onTopFieldChanged = onPreSplitCountChanged,

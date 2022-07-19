@@ -115,7 +115,7 @@ internal constructor(
     return tickers
         .asSequence()
         .filter { qs ->
-          val symbol = qs.symbol.symbol()
+          val symbol = qs.symbol.raw
           val name = qs.quote?.company()?.company()
           return@filter if (symbol.contains(search, ignoreCase = true)) true
           else name?.contains(search, ignoreCase = true) ?: false

@@ -106,7 +106,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
 
   @CheckResult
   private suspend fun fetchOption(symbol: StockSymbol): StockOptions {
-    val resp = service.getOptions(symbol.symbol())
+    val resp = service.getOptions(symbol.raw)
     return parseOptionsResponse(resp)
   }
 
@@ -170,6 +170,6 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
           tempStrike *= 10
         }
 
-        return@withContext "${symbol.symbol()}${dateString}${contract}${strikeString}"
+        return@withContext "${symbol.raw}${dateString}${contract}${strikeString}"
       }
 }

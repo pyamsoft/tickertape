@@ -53,7 +53,7 @@ protected constructor(
               .map { list -> list.first { it.symbol() == symbol } }
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting statistics: ${symbol.symbol()}")
+            Timber.e(e, "Error getting statistics: ${symbol.raw}")
             ResultWrapper.failure(e)
           }
         }
@@ -69,7 +69,7 @@ protected constructor(
           ResultWrapper.success(stockInteractor.getNews(force, symbol))
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting news ${symbol.symbol()}")
+            Timber.e(e, "Error getting news ${symbol.raw}")
             ResultWrapper.failure(e)
           }
         }

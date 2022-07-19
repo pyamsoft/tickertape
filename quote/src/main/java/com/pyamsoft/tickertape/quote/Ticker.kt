@@ -37,7 +37,7 @@ data class Ticker(
 
           // If no quote, sort by symbol
           if (q1 == null && q2 == null) {
-            return@Comparator s2.symbol.symbol().compareTo(s1.symbol.symbol(), ignoreCase = true)
+            return@Comparator s2.symbol.raw.compareTo(s1.symbol.raw, ignoreCase = true)
           }
 
           // If either has a quote, it goes first

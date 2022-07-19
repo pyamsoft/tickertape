@@ -139,7 +139,7 @@ internal constructor(
     val percentText = "(${directionSign}${percent})"
     val changeText = "$directionSign${changeAmount}"
 
-    remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol().symbol())
+    remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol().raw)
 
     remoteViews.setTextViewText(remoteViewIdGroup.priceViewId, priceText)
     remoteViews.setTextColor(remoteViewIdGroup.priceViewId, color)

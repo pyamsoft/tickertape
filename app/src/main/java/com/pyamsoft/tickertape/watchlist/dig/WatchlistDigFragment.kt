@@ -248,8 +248,8 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       return WatchlistDigFragment().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
-              putString(KEY_LOOKUP_SYMBOL, lookupSymbol.symbol())
+              putString(KEY_SYMBOL, symbol.raw)
+              putString(KEY_LOOKUP_SYMBOL, lookupSymbol.raw)
               putString(KEY_EQUITY_TYPE, equityType.name)
               putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
             }

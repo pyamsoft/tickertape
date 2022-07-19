@@ -44,7 +44,7 @@ internal fun WatchlistDigToolbar(
   val isInWatchlist = state.isInWatchlist
   val isAllowedToModifyWatchlist = state.isAllowModifyWatchlist
   val section = state.section
-  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
+  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.raw }
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
   val allTabs = remember { WatchlistDigSections.values() }

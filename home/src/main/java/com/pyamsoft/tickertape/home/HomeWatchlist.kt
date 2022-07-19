@@ -139,7 +139,7 @@ private fun TickerList(
   ) {
     itemsIndexed(
         items = tickers,
-        key = { index, item -> "${item.symbol.symbol()}-${index}" },
+        key = { index, item -> "${item.symbol.raw}-${index}" },
     ) { index, item ->
       // We can assume here the chart is not null
       HomeWatchlistItem(

@@ -37,7 +37,7 @@ internal constructor(@GoogleNewsApi private val service: NewsService) : NewsSour
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val resp = service.getNews(query = "${symbol.symbol()} Stock")
+        val resp = service.getNews(query = "${symbol.raw} Stock")
         return@withContext resp.news().map { article ->
           return@map StockNews.create(
               id = article.id(),

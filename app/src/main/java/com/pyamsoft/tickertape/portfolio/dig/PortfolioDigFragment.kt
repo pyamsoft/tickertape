@@ -367,12 +367,12 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       return PortfolioDigFragment().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.symbol())
+              putString(KEY_SYMBOL, symbol.raw)
               putString(KEY_HOLDING_ID, holdingId.id)
               putString(KEY_HOLDING_TYPE, holdingType.name)
               putString(KEY_HOLDING_SIDE, holdingSide.name)
               currentPrice?.also { putDouble(KEY_CURRENT_PRICE, it.value()) }
-              lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.symbol()) }
+              lookupSymbol?.also { putString(KEY_LOOKUP_SYMBOL, it.raw) }
             }
       }
     }

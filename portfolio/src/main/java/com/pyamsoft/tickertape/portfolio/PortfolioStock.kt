@@ -159,8 +159,8 @@ internal constructor(
 
           return@Comparator s1.holding
               .symbol()
-              .symbol()
-              .compareTo(s2.holding.symbol().symbol(), ignoreCase = true)
+              .raw
+              .compareTo(s2.holding.symbol().raw, ignoreCase = true)
         }
   }
 }

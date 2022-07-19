@@ -39,7 +39,7 @@ internal fun PortfolioDigToolbar(
 ) {
   val ticker = state.ticker
   val section = state.section
-  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.symbol() }
+  val title = remember(ticker) { ticker.quote?.company()?.company() ?: ticker.symbol.raw }
   val allTabs = remember { PortfolioDigSections.values() }
 
   Surface(

@@ -217,7 +217,7 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) {
       optionLookupRunner
           .call(false, symbol)
-          .onFailure { Timber.e(it, "Error looking up options data: ${symbol.symbol()}") }
+          .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
           .onSuccess { Timber.d("Options data: $it") }
           .onSuccess { state.resolvedOption = it }
           .onFailure { state.resolvedOption = null }
@@ -237,7 +237,7 @@ internal constructor(
     val s = state
     s.apply {
       validSymbol = symbol
-      this.symbol = symbol.symbol()
+      this.symbol = symbol.raw
 
       if (dismiss) {
         dismissSearchResultsPopup()

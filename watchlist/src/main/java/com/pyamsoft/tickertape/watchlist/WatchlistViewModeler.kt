@@ -56,9 +56,9 @@ internal constructor(
 
   private fun CoroutineScope.handleRealtimeEvent(event: SymbolChangeEvent) =
       when (event) {
-        is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol(), event.offerUndo)
-        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol())
-        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol())
+        is SymbolChangeEvent.Delete -> handleDeleteSymbol(event.symbol.symbol, event.offerUndo)
+        is SymbolChangeEvent.Insert -> handleInsertSymbol(event.symbol.symbol)
+        is SymbolChangeEvent.Update -> handleUpdateSymbol(event.symbol.symbol)
       }
 
   private fun CoroutineScope.handleInsertSymbol(symbol: StockSymbol) {

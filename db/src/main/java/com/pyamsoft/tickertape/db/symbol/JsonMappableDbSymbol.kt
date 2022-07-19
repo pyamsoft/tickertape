@@ -24,17 +24,9 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbSymbol
 internal constructor(
-    internal val id: DbSymbol.Id,
-    internal val symbol: StockSymbol,
+    override val id: DbSymbol.Id,
+    override val symbol: StockSymbol,
 ) : DbSymbol {
-
-  override fun id(): DbSymbol.Id {
-    return id
-  }
-
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
 
   companion object {
 
@@ -50,8 +42,8 @@ internal constructor(
       return if (item is JsonMappableDbSymbol) item
       else {
         JsonMappableDbSymbol(
-            item.id(),
-            item.symbol(),
+            item.id,
+            item.symbol,
         )
       }
     }

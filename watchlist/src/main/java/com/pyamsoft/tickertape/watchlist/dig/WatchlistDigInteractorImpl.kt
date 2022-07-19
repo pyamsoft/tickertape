@@ -49,7 +49,7 @@ internal constructor(
 
   @CheckResult
   private suspend fun getExistingSymbol(force: Boolean, symbol: StockSymbol): DbSymbol? {
-    return symbolQueryDao.query(force).firstOrNull { it.symbol() == symbol }
+    return symbolQueryDao.query(force).firstOrNull { it.symbol == symbol }
   }
 
   override suspend fun isInWatchlist(symbol: StockSymbol, force: Boolean): ResultWrapper<Boolean> =

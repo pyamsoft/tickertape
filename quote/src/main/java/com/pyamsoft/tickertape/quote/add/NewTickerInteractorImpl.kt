@@ -114,11 +114,11 @@ internal constructor(
   private suspend fun handleInsertWatchlist(
       symbol: StockSymbol
   ): DbInsert.InsertResult<StockSymbol> {
-    val existing = symbolQueryDao.query(false).firstOrNull { it.symbol() == symbol }
+    val existing = symbolQueryDao.query(false).firstOrNull { it.symbol == symbol }
     return if (existing == null) {
       val model = JsonMappableDbSymbol.create(symbol)
       val result = symbolInsertDao.insert(model)
-      mapResultToSymbol(result) { it.symbol() }
+      mapResultToSymbol(result) { it.symbol }
     } else {
       val error = IllegalArgumentException("${symbol.symbol()} already in watchlist")
       DbInsert.InsertResult.Fail(

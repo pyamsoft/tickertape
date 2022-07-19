@@ -27,19 +27,13 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 @Entity(tableName = RoomDbSymbol.TABLE_NAME)
 internal data class RoomDbSymbol
 internal constructor(
-    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val id: DbSymbol.Id,
-    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val symbol: StockSymbol
+    @JvmField @PrimaryKey @ColumnInfo(name = COLUMN_ID) val dbId: DbSymbol.Id,
+    @JvmField @ColumnInfo(name = COLUMN_SYMBOL) val dbSymbol: StockSymbol
 ) : DbSymbol {
 
-  @Ignore
-  override fun id(): DbSymbol.Id {
-    return id
-  }
+  @Ignore override val id: DbSymbol.Id = dbId
 
-  @Ignore
-  override fun symbol(): StockSymbol {
-    return symbol
-  }
+  @Ignore override val symbol: StockSymbol = dbSymbol
 
   companion object {
 
@@ -55,7 +49,10 @@ internal constructor(
     internal fun create(symbol: DbSymbol): RoomDbSymbol {
       return if (symbol is RoomDbSymbol) symbol
       else {
-        RoomDbSymbol(symbol.id(), symbol.symbol())
+        RoomDbSymbol(
+            symbol.id,
+            symbol.symbol,
+        )
       }
     }
   }

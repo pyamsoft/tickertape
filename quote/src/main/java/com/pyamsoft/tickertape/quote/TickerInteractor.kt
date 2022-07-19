@@ -50,7 +50,7 @@ suspend fun TickerInteractor.getWatchListQuotes(
     dao: SymbolQueryDao,
     options: TickerInteractor.Options?,
 ): ResultWrapper<List<Ticker>> {
-  val watchList = dao.query(force).map { it.symbol() }
+  val watchList = dao.query(force).map { it.symbol }
   return this.getQuotes(
       force,
       watchList,

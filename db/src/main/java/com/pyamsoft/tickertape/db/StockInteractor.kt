@@ -10,7 +10,7 @@ suspend fun StockInteractor.getWatchListQuotes(
     force: Boolean,
     dao: SymbolQueryDao,
 ): List<StockQuote> {
-  val watchList = dao.query(force).map { it.symbol() }
+  val watchList = dao.query(force).map { it.symbol }
   return this.getQuotes(
       force,
       watchList,

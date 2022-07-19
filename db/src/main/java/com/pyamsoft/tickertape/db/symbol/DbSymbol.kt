@@ -22,9 +22,9 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DbSymbol {
 
-  @CheckResult fun id(): Id
+  @get:CheckResult val id: Id
 
-  @CheckResult fun symbol(): StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
   data class Id(override val id: String) : IdType {
 

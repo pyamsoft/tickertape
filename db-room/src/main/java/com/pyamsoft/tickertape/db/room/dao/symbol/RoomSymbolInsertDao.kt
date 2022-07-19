@@ -37,7 +37,7 @@ internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
   override suspend fun insert(o: DbSymbol): DbInsert.InsertResult<DbSymbol> =
       withContext(context = Dispatchers.IO) {
         val roomSymbol = RoomDbSymbol.create(o)
-        return@withContext if (daoQuery(roomSymbol.id()) == null) {
+        return@withContext if (daoQuery(roomSymbol.id) == null) {
           if (daoInsert(roomSymbol) != ROOM_ROW_ID_INSERT_INVALID) {
             DbInsert.InsertResult.Insert(roomSymbol)
           } else {

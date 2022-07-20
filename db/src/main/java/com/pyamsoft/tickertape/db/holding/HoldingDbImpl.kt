@@ -32,8 +32,8 @@ internal class HoldingDbImpl
 @Inject
 internal constructor(
     @DbApi realQueryDao: HoldingQueryDao,
-    @param:DbApi private val realInsertDao: HoldingInsertDao,
-    @param:DbApi private val realDeleteDao: HoldingDeleteDao,
+    @DbApi private val realInsertDao: HoldingInsertDao,
+    @DbApi private val realDeleteDao: HoldingDeleteDao,
 ) :
     BaseDbImpl<
         HoldingChangeEvent, HoldingRealtime, HoldingQueryDao, HoldingInsertDao, HoldingDeleteDao>(),

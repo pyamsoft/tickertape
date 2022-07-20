@@ -35,7 +35,7 @@ import timber.log.Timber
 class TapeLauncher
 @Inject
 internal constructor(
-    @param:TapeInternalApi private val tapeStopBus: EventBus<TapeRemote.StopCommand>,
+    @TapeInternalApi private val tapeStopBus: EventBus<TapeRemote.StopCommand>,
     private val context: Context,
     private val serviceClass: Class<out Service>,
     private val preferences: TapePreferences,

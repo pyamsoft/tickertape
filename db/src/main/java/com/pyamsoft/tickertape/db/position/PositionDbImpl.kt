@@ -32,8 +32,8 @@ internal class PositionDbImpl
 @Inject
 internal constructor(
     @DbApi realQueryDao: PositionQueryDao,
-    @param:DbApi private val realInsertDao: PositionInsertDao,
-    @param:DbApi private val realDeleteDao: PositionDeleteDao,
+    @DbApi private val realInsertDao: PositionInsertDao,
+    @DbApi private val realDeleteDao: PositionDeleteDao,
 ) :
     BaseDbImpl<
         PositionChangeEvent,

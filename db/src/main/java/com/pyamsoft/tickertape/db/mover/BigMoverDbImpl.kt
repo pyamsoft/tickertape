@@ -32,8 +32,8 @@ internal class BigMoverDbImpl
 @Inject
 internal constructor(
     @DbApi realQueryDao: BigMoverQueryDao,
-    @param:DbApi private val realInsertDao: BigMoverInsertDao,
-    @param:DbApi private val realDeleteDao: BigMoverDeleteDao,
+    @DbApi private val realInsertDao: BigMoverInsertDao,
+    @DbApi private val realDeleteDao: BigMoverDeleteDao,
 ) :
     BaseDbImpl<
         BigMoverChangeEvent,

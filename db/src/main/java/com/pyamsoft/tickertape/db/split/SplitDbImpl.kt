@@ -32,8 +32,8 @@ internal class SplitDbImpl
 @Inject
 internal constructor(
     @DbApi realQueryDao: SplitQueryDao,
-    @param:DbApi private val realInsertDao: SplitInsertDao,
-    @param:DbApi private val realDeleteDao: SplitDeleteDao,
+    @DbApi private val realInsertDao: SplitInsertDao,
+    @DbApi private val realDeleteDao: SplitDeleteDao,
 ) :
     BaseDbImpl<SplitChangeEvent, SplitRealtime, SplitQueryDao, SplitInsertDao, SplitDeleteDao>(),
     SplitDb {

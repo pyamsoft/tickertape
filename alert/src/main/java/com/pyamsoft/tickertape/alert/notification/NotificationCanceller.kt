@@ -27,7 +27,7 @@ import timber.log.Timber
 class NotificationCanceller
 @Inject
 internal constructor(
-    @param:AlertInternalApi private val notifier: Notifier,
+    @AlertInternalApi private val notifier: Notifier,
     private val idMap: NotificationIdMap,
 ) {
 

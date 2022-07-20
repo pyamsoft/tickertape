@@ -42,7 +42,7 @@ import timber.log.Timber
 class BigMoverStandalone
 @Inject
 internal constructor(
-    @param:AlertInternalApi private val notifier: Notifier,
+    @AlertInternalApi private val notifier: Notifier,
     private val bigMoverQueryDao: BigMoverQueryDao,
     private val bigMoverInsertDao: BigMoverInsertDao,
     private val idMap: NotificationIdMap,

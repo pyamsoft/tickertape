@@ -39,8 +39,8 @@ import timber.log.Timber
 internal class TapeRemoteImpl
 @Inject
 internal constructor(
-    @param:TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
-    @param:TapeInternalApi private val notifier: Notifier,
+    @TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
+    @TapeInternalApi private val notifier: Notifier,
     private val symbolQueryDao: SymbolQueryDao,
     private val interactor: StockInteractor,
 ) : TapeRemote {

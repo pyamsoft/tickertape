@@ -32,8 +32,8 @@ internal class SymbolDbImpl
 @Inject
 internal constructor(
     @DbApi realQueryDao: SymbolQueryDao,
-    @param:DbApi private val realInsertDao: SymbolInsertDao,
-    @param:DbApi private val realDeleteDao: SymbolDeleteDao,
+    @DbApi private val realInsertDao: SymbolInsertDao,
+    @DbApi private val realDeleteDao: SymbolDeleteDao,
 ) :
     BaseDbImpl<
         SymbolChangeEvent, SymbolRealtime, SymbolQueryDao, SymbolInsertDao, SymbolDeleteDao>(),

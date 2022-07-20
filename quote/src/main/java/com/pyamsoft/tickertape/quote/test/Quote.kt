@@ -28,33 +28,15 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import com.pyamsoft.tickertape.stocks.api.asCompany
-import com.pyamsoft.tickertape.stocks.api.asDirection
-import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
-import com.pyamsoft.tickertape.stocks.api.asVolume
 
 @CheckResult
-private fun newSession(state: MarketState): StockMarketSession {
+private fun newTestSession(): StockMarketSession {
   return object : StockMarketSession {
-    override fun direction(): StockDirection {
-      return 0.0.asDirection()
-    }
-
-    override fun price(): StockMoneyValue {
-      return 1.0.asMoney()
-    }
-
-    override fun amount(): StockMoneyValue {
-      return 1.0.asMoney()
-    }
-
-    override fun percent(): StockPercent {
-      return 1.0.asPercent()
-    }
-
-    override fun state(): MarketState {
-      return state
-    }
+    override val direction: StockDirection = StockDirection.NONE
+    override val price: StockMoneyValue = StockMoneyValue.NONE
+    override val amount: StockMoneyValue = StockMoneyValue.NONE
+    override val percent: StockPercent = StockPercent.NONE
+    override val state: MarketState = MarketState.REGULAR
   }
 }
 
@@ -62,52 +44,18 @@ private fun newSession(state: MarketState): StockMarketSession {
 @CheckResult
 fun newTestQuote(symbol: StockSymbol): StockQuote {
   return object : StockQuote {
-    override fun symbol(): StockSymbol {
-      return symbol
-    }
-
-    override fun company(): StockCompany {
-      return "TEST COMPANY".asCompany()
-    }
-
-    override fun type(): EquityType {
-      return EquityType.STOCK
-    }
-
-    override fun regular(): StockMarketSession {
-      return newSession(MarketState.REGULAR)
-    }
-
-    override fun preMarket(): StockMarketSession? {
-      return null
-    }
-
-    override fun afterHours(): StockMarketSession? {
-      return null
-    }
-
-    override fun dataDelayBy(): Long {
-      return 0
-    }
-
-    override fun dayPreviousClose(): StockMoneyValue? {
-      return 1.0.asMoney()
-    }
-
-    override fun dayOpen(): StockMoneyValue {
-      return 2.0.asMoney()
-    }
-
-    override fun dayHigh(): StockMoneyValue {
-      return 3.0.asMoney()
-    }
-
-    override fun dayLow(): StockMoneyValue {
-      return 0.7.asMoney()
-    }
-
-    override fun dayVolume(): StockVolumeValue {
-      return 100L.asVolume()
-    }
+    override val symbol: StockSymbol = symbol
+    override val company: StockCompany = "".asCompany()
+    override val type: EquityType = EquityType.STOCK
+    override val regular: StockMarketSession = newTestSession()
+    override val preMarket: StockMarketSession? = null
+    override val afterHours: StockMarketSession? = null
+    override val dataDelayBy: Long = 0
+    override val dayPreviousClose: StockMoneyValue? = null
+    override val dayOpen: StockMoneyValue? = null
+    override val dayHigh: StockMoneyValue? = null
+    override val dayLow: StockMoneyValue? = null
+    override val dayVolume: StockVolumeValue? = null
+    override val currentSession: StockMarketSession = regular
   }
 }

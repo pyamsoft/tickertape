@@ -3,7 +3,6 @@ package com.pyamsoft.tickertape.portfolio.dig
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +23,7 @@ import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -145,8 +145,11 @@ private fun Content(
         )
       }
       PortfolioDigSections.STATISTICS -> {
-        Spacer(
+        DigKeyStatistics(
             modifier = Modifier.fillMaxSize(),
+            isLoading = false,
+            statistics = null,
+            onRefresh = {},
         )
       }
       PortfolioDigSections.SPLITS -> {

@@ -66,30 +66,25 @@ fun <T : Any> BaseListScreen(
       modifier = modifier,
       scaffoldState = scaffoldState,
   ) {
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = isLoading),
+    Content(
+        modifier = Modifier.fillMaxSize(),
+        imageLoader = imageLoader,
+        isLoading = isLoading,
+        navBarBottomHeight = navBarBottomHeight,
         onRefresh = onRefresh,
-    ) {
-      Content(
-          modifier = Modifier.fillMaxSize(),
-          imageLoader = imageLoader,
-          isLoading = isLoading,
-          navBarBottomHeight = navBarBottomHeight,
-          onRefresh = onRefresh,
-          onSearchChanged = onSearchChanged,
-          onTabUpdated = onTabUpdated,
-          onFabClick = onFabClick,
-          onRegenerateList = onRegenerateList,
-          itemKey = itemKey,
-          renderHeader = renderHeader,
-          renderEmptyState = renderEmptyState,
-          renderListItem = renderListItem,
-          pageError = pageError,
-          list = list,
-          search = search,
-          tab = tab,
-      )
-    }
+        onSearchChanged = onSearchChanged,
+        onTabUpdated = onTabUpdated,
+        onFabClick = onFabClick,
+        onRegenerateList = onRegenerateList,
+        itemKey = itemKey,
+        renderHeader = renderHeader,
+        renderEmptyState = renderEmptyState,
+        renderListItem = renderListItem,
+        pageError = pageError,
+        list = list,
+        search = search,
+        tab = tab,
+    )
   }
 }
 
@@ -133,23 +128,28 @@ private fun <T : Any> Content(
       modifier = modifier,
       contentAlignment = Alignment.BottomCenter,
   ) {
-    ListSection(
-        modifier = Modifier.fillMaxSize(),
-        imageLoader = imageLoader,
-        navBarBottomHeight = bottomPaddingDp,
-        renderEmptyState = renderEmptyState,
-        onSearchChanged = onSearchChanged,
-        onTabUpdated = onTabUpdated,
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isLoading),
         onRefresh = onRefresh,
-        onRegenerateList = onRegenerateList,
-        itemKey = itemKey,
-        renderHeader = renderHeader,
-        renderListItem = renderListItem,
-        pageError = pageError,
-        list = list,
-        search = search,
-        tab = tab,
-    )
+    ) {
+      ListSection(
+          modifier = Modifier.fillMaxSize(),
+          imageLoader = imageLoader,
+          navBarBottomHeight = bottomPaddingDp,
+          renderEmptyState = renderEmptyState,
+          onSearchChanged = onSearchChanged,
+          onTabUpdated = onTabUpdated,
+          onRefresh = onRefresh,
+          onRegenerateList = onRegenerateList,
+          itemKey = itemKey,
+          renderHeader = renderHeader,
+          renderListItem = renderListItem,
+          pageError = pageError,
+          list = list,
+          search = search,
+          tab = tab,
+      )
+    }
 
     NewTickerFab(
         visible = !isLoading,

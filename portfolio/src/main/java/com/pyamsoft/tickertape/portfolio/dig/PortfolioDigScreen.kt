@@ -22,8 +22,8 @@ import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
+import com.pyamsoft.tickertape.portfolio.dig.stats.PositionStats
 import com.pyamsoft.tickertape.quote.Chart
-import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -145,11 +145,10 @@ private fun Content(
         )
       }
       PortfolioDigSections.STATISTICS -> {
-        DigKeyStatistics(
+        PositionStats(
             modifier = Modifier.fillMaxSize(),
-            isLoading = false,
-            statistics = null,
-            onRefresh = {},
+            state = state,
+            onRefresh = onRefresh,
         )
       }
       PortfolioDigSections.SPLITS -> {

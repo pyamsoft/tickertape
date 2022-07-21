@@ -162,7 +162,7 @@ private fun <T : Any> OptionsDropdown(
   val formatToDisplayChoice by rememberUpdatedState(onDisplayChoice)
 
   val displayChoices =
-      rememberInBackground(choices, formatToDisplayChoice) {
+      rememberInBackground(choices) {
         choices.map { c ->
           OptionsDropdownItem(
               display = formatToDisplayChoice(c),

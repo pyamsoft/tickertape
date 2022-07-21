@@ -29,8 +29,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.spark.SparkAdapter
@@ -138,6 +141,7 @@ private fun SparkChart(
     chart: StockChart,
     onScrub: ((Chart.Data?) -> Unit)?,
 ) {
+  val handleScrub by rememberUpdatedState(onScrub)
   // Keep a ref of the constructed SparkView chart
   val chartView = remember { mutableStateOf<SparkView?>(null) }
 
@@ -145,8 +149,14 @@ private fun SparkChart(
   val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
 
   val onScrubListener =
-      if (onScrub == null) null
-      else remember(onScrub) { SparkView.OnScrubListener { onScrub(it as? Chart.Data) } }
+      remember(handleScrub) {
+        if (handleScrub == null) null
+        else
+            SparkView.OnScrubListener {
+              val callback = handleScrub.requireNotNull()
+              callback(it as? Chart.Data)
+            }
+      }
 
   val isLight = MaterialTheme.colors.isLight
   val baseColor =
@@ -174,6 +184,7 @@ private fun SparkChart(
 
   val chartAdapter =
       rememberInBackground(chart) { ChartAdapter(chart, chart.periodHigh(), chart.periodLow()) }
+  Timber.d("ChartAdapter: $chartAdapter")
 
   AndroidView(
       modifier = modifier,

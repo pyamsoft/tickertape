@@ -31,20 +31,23 @@ fun DigKeyStatistics(
     statistics: KeyStatistics?,
     onRefresh: () -> Unit,
 ) {
-  val visible = remember(statistics) { true || statistics != null }
+  val visible = remember(statistics) { statistics != null }
 
   AnimatedVisibility(
       modifier = Modifier.padding(MaterialTheme.keylines.content),
       visible = visible,
   ) {
-    SwipeRefresh(
-        modifier = modifier,
-        state = rememberSwipeRefreshState(isRefreshing = isLoading),
-        onRefresh = onRefresh,
-    ) {
-      StatisticsGrid(
-          modifier = Modifier.fillMaxSize(),
-      )
+    if (statistics != null) {
+      SwipeRefresh(
+          modifier = modifier,
+          state = rememberSwipeRefreshState(isRefreshing = isLoading),
+          onRefresh = onRefresh,
+      ) {
+        StatisticsGrid(
+            modifier = Modifier.fillMaxSize(),
+            statistics = statistics,
+        )
+      }
     }
   }
 }
@@ -52,6 +55,7 @@ fun DigKeyStatistics(
 @Composable
 private fun StatisticsGrid(
     modifier: Modifier = Modifier,
+    statistics: KeyStatistics,
 ) {
   LazyColumn(
       modifier =
@@ -60,28 +64,92 @@ private fun StatisticsGrid(
               .drawBorder(Borders.BOTTOM),
   ) {
     item {
-      StatisticsItem(
+      StatisticsTitle(
           modifier = Modifier.fillMaxWidth(),
-          title = "Test",
-          content = "Test 1 Top Thing",
+          title = "Valuation Measures",
       )
     }
 
     item {
       StatisticsItem(
           modifier = Modifier.fillMaxWidth(),
-          title = "Test 2",
-          content = "Test 2 Top Thing",
+          title = "Market Cap",
+          content = statistics.info.marketCap.fmt,
       )
     }
 
     item {
       StatisticsItem(
           modifier = Modifier.fillMaxWidth(),
-          title = "Test 3",
-          content = "Test 3 Top Thing",
+          title = "Enterprise Value",
+          content = statistics.info.enterpriseValue.fmt,
       )
     }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Trailing P/E",
+          content = statistics.info.trailingEps.fmt,
+      )
+    }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Forward P/E",
+          content = statistics.info.forwardEps.fmt,
+      )
+    }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "PEG Ratio",
+          content = statistics.info.pegRatio.fmt,
+      )
+    }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Price/Book (mrq)",
+          content = statistics.info.priceToBook.fmt,
+      )
+    }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Enterprise Value/Revenue",
+          content = statistics.info.enterpriseValueToRevenue.fmt,
+      )
+    }
+
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Enterprise Value/EBITDA",
+          content = statistics.info.enterpriseValueToEbitda.fmt,
+      )
+    }
+  }
+}
+
+@Composable
+private fun StatisticsTitle(
+    modifier: Modifier = Modifier,
+    title: String,
+) {
+  Row(
+      modifier = modifier,
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+        modifier = Modifier.padding(MaterialTheme.keylines.baseline),
+        text = title,
+        style = MaterialTheme.typography.h6,
+    )
   }
 }
 

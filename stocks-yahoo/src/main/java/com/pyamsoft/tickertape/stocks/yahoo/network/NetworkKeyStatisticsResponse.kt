@@ -60,6 +60,7 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
       @JsonClass(generateAdapter = true)
       internal data class FinancialData
       internal constructor(
+          val currentPrice: YFData?,
           val targetHighPrice: YFData?,
           val targetLowPrice: YFData?,
           val targetMeanPrice: YFData?,
@@ -91,7 +92,11 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val lastDividendValue: YFData?,
           val lastDividendDate: YFData?,
           val forwardEps: YFData?,
+          val pegRatio: YFData?,
           val trailingEps: YFData?,
+          val priceToBook: YFData?,
+          val enterpriseToRevenue: YFData?,
+          val enterpriseToEbitda: YFData?
       )
     }
   }

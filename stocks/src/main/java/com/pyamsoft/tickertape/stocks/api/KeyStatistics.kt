@@ -30,6 +30,7 @@ interface KeyStatistics {
   @get:CheckResult val info: Info
 
   interface Financials {
+    val currentPrice: DataPoint
     val targetHighPrice: DataPoint
     val targetLowPrice: DataPoint
     val targetMeanPrice: DataPoint
@@ -46,6 +47,7 @@ interface KeyStatistics {
   }
 
   interface Info {
+    val marketCap: DataPoint
     val beta: DataPoint
     val enterpriseValue: DataPoint
     val profitMargin: DataPoint
@@ -67,6 +69,10 @@ interface KeyStatistics {
     val lastDividendDate: DataPoint
     val forwardEps: DataPoint
     val trailingEps: DataPoint
+    val pegRatio: DataPoint
+    val priceToBook: DataPoint
+    val enterpriseValueToRevenue: DataPoint
+    val enterpriseValueToEbitda: DataPoint
   }
 
   interface Earnings {

@@ -128,6 +128,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     }
 
     private data class YFFinancials(
+        override val currentPrice: KeyStatistics.DataPoint,
         override val targetHighPrice: KeyStatistics.DataPoint,
         override val targetLowPrice: KeyStatistics.DataPoint,
         override val targetMeanPrice: KeyStatistics.DataPoint,
@@ -141,6 +142,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     private fun createFinancials(response: NetworkKeyStatisticsResponse): KeyStatistics.Financials {
       val data = response.getData().financialData
       return YFFinancials(
+          currentPrice = data.currentPrice.asDataPoint(),
           targetHighPrice = data.targetHighPrice.asDataPoint(),
           targetLowPrice = data.targetLowPrice.asDataPoint(),
           targetMeanPrice = data.targetMeanPrice.asDataPoint(),
@@ -151,6 +153,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     }
 
     private data class YFInfo(
+        override val marketCap: KeyStatistics.DataPoint,
         override val beta: KeyStatistics.DataPoint,
         override val enterpriseValue: KeyStatistics.DataPoint,
         override val profitMargin: KeyStatistics.DataPoint,
@@ -171,14 +174,54 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val lastDividendValue: KeyStatistics.DataPoint,
         override val lastDividendDate: KeyStatistics.DataPoint,
         override val forwardEps: KeyStatistics.DataPoint,
-        override val trailingEps: KeyStatistics.DataPoint
+        override val trailingEps: KeyStatistics.DataPoint,
+        override val pegRatio: KeyStatistics.DataPoint,
+        override val enterpriseValueToEbitda: KeyStatistics.DataPoint,
+        override val enterpriseValueToRevenue: KeyStatistics.DataPoint,
+        override val priceToBook: KeyStatistics.DataPoint,
     ) : KeyStatistics.Info
+
+    private fun computeMarketCap(response: NetworkKeyStatisticsResponse): KeyStatistics.DataPoint {
+      val d = response.getData()
+      val data = d.defaultKeyStatistics
+
+      val so = data.sharesOutstanding
+      val price = d.financialData.currentPrice
+      if (so == null || price == null) {
+        return KeyStatistics.DataPoint.EMPTY
+      }
+
+      val sharesOutstandingValue = so.raw
+      val priceValue = price.raw
+      val marketCapValue = sharesOutstandingValue * priceValue
+
+      // Also find the string suffix for units
+      var marketCapFinal = marketCapValue
+      var marketCapUnit = ""
+      while (marketCapFinal > 1000) {
+        marketCapFinal /= 1000
+        marketCapUnit =
+            when (marketCapUnit) {
+              "K" -> "M"
+              "M" -> "B"
+              "B" -> "T"
+              "T" -> "Q"
+              else -> " Unknown"
+            }
+      }
+      return object : KeyStatistics.DataPoint {
+        override val raw: Double = marketCapValue
+        override val fmt: String = "${marketCapFinal}${marketCapUnit}"
+        override val isEmpty: Boolean = false
+      }
+    }
 
     @JvmStatic
     @CheckResult
     private fun createInfo(response: NetworkKeyStatisticsResponse): KeyStatistics.Info {
       val data = response.getData().defaultKeyStatistics
       return YFInfo(
+          marketCap = computeMarketCap(response),
           beta = data.beta.asDataPoint(),
           enterpriseValue = data.enterpriseValue.asDataPoint(),
           profitMargin = data.profitMargin.asDataPoint(),
@@ -200,6 +243,10 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
           lastDividendValue = data.lastDividendValue.asDataPoint(),
           forwardEps = data.forwardEps.asDataPoint(),
           trailingEps = data.trailingEps.asDataPoint(),
+          pegRatio = data.pegRatio.asDataPoint(),
+          priceToBook = data.priceToBook.asDataPoint(),
+          enterpriseValueToEbitda = data.enterpriseToEbitda.asDataPoint(),
+          enterpriseValueToRevenue = data.enterpriseToRevenue.asDataPoint(),
       )
     }
 

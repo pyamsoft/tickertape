@@ -61,7 +61,6 @@ interface KeyStatistics {
     val lastFiscalYearEnd: DataPoint
     val nextFiscalYearEnd: DataPoint
     val mostRecentQuarter: DataPoint
-    val earningsQuarterlyGrowth: DataPoint
     val netIncomeToCommon: DataPoint
     val lastSplitDate: DataPoint
     val lastDividendValue: DataPoint

@@ -2,8 +2,8 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 enum class PortfolioDigSections(val display: String) {
   CHART("Chart"),
-  NEWS("News"),
   STATISTICS("Details"),
+  NEWS("News"),
   POSITIONS("Positions"),
   SPLITS("Stock Splits"),
 }

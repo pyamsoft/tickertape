@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.stocks.yahoo.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
@@ -167,7 +169,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val lastFiscalYearEnd: KeyStatistics.DataPoint,
         override val nextFiscalYearEnd: KeyStatistics.DataPoint,
         override val mostRecentQuarter: KeyStatistics.DataPoint,
-        override val earningsQuarterlyGrowth: KeyStatistics.DataPoint,
         override val netIncomeToCommon: KeyStatistics.DataPoint,
         override val lastSplitDate: KeyStatistics.DataPoint,
         override val lastDividendValue: KeyStatistics.DataPoint,
@@ -201,6 +202,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         marketCapFinal /= 1000
         marketCapUnit =
             when (marketCapUnit) {
+              "" -> "K"
               "K" -> "M"
               "M" -> "B"
               "B" -> "T"
@@ -208,9 +210,17 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
               else -> " Unknown"
             }
       }
+
+      val formatter = BIG_MONEY_FORMATTER.get().requireNotNull()
+
+      // substring(1) removes the $ currency symbol
+      // NOTE(Peter): Will this be fucked up with locale currency being different from USD? Oh well
+      // for now, we only support USD.
+      val cleanNumberFormatNoDollarSign = formatter.format(marketCapFinal).substring(1)
+
       return object : KeyStatistics.DataPoint {
         override val raw: Double = marketCapValue
-        override val fmt: String = "${marketCapFinal}${marketCapUnit}"
+        override val fmt: String = "${cleanNumberFormatNoDollarSign}${marketCapUnit}"
         override val isEmpty: Boolean = false
       }
     }
@@ -234,7 +244,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
           lastFiscalYearEnd = data.lastFiscalYearEnd.asDataPoint(),
           nextFiscalYearEnd = data.nextFiscalYearEnd.asDataPoint(),
           mostRecentQuarter = data.mostRecentQuarter.asDataPoint(),
-          earningsQuarterlyGrowth = data.earningsQuarterlyGrowth.asDataPoint(),
           netIncomeToCommon = data.netIncomeToCommon.asDataPoint(),
           lastSplitDate = data.lastSplitDate.asDataPoint(),
           lastDividendDate = data.lastDividendDate.asDataPoint(),

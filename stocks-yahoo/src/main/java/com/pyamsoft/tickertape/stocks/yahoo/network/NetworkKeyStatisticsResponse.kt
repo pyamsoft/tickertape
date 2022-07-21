@@ -85,7 +85,6 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val lastFiscalYearEnd: YFData?,
           val nextFiscalYearEnd: YFData?,
           val mostRecentQuarter: YFData?,
-          val earningsQuarterlyGrowth: YFData?,
           val netIncomeToCommon: YFData?,
           val lastSplitDate: YFData?,
           val lastDividendValue: YFData?,

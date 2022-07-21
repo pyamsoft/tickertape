@@ -3,7 +3,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
-import com.google.accompanist.insets.statusBarsHeight
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.quote.Chart
@@ -95,7 +94,7 @@ private fun Content(
     return@Crossfade when (s) {
       WatchlistDigSections.CHART -> {
         DigChart(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
             onScrub = onScrub,
@@ -104,14 +103,16 @@ private fun Content(
       }
       WatchlistDigSections.NEWS -> {
         WatchlistNews(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       WatchlistDigSections.STATISTICS -> {
-        Spacer(
-            modifier = Modifier.fillMaxWidth(),
+        WatchlistStats(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
         )
       }
     }

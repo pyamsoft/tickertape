@@ -58,7 +58,6 @@ interface KeyStatistics {
     val heldPercentInsiders: DataPoint
     val heldPercentInstitutions: DataPoint
     val shortPercentOfFloat: DataPoint
-    val impliedSharesOutstanding: DataPoint
     val lastFiscalYearEnd: DataPoint
     val nextFiscalYearEnd: DataPoint
     val mostRecentQuarter: DataPoint

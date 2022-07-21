@@ -82,7 +82,6 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val heldPercentInstitutions: YFData?,
           val shortPercentOfFloat: YFData?,
           val beta: YFData?,
-          val impliedSharesOutstanding: YFData?,
           val lastFiscalYearEnd: YFData?,
           val nextFiscalYearEnd: YFData?,
           val mostRecentQuarter: YFData?,

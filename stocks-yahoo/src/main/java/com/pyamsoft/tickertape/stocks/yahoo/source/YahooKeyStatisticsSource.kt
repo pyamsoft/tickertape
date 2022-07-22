@@ -193,6 +193,10 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
       val sharesOutstandingValue = so.raw
       val priceValue = price.raw
+      if (sharesOutstandingValue == null || priceValue == null) {
+        return KeyStatistics.DataPoint.EMPTY
+      }
+
       val marketCapValue = sharesOutstandingValue * priceValue
 
       // Also find the string suffix for units

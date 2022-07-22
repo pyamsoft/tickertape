@@ -102,8 +102,8 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
   @JsonClass(generateAdapter = true)
   internal data class YFData
   internal constructor(
-      val raw: Double,
-      val fmt: String,
+      val raw: Double?,
+      val fmt: String?,
       val longFmt: String?,
   )
 }
@@ -119,7 +119,7 @@ private data class YFDataPoint(
 internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
     long: Boolean = false
 ): KeyStatistics.DataPoint {
-  return if (this == null) KeyStatistics.DataPoint.EMPTY
+  return if (this == null || this.raw == null || this.fmt == null) KeyStatistics.DataPoint.EMPTY
   else
       YFDataPoint(
           raw = this.raw,

@@ -89,6 +89,7 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val lastSplitDate: YFData?,
           val lastDividendValue: YFData?,
           val lastDividendDate: YFData?,
+          val forwardPE: YFData?,
           val forwardEps: YFData?,
           val pegRatio: YFData?,
           val trailingEps: YFData?,
@@ -125,12 +126,9 @@ internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
   } else {
     YFDataPoint(
         raw =
-            when (this.raw) {
-              // Sometimes the raw value can be "Infinity"
-              is Double -> this.raw
-              "Infinity" -> Double.POSITIVE_INFINITY
-              else -> throw IllegalArgumentException("Invalid YFData.raw value: ${this.raw}")
-            },
+            if (this.raw is Double) this.raw
+            else if (this.raw is String && this.raw == "Infinity") Double.POSITIVE_INFINITY
+            else throw IllegalArgumentException("Invalid YFData.raw value: ${this.raw}"),
         fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
     )
   }

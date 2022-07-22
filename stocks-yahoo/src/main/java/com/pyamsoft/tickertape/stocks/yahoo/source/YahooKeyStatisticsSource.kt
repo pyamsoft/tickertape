@@ -175,6 +175,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val lastDividendDate: KeyStatistics.DataPoint,
         override val forwardEps: KeyStatistics.DataPoint,
         override val trailingEps: KeyStatistics.DataPoint,
+        override val forwardPE: KeyStatistics.DataPoint,
         override val pegRatio: KeyStatistics.DataPoint,
         override val enterpriseValueToEbitda: KeyStatistics.DataPoint,
         override val enterpriseValueToRevenue: KeyStatistics.DataPoint,
@@ -259,6 +260,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
           priceToBook = data.priceToBook.asDataPoint(),
           enterpriseValueToEbitda = data.enterpriseToEbitda.asDataPoint(),
           enterpriseValueToRevenue = data.enterpriseToRevenue.asDataPoint(),
+          forwardPE = data.forwardPE.asDataPoint(),
       )
     }
 

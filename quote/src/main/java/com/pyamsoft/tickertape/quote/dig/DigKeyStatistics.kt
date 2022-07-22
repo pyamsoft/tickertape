@@ -83,15 +83,7 @@ private fun StatisticsGrid(
       )
     }
 
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Trailing P/E",
-          content = statistics.info.trailingEps.fmt,
-      )
-    }
-
-    statistics.info.forwardEps.fmt.runIfNotBlack { value ->
+    statistics.info.forwardPE.fmt.runIfNotBlack { value ->
       item {
         StatisticsItem(
             modifier = Modifier.fillMaxWidth(),

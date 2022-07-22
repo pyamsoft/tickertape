@@ -67,6 +67,7 @@ interface KeyStatistics {
     val lastDividendValue: DataPoint
     val lastDividendDate: DataPoint
     val forwardEps: DataPoint
+    val forwardPE: DataPoint
     val trailingEps: DataPoint
     val pegRatio: DataPoint
     val priceToBook: DataPoint

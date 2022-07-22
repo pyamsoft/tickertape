@@ -64,7 +64,7 @@ buildscript {
     room = "2.4.2"
 
     // Dagger
-    dagger = "2.42"
+    dagger = "2.43"
 
     moshi = "1.13.0"
     retrofit = "2.9.0"

@@ -91,20 +91,24 @@ private fun StatisticsGrid(
       )
     }
 
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Forward P/E",
-          content = statistics.info.forwardEps.fmt,
-      )
+    statistics.info.forwardEps.fmt.runIfNotBlack { value ->
+      item {
+        StatisticsItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = "Forward P/E",
+            content = value,
+        )
+      }
     }
 
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "PEG Ratio",
-          content = statistics.info.pegRatio.fmt,
-      )
+    statistics.info.pegRatio.fmt.runIfNotBlack { value ->
+      item {
+        StatisticsItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = "PEG Ratio",
+            content = value,
+        )
+      }
     }
 
     item {
@@ -130,6 +134,12 @@ private fun StatisticsGrid(
           content = statistics.info.enterpriseValueToEbitda.fmt,
       )
     }
+  }
+}
+
+private inline fun <T : Any> String.runIfNotBlack(block: (String) -> T) {
+  if (this.isNotBlank()) {
+    block(this)
   }
 }
 

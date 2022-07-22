@@ -40,7 +40,7 @@ internal constructor(
     override val tradeSide: TradeSide,
 ) : MutableDigViewState(symbol, lookupSymbol, equityType), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
-  override var section by mutableStateOf(PortfolioDigSections.CHART)
+  override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
 
   override var stockSplits by mutableStateOf(emptyList<DbSplit>())
   override var stockSplitError by mutableStateOf<Throwable?>(null)

@@ -102,7 +102,8 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
   @JsonClass(generateAdapter = true)
   internal data class YFData
   internal constructor(
-      val raw: Double?,
+      // Use Any because this may be a String, may be a Double, may be null
+      val raw: Any?,
       val fmt: String?,
       val longFmt: String?,
   )
@@ -119,10 +120,18 @@ private data class YFDataPoint(
 internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
     long: Boolean = false
 ): KeyStatistics.DataPoint {
-  return if (this == null || this.raw == null || this.fmt == null) KeyStatistics.DataPoint.EMPTY
-  else
-      YFDataPoint(
-          raw = this.raw,
-          fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
-      )
+  return if (this == null || this.raw == null || this.fmt == null) {
+    KeyStatistics.DataPoint.EMPTY
+  } else {
+    YFDataPoint(
+        raw =
+            when (this.raw) {
+              // Sometimes the raw value can be "Infinity"
+              is Double -> this.raw
+              "Infinity" -> Double.POSITIVE_INFINITY
+              else -> throw IllegalArgumentException("Invalid YFData.raw value: ${this.raw}")
+            },
+        fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
+    )
+  }
 }

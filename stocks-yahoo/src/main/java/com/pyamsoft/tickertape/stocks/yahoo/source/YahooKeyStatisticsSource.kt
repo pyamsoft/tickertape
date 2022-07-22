@@ -191,8 +191,9 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         return KeyStatistics.DataPoint.EMPTY
       }
 
-      val sharesOutstandingValue = so.raw
-      val priceValue = price.raw
+      // We basically must expect these to always be numbers instead of "Infinity"
+      val sharesOutstandingValue = so.raw as? Double
+      val priceValue = price.raw as? Double
       if (sharesOutstandingValue == null || priceValue == null) {
         return KeyStatistics.DataPoint.EMPTY
       }

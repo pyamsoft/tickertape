@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -57,79 +58,90 @@ private fun StatisticsGrid(
     modifier: Modifier = Modifier,
     statistics: KeyStatistics,
 ) {
+  val info = statistics.info
   LazyColumn(
       modifier = modifier,
   ) {
-    item {
-      StatisticsTitle(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Valuation Measures",
-      )
-    }
-
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Market Cap",
-          content = statistics.info.marketCap.fmt,
-      )
-    }
-
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Enterprise Value",
-          content = statistics.info.enterpriseValue.fmt,
-      )
-    }
-
-    statistics.info.forwardPE.fmt.runIfNotBlack { value ->
-      item {
-        StatisticsItem(
-            modifier = Modifier.fillMaxWidth(),
-            title = "Forward P/E",
-            content = value,
-        )
-      }
-    }
-
-    statistics.info.pegRatio.fmt.runIfNotBlack { value ->
-      item {
-        StatisticsItem(
-            modifier = Modifier.fillMaxWidth(),
-            title = "PEG Ratio",
-            content = value,
-        )
-      }
-    }
-
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Price/Book (mrq)",
-          content = statistics.info.priceToBook.fmt,
-      )
-    }
-
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Enterprise Value/Revenue",
-          content = statistics.info.enterpriseValueToRevenue.fmt,
-      )
-    }
-
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Enterprise Value/EBITDA",
-          content = statistics.info.enterpriseValueToEbitda.fmt,
+    if (info != null) {
+      renderFinancialInfo(
+          info = info,
       )
     }
   }
 }
 
-private inline fun <T : Any> String.runIfNotBlack(block: (String) -> T) {
+private fun LazyListScope.renderFinancialInfo(
+    info: KeyStatistics.Info,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Valuation Measures",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Market Cap",
+        content = info.marketCap.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Enterprise Value",
+        content = info.enterpriseValue.fmt,
+    )
+  }
+
+  info.forwardPE.fmt.runIfNotBlank { value ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Forward P/E",
+          content = value,
+      )
+    }
+  }
+
+  info.pegRatio.fmt.runIfNotBlank { value ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "PEG Ratio",
+          content = value,
+      )
+    }
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Price/Book",
+        content = info.priceToBook.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Enterprise Value/Revenue",
+        content = info.enterpriseValueToRevenue.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Enterprise Value/EBITDA",
+        content = info.enterpriseValueToEbitda.fmt,
+    )
+  }
+}
+
+private inline fun <T : Any> String.runIfNotBlank(block: (String) -> T) {
   if (this.isNotBlank()) {
     block(this)
   }

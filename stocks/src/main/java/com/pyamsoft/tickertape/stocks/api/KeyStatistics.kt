@@ -23,11 +23,11 @@ interface KeyStatistics {
 
   @get:CheckResult val symbol: StockSymbol
 
-  @get:CheckResult val earnings: Earnings
+  @get:CheckResult val earnings: Earnings?
 
-  @get:CheckResult val financials: Financials
+  @get:CheckResult val financials: Financials?
 
-  @get:CheckResult val info: Info
+  @get:CheckResult val info: Info?
 
   interface Financials {
     val currentPrice: DataPoint
@@ -109,9 +109,9 @@ interface KeyStatistics {
     @CheckResult
     fun create(
         symbol: StockSymbol,
-        earnings: Earnings,
-        financials: Financials,
-        info: Info,
+        earnings: Earnings?,
+        financials: Financials?,
+        info: Info?,
     ): KeyStatistics {
       return KeyStatisticsImpl(
           symbol = symbol,

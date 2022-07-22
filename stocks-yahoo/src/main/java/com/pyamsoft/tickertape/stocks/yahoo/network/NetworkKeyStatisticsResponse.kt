@@ -31,9 +31,9 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
     @JsonClass(generateAdapter = true)
     internal data class Statistics
     internal constructor(
-        val defaultKeyStatistics: Info,
-        val financialData: FinancialData,
-        val calendarEvents: Calendar,
+        val defaultKeyStatistics: Info?,
+        val financialData: FinancialData?,
+        val calendarEvents: Calendar?,
     ) {
 
       @JsonClass(generateAdapter = true)

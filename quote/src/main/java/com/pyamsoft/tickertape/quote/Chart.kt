@@ -148,15 +148,14 @@ private fun SparkChart(
   val density = LocalDensity.current
   val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
 
-  val onScrubListener =
-      remember(handleScrub) {
-        if (handleScrub == null) null
-        else
-            SparkView.OnScrubListener {
-              val callback = handleScrub.requireNotNull()
-              callback(it as? Chart.Data)
-            }
-      }
+  val onScrubListener = remember {
+    if (handleScrub == null) null
+    else
+        SparkView.OnScrubListener {
+          val callback = handleScrub.requireNotNull()
+          callback(it as? Chart.Data)
+        }
+  }
 
   val isLight = MaterialTheme.colors.isLight
   val baseColor =

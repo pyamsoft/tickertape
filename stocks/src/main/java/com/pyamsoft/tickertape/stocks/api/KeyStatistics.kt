@@ -42,7 +42,8 @@ interface KeyStatistics {
       BUY,
       SELL,
       HOLD,
-      UNKNOWN
+      STRONG_BUY,
+      UNKNOWN,
     }
   }
 

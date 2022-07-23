@@ -26,7 +26,11 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Path
 import org.simpleframework.xml.Root
 
-/** Can't be a data class because SimpleXML is weird yo */
+/**
+ * Can't be a data class because SimpleXML is weird yo
+ *
+ * Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+ */
 @Root(name = "rss", strict = false)
 internal class NetworkNewsResponse
 /** SimpleXML requires an empty constructor */
@@ -39,7 +43,8 @@ internal constructor() {
   @set:Path("channel")
   internal var data: List<NewsArticle>? = null
 
-  @get:CheckResult val news = data ?: emptyList()
+  // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+  @get:CheckResult val news by lazy(LazyThreadSafetyMode.NONE) { data ?: emptyList() }
 
   /** Can't be a data class because SimpleXML is weird yo */
   @Root(name = "item", strict = false)
@@ -68,35 +73,45 @@ internal constructor() {
     @set:Element(name = "pubDate")
     internal var articlePublishedAt: String? = null
 
-    @get:CheckResult val id = articleGuid.orEmpty()
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult val id by lazy(LazyThreadSafetyMode.NONE) { articleGuid.orEmpty() }
 
-    @get:CheckResult val publishDate: LocalDateTime?
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult
+    val publishDate by
+        lazy(LazyThreadSafetyMode.NONE) {
+          val p = articlePublishedAt
+          val parseFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
+          return@lazy if (p == null) null else LocalDateTime.parse(p, parseFormatter)
+        }
 
-    @get:CheckResult val title = articleTitle.orEmpty()
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult val title by lazy(LazyThreadSafetyMode.NONE) { articleTitle.orEmpty() }
 
-    @get:CheckResult val link: String
-
-    @get:CheckResult val newsSource: String
-
-    @get:CheckResult val description: String
-
-    init {
-      val p = articlePublishedAt
-      val parseFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
-      publishDate = if (p == null) null else LocalDateTime.parse(p, parseFormatter)
-
-      val d = articleDescription
-      description =
-          if (d == null) ""
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult
+    val description by
+        lazy(LazyThreadSafetyMode.NONE) {
+          val d = articleDescription
+          return@lazy if (d == null) ""
           else {
             val spanned = HtmlCompat.fromHtml(d, HtmlCompat.FROM_HTML_MODE_LEGACY)
             spanned.toString()
           }
+        }
 
-      val u = articleUrl
-      val urlData = if (u == null) null else URL(u)
-      link = urlData?.toString().orEmpty()
-      newsSource = urlData?.host.orEmpty()
-    }
+    private val articleUrlData by
+        lazy(LazyThreadSafetyMode.NONE) {
+          val u = articleUrl
+          return@lazy if (u == null) null else URL(u)
+        }
+
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult
+    val link by lazy(LazyThreadSafetyMode.NONE) { articleUrlData?.toString().orEmpty() }
+
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult
+    val newsSource by lazy(LazyThreadSafetyMode.NONE) { articleUrlData?.host.orEmpty() }
   }
 }

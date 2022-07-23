@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class GoogleNewsSource
 @Inject

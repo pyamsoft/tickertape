@@ -27,6 +27,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import timber.log.Timber
 
 @Composable
 @JvmOverloads

@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
+import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
@@ -33,6 +34,7 @@ import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
 import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooChartSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooKeyStatisticsSource
+import com.pyamsoft.tickertape.stocks.yahoo.source.YahooNewsSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooOptionsSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooSearchSource
@@ -78,6 +80,11 @@ abstract class YahooFinanceModule {
   @StockApi
   @CheckResult
   internal abstract fun bindYFSearchSource(impl: YahooSearchSource): SearchSource
+
+  @Binds
+  @StockApi
+  @CheckResult
+  internal abstract fun bindYFNewsSource(impl: YahooNewsSource): NewsSource
 
   @Module
   companion object {

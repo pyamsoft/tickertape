@@ -139,7 +139,27 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val targetMeanPrice: KeyStatistics.DataPoint,
         override val recommendationMean: KeyStatistics.DataPoint,
         override val numberOfAnalystOpinions: KeyStatistics.DataPoint,
-        override val recommendationKey: KeyStatistics.Financials.Recommendation
+        override val recommendationKey: KeyStatistics.Financials.Recommendation,
+        override val returnOnAssets: KeyStatistics.DataPoint,
+        override val returnOnEquity: KeyStatistics.DataPoint,
+        override val profitMargin: KeyStatistics.DataPoint,
+        override val operatingMargin: KeyStatistics.DataPoint,
+        override val ebitdaMargin: KeyStatistics.DataPoint,
+        override val grossMargin: KeyStatistics.DataPoint,
+        override val revenuePerShare: KeyStatistics.DataPoint,
+        override val totalRevenue: KeyStatistics.DataPoint,
+        override val revenueGrowth: KeyStatistics.DataPoint,
+        override val grossProfits: KeyStatistics.DataPoint,
+        override val freeCashflow: KeyStatistics.DataPoint,
+        override val operatingCashflow: KeyStatistics.DataPoint,
+        override val currentRatio: KeyStatistics.DataPoint,
+        override val ebitda: KeyStatistics.DataPoint,
+        override val totalDebt: KeyStatistics.DataPoint,
+        override val totalCashPerShare: KeyStatistics.DataPoint,
+        override val quickRatio: KeyStatistics.DataPoint,
+        override val debtToEquity: KeyStatistics.DataPoint,
+        override val totalCash: KeyStatistics.DataPoint,
+        override val earningsGrowth: KeyStatistics.DataPoint,
     ) : KeyStatistics.Financials
 
     @JvmStatic
@@ -158,6 +178,26 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
             recommendationMean = data.recommendationMean.asDataPoint(),
             recommendationKey = data.recommendationKey.asRecommendation(),
             numberOfAnalystOpinions = data.numberOfAnalystOpinions.asDataPoint(),
+            profitMargin = data.profitMargins.asDataPoint(),
+            ebitdaMargin = data.ebitdaMargins.asDataPoint(),
+            operatingMargin = data.operatingMargins.asDataPoint(),
+            grossMargin = data.grossMargins.asDataPoint(),
+            returnOnAssets = data.returnOnAssets.asDataPoint(),
+            returnOnEquity = data.returnOnEquity.asDataPoint(),
+            totalRevenue = data.totalRevenue.asDataPoint(),
+            revenuePerShare = data.revenuePerShare.asDataPoint(),
+            revenueGrowth = data.revenueGrowth.asDataPoint(),
+            grossProfits = data.grossProfits.asDataPoint(),
+            freeCashflow = data.freeCashflow.asDataPoint(),
+            operatingCashflow = data.operatingCashflow.asDataPoint(),
+            currentRatio = data.currentRatio.asDataPoint(),
+            earningsGrowth = data.earningsGrowth.asDataPoint(),
+            ebitda = data.ebitda.asDataPoint(),
+            debtToEquity = data.debtToEquity.asDataPoint(),
+            totalCashPerShare = data.totalCashPerShare.asDataPoint(),
+            totalDebt = data.totalDebt.asDataPoint(),
+            quickRatio = data.quickRatio.asDataPoint(),
+            totalCash = data.totalCash.asDataPoint(),
         )
       }
     }
@@ -166,7 +206,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val marketCap: KeyStatistics.DataPoint,
         override val beta: KeyStatistics.DataPoint,
         override val enterpriseValue: KeyStatistics.DataPoint,
-        override val profitMargin: KeyStatistics.DataPoint,
         override val floatShares: KeyStatistics.DataPoint,
         override val sharesOutstanding: KeyStatistics.DataPoint,
         override val sharesShort: KeyStatistics.DataPoint,
@@ -188,6 +227,8 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val enterpriseValueToEbitda: KeyStatistics.DataPoint,
         override val enterpriseValueToRevenue: KeyStatistics.DataPoint,
         override val priceToBook: KeyStatistics.DataPoint,
+        override val fiftyTwoWeekChange: KeyStatistics.DataPoint,
+        override val marketFiftyTwoWeekChange: KeyStatistics.DataPoint,
     ) : KeyStatistics.Info
 
     private fun computeMarketCap(response: NetworkKeyStatisticsResponse): KeyStatistics.DataPoint {
@@ -250,7 +291,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
             marketCap = computeMarketCap(response),
             beta = data.beta.asDataPoint(),
             enterpriseValue = data.enterpriseValue.asDataPoint(),
-            profitMargin = data.profitMargin.asDataPoint(),
             floatShares = data.floatShares.asDataPoint(),
             sharesOutstanding = data.sharesOutstanding.asDataPoint(),
             sharesShort = data.sharesShort.asDataPoint(),
@@ -272,6 +312,8 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
             enterpriseValueToEbitda = data.enterpriseToEbitda.asDataPoint(),
             enterpriseValueToRevenue = data.enterpriseToRevenue.asDataPoint(),
             forwardPE = data.forwardPE.asDataPoint(),
+            fiftyTwoWeekChange = data.fiftyTwoWeekChange.asDataPoint(),
+            marketFiftyTwoWeekChange = data.marketFiftyTwoWeekChange.asDataPoint(),
         )
       }
     }

@@ -30,8 +30,18 @@ internal interface SearchService {
       @Query("quotesCount") count: Int
   ): NetworkSearchResponse
 
+  @CheckResult
+  @GET("https://query2.finance.yahoo.com/v1/finance/search?$DEFAULT_NEWS_OPTIONS")
+  suspend fun getNews(
+      @Query("q") query: String,
+      @Query("newsCount") count: Int
+  ): NetworkSearchResponse
+
   companion object {
     private const val DEFAULT_SEARCH_OPTIONS =
         "newsCount=0&enableFuzzyQuery=true&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=true"
+
+    private const val DEFAULT_NEWS_OPTIONS =
+        "quotesCount=0&enableFuzzyQuery=false&enableCb=false&enableNavLinks=false&enableEnhancedTrivialQuery=false&newsQueryId=news_cie_vespa"
   }
 }

@@ -37,6 +37,26 @@ interface KeyStatistics {
     val recommendationMean: DataPoint
     val numberOfAnalystOpinions: DataPoint
     val recommendationKey: Recommendation
+    val profitMargin: DataPoint
+    val operatingMargin: DataPoint
+    val ebitdaMargin: DataPoint
+    val grossMargin: DataPoint
+    val returnOnAssets: DataPoint
+    val returnOnEquity: DataPoint
+    val totalRevenue: DataPoint
+    val revenuePerShare: DataPoint
+    val revenueGrowth: DataPoint
+    val grossProfits: DataPoint
+    val freeCashflow: DataPoint
+    val operatingCashflow: DataPoint
+    val ebitda: DataPoint
+    val totalDebt: DataPoint
+    val totalCashPerShare: DataPoint
+    val quickRatio: DataPoint
+    val currentRatio: DataPoint
+    val debtToEquity: DataPoint
+    val totalCash: DataPoint
+    val earningsGrowth: DataPoint
 
     enum class Recommendation {
       BUY,
@@ -51,7 +71,6 @@ interface KeyStatistics {
     val marketCap: DataPoint
     val beta: DataPoint
     val enterpriseValue: DataPoint
-    val profitMargin: DataPoint
     val floatShares: DataPoint
     val sharesOutstanding: DataPoint
     val sharesShort: DataPoint
@@ -73,6 +92,8 @@ interface KeyStatistics {
     val priceToBook: DataPoint
     val enterpriseValueToRevenue: DataPoint
     val enterpriseValueToEbitda: DataPoint
+    val fiftyTwoWeekChange: DataPoint
+    val marketFiftyTwoWeekChange: DataPoint
   }
 
   interface Earnings {
@@ -97,7 +118,7 @@ interface KeyStatistics {
 
             override val raw: Double = 0.0
 
-            override val fmt: String = ""
+            override val fmt: String = "N/A"
 
             override val isEmpty: Boolean = true
           }

@@ -58,19 +58,52 @@ private fun StatisticsGrid(
     modifier: Modifier = Modifier,
     statistics: KeyStatistics,
 ) {
-  val info = statistics.info
   LazyColumn(
       modifier = modifier,
   ) {
-    if (info != null) {
-      renderFinancialInfo(
-          info = info,
-      )
-    }
+    renderFinancialHighlights(
+        statistics = statistics,
+    )
+    renderTradingInformation(
+        statistics = statistics,
+    )
   }
 }
 
-private fun LazyListScope.renderFinancialInfo(
+private fun LazyListScope.renderFinancialHighlights(
+    statistics: KeyStatistics,
+) {
+  val info = statistics.info
+  val financials = statistics.financials
+
+  if (info != null) {
+    renderValuationMeasures(
+        info = info,
+    )
+    renderFiscalYear(
+        info = info,
+    )
+  }
+
+  if (financials != null) {
+    renderProfitability(
+        financials = financials,
+    )
+
+    renderManagementEffectiveness(
+        financials = financials,
+    )
+  }
+
+  if (info != null && financials != null) {
+    renderIncomeStatement(
+        info = info,
+        financials = financials,
+    )
+  }
+}
+
+private fun LazyListScope.renderValuationMeasures(
     info: KeyStatistics.Info,
 ) {
   item {
@@ -96,24 +129,20 @@ private fun LazyListScope.renderFinancialInfo(
     )
   }
 
-  info.forwardPE.fmt.runIfNotBlank { value ->
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "Forward P/E",
-          content = value,
-      )
-    }
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Forward P/E",
+        content = info.forwardPE.fmt,
+    )
   }
 
-  info.pegRatio.fmt.runIfNotBlank { value ->
-    item {
-      StatisticsItem(
-          modifier = Modifier.fillMaxWidth(),
-          title = "PEG Ratio",
-          content = value,
-      )
-    }
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "PEG Ratio",
+        content = info.pegRatio.fmt,
+    )
   }
 
   item {
@@ -141,9 +170,227 @@ private fun LazyListScope.renderFinancialInfo(
   }
 }
 
-private inline fun <T : Any> String.runIfNotBlank(block: (String) -> T) {
-  if (this.isNotBlank()) {
-    block(this)
+private fun LazyListScope.renderFiscalYear(
+    info: KeyStatistics.Info,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Fiscal Year",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Fiscal Year Ends",
+        content = info.nextFiscalYearEnd.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Most Recent Quarter",
+        content = info.mostRecentQuarter.fmt,
+    )
+  }
+}
+
+private fun LazyListScope.renderProfitability(
+    financials: KeyStatistics.Financials,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Profitability",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Profit Margin",
+        content = financials.profitMargin.fmt)
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Operating Margin",
+        content = financials.operatingMargin.fmt,
+    )
+  }
+}
+
+private fun LazyListScope.renderManagementEffectiveness(
+    financials: KeyStatistics.Financials,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Management Effectivenss",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Return on Assets",
+        content = financials.returnOnAssets.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Return on Equity",
+        content = financials.returnOnEquity.fmt,
+    )
+  }
+}
+
+private fun LazyListScope.renderCashFlowStatement(
+    financials: KeyStatistics.Financials,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Cash Flow Statement",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Operating Cash Flow",
+        content = financials.operatingCashflow.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Levered Free Cash Flow",
+        content = financials.freeCashflow.fmt,
+    )
+  }
+}
+
+private fun LazyListScope.renderTradingInformation(
+    statistics: KeyStatistics,
+) {}
+
+private fun LazyListScope.renderStockPriceHistory(
+    info: KeyStatistics.Info,
+    financials: KeyStatistics.Financials,
+    earnings: KeyStatistics.Financials,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Stock Price History",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Beta",
+        content = info.beta.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "52-Week Change",
+        content = info.fiftyTwoWeekChange.fmt,
+    )
+  }
+
+    item {
+        StatisticsItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = "S&P500 52-Week Change",
+            content = info.marketFiftyTwoWeekChange.fmt,
+        )
+    }
+}
+
+private fun LazyListScope.renderIncomeStatement(
+    info: KeyStatistics.Info,
+    financials: KeyStatistics.Financials,
+) {
+  item {
+    StatisticsTitle(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Income Statement",
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Revenue",
+        content = financials.totalRevenue.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Revenue per Share",
+        content = financials.revenuePerShare.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Quarterly Revenue Growth",
+        content = financials.revenueGrowth.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Gross Profit",
+        content = financials.grossProfits.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "EBITDA",
+        content = financials.ebitda.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Diluted EPS",
+        content = info.trailingEps.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Net Income to Common",
+        content = info.netIncomeToCommon.fmt,
+    )
+  }
+
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "Quarterly Earnings Growth",
+        content = financials.earningsGrowth.fmt,
+    )
   }
 }
 

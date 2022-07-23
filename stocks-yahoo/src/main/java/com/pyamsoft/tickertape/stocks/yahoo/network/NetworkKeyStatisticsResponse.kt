@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.stocks.yahoo.network
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 // https://query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory
@@ -67,13 +68,32 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val recommendationMean: YFData?,
           val recommendationKey: String?,
           val numberOfAnalystOpinions: YFData?,
+          val profitMargins: YFData?,
+          val grossMargins: YFData?,
+          val ebitdaMargins: YFData?,
+          val operatingMargins: YFData?,
+          val returnOnAssets: YFData?,
+          val returnOnEquity: YFData?,
+          val totalRevenue: YFData?,
+          val revenuePerShare: YFData?,
+          val revenueGrowth: YFData?,
+          val grossProfits: YFData?,
+          val freeCashflow: YFData?,
+          val operatingCashflow: YFData?,
+          val ebitda: YFData?,
+          val totalDebt: YFData?,
+          val totalCashPerShare: YFData?,
+          val quickRatio: YFData?,
+          val currentRatio: YFData?,
+          val debtToEquity: YFData?,
+          val totalCash: YFData?,
+          val earningsGrowth: YFData?,
       )
 
       @JsonClass(generateAdapter = true)
       internal data class Info
       internal constructor(
           val enterpriseValue: YFData?,
-          val profitMargin: YFData?,
           val floatShares: YFData?,
           val sharesOutstanding: YFData?,
           val sharesShort: YFData?,
@@ -95,7 +115,9 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val trailingEps: YFData?,
           val priceToBook: YFData?,
           val enterpriseToRevenue: YFData?,
-          val enterpriseToEbitda: YFData?
+          val enterpriseToEbitda: YFData?,
+          @Json(name = "52WeekChange") val fiftyTwoWeekChange: YFData?,
+          @Json(name = "SandP52WeekChange") val marketFiftyTwoWeekChange: YFData?,
       )
     }
   }
@@ -124,12 +146,13 @@ internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
   return if (this == null || this.raw == null || this.fmt == null) {
     KeyStatistics.DataPoint.EMPTY
   } else {
+    val f = if (long) this.longFmt ?: this.fmt else this.fmt
     YFDataPoint(
         raw =
             if (this.raw is Double) this.raw
             else if (this.raw is String && this.raw == "Infinity") Double.POSITIVE_INFINITY
             else throw IllegalArgumentException("Invalid YFData.raw value: ${this.raw}"),
-        fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
+        fmt = f.ifBlank { "N/A" },
     )
   }
 }

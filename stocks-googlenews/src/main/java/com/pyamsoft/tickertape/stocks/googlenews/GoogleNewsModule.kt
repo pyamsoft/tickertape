@@ -31,11 +31,6 @@ import retrofit2.Converter
 @Module
 abstract class GoogleNewsModule {
 
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindGoogleNewsSource(impl: GoogleNewsSource): NewsSource
-
   @Module
   companion object {
 

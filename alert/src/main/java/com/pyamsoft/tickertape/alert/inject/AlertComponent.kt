@@ -21,7 +21,9 @@ import dagger.Subcomponent
 @Subcomponent
 interface AlertComponent {
 
-  fun inject(injector: RefresherInjector)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: RefresherInjector)
 
-  fun inject(injector: BigMoverInjector)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: BigMoverInjector)
 }

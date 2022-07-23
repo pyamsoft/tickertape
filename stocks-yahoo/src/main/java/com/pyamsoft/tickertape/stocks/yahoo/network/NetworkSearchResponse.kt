@@ -22,7 +22,6 @@ import com.squareup.moshi.JsonClass
 internal data class NetworkSearchResponse
 internal constructor(
     val quotes: List<Quote>,
-    val news: List<News>,
 ) {
 
   @JsonClass(generateAdapter = true)
@@ -36,34 +35,5 @@ internal constructor(
   ) {
 
     val name = shortname ?: longname
-  }
-
-  @JsonClass(generateAdapter = true)
-  internal data class News
-  internal constructor(
-      val uuid: String,
-      val title: String,
-      val publisher: String,
-      val link: String,
-      val providerPublishTime: Long,
-      val thumbnail: Thumbnail,
-      val relatedTickers: List<String>,
-  ) {
-
-    @JsonClass(generateAdapter = true)
-    internal data class Thumbnail
-    internal constructor(
-        val resolutions: List<Resolution>,
-    ) {
-
-      @JsonClass(generateAdapter = true)
-      internal data class Resolution
-      internal constructor(
-          val url: String,
-          val width: Int,
-          val height: Int,
-          val tag: String,
-      )
-    }
   }
 }

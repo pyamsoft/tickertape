@@ -31,7 +31,9 @@ import retrofit2.HttpException
 
 internal class YahooSearchSource
 @Inject
-internal constructor(@YahooApi private val service: SearchService) : SearchSource {
+internal constructor(
+    @YahooApi private val service: SearchService,
+) : SearchSource {
 
   override suspend fun search(
       force: Boolean,

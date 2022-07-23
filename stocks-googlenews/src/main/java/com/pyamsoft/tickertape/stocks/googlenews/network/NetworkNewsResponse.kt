@@ -39,12 +39,7 @@ internal constructor() {
   @set:Path("channel")
   internal var data: List<NewsArticle>? = null
 
-  private val articles by lazy(LazyThreadSafetyMode.NONE) { data ?: emptyList() }
-
-  @CheckResult
-  fun news(): List<NewsArticle> {
-    return articles
-  }
+  @get:CheckResult val news = data ?: emptyList()
 
   /** Can't be a data class because SimpleXML is weird yo */
   @Root(name = "item", strict = false)
@@ -53,86 +48,55 @@ internal constructor() {
   internal constructor() {
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "guid") @set:Element(name = "guid") internal var guid: String? = null
+    @get:Element(name = "guid") @set:Element(name = "guid") internal var articleGuid: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "link") @set:Element(name = "link") internal var url: String? = null
+    @get:Element(name = "link") @set:Element(name = "link") internal var articleUrl: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "title") @set:Element(name = "title") internal var title: String? = null
+    @get:Element(name = "title")
+    @set:Element(name = "title")
+    internal var articleTitle: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
     @get:Element(name = "description")
     @set:Element(name = "description")
-    internal var description: String? = null
+    internal var articleDescription: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
     @get:Element(name = "pubDate")
     @set:Element(name = "pubDate")
-    internal var publishedAt: String? = null
+    internal var articlePublishedAt: String? = null
 
-    private val id by
-        lazy(LazyThreadSafetyMode.NONE) {
-          return@lazy guid.orEmpty()
-        }
+    @get:CheckResult val id = articleGuid.orEmpty()
 
-    private val publishDate by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val p = publishedAt
-          val parseFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
-          return@lazy if (p == null) null else LocalDateTime.parse(p, parseFormatter)
-        }
+    @get:CheckResult val publishDate: LocalDateTime?
 
-    private val sanitizedTitle by lazy(LazyThreadSafetyMode.NONE) { title.orEmpty() }
+    @get:CheckResult val title = articleTitle.orEmpty()
 
-    private val urlData by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val u = url
-          return@lazy if (u == null) null else URL(u)
-        }
+    @get:CheckResult val link: String
 
-    private val link by lazy(LazyThreadSafetyMode.NONE) { urlData?.toString().orEmpty() }
+    @get:CheckResult val newsSource: String
 
-    private val source by lazy(LazyThreadSafetyMode.NONE) { urlData?.host.orEmpty() }
+    @get:CheckResult val description: String
 
-    private val sanitizedDescription by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val d = description
-          return@lazy if (d == null) ""
+    init {
+      val p = articlePublishedAt
+      val parseFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
+      publishDate = if (p == null) null else LocalDateTime.parse(p, parseFormatter)
+
+      val d = articleDescription
+      description =
+          if (d == null) ""
           else {
             val spanned = HtmlCompat.fromHtml(d, HtmlCompat.FROM_HTML_MODE_LEGACY)
             spanned.toString()
           }
-        }
 
-    @CheckResult
-    fun id(): String {
-      return id
-    }
-
-    @CheckResult
-    fun publishDate(): LocalDateTime? {
-      return publishDate
-    }
-
-    @CheckResult
-    fun title(): String {
-      return sanitizedTitle
-    }
-
-    @CheckResult
-    fun description(): String {
-      return sanitizedDescription
-    }
-
-    @CheckResult
-    fun newsSource(): String {
-      return source
-    }
-
-    @CheckResult
-    fun link(): String {
-      return link
+      val u = articleUrl
+      val urlData = if (u == null) null else URL(u)
+      link = urlData?.toString().orEmpty()
+      newsSource = urlData?.host.orEmpty()
     }
   }
 }

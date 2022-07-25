@@ -34,10 +34,12 @@ import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooTopSource
 @Inject
 internal constructor(@YahooApi private val service: TopService) : TopSource {
@@ -47,16 +49,13 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
         Enforcer.assertOffMainThread()
 
         val result = service.getTrending(count)
-        return@withContext result
-            .finance
-            .result
+        return@withContext result.finance.result
             .asSequence()
             .filterOnlyValidTrending()
             .map { trend ->
               StockTrends.create(
                   symbols =
-                      trend
-                          .quotes
+                      trend.quotes
                           .requireNotNull()
                           .asSequence()
                           .filterOnlyValidTrends()
@@ -79,8 +78,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
 
         return@withContext service
             .getScreener(count, screener.name.lowercase())
-            .finance
-            .result
+            .finance.result
             .asSequence()
             .filterOnlyValidTops()
             .map { top ->
@@ -110,13 +108,11 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                         amount =
                                             stock.regularMarketChange.requireNotNull().asMoney(),
                                         direction =
-                                            stock
-                                                .regularMarketChange
+                                            stock.regularMarketChange
                                                 .requireNotNull()
                                                 .asDirection(),
                                         percent =
-                                            stock
-                                                .regularMarketChangePercent
+                                            stock.regularMarketChangePercent
                                                 .requireNotNull()
                                                 .asPercent(),
                                         price = stock.regularMarketPrice.requireNotNull().asMoney(),
@@ -131,8 +127,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                           direction =
                                               stock.postMarketChange.requireNotNull().asDirection(),
                                           percent =
-                                              stock
-                                                  .postMarketChangePercent
+                                              stock.postMarketChangePercent
                                                   .requireNotNull()
                                                   .asPercent(),
                                           price = stock.postMarketPrice.requireNotNull().asMoney(),
@@ -147,8 +142,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                           direction =
                                               stock.preMarketChange.requireNotNull().asDirection(),
                                           percent =
-                                              stock
-                                                  .preMarketChangePercent
+                                              stock.preMarketChangePercent
                                                   .requireNotNull()
                                                   .asPercent(),
                                           price = stock.preMarketPrice.requireNotNull().asMoney(),

@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote
 
-import android.graphics.Color as ViewColor
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,7 +54,7 @@ import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
-import timber.log.Timber
+import android.graphics.Color as ViewColor
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
 private const val LINE_ALPHA = 255
@@ -172,7 +171,6 @@ private fun SparkChart(
   if (cv != null) {
     DisposableEffect(cv) {
       onDispose {
-        Timber.d("Dispose ChartView from effect: $cv")
         cv.teardown()
 
         // Null out the ref
@@ -183,7 +181,6 @@ private fun SparkChart(
 
   val chartAdapter =
       rememberInBackground(chart) { ChartAdapter(chart, chart.periodHigh(), chart.periodLow()) }
-  Timber.d("ChartAdapter: $chartAdapter")
 
   AndroidView(
       modifier = modifier,

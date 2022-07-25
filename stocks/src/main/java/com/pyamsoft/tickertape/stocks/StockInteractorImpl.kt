@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
@@ -35,11 +36,11 @@ import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class StockInteractorImpl
@@ -70,6 +71,11 @@ internal constructor(
       multiCachify<StockSymbol, List<StockNews>, StockSymbol>(
           storage = { listOf(createNewMemoryCacheStorage()) },
       ) { interactor.getNews(true, it) }
+
+  private val recommendationCache =
+      multiCachify<StockSymbol, StockRecommendations, StockSymbol>(
+          storage = { listOf(createNewMemoryCacheStorage()) },
+      ) { interactor.getRecommendations(true, it) }
 
   override suspend fun getKeyStatistics(
       force: Boolean,
@@ -192,10 +198,23 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         if (force) {
-          // Remove the cache from the news map and clear it if it exists
           newsCache.key(symbol).clear()
         }
 
         return@withContext newsCache.key(symbol).call(symbol)
+      }
+
+  override suspend fun getRecommendations(
+      force: Boolean,
+      symbol: StockSymbol
+  ): StockRecommendations =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        if (force) {
+          recommendationCache.key(symbol).clear()
+        }
+
+        return@withContext recommendationCache.key(symbol).call(symbol)
       }
 }

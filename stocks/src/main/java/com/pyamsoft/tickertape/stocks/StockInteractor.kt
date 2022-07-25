@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 
@@ -31,4 +32,5 @@ interface StockInteractor :
     OptionsSource,
     SearchSource,
     KeyStatisticSource,
-    NewsSource
+    NewsSource,
+    RecommendationSource

@@ -36,12 +36,14 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooQuoteSource
 @Inject
 internal constructor(@YahooApi private val service: QuoteService) : QuoteSource {
@@ -58,9 +60,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
 
         val formatter = DATE_FORMATTER.get().requireNotNull()
         val localId = ZoneId.systemDefault()
-        return@withContext result
-            .quoteResponse
-            .result
+        return@withContext result.quoteResponse.result
             .asSequence()
             .filterOnlyValidQuotes()
             // Remove duplicate listings

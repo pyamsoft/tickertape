@@ -27,7 +27,6 @@ import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkKeyStatisticsResponse
 import com.pyamsoft.tickertape.stocks.yahoo.network.asDataPoint
 import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
-import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -35,7 +34,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooKeyStatisticsSource
 @Inject
 internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyStatisticSource {

@@ -27,12 +27,14 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooChartSource
 @Inject
 internal constructor(@YahooApi private val service: ChartService) : ChartSource {
@@ -53,9 +55,7 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
             )
 
         val localId = ZoneId.systemDefault()
-        return@withContext result
-            .spark
-            .result
+        return@withContext result.spark.result
             .asSequence()
             .filterOnlyValidCharts()
             // Remove duplicate listings

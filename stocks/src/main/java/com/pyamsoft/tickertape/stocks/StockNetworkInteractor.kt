@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
@@ -34,14 +35,15 @@ import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class StockNetworkInteractor
@@ -54,7 +56,17 @@ internal constructor(
     @StockApi private val searchSource: SearchSource,
     @StockApi private val keyStatisticSource: KeyStatisticSource,
     @StockApi private val newsSource: NewsSource,
+    @StockApi private val recommendationSource: RecommendationSource,
 ) : StockInteractor {
+
+  override suspend fun getRecommendations(
+      force: Boolean,
+      symbol: StockSymbol
+  ): StockRecommendations =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext recommendationSource.getRecommendations(force, symbol)
+      }
 
   override suspend fun getKeyStatistics(
       force: Boolean,
@@ -114,7 +126,8 @@ internal constructor(
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext chartSource.getCharts(force, symbols, range)
+        return@withContext chartSource
+            .getCharts(force, symbols, range)
             // Remove any duplicated symbols, we expect only one
             .distinctBy { it.symbol }
       }

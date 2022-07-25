@@ -21,29 +21,31 @@ import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
-import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import com.pyamsoft.tickertape.stocks.yahoo.service.ChartService
 import com.pyamsoft.tickertape.stocks.yahoo.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.yahoo.service.OptionsService
 import com.pyamsoft.tickertape.stocks.yahoo.service.QuoteService
+import com.pyamsoft.tickertape.stocks.yahoo.service.RecommendationService
 import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
 import com.pyamsoft.tickertape.stocks.yahoo.service.TopService
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooChartSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooKeyStatisticsSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooOptionsSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooQuoteSource
+import com.pyamsoft.tickertape.stocks.yahoo.source.YahooRecommendationSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooSearchSource
 import com.pyamsoft.tickertape.stocks.yahoo.source.YahooTopSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 
 @Module
 abstract class YahooFinanceModule {
@@ -79,6 +81,13 @@ abstract class YahooFinanceModule {
   @StockApi
   @CheckResult
   internal abstract fun bindYFSearchSource(impl: YahooSearchSource): SearchSource
+
+  @Binds
+  @StockApi
+  @CheckResult
+  internal abstract fun bindYFRecommendationsSource(
+      impl: YahooRecommendationSource
+  ): RecommendationSource
 
   @Module
   companion object {
@@ -143,6 +152,16 @@ abstract class YahooFinanceModule {
         @Named("json") serviceCreator: NetworkServiceCreator
     ): KeyStatisticsService {
       return serviceCreator.create(KeyStatisticsService::class)
+    }
+
+    @Provides
+    @YahooApi
+    @JvmStatic
+    @CheckResult
+    internal fun provideRecommendations(
+        @Named("json") serviceCreator: NetworkServiceCreator
+    ): RecommendationService {
+      return serviceCreator.create(RecommendationService::class)
     }
   }
 }

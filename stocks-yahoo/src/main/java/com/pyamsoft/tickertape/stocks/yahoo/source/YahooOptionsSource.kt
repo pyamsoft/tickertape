@@ -28,17 +28,19 @@ import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.yahoo.service.OptionsService
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooOptionsSource
 @Inject
 internal constructor(@YahooApi private val service: OptionsService) : OptionsSource {
@@ -53,7 +55,8 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
     @JvmStatic
     @CheckResult
     private fun <
-        T : StockOptions.Contract> NetworkOptionResponse.Resp.OptionChain.Option.OptionContract.asContract(
+        T : StockOptions.Contract> NetworkOptionResponse.Resp.OptionChain.Option.OptionContract
+        .asContract(
         symbol: StockSymbol,
         type: StockOptions.Contract.Type,
     ): T {

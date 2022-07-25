@@ -24,11 +24,13 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.yahoo.YahooApi
 import com.pyamsoft.tickertape.stocks.yahoo.service.SearchService
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class YahooSearchSource
 @Inject
 internal constructor(
@@ -48,8 +50,7 @@ internal constructor(
 
         try {
           val result = service.performSearch(query, count = 20)
-          return@withContext result
-              .quotes
+          return@withContext result.quotes
               .asSequence()
               // Remove duplicate listings
               .distinctBy { it.symbol }

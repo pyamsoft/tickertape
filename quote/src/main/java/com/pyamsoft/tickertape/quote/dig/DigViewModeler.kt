@@ -40,6 +40,27 @@ protected constructor(
     return state.lookupSymbol ?: state.ticker.symbol
   }
 
+  protected suspend fun loadRecommendations(force: Boolean) {
+    val s = state
+    interactor
+        .getRecommendations(
+            force = force,
+            symbol = getLookupSymbol(),
+        )
+        .onSuccess { r ->
+          s.apply {
+            recommendations = r
+            recommendationError = null
+          }
+        }
+        .onFailure { e ->
+          s.apply {
+            recommendations = null
+            recommendationError = e
+          }
+        }
+  }
+
   protected suspend fun loadStatistics(force: Boolean) {
     val s = state
     interactor
@@ -74,7 +95,7 @@ protected constructor(
           withContext(context = Dispatchers.IO) {
             Enforcer.assertOffMainThread()
 
-            return@withContext news.sortedByDescending { it.publishedAt}
+            return@withContext news.sortedByDescending { it.publishedAt }
           }
         }
         .onSuccess { n ->

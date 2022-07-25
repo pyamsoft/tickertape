@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,9 +37,29 @@ protected constructor(
     private val stockInteractor: StockInteractor,
 ) : DigInteractor {
 
+  final override suspend fun getRecommendations(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<StockRecommendations> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(
+              stockInteractor.getRecommendations(
+                  force = force,
+                  symbol = symbol,
+              ))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Error getting recommendations: ${symbol.raw}")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
   final override suspend fun getStatistics(
       force: Boolean,
-      symbol: StockSymbol
+      symbol: StockSymbol,
   ): ResultWrapper<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
@@ -84,7 +105,8 @@ protected constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          interactor.getCharts(
+          interactor
+              .getCharts(
                   force = force,
                   symbols = listOf(symbol),
                   range = range,

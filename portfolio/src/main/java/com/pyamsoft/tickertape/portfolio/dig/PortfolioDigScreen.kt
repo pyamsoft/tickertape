@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
+import com.pyamsoft.tickertape.portfolio.dig.recs.PositionRecommendations
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.portfolio.dig.stats.PositionStats
 import com.pyamsoft.tickertape.quote.Chart
@@ -159,6 +160,13 @@ private fun Content(
             onAddSplit = onAddSplit,
             onDeleteSplit = onDeleteSplit,
             onUpdateSplit = onUpdateSplit,
+        )
+      }
+      PortfolioDigSections.RECOMMENDATIONS -> {
+        PositionRecommendations(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
         )
       }
     }

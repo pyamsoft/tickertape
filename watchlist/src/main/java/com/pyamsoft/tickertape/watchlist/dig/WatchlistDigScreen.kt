@@ -22,6 +22,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import com.pyamsoft.tickertape.watchlist.dig.recs.WatchlistRecommendations
 
 @Composable
 @JvmOverloads
@@ -110,6 +111,13 @@ private fun Content(
       }
       WatchlistDigSections.STATISTICS -> {
         WatchlistStats(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
+        )
+      }
+      WatchlistDigSections.RECOMMENDATIONS -> {
+        WatchlistRecommendations(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,

@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.watchlist.dig
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +26,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class WatchlistDigViewModeler
 @Inject
@@ -57,6 +57,9 @@ internal constructor(
                 }
                 WatchlistDigSections.STATISTICS -> {
                   add(async { loadStatistics(force) })
+                }
+                WatchlistDigSections.RECOMMENDATIONS -> {
+                  add(async { loadRecommendations(force) })
                 }
               }.also {
                 // Just here for exhaustive when

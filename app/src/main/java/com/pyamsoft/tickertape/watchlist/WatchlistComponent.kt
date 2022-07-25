@@ -22,7 +22,8 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface WatchlistComponent {
 
-  fun inject(fragment: WatchlistFragment)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: WatchlistFragment)
 
   @Subcomponent.Factory
   interface Factory {

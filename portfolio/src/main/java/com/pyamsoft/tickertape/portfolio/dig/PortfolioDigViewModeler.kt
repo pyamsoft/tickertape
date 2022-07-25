@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +32,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
@@ -56,6 +56,7 @@ internal constructor(
       highlander<Unit, Boolean> { force ->
         mutableListOf<Deferred<*>>()
             .apply {
+              @Suppress("ControlFlowWithEmptyBody")
               when (state.section) {
                 PortfolioDigSections.CHART -> {
                   add(async { loadTicker(force) })
@@ -74,6 +75,11 @@ internal constructor(
                   add(async { loadSplits(force) })
                   add(async { loadPositions(force) })
                 }
+                PortfolioDigSections.RECOMMENDATIONS -> {
+                  add(async { loadRecommendations(force) })
+                }
+              }.also {
+                // Just here for exhaustive when
               }
             }
             .awaitAll()

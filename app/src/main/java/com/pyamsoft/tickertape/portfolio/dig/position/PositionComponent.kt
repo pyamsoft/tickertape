@@ -27,7 +27,8 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface PositionComponent {
 
-  fun inject(dialog: PositionDialog)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: PositionDialog)
 
   @Subcomponent.Factory
   interface Factory {

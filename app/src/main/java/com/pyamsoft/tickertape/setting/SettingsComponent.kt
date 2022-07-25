@@ -33,7 +33,8 @@ import javax.inject.Named
 )
 internal interface SettingsComponent {
 
-  fun inject(dialog: SettingsDialog)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: SettingsDialog)
 
   @Subcomponent.Factory
   interface Factory {

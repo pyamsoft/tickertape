@@ -28,7 +28,8 @@ import javax.inject.Named
 @Subcomponent
 internal interface PortfolioDigComponent {
 
-  fun inject(dialog: PortfolioDigFragment)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: PortfolioDigFragment)
 
   @Subcomponent.Factory
   interface Factory {

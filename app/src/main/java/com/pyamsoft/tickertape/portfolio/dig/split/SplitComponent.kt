@@ -26,7 +26,8 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface SplitComponent {
 
-  fun inject(dialog: SplitDialog)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: SplitDialog)
 
   @Subcomponent.Factory
   interface Factory {

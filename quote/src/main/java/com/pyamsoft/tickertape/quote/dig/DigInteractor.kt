@@ -22,6 +22,7 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DigInteractor {
@@ -31,6 +32,12 @@ interface DigInteractor {
       force: Boolean,
       symbol: StockSymbol,
   ): ResultWrapper<KeyStatistics>
+
+  @CheckResult
+  suspend fun getRecommendations(
+      force: Boolean,
+      symbol: StockSymbol,
+  ): ResultWrapper<StockRecommendations>
 
   @CheckResult
   suspend fun getNews(

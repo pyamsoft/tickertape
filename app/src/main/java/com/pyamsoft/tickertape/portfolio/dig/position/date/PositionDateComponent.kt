@@ -8,7 +8,8 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface PositionDateComponent {
 
-  fun inject(dialog: PositionDateDialog)
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: PositionDateDialog)
 
   @Subcomponent.Factory
   interface Factory {

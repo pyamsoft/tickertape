@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -20,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
@@ -33,7 +35,6 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
-import com.pyamsoft.tickertape.ui.ThemedCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 import com.pyamsoft.tickertape.ui.rememberInBackground
 
@@ -110,8 +111,9 @@ internal fun PositionItem(
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
   val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
 
-  ThemedCard(
+  Card(
       modifier = modifier,
+      elevation = CardDefaults.Elevation,
   ) {
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),

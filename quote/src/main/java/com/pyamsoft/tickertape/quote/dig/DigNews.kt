@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -28,7 +29,6 @@ import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.tickertape.ui.ThemedCard
 
 @Composable
 @JvmOverloads
@@ -75,7 +75,7 @@ private fun NewsItem(
 
   val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }
 
-  ThemedCard(
+  Card(
       modifier = modifier.clickable { uriHandler.openUri(link) },
       elevation = CardDefaults.Elevation,
   ) {

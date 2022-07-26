@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -23,7 +24,6 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.tickertape.ui.ThemedCard
 
 interface QuoteScope {
 
@@ -112,13 +112,15 @@ fun Quote(
 ) {
   val quote = ticker.quote
 
-  ThemedCard(
+  Card(
       modifier =
           modifier.combinedClickable(
               onClick = { onClick(ticker) },
               onLongClick = { onLongClick(ticker) },
           ),
       elevation = CardDefaults.Elevation,
+      backgroundColor = rememberCardColorForQuote(quote),
+      contentColor = MaterialTheme.colors.onSecondary,
   ) {
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),

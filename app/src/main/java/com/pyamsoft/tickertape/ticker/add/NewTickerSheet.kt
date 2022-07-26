@@ -24,7 +24,7 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.TickerTapeTheme
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.quote.add.NewTickerScreen
 import com.pyamsoft.tickertape.quote.add.NewTickerViewModeler
 import com.pyamsoft.tickertape.quote.add.TickerDestination

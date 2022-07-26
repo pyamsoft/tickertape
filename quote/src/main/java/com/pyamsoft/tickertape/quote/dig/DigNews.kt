@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -20,6 +19,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -27,7 +27,8 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
-import timber.log.Timber
+import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.ThemedCard
 
 @Composable
 @JvmOverloads
@@ -74,7 +75,7 @@ private fun NewsItem(
 
   val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }
 
-  Card(
+  ThemedCard(
       modifier = modifier.clickable { uriHandler.openUri(link) },
       elevation = CardDefaults.Elevation,
   ) {
@@ -127,11 +128,14 @@ private fun NewsItem(
 @Preview
 @Composable
 private fun PreviewDigNews() {
-  Surface {
-    DigNews(
-        isLoading = false,
-        news = emptyList(),
-        onRefresh = {},
-    )
+  PreviewTickerTapeTheme {
+    Surface {
+      DigNews(
+          modifier = Modifier.padding(16.dp),
+          isLoading = false,
+          news = emptyList(),
+          onRefresh = {},
+      )
+    }
   }
 }

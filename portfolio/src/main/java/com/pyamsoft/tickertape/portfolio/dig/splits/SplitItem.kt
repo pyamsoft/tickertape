@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -14,11 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.test.newTestSplit
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.ThemedCard
 
 @Composable
 @JvmOverloads
@@ -32,7 +34,7 @@ internal fun SplitItem(
   val displaySplitDate =
       remember(splitDate) { splitDate.format(DATE_FORMATTER.get().requireNotNull()) }
 
-  Card(
+  ThemedCard(
       modifier = modifier,
   ) {
     Column(
@@ -76,9 +78,12 @@ internal fun SplitItem(
 @Preview
 @Composable
 private fun PreviewSplitItem() {
-  Surface {
-    SplitItem(
-        split = newTestSplit(),
-    )
+  PreviewTickerTapeTheme {
+    Surface {
+      SplitItem(
+          modifier = Modifier.padding(16.dp),
+          split = newTestSplit(),
+      )
+    }
   }
 }

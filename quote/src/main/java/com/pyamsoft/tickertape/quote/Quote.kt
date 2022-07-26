@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,11 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.ThemedCard
 
 interface QuoteScope {
 
@@ -109,7 +112,7 @@ fun Quote(
 ) {
   val quote = ticker.quote
 
-  Card(
+  ThemedCard(
       modifier =
           modifier.combinedClickable(
               onClick = { onClick(ticker) },
@@ -199,14 +202,19 @@ private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuot
 @Composable
 private fun PreviewQuote() {
   val symbol = "MSFT".asSymbol()
-  Quote(
-      ticker =
-          Ticker(
-              symbol = symbol,
-              quote = newTestQuote(symbol),
-              chart = null,
-          ),
-      onClick = {},
-      onLongClick = {},
-  )
+  PreviewTickerTapeTheme {
+    Surface {
+      Quote(
+          modifier = Modifier.padding(16.dp),
+          ticker =
+              Ticker(
+                  symbol = symbol,
+                  quote = newTestQuote(symbol),
+                  chart = null,
+              ),
+          onClick = {},
+          onLongClick = {},
+      )
+    }
+  }
 }

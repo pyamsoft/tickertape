@@ -154,7 +154,7 @@ private fun <T : Any> Content(
     NewTickerFab(
         visible = !isLoading,
         modifier =
-            Modifier.padding(MaterialTheme.keylines.content)
+            Modifier.padding(MaterialTheme.keylines.baseline)
                 .navigationBarsPadding(bottom = true)
                 .padding(bottom = fabBottomPadding),
         onClick = onFabClick,

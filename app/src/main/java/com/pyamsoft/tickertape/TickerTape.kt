@@ -34,6 +34,7 @@ import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.receiver.BootReceiver
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

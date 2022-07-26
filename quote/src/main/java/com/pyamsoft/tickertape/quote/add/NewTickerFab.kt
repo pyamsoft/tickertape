@@ -1,15 +1,19 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
 @Composable
 @JvmOverloads
@@ -23,6 +27,8 @@ fun NewTickerFab(
       visible = visible,
   ) {
     FloatingActionButton(
+        modifier = Modifier.padding(MaterialTheme.keylines.baseline),
+        backgroundColor = MaterialTheme.colors.primary,
         onClick = onClick,
     ) {
       Icon(
@@ -36,10 +42,13 @@ fun NewTickerFab(
 @Preview
 @Composable
 private fun PreviewNewTickerFab() {
-  Surface {
-    NewTickerFab(
-        visible = true,
-        onClick = {},
-    )
+  PreviewTickerTapeTheme {
+    Surface {
+      NewTickerFab(
+          modifier = Modifier.padding(8.dp),
+          visible = true,
+          onClick = {},
+      )
+    }
   }
 }

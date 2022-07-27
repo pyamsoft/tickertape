@@ -48,8 +48,13 @@ internal constructor(
   val totalDirection: StockDirection
   val current: StockMoneyValue
   val totalShares: StockShareValue
+
   val gainLossDisplayString: String
   val changeTodayDisplayString: String
+
+  val gainLossAmount: String
+  val gainLossPercent: String
+
   val isOption = holding.type == EquityType.OPTION
 
   // Used in PortfolioStockList
@@ -128,8 +133,9 @@ internal constructor(
     }
 
     val sign = totalDirection.sign
-    gainLossDisplayString =
-        "${sign}${totalGainLoss.display} (${sign}${totalGainLossPercent.display})"
+    gainLossAmount = "${sign}${totalGainLoss.display}"
+    gainLossPercent = "${sign}${totalGainLossPercent.display}"
+    gainLossDisplayString = "$gainLossAmount ($gainLossPercent)"
 
     val todayChange =
         if (isNoTodayChange) StockMoneyValue.NONE

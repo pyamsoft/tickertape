@@ -33,9 +33,9 @@ internal fun PortfolioItem(
   val totalChangeTitle =
       remember(totalDirection) {
         when {
-          totalDirection.isUp -> "Overall Gain"
-          totalDirection.isDown -> "Overall Loss"
-          else -> "Overall Change"
+          totalDirection.isUp -> "Gain"
+          totalDirection.isDown -> "Loss"
+          else -> "Change"
         }
       }
 
@@ -58,18 +58,24 @@ internal fun PortfolioItem(
           )
 
           Info(
-              name = "Change Today",
-              value = stock.changeTodayDisplayString,
-          )
-
-          Info(
               name = "Value",
               value = stock.current.display,
           )
 
           Info(
-              name = totalChangeTitle,
-              value = stock.gainLossDisplayString,
+              name = "Change Today",
+              value = stock.changeTodayDisplayString,
+          )
+
+          Info(
+              modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+              name = "$totalChangeTitle Amount",
+              value = stock.gainLossAmount,
+          )
+
+          Info(
+              name = "$totalChangeTitle Percent",
+              value = stock.gainLossPercent,
           )
         }
       }

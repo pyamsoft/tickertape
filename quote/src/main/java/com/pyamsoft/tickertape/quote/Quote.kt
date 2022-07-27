@@ -5,7 +5,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -32,53 +34,57 @@ interface QuoteScope {
   fun Info(
       name: String,
       value: String,
-  ) {
-    Info(
-        modifier = Modifier,
-        name = name,
-        value = value,
-        valueColor = Color.Unspecified,
-    )
-  }
+  )
 
   @Composable
   fun Info(
       modifier: Modifier,
       name: String,
       value: String,
-  ) {
-    Info(
-        modifier = modifier,
-        name = name,
-        value = value,
-        valueColor = Color.Unspecified,
-    )
-  }
+  )
 
   @Composable
   fun Info(
+      modifier: Modifier,
       name: String,
       value: String,
+      nameColor: Color,
       valueColor: Color,
-  ) {
-    Info(
-        modifier = Modifier,
-        name = name,
-        value = value,
-        valueColor = valueColor,
-    )
-  }
-
-  @Composable fun Info(modifier: Modifier, name: String, value: String, valueColor: Color)
+  )
 }
 
 private object QuoteScopeInstance : QuoteScope {
+  @Composable
+  override fun Info(
+      name: String,
+      value: String,
+  ) =
+      Info(
+          modifier = Modifier,
+          name = name,
+          value = value,
+      )
 
   @Composable
   override fun Info(
       modifier: Modifier,
       name: String,
       value: String,
+  ) =
+      Info(
+          modifier = modifier,
+          name = name,
+          value = value,
+          nameColor = Color.Unspecified,
+          valueColor = Color.Unspecified,
+      )
+
+  @Composable
+  override fun Info(
+      modifier: Modifier,
+      name: String,
+      value: String,
+      nameColor: Color,
       valueColor: Color,
   ) {
     val captionStyle = MaterialTheme.typography.caption
@@ -93,6 +99,7 @@ private object QuoteScopeInstance : QuoteScope {
       Text(
           text = name,
           style = textStyle,
+          color = nameColor,
       )
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
@@ -169,6 +176,13 @@ private fun QuoteScope.QuoteInfo(
   Column(
       modifier = modifier,
   ) {
+    quote.dayPreviousClose?.also { close ->
+      Info(
+          name = "Previous Close",
+          value = close.display,
+      )
+    }
+
     quote.dayOpen?.also { open ->
       Info(
           name = "Open",
@@ -176,10 +190,9 @@ private fun QuoteScope.QuoteInfo(
       )
     }
 
-    quote.dayPreviousClose?.also { close ->
-      Info(
-          name = "Previous Close",
-          value = close.display,
+    if (quote.dayLow != null || quote.dayHigh != null || quote.dayVolume != null) {
+      Spacer(
+          modifier = Modifier.height(MaterialTheme.keylines.baseline),
       )
     }
 

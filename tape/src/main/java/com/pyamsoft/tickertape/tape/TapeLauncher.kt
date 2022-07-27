@@ -85,7 +85,7 @@ internal constructor(
 
     @CheckResult
     private fun DayOfWeek.isWeekend(): Boolean {
-      return this == DayOfWeek.SATURDAY || this == DayOfWeek.SATURDAY
+      return this == DayOfWeek.SATURDAY || this == DayOfWeek.SUNDAY
     }
 
     @JvmStatic

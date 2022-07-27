@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,23 +18,33 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun TickerName(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    size: TickerSize,
 ) {
+
   val symbol = ticker.symbol
   val quote = ticker.quote
+  val typography = MaterialTheme.typography
+  val sizes =
+      remember(size, typography) {
+        when (size) {
+          TickerSize.CHART -> TickerSizes.chart(typography)
+          TickerSize.QUOTE -> TickerSizes.company(typography)
+        }
+      }
 
   Column(
       modifier = modifier,
   ) {
     Text(
         text = symbol.raw,
-        style = MaterialTheme.typography.body1,
+        style = sizes.title,
     )
 
     if (quote != null) {
       if (quote.company.isValidCompany) {
         Text(
             text = quote.company.company,
-            style = MaterialTheme.typography.body2,
+            style = sizes.description,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )
@@ -54,6 +65,7 @@ private fun PreviewTickerName() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol),
             ),
+        size = TickerSize.QUOTE,
     )
   }
 }

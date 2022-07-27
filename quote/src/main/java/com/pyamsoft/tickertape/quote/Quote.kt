@@ -2,6 +2,7 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -119,30 +120,37 @@ fun Quote(
               onLongClick = { onLongClick(ticker) },
           ),
       elevation = CardDefaults.Elevation,
-      backgroundColor = rememberCardColorForQuote(quote),
-      contentColor = MaterialTheme.colors.onSecondary,
+      backgroundColor = rememberCardBackgroundColorForQuote(quote),
+      contentColor = rememberCardContentColorForQuote(quote),
   ) {
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
     ) {
+      TickerName(
+          ticker = ticker,
+          size = TickerSize.QUOTE,
+      )
       Row(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.Bottom,
       ) {
-        TickerName(
+        Column(
             modifier = Modifier.weight(1F),
-            ticker = ticker,
-        )
+        ) {
+          if (quote != null) {
+            QuoteScopeInstance.QuoteInfo(
+                modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
+                quote = quote,
+            )
+          }
+          QuoteScopeInstance.content()
+        }
+
         TickerPrice(
             ticker = ticker,
+            size = TickerSize.QUOTE,
         )
       }
-      if (quote != null) {
-        QuoteScopeInstance.QuoteInfo(
-            modifier = Modifier.fillMaxWidth(),
-            quote = quote,
-        )
-      }
-      QuoteScopeInstance.content()
     }
   }
 }

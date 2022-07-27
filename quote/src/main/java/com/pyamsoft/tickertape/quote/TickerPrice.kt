@@ -23,8 +23,18 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun TickerPrice(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    size: TickerSize,
 ) {
   val quote = ticker.quote
+
+  val typography = MaterialTheme.typography
+  val sizes =
+      remember(size, typography) {
+        when (size) {
+          TickerSize.CHART -> TickerSizes.chart(typography)
+          TickerSize.QUOTE -> TickerSizes.price(typography)
+        }
+      }
 
   if (quote != null) {
     Column(
@@ -36,10 +46,10 @@ fun TickerPrice(
       val direction = session.direction
       val directionSign = session.direction.sign
       val composeColor =
-          if (direction.isZero) {
-            MaterialTheme.typography.caption.color
-          } else {
-            remember(direction) { Color(direction.color) }
+          remember(direction, size) {
+            // If it is a quote, we don't color text
+            val hasNoDirection = size == TickerSize.QUOTE || direction.isZero
+            return@remember if (hasNoDirection) Color.Unspecified else Color(direction.color)
           }
 
       Text(
@@ -53,19 +63,19 @@ fun TickerPrice(
       )
       Text(
           text = session.price.display,
-          style = MaterialTheme.typography.body2.copy(color = composeColor),
+          style = sizes.title.copy(color = composeColor),
       )
       Row(
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
             text = "${directionSign}${session.amount.display}",
-            style = MaterialTheme.typography.caption.copy(color = composeColor),
+            style = sizes.description.copy(color = composeColor),
         )
         Text(
             modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
             text = "(${directionSign}${session.percent.display})",
-            style = MaterialTheme.typography.caption.copy(color = composeColor),
+            style = sizes.description.copy(color = composeColor),
         )
       }
     }
@@ -84,6 +94,7 @@ private fun PreviewTickerPrice() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol),
             ),
+        size = TickerSize.QUOTE,
     )
   }
 }

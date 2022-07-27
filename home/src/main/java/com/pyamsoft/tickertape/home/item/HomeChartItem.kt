@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
+import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -52,10 +53,12 @@ internal fun HomeChartItem(
       TickerName(
           modifier = Modifier.weight(1F),
           ticker = ticker,
+          size = TickerSize.CHART,
       )
       TickerPrice(
           modifier = Modifier.padding(start = MaterialTheme.keylines.content),
           ticker = ticker,
+          size = TickerSize.CHART,
       )
     }
     Chart(

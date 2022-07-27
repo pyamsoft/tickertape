@@ -81,19 +81,24 @@ private object QuoteScopeInstance : QuoteScope {
       value: String,
       valueColor: Color,
   ) {
+    val captionStyle = MaterialTheme.typography.caption
+    val textStyle =
+        captionStyle.copy(
+            color = captionStyle.color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+        )
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
       Text(
           text = name,
-          style = MaterialTheme.typography.caption,
+          style = textStyle,
       )
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           color = valueColor,
           text = value,
-          style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
+          style = textStyle.copy(fontWeight = FontWeight.W700),
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
       )
@@ -121,7 +126,7 @@ fun Quote(
           ),
       elevation = CardDefaults.Elevation,
       backgroundColor = rememberCardBackgroundColorForQuote(quote),
-      contentColor = rememberCardContentColorForQuote(quote),
+      contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
     Column(
         modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
@@ -131,6 +136,7 @@ fun Quote(
           size = TickerSize.QUOTE,
       )
       Row(
+          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.Bottom,
       ) {
@@ -139,7 +145,7 @@ fun Quote(
         ) {
           if (quote != null) {
             QuoteScopeInstance.QuoteInfo(
-                modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
+                modifier = Modifier.fillMaxWidth(),
                 quote = quote,
             )
           }
@@ -156,54 +162,50 @@ fun Quote(
 }
 
 @Composable
-private fun QuoteScope.QuoteInfo(modifier: Modifier = Modifier, quote: StockQuote) {
+private fun QuoteScope.QuoteInfo(
+    modifier: Modifier = Modifier,
+    quote: StockQuote,
+) {
   Column(
       modifier = modifier,
   ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      quote.dayOpen?.also { open ->
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Open",
-            value = open.display,
-        )
-      }
-
-      quote.dayPreviousClose?.also { close ->
-        Info(
-            name = "Previous Close",
-            value = close.display,
-        )
-      }
+    quote.dayOpen?.also { open ->
+      Info(
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+          name = "Open",
+          value = open.display,
+      )
     }
 
-    Row(
-        modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      quote.dayLow?.also { low ->
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Low",
-            value = low.display,
-        )
-      }
-      quote.dayHigh?.also { high ->
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "High",
-            value = high.display,
-        )
-      }
-      quote.dayVolume?.also { volume ->
-        Info(
-            modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
-            name = "Volume",
-            value = volume.display,
-        )
-      }
+    quote.dayPreviousClose?.also { close ->
+      Info(
+          name = "Previous Close",
+          value = close.display,
+      )
+    }
+
+    quote.dayLow?.also { low ->
+      Info(
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+          name = "Low",
+          value = low.display,
+      )
+    }
+
+    quote.dayHigh?.also { high ->
+      Info(
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+          name = "High",
+          value = high.display,
+      )
+    }
+
+    quote.dayVolume?.also { volume ->
+      Info(
+          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
+          name = "Volume",
+          value = volume.display,
+      )
     }
   }
 }

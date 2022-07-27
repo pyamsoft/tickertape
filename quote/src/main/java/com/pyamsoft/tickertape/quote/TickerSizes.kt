@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.quote
 import androidx.annotation.CheckResult
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 
 enum class TickerSize {
   CHART,
@@ -26,18 +27,27 @@ internal constructor(
 
     @JvmStatic
     @CheckResult
-    fun company(typography: Typography) =
-        TickerSizes(
-            title = typography.h6,
-            description = typography.body1,
-        )
+    fun company(typography: Typography): TickerSizes {
+      val titleStyle = typography.h6
+      val descriptionStyle = typography.body1
+      return TickerSizes(
+          title =
+              titleStyle.copy(
+                  color = titleStyle.color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+              ),
+          description =
+              descriptionStyle.copy(
+                  color = descriptionStyle.color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+              ),
+      )
+    }
 
     @JvmStatic
     @CheckResult
     fun price(typography: Typography) =
         TickerSizes(
-            title = typography.h5,
-            description = typography.body2,
+            title = typography.h5.copy(fontWeight = FontWeight.W700),
+            description = typography.body2.copy(fontWeight = FontWeight.W600),
         )
   }
 }

@@ -26,7 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 private val BOLD_STYLE =
     SpanStyle(
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.W700,
     )
 
 @Composable

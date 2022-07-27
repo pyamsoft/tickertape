@@ -87,7 +87,7 @@ private fun NewsItem(
             text = d,
             style =
                 MaterialTheme.typography.caption.copy(
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.W500,
                 ),
         )
       }
@@ -97,7 +97,7 @@ private fun NewsItem(
             text = source,
             style =
                 MaterialTheme.typography.caption.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.W700,
                 ),
         )
       }
@@ -107,7 +107,7 @@ private fun NewsItem(
             text = title,
             style =
                 MaterialTheme.typography.body1.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.W700,
                 ),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

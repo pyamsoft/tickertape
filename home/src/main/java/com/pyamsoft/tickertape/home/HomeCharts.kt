@@ -247,7 +247,7 @@ private fun HomeCharts(
             text = name,
             style =
                 MaterialTheme.typography.h6.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.W700,
                 ),
         )
 

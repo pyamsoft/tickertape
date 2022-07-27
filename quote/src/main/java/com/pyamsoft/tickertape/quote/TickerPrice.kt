@@ -25,9 +25,11 @@ fun TickerPrice(
     ticker: Ticker,
     size: TickerSize,
 ) {
+  val typography = MaterialTheme.typography
+  val colors = MaterialTheme.colors
+
   val quote = ticker.quote
 
-  val typography = MaterialTheme.typography
   val sizes =
       remember(size, typography) {
         when (size) {
@@ -46,10 +48,13 @@ fun TickerPrice(
       val direction = session.direction
       val directionSign = session.direction.sign
       val composeColor =
-          remember(direction, size) {
-            // If it is a quote, we don't color text
-            val hasNoDirection = size == TickerSize.QUOTE || direction.isZero
-            return@remember if (hasNoDirection) Color.Unspecified else Color(direction.color)
+          remember(direction, size, colors) {
+            return@remember if (size == TickerSize.QUOTE || direction.isZero) {
+              // If no direction or is a quote so bg is colored, unspecified
+              Color.Unspecified
+            } else {
+              Color(direction.color)
+            }
           }
 
       Text(

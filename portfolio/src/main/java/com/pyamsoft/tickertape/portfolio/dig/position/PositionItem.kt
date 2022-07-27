@@ -338,7 +338,7 @@ private fun Info(
       Text(
           modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
           text = "${name}:",
-          style = textStyle.copy(fontWeight = FontWeight.Bold),
+          style = textStyle.copy(fontWeight = FontWeight.W700),
       )
     }
 

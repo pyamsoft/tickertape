@@ -82,7 +82,7 @@ internal fun HomeWatchlist(
               text = "My Watchlist",
               style =
                   MaterialTheme.typography.h6.copy(
-                      fontWeight = FontWeight.Bold,
+                      fontWeight = FontWeight.W700,
                   ),
           )
         }

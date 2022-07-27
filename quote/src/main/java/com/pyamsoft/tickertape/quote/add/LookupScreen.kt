@@ -202,7 +202,7 @@ private fun ResultItem(
         text = symbol.raw,
         style =
             MaterialTheme.typography.body1.copy(
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.W500,
             ),
     )
     if (company.isValidCompany) {

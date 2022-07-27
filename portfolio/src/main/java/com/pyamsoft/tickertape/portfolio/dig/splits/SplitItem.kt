@@ -53,7 +53,7 @@ internal fun SplitItem(
       ) {
         Text(
             text = postSplitShareCount.display,
-            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.W700),
         )
 
         Text(
@@ -64,7 +64,7 @@ internal fun SplitItem(
 
         Text(
             text = preSplitShareCount.display,
-            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.W700),
         )
 
         Text(

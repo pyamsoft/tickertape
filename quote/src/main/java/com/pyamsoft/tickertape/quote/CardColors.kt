@@ -1,7 +1,6 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -20,6 +19,7 @@ private val DOWN_COLOR_5 = Color(0xFFE53935)
 private val DOWN_COLOR_2 = Color(0xFFF44336)
 private val DOWN_COLOR_1 = Color(0xFFE57373)
 
+val QUOTE_BACKGROUND_DEFAULT_COLOR = Color(0xFF03A9F4)
 val QUOTE_CONTENT_DEFAULT_COLOR = Color(0xFF121212)
 const val QUOTE_CONTENT_DEFAULT_ALPHA = 0.6F
 
@@ -48,7 +48,7 @@ private fun decideCardBackgroundColorForPercentChange(
 @CheckResult
 fun rememberCardBackgroundColorForQuote(
     quote: StockQuote?,
-    defaultColor: Color = MaterialTheme.colors.secondary,
+    defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
 ): Color {
   if (quote == null) {
     return defaultColor
@@ -65,7 +65,7 @@ fun rememberCardBackgroundColorForQuote(
 @CheckResult
 fun rememberCardBackgroundColorForPercentChange(
     percentChange: Double,
-    defaultColor: Color = MaterialTheme.colors.secondary,
+    defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
 ): Color {
   return remember(percentChange, defaultColor) {
     decideCardBackgroundColorForPercentChange(percentChange, defaultColor)

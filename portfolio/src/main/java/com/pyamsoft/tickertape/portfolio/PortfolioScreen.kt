@@ -58,13 +58,15 @@ fun PortfolioScreen(
       itemKey = { index, stock -> "${stock.holding.symbol.raw}-${index}" },
       renderHeader = {
         PortfolioSummary(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             state = state,
         )
       },
       renderListItem = { stock ->
         PortfolioItem(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             stock = stock,
             onSelect = onSelect,
             onDelete = onDelete,
@@ -72,7 +74,8 @@ fun PortfolioScreen(
       },
       renderEmptyState = {
         EmptyState(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             imageLoader = imageLoader,
         )
       },

@@ -185,7 +185,6 @@ private fun <T : Any> ListSection(
 
   LazyColumn(
       modifier = modifier,
-      contentPadding = PaddingValues(horizontal = MaterialTheme.keylines.baseline),
   ) {
     if (renderHeader != null) {
       item { renderHeader() }
@@ -213,7 +212,8 @@ private fun <T : Any> ListSection(
       pageError != null -> {
         item {
           ErrorState(
-              modifier = Modifier.fillMaxSize(),
+              modifier = Modifier.fillMaxSize()
+                  .padding(horizontal = MaterialTheme.keylines.baseline),
               imageLoader = imageLoader,
               error = pageError,
               onRefresh = onRefresh,

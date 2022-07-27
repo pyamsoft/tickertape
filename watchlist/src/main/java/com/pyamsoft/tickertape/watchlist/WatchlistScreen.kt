@@ -55,7 +55,8 @@ fun WatchlistScreen(
       itemKey = { index, stock -> "${stock.symbol.raw}-${index}" },
       renderListItem = { stock ->
         WatchlistItem(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             ticker = stock,
             onSelect = onSelectTicker,
             onDelete = onDeleteTicker,
@@ -63,7 +64,8 @@ fun WatchlistScreen(
       },
       renderEmptyState = {
         EmptyState(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             imageLoader = imageLoader,
         )
       },

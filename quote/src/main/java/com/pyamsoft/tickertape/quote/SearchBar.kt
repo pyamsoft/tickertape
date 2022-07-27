@@ -128,7 +128,7 @@ private fun SearchInput(
   OutlinedTextField(
       modifier =
           modifier
-              .padding(horizontal = MaterialTheme.keylines.baseline)
+              .padding(horizontal = MaterialTheme.keylines.content)
               .padding(bottom = MaterialTheme.keylines.baseline)
               .onFocusChanged { focus -> setSearchFocused(focus.isFocused) },
       value = search,

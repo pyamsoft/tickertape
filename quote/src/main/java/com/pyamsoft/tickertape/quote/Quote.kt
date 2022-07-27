@@ -171,7 +171,6 @@ private fun QuoteScope.QuoteInfo(
   ) {
     quote.dayOpen?.also { open ->
       Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Open",
           value = open.display,
       )
@@ -186,7 +185,6 @@ private fun QuoteScope.QuoteInfo(
 
     quote.dayLow?.also { low ->
       Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Low",
           value = low.display,
       )
@@ -194,7 +192,6 @@ private fun QuoteScope.QuoteInfo(
 
     quote.dayHigh?.also { high ->
       Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "High",
           value = high.display,
       )
@@ -202,7 +199,6 @@ private fun QuoteScope.QuoteInfo(
 
     quote.dayVolume?.also { volume ->
       Info(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.baseline),
           name = "Volume",
           value = volume.display,
       )

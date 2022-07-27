@@ -11,10 +11,17 @@ import com.pyamsoft.tickertape.core.isNegative
 import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import kotlin.math.abs
+import kotlin.math.max
 
 private const val LIMIT_PERCENT = 10
-private val UP_COLOR = Color.parseColor("4CAF50")
-private val DOWN_COLOR = Color.parseColor("E53935")
+private const val COLOR_ADJUST_OFFSET = 0.25F
+
+private val UP_COLOR = Color.parseColor("#388E3C")
+private val DOWN_COLOR = Color.parseColor("#D32F2F")
+
+private val UP_COMPOSE_COLOR = ComposeColor(UP_COLOR)
+private val DOWN_COMPOSE_COLOR = ComposeColor(DOWN_COLOR)
 
 val QUOTE_BACKGROUND_DEFAULT_COLOR = ComposeColor(0xFF709EFF)
 val QUOTE_CONTENT_DEFAULT_COLOR = ComposeColor(0xFF121212)
@@ -28,12 +35,42 @@ private fun decideCardBackgroundColorForPercentChange(
   return when {
     percentChange.isZero() -> defaultColor
     percentChange.isPositive() -> {
-      val diff = ((LIMIT_PERCENT - percentChange) / 100.0).toFloat()
-      ComposeColor(ColorUtils.blendARGB(defaultColor.toArgb(), UP_COLOR, diff))
+      // If we are out of range, just feed directly UP_COLOR
+      // blendARGB would also do this, but save some cycles
+      if (percentChange.compareTo(10) >= 0) {
+        UP_COMPOSE_COLOR
+      } else {
+        val diff = LIMIT_PERCENT - percentChange
+        val diffPct = (diff / LIMIT_PERCENT).toFloat()
+
+        // Add small offset to bias a card towards the direction color
+        val colorAmount = max(0F, diffPct - COLOR_ADJUST_OFFSET)
+        if (colorAmount.isZero()) {
+          // If with adjustment we are 100%, short circuit
+          UP_COMPOSE_COLOR
+        } else {
+          ComposeColor(ColorUtils.blendARGB(UP_COLOR, defaultColor.toArgb(), colorAmount))
+        }
+      }
     }
     percentChange.isNegative() -> {
-      val diff = ((LIMIT_PERCENT - percentChange) / 100.0).toFloat()
-      ComposeColor(ColorUtils.blendARGB(defaultColor.toArgb(), DOWN_COLOR, diff))
+      // If we are out of range, just feed directly DOWN_COLOR
+      // blendARGB would also do this, but save some cycles
+      if (percentChange.compareTo(-10) <= 0) {
+        DOWN_COMPOSE_COLOR
+      } else {
+        val diff = -(LIMIT_PERCENT) - percentChange
+        val diffPct = abs(diff / LIMIT_PERCENT).toFloat()
+
+        // Add small offset to bias a card towards the direction color
+        val colorAmount = max(0F, diffPct - COLOR_ADJUST_OFFSET)
+        if (colorAmount.isZero()) {
+          // If with adjustment we are 100%, short circuit
+          DOWN_COMPOSE_COLOR
+        } else {
+          ComposeColor(ColorUtils.blendARGB(DOWN_COLOR, defaultColor.toArgb(), colorAmount))
+        }
+      }
     }
     else -> defaultColor
   }

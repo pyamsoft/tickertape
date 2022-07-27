@@ -34,6 +34,11 @@ fun Double.isZero(): Boolean {
 }
 
 @CheckResult
+fun Float.isZero(): Boolean {
+  return this.compareTo(0) == 0
+}
+
+@CheckResult
 fun Long.isZero(): Boolean {
   return this.compareTo(0) == 0
 }

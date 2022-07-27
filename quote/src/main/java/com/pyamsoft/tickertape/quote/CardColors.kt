@@ -14,8 +14,9 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 
-private const val LIMIT_PERCENT = 10.0
+private const val LIMIT_PERCENT = 5.0
 private const val COLOR_ADJUST_OFFSET = 0.15F
 
 private val UP_COMPOSE_COLOR = Color(DEFAULT_STOCK_UP_COLOR)
@@ -47,7 +48,7 @@ private fun decideCardBackgroundColorForPercentChange(
         val diffPct = (diff / limit).toFloat()
 
         // Add small offset to bias a card towards the direction color
-        val colorAmount = max(0F, diffPct - COLOR_ADJUST_OFFSET)
+        val colorAmount = min(1F, max(0F, diffPct - COLOR_ADJUST_OFFSET))
         if (colorAmount.isZero()) {
           // If with adjustment we are 100%, short circuit
           UP_COMPOSE_COLOR
@@ -66,7 +67,7 @@ private fun decideCardBackgroundColorForPercentChange(
         val diffPct = abs(diff / limit).toFloat()
 
         // Add small offset to bias a card towards the direction color
-        val colorAmount = max(0F, diffPct - COLOR_ADJUST_OFFSET)
+        val colorAmount = min(1F, max(0F, diffPct - COLOR_ADJUST_OFFSET))
         if (colorAmount.isZero()) {
           // If with adjustment we are 100%, short circuit
           DOWN_COMPOSE_COLOR

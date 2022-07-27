@@ -24,5 +24,5 @@ const val TERMS_CONDITIONS_URL =
     "https://pyamsoft.blogspot.com/p/tickertape-terms-and-conditions.html"
 
 @ColorInt const val DEFAULT_STOCK_COLOR = Color.WHITE
-@ColorInt const val DEFAULT_STOCK_UP_COLOR = Color.GREEN
-@ColorInt const val DEFAULT_STOCK_DOWN_COLOR = Color.RED
+@ColorInt val DEFAULT_STOCK_UP_COLOR = Color.parseColor("#388E3C")
+@ColorInt val DEFAULT_STOCK_DOWN_COLOR = Color.parseColor("#D32F2F")

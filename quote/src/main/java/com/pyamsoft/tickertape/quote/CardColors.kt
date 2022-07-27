@@ -1,45 +1,40 @@
 package com.pyamsoft.tickertape.quote
 
+import android.graphics.Color
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
+import com.pyamsoft.tickertape.core.isNegative
+import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-private val UP_COLOR_10 = Color(0xFF2E7D32)
-private val UP_COLOR_7 = Color(0xFF388E3C)
-private val UP_COLOR_5 = Color(0xFF4CAF50)
-private val UP_COLOR_2 = Color(0xFF8BC34A)
-private val UP_COLOR_1 = Color(0xFFAED581)
+private const val LIMIT_PERCENT = 10
+private val UP_COLOR = Color.parseColor("4CAF50")
+private val DOWN_COLOR = Color.parseColor("E53935")
 
-private val DOWN_COLOR_10 = Color(0xFFC62828)
-private val DOWN_COLOR_7 = Color(0xFFD32F2F)
-private val DOWN_COLOR_5 = Color(0xFFE53935)
-private val DOWN_COLOR_2 = Color(0xFFF44336)
-private val DOWN_COLOR_1 = Color(0xFFE57373)
-
-val QUOTE_BACKGROUND_DEFAULT_COLOR = Color(0xFF709EFF)
-val QUOTE_CONTENT_DEFAULT_COLOR = Color(0xFF121212)
+val QUOTE_BACKGROUND_DEFAULT_COLOR = ComposeColor(0xFF709EFF)
+val QUOTE_CONTENT_DEFAULT_COLOR = ComposeColor(0xFF121212)
 const val QUOTE_CONTENT_DEFAULT_ALPHA = 0.6F
 
 @CheckResult
 private fun decideCardBackgroundColorForPercentChange(
     percentChange: Double,
-    defaultColor: Color,
-): Color {
+    defaultColor: ComposeColor,
+): ComposeColor {
   return when {
     percentChange.isZero() -> defaultColor
-    percentChange >= 10 -> UP_COLOR_10
-    percentChange >= 7 -> UP_COLOR_7
-    percentChange >= 5 -> UP_COLOR_5
-    percentChange >= 2 -> UP_COLOR_2
-    percentChange >= 1 -> UP_COLOR_1
-    percentChange <= -10 -> DOWN_COLOR_10
-    percentChange <= -7 -> DOWN_COLOR_7
-    percentChange <= -5 -> DOWN_COLOR_5
-    percentChange <= -2 -> DOWN_COLOR_2
-    percentChange <= -1 -> DOWN_COLOR_1
+    percentChange.isPositive() -> {
+      val diff = ((LIMIT_PERCENT - percentChange) / 100.0).toFloat()
+      ComposeColor(ColorUtils.blendARGB(defaultColor.toArgb(), UP_COLOR, diff))
+    }
+    percentChange.isNegative() -> {
+      val diff = ((LIMIT_PERCENT - percentChange) / 100.0).toFloat()
+      ComposeColor(ColorUtils.blendARGB(defaultColor.toArgb(), DOWN_COLOR, diff))
+    }
     else -> defaultColor
   }
 }
@@ -48,8 +43,8 @@ private fun decideCardBackgroundColorForPercentChange(
 @CheckResult
 fun rememberCardBackgroundColorForQuote(
     quote: StockQuote?,
-    defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
-): Color {
+    defaultColor: ComposeColor = QUOTE_BACKGROUND_DEFAULT_COLOR,
+): ComposeColor {
   if (quote == null) {
     return defaultColor
   }
@@ -65,8 +60,8 @@ fun rememberCardBackgroundColorForQuote(
 @CheckResult
 fun rememberCardBackgroundColorForPercentChange(
     percentChange: Double,
-    defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
-): Color {
+    defaultColor: ComposeColor = QUOTE_BACKGROUND_DEFAULT_COLOR,
+): ComposeColor {
   return remember(percentChange, defaultColor) {
     decideCardBackgroundColorForPercentChange(percentChange, defaultColor)
   }

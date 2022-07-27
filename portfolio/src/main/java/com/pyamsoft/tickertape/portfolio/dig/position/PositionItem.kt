@@ -1,9 +1,12 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -27,6 +30,11 @@ import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
+import com.pyamsoft.tickertape.quote.PriceSection
+import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_ALPHA
+import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_COLOR
+import com.pyamsoft.tickertape.quote.TickerSizes
+import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForPercentChange
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -41,7 +49,10 @@ import com.pyamsoft.tickertape.ui.rememberInBackground
 private data class DisplayValues(
     val cost: String,
     val current: String,
-    val gainLoss: String,
+    val gainLossAmount: Double,
+    val gainLossPercent: Double,
+    val displayGainLossAmount: String,
+    val displayGainLossPercent: String,
     val color: Color,
 )
 
@@ -58,13 +69,19 @@ private fun calculateDisplayValues(
   val totalCost = (price.value * shareCount.value).asMoney()
   val displayTotal = totalCost.display
 
+  val gainLossAmount: Double
+  val gainLossPercent: Double
+  val displayGainLossAmount: String
+  val displayGainLossPercent: String
   val displayCurrent: String
-  val displayGainLoss: String
   val colorGainLoss: Color
 
   if (currentPrice == null) {
+    gainLossAmount = 0.0
+    gainLossPercent = 0.0
     displayCurrent = ""
-    displayGainLoss = ""
+    displayGainLossAmount = ""
+    displayGainLossPercent = ""
     colorGainLoss = Color.Unspecified
   } else {
     // Current
@@ -74,17 +91,19 @@ private fun calculateDisplayValues(
 
     // Gain/Loss
     val gainLossValue = currentValue.value - totalCost.value
-    val gainLossPercent = ((gainLossValue * 100) / totalCost.value).asPercent().display
+    val gainLossPct = (gainLossValue * 100) / totalCost.value
 
     val optionsScaledValue = if (isOption) (gainLossValue * 100) else gainLossValue
     val sideScaledValue = if (isSell) optionsScaledValue * -1 else optionsScaledValue
-    val amount = sideScaledValue.asMoney().display
 
     val gainLossDirection = sideScaledValue.asDirection()
     val sign = gainLossDirection.sign
 
     // Final display
-    displayGainLoss = "${sign}${amount} (${sign}${gainLossPercent})"
+    gainLossAmount = sideScaledValue
+    gainLossPercent = gainLossPct
+    displayGainLossAmount = "${sign}${sideScaledValue.asMoney().display}"
+    displayGainLossPercent = "${sign}${gainLossPct.asPercent().display}"
 
     // Color
     colorGainLoss = Color(gainLossDirection.color)
@@ -93,7 +112,10 @@ private fun calculateDisplayValues(
   return DisplayValues(
       cost = displayTotal,
       current = displayCurrent,
-      gainLoss = displayGainLoss,
+      gainLossAmount = gainLossAmount,
+      gainLossPercent = gainLossPercent,
+      displayGainLossAmount = displayGainLossAmount,
+      displayGainLossPercent = displayGainLossPercent,
       color = colorGainLoss,
   )
 }
@@ -111,37 +133,50 @@ internal fun PositionItem(
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
   val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
 
+  val displayValues =
+      rememberInBackground(position, currentPrice, isOption, isSell, splits) {
+        calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
+      }
+
   Card(
       modifier = modifier,
       elevation = CardDefaults.Elevation,
+      backgroundColor =
+          rememberCardBackgroundColorForPercentChange(
+              displayValues?.gainLossPercent,
+              // More generous change limit since positions can be big in the red or green
+              changeLimit = 30.0,
+          ),
+      contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
     Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.baseline),
     ) {
       PurchaseDate(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
           position = position,
       )
       NumberOfShares(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
           isOption = isOption,
           isSell = isSell,
           position = position,
           splits = splits,
       )
       CostBasis(
+          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
           isOption = isOption,
           position = position,
           splits = splits,
       )
-      CurrentPrices(
-          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
-          isOption = isOption,
-          isSell = isSell,
-          position = position,
-          currentPrice = currentPrice,
-          splits = splits,
-      )
+
+      displayValues?.also { dv ->
+        CurrentPrices(
+            modifier = Modifier.fillMaxWidth(),
+            isOption = isOption,
+            isSell = isSell,
+            displayValues = dv,
+        )
+      }
     }
   }
 }
@@ -151,40 +186,38 @@ private fun CurrentPrices(
     modifier: Modifier = Modifier,
     isOption: Boolean,
     isSell: Boolean,
-    position: DbPosition,
-    currentPrice: StockMoneyValue?,
-    splits: List<DbSplit>,
+    displayValues: DisplayValues,
 ) {
-  val displayValues =
-      rememberInBackground(position, currentPrice, isOption, isSell, splits) {
-        calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
-      }
+  val sizes = TickerSizes.price(MaterialTheme.typography)
 
   Column(
       modifier = modifier,
   ) {
-    if (displayValues != null) {
-      Info(
-          name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
-          value = displayValues.cost,
-          textStyle = MaterialTheme.typography.body1,
+    Info(
+        name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
+        value = displayValues.cost,
+        textStyle = MaterialTheme.typography.body1,
+    )
+
+    if (displayValues.current.isNotBlank() ||
+        displayValues.displayGainLossPercent.isNotBlank() ||
+        displayValues.displayGainLossAmount.isNotBlank()) {
+      Spacer(
+          modifier = Modifier.height(MaterialTheme.keylines.content),
       )
+    }
 
-      if (displayValues.current.isNotBlank()) {
-        Info(
-            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
-            value = displayValues.current,
-            valueColor = displayValues.color,
-            textStyle = MaterialTheme.typography.body1,
-        )
-      }
-
-      if (displayValues.gainLoss.isNotBlank()) {
-        Info(
-            value = displayValues.gainLoss,
-            valueColor = displayValues.color,
-        )
-      }
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomEnd,
+    ) {
+      PriceSection(
+          value = displayValues.current,
+          valueStyle = sizes.title,
+          changeAmount = displayValues.displayGainLossAmount,
+          changePercent = displayValues.displayGainLossPercent,
+          changeStyle = sizes.description,
+      )
     }
   }
 }
@@ -200,6 +233,10 @@ private fun PurchaseDate(
   Info(
       modifier = modifier,
       value = displayPurchaseDate,
+      textStyle =
+          MaterialTheme.typography.body1.copy(
+              fontWeight = FontWeight.W700,
+          ),
   )
 }
 
@@ -314,7 +351,6 @@ private fun NumberOfShares(
           value = displayOriginalShares,
       )
     }
-
     Info(
         name = "${prefix}${if (isOption) "Contracts" else "Shares"}",
         value = displayAdjustedShares,
@@ -328,8 +364,19 @@ private fun Info(
     name: String = "",
     value: String,
     valueColor: Color = Color.Unspecified,
-    textStyle: TextStyle = MaterialTheme.typography.body2
+    textStyle: TextStyle = MaterialTheme.typography.body2,
 ) {
+
+  val displayedTextStyle =
+      remember(textStyle) {
+        textStyle.copy(
+            color =
+                textStyle.color.copy(
+                    alpha = QUOTE_CONTENT_DEFAULT_ALPHA,
+                ),
+        )
+      }
+
   Row(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
@@ -338,14 +385,14 @@ private fun Info(
       Text(
           modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
           text = "${name}:",
-          style = textStyle.copy(fontWeight = FontWeight.W700),
+          style = displayedTextStyle,
       )
     }
 
     Text(
         color = valueColor,
         text = value,
-        style = textStyle,
+        style = displayedTextStyle.copy(fontWeight = FontWeight.W700),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )
@@ -362,7 +409,7 @@ private fun PreviewPositionItem() {
           position = newTestPosition(),
           equityType = EquityType.STOCK,
           tradeSide = TradeSide.BUY,
-          currentPrice = null,
+          currentPrice = 25.0.asMoney(),
           splits = emptyList(),
       )
     }

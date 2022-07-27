@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.portfolio.item
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,45 +38,41 @@ internal fun PortfolioItem(
         }
       }
 
-  Box(
-      modifier = modifier,
-  ) {
-    if (ticker != null) {
-      Quote(
-          modifier = Modifier.fillMaxWidth(),
-          ticker = ticker,
-          onClick = { onSelect(stock) },
-          onLongClick = { onDelete(stock) },
+  if (ticker != null) {
+    Quote(
+        modifier = modifier.fillMaxWidth(),
+        ticker = ticker,
+        onClick = { onSelect(stock) },
+        onLongClick = { onDelete(stock) },
+    ) {
+      Column(
+          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
       ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
-        ) {
-          Info(
-              name = if (isOption) "Contracts" else "Shares",
-              value = stock.totalShares.display,
-          )
+        Info(
+            name = if (isOption) "Contracts" else "Shares",
+            value = stock.totalShares.display,
+        )
 
-          Info(
-              name = "Value",
-              value = stock.current.display,
-          )
+        Info(
+            name = "Value",
+            value = stock.current.display,
+        )
 
-          Info(
-              name = "Change Today",
-              value = stock.changeTodayDisplayString,
-          )
+        Info(
+            name = "Change Today",
+            value = stock.changeTodayDisplayString,
+        )
 
-          Info(
-              modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
-              name = "$totalChangeTitle Amount",
-              value = stock.gainLossAmount,
-          )
+        Info(
+            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+            name = "$totalChangeTitle Amount",
+            value = stock.gainLossAmount,
+        )
 
-          Info(
-              name = "$totalChangeTitle Percent",
-              value = stock.gainLossPercent,
-          )
-        }
+        Info(
+            name = "$totalChangeTitle Percent",
+            value = stock.gainLossPercent,
+        )
       }
     }
   }

@@ -10,7 +10,7 @@ enum class TickerSize {
   QUOTE
 }
 
-internal data class TickerSizes
+data class TickerSizes
 internal constructor(
     val title: TextStyle,
     val description: TextStyle,

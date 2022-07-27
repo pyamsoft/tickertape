@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.test.newTestChart
@@ -25,38 +26,38 @@ fun TickerPrice(
     ticker: Ticker,
     size: TickerSize,
 ) {
-  val typography = MaterialTheme.typography
-  val colors = MaterialTheme.colors
-
   val quote = ticker.quote
 
-  val sizes =
-      remember(size, typography) {
-        when (size) {
-          TickerSize.CHART -> TickerSizes.chart(typography)
-          TickerSize.QUOTE -> TickerSizes.price(typography)
-        }
-      }
-
   if (quote != null) {
+    val typography = MaterialTheme.typography
+    val colors = MaterialTheme.colors
+
+    val sizes =
+        remember(size, typography) {
+          when (size) {
+            TickerSize.CHART -> TickerSizes.chart(typography)
+            TickerSize.QUOTE -> TickerSizes.price(typography)
+          }
+        }
+
+    val session = quote.currentSession
+
+    val direction = session.direction
+    val directionSign = session.direction.sign
+    val composeColor =
+        remember(direction, size, colors) {
+          return@remember if (size == TickerSize.QUOTE || direction.isZero) {
+            // If no direction or is a quote so bg is colored, unspecified
+            Color.Unspecified
+          } else {
+            Color(direction.color)
+          }
+        }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End,
     ) {
-      val session = quote.currentSession
-
-      val direction = session.direction
-      val directionSign = session.direction.sign
-      val composeColor =
-          remember(direction, size, colors) {
-            return@remember if (size == TickerSize.QUOTE || direction.isZero) {
-              // If no direction or is a quote so bg is colored, unspecified
-              Color.Unspecified
-            } else {
-              Color(direction.color)
-            }
-          }
-
       Text(
           text =
               when (session.state) {
@@ -66,21 +67,51 @@ fun TickerPrice(
               },
           style = MaterialTheme.typography.caption,
       )
-      Text(
-          text = session.price.display,
-          style = sizes.title.copy(color = composeColor),
+      PriceSection(
+          value = session.price.display,
+          valueStyle = sizes.title.copy(color = composeColor),
+          changeAmount = "${directionSign}${session.amount.display}",
+          changePercent = "(${directionSign}${session.percent.display})",
+          changeStyle = sizes.description.copy(color = composeColor),
       )
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
+    }
+  }
+}
+
+@Composable
+@JvmOverloads
+fun PriceSection(
+    modifier: Modifier = Modifier,
+    value: String,
+    valueStyle: TextStyle,
+    changeAmount: String,
+    changePercent: String,
+    changeStyle: TextStyle,
+) {
+  Column(
+      modifier = modifier,
+      horizontalAlignment = Alignment.End,
+  ) {
+    if (value.isNotBlank()) {
+      Text(
+          text = value,
+          style = valueStyle,
+      )
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      if (changeAmount.isNotBlank()) {
         Text(
-            text = "${directionSign}${session.amount.display}",
-            style = sizes.description.copy(color = composeColor),
+            text = changeAmount,
+            style = changeStyle,
         )
+      }
+      if (changePercent.isNotBlank()) {
         Text(
             modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-            text = "(${directionSign}${session.percent.display})",
-            style = sizes.description.copy(color = composeColor),
+            text = changePercent,
+            style = changeStyle,
         )
       }
     }

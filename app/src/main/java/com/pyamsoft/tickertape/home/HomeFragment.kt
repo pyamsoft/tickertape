@@ -23,13 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import coil.ImageLoader
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
@@ -39,7 +36,6 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
@@ -47,6 +43,7 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import timber.log.Timber
@@ -58,8 +55,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var viewModel: HomeViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
-
-  private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenDigDialog(ticker: Ticker) {
     val quote = ticker.quote
@@ -102,37 +97,31 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     return ComposeView(act).apply {
       id = R.id.screen_home
 
-      val observer = ViewWindowInsetObserver(this)
-      val windowInsets = observer.start()
-      windowInsetObserver = observer
-
       val appName = act.getString(R.string.app_name)
 
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
             act.TickerTapeTheme(themeProvider) {
-              CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
-                HomeScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    appName = appName,
-                    imageLoader = loader,
-                    navBarBottomHeight = mainState.bottomNavHeight,
-                    onSettingsClicked = { handleOpenSettingsDialog() },
-                    onChartClicked = { handleOpenDigDialog(it) },
-                    onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
-                    onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
-                    onRefreshTrending = { vm.handleFetchTrending(this, false) },
-                    onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
-                    onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
-                    onRefreshLosers = { vm.handleFetchLosers(this, false) },
-                    onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
-                    onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
-                    onRefreshGainers = { vm.handleFetchGainers(this, false) },
-                    onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
-                )
-              }
+              HomeScreen(
+                  modifier = Modifier.fillMaxSize(),
+                  state = state,
+                  appName = appName,
+                  imageLoader = loader,
+                  navBarBottomHeight = mainState.bottomNavHeight,
+                  onSettingsClicked = { handleOpenSettingsDialog() },
+                  onChartClicked = { handleOpenDigDialog(it) },
+                  onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
+                  onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
+                  onRefreshTrending = { vm.handleFetchTrending(this, false) },
+                  onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
+                  onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
+                  onRefreshLosers = { vm.handleFetchLosers(this, false) },
+                  onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
+                  onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
+                  onRefreshGainers = { vm.handleFetchGainers(this, false) },
+                  onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
+              )
             }
           }
         }
@@ -160,9 +149,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   override fun onDestroyView() {
     super.onDestroyView()
     dispose()
-
-    windowInsetObserver?.stop()
-    windowInsetObserver = null
 
     theming = null
     viewModel = null

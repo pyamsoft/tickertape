@@ -23,14 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
@@ -40,7 +37,6 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
@@ -49,6 +45,7 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import timber.log.Timber
@@ -60,8 +57,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
-
-  private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleOpenDigDialog(ticker: Ticker) {
     val quote = ticker.quote
@@ -124,29 +119,23 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     return ComposeView(act).apply {
       id = R.id.screen_watchlist
 
-      val observer = ViewWindowInsetObserver(this)
-      val windowInsets = observer.start()
-      windowInsetObserver = observer
-
       setContent {
         vm.Render { state ->
           mainVM.Render { mainState ->
             act.TickerTapeTheme(themeProvider) {
-              CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
-                WatchlistScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    imageLoader = loader,
-                    navBarBottomHeight = mainState.bottomNavHeight,
-                    onRefresh = { handleRefresh(true) },
-                    onDeleteTicker = { handleDeleteTicker(it) },
-                    onSearchChanged = { vm.handleSearch(it) },
-                    onTabUpdated = { vm.handleSectionChanged(it) },
-                    onFabClick = { handleFabClicked() },
-                    onSelectTicker = { handleOpenDigDialog(it) },
-                    onRegenerateList = { vm.handleRegenerateList(this) },
-                )
-              }
+              WatchlistScreen(
+                  modifier = Modifier.fillMaxSize(),
+                  state = state,
+                  imageLoader = loader,
+                  navBarBottomHeight = mainState.bottomNavHeight,
+                  onRefresh = { handleRefresh(true) },
+                  onDeleteTicker = { handleDeleteTicker(it) },
+                  onSearchChanged = { vm.handleSearch(it) },
+                  onTabUpdated = { vm.handleSectionChanged(it) },
+                  onFabClick = { handleFabClicked() },
+                  onSelectTicker = { handleOpenDigDialog(it) },
+                  onRegenerateList = { vm.handleRegenerateList(this) },
+              )
             }
           }
         }
@@ -182,9 +171,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   override fun onDestroyView() {
     super.onDestroyView()
     dispose()
-
-    windowInsetObserver?.stop()
-    windowInsetObserver = null
 
     viewModel = null
     mainViewModel = null

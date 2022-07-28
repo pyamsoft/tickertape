@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.PYDroidActivity
@@ -36,7 +35,6 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
@@ -46,6 +44,7 @@ import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -176,21 +175,18 @@ internal class MainActivity : PYDroidActivity() {
 
         SystemBars(theme)
         TickerTapeTheme(theme) {
-          ProvideWindowInsets {
-
-            // Need to have box or snackbars push up bottom bar
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-              if (page != null) {
-                MainScreen(
-                    page = page,
-                    onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
-                    onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
-                    onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
-                    onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                )
-              }
+          // Need to have box or snackbars push up bottom bar
+          Box(
+              contentAlignment = Alignment.BottomCenter,
+          ) {
+            if (page != null) {
+              MainScreen(
+                  page = page,
+                  onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
+                  onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
+                  onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
+                  onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+              )
             }
           }
         }

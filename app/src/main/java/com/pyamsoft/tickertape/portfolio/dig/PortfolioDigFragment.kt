@@ -24,14 +24,11 @@ import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
@@ -41,7 +38,6 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -58,6 +54,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
@@ -66,8 +63,6 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
-
-  private var windowInsetObserver: ViewWindowInsetObserver? = null
 
   private fun handleRangeSelected(range: StockChart.IntervalRange) {
     viewModel
@@ -224,36 +219,30 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
-      val observer = ViewWindowInsetObserver(this)
-      val windowInsets = observer.start()
-      windowInsetObserver = observer
-
       setContent {
         vm.Render { state ->
           act.TickerTapeTheme(themeProvider) {
-            CompositionLocalProvider(LocalWindowInsets provides windowInsets) {
-              BackHandler(
-                  onBack = { navi.goBack() },
-              )
+            BackHandler(
+                onBack = { navi.goBack() },
+            )
 
-              PortfolioDigScreen(
-                  modifier = Modifier.fillMaxWidth(),
-                  state = state,
-                  imageLoader = loader,
-                  currentPrice = currentPrice,
-                  onClose = { act.onBackPressed() },
-                  onScrub = { vm.handleDateScrubbed(it) },
-                  onRangeSelected = { handleRangeSelected(it) },
-                  onTabUpdated = { handleTabUpdated(it) },
-                  onRefresh = { handleRefresh(true) },
-                  onAddPosition = { handleAddPosition() },
-                  onDeletePosition = { handleDeletePosition(it) },
-                  onUpdatePosition = { handleUpdatePosition(it) },
-                  onAddSplit = { handleAddSplit() },
-                  onDeleteSplit = { handleDeleteSplit(it) },
-                  onUpdateSplit = { handleUpdateSplit(it) },
-              )
-            }
+            PortfolioDigScreen(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                imageLoader = loader,
+                currentPrice = currentPrice,
+                onClose = { act.onBackPressed() },
+                onScrub = { vm.handleDateScrubbed(it) },
+                onRangeSelected = { handleRangeSelected(it) },
+                onTabUpdated = { handleTabUpdated(it) },
+                onRefresh = { handleRefresh(true) },
+                onAddPosition = { handleAddPosition() },
+                onDeletePosition = { handleDeletePosition(it) },
+                onUpdatePosition = { handleUpdatePosition(it) },
+                onAddSplit = { handleAddSplit() },
+                onDeleteSplit = { handleDeleteSplit(it) },
+                onUpdateSplit = { handleUpdateSplit(it) },
+            )
           }
         }
       }
@@ -286,9 +275,6 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   override fun onDestroyView() {
     super.onDestroyView()
     dispose()
-
-    windowInsetObserver?.stop()
-    windowInsetObserver = null
 
     viewModel = null
     theming = null

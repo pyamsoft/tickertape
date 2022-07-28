@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
@@ -26,9 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import coil.ImageLoader
-import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
@@ -65,9 +64,10 @@ fun <T : Any> BaseListScreen(
   Scaffold(
       modifier = modifier,
       scaffoldState = scaffoldState,
-  ) {
+  ) { pv ->
     Content(
         modifier = Modifier.fillMaxSize(),
+        scaffoldPaddingValues = pv,
         imageLoader = imageLoader,
         isLoading = isLoading,
         navBarBottomHeight = navBarBottomHeight,
@@ -91,6 +91,7 @@ fun <T : Any> BaseListScreen(
 @Composable
 private fun <T : Any> Content(
     modifier: Modifier = Modifier,
+    scaffoldPaddingValues: PaddingValues,
     imageLoader: ImageLoader,
     pageError: Throwable?,
     list: List<T>,
@@ -134,6 +135,7 @@ private fun <T : Any> Content(
     ) {
       ListSection(
           modifier = Modifier.fillMaxSize(),
+          scaffoldPaddingValues = scaffoldPaddingValues,
           imageLoader = imageLoader,
           navBarBottomHeight = bottomPaddingDp,
           renderEmptyState = renderEmptyState,
@@ -155,7 +157,7 @@ private fun <T : Any> Content(
         visible = !isLoading,
         modifier =
             Modifier.padding(MaterialTheme.keylines.baseline)
-                .navigationBarsPadding(bottom = true)
+                .navigationBarsPadding()
                 .padding(bottom = fabBottomPadding),
         onClick = onFabClick,
     )
@@ -166,6 +168,7 @@ private fun <T : Any> Content(
 @OptIn(ExperimentalFoundationApi::class)
 private fun <T : Any> ListSection(
     modifier: Modifier = Modifier,
+    scaffoldPaddingValues: PaddingValues,
     imageLoader: ImageLoader,
     pageError: Throwable?,
     list: List<T>,
@@ -192,13 +195,13 @@ private fun <T : Any> ListSection(
 
     stickyHeader {
       Column(
-          modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colors.background),
+          modifier =
+              Modifier.fillMaxWidth()
+                  .background(color = MaterialTheme.colors.background)
+                  .padding(scaffoldPaddingValues),
       ) {
-        Spacer(
-            modifier = Modifier.statusBarsHeight(),
-        )
         SearchBar(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.statusBarsPadding().fillMaxWidth(),
             search = search,
             currentTab = tab,
             onSearchChanged = onSearchChanged,
@@ -212,8 +215,8 @@ private fun <T : Any> ListSection(
       pageError != null -> {
         item {
           ErrorState(
-              modifier = Modifier.fillMaxSize()
-                  .padding(horizontal = MaterialTheme.keylines.baseline),
+              modifier =
+                  Modifier.fillMaxSize().padding(horizontal = MaterialTheme.keylines.baseline),
               imageLoader = imageLoader,
               error = pageError,
               onRefresh = onRefresh,
@@ -246,12 +249,13 @@ private fun <T : Any> ListSection(
     item {
       Spacer(
           modifier =
-              Modifier.navigationBarsHeight(
-                  additional =
+              Modifier.padding(scaffoldPaddingValues)
+                  .navigationBarsPadding()
+                  .height(
                       navBarBottomHeight +
                           FabDefaults.FAB_OFFSET_DP +
                           (MaterialTheme.keylines.content * 2),
-              ),
+                  ),
       )
     }
   }

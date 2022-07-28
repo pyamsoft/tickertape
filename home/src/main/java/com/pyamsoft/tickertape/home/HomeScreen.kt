@@ -19,8 +19,12 @@ package com.pyamsoft.tickertape.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -36,8 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
-import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.statusBarsPadding
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
@@ -73,14 +75,18 @@ fun HomeScreen(
 
   Scaffold(
       modifier = modifier,
-  ) {
+  ) { pv ->
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
       item {
         HomeHeader(
-            modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(pv)
+                    .statusBarsPadding()
+                    .padding(MaterialTheme.keylines.content),
             appName = appName,
             onSettingsClicked = onSettingsClicked,
         )
@@ -176,9 +182,11 @@ fun HomeScreen(
       item {
         Spacer(
             modifier =
-                Modifier.navigationBarsHeight(
-                    additional = bottomPaddingDp + MaterialTheme.keylines.content,
-                ),
+                Modifier.padding(pv)
+                    .navigationBarsPadding()
+                    .height(
+                        bottomPaddingDp + MaterialTheme.keylines.content,
+                    ),
         )
       }
     }
@@ -192,7 +200,7 @@ private fun HomeHeader(
     onSettingsClicked: () -> Unit,
 ) {
   Row(
-      modifier = modifier.padding(MaterialTheme.keylines.content),
+      modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Text(

@@ -1,9 +1,9 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.accompanist.insets.statusBarsHeight
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -42,6 +41,8 @@ internal fun PortfolioDigToolbar(
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
   val allTabs = remember { PortfolioDigSections.values() }
 
+  val contentColor = LocalContentColor.current
+
   Surface(
       modifier = modifier,
       elevation = AppBarDefaults.TopAppBarElevation,
@@ -56,14 +57,8 @@ internal fun PortfolioDigToolbar(
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-      // Status bar offset
-      Spacer(
-          modifier = Modifier.statusBarsHeight().fillMaxWidth(),
-      )
-
-      val contentColor = LocalContentColor.current
       TopAppBar(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.statusBarsPadding().fillMaxWidth(),
           backgroundColor = Color.Transparent,
           contentColor = contentColor,
           elevation = ZeroElevation,

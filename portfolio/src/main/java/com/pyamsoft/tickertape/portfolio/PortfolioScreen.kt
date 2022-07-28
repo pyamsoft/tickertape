@@ -1,16 +1,15 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
-import com.google.accompanist.insets.statusBarsHeight
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
@@ -111,11 +110,11 @@ private fun PortfolioSummary(
   Column(
       modifier = modifier,
   ) {
-    Spacer(
-        modifier = Modifier.statusBarsHeight(),
-    )
     PorfolioSummaryItem(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
+        modifier =
+            Modifier.fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = MaterialTheme.keylines.baseline),
         portfolio = portfolio,
     )
   }

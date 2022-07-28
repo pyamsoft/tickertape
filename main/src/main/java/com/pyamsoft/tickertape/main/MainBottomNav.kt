@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.accompanist.insets.navigationBarsHeight
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.ui.icon.BarChart
 import com.pyamsoft.tickertape.ui.icon.PieChart
@@ -83,7 +83,7 @@ internal fun MainBottomNav(
       }
     }
     Spacer(
-        modifier = Modifier.navigationBarsHeight(),
+        modifier = Modifier.navigationBarsPadding(),
     )
   }
 }

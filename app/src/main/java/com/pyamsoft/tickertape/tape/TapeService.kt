@@ -55,14 +55,16 @@ class TapeService : Service() {
     Injector.obtainFromApplication<TickerComponent>(this).plusTapeComponent().create().inject(this)
 
     tapeRemote.requireNotNull().also { remote ->
+      // Launch notification immediately
+      remote.createNotification(this)
+
+      // Also open for listening for Stop commands
       serviceScope.launch(context = Dispatchers.Default) {
         remote.onStopReceived {
           Timber.w("Stop command received from remote. Stop TapeService")
           stopSelf()
         }
       }
-
-      remote.createNotification(this)
     }
 
     screenReceiverRegistration = ScreenReceiver.register(this)
@@ -87,7 +89,11 @@ class TapeService : Service() {
       tapeRemote
           .requireNotNull()
           .updateNotification(
-              TapeRemote.NotificationOptions(index = index, forceRefresh = forceRefresh))
+              TapeRemote.NotificationOptions(
+                  index = index,
+                  forceRefresh = forceRefresh,
+              ),
+          )
     }
   }
 

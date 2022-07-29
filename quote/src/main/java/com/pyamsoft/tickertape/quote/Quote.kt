@@ -5,9 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -18,13 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
@@ -87,7 +83,7 @@ private object QuoteScopeInstance : QuoteScope {
       nameColor: Color,
       valueColor: Color,
   ) {
-    val captionStyle = MaterialTheme.typography.caption
+    val captionStyle = MaterialTheme.typography.body2
     val textStyle =
         captionStyle.copy(
             color = captionStyle.color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
@@ -100,6 +96,7 @@ private object QuoteScopeInstance : QuoteScope {
           text = name,
           style = textStyle,
           color = nameColor,
+          maxLines = 1,
       )
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
@@ -107,7 +104,6 @@ private object QuoteScopeInstance : QuoteScope {
           text = value,
           style = textStyle.copy(fontWeight = FontWeight.W700),
           maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
       )
     }
   }
@@ -149,72 +145,13 @@ fun Quote(
       ) {
         Column(
             modifier = Modifier.weight(1F),
-        ) {
-          if (quote != null) {
-            QuoteScopeInstance.QuoteInfo(
-                modifier = Modifier.fillMaxWidth(),
-                quote = quote,
-            )
-          }
-          QuoteScopeInstance.content()
-        }
+        ) { QuoteScopeInstance.content() }
 
         TickerPrice(
             ticker = ticker,
             size = TickerSize.QUOTE,
         )
       }
-    }
-  }
-}
-
-@Composable
-private fun QuoteScope.QuoteInfo(
-    modifier: Modifier = Modifier,
-    quote: StockQuote,
-) {
-  Column(
-      modifier = modifier,
-  ) {
-    quote.dayPreviousClose?.also { close ->
-      Info(
-          name = "Previous Close",
-          value = close.display,
-      )
-    }
-
-    quote.dayOpen?.also { open ->
-      Info(
-          name = "Open",
-          value = open.display,
-      )
-    }
-
-    if (quote.dayLow != null || quote.dayHigh != null || quote.dayVolume != null) {
-      Spacer(
-          modifier = Modifier.height(MaterialTheme.keylines.baseline),
-      )
-    }
-
-    quote.dayLow?.also { low ->
-      Info(
-          name = "Low",
-          value = low.display,
-      )
-    }
-
-    quote.dayHigh?.also { high ->
-      Info(
-          name = "High",
-          value = high.display,
-      )
-    }
-
-    quote.dayVolume?.also { volume ->
-      Info(
-          name = "Volume",
-          value = volume.display,
-      )
     }
   }
 }

@@ -29,7 +29,7 @@ internal constructor(
     @CheckResult
     fun company(typography: Typography): TickerSizes {
       val titleStyle = typography.h6
-      val descriptionStyle = typography.body1
+      val descriptionStyle = typography.body2
       return TickerSizes(
           title =
               titleStyle.copy(

@@ -15,9 +15,10 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import timber.log.Timber
 
 private const val LIMIT_PERCENT = 5.0
-private const val COLOR_ADJUST_OFFSET = 0.15F
+private const val COLOR_ADJUST_OFFSET = 0.05F
 
 private val UP_COMPOSE_COLOR = Color(DEFAULT_STOCK_UP_COLOR)
 private val DOWN_COMPOSE_COLOR = Color(DEFAULT_STOCK_DOWN_COLOR)
@@ -44,16 +45,18 @@ private fun decideCardBackgroundColorForPercentChange(
       if (percentChange.compareTo(10) >= 0) {
         UP_COMPOSE_COLOR
       } else {
-        val diff = limit - percentChange
-        val diffPct = (diff / limit).toFloat()
+        val diffPct = (percentChange / limit).toFloat()
 
         // Add small offset to bias a card towards the direction color
-        val colorAmount = min(1F, max(0F, diffPct - COLOR_ADJUST_OFFSET))
+        val colorAmount = min(1F, max(0F, diffPct + COLOR_ADJUST_OFFSET))
         if (colorAmount.isZero()) {
+          // If we are nothing, short circuit
+          defaultColor
+        } else if (colorAmount == 1F) {
           // If with adjustment we are 100%, short circuit
           UP_COMPOSE_COLOR
         } else {
-          Color(ColorUtils.blendARGB(DEFAULT_STOCK_UP_COLOR, defaultColor.toArgb(), colorAmount))
+          Color(ColorUtils.blendARGB(defaultColor.toArgb(), DEFAULT_STOCK_UP_COLOR, colorAmount))
         }
       }
     }
@@ -63,16 +66,18 @@ private fun decideCardBackgroundColorForPercentChange(
       if (percentChange.compareTo(-10) <= 0) {
         DOWN_COMPOSE_COLOR
       } else {
-        val diff = -(limit) - percentChange
-        val diffPct = abs(diff / limit).toFloat()
+        val diffPct = abs(percentChange / limit).toFloat()
 
         // Add small offset to bias a card towards the direction color
-        val colorAmount = min(1F, max(0F, diffPct - COLOR_ADJUST_OFFSET))
+        val colorAmount = min(1F, max(0F, diffPct + COLOR_ADJUST_OFFSET))
         if (colorAmount.isZero()) {
+          // If we are nothing, short circuit
+          defaultColor
+        } else if (colorAmount == 1F) {
           // If with adjustment we are 100%, short circuit
           DOWN_COMPOSE_COLOR
         } else {
-          Color(ColorUtils.blendARGB(DEFAULT_STOCK_DOWN_COLOR, defaultColor.toArgb(), colorAmount))
+          Color(ColorUtils.blendARGB(defaultColor.toArgb(), DEFAULT_STOCK_DOWN_COLOR, colorAmount))
         }
       }
     }

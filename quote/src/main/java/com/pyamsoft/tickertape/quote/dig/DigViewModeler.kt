@@ -23,9 +23,12 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -34,6 +37,15 @@ protected constructor(
     private val state: S,
     private val interactor: DigInteractor,
 ) : AbstractViewModeler<S>(state) {
+
+  @CheckResult
+  private fun StockSymbol.asTicker(): Ticker {
+    return Ticker(
+        symbol = this,
+        quote = null,
+        chart = null,
+    )
+  }
 
   @CheckResult
   private fun getLookupSymbol(): StockSymbol {
@@ -49,17 +61,38 @@ protected constructor(
         )
         .onSuccess { r ->
           s.apply {
-            recommendations = r
+            recommendations = r.recommendations.map { it.asTicker() }
             recommendationError = null
           }
         }
         .onFailure { e ->
           s.apply {
-            recommendations = null
+            recommendations = emptyList()
             recommendationError = e
           }
         }
+        .onSuccess { loadQuotesForRecommendations(it) }
   }
+
+  private suspend fun loadQuotesForRecommendations(recommendations: StockRecommendations) =
+      coroutineScope {
+        launch(context = Dispatchers.Main) {
+          val symbols = recommendations.recommendations
+          interactor
+              .getCharts(
+                  force = false,
+                  symbols = symbols,
+                  StockChart.IntervalRange.ONE_DAY,
+              )
+              .onSuccess { rec ->
+                Timber.d("Loaded full recs for symbols: $rec")
+                state.recommendations = rec
+              }
+              .onFailure { e ->
+                Timber.e(e, "Failed to load full ticker quote for symbols: $symbols")
+              }
+        }
+      }
 
   protected suspend fun loadStatistics(force: Boolean) {
     val s = state

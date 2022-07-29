@@ -122,17 +122,19 @@ fun Quote(
   val quote = ticker.quote
 
   Card(
-      modifier =
-          modifier.combinedClickable(
-              onClick = { onClick(ticker) },
-              onLongClick = { onLongClick(ticker) },
-          ),
+      modifier = modifier,
       elevation = CardDefaults.Elevation,
       backgroundColor = rememberCardBackgroundColorForQuote(quote),
       contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
     Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
+        modifier =
+            Modifier.combinedClickable(
+                    onClick = { onClick(ticker) },
+                    onLongClick = { onLongClick(ticker) },
+                )
+                .padding(MaterialTheme.keylines.baseline)
+                .fillMaxWidth(),
     ) {
       TickerName(
           ticker = ticker,

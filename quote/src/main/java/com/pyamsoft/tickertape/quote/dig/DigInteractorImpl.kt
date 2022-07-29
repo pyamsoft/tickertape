@@ -104,19 +104,33 @@ protected constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
+        return@withContext getCharts(
+                force = force,
+                symbols = listOf(symbol),
+                range = range,
+            )
+            // Only pick out the single quote
+            .map { list -> list.first { it.symbol == symbol } }
+      }
+
+  override suspend fun getCharts(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+      range: StockChart.IntervalRange
+  ): ResultWrapper<List<Ticker>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
         return@withContext try {
-          interactor
-              .getCharts(
-                  force = force,
-                  symbols = listOf(symbol),
-                  range = range,
-                  options = null,
-              )
-              // Only pick out the single quote
-              .map { list -> list.first { it.symbol == symbol } }
+          interactor.getCharts(
+              force = force,
+              symbols = symbols,
+              range = range,
+              options = null,
+          )
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting quote: $symbol")
+            Timber.e(e, "Error getting quotes: $symbols")
             ResultWrapper.failure(e)
           }
         }

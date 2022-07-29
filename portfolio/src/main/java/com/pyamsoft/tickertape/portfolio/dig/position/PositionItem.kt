@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -188,7 +189,16 @@ private fun CurrentPrices(
     isSell: Boolean,
     displayValues: DisplayValues,
 ) {
-  val sizes = TickerSizes.price(MaterialTheme.typography)
+  val typography = MaterialTheme.typography
+  val contentColor = LocalContentColor.current
+
+  val sizes =
+      remember(typography, contentColor) {
+        TickerSizes.price(
+            typography,
+            contentColor,
+        )
+      }
 
   Column(
       modifier = modifier,

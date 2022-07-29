@@ -10,7 +10,6 @@ import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
-import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
@@ -31,7 +30,7 @@ interface DigViewState : UiViewState {
   val statistics: KeyStatistics?
   val statisticsError: Throwable?
 
-  val recommendations: StockRecommendations?
+  val recommendations: List<Ticker>
   val recommendationError: Throwable?
 }
 
@@ -44,7 +43,7 @@ protected constructor(
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)
 
-  final override var recommendations by mutableStateOf<StockRecommendations?>(null)
+  final override var recommendations by mutableStateOf(emptyList<Ticker>())
   final override var recommendationError by mutableStateOf<Throwable?>(null)
 
   final override var news by mutableStateOf(emptyList<StockNews>())

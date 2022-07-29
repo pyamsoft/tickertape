@@ -76,11 +76,13 @@ private fun NewsItem(
   val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }
 
   Card(
-      modifier = modifier.clickable { uriHandler.openUri(link) },
+      modifier = modifier,
       elevation = CardDefaults.Elevation,
   ) {
     Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline),
+        modifier =
+            Modifier.clickable { uriHandler.openUri(link) }
+                .padding(MaterialTheme.keylines.baseline),
     ) {
       displayDate?.also { d ->
         Text(

@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -24,11 +25,13 @@ fun TickerName(
   val symbol = ticker.symbol
   val quote = ticker.quote
   val typography = MaterialTheme.typography
+    val contentColor = LocalContentColor.current
+
   val sizes =
-      remember(size, typography) {
+      remember(size, typography, contentColor) {
         when (size) {
-          TickerSize.CHART -> TickerSizes.chart(typography)
-          TickerSize.QUOTE -> TickerSizes.company(typography)
+          TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
+          TickerSize.QUOTE -> TickerSizes.company(typography, contentColor)
         }
       }
 

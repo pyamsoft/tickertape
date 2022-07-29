@@ -51,4 +51,11 @@ interface DigInteractor {
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
   ): ResultWrapper<Ticker>
+
+  @CheckResult
+  suspend fun getCharts(
+      force: Boolean,
+      symbols: List<StockSymbol>,
+      range: StockChart.IntervalRange,
+  ): ResultWrapper<List<Ticker>>
 }

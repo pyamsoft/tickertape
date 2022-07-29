@@ -197,7 +197,12 @@ private fun <T : Any> ListSection(
       Column(
           modifier =
               Modifier.fillMaxWidth()
-                  .background(color = MaterialTheme.colors.background)
+                  .background(
+                      color =
+                          MaterialTheme.colors.background.copy(
+                              alpha = 0.85F,
+                          ),
+                  )
                   .padding(scaffoldPaddingValues),
       ) {
         SearchBar(

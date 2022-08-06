@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.alert.preference
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.util.PreferenceListener
+import kotlinx.coroutines.flow.Flow
 
 interface BigMoverPreferences {
 
@@ -25,8 +25,5 @@ interface BigMoverPreferences {
 
   suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
 
-  @CheckResult
-  suspend fun listenForBigMoverNotificationChanged(
-      onChange: suspend (Boolean) -> Unit
-  ): PreferenceListener
+  @CheckResult suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean>
 }

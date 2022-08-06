@@ -20,14 +20,14 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.util.PreferenceListener
-import com.pyamsoft.pydroid.util.onChange
+import com.pyamsoft.pydroid.util.booleanFlow
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class PreferencesImpl @Inject internal constructor(context: Context) :
@@ -49,15 +49,10 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) :
         preferences.edit { putBoolean(KEY_TAPE_NOTIFICATION, enabled) }
       }
 
-  override suspend fun listenForTapeNotificationChanged(
-      onChange: suspend (Boolean) -> Unit
-  ): PreferenceListener =
+  override suspend fun listenForTapeNotificationChanged(): Flow<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext preferences.onChange(KEY_TAPE_NOTIFICATION) {
-          val enabled = isTapeNotificationEnabled()
-          onChange(enabled)
-        }
+        return@withContext preferences.booleanFlow(KEY_TAPE_NOTIFICATION, true)
       }
 
   override suspend fun isBigMoverNotificationEnabled(): Boolean =
@@ -72,15 +67,10 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) :
         preferences.edit { putBoolean(KEY_BIG_MOVER_NOTIFICATION, enabled) }
       }
 
-  override suspend fun listenForBigMoverNotificationChanged(
-      onChange: suspend (Boolean) -> Unit
-  ): PreferenceListener =
+  override suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext preferences.onChange(KEY_BIG_MOVER_NOTIFICATION) {
-          val enabled = isBigMoverNotificationEnabled()
-          onChange(enabled)
-        }
+        return@withContext preferences.booleanFlow(KEY_BIG_MOVER_NOTIFICATION, true)
       }
 
   companion object {

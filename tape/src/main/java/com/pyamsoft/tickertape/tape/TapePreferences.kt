@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.tape
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.util.PreferenceListener
+import kotlinx.coroutines.flow.Flow
 
 interface TapePreferences {
 
@@ -25,8 +25,5 @@ interface TapePreferences {
 
   suspend fun setTapeNotificationEnabled(enabled: Boolean)
 
-  @CheckResult
-  suspend fun listenForTapeNotificationChanged(
-      onChange: suspend (Boolean) -> Unit
-  ): PreferenceListener
+  @CheckResult suspend fun listenForTapeNotificationChanged(): Flow<Boolean>
 }

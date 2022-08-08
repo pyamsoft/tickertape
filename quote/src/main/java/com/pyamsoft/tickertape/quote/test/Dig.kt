@@ -26,7 +26,7 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
 
     override val recommendationError: Throwable? = null
 
-    override val recommendations: StockRecommendations? = null
+    override val recommendations: List<Ticker> = emptyList()
 
     override val equityType: EquityType = EquityType.STOCK
 

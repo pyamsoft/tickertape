@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.alert.AlertInternalApi
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
 import com.pyamsoft.tickertape.alert.notification.NotificationType
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverReport
@@ -36,8 +37,6 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
@@ -70,10 +69,10 @@ internal constructor(
     Enforcer.assertOffMainThread()
 
     val now = LocalDateTime.now()
-    val allQuotes = withContext(context = Dispatchers.IO) { bigMoverQueryDao.query(false) }
+    val alreadySeenBigMovers = bigMoverQueryDao.query(false)
 
     bigMovers.forEach { quote ->
-      val moverRecord = allQuotes.firstOrNull { it.symbol == quote.symbol }
+      val moverRecord = alreadySeenBigMovers.firstOrNull { it.symbol == quote.symbol }
       val insertRecord =
           if (moverRecord == null) {
             // If no mover record exists yet, make a new one
@@ -100,7 +99,12 @@ internal constructor(
       }
 
       // Insert the record so that we can avoid future noisy big mover updates.
-      withContext(context = Dispatchers.IO) { bigMoverInsertDao.insert(insertRecord) }
+      when (val record = bigMoverInsertDao.insert(insertRecord)) {
+        is DbInsert.InsertResult.Fail -> Timber.e(record.error, "Failed to record Big move")
+        is DbInsert.InsertResult.Insert ->
+            Timber.d("Tracking new big move: ${record.data.symbol.raw}")
+        is DbInsert.InsertResult.Update -> Timber.d("Updated big move: ${record.data.symbol.raw}")
+      }
 
       postNotification(quote)
     }

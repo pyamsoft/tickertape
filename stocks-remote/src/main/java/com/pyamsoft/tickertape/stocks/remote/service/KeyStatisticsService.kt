@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':ui'
-include ':stocks'
-include ':stocks-remote'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
-include ':portfolio'
-include ':alert'
-include ':alert-workmanager'
-include ':home'
+package com.pyamsoft.tickertape.stocks.remote.service
+
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.remote.network.NetworkKeyStatisticsResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+internal interface KeyStatisticsService {
+
+  @CheckResult
+  @GET("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}")
+  suspend fun getStatistics(
+      @Path("symbol") symbol: String,
+      @Query("modules") modules: String
+  ): NetworkKeyStatisticsResponse
+}

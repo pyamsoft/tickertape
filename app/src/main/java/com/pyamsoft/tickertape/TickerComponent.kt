@@ -43,8 +43,7 @@ import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
-import com.pyamsoft.tickertape.stocks.googlenews.GoogleNewsModule
-import com.pyamsoft.tickertape.stocks.yahoo.YahooFinanceModule
+import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
 import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapePreferences
@@ -75,8 +74,7 @@ import javax.inject.Singleton
             HomeModule::class,
             WatchlistModule::class,
             PortfolioModule::class,
-            YahooFinanceModule::class,
-            GoogleNewsModule::class,
+            StockRemoteModule::class,
         ],
 )
 internal interface TickerComponent {

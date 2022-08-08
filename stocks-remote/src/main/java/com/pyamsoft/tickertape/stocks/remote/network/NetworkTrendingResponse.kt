@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':ui'
-include ':stocks'
-include ':stocks-remote'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
-include ':portfolio'
-include ':alert'
-include ':alert-workmanager'
-include ':home'
+package com.pyamsoft.tickertape.stocks.remote.network
+
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+internal data class NetworkTrendingResponse internal constructor(val finance: Resp) {
+
+  @JsonClass(generateAdapter = true)
+  internal data class Resp internal constructor(val result: List<Trending>) {
+
+    @JsonClass(generateAdapter = true)
+    internal data class Trending internal constructor(val quotes: List<Quote>?) {
+
+      @JsonClass(generateAdapter = true)
+      internal data class Quote internal constructor(val symbol: String?)
+    }
+  }
+}

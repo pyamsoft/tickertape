@@ -1,0 +1,90 @@
+/*
+ * Copyright 2021 Peter Kenji Yamanaka
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+
+//noinspection GroovyMissingReturnStatement
+android {
+  compileSdkVersion rootProject.ext.maxSdk
+
+  //noinspection GroovyMissingReturnStatement
+  defaultConfig {
+    minSdkVersion rootProject.ext.minSdk
+    targetSdkVersion rootProject.ext.maxSdk
+
+    resConfigs "en"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+
+    // Flag to enable support for the new language APIs
+    coreLibraryDesugaringEnabled true
+  }
+
+  kotlinOptions {
+    jvmTarget = "11"
+  }
+
+  buildFeatures {
+    buildConfig false
+  }
+}
+
+// Kapt flags
+kapt {
+  correctErrorTypes = true
+  useBuildCache = true
+  mapDiagnosticLocations = true
+
+  javacOptions {
+    option("-Xlint:unchecked")
+    option("-Xlint:deprecation")
+    option("-Xmaxerrs", 10000)
+  }
+}
+
+dependencies {
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+
+  kapt "com.google.dagger:dagger-compiler:$dagger"
+
+  // API for Dagger
+  api "com.squareup.retrofit2:retrofit:$retrofit"
+
+  // Moshi
+  implementation "com.squareup.moshi:moshi:$moshi"
+  kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+
+  // Retrofit
+  implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
+
+  // Retrofit for Google News
+  implementation("com.squareup.retrofit2:converter-simplexml:$retrofit") {
+    exclude group: 'xpp3', module: 'xpp3'
+    exclude group: 'stax', module: 'stax-api'
+    exclude group: 'stax', module: 'stax'
+  }
+
+  // PYDroid
+  implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"
+
+  api project(':core')
+  api project(':stocks')
+}

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':ui'
-include ':stocks'
-include ':stocks-remote'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
-include ':portfolio'
-include ':alert'
-include ':alert-workmanager'
-include ':home'
+package com.pyamsoft.tickertape.stocks.remote.service
+
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.remote.network.NetworkRecommendationResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+internal interface RecommendationService {
+
+  @CheckResult
+  @GET("https://query2.finance.yahoo.com/v6/finance/recommendationsbysymbol/{symbol}")
+  suspend fun getRecommendations(@Path("symbol") symbol: String): NetworkRecommendationResponse
+}

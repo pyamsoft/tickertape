@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':ui'
-include ':stocks'
-include ':stocks-remote'
-include ':main'
-include ':watchlist'
-include ':quote'
-include ':db'
-include ':db-room'
-include ':tape'
-include ':portfolio'
-include ':alert'
-include ':alert-workmanager'
-include ':home'
+package com.pyamsoft.tickertape.stocks.remote.service
+
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+internal interface QuoteService {
+
+  @CheckResult
+  @GET("https://query1.finance.yahoo.com/v7/finance/quote?$DEFAULT_QUOTE_OPTIONS")
+  suspend fun getQuotes(
+      @Query("fields", encoded = true) fields: String,
+      @Query("symbols", encoded = true) symbols: String
+  ): NetworkQuoteResponse
+
+  companion object {
+    private const val DEFAULT_QUOTE_OPTIONS = "json"
+  }
+}

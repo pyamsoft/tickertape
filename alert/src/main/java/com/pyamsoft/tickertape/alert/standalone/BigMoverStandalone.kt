@@ -28,7 +28,9 @@ import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.mover.JsonMappableBigMoverReport
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
+import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import java.time.LocalDateTime
@@ -120,16 +122,40 @@ internal constructor(
         .filter { quote ->
           val session = quote.currentSession
           val value = session.percent
-          return@filter value.compareTo(BIG_MOVER_UP_PERCENT) > 0 ||
-              value.compareTo(BIG_MOVER_DOWN_PERCENT) < 1
+
+          // Different threshold percentage based on type
+          val up: StockPercent
+          val down: StockPercent
+          when (quote.type) {
+            EquityType.STOCK -> {
+              up = STOCK_UP_PERCENT
+              down = STOCK_DOWN_PERCENT
+            }
+            EquityType.OPTION -> {
+              up = OPTION_UP_PERCENT
+              down = OPTION_DOWN_PERCENT
+            }
+            EquityType.CRYPTOCURRENCY -> {
+              up = CRYPTO_UP_PERCENT
+              down = CRYPTO_DOWN_PERCENT
+            }
+          }
+
+          return@filter value.compareTo(up) > 0 || value.compareTo(down) < 1
         }
         .toList()
   }
 
   companion object {
 
-    private val BIG_MOVER_DOWN_PERCENT = (-10.0).asPercent()
-    private val BIG_MOVER_UP_PERCENT = 10.0.asPercent()
+    private val STOCK_DOWN_PERCENT = (-10.0).asPercent()
+    private val STOCK_UP_PERCENT = 10.0.asPercent()
+
+    private val OPTION_DOWN_PERCENT = (-30.0).asPercent()
+    private val OPTION_UP_PERCENT = 30.0.asPercent()
+
+    private val CRYPTO_DOWN_PERCENT = (-25.0).asPercent()
+    private val CRYPTO_UP_PERCENT = 25.0.asPercent()
 
     // Don't notify between periods
     private const val NOTIFY_PERIOD = 6L

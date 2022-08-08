@@ -36,6 +36,8 @@ interface StockNews {
 
   @get:CheckResult val sourceName: String
 
+    @get:CheckResult val imageUrl: String
+
   companion object {
 
     @JvmStatic
@@ -48,6 +50,7 @@ interface StockNews {
         description: String,
         link: String,
         sourceName: String,
+        imageUrl: String,
     ): StockNews {
       return StockNewsImpl(
           id = id,
@@ -57,6 +60,7 @@ interface StockNews {
           description = description,
           link = link,
           sourceName = sourceName,
+          imageUrl = imageUrl,
       )
     }
   }

@@ -131,6 +131,7 @@ private fun Content(
         PositionNews(
             modifier = Modifier.fillMaxSize(),
             state = state,
+            imageLoader = imageLoader,
             onRefresh = onRefresh,
         )
       }

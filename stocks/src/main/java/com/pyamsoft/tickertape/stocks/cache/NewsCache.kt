@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.sources
+package com.pyamsoft.tickertape.stocks.cache
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface NewsSource {
+interface NewsCache {
+
+  suspend fun removeNews(symbol: StockSymbol)
 
   @CheckResult
   suspend fun getNews(
-      force: Boolean,
       symbols: List<StockSymbol>,
+      resolve: suspend (List<StockSymbol>) -> List<StockNews>
   ): List<StockNews>
 }

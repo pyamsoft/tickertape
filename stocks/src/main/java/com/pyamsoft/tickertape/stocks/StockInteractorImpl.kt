@@ -32,15 +32,16 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockTops
 import com.pyamsoft.tickertape.stocks.api.StockTrends
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
+import com.pyamsoft.tickertape.stocks.cache.NewsCache
 import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 internal class StockInteractorImpl
@@ -49,6 +50,7 @@ internal constructor(
     @InternalStockApi private val stockCache: StockCache,
     @InternalStockApi private val optionsCache: OptionsCache,
     @InternalStockApi private val statisticsCache: KeyStatisticsCache,
+    @InternalStockApi private val newsCache: NewsCache,
     @InternalStockApi private val interactor: StockInteractor,
 ) : StockInteractor {
 
@@ -66,11 +68,6 @@ internal constructor(
       multiCachify<String, List<SearchResult>, String>(
           storage = { listOf(createNewMemoryCacheStorage()) },
       ) { interactor.search(true, it) }
-
-  private val newsCache =
-      multiCachify<StockSymbol, List<StockNews>, StockSymbol>(
-          storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getNews(true, it) }
 
   private val recommendationCache =
       multiCachify<StockSymbol, StockRecommendations, StockSymbol>(
@@ -192,16 +189,16 @@ internal constructor(
 
   override suspend fun getNews(
       force: Boolean,
-      symbol: StockSymbol,
+      symbols: List<StockSymbol>,
   ): List<StockNews> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         if (force) {
-          newsCache.key(symbol).clear()
+          symbols.forEach { newsCache.removeNews(it) }
         }
 
-        return@withContext newsCache.key(symbol).call(symbol)
+        return@withContext newsCache.getNews(symbols) { interactor.getNews(true, it) }
       }
 
   override suspend fun getRecommendations(

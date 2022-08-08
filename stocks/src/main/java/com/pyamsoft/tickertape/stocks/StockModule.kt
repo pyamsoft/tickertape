@@ -18,9 +18,11 @@ package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
+import com.pyamsoft.tickertape.stocks.cache.NewsCache
 import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryKeyStatisticsCacheImpl
+import com.pyamsoft.tickertape.stocks.cache.impl.MemoryNewsCacheImpl
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryOptionsCacheImpl
 import com.pyamsoft.tickertape.stocks.cache.impl.MemoryStockCacheImpl
 import com.pyamsoft.tickertape.stocks.okhttp.OkHttpClientLazyCallFactory
@@ -57,6 +59,11 @@ abstract class StockModule {
   internal abstract fun bindKeyStatisticsCache(
       impl: MemoryKeyStatisticsCacheImpl
   ): KeyStatisticsCache
+
+  @Binds
+  @CheckResult
+  @InternalStockApi
+  internal abstract fun bindNewsCache(impl: MemoryNewsCacheImpl): NewsCache
 
   @Binds
   @CheckResult

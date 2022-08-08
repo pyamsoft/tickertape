@@ -87,7 +87,11 @@ protected constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          ResultWrapper.success(stockInteractor.getNews(force, symbol))
+          ResultWrapper.success(
+              stockInteractor.getNews(force, listOf(symbol))
+                  // Just make sure we are only returning news related to this symbol
+                  .filter { it.symbol == symbol },
+          )
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting news ${symbol.raw}")

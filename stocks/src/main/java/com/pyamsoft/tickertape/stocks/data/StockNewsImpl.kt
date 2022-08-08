@@ -28,4 +28,5 @@ internal data class StockNewsImpl(
     override val description: String,
     override val link: String,
     override val sourceName: String,
+    override val imageUrl: String,
 ) : StockNews

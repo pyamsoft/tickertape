@@ -22,6 +22,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import com.pyamsoft.tickertape.watchlist.dig.news.WatchlistNews
 import com.pyamsoft.tickertape.watchlist.dig.recs.WatchlistRecommendations
 
 @Composable
@@ -106,6 +107,7 @@ private fun Content(
         WatchlistNews(
             modifier = Modifier.fillMaxSize(),
             state = state,
+            imageLoader = imageLoader,
             onRefresh = onRefresh,
         )
       }

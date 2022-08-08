@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,12 +16,16 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -29,12 +34,14 @@ import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
 @JvmOverloads
 fun DigNews(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    imageLoader: ImageLoader,
     news: List<StockNews>,
     onRefresh: () -> Unit,
 ) {
@@ -55,6 +62,7 @@ fun DigNews(
         NewsItem(
             modifier = Modifier.fillMaxWidth(),
             news = n,
+            imageLoader = imageLoader,
         )
       }
     }
@@ -65,6 +73,7 @@ fun DigNews(
 private fun NewsItem(
     modifier: Modifier = Modifier,
     news: StockNews,
+    imageLoader: ImageLoader,
 ) {
   val title = news.title
   val description = news.description
@@ -103,25 +112,40 @@ private fun NewsItem(
                 ),
         )
       }
-      if (title.isNotBlank()) {
-        Text(
-            modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-            text = title,
-            style =
-                MaterialTheme.typography.body1.copy(
-                    fontWeight = FontWeight.W700,
-                ),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-      }
-      if (description.isNotBlank()) {
-        Text(
-            text = description,
-            style = MaterialTheme.typography.body2,
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis,
-        )
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        if (news.imageUrl.isNotBlank()) {
+          AsyncImage(
+              modifier = Modifier.weight(0.25F).padding(end = MaterialTheme.keylines.baseline),
+              model = news.imageUrl,
+              imageLoader = imageLoader,
+              contentScale = ContentScale.FillWidth,
+              contentDescription = null,
+          )
+        }
+        Column {
+          if (title.isNotBlank()) {
+            Text(
+                modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+                text = title,
+                style =
+                    MaterialTheme.typography.body1.copy(
+                        fontWeight = FontWeight.W700,
+                    ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+          }
+          if (description.isNotBlank()) {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.body2,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
+            )
+          }
+        }
       }
     }
   }
@@ -137,6 +161,7 @@ private fun PreviewDigNews() {
           isLoading = false,
           news = emptyList(),
           onRefresh = {},
+          imageLoader = createNewTestImageLoader(),
       )
     }
   }

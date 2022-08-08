@@ -38,12 +38,12 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Singleton
 internal class StockNetworkInteractor
@@ -126,8 +126,7 @@ internal constructor(
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext chartSource
-            .getCharts(force, symbols, range)
+        return@withContext chartSource.getCharts(force, symbols, range)
             // Remove any duplicated symbols, we expect only one
             .distinctBy { it.symbol }
       }
@@ -149,9 +148,9 @@ internal constructor(
         )
       }
 
-  override suspend fun getNews(force: Boolean, symbol: StockSymbol): List<StockNews> =
+  override suspend fun getNews(force: Boolean, symbols: List<StockSymbol>): List<StockNews> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext newsSource.getNews(force, symbol)
+        return@withContext newsSource.getNews(force, symbols)
       }
 }

@@ -16,38 +16,27 @@
 
 package com.pyamsoft.tickertape.stocks.cache.impl
 
-import com.pyamsoft.cachify.CacheStorage
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.StockCache
-import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 @Singleton
 internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache {
 
-  // Use a mutex to avoid multiple quote lookups hitting the network instead of taking a trip to the
-  // memory cache
-  private val quoteMutex = Mutex()
-  private val chartMutex = Mutex()
-
-  private val quotes by lazy { mutableMapOf<StockSymbol, CacheStorage<StockQuote>>() }
-  private val charts by lazy { mutableMapOf<ChartKey, CacheStorage<StockChart>>() }
+  private val quotes by lazy { Quotes() }
+  private val charts by lazy { Charts() }
 
   override suspend fun removeQuote(symbol: StockSymbol) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        quoteMutex.withLock { quotes[symbol]?.clear() }
-
-        return@withContext
+        return@withContext quotes.remove(symbol)
       }
 
   override suspend fun getQuotes(
@@ -57,41 +46,19 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        return@withContext quoteMutex.withLock {
-          val result = mutableListOf<StockQuote>()
-          val stillNeeded = mutableListOf<StockSymbol>()
-          for (symbol in symbols) {
-            val quote = quotes[symbol]?.retrieve()
-            if (quote != null) {
-              result.add(quote)
-            } else {
-              stillNeeded.add(symbol)
-            }
-          }
-
-          if (stillNeeded.isNotEmpty()) {
-            val upstreamResult = resolve(stillNeeded)
-            for (res in upstreamResult) {
-              quotes.getOrPut(res.symbol) { createNewMemoryCacheStorage() }
-              quotes[res.symbol]?.cache(res)
-              result.add(res)
-            }
-          }
-
-          return@withLock result
-        }
+        return@withContext quotes.get(symbols, resolve)
       }
 
   override suspend fun removeChart(symbol: StockSymbol, range: StockChart.IntervalRange) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        chartMutex.withLock {
-          val key = ChartKey(symbol, range)
-          charts[key]?.clear()
-        }
-
-        return@withContext
+        val key =
+            ChartKey(
+                symbol = symbol,
+                range = range,
+            )
+        return@withContext charts.remove(key)
       }
 
   override suspend fun getCharts(
@@ -100,35 +67,42 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
       resolve: suspend (List<StockSymbol>, StockChart.IntervalRange) -> List<StockChart>
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
-        chartMutex.withLock {
-          val result = mutableListOf<StockChart>()
-          val stillNeeded = mutableListOf<StockSymbol>()
-          for (symbol in symbols) {
-            val key = ChartKey(symbol, range)
-            val chart = charts[key]?.retrieve()
-            if (chart != null) {
-              result.add(chart)
-            } else {
-              stillNeeded.add(symbol)
+        Enforcer.assertOffMainThread()
+        val keys =
+            symbols.map {
+              ChartKey(
+                  symbol = it,
+                  range = range,
+              )
             }
-          }
-
-          if (stillNeeded.isNotEmpty()) {
-            val upstreamResult = resolve(stillNeeded, range)
-            for (res in upstreamResult) {
-              val key = ChartKey(res.symbol, range)
-              charts.getOrPut(key) { createNewMemoryCacheStorage() }
-              charts[key]?.cache(res)
-              result.add(res)
-            }
-          }
-
-          return@withLock result
-        }
+        return@withContext charts.get(keys) { resolve(it, range) }
       }
 
   private data class ChartKey(
       val symbol: StockSymbol,
       val range: StockChart.IntervalRange,
   )
+
+  private class Quotes : BaseMemoryCacheImpl<StockSymbol, StockQuote>() {
+    override fun getKeyFromValue(value: StockQuote): StockSymbol {
+      return value.symbol
+    }
+
+    override fun getSymbolFromKey(key: StockSymbol): StockSymbol {
+      return key
+    }
+  }
+
+  private class Charts : BaseMemoryCacheImpl<ChartKey, StockChart>() {
+    override fun getKeyFromValue(value: StockChart): ChartKey {
+      return ChartKey(
+          symbol = value.symbol,
+          range = value.range,
+      )
+    }
+
+    override fun getSymbolFromKey(key: ChartKey): StockSymbol {
+      return key.symbol
+    }
+  }
 }

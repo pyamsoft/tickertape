@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.portfolio.dig.splits.add
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber
 
+@Stable
 interface SplitAddViewState : UiViewState {
   val splitId: DbSplit.Id
   val isSubmitting: Boolean
@@ -20,6 +22,7 @@ interface SplitAddViewState : UiViewState {
   val splitDate: LocalDate?
 }
 
+@Stable
 internal class MutableSplitAddViewState
 @Inject
 internal constructor(

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,6 +25,7 @@ import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 
+@Stable
 interface PortfolioViewState : UiViewState {
   val query: String
   val section: EquityType
@@ -33,6 +35,7 @@ interface PortfolioViewState : UiViewState {
   val error: Throwable?
 }
 
+@Stable
 @ActivityScope
 internal class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
   override var query by mutableStateOf("")

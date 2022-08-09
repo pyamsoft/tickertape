@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.main
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,11 +25,13 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.core.ActivityScope
 import javax.inject.Inject
 
+@Stable
 interface MainViewState : UiViewState {
   val theme: Theming.Mode
   val bottomNavHeight: Int
 }
 
+@Stable
 @ActivityScope
 internal class MutableMainViewState @Inject internal constructor() : MainViewState {
   override var theme by mutableStateOf(Theming.Mode.SYSTEM)

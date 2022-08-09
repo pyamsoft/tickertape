@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,68 +26,80 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
+@Stable
 interface BaseState : UiViewState
 
+@Stable
 interface HomePortfolioViewState : UiViewState {
   val isLoadingPortfolio: Boolean
   val portfolio: PortfolioStockList
   val portfolioError: Throwable?
 }
 
+@Stable
 interface HomeWatchListViewState : BaseState {
   val isLoadingWatchlist: Boolean
   val watchlist: List<Ticker>
   val watchlistError: Throwable?
 }
 
+@Stable
 interface HomeIndexesViewState : BaseState {
   val isLoadingIndexes: Boolean
   val indexes: List<Ticker>
   val indexesError: Throwable?
 }
 
+@Stable
 interface HomeGainersViewState : BaseState {
   val isLoadingGainers: Boolean
   val gainers: List<Ticker>
   val gainersError: Throwable?
 }
 
+@Stable
 interface HomeLosersViewState : BaseState {
   val isLoadingLosers: Boolean
   val losers: List<Ticker>
   val losersError: Throwable?
 }
 
+@Stable
 interface HomeTrendingViewState : BaseState {
   val isLoadingTrending: Boolean
   val trending: List<Ticker>
   val trendingError: Throwable?
 }
 
+@Stable
 interface HomeShortedViewState : BaseState {
   val isLoadingMostShorted: Boolean
   val mostShorted: List<Ticker>
   val mostShortedError: Throwable?
 }
 
+@Stable
 interface HomeGrowthTechViewState : BaseState {
   val isLoadingGrowthTech: Boolean
   val growthTech: List<Ticker>
   val growthTechError: Throwable?
 }
 
+@Stable
 interface HomeUndervaluedGrowthViewState : BaseState {
   val isLoadingUndervaluedGrowth: Boolean
   val undervaluedGrowth: List<Ticker>
   val undervaluedGrowthError: Throwable?
 }
 
+@Stable
 interface HomeMostActiveViewState : BaseState {
   val isLoadingMostActive: Boolean
   val mostActive: List<Ticker>
   val mostActiveError: Throwable?
 }
 
+@Stable
 interface HomeViewState :
     UiViewState,
     HomePortfolioViewState,
@@ -100,6 +113,7 @@ interface HomeViewState :
     HomeGrowthTechViewState,
     HomeMostActiveViewState
 
+@Stable
 @ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
 

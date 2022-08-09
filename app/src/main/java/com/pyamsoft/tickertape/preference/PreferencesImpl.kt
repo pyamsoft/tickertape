@@ -23,25 +23,22 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.booleanFlow
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
-internal class PreferencesImpl @Inject internal constructor(context: Context) :
-    TapePreferences, BigMoverPreferences {
+internal class PreferencesImpl
+@Inject
+internal constructor(
+    context: Context,
+) : TapePreferences, BigMoverPreferences {
 
   private val preferences by lazy {
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
   }
-
-  override suspend fun isTapeNotificationEnabled(): Boolean =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext preferences.getBoolean(KEY_TAPE_NOTIFICATION, true)
-      }
 
   override suspend fun setTapeNotificationEnabled(enabled: Boolean) =
       withContext(context = Dispatchers.IO) {
@@ -53,12 +50,6 @@ internal class PreferencesImpl @Inject internal constructor(context: Context) :
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext preferences.booleanFlow(KEY_TAPE_NOTIFICATION, true)
-      }
-
-  override suspend fun isBigMoverNotificationEnabled(): Boolean =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext preferences.getBoolean(KEY_BIG_MOVER_NOTIFICATION, true)
       }
 
   override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =

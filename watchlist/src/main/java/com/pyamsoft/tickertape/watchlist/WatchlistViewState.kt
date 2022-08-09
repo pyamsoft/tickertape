@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,6 +26,7 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 
+@Stable
 interface WatchlistViewState : UiViewState {
   val query: String
   val section: EquityType
@@ -33,6 +35,7 @@ interface WatchlistViewState : UiViewState {
   val error: Throwable?
 }
 
+@Stable
 @ActivityScope
 internal class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewState {
   override var query by mutableStateOf("")

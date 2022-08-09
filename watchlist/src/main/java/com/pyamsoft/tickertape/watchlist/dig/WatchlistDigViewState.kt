@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +11,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Named
 
+@Stable
 interface WatchlistDigViewState : DigViewState {
   val section: WatchlistDigSections
   val isInWatchlist: Boolean
@@ -20,6 +22,7 @@ interface WatchlistDigViewState : DigViewState {
 }
 
 // Public for WatchlistDigViewModeler constructor
+@Stable
 class MutableWatchlistDigViewState
 @Inject
 internal constructor(

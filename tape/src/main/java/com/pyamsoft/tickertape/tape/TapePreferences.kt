@@ -21,8 +21,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface TapePreferences {
 
-  @CheckResult suspend fun isTapeNotificationEnabled(): Boolean
-
   suspend fun setTapeNotificationEnabled(enabled: Boolean)
 
   @CheckResult suspend fun listenForTapeNotificationChanged(): Flow<Boolean>

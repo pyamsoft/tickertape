@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +16,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+@Stable
 interface NewTickerViewState : UiViewState {
   val isSubmitting: Boolean
 
@@ -36,6 +38,7 @@ interface NewTickerViewState : UiViewState {
   @CheckResult fun canSubmit(): Boolean
 }
 
+@Stable
 internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
   internal var validSymbol by mutableStateOf<StockSymbol?>(null)
 

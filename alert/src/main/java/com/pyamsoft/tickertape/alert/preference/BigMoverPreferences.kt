@@ -21,8 +21,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface BigMoverPreferences {
 
-  @CheckResult suspend fun isBigMoverNotificationEnabled(): Boolean
-
   suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
 
   @CheckResult suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean>

@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.quote.dig
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,6 +14,7 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
+@Stable
 interface DigViewState : UiViewState {
 
   val equityType: EquityType
@@ -34,6 +36,7 @@ interface DigViewState : UiViewState {
   val recommendationError: Throwable?
 }
 
+@Stable
 abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,

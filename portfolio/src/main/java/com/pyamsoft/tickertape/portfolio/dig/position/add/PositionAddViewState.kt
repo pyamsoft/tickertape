@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +13,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber
 
+@Stable
 interface PositionAddViewState : UiViewState {
   val equityType: EquityType
   val positionId: DbPosition.Id
@@ -22,6 +24,7 @@ interface PositionAddViewState : UiViewState {
   val dateOfPurchase: LocalDate?
 }
 
+@Stable
 internal class MutablePositionAddViewState
 @Inject
 internal constructor(

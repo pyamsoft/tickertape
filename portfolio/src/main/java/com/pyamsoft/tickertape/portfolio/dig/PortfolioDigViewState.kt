@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,6 +15,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import javax.inject.Named
 
+@Stable
 interface PortfolioDigViewState : DigViewState {
   val tradeSide: TradeSide
 
@@ -31,6 +33,7 @@ interface PortfolioDigViewState : DigViewState {
 }
 
 // Public for PortfolioDigViewModeler constructor
+@Stable
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(

@@ -26,6 +26,6 @@ abstract class PeriodicAlarm protected constructor() : Alarm {
   }
 
   companion object {
-    private val PERIOD = TimeUnit.MILLISECONDS.toMillis(15L)
+    private val PERIOD = TimeUnit.MINUTES.toMillis(15L)
   }
 }

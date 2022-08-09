@@ -17,6 +17,7 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -37,6 +38,7 @@ fun WatchlistDigScreen(
     onTabUpdated: (WatchlistDigSections) -> Unit,
     onModifyWatchlist: () -> Unit,
     onRefresh: () -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -71,6 +73,7 @@ fun WatchlistDigScreen(
               onScrub = onScrub,
               onRangeSelected = onRangeSelected,
               onRefresh = onRefresh,
+              onRecClick = onRecClick,
           )
         }
       }
@@ -86,6 +89,7 @@ private fun Content(
     onScrub: (Chart.Data?) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRefresh: () -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val section = state.section
 
@@ -123,6 +127,7 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
+            onRecClick = onRecClick,
         )
       }
     }
@@ -158,5 +163,6 @@ private fun PreviewWatchlistDigScreen() {
       onModifyWatchlist = {},
       onTabUpdated = {},
       onRefresh = {},
+      onRecClick = {},
   )
 }

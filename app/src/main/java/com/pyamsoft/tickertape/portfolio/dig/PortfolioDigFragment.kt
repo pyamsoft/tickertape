@@ -45,6 +45,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitDialog
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -55,6 +56,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
@@ -63,6 +65,21 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
+
+  private fun handleRecommendationSelected(ticker: Ticker) {
+    val quote = ticker.quote
+
+    navigator
+        .requireNotNull()
+        .navigateTo(
+            WatchlistDigFragment.Screen(
+                symbol = ticker.symbol,
+                lookupSymbol = ticker.symbol,
+                equityType = quote?.type ?: EquityType.STOCK,
+                allowModifyWatchlist = true,
+            ),
+        )
+  }
 
   private fun handleRangeSelected(range: StockChart.IntervalRange) {
     viewModel
@@ -242,6 +259,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 onAddSplit = { handleAddSplit() },
                 onDeleteSplit = { handleDeleteSplit(it) },
                 onUpdateSplit = { handleUpdateSplit(it) },
+                onRecClick = { handleRecommendationSelected(it) },
             )
           }
         }

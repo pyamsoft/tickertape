@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
@@ -16,6 +17,7 @@ internal fun PositionRecommendations(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     onRefresh: () -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val isLoading = state.isLoading
   val recs = state.recommendations
@@ -25,6 +27,7 @@ internal fun PositionRecommendations(
       isLoading = isLoading,
       recommendations = recs,
       onRefresh = onRefresh,
+      onRecClick = onRecClick,
   )
 }
 
@@ -41,5 +44,6 @@ private fun PreviewPositionRecommendations() {
               tradeSide = TradeSide.BUY,
           ),
       onRefresh = {},
+      onRecClick = {},
   )
 }

@@ -40,6 +40,7 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -53,6 +54,21 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   @JvmField @Inject internal var viewModel: WatchlistDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
+
+  private fun handleRecommendationSelected(ticker: Ticker) {
+    val quote = ticker.quote
+
+    navigator
+        .requireNotNull()
+        .navigateTo(
+            Screen(
+                symbol = ticker.symbol,
+                lookupSymbol = ticker.symbol,
+                equityType = quote?.type ?: EquityType.STOCK,
+                allowModifyWatchlist = true,
+            ),
+        )
+  }
 
   @CheckResult
   private fun getSymbol(): StockSymbol {
@@ -164,6 +180,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 onModifyWatchlist = { handleModifyWatchlist() },
                 onRefresh = { handleRefresh(true) },
                 onTabUpdated = { handleTabUpdated(it) },
+                onRecClick = { handleRecommendationSelected(it) },
             )
           }
         }

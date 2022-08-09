@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.portfolio.dig.recs.PositionRecommendations
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.portfolio.dig.stats.PositionStats
 import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -50,6 +51,7 @@ fun PortfolioDigScreen(
     onAddSplit: () -> Unit,
     onDeleteSplit: (DbSplit) -> Unit,
     onUpdateSplit: (DbSplit) -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -88,6 +90,7 @@ fun PortfolioDigScreen(
               onAddSplit = onAddSplit,
               onDeleteSplit = onDeleteSplit,
               onUpdateSplit = onUpdateSplit,
+              onRecClick = onRecClick,
           )
         }
       }
@@ -110,6 +113,7 @@ private fun Content(
     onAddSplit: () -> Unit,
     onDeleteSplit: (DbSplit) -> Unit,
     onUpdateSplit: (DbSplit) -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val section = state.section
 
@@ -168,6 +172,7 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
+            onRecClick = onRecClick,
         )
       }
     }
@@ -209,5 +214,6 @@ private fun PreviewPortfolioDigScreen() {
       onAddSplit = {},
       onDeleteSplit = {},
       onUpdateSplit = {},
+      onRecClick = {},
   )
 }

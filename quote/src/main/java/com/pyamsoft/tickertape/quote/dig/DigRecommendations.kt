@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote.dig
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ fun DigRecommendations(
     isLoading: Boolean,
     recommendations: List<Ticker>,
     onRefresh: () -> Unit,
+    onRecClick: (Ticker) -> Unit,
 ) {
   val visible = remember(recommendations) { recommendations.isNotEmpty() }
 
@@ -48,6 +50,7 @@ fun DigRecommendations(
       RecommendationList(
           modifier = Modifier.fillMaxSize(),
           recommendations = recommendations,
+          onRecClick = onRecClick,
       )
     }
   }
@@ -57,6 +60,7 @@ fun DigRecommendations(
 private fun RecommendationList(
     modifier: Modifier = Modifier,
     recommendations: List<Ticker>,
+    onRecClick: (Ticker) -> Unit,
 ) {
   LazyColumn(
       modifier = modifier,
@@ -69,6 +73,7 @@ private fun RecommendationList(
       RecommendationItem(
           modifier = Modifier.fillMaxWidth(),
           recommendation = rec,
+          onClick = onRecClick,
       )
     }
   }
@@ -78,11 +83,12 @@ private fun RecommendationList(
 private fun RecommendationItem(
     modifier: Modifier = Modifier,
     recommendation: Ticker,
+    onClick: (Ticker) -> Unit,
 ) {
   val chart = recommendation.chart
 
   Card(
-      modifier = modifier,
+      modifier = modifier.clickable { onClick(recommendation) },
       elevation = CardDefaults.Elevation,
   ) {
     Column(
@@ -125,5 +131,6 @@ private fun PreviewDigRecommendations() {
       isLoading = false,
       recommendations = emptyList(),
       onRefresh = {},
+      onRecClick = {},
   )
 }

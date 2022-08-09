@@ -28,6 +28,7 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -56,7 +57,7 @@ internal constructor(
         // If its market time or the client has passed alwaysStart flag
         val canStart = options?.alwaysStart == true || itsMarketTime()
 
-        if (preferences.isTapeNotificationEnabled() && canStart) {
+        if (preferences.listenForTapeNotificationChanged().first() && canStart) {
           Timber.d("Starting tape notification")
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             appContext.startForegroundService(service)

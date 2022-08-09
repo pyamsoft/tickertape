@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.stocks.remote
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
-import com.pyamsoft.tickertape.stocks.remote.api.GoogleNewsApi
+import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.ChartService
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
@@ -28,7 +28,7 @@ import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
 import com.pyamsoft.tickertape.stocks.remote.service.RecommendationService
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
-import com.pyamsoft.tickertape.stocks.remote.source.GoogleNewsSource
+import com.pyamsoft.tickertape.stocks.remote.source.NasdaqNewsSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooChartSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooKeyStatisticsSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooOptionsSource
@@ -59,46 +59,46 @@ abstract class StockRemoteModule {
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFQuoteSource(impl: YahooQuoteSource): QuoteSource
+  internal abstract fun bindQuoteSource(impl: YahooQuoteSource): QuoteSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFOptionsSource(impl: YahooOptionsSource): OptionsSource
+  internal abstract fun bindOptionsSource(impl: YahooOptionsSource): OptionsSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFChartSource(impl: YahooChartSource): ChartSource
+  internal abstract fun bindChartSource(impl: YahooChartSource): ChartSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFTopSource(impl: YahooTopSource): TopSource
+  internal abstract fun bindTopSource(impl: YahooTopSource): TopSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFKeyStatisticsSource(
+  internal abstract fun bindKeyStatisticsSource(
       impl: YahooKeyStatisticsSource
   ): KeyStatisticSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFSearchSource(impl: YahooSearchSource): SearchSource
+  internal abstract fun bindSearchSource(impl: YahooSearchSource): SearchSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindYFRecommendationsSource(
+  internal abstract fun bindRecommendationsSource(
       impl: YahooRecommendationSource
   ): RecommendationSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindGoogleNewsSource(impl: GoogleNewsSource): NewsSource
+  internal abstract fun bindNewsSource(impl: NasdaqNewsSource): NewsSource
 
   @Module
   companion object {
@@ -114,7 +114,7 @@ abstract class StockRemoteModule {
     @Provides
     @JvmStatic
     @CheckResult
-    @GoogleNewsApi
+    @NasdaqApi
     internal fun provideNews(@Named("xml") serviceCreator: NetworkServiceCreator): NewsService {
       return serviceCreator.create(NewsService::class)
     }

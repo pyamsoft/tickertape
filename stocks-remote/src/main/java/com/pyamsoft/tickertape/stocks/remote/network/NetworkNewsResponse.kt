@@ -23,6 +23,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
+import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.Path
 import org.simpleframework.xml.Root
 
@@ -73,6 +74,20 @@ internal constructor() {
     @set:Element(name = "pubDate")
     internal var articlePublishedAt: String? = null
 
+    /** This needs to be a var because SimpleXML is weird yo */
+    @get:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
+    @get:Element(name = "creator")
+    @set:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
+    @set:Element(name = "creator")
+    internal var articleCreator: String? = null
+
+    /** This needs to be a var because SimpleXML is weird yo */
+    @get:Element(name = "tickers", required = false)
+    @get:Namespace(reference = "http://nasdaq.com/reference/feeds/1.0", prefix = "nasdaq")
+    @set:Element(name = "tickers", required = false)
+    @set:Namespace(reference = "http://nasdaq.com/reference/feeds/1.0", prefix = "nasdaq")
+    internal var articleTickers: String? = null
+
     // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
     @get:CheckResult val id by lazy(LazyThreadSafetyMode.NONE) { articleGuid.orEmpty() }
 
@@ -111,7 +126,10 @@ internal constructor() {
     val link by lazy(LazyThreadSafetyMode.NONE) { articleUrlData?.toString().orEmpty() }
 
     // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
+    @get:CheckResult val newsSource by lazy(LazyThreadSafetyMode.NONE) { articleCreator.orEmpty() }
+
+    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
     @get:CheckResult
-    val newsSource by lazy(LazyThreadSafetyMode.NONE) { articleUrlData?.host.orEmpty() }
+    val tickers by lazy(LazyThreadSafetyMode.NONE) { articleTickers?.split(",") ?: emptyList() }
   }
 }

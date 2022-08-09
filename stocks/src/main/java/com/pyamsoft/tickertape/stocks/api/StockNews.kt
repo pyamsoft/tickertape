@@ -36,7 +36,9 @@ interface StockNews {
 
   @get:CheckResult val sourceName: String
 
-    @get:CheckResult val imageUrl: String
+  @get:CheckResult val imageUrl: String
+
+  @get:CheckResult val tickers: List<StockSymbol>
 
   companion object {
 
@@ -51,6 +53,7 @@ interface StockNews {
         link: String,
         sourceName: String,
         imageUrl: String,
+        tickers: List<StockSymbol>
     ): StockNews {
       return StockNewsImpl(
           id = id,
@@ -61,6 +64,7 @@ interface StockNews {
           link = link,
           sourceName = sourceName,
           imageUrl = imageUrl,
+          tickers = tickers,
       )
     }
   }

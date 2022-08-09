@@ -19,18 +19,15 @@ package com.pyamsoft.tickertape.stocks.remote.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkNewsResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 internal interface NewsService {
 
   @CheckResult
-  @GET("https://news.google.com/rss/search?$DEFAULT_NEWS_OPTIONS")
+  @GET("https://www.nasdaq.com/feed/rssoutbound")
   suspend fun getNews(
-      @Query("q") query: String,
+      @Query("symbol") symbol: String,
+      @Header("User-Agent") userAgent: String,
   ): NetworkNewsResponse
-
-  companion object {
-
-    private const val DEFAULT_NEWS_OPTIONS = "hl=en-US&gl=US&ceid=US:en"
-  }
 }

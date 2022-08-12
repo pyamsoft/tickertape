@@ -49,8 +49,8 @@ internal constructor(
         val service =
             Intent(appContext, serviceClass).apply {
               options?.also { opts ->
-                opts.index?.also { i -> putExtra(TapeRemote.KEY_CURRENT_INDEX, i) }
-                opts.forceRefresh?.also { f -> putExtra(TapeRemote.KEY_FORCE_REFRESH, f) }
+                opts.index?.also { putExtra(TapeRemote.KEY_CURRENT_INDEX, it) }
+                opts.forceRefresh?.also { putExtra(TapeRemote.KEY_FORCE_REFRESH, it) }
               }
             }
 

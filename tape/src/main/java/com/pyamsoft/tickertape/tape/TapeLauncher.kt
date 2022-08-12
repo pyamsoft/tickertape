@@ -74,7 +74,7 @@ internal constructor(
   companion object {
 
     @CheckResult
-    private fun ZonedDateTime.cleanHourTo(hour: Int, minute: Int? = null): ZonedDateTime {
+    private fun ZonedDateTime.cleanTimeTo(hour: Int, minute: Int? = null): ZonedDateTime {
       return this.withHour(hour).withSecond(0).withNano(0).run {
         if (minute != null) {
           withMinute(minute)
@@ -94,21 +94,19 @@ internal constructor(
     private fun itsMarketTime(): Boolean {
       // NYSE decides if the market is "open"
       val marketTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
-      val preMarket = marketTime.cleanHourTo(8)
-      val postMarket = marketTime.cleanHourTo(12 + 6, 30)
 
       // Weekend, no market
       if (marketTime.dayOfWeek.isWeekend()) {
         return false
       }
 
-      // Pre-market is from 8am
-      if (marketTime.isBefore(preMarket)) {
+      val marketOpen = marketTime.cleanTimeTo(9, 30)
+      if (marketTime.isBefore(marketOpen)) {
         return false
       }
 
-      // After-hours is until 6:30 ish
-      if (marketTime.isAfter(postMarket)) {
+      val marketClose = marketTime.cleanTimeTo(12 + 4)
+      if (marketTime.isAfter(marketClose)) {
         return false
       }
 

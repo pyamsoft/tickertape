@@ -146,7 +146,6 @@ private fun PreviewWatchlistDigToolbar() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
               allowModifyWatchlist = true,
           ),
       onClose = {},

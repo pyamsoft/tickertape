@@ -37,7 +37,6 @@ private fun PreviewPositionRecommendations() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
           ),
       onRefresh = {},
       onRecClick = {},

@@ -36,6 +36,7 @@ abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
     private val state: S,
     private val interactor: DigInteractor,
+    private val lookupSymbol: StockSymbol?,
 ) : AbstractViewModeler<S>(state) {
 
   @CheckResult
@@ -49,7 +50,7 @@ protected constructor(
 
   @CheckResult
   private fun getLookupSymbol(): StockSymbol {
-    return state.lookupSymbol ?: state.ticker.symbol
+    return lookupSymbol ?: state.ticker.symbol
   }
 
   protected suspend fun loadRecommendations(force: Boolean) {

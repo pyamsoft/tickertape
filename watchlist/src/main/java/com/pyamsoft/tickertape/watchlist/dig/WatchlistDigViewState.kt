@@ -27,9 +27,8 @@ class MutableWatchlistDigViewState
 @Inject
 internal constructor(
     symbol: StockSymbol,
-    @Named("lookup") lookupSymbol: StockSymbol,
     allowModifyWatchlist: Boolean,
-) : MutableDigViewState(symbol, lookupSymbol), WatchlistDigViewState {
+) : MutableDigViewState(symbol), WatchlistDigViewState {
 
   // Not state backed since this is constant
   override val isAllowModifyWatchlist = allowModifyWatchlist

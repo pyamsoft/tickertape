@@ -122,7 +122,6 @@ private fun PreviewPortfolioDigToolbar() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
           ),
       onClose = {},
       onTabUpdated = {},

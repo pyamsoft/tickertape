@@ -38,7 +38,6 @@ interface DigViewState : UiViewState {
 abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
-    internal val lookupSymbol: StockSymbol?,
 ) : DigViewState {
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)

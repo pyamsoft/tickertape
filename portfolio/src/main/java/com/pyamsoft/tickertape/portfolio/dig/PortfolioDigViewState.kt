@@ -11,7 +11,6 @@ import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
-import javax.inject.Named
 
 @Stable
 interface PortfolioDigViewState : DigViewState {
@@ -33,9 +32,8 @@ interface PortfolioDigViewState : DigViewState {
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(
-    @Named("lookup") lookupSymbol: StockSymbol?,
     symbol: StockSymbol,
-) : MutableDigViewState(symbol, lookupSymbol), PortfolioDigViewState {
+) : MutableDigViewState(symbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
 

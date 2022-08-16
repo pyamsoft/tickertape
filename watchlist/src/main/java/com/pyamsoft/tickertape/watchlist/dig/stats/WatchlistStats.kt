@@ -34,7 +34,6 @@ private fun PreviewWatchlistStats() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
               allowModifyWatchlist = true,
           ),
       onRefresh = {},

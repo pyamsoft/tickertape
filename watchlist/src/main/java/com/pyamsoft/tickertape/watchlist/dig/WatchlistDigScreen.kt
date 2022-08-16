@@ -152,7 +152,6 @@ private fun PreviewWatchlistDigScreen() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
               allowModifyWatchlist = true,
           ),
       imageLoader = createNewTestImageLoader(),

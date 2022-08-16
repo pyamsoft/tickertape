@@ -190,7 +190,6 @@ private fun PreviewPortfolioDigScreen() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},

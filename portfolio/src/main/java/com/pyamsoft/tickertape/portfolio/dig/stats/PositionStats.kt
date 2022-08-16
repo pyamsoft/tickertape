@@ -34,7 +34,6 @@ private fun PreviewPositionStats() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
           ),
       onRefresh = {},
   )

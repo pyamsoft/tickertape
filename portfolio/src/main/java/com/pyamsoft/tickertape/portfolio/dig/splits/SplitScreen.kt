@@ -69,7 +69,6 @@ private fun PreviewSplitScreen() {
         state =
             MutablePortfolioDigViewState(
                 symbol = symbol,
-                lookupSymbol = symbol,
             ),
         onAddSplit = {},
         onRefresh = {},

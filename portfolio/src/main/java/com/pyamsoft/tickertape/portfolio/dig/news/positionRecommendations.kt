@@ -38,7 +38,6 @@ private fun PreviewPositionNews() {
       state =
           MutablePortfolioDigViewState(
               symbol = symbol,
-              lookupSymbol = symbol,
           ),
       onRefresh = {},
       imageLoader = createNewTestImageLoader(),

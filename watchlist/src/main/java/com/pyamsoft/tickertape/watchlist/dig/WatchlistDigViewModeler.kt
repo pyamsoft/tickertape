@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -27,16 +28,19 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Named
 
 class WatchlistDigViewModeler
 @Inject
 internal constructor(
     private val state: MutableWatchlistDigViewState,
     private val interactor: WatchlistDigInteractor,
+    @Named("lookup") lookupSymbol: StockSymbol?,
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
         state,
         interactor,
+        lookupSymbol,
     ) {
 
   private val loadRunner =

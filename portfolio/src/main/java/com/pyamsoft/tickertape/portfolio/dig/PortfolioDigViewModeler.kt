@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Named
 
 class PortfolioDigViewModeler
 @Inject
@@ -47,10 +49,12 @@ internal constructor(
     private val equityType: EquityType,
     private val tradeSide: TradeSide,
     private val currentPrice: StockMoneyValue?,
+    @Named("lookup") lookupSymbol: StockSymbol?,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
         interactor,
+        lookupSymbol,
     ) {
 
   private val positionDeleteRunner =

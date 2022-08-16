@@ -99,17 +99,16 @@ private fun calculateDisplayValues(
 
     val optionsScaledValue = gainLossValue * optionsModifier
     val sideScaledValue = optionsScaledValue * sellSideModifier
+    val sideScaledPct = gainLossPct * sellSideModifier
 
     val gainLossDirection = sideScaledValue.asDirection()
     val sign = gainLossDirection.sign
 
     // Final display
     gainLossAmount = sideScaledValue
-    gainLossPercent = gainLossPct
-    displayGainLossAmount = "${sign}${sideScaledValue.asMoney().display}"
-    displayGainLossPercent = "${sign}${gainLossPct.asPercent().display}"
-
-    // Color
+    gainLossPercent = sideScaledPct
+    displayGainLossAmount = "${sign}${gainLossAmount.asMoney().display}"
+    displayGainLossPercent = "${sign}${gainLossPercent.asPercent().display}"
     colorGainLoss = Color(gainLossDirection.color)
   }
 

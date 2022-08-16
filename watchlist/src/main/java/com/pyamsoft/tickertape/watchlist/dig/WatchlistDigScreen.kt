@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import com.pyamsoft.tickertape.watchlist.dig.news.WatchlistNews
 import com.pyamsoft.tickertape.watchlist.dig.recs.WatchlistRecommendations
+import com.pyamsoft.tickertape.watchlist.dig.stats.WatchlistStats
 
 @Composable
 @JvmOverloads

@@ -27,8 +27,6 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
 
     override val recommendations: List<Ticker> = emptyList()
 
-    override val equityType: EquityType = EquityType.STOCK
-
     override val range = StockChart.IntervalRange.ONE_DAY
 
     override val currentDate = LocalDateTime.now()

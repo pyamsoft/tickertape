@@ -7,8 +7,6 @@ import coil.ImageLoader
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigNews
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 

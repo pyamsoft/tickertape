@@ -15,7 +15,6 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import timber.log.Timber
 
 private const val LIMIT_PERCENT = 5.0
 private const val COLOR_ADJUST_OFFSET = 0.05F

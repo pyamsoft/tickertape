@@ -6,8 +6,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable

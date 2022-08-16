@@ -1,11 +1,12 @@
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.watchlist.dig.stats
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.watchlist.dig.MutableWatchlistDigViewState
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigViewState
 
 @Composable
 @JvmOverloads

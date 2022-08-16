@@ -13,8 +13,6 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionScreen
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable

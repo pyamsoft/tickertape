@@ -26,10 +26,7 @@ import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.portfolio.dig.stats.PositionStats
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 

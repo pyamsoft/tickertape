@@ -83,38 +83,46 @@ private fun OptionsStrikeExpiration(
     onExpirationDateSelected: (LocalDateTime) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val option = state.resolvedOption ?: return
+  val option = state.resolvedOption
+  val isOptionResolved = remember(option) { option != null }
 
-  val selectedExpirationDate = state.optionExpirationDate
-  val allExpirationDates = option.expirationDates
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
-
+  val selectedExpirationDate = state.optionExpirationDate
   val selectedStrikePrice = state.optionStrikePrice
-  val allStrikes = option.strikes
 
-  Row(
+  AnimatedVisibility(
       modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
+      visible = isOptionResolved,
   ) {
-    OptionsDropdown(
-        modifier = Modifier.weight(1F),
-        value = selectedExpirationDate,
-        choices = allExpirationDates,
-        onDisplayChoice = { it.format(dateFormatter) },
-        onSelect = { onExpirationDateSelected(it) },
-    )
+    if (option != null) {
+      val allExpirationDates = option.expirationDates
+      val allStrikes = option.strikes
 
-    Spacer(
-        modifier = Modifier.weight(1F),
-    )
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        OptionsDropdown(
+            modifier = Modifier.weight(1F),
+            value = selectedExpirationDate,
+            choices = allExpirationDates,
+            onDisplayChoice = { it.format(dateFormatter) },
+            onSelect = { onExpirationDateSelected(it) },
+        )
 
-    OptionsDropdown(
-        modifier = Modifier.weight(1F),
-        value = selectedStrikePrice,
-        choices = allStrikes,
-        onDisplayChoice = { it.display },
-        onSelect = { onStrikeSelected(it) },
-    )
+        Spacer(
+            modifier = Modifier.weight(1F),
+        )
+
+        OptionsDropdown(
+            modifier = Modifier.weight(1F),
+            value = selectedStrikePrice,
+            choices = allStrikes,
+            onDisplayChoice = { it.display },
+            onSelect = { onStrikeSelected(it) },
+        )
+      }
+    }
   }
 }
 

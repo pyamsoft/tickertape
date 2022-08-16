@@ -100,16 +100,16 @@ internal constructor(
 
     if (symbol.isBlank()) {
       Timber.w("Cannot resolve for empty symbol")
-      s.resolvedTicker = null
       return
     }
 
+    val sym = symbol.uppercase()
     scope.launch(context = Dispatchers.Main) {
       tickerResolutionRunner
-          .call(false, symbol)
-          .onSuccess { Timber.d("Resolved ticker for $symbol $it") }
+          .call(false, sym)
+          .onSuccess { Timber.d("Resolved ticker for $sym $it") }
           .onSuccess { s.resolvedTicker = it }
-          .onFailure { Timber.e(it, "Error resolving ticker for $symbol") }
+          .onFailure { Timber.e(it, "Error resolving ticker for $sym") }
           .onFailure { s.resolvedTicker = null }
           .onSuccess { ticker ->
             ticker.quote?.also { q ->

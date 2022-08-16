@@ -42,18 +42,21 @@ internal constructor(
       override val change: StockMoneyValue,
       override val percent: StockPercent,
       override val lastPrice: StockMoneyValue,
-      override val bid: StockMoneyValue,
-      override val ask: StockMoneyValue,
       override val iv: StockPercent,
       override val itm: Boolean,
+      override val lastTradeDate: LocalDateTime,
+      override val openInterest: Int,
+      override val bid: StockMoneyValue,
+      override val ask: StockMoneyValue,
   ) : StockOptions.Contract, StockOptions.Call, StockOptions.Put {
 
-    override val mid: StockMoneyValue
-
-    init {
-      val bidValue = bid.value
-      val diff = ask.value - bidValue
-      mid = (bidValue + diff).asMoney()
-    }
+    override val mid: StockMoneyValue =
+        if (bid == StockMoneyValue.NONE || ask == StockMoneyValue.NONE) {
+          StockMoneyValue.NONE
+        } else {
+          val bidValue = bid.value
+          val diff = ask.value - bidValue
+          (bidValue + diff).asMoney()
+        }
   }
 }

@@ -65,10 +65,13 @@ private fun calculateDisplayValues(
     splits: List<DbSplit>,
     currentPrice: StockMoneyValue?
 ): DisplayValues {
+  val optionsModifier = if (isOption) 100 else 1
+  val sellSideModifier = if (isSell) -1 else 1
+
   val price = position.priceWithSplits(splits)
   val shareCount = position.shareCountWithSplits(splits)
-  val totalCost = (price.value * shareCount.value).asMoney()
-  val displayTotal = totalCost.display
+  val totalCost = price.value * shareCount.value
+  val displayTotal = (totalCost * optionsModifier).asMoney().display
 
   val gainLossAmount: Double
   val gainLossPercent: Double
@@ -91,11 +94,11 @@ private fun calculateDisplayValues(
     displayCurrent = currentValue.display
 
     // Gain/Loss
-    val gainLossValue = currentValue.value - totalCost.value
-    val gainLossPct = (gainLossValue * 100) / totalCost.value
+    val gainLossValue = currentValue.value - totalCost
+    val gainLossPct = (gainLossValue * 100) / totalCost
 
-    val optionsScaledValue = if (isOption) (gainLossValue * 100) else gainLossValue
-    val sideScaledValue = if (isSell) optionsScaledValue * -1 else optionsScaledValue
+    val optionsScaledValue = gainLossValue * optionsModifier
+    val sideScaledValue = optionsScaledValue * sellSideModifier
 
     val gainLossDirection = sideScaledValue.asDirection()
     val sign = gainLossDirection.sign

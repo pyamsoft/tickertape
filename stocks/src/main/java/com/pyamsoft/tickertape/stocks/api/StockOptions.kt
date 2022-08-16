@@ -50,15 +50,19 @@ interface StockOptions {
 
     @get:CheckResult val lastPrice: StockMoneyValue
 
-    @get:CheckResult val bid: StockMoneyValue
-
-    @get:CheckResult val ask: StockMoneyValue
-
-    @get:CheckResult val mid: StockMoneyValue
-
     @get:CheckResult val iv: StockPercent
 
     @get:CheckResult val itm: Boolean
+
+    @get:CheckResult val openInterest: Int
+
+    @get:CheckResult val lastTradeDate: LocalDateTime
+
+    @get:CheckResult val mid: StockMoneyValue
+
+    @get:CheckResult val bid: StockMoneyValue
+
+    @get:CheckResult val ask: StockMoneyValue
 
     enum class Type {
       CALL,
@@ -76,10 +80,12 @@ interface StockOptions {
           change: StockMoneyValue,
           percent: StockPercent,
           lastPrice: StockMoneyValue,
-          bid: StockMoneyValue,
-          ask: StockMoneyValue,
           iv: StockPercent,
           itm: Boolean,
+          lastTradeDate: LocalDateTime,
+          openInterest: Int,
+          bid: StockMoneyValue,
+          ask: StockMoneyValue,
       ): StockOptionsImpl.ContractImpl {
         return StockOptionsImpl.ContractImpl(
             type,
@@ -89,10 +95,12 @@ interface StockOptions {
             change,
             percent,
             lastPrice,
-            bid,
-            ask,
             iv,
             itm,
+            lastTradeDate,
+            openInterest,
+            bid,
+            ask,
         )
       }
 
@@ -106,10 +114,12 @@ interface StockOptions {
           change: StockMoneyValue,
           percent: StockPercent,
           lastPrice: StockMoneyValue,
-          bid: StockMoneyValue,
-          ask: StockMoneyValue,
           iv: StockPercent,
           itm: Boolean,
+          lastTradeDate: LocalDateTime,
+          openInterest: Int,
+          bid: StockMoneyValue,
+          ask: StockMoneyValue,
       ): T {
         @Suppress("UNCHECKED_CAST")
         return createContract(
@@ -120,12 +130,14 @@ interface StockOptions {
             change,
             percent,
             lastPrice,
-            bid,
-            ask,
             iv,
             itm,
-        ) as
-            T
+            lastTradeDate,
+            openInterest,
+            bid,
+            ask,
+        )
+            as T
       }
     }
   }

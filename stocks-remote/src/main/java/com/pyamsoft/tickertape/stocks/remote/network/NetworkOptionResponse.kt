@@ -52,10 +52,10 @@ internal data class NetworkOptionResponse internal constructor(val optionChain: 
             val impliedVolatility: Double,
             val inTheMoney: Boolean,
             val change: Double,
+            val lastTradeDate: Long,
             val bid: Double?,
             val ask: Double?,
-            val openInterest: Int,
-            val lastTradeDate: Long,
+            val openInterest: Int?,
         )
       }
     }

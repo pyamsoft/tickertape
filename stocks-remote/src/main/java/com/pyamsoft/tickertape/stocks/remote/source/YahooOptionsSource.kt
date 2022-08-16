@@ -24,21 +24,21 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.sources.OptionsSource
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.remote.service.OptionsService
+import com.pyamsoft.tickertape.stocks.sources.OptionsSource
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooOptionsSource
@@ -59,6 +59,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
         .asContract(
         symbol: StockSymbol,
         type: StockOptions.Contract.Type,
+        localId: ZoneId,
     ): T {
       return StockOptions.Contract.create(
           type = type,
@@ -68,10 +69,12 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
           change = this.change.asMoney(),
           percent = this.percentChange.asPercent(),
           lastPrice = this.lastPrice.asMoney(),
-          bid = this.bid.asMoney(),
-          ask = this.ask.asMoney(),
           iv = this.impliedVolatility.asPercent(),
           itm = this.inTheMoney,
+          lastTradeDate = parseMarketTime(this.lastTradeDate, localId),
+          openInterest = this.openInterest ?: 0,
+          bid = this.bid?.asMoney() ?: StockMoneyValue.NONE,
+          ask = this.ask?.asMoney() ?: StockMoneyValue.NONE,
       )
     }
   }
@@ -81,11 +84,13 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
     val option = resp.optionChain.result.first()
     val chain = option.options.first()
     val symbol = option.underlyingSymbol.asSymbol()
+    val localId = ZoneId.systemDefault()
     val calls =
         chain.calls.map {
           it.asContract<StockOptions.Call>(
               symbol = symbol,
               type = StockOptions.Contract.Type.CALL,
+              localId = localId,
           )
         }
     val puts =
@@ -93,10 +98,10 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
           it.asContract<StockOptions.Put>(
               symbol = symbol,
               type = StockOptions.Contract.Type.PUT,
+              localId = localId,
           )
         }
 
-    val localId = ZoneId.systemDefault()
     return StockOptions.create(
         symbol = symbol,
         expirationDates = option.expirationDates.map { parseUTCTime(it, localId) },

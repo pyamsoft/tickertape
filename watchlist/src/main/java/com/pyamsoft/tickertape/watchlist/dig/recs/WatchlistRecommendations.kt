@@ -39,7 +39,6 @@ private fun PreviewWatchlistRecommendations() {
           MutableWatchlistDigViewState(
               symbol = symbol,
               lookupSymbol = symbol,
-              equityType = EquityType.STOCK,
               allowModifyWatchlist = false,
           ),
       onRefresh = {},

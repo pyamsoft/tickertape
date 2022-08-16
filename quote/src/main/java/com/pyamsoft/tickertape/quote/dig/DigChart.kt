@@ -64,10 +64,9 @@ fun DigChart(
   val currentDate = state.currentDate
   val currentPrice = state.currentPrice
   val openingPrice = state.openingPrice
-  val equityType = state.equityType
-  val isOptions = remember(equityType) { equityType == EquityType.OPTION }
 
   val chart = ticker.chart
+  val isOptions = remember(ticker) { ticker.quote?.type == EquityType.OPTION }
 
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
@@ -186,7 +185,9 @@ private fun CurrentPriceDisplay(
       rememberInBackground(
           price,
           openingPrice,
-      ) { if (openingPrice == null) null else calculateDifferences(price, openingPrice) }
+      ) {
+        if (openingPrice == null) null else calculateDifferences(price, openingPrice)
+      }
 
   Column(
       modifier = modifier,

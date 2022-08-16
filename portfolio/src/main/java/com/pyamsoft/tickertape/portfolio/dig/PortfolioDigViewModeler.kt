@@ -24,7 +24,12 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.TradeSide
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +37,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
@@ -40,6 +44,9 @@ internal constructor(
     private val state: MutablePortfolioDigViewState,
     private val holdingId: DbHolding.Id,
     private val interactor: PortfolioDigInteractor,
+    private val equityType: EquityType,
+    private val tradeSide: TradeSide,
+    private val currentPrice: StockMoneyValue?,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
@@ -85,19 +92,34 @@ internal constructor(
             .awaitAll()
       }
 
+  @CheckResult
+  private fun createPositionStock(
+      position: DbPosition,
+      splits: List<DbSplit>,
+  ): PositionStock {
+    return PositionStock(
+        position = position,
+        equityType = equityType,
+        tradeSide = tradeSide,
+        currentPrice = currentPrice,
+        splits = splits,
+    )
+  }
+
   private suspend fun loadSplits(force: Boolean) {
+    val s = state
     interactor
         .getSplits(force, holdingId)
-        .onSuccess { s ->
-          state.apply {
-            stockSplits = s
+        .onSuccess { sp ->
+          s.apply {
             stockSplitError = null
+            s.handlePositionListRegenOnSplitsUpdated(splits = sp)
           }
         }
         .onFailure { e ->
-          state.apply {
-            stockSplits = emptyList()
+          s.apply {
             stockSplitError = e
+            s.handlePositionListRegenOnSplitsUpdated(splits = emptyList())
           }
         }
   }
@@ -120,18 +142,21 @@ internal constructor(
   }
 
   private suspend fun loadPositions(force: Boolean) {
+    val s = state
+    val splits = s.stockSplits
     interactor
         .getPositions(force, holdingId)
+        .map { p -> p.map { createPositionStock(it, splits) } }
         .onSuccess { p ->
-          state.apply {
-            positions = p
+          s.apply {
             positionsError = null
+            s.handlePositionListRegenOnSplitsUpdated(positions = p)
           }
         }
         .onFailure { e ->
-          state.apply {
-            positions = emptyList()
+          s.apply {
             positionsError = e
+            s.handlePositionListRegenOnSplitsUpdated(positions = emptyList())
           }
         }
   }
@@ -146,10 +171,18 @@ internal constructor(
 
   private fun onPositionInsertOrUpdate(position: DbPosition) {
     val s = state
-    s.positions =
-        insertOrUpdate(s.positions, position) {
-          it.holdingId == position.holdingId && it.id == position.id
-        }
+    s.handlePositionListRegenOnSplitsUpdated(
+        positions =
+            insertOrUpdate(
+                s.positions,
+                createPositionStock(
+                    position,
+                    s.stockSplits,
+                ),
+            ) {
+              it.holdingId == position.holdingId && it.id == position.id
+            },
+    )
   }
 
   private fun onPositionUpdated(position: DbPosition) {
@@ -163,7 +196,8 @@ internal constructor(
   private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.positions = s.positions.filterNot { it.id == position.id }
+    s.handlePositionListRegenOnSplitsUpdated(
+        positions = s.positions.filterNot { it.id == position.id })
   }
 
   private fun onSplitChangeEvent(event: SplitChangeEvent) {
@@ -176,10 +210,11 @@ internal constructor(
 
   private fun onSplitInsertOrUpdate(split: DbSplit) {
     val s = state
-    s.stockSplits =
-        insertOrUpdate(s.stockSplits, split) {
-          it.holdingId == split.holdingId && it.id == split.id
-        }
+    s.handlePositionListRegenOnSplitsUpdated(
+        splits =
+            insertOrUpdate(s.stockSplits, split) {
+              it.holdingId == split.holdingId && it.id == split.id
+            })
   }
 
   private fun onSplitUpdated(split: DbSplit) {
@@ -193,7 +228,7 @@ internal constructor(
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.stockSplits = s.stockSplits.filterNot { it.id == split.id }
+    s.handlePositionListRegenOnSplitsUpdated(splits = s.stockSplits.filterNot { it.id == split.id })
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {

@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
-import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
-import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
 import com.pyamsoft.tickertape.quote.PriceSection
 import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_ALPHA
@@ -38,115 +36,23 @@ import com.pyamsoft.tickertape.quote.TickerSizes
 import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForPercentChange
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.tickertape.ui.rememberInBackground
-
-private data class DisplayValues(
-    val cost: String,
-    val current: String,
-    val gainLossAmount: Double,
-    val gainLossPercent: Double,
-    val displayGainLossAmount: String,
-    val displayGainLossPercent: String,
-    val color: Color,
-)
-
-@CheckResult
-private fun calculateDisplayValues(
-    position: DbPosition,
-    isOption: Boolean,
-    isSell: Boolean,
-    splits: List<DbSplit>,
-    currentPrice: StockMoneyValue?
-): DisplayValues {
-  val optionsModifier = if (isOption) 100 else 1
-  val sellSideModifier = if (isSell) -1 else 1
-
-  val price = position.priceWithSplits(splits)
-  val shareCount = position.shareCountWithSplits(splits)
-  val totalCost = price.value * shareCount.value
-  val displayTotal = (totalCost * optionsModifier).asMoney().display
-
-  val gainLossAmount: Double
-  val gainLossPercent: Double
-  val displayGainLossAmount: String
-  val displayGainLossPercent: String
-  val displayCurrent: String
-  val colorGainLoss: Color
-
-  if (currentPrice == null) {
-    gainLossAmount = 0.0
-    gainLossPercent = 0.0
-    displayCurrent = ""
-    displayGainLossAmount = ""
-    displayGainLossPercent = ""
-    colorGainLoss = Color.Unspecified
-  } else {
-    // Current
-    val currentRaw = (currentPrice.value * shareCount.value)
-    val currentValue = currentRaw.asMoney()
-    displayCurrent = currentValue.display
-
-    // Gain/Loss
-    val gainLossValue = currentValue.value - totalCost
-    val gainLossPct = (gainLossValue * 100) / totalCost
-
-    val optionsScaledValue = gainLossValue * optionsModifier
-    val sideScaledValue = optionsScaledValue * sellSideModifier
-    val sideScaledPct = gainLossPct * sellSideModifier
-
-    val gainLossDirection = sideScaledValue.asDirection()
-    val sign = gainLossDirection.sign
-
-    // Final display
-    gainLossAmount = sideScaledValue
-    gainLossPercent = sideScaledPct
-    displayGainLossAmount = "${sign}${gainLossAmount.asMoney().display}"
-    displayGainLossPercent = "${sign}${gainLossPercent.asPercent().display}"
-    colorGainLoss = Color(gainLossDirection.color)
-  }
-
-  return DisplayValues(
-      cost = displayTotal,
-      current = displayCurrent,
-      gainLossAmount = gainLossAmount,
-      gainLossPercent = gainLossPercent,
-      displayGainLossAmount = displayGainLossAmount,
-      displayGainLossPercent = displayGainLossPercent,
-      color = colorGainLoss,
-  )
-}
 
 @Composable
 @JvmOverloads
 internal fun PositionItem(
     modifier: Modifier = Modifier,
-    equityType: EquityType,
-    tradeSide: TradeSide,
-    position: DbPosition,
-    splits: List<DbSplit>,
-    currentPrice: StockMoneyValue?,
+    position: PositionStock,
 ) {
-  val isOption = remember(equityType) { equityType == EquityType.OPTION }
-  val isSell = remember(tradeSide) { tradeSide == TradeSide.SELL }
-
-  val displayValues =
-      rememberInBackground(position, currentPrice, isOption, isSell, splits) {
-        calculateDisplayValues(position, isOption, isSell, splits, currentPrice)
-      }
-
   Card(
       modifier = modifier,
       elevation = CardDefaults.Elevation,
       backgroundColor =
           rememberCardBackgroundColorForPercentChange(
-              displayValues?.gainLossPercent,
+              position.gainLossPercent,
               // More generous change limit since positions can be big in the red or green
               changeLimit = 30.0,
           ),
@@ -160,26 +66,17 @@ internal fun PositionItem(
       )
       NumberOfShares(
           modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
-          isOption = isOption,
-          isSell = isSell,
           position = position,
-          splits = splits,
       )
       CostBasis(
           modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
-          isOption = isOption,
           position = position,
-          splits = splits,
       )
 
-      displayValues?.also { dv ->
-        CurrentPrices(
-            modifier = Modifier.fillMaxWidth(),
-            isOption = isOption,
-            isSell = isSell,
-            displayValues = dv,
-        )
-      }
+      CurrentPrices(
+          modifier = Modifier.fillMaxWidth(),
+          position = position,
+      )
     }
   }
 }
@@ -187,9 +84,7 @@ internal fun PositionItem(
 @Composable
 private fun CurrentPrices(
     modifier: Modifier = Modifier,
-    isOption: Boolean,
-    isSell: Boolean,
-    displayValues: DisplayValues,
+    position: PositionStock,
 ) {
   val typography = MaterialTheme.typography
   val contentColor = LocalContentColor.current
@@ -206,14 +101,14 @@ private fun CurrentPrices(
       modifier = modifier,
   ) {
     Info(
-        name = "Total ${if (isOption && isSell) "Premium" else "Cost"}",
-        value = displayValues.cost,
+        name = "Total ${if (position.isOption && position.isSell) "Premium" else "Cost"}",
+        value = position.cost,
         textStyle = MaterialTheme.typography.body1,
     )
 
-    if (displayValues.current.isNotBlank() ||
-        displayValues.displayGainLossPercent.isNotBlank() ||
-        displayValues.displayGainLossAmount.isNotBlank()) {
+    if (position.currentValue.isNotBlank() ||
+        position.displayGainLossPercent.isNotBlank() ||
+        position.displayGainLossAmount.isNotBlank()) {
       Spacer(
           modifier = Modifier.height(MaterialTheme.keylines.content),
       )
@@ -224,10 +119,10 @@ private fun CurrentPrices(
         contentAlignment = Alignment.BottomEnd,
     ) {
       PriceSection(
-          value = displayValues.current,
+          value = position.currentValue,
           valueStyle = sizes.title,
-          changeAmount = displayValues.displayGainLossAmount,
-          changePercent = displayValues.displayGainLossPercent,
+          changeAmount = position.displayGainLossAmount,
+          changePercent = position.displayGainLossPercent,
           changeStyle = sizes.description,
       )
     }
@@ -255,28 +150,23 @@ private fun PurchaseDate(
 @Composable
 private fun CostBasis(
     modifier: Modifier = Modifier,
-    isOption: Boolean,
-    position: DbPosition,
-    splits: List<DbSplit>,
+    position: PositionStock,
 ) {
   val displayOriginalPrice =
       remember(
-          position,
-          isOption,
+          position
       ) {
         val price = position.price
-        val p = if (isOption) (price.value * 100).asMoney() else price
+        val p = if (position.isOption) (price.value * 100).asMoney() else price
         return@remember p.display
       }
 
   val displayAdjustedPrice =
       remember(
-          position,
-          isOption,
-          splits,
+          position
       ) {
-        val price = position.priceWithSplits(splits)
-        val p = if (isOption) (price.value * 100).asMoney() else price
+        val price = position.priceWithSplits(position.splits)
+        val p = if (position.isOption) (price.value * 100).asMoney() else price
         return@remember p.display
       }
 
@@ -314,29 +204,23 @@ private fun CostBasis(
 @Composable
 private fun NumberOfShares(
     modifier: Modifier = Modifier,
-    isOption: Boolean,
-    isSell: Boolean,
-    position: DbPosition,
-    splits: List<DbSplit>,
+    position: PositionStock,
 ) {
   val displayOriginalShares =
       remember(
           position,
-          isSell,
       ) {
         val shareCount = position.shareCount
-        val s = if (isSell) (shareCount.value * -1).asShares() else shareCount
+        val s = if (position.isSell) (shareCount.value * -1).asShares() else shareCount
         return@remember s.display
       }
 
   val displayAdjustedShares =
       remember(
           position,
-          isSell,
-          splits,
       ) {
-        val shareCount = position.shareCountWithSplits(splits)
-        val s = if (isSell) (shareCount.value * -1).asShares() else shareCount
+        val shareCount = position.shareCountWithSplits(position.splits)
+        val s = if (position.isSell) (shareCount.value * -1).asShares() else shareCount
         return@remember s.display
       }
 
@@ -359,12 +243,12 @@ private fun NumberOfShares(
   ) {
     if (prefix.isNotBlank()) {
       Info(
-          name = "Original ${if (isOption) "Contracts" else "Shares"}",
+          name = "Original ${if (position.isOption) "Contracts" else "Shares"}",
           value = displayOriginalShares,
       )
     }
     Info(
-        name = "${prefix}${if (isOption) "Contracts" else "Shares"}",
+        name = "${prefix}${if (position.isOption) "Contracts" else "Shares"}",
         value = displayAdjustedShares,
     )
   }
@@ -418,11 +302,14 @@ private fun PreviewPositionItem() {
     Surface {
       PositionItem(
           modifier = Modifier.padding(16.dp),
-          position = newTestPosition(),
-          equityType = EquityType.STOCK,
-          tradeSide = TradeSide.BUY,
-          currentPrice = 25.0.asMoney(),
-          splits = emptyList(),
+          position =
+              PositionStock(
+                  position = newTestPosition(),
+                  equityType = EquityType.STOCK,
+                  tradeSide = TradeSide.BUY,
+                  currentPrice = 25.0.asMoney(),
+                  splits = emptyList(),
+              ),
       )
     }
   }

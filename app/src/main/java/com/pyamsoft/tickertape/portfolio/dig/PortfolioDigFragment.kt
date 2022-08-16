@@ -216,6 +216,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       savedInstanceState: Bundle?,
   ): View {
     val act = requireActivity()
+
     Injector.obtainFromActivity<MainComponent>(act)
         .plusPortfolioDig()
         .create(
@@ -224,6 +225,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
             getHoldingId(),
             getHoldingType(),
             getHoldingSide(),
+            getCurrentPrice(),
         )
         .inject(this)
 
@@ -232,7 +234,6 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     val navi = navigator.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
-    val currentPrice = getCurrentPrice()
     return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
@@ -247,7 +248,6 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 imageLoader = loader,
-                currentPrice = currentPrice,
                 onClose = { act.onBackPressed() },
                 onScrub = { vm.handleDateScrubbed(it) },
                 onRangeSelected = { handleRangeSelected(it) },

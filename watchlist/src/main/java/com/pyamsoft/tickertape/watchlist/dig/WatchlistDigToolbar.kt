@@ -149,7 +149,6 @@ private fun PreviewWatchlistDigToolbar() {
               symbol = symbol,
               lookupSymbol = symbol,
               allowModifyWatchlist = true,
-              equityType = EquityType.STOCK,
           ),
       onClose = {},
       onModifyWatchlist = {},

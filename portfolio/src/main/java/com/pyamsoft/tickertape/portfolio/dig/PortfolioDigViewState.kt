@@ -5,20 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
 import javax.inject.Named
 
 @Stable
 interface PortfolioDigViewState : DigViewState {
-  val tradeSide: TradeSide
-
   val isLoading: Boolean
   val section: PortfolioDigSections
 
@@ -28,7 +24,7 @@ interface PortfolioDigViewState : DigViewState {
   val holding: DbHolding?
   val holdingError: Throwable?
 
-  val positions: List<DbPosition>
+  val positions: List<PositionStock>
   val positionsError: Throwable?
 }
 
@@ -37,20 +33,33 @@ interface PortfolioDigViewState : DigViewState {
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(
-    equityType: EquityType,
     @Named("lookup") lookupSymbol: StockSymbol?,
     symbol: StockSymbol,
-    override val tradeSide: TradeSide,
-) : MutableDigViewState(symbol, lookupSymbol, equityType), PortfolioDigViewState {
+) : MutableDigViewState(symbol, lookupSymbol), PortfolioDigViewState {
   override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
 
-  override var stockSplits by mutableStateOf(emptyList<DbSplit>())
   override var stockSplitError by mutableStateOf<Throwable?>(null)
+  override var stockSplits by mutableStateOf(emptyList<DbSplit>())
+    private set
 
   override var holding by mutableStateOf<DbHolding?>(null)
   override var holdingError by mutableStateOf<Throwable?>(null)
 
-  override var positions by mutableStateOf(emptyList<DbPosition>())
   override var positionsError by mutableStateOf<Throwable?>(null)
+  override var positions by mutableStateOf(emptyList<PositionStock>())
+    private set
+
+  /**
+   * This function ensures along with private setters, that positions and splits are always updated
+   * together to be consistent
+   */
+  internal fun handlePositionListRegenOnSplitsUpdated(
+      positions: List<PositionStock> = this.positions,
+      splits: List<DbSplit> = this.stockSplits,
+  ) {
+    val self = this
+    self.stockSplits = splits
+    self.positions = positions.map { it.copy(splits = splits) }
+  }
 }

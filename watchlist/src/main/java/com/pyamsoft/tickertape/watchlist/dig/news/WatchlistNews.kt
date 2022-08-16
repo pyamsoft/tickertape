@@ -41,7 +41,6 @@ private fun PreviewWatchlistNews() {
               symbol = symbol,
               lookupSymbol = symbol,
               allowModifyWatchlist = true,
-              equityType = EquityType.STOCK,
           ),
       onRefresh = {},
       imageLoader = createNewTestImageLoader(),

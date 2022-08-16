@@ -17,7 +17,6 @@ import java.time.LocalDateTime
 @Stable
 interface DigViewState : UiViewState {
 
-  val equityType: EquityType
   val ticker: Ticker
 
   val range: StockChart.IntervalRange
@@ -41,7 +40,6 @@ abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
     internal val lookupSymbol: StockSymbol?,
-    override val equityType: EquityType,
 ) : DigViewState {
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)

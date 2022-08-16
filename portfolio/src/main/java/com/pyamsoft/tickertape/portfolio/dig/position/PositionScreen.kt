@@ -13,9 +13,6 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionScreen
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -23,17 +20,13 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 internal fun PositionScreen(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
-    currentPrice: StockMoneyValue?,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
     onUpdatePosition: (DbPosition) -> Unit,
 ) {
-  val tradeSide = state.tradeSide
-  val equityType = state.equityType
   val isLoading = state.isLoading
   val positions = state.positions
-  val splits = state.stockSplits
 
   val positionError = state.positionsError
   val holdingError = state.holdingError
@@ -61,10 +54,6 @@ internal fun PositionScreen(
                         onLongClick = { onDeletePosition(position) },
                     ),
             position = position,
-            currentPrice = currentPrice,
-            equityType = equityType,
-            tradeSide = tradeSide,
-            splits = splits,
         )
       },
   )
@@ -81,10 +70,7 @@ private fun PreviewPositionScreen() {
             MutablePortfolioDigViewState(
                 symbol = symbol,
                 lookupSymbol = symbol,
-                equityType = EquityType.STOCK,
-                tradeSide = TradeSide.BUY,
             ),
-        currentPrice = null,
         onAddPosition = {},
         onRefresh = {},
         onDeletePosition = {},

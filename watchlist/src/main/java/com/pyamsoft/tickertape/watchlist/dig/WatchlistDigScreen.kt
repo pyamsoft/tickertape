@@ -154,7 +154,6 @@ private fun PreviewWatchlistDigScreen() {
               symbol = symbol,
               lookupSymbol = symbol,
               allowModifyWatchlist = true,
-              equityType = EquityType.STOCK,
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},

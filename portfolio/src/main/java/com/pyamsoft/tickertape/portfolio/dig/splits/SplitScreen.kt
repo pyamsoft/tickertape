@@ -72,8 +72,6 @@ private fun PreviewSplitScreen() {
             MutablePortfolioDigViewState(
                 symbol = symbol,
                 lookupSymbol = symbol,
-                equityType = EquityType.STOCK,
-                tradeSide = TradeSide.BUY,
             ),
         onAddSplit = {},
         onRefresh = {},

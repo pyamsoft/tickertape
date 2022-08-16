@@ -313,7 +313,7 @@ private fun PositionToolbar(
 
 @Preview
 @Composable
-private fun PreviewBasePositionScreen() {
+private fun PreviewBasePositionPopup() {
   BasePositionPopup(
       title = "Testing 123",
       isReadOnly = false,

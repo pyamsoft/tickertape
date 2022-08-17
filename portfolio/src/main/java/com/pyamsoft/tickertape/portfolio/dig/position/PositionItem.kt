@@ -106,25 +106,28 @@ private fun CurrentPrices(
         textStyle = MaterialTheme.typography.body1,
     )
 
-    if (position.currentValue.isNotBlank() ||
-        position.displayGainLossPercent.isNotBlank() ||
-        position.displayGainLossAmount.isNotBlank()) {
-      Spacer(
-          modifier = Modifier.height(MaterialTheme.keylines.content),
-      )
-    }
+    // We need knowledge of the current price to show the change amounts
+    if (position.currentPrice != null) {
+      if (position.currentValue.isNotBlank() ||
+          position.displayGainLossPercent.isNotBlank() ||
+          position.displayGainLossAmount.isNotBlank()) {
+        Spacer(
+            modifier = Modifier.height(MaterialTheme.keylines.content),
+        )
+      }
 
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.BottomEnd,
-    ) {
-      PriceSection(
-          value = position.currentValue,
-          valueStyle = sizes.title,
-          changeAmount = position.displayGainLossAmount,
-          changePercent = position.displayGainLossPercent,
-          changeStyle = sizes.description,
-      )
+      Box(
+          modifier = Modifier.fillMaxWidth(),
+          contentAlignment = Alignment.BottomEnd,
+      ) {
+        PriceSection(
+            value = position.currentValue,
+            valueStyle = sizes.title,
+            changeAmount = position.displayGainLossAmount,
+            changePercent = position.displayGainLossPercent,
+            changeStyle = sizes.description,
+        )
+      }
     }
   }
 }

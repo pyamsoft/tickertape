@@ -93,7 +93,7 @@ internal constructor(
                 }
 
             val result = jobs.awaitAll()
-              
+
             // Parse result return pair order decides which is which
             val (quotes, charts) = parseResult(result)
 

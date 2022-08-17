@@ -44,7 +44,7 @@ internal constructor(
   private val quoteFetcher =
       highlander<ResultWrapper<List<Ticker>>, Boolean> { interactor.getQuotes(it) }
 
-  private val searchRunner =
+  private val watchlistGenerator =
       highlander<ListGenerateResult<Ticker>, WatchlistViewState, List<Ticker>> { state, tickers ->
         val all = tickers.sortedWith(Ticker.COMPARATOR)
         val visible = state.asVisible(all)
@@ -93,7 +93,7 @@ internal constructor(
     scope.launch(context = Dispatchers.Default) {
       // Cancel any old processing
       try {
-        val result = searchRunner.call(self, tickers())
+        val result = watchlistGenerator.call(self, tickers())
         self.allTickers = result.all
         self.watchlist = result.visible
       } catch (e: Throwable) {

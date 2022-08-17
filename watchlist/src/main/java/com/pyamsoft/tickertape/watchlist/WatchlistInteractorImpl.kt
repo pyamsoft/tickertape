@@ -54,7 +54,14 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          interactor.getWatchListQuotes(force, symbolQueryDao, options = TICKER_OPTIONS)
+          interactor
+              .getWatchListQuotes(
+                  force,
+                  symbolQueryDao,
+                  options = TICKER_OPTIONS,
+              )
+              .onFailure { Timber.e(it, "Unable to get quotes for watchlist") }
+              .recover { emptyList() }
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting quotes")

@@ -64,14 +64,39 @@ internal constructor(
           coroutineScope {
             val jobs =
                 mutableListOf<Deferred<Any>>().apply {
-                  add(async { interactor.getQuotes(force, symbols) })
+                  add(
+                      async {
+                        try {
+                          interactor.getQuotes(force, symbols)
+                        } catch (e: Throwable) {
+                          e.ifNotCancellation {
+                            Timber.e(e, "Error getting quotes from network: $symbols")
+                            emptyList()
+                          }
+                        }
+                      },
+                  )
                   if (range != null) {
-                    add(async { interactor.getCharts(force, symbols, range) })
+                    add(
+                        async {
+                          try {
+                            interactor.getCharts(force, symbols, range)
+                          } catch (e: Throwable) {
+                            e.ifNotCancellation {
+                              Timber.e(e, "Error getting charts from network: $symbols")
+                              emptyList()
+                            }
+                          }
+                        },
+                    )
                   }
                 }
 
             val result = jobs.awaitAll()
+              
+            // Parse result return pair order decides which is which
             val (quotes, charts) = parseResult(result)
+
             val tickers =
                 symbols.map { symbol ->
                   val chart = charts.firstOrNull { it.symbol == symbol }
@@ -89,7 +114,7 @@ internal constructor(
           }
         } catch (e: Exception) {
           e.ifNotCancellation {
-            Timber.e(e, "Error getting tickers: $symbols $range")
+            Timber.e(e, "Error getting tickers: $symbols $range $options")
             ResultWrapper.failure(e)
           }
         }

@@ -110,21 +110,19 @@ private object QuoteScopeInstance : QuoteScope {
 }
 
 @Composable
-@JvmOverloads
 @OptIn(ExperimentalFoundationApi::class)
 fun Quote(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    backgroundColor: Color,
     onClick: (Ticker) -> Unit,
     onLongClick: (Ticker) -> Unit,
     content: @Composable QuoteScope.() -> Unit = {},
 ) {
-  val quote = ticker.quote
-
   Card(
       modifier = modifier,
       elevation = CardDefaults.Elevation,
-      backgroundColor = rememberCardBackgroundColorForQuote(quote),
+      backgroundColor = backgroundColor,
       contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
     Column(
@@ -166,6 +164,7 @@ private fun PreviewQuote() {
     Surface {
       Quote(
           modifier = Modifier.padding(16.dp),
+          backgroundColor = Color.Unspecified,
           ticker =
               Ticker(
                   symbol = symbol,

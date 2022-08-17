@@ -16,7 +16,16 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-private const val LIMIT_PERCENT = 5.0
+// Normal stocks am 8% move is kinda noticeable
+const val QUOTE_DEFAULT_LIMIT_PERCENT = 8.0
+// Options are a bit riskier, don't tell me unless this has moved 35%
+const val OPTIONS_LIMIT_PERCENT = 35.0
+// Crypto is wacky
+const val CRYPTO_LIMIT_PERCENT = 85.0
+
+// More generous change limit since positions can be big in the red or green
+const val POSITION_CHANGE_LIMIT_PERCENT = 25.0
+
 private const val COLOR_ADJUST_OFFSET = 0.05F
 
 private val UP_COMPOSE_COLOR = Color(DEFAULT_STOCK_UP_COLOR)
@@ -88,7 +97,7 @@ private fun decideCardBackgroundColorForPercentChange(
 @CheckResult
 fun rememberCardBackgroundColorForQuote(
     quote: StockQuote?,
-    changeLimit: Double = LIMIT_PERCENT,
+    changeLimit: Double = QUOTE_DEFAULT_LIMIT_PERCENT,
     defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
 ): Color {
   if (quote == null) {
@@ -110,7 +119,7 @@ fun rememberCardBackgroundColorForQuote(
 @CheckResult
 fun rememberCardBackgroundColorForPercentChange(
     percentChange: Double?,
-    changeLimit: Double = LIMIT_PERCENT,
+    changeLimit: Double = QUOTE_DEFAULT_LIMIT_PERCENT,
     defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
 ): Color {
   return remember(percentChange, changeLimit, defaultColor) {

@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
+import com.pyamsoft.tickertape.quote.POSITION_CHANGE_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.PriceSection
 import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_ALPHA
 import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_COLOR
@@ -53,8 +54,7 @@ internal fun PositionItem(
       backgroundColor =
           rememberCardBackgroundColorForPercentChange(
               position.gainLossPercent,
-              // More generous change limit since positions can be big in the red or green
-              changeLimit = 30.0,
+              changeLimit = POSITION_CHANGE_LIMIT_PERCENT,
           ),
       contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
@@ -153,18 +153,14 @@ private fun CostBasis(
     position: PositionStock,
 ) {
   val displayOriginalPrice =
-      remember(
-          position
-      ) {
+      remember(position) {
         val price = position.price
         val p = if (position.isOption) (price.value * 100).asMoney() else price
         return@remember p.display
       }
 
   val displayAdjustedPrice =
-      remember(
-          position
-      ) {
+      remember(position) {
         val price = position.priceWithSplits(position.splits)
         val p = if (position.isOption) (price.value * 100).asMoney() else price
         return@remember p.display

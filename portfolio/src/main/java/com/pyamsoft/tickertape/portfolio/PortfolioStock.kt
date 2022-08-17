@@ -43,28 +43,31 @@ internal constructor(
     val ticker: Ticker?,
     val splits: List<DbSplit>,
 ) {
-
-  val todayDirection: StockDirection
-  val totalDirection: StockDirection
-  val current: StockMoneyValue
-  val totalShares: StockShareValue
-
-  val gainLossDisplayString: String
-  val changeTodayDisplayString: String
-
-  val gainLossAmount: String
-  val gainLossPercent: String
-
   val isOption = holding.type == EquityType.OPTION
+  val isSell = holding.side == TradeSide.SELL
 
   // Used in PortfolioStockList
   internal val costNumber: Double
+  val current: StockMoneyValue
+
+  val todayPercent: Double
+  val todayDirection: StockDirection
+  val changeTodayDisplayString: String
+  // Used in PortfolioStockList
   internal val todayChangeNumber: Double?
+  // Used in PortfolioStockList
   internal val todayNumber: Double?
+
+  val totalDirection: StockDirection
+  val totalShares: StockShareValue
+  val totalGainLossDisplayString: String
+  val totalGainLossAmount: String
+  val totalGainLossPercent: String
+
 
   init {
     val optionsModifier = if (isOption) 100 else 1
-    val sellSideModifier = if (holding.side == TradeSide.SELL) -1 else 1
+    val sellSideModifier = if (isSell) -1 else 1
 
     val isNoPosition = positions.isEmpty()
 
@@ -84,15 +87,18 @@ internal constructor(
     if (isNoPosition) {
       tempTodayChange = NO_POSITION
       tempTodayNumber = NO_POSITION
+      todayPercent = NO_POSITION
     } else {
       val q = ticker?.quote
       if (q == null) {
         tempTodayChange = NO_POSITION
         tempTodayNumber = NO_POSITION
+        todayPercent = NO_POSITION
       } else {
-        val reg = q.regular
-        tempTodayChange = reg.amount.value * totalSharesNumber
-        tempTodayNumber = reg.price.value * totalSharesNumber
+        val session = q.currentSession
+        tempTodayChange = session.amount.value * totalSharesNumber
+        tempTodayNumber = session.price.value * totalSharesNumber
+        todayPercent = session.percent.value
       }
     }
 
@@ -133,9 +139,9 @@ internal constructor(
     }
 
     val sign = totalDirection.sign
-    gainLossAmount = "${sign}${totalGainLoss.display}"
-    gainLossPercent = "${sign}${totalGainLossPercent.display}"
-    gainLossDisplayString = "$gainLossAmount ($gainLossPercent)"
+    totalGainLossAmount = "${sign}${totalGainLoss.display}"
+    this.totalGainLossPercent = "${sign}${totalGainLossPercent.display}"
+    totalGainLossDisplayString = "$totalGainLossAmount (${this.totalGainLossPercent})"
 
     val todayChange =
         if (isNoTodayChange) StockMoneyValue.NONE

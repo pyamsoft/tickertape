@@ -8,12 +8,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.quote.CRYPTO_LIMIT_PERCENT
+import com.pyamsoft.tickertape.quote.OPTIONS_LIMIT_PERCENT
+import com.pyamsoft.tickertape.quote.QUOTE_DEFAULT_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForQuote
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -25,6 +31,19 @@ fun WatchlistItem(
     onDelete: (Ticker) -> Unit,
 ) {
   val quote = ticker.quote
+  val limitPercent =
+      remember(quote) {
+        val type = quote?.type
+        if (type == null) {
+          QUOTE_DEFAULT_LIMIT_PERCENT
+        } else {
+          when (type) {
+            EquityType.STOCK -> QUOTE_DEFAULT_LIMIT_PERCENT
+            EquityType.OPTION -> OPTIONS_LIMIT_PERCENT
+            EquityType.CRYPTOCURRENCY -> CRYPTO_LIMIT_PERCENT
+          }
+        }
+      }
 
   Box(
       modifier = modifier,
@@ -32,6 +51,11 @@ fun WatchlistItem(
     Quote(
         modifier = Modifier.fillMaxWidth(),
         ticker = ticker,
+        backgroundColor =
+            rememberCardBackgroundColorForQuote(
+                quote = quote,
+                changeLimit = limitPercent,
+            ),
         onClick = onSelect,
         onLongClick = onDelete,
     ) {

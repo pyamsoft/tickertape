@@ -47,7 +47,7 @@ internal constructor(
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { interactor.getPortfolio(it) }
 
-  private val searchRunner =
+  private val portfolioGenerator =
       highlander<PortfolioListGenerateResult, PortfolioViewState, List<PortfolioStock>> {
           state,
           tickers ->
@@ -136,7 +136,7 @@ internal constructor(
     scope.launch(context = Dispatchers.Default) {
       // Cancel any old processing
       try {
-        val result = searchRunner.call(state, stocks())
+        val result = portfolioGenerator.call(state, stocks())
         self.fullPortfolio = result.all
         self.portfolio = result.portfolio
         self.stocks = result.visible

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
@@ -18,6 +19,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @Composable
 @JvmOverloads

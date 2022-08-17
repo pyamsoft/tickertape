@@ -96,6 +96,7 @@ private fun RecommendationItem(
     ) {
       TickerName(
           modifier = Modifier.fillMaxWidth(),
+          symbol = recommendation.symbol,
           ticker = recommendation,
           size = TickerSize.QUOTE,
       )

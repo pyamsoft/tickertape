@@ -12,20 +12,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @JvmOverloads
 fun TickerName(
     modifier: Modifier = Modifier,
-    ticker: Ticker,
+    symbol: StockSymbol,
+    ticker: Ticker?,
     size: TickerSize,
 ) {
-
-  val symbol = ticker.symbol
-  val quote = ticker.quote
+  val quote = ticker?.quote
   val typography = MaterialTheme.typography
-    val contentColor = LocalContentColor.current
+  val contentColor = LocalContentColor.current
 
   val sizes =
       remember(size, typography, contentColor) {
@@ -62,6 +62,7 @@ private fun PreviewTickerName() {
   val symbol = "MSFT".asSymbol()
   Surface {
     TickerName(
+        symbol = symbol,
         ticker =
             Ticker(
                 symbol = symbol,

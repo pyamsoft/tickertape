@@ -18,17 +18,17 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.MarketState
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @JvmOverloads
 fun TickerPrice(
     modifier: Modifier = Modifier,
-    ticker: Ticker,
+    ticker: Ticker?,
     size: TickerSize,
 ) {
-  val quote = ticker.quote
-
+  val quote = ticker?.quote
   if (quote != null) {
     val typography = MaterialTheme.typography
     val colors = MaterialTheme.colors

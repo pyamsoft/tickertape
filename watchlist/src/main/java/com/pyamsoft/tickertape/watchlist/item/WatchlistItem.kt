@@ -50,14 +50,15 @@ fun WatchlistItem(
   ) {
     Quote(
         modifier = Modifier.fillMaxWidth(),
+        symbol = ticker.symbol,
         ticker = ticker,
         backgroundColor =
             rememberCardBackgroundColorForQuote(
                 quote = quote,
                 changeLimit = limitPercent,
             ),
-        onClick = onSelect,
-        onLongClick = onDelete,
+        onClick = { onSelect(ticker) },
+        onLongClick = { onDelete(ticker) },
     ) {
       if (quote != null) {
         Column(

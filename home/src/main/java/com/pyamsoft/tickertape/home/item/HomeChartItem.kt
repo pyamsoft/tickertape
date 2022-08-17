@@ -52,6 +52,7 @@ internal fun HomeChartItem(
     ) {
       TickerName(
           modifier = Modifier.weight(1F),
+          symbol = ticker.symbol,
           ticker = ticker,
           size = TickerSize.CHART,
       )

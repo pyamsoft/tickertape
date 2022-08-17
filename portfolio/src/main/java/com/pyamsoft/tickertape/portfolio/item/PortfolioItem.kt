@@ -30,14 +30,13 @@ internal fun PortfolioItem(
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
 ) {
-  val ticker = stock.ticker
   val totalDirection = stock.totalDirection
   val isOption = stock.isOption
 
   // Color the portfolio card based on the percent move today
   // If this is a sell side position, we flip the percentage direction
   val percentChange = remember(stock) { stock.todayPercent * if (stock.isSell) -1 else 1 }
-    // Decide limits based on equity type
+  // Decide limits based on equity type
   val limitPercent =
       remember(stock) {
         when (stock.holding.type) {
@@ -56,31 +55,33 @@ internal fun PortfolioItem(
         }
       }
 
-  if (ticker != null) {
-    Quote(
-        modifier = modifier.fillMaxWidth(),
-        ticker = ticker,
-        backgroundColor =
-            rememberCardBackgroundColorForPercentChange(
-                percentChange = percentChange,
-                changeLimit = limitPercent,
-            ),
-        onClick = { onSelect(stock) },
-        onLongClick = { onDelete(stock) },
+  Quote(
+      modifier = modifier.fillMaxWidth(),
+      symbol = stock.holding.symbol,
+      ticker = stock.ticker,
+      backgroundColor =
+          rememberCardBackgroundColorForPercentChange(
+              percentChange = percentChange,
+              changeLimit = limitPercent,
+          ),
+      onClick = { onSelect(stock) },
+      onLongClick = { onDelete(stock) },
+  ) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
     ) {
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
-      ) {
-        Info(
-            name = if (isOption) "Contracts" else "Shares",
-            value = stock.totalShares.display,
-        )
+      Info(
+          name = if (isOption) "Contracts" else "Shares",
+          value = stock.totalShares.display,
+      )
 
-        Info(
-            name = "Value",
-            value = stock.current.display,
-        )
+      Info(
+          name = "Value",
+          value = stock.current.display,
+      )
 
+        // These are only valid if we have current day quotes
+      if (stock.ticker != null) {
         Info(
             name = "Change Today",
             value = stock.changeTodayDisplayString,

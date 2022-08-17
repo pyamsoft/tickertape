@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
@@ -113,10 +114,11 @@ private object QuoteScopeInstance : QuoteScope {
 @OptIn(ExperimentalFoundationApi::class)
 fun Quote(
     modifier: Modifier = Modifier,
-    ticker: Ticker,
+    symbol: StockSymbol,
+    ticker: Ticker?,
     backgroundColor: Color,
-    onClick: (Ticker) -> Unit,
-    onLongClick: (Ticker) -> Unit,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     content: @Composable QuoteScope.() -> Unit = {},
 ) {
   Card(
@@ -128,13 +130,14 @@ fun Quote(
     Column(
         modifier =
             Modifier.combinedClickable(
-                    onClick = { onClick(ticker) },
-                    onLongClick = { onLongClick(ticker) },
+                    onClick = onClick,
+                    onLongClick = onLongClick,
                 )
                 .padding(MaterialTheme.keylines.baseline)
                 .fillMaxWidth(),
     ) {
       TickerName(
+          symbol = symbol,
           ticker = ticker,
           size = TickerSize.QUOTE,
       )
@@ -145,7 +148,9 @@ fun Quote(
       ) {
         Column(
             modifier = Modifier.weight(1F),
-        ) { QuoteScopeInstance.content() }
+        ) {
+          QuoteScopeInstance.content()
+        }
 
         TickerPrice(
             ticker = ticker,
@@ -165,6 +170,7 @@ private fun PreviewQuote() {
       Quote(
           modifier = Modifier.padding(16.dp),
           backgroundColor = Color.Unspecified,
+          symbol = symbol,
           ticker =
               Ticker(
                   symbol = symbol,

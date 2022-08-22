@@ -59,26 +59,19 @@ internal constructor(
     @StockApi private val recommendationSource: RecommendationSource,
 ) : StockInteractor {
 
-  override suspend fun getRecommendations(
-      force: Boolean,
-      symbol: StockSymbol
-  ): StockRecommendations =
+  override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext recommendationSource.getRecommendations(force, symbol)
+        return@withContext recommendationSource.getRecommendations(symbol)
       }
 
-  override suspend fun getKeyStatistics(
-      force: Boolean,
-      symbols: List<StockSymbol>
-  ): List<KeyStatistics> =
+  override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext keyStatisticSource.getKeyStatistics(force, symbols)
+        return@withContext keyStatisticSource.getKeyStatistics(symbols)
       }
 
   override suspend fun search(
-      force: Boolean,
       query: String,
   ): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
@@ -89,44 +82,43 @@ internal constructor(
         // TODO Add variable? Do we ever need to search immediately?
         delay(300L)
 
-        return@withContext searchSource.search(force, query)
+        return@withContext searchSource.search(query)
       }
 
   override suspend fun getOptions(
-      force: Boolean,
       symbols: List<StockSymbol>,
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext optionsSource.getOptions(force, symbols)
+        return@withContext optionsSource.getOptions(symbols)
       }
 
-  override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
+  override suspend fun getTrending(count: Int): StockTrends =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext topSource.getTrending(force, count)
+        return@withContext topSource.getTrending(count)
       }
 
-  override suspend fun getScreener(force: Boolean, screener: StockScreener, count: Int): StockTops =
+  override suspend fun getScreener(screener: StockScreener, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext topSource.getScreener(force, screener, count)
+        return@withContext topSource.getScreener(screener, count)
       }
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
+  override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext quoteSource.getQuotes(force, symbols)
+        return@withContext quoteSource.getQuotes(symbols)
       }
 
   override suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext chartSource.getCharts(force, symbols, range)
+        return@withContext chartSource
+            .getCharts(symbols, range)
             // Remove any duplicated symbols, we expect only one
             .distinctBy { it.symbol }
       }
@@ -148,9 +140,9 @@ internal constructor(
         )
       }
 
-  override suspend fun getNews(force: Boolean, symbols: List<StockSymbol>): List<StockNews> =
+  override suspend fun getNews(symbols: List<StockSymbol>): List<StockNews> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext newsSource.getNews(force, symbols)
+        return@withContext newsSource.getNews(symbols)
       }
 }

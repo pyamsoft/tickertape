@@ -39,10 +39,17 @@ class WatchlistViewModeler
 internal constructor(
     private val state: MutableWatchlistViewState,
     private val interactor: WatchlistInteractor,
+    private val interactorCache: WatchlistInteractor.Cache,
 ) : AbstractViewModeler<WatchlistViewState>(state) {
 
   private val quoteFetcher =
-      highlander<ResultWrapper<List<Ticker>>, Boolean> { interactor.getQuotes(it) }
+      highlander<ResultWrapper<List<Ticker>>, Boolean> { force ->
+        if (force) {
+          interactorCache.invalidateQuotes()
+        }
+
+        return@highlander interactor.getQuotes()
+      }
 
   private val watchlistGenerator =
       highlander<ListGenerateResult<Ticker>, WatchlistViewState, List<Ticker>> { state, tickers ->

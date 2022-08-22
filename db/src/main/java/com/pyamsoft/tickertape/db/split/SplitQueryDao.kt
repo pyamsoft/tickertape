@@ -18,4 +18,7 @@ package com.pyamsoft.tickertape.db.split
 
 import com.pyamsoft.tickertape.db.DbQuery
 
-interface SplitQueryDao : DbQuery<DbSplit>
+interface SplitQueryDao : DbQuery<DbSplit> {
+
+  interface Cache : DbQuery.Cache
+}

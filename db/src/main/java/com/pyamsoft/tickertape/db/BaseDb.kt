@@ -23,7 +23,7 @@ interface BaseDb<
     Q : DbQuery<*>,
     I : DbInsert<*>,
     D : DbDelete<*>,
-> : DbCache {
+> {
 
   @get:CheckResult val realtime: R
 

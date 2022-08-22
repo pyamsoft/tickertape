@@ -26,14 +26,12 @@ interface TickerInteractor {
 
   @CheckResult
   suspend fun getQuotes(
-      force: Boolean,
       symbols: List<StockSymbol>,
       options: Options?,
   ): ResultWrapper<List<Ticker>>
 
   @CheckResult
   suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
       options: Options?,
@@ -42,17 +40,29 @@ interface TickerInteractor {
   data class Options(
       val notifyBigMovers: Boolean,
   )
+
+  interface Cache {
+
+    suspend fun invalidateAllQuotes()
+
+    suspend fun invalidateQuotes(symbols: List<StockSymbol>)
+
+    suspend fun invalidateAllCharts()
+
+    suspend fun invalidateCharts(
+        symbols: List<StockSymbol>,
+        range: StockChart.IntervalRange,
+    )
+  }
 }
 
 @CheckResult
 suspend fun TickerInteractor.getWatchListQuotes(
-    force: Boolean,
     dao: SymbolQueryDao,
     options: TickerInteractor.Options?,
 ): ResultWrapper<List<Ticker>> {
-  val watchList = dao.query(force).map { it.symbol }
+  val watchList = dao.query().map { it.symbol }
   return this.getQuotes(
-      force,
       watchList,
       options,
   )

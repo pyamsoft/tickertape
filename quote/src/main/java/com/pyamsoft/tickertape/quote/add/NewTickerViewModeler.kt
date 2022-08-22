@@ -42,23 +42,25 @@ class NewTickerViewModeler
 internal constructor(
     private val state: MutableNewTickerViewState,
     interactor: NewTickerInteractor,
+    interactorCache: NewTickerInteractor.Cache,
     destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
   private val tickerResolutionRunner =
       highlander<ResultWrapper<Ticker>, Boolean, String> { force, query ->
-        interactor.resolveTicker(
-            force = force,
-            symbol = query.asSymbol(),
-        )
+        val symbol = query.asSymbol()
+        if (force) {
+          interactorCache.invalidateTicker(symbol)
+        }
+        return@highlander interactor.resolveTicker(symbol)
       }
 
   private val optionLookupRunner =
       highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
-        interactor.lookupOptionsData(
-            force = force,
-            symbol = symbol,
-        )
+        if (force) {
+          interactorCache.invalidateOptionsData(symbol)
+        }
+        return@highlander interactor.lookupOptionsData(symbol)
       }
 
   private val optionResolverRunner =
@@ -88,7 +90,11 @@ internal constructor(
 
   private val symbolLookupRunner =
       highlander<ResultWrapper<List<SearchResult>>, Boolean, String> { force, query ->
-        interactor.search(force, query)
+        if (force) {
+          interactorCache.invalidateSearch(query)
+        }
+
+        return@highlander interactor.search(query)
       }
 
   private fun performSymbolResolution(
@@ -153,13 +159,14 @@ internal constructor(
           }
           .onSuccess { r ->
             // Auto select a matching symbol if one is exact
-            r.firstOrNull { it.symbol == symbol.asSymbol() }?.also { result ->
-              onSearchResultSelected(
-                  scope = scope,
-                  symbol = result.symbol,
-                  dismiss = false,
-              )
-            }
+            r.firstOrNull { it.symbol == symbol.asSymbol() }
+                ?.also { result ->
+                  onSearchResultSelected(
+                      scope = scope,
+                      symbol = result.symbol,
+                      dismiss = false,
+                  )
+                }
           }
           .onFailure { e ->
             s.apply {

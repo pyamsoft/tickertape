@@ -20,5 +20,10 @@ import androidx.annotation.CheckResult
 
 interface DbQuery<T : Any> {
 
-  @CheckResult suspend fun query(force: Boolean): List<T>
+  @CheckResult suspend fun query(): List<T>
+
+  interface Cache {
+
+    suspend fun invalidate()
+  }
 }

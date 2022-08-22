@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
 
-  override suspend fun query(force: Boolean): List<DbHolding> =
+  override suspend fun query(): List<DbHolding> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult

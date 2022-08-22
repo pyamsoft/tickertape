@@ -25,14 +25,16 @@ internal interface HomeInteractor {
 
   @CheckResult
   suspend fun getScreener(
-      force: Boolean,
       screener: StockScreener,
       count: Int,
   ): ResultWrapper<List<Ticker>>
 
-  @CheckResult
-  suspend fun getTrending(
-      force: Boolean,
-      count: Int,
-  ): ResultWrapper<List<Ticker>>
+  @CheckResult suspend fun getTrending(count: Int): ResultWrapper<List<Ticker>>
+
+  interface Cache {
+
+    suspend fun invalidateScreener(screener: StockScreener)
+
+    suspend fun invalidateTrending()
+  }
 }

@@ -25,9 +25,10 @@ interface WatchlistDigInteractor : DigInteractor {
 
   @CheckResult suspend fun modifyWatchlist(symbol: StockSymbol): ResultWrapper<Boolean>
 
-  @CheckResult
-  suspend fun isInWatchlist(
-      symbol: StockSymbol,
-      force: Boolean,
-  ): ResultWrapper<Boolean>
+  @CheckResult suspend fun isInWatchlist(symbol: StockSymbol): ResultWrapper<Boolean>
+
+  interface Cache : DigInteractor.Cache {
+
+    suspend fun invalidateIsInWatchlist()
+  }
 }

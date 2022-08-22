@@ -25,14 +25,9 @@ interface TopSource {
 
   @CheckResult
   suspend fun getScreener(
-      force: Boolean,
       screener: StockScreener,
       count: Int,
   ): StockTops
 
-  @CheckResult
-  suspend fun getTrending(
-      force: Boolean,
-      count: Int,
-  ): StockTrends
+  @CheckResult suspend fun getTrending(count: Int): StockTrends
 }

@@ -24,11 +24,7 @@ import java.time.LocalDate
 
 interface OptionsSource {
 
-  @CheckResult
-  suspend fun getOptions(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions>
+  @CheckResult suspend fun getOptions(symbols: List<StockSymbol>): List<StockOptions>
 
   @CheckResult
   suspend fun resolveOptionLookupIdentifier(

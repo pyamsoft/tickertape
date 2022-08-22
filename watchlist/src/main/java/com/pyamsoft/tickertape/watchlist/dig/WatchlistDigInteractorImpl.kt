@@ -41,28 +41,45 @@ internal class WatchlistDigInteractorImpl
 @Inject
 internal constructor(
     interactor: TickerInteractor,
+    interactorCache: TickerInteractor.Cache,
     stockInteractor: StockInteractor,
+    stockInteractorCache: StockInteractor.Cache,
     private val symbolQueryDao: SymbolQueryDao,
+    private val symbolQueryDaoCache: SymbolQueryDao.Cache,
     private val symbolDeleteDao: SymbolDeleteDao,
     private val symbolInsertDao: SymbolInsertDao,
-) : DigInteractorImpl(interactor, stockInteractor), WatchlistDigInteractor {
+) :
+    WatchlistDigInteractor,
+    WatchlistDigInteractor.Cache,
+    DigInteractorImpl(
+        interactor,
+        interactorCache,
+        stockInteractor,
+        stockInteractorCache,
+    ) {
 
   @CheckResult
-  private suspend fun getExistingSymbol(force: Boolean, symbol: StockSymbol): DbSymbol? {
-    return symbolQueryDao.query(force).firstOrNull { it.symbol == symbol }
+  private suspend fun getExistingSymbol(symbol: StockSymbol): DbSymbol? {
+    return symbolQueryDao.query().firstOrNull { it.symbol == symbol }
   }
 
-  override suspend fun isInWatchlist(symbol: StockSymbol, force: Boolean): ResultWrapper<Boolean> =
+  override suspend fun isInWatchlist(symbol: StockSymbol): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          ResultWrapper.success(getExistingSymbol(force, symbol) != null)
+          ResultWrapper.success(getExistingSymbol(symbol) != null)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error checking if symbol in watchlist: $symbol")
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun invalidateIsInWatchlist() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        symbolQueryDaoCache.invalidate()
       }
 
   /**
@@ -78,7 +95,8 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val existingSymbol = getExistingSymbol(force = true, symbol)
+        invalidateIsInWatchlist()
+        val existingSymbol = getExistingSymbol(symbol)
         return@withContext try {
           if (existingSymbol == null) {
             Timber.d("Insert symbol into watchlist: $symbol")

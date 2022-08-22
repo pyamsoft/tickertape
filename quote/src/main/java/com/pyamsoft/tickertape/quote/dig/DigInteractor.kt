@@ -27,35 +27,35 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface DigInteractor {
 
-  @CheckResult
-  suspend fun getStatistics(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<KeyStatistics>
+  @CheckResult suspend fun getStatistics(symbol: StockSymbol): ResultWrapper<KeyStatistics>
 
   @CheckResult
-  suspend fun getRecommendations(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<StockRecommendations>
+  suspend fun getRecommendations(symbol: StockSymbol): ResultWrapper<StockRecommendations>
 
-  @CheckResult
-  suspend fun getNews(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<List<StockNews>>
+  @CheckResult suspend fun getNews(symbol: StockSymbol): ResultWrapper<List<StockNews>>
 
   @CheckResult
   suspend fun getChart(
-      force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
   ): ResultWrapper<Ticker>
 
   @CheckResult
   suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): ResultWrapper<List<Ticker>>
+
+  interface Cache {
+
+    suspend fun invalidateStatistics(symbol: StockSymbol)
+
+    suspend fun invalidateRecommendations(symbol: StockSymbol)
+
+    suspend fun invalidateNews(symbol: StockSymbol)
+
+    suspend fun invalidateChart(symbol: StockSymbol, range: StockChart.IntervalRange)
+
+    suspend fun invalidateCharts(symbols: List<StockSymbol>, range: StockChart.IntervalRange)
+  }
 }

@@ -31,7 +31,9 @@ internal class BigMoverRunner
 @Inject
 internal constructor(
     private val symbolQueryDao: SymbolQueryDao,
+    private val symbolQueryDaoCache: SymbolQueryDao.Cache,
     private val stockInteractor: StockInteractor,
+    private val stockInteractorCache: StockInteractor.Cache,
     private val standalone: BigMoverStandalone,
 ) : BaseRunner<BigMoverParameters>() {
 
@@ -40,7 +42,12 @@ internal constructor(
     try {
       // Don't use TickerInteractor here since this is imported in TickerInteractor, which would
       // make a circular dependency
-      val quotes = stockInteractor.getWatchListQuotes(force, symbolQueryDao)
+      if (force) {
+        symbolQueryDaoCache.invalidate()
+        stockInteractorCache.invalidateAllQuotes()
+      }
+
+      val quotes = stockInteractor.getWatchListQuotes(symbolQueryDao)
       standalone.notifyForBigMovers(quotes)
     } catch (e: Throwable) {
       Timber.e(e, "Error getting watchlist quotes for big movers")

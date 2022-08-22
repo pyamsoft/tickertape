@@ -24,4 +24,10 @@ import dagger.Module
 abstract class HomeModule {
 
   @Binds @CheckResult internal abstract fun bindInteractor(impl: HomeInteractorImpl): HomeInteractor
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindInteractorCache(
+      impl: HomeInteractorImpl,
+  ): HomeInteractor.Cache
 }

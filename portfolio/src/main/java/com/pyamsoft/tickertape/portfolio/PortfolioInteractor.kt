@@ -31,7 +31,13 @@ interface PortfolioInteractor {
 
   suspend fun listenForSplitChanges(onChange: (event: SplitChangeEvent) -> Unit)
 
-  @CheckResult suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>>
+  @CheckResult suspend fun getPortfolio(): ResultWrapper<List<PortfolioStock>>
 
   @CheckResult suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean>
+
+  interface Cache {
+
+    suspend fun invalidatePortfolio()
+
+  }
 }

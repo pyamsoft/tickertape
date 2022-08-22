@@ -19,8 +19,13 @@ package com.pyamsoft.tickertape.db.symbol
 import com.pyamsoft.tickertape.db.BaseDb
 
 interface SymbolDb :
-    BaseDb<SymbolRealtime, SymbolQueryDao, SymbolInsertDao, SymbolDeleteDao>,
     SymbolRealtime,
     SymbolQueryDao,
     SymbolInsertDao,
-    SymbolDeleteDao
+    SymbolDeleteDao,
+    BaseDb<
+        SymbolRealtime,
+        SymbolQueryDao,
+        SymbolInsertDao,
+        SymbolDeleteDao,
+    >

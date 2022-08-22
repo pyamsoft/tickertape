@@ -40,7 +40,6 @@ internal class YahooChartSource
 internal constructor(@YahooApi private val service: ChartService) : ChartSource {
 
   override suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart> =

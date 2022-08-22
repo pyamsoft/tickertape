@@ -57,6 +57,8 @@ import javax.inject.Qualifier
 @Module
 abstract class DbModule {
 
+  // DB
+
   @Binds @CheckResult internal abstract fun provideSymbolDbImpl(impl: SymbolDbImpl): SymbolDb
 
   @Binds @CheckResult internal abstract fun provideHoldingDbImpl(impl: HoldingDbImpl): HoldingDb
@@ -66,6 +68,28 @@ abstract class DbModule {
   @Binds @CheckResult internal abstract fun provideBigMoverDbImpl(impl: BigMoverDbImpl): BigMoverDb
 
   @Binds @CheckResult internal abstract fun provideSplitDbImpl(impl: SplitDbImpl): SplitDb
+
+  // Caches
+
+  @Binds
+  @CheckResult
+  internal abstract fun provideSymbolCache(impl: SymbolDbImpl): SymbolQueryDao.Cache
+
+  @Binds
+  @CheckResult
+  internal abstract fun provideHoldingCache(impl: HoldingDbImpl): HoldingQueryDao.Cache
+
+  @Binds
+  @CheckResult
+  internal abstract fun providePositionCache(impl: PositionDbImpl): PositionQueryDao.Cache
+
+  @Binds
+  @CheckResult
+  internal abstract fun provideBigMoverCache(impl: BigMoverDbImpl): BigMoverQueryDao.Cache
+
+  @Binds
+  @CheckResult
+  internal abstract fun provideSplitCache(impl: SplitDbImpl): SplitQueryDao.Cache
 
   @Module
   companion object {

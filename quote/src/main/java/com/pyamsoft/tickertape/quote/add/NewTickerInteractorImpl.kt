@@ -47,23 +47,22 @@ import timber.log.Timber
 internal class NewTickerInteractorImpl
 @Inject
 internal constructor(
-    private val tickerInteractor: TickerInteractor,
-    private val stockInteractor: StockInteractor,
     private val symbolQueryDao: SymbolQueryDao,
     private val symbolInsertDao: SymbolInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingInsertDao: HoldingInsertDao,
-) : NewTickerInteractor {
+    private val stockInteractor: StockInteractor,
+    private val stockInteractorCache: StockInteractor.Cache,
+    private val tickerInteractor: TickerInteractor,
+    private val tickerInteractorCache: TickerInteractor.Cache,
+) : NewTickerInteractor, NewTickerInteractor.Cache {
 
-  override suspend fun resolveTicker(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<Ticker> =
+  override suspend fun resolveTicker(symbol: StockSymbol): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          tickerInteractor.getQuotes(
-                  force,
+          tickerInteractor
+              .getQuotes(
                   listOf(symbol),
                   options = TICKER_OPTIONS,
               )
@@ -77,12 +76,19 @@ internal constructor(
         }
       }
 
-  override suspend fun search(force: Boolean, query: String): ResultWrapper<List<SearchResult>> =
+  override suspend fun invalidateTicker(symbol: StockSymbol) {
+    withContext(context = Dispatchers.IO) {
+      Enforcer.assertOffMainThread()
+      tickerInteractorCache.invalidateQuotes(listOf(symbol))
+    }
+  }
+
+  override suspend fun search(query: String): ResultWrapper<List<SearchResult>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val results = stockInteractor.search(force, query)
+          val results = stockInteractor.search(query)
           ResultWrapper.success(results)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -90,6 +96,12 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun invalidateSearch(query: String) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateSearch(query)
       }
 
   @CheckResult
@@ -112,9 +124,9 @@ internal constructor(
 
   @CheckResult
   private suspend fun handleInsertWatchlist(
-      symbol: StockSymbol
+      symbol: StockSymbol,
   ): DbInsert.InsertResult<StockSymbol> {
-    val existing = symbolQueryDao.query(false).firstOrNull { it.symbol == symbol }
+    val existing = symbolQueryDao.query().firstOrNull { it.symbol == symbol }
     return if (existing == null) {
       val model = JsonMappableDbSymbol.create(symbol)
       val result = symbolInsertDao.insert(model)
@@ -135,7 +147,7 @@ internal constructor(
       tradeSide: TradeSide,
   ): DbInsert.InsertResult<StockSymbol> {
     val existing =
-        holdingQueryDao.query(false).firstOrNull { it.symbol == symbol && it.side == tradeSide }
+        holdingQueryDao.query().firstOrNull { it.symbol == symbol && it.side == tradeSide }
     return if (existing == null) {
       val model =
           JsonMappableDbHolding.create(
@@ -178,15 +190,12 @@ internal constructor(
         }
       }
 
-  override suspend fun lookupOptionsData(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<StockOptions> =
+  override suspend fun lookupOptionsData(symbol: StockSymbol): ResultWrapper<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val options = stockInteractor.getOptions(force, listOf(symbol))
+          val options = stockInteractor.getOptions(listOf(symbol))
           // Right now we only support 1 lookup at a time in the UI
           val result = options.first()
           ResultWrapper.success(result)
@@ -196,6 +205,12 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun invalidateOptionsData(symbol: StockSymbol) =
+      withContext(context = Dispatchers.Default) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateQuotes(listOf(symbol))
       }
 
   override suspend fun resolveOptionsIdentifier(

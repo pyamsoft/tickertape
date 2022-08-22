@@ -40,7 +40,6 @@ internal abstract class BaseDbImpl<
   protected suspend fun publish(event: ChangeEvent) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        invalidate()
         bus.send(event)
       }
 }

@@ -38,23 +38,25 @@ internal class HomeInteractorImpl
 internal constructor(
     private val tickerInteractor: TickerInteractor,
     private val stockInteractor: StockInteractor,
-) : HomeInteractor {
+    private val stockInteractorCache: StockInteractor.Cache,
+) : HomeInteractor, HomeInteractor.Cache {
 
   @CheckResult
-  private suspend fun lookupCharts(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): ResultWrapper<List<Ticker>> {
+  private suspend fun lookupCharts(symbols: List<StockSymbol>): ResultWrapper<List<Ticker>> {
     return tickerInteractor.getCharts(
-        force,
         symbols,
-        StockChart.IntervalRange.ONE_DAY,
+        CHART_DATE_RANGE,
         options = null,
     )
   }
 
+  override suspend fun invalidateScreener(screener: StockScreener) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateScreener(screener)
+      }
+
   override suspend fun getScreener(
-      force: Boolean,
       screener: StockScreener,
       count: Int
   ): ResultWrapper<List<Ticker>> =
@@ -62,8 +64,8 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val top = stockInteractor.getScreener(force, screener, count)
-          lookupCharts(force, top.quotes.map { it.symbol })
+          val top = stockInteractor.getScreener(screener, count)
+          lookupCharts(top.quotes.map { it.symbol })
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting screener: $screener")
@@ -74,15 +76,14 @@ internal constructor(
 
   @CheckResult
   override suspend fun getTrending(
-      force: Boolean,
       count: Int,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val trend = stockInteractor.getTrending(force, count)
-          lookupCharts(force, trend.symbols)
+          val trend = stockInteractor.getTrending(count)
+          lookupCharts(trend.symbols)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting day trending")
@@ -90,4 +91,15 @@ internal constructor(
           }
         }
       }
+
+  override suspend fun invalidateTrending() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateTrending()
+      }
+
+  companion object {
+
+    private val CHART_DATE_RANGE = StockChart.IntervalRange.ONE_DAY
+  }
 }

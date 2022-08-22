@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import androidx.room.Room
 import com.pyamsoft.tickertape.db.DbApi
-import com.pyamsoft.tickertape.db.DbCache
 import com.pyamsoft.tickertape.db.TickerDb
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
@@ -48,8 +47,6 @@ import javax.inject.Qualifier
 abstract class RoomModule {
 
   @Binds @CheckResult internal abstract fun provideDb(impl: TickerDbImpl): TickerDb
-
-  @Binds @CheckResult internal abstract fun provideDbCache(impl: TickerDbImpl): DbCache
 
   @Module
   companion object {

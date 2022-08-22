@@ -34,21 +34,18 @@ import timber.log.Timber
 abstract class DigInteractorImpl
 protected constructor(
     private val interactor: TickerInteractor,
+    private val interactorCache: TickerInteractor.Cache,
     private val stockInteractor: StockInteractor,
-) : DigInteractor {
+    private val stockInteractorCache: StockInteractor.Cache,
+) : DigInteractor, DigInteractor.Cache {
 
   final override suspend fun getRecommendations(
-      force: Boolean,
-      symbol: StockSymbol,
+      symbol: StockSymbol
   ): ResultWrapper<StockRecommendations> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
-          ResultWrapper.success(
-              stockInteractor.getRecommendations(
-                  force = force,
-                  symbol = symbol,
-              ))
+          ResultWrapper.success(stockInteractor.getRecommendations(symbol))
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting recommendations: ${symbol.raw}")
@@ -57,18 +54,18 @@ protected constructor(
         }
       }
 
-  final override suspend fun getStatistics(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): ResultWrapper<KeyStatistics> =
+  final override suspend fun invalidateRecommendations(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateRecommendations(symbol)
+      }
+
+  final override suspend fun getStatistics(symbol: StockSymbol): ResultWrapper<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
           ResultWrapper.success(
-                  stockInteractor.getKeyStatistics(
-                      force = force,
-                      symbols = listOf(symbol),
-                  ),
+                  stockInteractor.getKeyStatistics(listOf(symbol)),
               )
               // Only pick out the single quote
               .map { list -> list.first { it.symbol == symbol } }
@@ -80,15 +77,21 @@ protected constructor(
         }
       }
 
+  final override suspend fun invalidateStatistics(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateStatistics(listOf(symbol))
+      }
+
   final override suspend fun getNews(
-      force: Boolean,
       symbol: StockSymbol,
   ): ResultWrapper<List<StockNews>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
           ResultWrapper.success(
-              stockInteractor.getNews(force, listOf(symbol))
+              stockInteractor
+                  .getNews(listOf(symbol))
                   // Just make sure we are only returning news related to this symbol
                   .filter { it.symbol == symbol },
           )
@@ -100,8 +103,13 @@ protected constructor(
         }
       }
 
+  final override suspend fun invalidateNews(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockInteractorCache.invalidateNews(listOf(symbol))
+      }
+
   final override suspend fun getChart(
-      force: Boolean,
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
   ): ResultWrapper<Ticker> =
@@ -109,7 +117,6 @@ protected constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext getCharts(
-                force = force,
                 symbols = listOf(symbol),
                 range = range,
             )
@@ -117,8 +124,7 @@ protected constructor(
             .map { list -> list.first { it.symbol == symbol } }
       }
 
-  override suspend fun getCharts(
-      force: Boolean,
+  final override suspend fun getCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange
   ): ResultWrapper<List<Ticker>> =
@@ -127,7 +133,6 @@ protected constructor(
 
         return@withContext try {
           interactor.getCharts(
-              force = force,
               symbols = symbols,
               range = range,
               options = null,
@@ -138,5 +143,23 @@ protected constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  final override suspend fun invalidateChart(
+      symbol: StockSymbol,
+      range: StockChart.IntervalRange,
+  ) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        invalidateCharts(listOf(symbol), range)
+      }
+
+  final override suspend fun invalidateCharts(
+      symbols: List<StockSymbol>,
+      range: StockChart.IntervalRange,
+  ) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        interactorCache.invalidateCharts(symbols, range)
       }
 }

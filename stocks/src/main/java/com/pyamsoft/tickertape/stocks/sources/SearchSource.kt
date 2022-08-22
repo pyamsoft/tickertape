@@ -21,9 +21,5 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 
 interface SearchSource {
 
-  @CheckResult
-  suspend fun search(
-      force: Boolean,
-      query: String,
-  ): List<SearchResult>
+  @CheckResult suspend fun search(query: String): List<SearchResult>
 }

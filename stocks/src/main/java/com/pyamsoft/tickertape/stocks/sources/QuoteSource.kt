@@ -22,9 +22,5 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface QuoteSource {
 
-  @CheckResult
-  suspend fun getQuotes(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockQuote>
+  @CheckResult suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote>
 }

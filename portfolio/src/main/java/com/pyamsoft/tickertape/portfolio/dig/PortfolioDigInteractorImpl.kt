@@ -46,15 +46,28 @@ internal class PortfolioDigInteractorImpl
 @Inject
 internal constructor(
     interactor: TickerInteractor,
+    interactorCache: TickerInteractor.Cache,
     stockInteractor: StockInteractor,
+    stockInteractorCache: StockInteractor.Cache,
     private val holdingQueryDao: HoldingQueryDao,
+    private val holdingQueryDaoCache: HoldingQueryDao.Cache,
     private val positionQueryDao: PositionQueryDao,
+    private val positionQueryDaoCache: PositionQueryDao.Cache,
     private val positionRealtime: PositionRealtime,
     private val positionDeleteDao: PositionDeleteDao,
     private val splitQueryDao: SplitQueryDao,
+    private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val splitRealtime: SplitRealtime,
     private val splitDeleteDao: SplitDeleteDao,
-) : DigInteractorImpl(interactor, stockInteractor), PortfolioDigInteractor {
+) :
+    PortfolioDigInteractor,
+    PortfolioDigInteractor.Cache,
+    DigInteractorImpl(
+        interactor,
+        interactorCache,
+        stockInteractor,
+        stockInteractorCache,
+    ) {
 
   override suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
@@ -94,15 +107,12 @@ internal constructor(
         return@withContext positionRealtime.listenForChanges(onEvent)
       }
 
-  override suspend fun getHolding(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<DbHolding> =
+  override suspend fun getHolding(id: DbHolding.Id): ResultWrapper<DbHolding> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val holding = holdingQueryDao.query(force).firstOrNull { it.id == id }
+          val holding = holdingQueryDao.query().firstOrNull { it.id == id }
           ResultWrapper.success(holding.requireNotNull { "Unable to find holding with id: $id" })
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -112,15 +122,18 @@ internal constructor(
         }
       }
 
-  override suspend fun getPositions(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<List<DbPosition>> =
+  override suspend fun invalidateHolding() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        holdingQueryDaoCache.invalidate()
+      }
+
+  override suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val positions = positionQueryDao.query(force).filter { it.holdingId == id }
+          val positions = positionQueryDao.query().filter { it.holdingId == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -130,15 +143,18 @@ internal constructor(
         }
       }
 
-  override suspend fun getSplits(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<List<DbSplit>> =
+  override suspend fun invalidatePositions() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        positionQueryDaoCache.invalidate()
+      }
+
+  override suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val positions = splitQueryDao.query(force).filter { it.holdingId == id }
+          val positions = splitQueryDao.query().filter { it.holdingId == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -146,5 +162,11 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
+      }
+
+  override suspend fun invalidateSplits() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        splitQueryDaoCache.invalidate()
       }
 }

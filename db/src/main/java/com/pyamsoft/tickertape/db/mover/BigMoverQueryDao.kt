@@ -18,4 +18,7 @@ package com.pyamsoft.tickertape.db.mover
 
 import com.pyamsoft.tickertape.db.DbQuery
 
-interface BigMoverQueryDao : DbQuery<BigMoverReport>
+interface BigMoverQueryDao : DbQuery<BigMoverReport> {
+
+  interface Cache : DbQuery.Cache
+}

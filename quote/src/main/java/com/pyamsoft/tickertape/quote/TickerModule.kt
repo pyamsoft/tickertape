@@ -31,5 +31,15 @@ abstract class TickerModule {
 
   @Binds
   @CheckResult
+  internal abstract fun bindNewTickerInteractorCache(
+      impl: NewTickerInteractorImpl,
+  ): NewTickerInteractor.Cache
+
+  @Binds
+  @CheckResult
   internal abstract fun bindInteractor(impl: TickerInteractorImpl): TickerInteractor
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindInteractorCache(impl: TickerInteractorImpl): TickerInteractor.Cache
 }

@@ -42,12 +42,12 @@ class TickerInteractorImpl
 @Inject
 internal constructor(
     private val interactor: StockInteractor,
+    private val interactorCache: StockInteractor.Cache,
     private val bigMoverStandalone: BigMoverStandalone,
-) : TickerInteractor {
+) : TickerInteractor, TickerInteractor.Cache {
 
   @CheckResult
   private suspend fun getTickers(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange?,
       options: TickerInteractor.Options?,
@@ -67,7 +67,7 @@ internal constructor(
                   add(
                       async {
                         try {
-                          interactor.getQuotes(force, symbols)
+                          interactor.getQuotes(symbols)
                         } catch (e: Throwable) {
                           e.ifNotCancellation {
                             Timber.e(e, "Error getting quotes from network: $symbols")
@@ -80,7 +80,7 @@ internal constructor(
                     add(
                         async {
                           try {
-                            interactor.getCharts(force, symbols, range)
+                            interactor.getCharts(symbols, range)
                           } catch (e: Throwable) {
                             e.ifNotCancellation {
                               Timber.e(e, "Error getting charts from network: $symbols")
@@ -140,7 +140,6 @@ internal constructor(
   }
 
   override suspend fun getQuotes(
-      force: Boolean,
       symbols: List<StockSymbol>,
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
@@ -148,16 +147,26 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext getTickers(
-            force = force,
             symbols = symbols,
             range = null,
             options = options,
         )
       }
 
+  override suspend fun invalidateQuotes(symbols: List<StockSymbol>) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        interactorCache.invalidateQuotes(symbols)
+      }
+
+  override suspend fun invalidateAllQuotes() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        interactorCache.invalidateAllQuotes()
+      }
+
   @CheckResult
   override suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
       options: TickerInteractor.Options?,
@@ -166,11 +175,25 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext getTickers(
-            force = force,
             symbols = symbols,
             range = range,
             options = options,
         )
+      }
+
+  override suspend fun invalidateCharts(
+      symbols: List<StockSymbol>,
+      range: StockChart.IntervalRange
+  ) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        interactorCache.invalidateCharts(symbols, range)
+      }
+
+  override suspend fun invalidateAllCharts() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        interactorCache.invalidateAllCharts()
       }
 
   companion object {

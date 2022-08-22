@@ -47,6 +47,15 @@ internal abstract class BaseMemoryCacheImpl<K : Any, V : Any> protected construc
         return@withContext
       }
 
+  suspend fun clear() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        mutex.withLock { cache.clear() }
+
+        return@withContext
+      }
+
   @CheckResult
   suspend inline fun get(
       keys: List<K>,

@@ -18,4 +18,7 @@ package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.tickertape.db.DbQuery
 
-interface SymbolQueryDao : DbQuery<DbSymbol>
+interface SymbolQueryDao : DbQuery<DbSymbol> {
+
+  interface Cache : DbQuery.Cache
+}

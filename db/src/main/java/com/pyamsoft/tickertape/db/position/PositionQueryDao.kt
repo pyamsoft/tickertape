@@ -18,4 +18,7 @@ package com.pyamsoft.tickertape.db.position
 
 import com.pyamsoft.tickertape.db.DbQuery
 
-interface PositionQueryDao : DbQuery<DbPosition>
+interface PositionQueryDao : DbQuery<DbPosition> {
+
+  interface Cache : DbQuery.Cache
+}

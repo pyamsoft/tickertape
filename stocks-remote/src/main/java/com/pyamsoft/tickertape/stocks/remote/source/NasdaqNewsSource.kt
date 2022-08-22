@@ -48,10 +48,7 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
     )
   }
 
-  override suspend fun getNews(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockNews> =
+  override suspend fun getNews(symbols: List<StockSymbol>): List<StockNews> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

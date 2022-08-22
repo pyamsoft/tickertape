@@ -24,7 +24,6 @@ interface ChartSource {
 
   @CheckResult
   suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart>

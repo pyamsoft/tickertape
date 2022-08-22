@@ -22,9 +22,5 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface NewsSource {
 
-  @CheckResult
-  suspend fun getNews(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockNews>
+  @CheckResult suspend fun getNews(symbols: List<StockSymbol>): List<StockNews>
 }

@@ -16,6 +16,9 @@
 
 package com.pyamsoft.tickertape.stocks
 
+import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockScreener
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
@@ -33,4 +36,33 @@ interface StockInteractor :
     SearchSource,
     KeyStatisticSource,
     NewsSource,
-    RecommendationSource
+    RecommendationSource {
+
+  interface Cache {
+
+    suspend fun invalidateSearch(query: String)
+
+    suspend fun invalidateAllQuotes()
+
+    suspend fun invalidateQuotes(symbols: List<StockSymbol>)
+
+    suspend fun invalidateAllCharts()
+
+    suspend fun invalidateCharts(
+        symbols: List<StockSymbol>,
+        range: StockChart.IntervalRange,
+    )
+
+    suspend fun invalidateOptions(symbols: List<StockSymbol>)
+
+    suspend fun invalidateNews(symbols: List<StockSymbol>)
+
+    suspend fun invalidateRecommendations(symbol: StockSymbol)
+
+    suspend fun invalidateScreener(screener: StockScreener)
+
+    suspend fun invalidateStatistics(symbols: List<StockSymbol>)
+
+    suspend fun invalidateTrending()
+  }
+}

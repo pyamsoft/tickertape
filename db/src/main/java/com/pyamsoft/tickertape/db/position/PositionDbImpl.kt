@@ -35,18 +35,20 @@ internal constructor(
     @DbApi private val realInsertDao: PositionInsertDao,
     @DbApi private val realDeleteDao: PositionDeleteDao,
 ) :
+    PositionDb,
+    PositionQueryDao.Cache,
     BaseDbImpl<
         PositionChangeEvent,
         PositionRealtime,
         PositionQueryDao,
         PositionInsertDao,
-        PositionDeleteDao>(),
-    PositionDb {
+        PositionDeleteDao,
+    >() {
 
   private val queryCache =
       cachify<List<DbPosition>> {
         Enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query(true)
+        return@cachify realQueryDao.query()
       }
 
   override val deleteDao: PositionDeleteDao = this
@@ -69,13 +71,9 @@ internal constructor(
         onEvent(onChange)
       }
 
-  override suspend fun query(force: Boolean): List<DbPosition> =
+  override suspend fun query(): List<DbPosition> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        if (force) {
-          invalidate()
-        }
-
         return@withContext queryCache.call()
       }
 
@@ -84,8 +82,14 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            is DbInsert.InsertResult.Insert -> publish(PositionChangeEvent.Insert(result.data))
-            is DbInsert.InsertResult.Update -> publish(PositionChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Insert -> {
+              invalidate()
+              publish(PositionChangeEvent.Insert(result.data))
+            }
+            is DbInsert.InsertResult.Update -> {
+              invalidate()
+              publish(PositionChangeEvent.Update(result.data))
+            }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
@@ -97,6 +101,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
+            invalidate()
             publish(PositionChangeEvent.Delete(o, offerUndo))
           }
         }

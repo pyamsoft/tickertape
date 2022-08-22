@@ -38,10 +38,12 @@ internal class WatchlistInteractorImpl
 @Inject
 internal constructor(
     private val symbolQueryDao: SymbolQueryDao,
+    private val symbolQueryDaoCache: SymbolQueryDao.Cache,
     private val symbolDeleteDao: SymbolDeleteDao,
     private val symbolRealtime: SymbolRealtime,
     private val interactor: TickerInteractor,
-) : WatchlistInteractor {
+    private val interactorCache: TickerInteractor.Cache,
+) : WatchlistInteractor, WatchlistInteractor.Cache {
 
   override suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
@@ -49,14 +51,13 @@ internal constructor(
         return@withContext symbolRealtime.listenForChanges(onChange)
       }
 
-  override suspend fun getQuotes(force: Boolean): ResultWrapper<List<Ticker>> =
+  override suspend fun getQuotes(): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
           interactor
               .getWatchListQuotes(
-                  force,
                   symbolQueryDao,
                   options = TICKER_OPTIONS,
               )
@@ -70,13 +71,22 @@ internal constructor(
         }
       }
 
+  override suspend fun invalidateQuotes() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        symbolQueryDaoCache.invalidate()
+        interactorCache.invalidateAllQuotes()
+      }
+
   override suspend fun removeQuote(symbol: StockSymbol): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
+          // First invalidate
+          invalidateQuotes()
           // TODO move this query into the DAO layer
-          val dbSymbol = symbolQueryDao.query(true).firstOrNull { it.symbol == symbol }
+          val dbSymbol = symbolQueryDao.query().firstOrNull { it.symbol == symbol }
           if (dbSymbol == null) {
             val err = IllegalStateException("Symbol does not exist in DB: $symbol")
             Timber.e(err)

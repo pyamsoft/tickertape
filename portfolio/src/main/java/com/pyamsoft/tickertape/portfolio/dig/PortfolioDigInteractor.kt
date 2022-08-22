@@ -35,21 +35,18 @@ interface PortfolioDigInteractor : DigInteractor {
 
   @CheckResult suspend fun deleteSplit(split: DbSplit): ResultWrapper<Boolean>
 
-  @CheckResult
-  suspend fun getSplits(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<List<DbSplit>>
+  @CheckResult suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>>
 
-  @CheckResult
-  suspend fun getHolding(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<DbHolding>
+  @CheckResult suspend fun getHolding(id: DbHolding.Id): ResultWrapper<DbHolding>
 
-  @CheckResult
-  suspend fun getPositions(
-      force: Boolean,
-      id: DbHolding.Id,
-  ): ResultWrapper<List<DbPosition>>
+  @CheckResult suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>>
+
+  interface Cache : DigInteractor.Cache {
+
+    suspend fun invalidateSplits()
+
+    suspend fun invalidateHolding()
+
+    suspend fun invalidatePositions()
+  }
 }

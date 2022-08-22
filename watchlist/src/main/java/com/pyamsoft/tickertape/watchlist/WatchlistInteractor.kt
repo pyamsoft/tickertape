@@ -26,7 +26,13 @@ interface WatchlistInteractor {
 
   suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit)
 
-  @CheckResult suspend fun getQuotes(force: Boolean): ResultWrapper<List<Ticker>>
+  @CheckResult suspend fun getQuotes(): ResultWrapper<List<Ticker>>
 
   @CheckResult suspend fun removeQuote(symbol: StockSymbol): ResultWrapper<Boolean>
+
+  interface Cache {
+
+    suspend fun invalidateQuotes()
+
+  }
 }

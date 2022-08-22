@@ -52,94 +52,97 @@ internal constructor(
     @InternalStockApi private val statisticsCache: KeyStatisticsCache,
     @InternalStockApi private val newsCache: NewsCache,
     @InternalStockApi private val interactor: StockInteractor,
-) : StockInteractor {
+) : StockInteractor, StockInteractor.Cache {
 
   private val trendingCache =
       cachify<StockTrends, Int>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getTrending(true, it) }
+      ) {
+        interactor.getTrending(it)
+      }
 
   private val topCaches =
       multiCachify<StockScreener, StockTops, StockScreener, Int>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { screener, count -> interactor.getScreener(true, screener, count) }
+      ) { screener, count ->
+        interactor.getScreener(screener, count)
+      }
 
   private val searchCache =
       multiCachify<String, List<SearchResult>, String>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.search(true, it) }
+      ) {
+        interactor.search(it)
+      }
 
   private val recommendationCache =
       multiCachify<StockSymbol, StockRecommendations, StockSymbol>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) { interactor.getRecommendations(true, it) }
+      ) {
+        interactor.getRecommendations(it)
+      }
 
-  override suspend fun getKeyStatistics(
-      force: Boolean,
-      symbols: List<StockSymbol>
-  ): List<KeyStatistics> =
+  override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-
-        if (force) {
-          symbols.forEach { statisticsCache.removeStatistics(it) }
-        }
-
         return@withContext statisticsCache.getStatistics(symbols) {
-          interactor.getKeyStatistics(true, it)
+          interactor.getKeyStatistics(it)
         }
       }
 
-  override suspend fun search(
-      force: Boolean,
-      query: String,
-  ): List<SearchResult> =
+  override suspend fun invalidateStatistics(symbols: List<StockSymbol>) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+        symbols.forEach { statisticsCache.removeStatistics(it) }
+      }
 
-        if (force) {
-          // Remove the cache from the search map and clear it if it exists
-          searchCache.key(query).clear()
-        }
-
+  override suspend fun search(query: String): List<SearchResult> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
         return@withContext searchCache.key(query).call(query)
       }
 
-  override suspend fun getTrending(force: Boolean, count: Int): StockTrends =
+  override suspend fun invalidateSearch(query: String) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+        // Remove the cache from the search map and clear it if it exists
+        searchCache.key(query).clear()
+      }
 
-        if (force) {
-          trendingCache.clear()
-        }
-
+  override suspend fun getTrending(count: Int): StockTrends =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
         return@withContext trendingCache.call(count)
       }
 
-  override suspend fun getScreener(force: Boolean, screener: StockScreener, count: Int): StockTops =
+  override suspend fun invalidateTrending() =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-
-        val cache = topCaches.key(screener)
-        if (force) {
-          cache.clear()
-        }
-
-        return@withContext cache.call(screener, count)
+        trendingCache.clear()
       }
 
-  override suspend fun getOptions(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions> =
+  override suspend fun getScreener(screener: StockScreener, count: Int): StockTops =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+        return@withContext topCaches.key(screener).call(screener, count)
+      }
 
-        if (force) {
-          symbols.forEach { optionsCache.removeOption(it) }
-        }
+  override suspend fun invalidateScreener(screener: StockScreener) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        topCaches.key(screener).clear()
+      }
 
-        return@withContext optionsCache.getOptions(symbols) { interactor.getOptions(true, it) }
+  override suspend fun getOptions(symbols: List<StockSymbol>): List<StockOptions> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext optionsCache.getOptions(symbols) { interactor.getOptions(it) }
+      }
+
+  override suspend fun invalidateOptions(symbols: List<StockSymbol>) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        symbols.forEach { optionsCache.removeOption(it) }
       }
 
   override suspend fun resolveOptionLookupIdentifier(
@@ -159,59 +162,73 @@ internal constructor(
         )
       }
 
-  override suspend fun getQuotes(force: Boolean, symbols: List<StockSymbol>): List<StockQuote> =
+  override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(it) }
+      }
 
-        if (force) {
-          symbols.forEach { stockCache.removeQuote(it) }
-        }
+  override suspend fun invalidateQuotes(symbols: List<StockSymbol>) {
+    withContext(context = Dispatchers.IO) {
+      Enforcer.assertOffMainThread()
+      symbols.forEach { stockCache.removeQuote(it) }
+    }
+  }
 
-        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(true, it) }
+  override suspend fun invalidateAllQuotes() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        stockCache.removeAllQuotes()
       }
 
   override suspend fun getCharts(
-      force: Boolean,
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        if (force) {
-          symbols.forEach { stockCache.removeChart(it, range) }
-        }
-
         return@withContext stockCache.getCharts(symbols, range) { s, r ->
-          interactor.getCharts(true, s, r)
+          interactor.getCharts(s, r)
         }
       }
 
-  override suspend fun getNews(
-      force: Boolean,
+  override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
-  ): List<StockNews> =
+      range: StockChart.IntervalRange
+  ) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-
-        if (force) {
-          symbols.forEach { newsCache.removeNews(it) }
-        }
-
-        return@withContext newsCache.getNews(symbols) { interactor.getNews(true, it) }
+        symbols.forEach { stockCache.removeChart(it, range) }
       }
 
-  override suspend fun getRecommendations(
-      force: Boolean,
-      symbol: StockSymbol
-  ): StockRecommendations =
+  override suspend fun invalidateAllCharts() =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
+        stockCache.removeAllCharts()
+      }
 
-        if (force) {
-          recommendationCache.key(symbol).clear()
-        }
+  override suspend fun getNews(symbols: List<StockSymbol>): List<StockNews> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext newsCache.getNews(symbols) { interactor.getNews(it) }
+      }
 
+  override suspend fun invalidateNews(symbols: List<StockSymbol>) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        symbols.forEach { newsCache.removeNews(it) }
+      }
+
+  override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
         return@withContext recommendationCache.key(symbol).call(symbol)
+      }
+
+  override suspend fun invalidateRecommendations(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        recommendationCache.key(symbol).clear()
       }
 }

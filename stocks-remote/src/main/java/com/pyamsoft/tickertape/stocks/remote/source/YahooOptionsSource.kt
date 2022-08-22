@@ -118,10 +118,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
     return parseOptionsResponse(resp)
   }
 
-  override suspend fun getOptions(
-      force: Boolean,
-      symbols: List<StockSymbol>,
-  ): List<StockOptions> =
+  override suspend fun getOptions(symbols: List<StockSymbol>): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

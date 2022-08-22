@@ -35,14 +35,20 @@ internal constructor(
     @DbApi private val realInsertDao: SymbolInsertDao,
     @DbApi private val realDeleteDao: SymbolDeleteDao,
 ) :
+    SymbolDb,
+    SymbolQueryDao.Cache,
     BaseDbImpl<
-        SymbolChangeEvent, SymbolRealtime, SymbolQueryDao, SymbolInsertDao, SymbolDeleteDao>(),
-    SymbolDb {
+        SymbolChangeEvent,
+        SymbolRealtime,
+        SymbolQueryDao,
+        SymbolInsertDao,
+        SymbolDeleteDao,
+    >() {
 
   private val queryCache =
       cachify<List<DbSymbol>> {
         Enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query(true)
+        return@cachify realQueryDao.query()
       }
 
   override val deleteDao: SymbolDeleteDao = this
@@ -65,13 +71,9 @@ internal constructor(
         onEvent(onChange)
       }
 
-  override suspend fun query(force: Boolean): List<DbSymbol> =
+  override suspend fun query(): List<DbSymbol> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        if (force) {
-          invalidate()
-        }
-
         return@withContext queryCache.call()
       }
 
@@ -80,8 +82,14 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            is DbInsert.InsertResult.Insert -> publish(SymbolChangeEvent.Insert(result.data))
-            is DbInsert.InsertResult.Update -> publish(SymbolChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Insert -> {
+              invalidate()
+              publish(SymbolChangeEvent.Insert(result.data))
+            }
+            is DbInsert.InsertResult.Update -> {
+              invalidate()
+              publish(SymbolChangeEvent.Update(result.data))
+            }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
@@ -93,6 +101,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
+            invalidate()
             publish(SymbolChangeEvent.Delete(o, offerUndo))
           }
         }

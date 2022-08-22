@@ -35,13 +35,20 @@ internal constructor(
     @DbApi private val realInsertDao: SplitInsertDao,
     @DbApi private val realDeleteDao: SplitDeleteDao,
 ) :
-    BaseDbImpl<SplitChangeEvent, SplitRealtime, SplitQueryDao, SplitInsertDao, SplitDeleteDao>(),
-    SplitDb {
+    SplitDb,
+    SplitQueryDao.Cache,
+    BaseDbImpl<
+        SplitChangeEvent,
+        SplitRealtime,
+        SplitQueryDao,
+        SplitInsertDao,
+        SplitDeleteDao,
+    >() {
 
   private val queryCache =
       cachify<List<DbSplit>> {
         Enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query(true)
+        return@cachify realQueryDao.query()
       }
 
   override val deleteDao: SplitDeleteDao = this
@@ -64,13 +71,9 @@ internal constructor(
         onEvent(onChange)
       }
 
-  override suspend fun query(force: Boolean): List<DbSplit> =
+  override suspend fun query(): List<DbSplit> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        if (force) {
-          invalidate()
-        }
-
         return@withContext queryCache.call()
       }
 
@@ -79,8 +82,14 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            is DbInsert.InsertResult.Insert -> publish(SplitChangeEvent.Insert(result.data))
-            is DbInsert.InsertResult.Update -> publish(SplitChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Insert -> {
+              invalidate()
+              publish(SplitChangeEvent.Insert(result.data))
+            }
+            is DbInsert.InsertResult.Update -> {
+              invalidate()
+              publish(SplitChangeEvent.Update(result.data))
+            }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
@@ -92,6 +101,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
+            invalidate()
             publish(SplitChangeEvent.Delete(o, offerUndo))
           }
         }

@@ -20,6 +20,8 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -27,19 +29,19 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Named
 
 class WatchlistDigViewModeler
 @Inject
 internal constructor(
     private val state: MutableWatchlistDigViewState,
     private val interactor: WatchlistDigInteractor,
+    private val interactorCache: WatchlistDigInteractor.Cache,
     @Named("lookup") lookupSymbol: StockSymbol?,
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
         state,
         interactor,
+        interactorCache,
         lookupSymbol,
     ) {
 
@@ -81,8 +83,12 @@ internal constructor(
 
   private suspend fun checkIsInWatchlist(force: Boolean) {
     val s = state
+    if (force) {
+      interactorCache.invalidateIsInWatchlist()
+    }
+
     interactor
-        .isInWatchlist(symbol = state.ticker.symbol, force)
+        .isInWatchlist(state.ticker.symbol)
         .onSuccess { isIn ->
           Timber.d("Symbol is in watchlist: $isIn")
           s.apply {

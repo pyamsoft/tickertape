@@ -42,14 +42,17 @@ internal constructor(
     @TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
     @TapeInternalApi private val notifier: Notifier,
     private val symbolQueryDao: SymbolQueryDao,
+    private val symbolQueryDaoCache: SymbolQueryDao.Cache,
     private val interactor: StockInteractor,
+    private val interactorCache: StockInteractor.Cache,
 ) : TapeRemote {
 
   override suspend fun onStopReceived(onStop: () -> Unit) =
       withContext(context = Dispatchers.IO) { stopBus.onEvent { onStop() } }
 
   override fun createNotification(service: Service) {
-    notifier.startForeground(
+    notifier
+        .startForeground(
             service = service,
             channelInfo = CHANNEL_INFO,
             id = NOTIFICATION_ID,
@@ -62,7 +65,12 @@ internal constructor(
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
     val result =
         try {
-          val quotes = interactor.getWatchListQuotes(force, symbolQueryDao)
+          if (force) {
+            symbolQueryDaoCache.invalidate()
+            interactorCache.invalidateAllQuotes()
+          }
+
+          val quotes = interactor.getWatchListQuotes(symbolQueryDao)
           ResultWrapper.success(quotes)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -81,7 +89,8 @@ internal constructor(
         val force = options.forceRefresh
         fetchQuotes(force)
             .onSuccess { quotes ->
-              notifier.show(
+              notifier
+                  .show(
                       id = NOTIFICATION_ID,
                       channelInfo = CHANNEL_INFO,
                       notification = TapeNotificationData(quotes = quotes, index = options.index),

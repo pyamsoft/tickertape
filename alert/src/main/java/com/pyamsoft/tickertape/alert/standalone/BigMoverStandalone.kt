@@ -69,7 +69,7 @@ internal constructor(
     Enforcer.assertOffMainThread()
 
     val now = LocalDateTime.now()
-    val alreadySeenBigMovers = bigMoverQueryDao.query(false)
+    val alreadySeenBigMovers = bigMoverQueryDao.query()
 
     bigMovers.forEach { quote ->
       val moverRecord = alreadySeenBigMovers.firstOrNull { it.symbol == quote.symbol }

@@ -23,7 +23,7 @@ import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
-interface TickerDb : DbCache {
+interface TickerDb {
 
   @get:CheckResult val symbols: SymbolDb
 
@@ -34,4 +34,6 @@ interface TickerDb : DbCache {
   @get:CheckResult val bigMovers: BigMoverDb
 
   @get:CheckResult val splits: SplitDb
+
+  suspend fun invalidate()
 }

@@ -35,14 +35,20 @@ internal constructor(
     @DbApi private val realInsertDao: HoldingInsertDao,
     @DbApi private val realDeleteDao: HoldingDeleteDao,
 ) :
+    HoldingDb,
+    HoldingQueryDao.Cache,
     BaseDbImpl<
-        HoldingChangeEvent, HoldingRealtime, HoldingQueryDao, HoldingInsertDao, HoldingDeleteDao>(),
-    HoldingDb {
+        HoldingChangeEvent,
+        HoldingRealtime,
+        HoldingQueryDao,
+        HoldingInsertDao,
+        HoldingDeleteDao,
+    >() {
 
   private val queryCache =
       cachify<List<DbHolding>> {
         Enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query(true)
+        return@cachify realQueryDao.query()
       }
 
   override val deleteDao: HoldingDeleteDao = this
@@ -65,13 +71,9 @@ internal constructor(
         onEvent(onChange)
       }
 
-  override suspend fun query(force: Boolean): List<DbHolding> =
+  override suspend fun query(): List<DbHolding> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        if (force) {
-          invalidate()
-        }
-
         return@withContext queryCache.call()
       }
 
@@ -81,8 +83,14 @@ internal constructor(
 
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            is DbInsert.InsertResult.Insert -> publish(HoldingChangeEvent.Insert(result.data))
-            is DbInsert.InsertResult.Update -> publish(HoldingChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Insert -> {
+              invalidate()
+              publish(HoldingChangeEvent.Insert(result.data))
+            }
+            is DbInsert.InsertResult.Update -> {
+              invalidate()
+              publish(HoldingChangeEvent.Update(result.data))
+            }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
@@ -94,6 +102,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
+            invalidate()
             publish(HoldingChangeEvent.Delete(o, offerUndo))
           }
         }

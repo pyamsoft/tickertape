@@ -49,13 +49,17 @@ internal class PortfolioInteractorImpl
 internal constructor(
     private val holdingRealtime: HoldingRealtime,
     private val holdingQueryDao: HoldingQueryDao,
+    private val holdingQueryDaoCache: HoldingQueryDao.Cache,
     private val holdingDeleteDao: HoldingDeleteDao,
     private val positionRealtime: PositionRealtime,
     private val positionQueryDao: PositionQueryDao,
+    private val positionQueryDaoCache: PositionQueryDao.Cache,
     private val splitRealtime: SplitRealtime,
     private val splitQueryDao: SplitQueryDao,
+    private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val interactor: TickerInteractor,
-) : PortfolioInteractor {
+    private val interactorCache: TickerInteractor.Cache,
+) : PortfolioInteractor, PortfolioInteractor.Cache {
 
   override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {
@@ -75,7 +79,7 @@ internal constructor(
         splitRealtime.listenForChanges(onChange)
       }
 
-  override suspend fun getPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>> =
+  override suspend fun getPortfolio(): ResultWrapper<List<PortfolioStock>> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -84,9 +88,9 @@ internal constructor(
             // Run both queries in parallel
             val jobResult =
                 awaitAll(
-                    async { holdingQueryDao.query(force) },
-                    async { positionQueryDao.query(force) },
-                    async { splitQueryDao.query(force) },
+                    async { holdingQueryDao.query() },
+                    async { positionQueryDao.query() },
+                    async { splitQueryDao.query() },
                 )
 
             // We can cast since we know what this one is
@@ -101,7 +105,6 @@ internal constructor(
 
             return@coroutineScope interactor
                 .getQuotes(
-                    force,
                     symbols,
                     options = TICKER_OPTIONS,
                 )
@@ -134,14 +137,32 @@ internal constructor(
         }
       }
 
+  override suspend fun invalidatePortfolio() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        // Clear all DB
+        awaitAll(
+            async { holdingQueryDaoCache.invalidate() },
+            async { positionQueryDaoCache.invalidate() },
+            async { splitQueryDaoCache.invalidate() },
+        )
+
+        // Clear cache for quotes
+        interactorCache.invalidateAllQuotes()
+      }
+
   @CheckResult
   override suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
+          // First invalidate cache to be sure we are up to date
+          holdingQueryDaoCache.invalidate()
+
           // TODO move this query into the DAO layer
-          val holding = holdingQueryDao.query(true).firstOrNull { it.id == id }
+          val holding = holdingQueryDao.query().firstOrNull { it.id == id }
           if (holding == null) {
             val err = IllegalStateException("Holding does not exist in DB: $id")
             Timber.e(err)

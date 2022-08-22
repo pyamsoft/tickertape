@@ -18,4 +18,7 @@ package com.pyamsoft.tickertape.db.holding
 
 import com.pyamsoft.tickertape.db.DbQuery
 
-interface HoldingQueryDao : DbQuery<DbHolding>
+interface HoldingQueryDao : DbQuery<DbHolding> {
+
+  interface Cache : DbQuery.Cache
+}

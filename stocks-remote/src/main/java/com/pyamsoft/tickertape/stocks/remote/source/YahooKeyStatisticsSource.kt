@@ -22,11 +22,13 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkKeyStatisticsResponse
 import com.pyamsoft.tickertape.stocks.remote.network.asDataPoint
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
+import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -34,8 +36,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooKeyStatisticsSource
@@ -55,10 +55,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     )
   }
 
-  override suspend fun getKeyStatistics(
-      force: Boolean,
-      symbols: List<StockSymbol>
-  ): List<KeyStatistics> =
+  override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 

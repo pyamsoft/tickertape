@@ -36,6 +36,7 @@ abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
     private val state: S,
     private val interactor: DigInteractor,
+    private val interactorCache: DigInteractor.Cache,
     private val lookupSymbol: StockSymbol?,
 ) : AbstractViewModeler<S>(state) {
 
@@ -55,11 +56,13 @@ protected constructor(
 
   protected suspend fun loadRecommendations(force: Boolean) {
     val s = state
+    val symbol = getLookupSymbol()
+    if (force) {
+      interactorCache.invalidateRecommendations(symbol)
+    }
+
     interactor
-        .getRecommendations(
-            force = force,
-            symbol = getLookupSymbol(),
-        )
+        .getRecommendations(symbol)
         .onSuccess { r ->
           s.apply {
             recommendations = r.recommendations.map { it.asTicker() }
@@ -79,11 +82,11 @@ protected constructor(
       coroutineScope {
         launch(context = Dispatchers.Main) {
           val symbols = recommendations.recommendations
+          val range = StockChart.IntervalRange.ONE_DAY
           interactor
               .getCharts(
-                  force = false,
                   symbols = symbols,
-                  StockChart.IntervalRange.ONE_DAY,
+                  range,
               )
               .onSuccess { rec ->
                 Timber.d("Loaded full recs for symbols: $rec")
@@ -97,11 +100,12 @@ protected constructor(
 
   protected suspend fun loadStatistics(force: Boolean) {
     val s = state
+    val symbol = getLookupSymbol()
+    if (force) {
+      interactorCache.invalidateStatistics(symbol)
+    }
     interactor
-        .getStatistics(
-            force = force,
-            symbol = getLookupSymbol(),
-        )
+        .getStatistics(symbol)
         .onSuccess { n ->
           s.apply {
             statistics = n
@@ -118,11 +122,12 @@ protected constructor(
 
   protected suspend fun loadNews(force: Boolean) {
     val s = state
+    val symbol = getLookupSymbol()
+    if (force) {
+      interactorCache.invalidateNews(symbol)
+    }
     interactor
-        .getNews(
-            force = force,
-            symbol = getLookupSymbol(),
-        )
+        .getNews(symbol)
         // Sort news articles by published date
         .map { news ->
           // Run Off main thread
@@ -150,12 +155,14 @@ protected constructor(
       force: Boolean,
   ): ResultWrapper<Ticker> {
     val s = state
+    val symbol = s.ticker.symbol
+    val range = s.range
+    if (force) {
+      interactorCache.invalidateChart(symbol, range)
+    }
+
     return interactor
-        .getChart(
-            force = force,
-            symbol = s.ticker.symbol,
-            range = s.range,
-        )
+        .getChart(symbol, range)
         .onSuccess { t -> s.apply { ticker = t } }
         .onSuccess { ticker ->
           ticker.chart?.also { c ->

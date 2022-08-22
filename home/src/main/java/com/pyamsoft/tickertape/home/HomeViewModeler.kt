@@ -37,9 +37,13 @@ class HomeViewModeler
 internal constructor(
     private val state: MutableHomeViewState,
     private val homeInteractor: HomeInteractor,
+    private val homeInteractorCache: HomeInteractor.Cache,
     private val portfolioInteractor: PortfolioInteractor,
+    private val portfolioInteractorCache: PortfolioInteractor.Cache,
     private val watchlistInteractor: WatchlistInteractor,
+    private val watchlistInteractorCache: WatchlistInteractor.Cache,
     private val tickerInteractor: TickerInteractor,
+    private val tickerInteractorCache: TickerInteractor.Cache,
 ) : AbstractViewModeler<HomeViewState>(state) {
 
   @CheckResult
@@ -49,9 +53,13 @@ internal constructor(
       onLoading: (Boolean) -> Unit,
       onFetched: (List<Ticker>, Throwable?) -> Unit,
   ) {
+    if (force) {
+      homeInteractorCache.invalidateScreener(screener)
+    }
+
     onLoading(true)
     homeInteractor
-        .getScreener(force, screener, WATCHLIST_COUNT)
+        .getScreener(screener, WATCHLIST_COUNT)
         .onSuccess { onFetched(it, null) }
         .onFailure { Timber.e(it, "Failed to fetch screener: $screener") }
         .onFailure { onFetched(emptyList(), it) }
@@ -62,8 +70,11 @@ internal constructor(
     val s = state
     s.isLoadingWatchlist = true
     scope.launch(context = Dispatchers.Main) {
+      if (force) {
+        watchlistInteractorCache.invalidateQuotes()
+      }
       watchlistInteractor
-          .getQuotes(force)
+          .getQuotes()
           .map { it.sortedWith(Ticker.COMPARATOR) }
           .map { it.take(WATCHLIST_COUNT) }
           .onSuccess {
@@ -87,8 +98,13 @@ internal constructor(
     val s = state
     scope.launch(context = Dispatchers.Main) {
       s.isLoadingPortfolio = true
+
+      if (force) {
+        portfolioInteractorCache.invalidatePortfolio()
+      }
+
       portfolioInteractor
-          .getPortfolio(force)
+          .getPortfolio()
           .onSuccess {
             s.apply {
               portfolio = PortfolioStockList.of(it)
@@ -110,9 +126,16 @@ internal constructor(
     val s = state
     scope.launch(context = Dispatchers.Main) {
       s.isLoadingIndexes = true
+
+      if (force) {
+        tickerInteractorCache.invalidateCharts(
+            symbols = INDEXES,
+            range = StockChart.IntervalRange.ONE_DAY,
+        )
+      }
+
       tickerInteractor
           .getCharts(
-              force = force,
               symbols = INDEXES,
               range = StockChart.IntervalRange.ONE_DAY,
               options = null,
@@ -240,8 +263,12 @@ internal constructor(
     val s = state
     s.isLoadingTrending = true
     scope.launch(context = Dispatchers.Main) {
+      if (force) {
+        homeInteractorCache.invalidateTrending()
+      }
+
       homeInteractor
-          .getTrending(force, TRENDING_COUNT)
+          .getTrending(TRENDING_COUNT)
           .onSuccess {
             s.apply {
               trending = it

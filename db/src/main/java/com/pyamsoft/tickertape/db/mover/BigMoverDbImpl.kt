@@ -35,19 +35,20 @@ internal constructor(
     @DbApi private val realInsertDao: BigMoverInsertDao,
     @DbApi private val realDeleteDao: BigMoverDeleteDao,
 ) :
+    BigMoverDb,
+    BigMoverQueryDao.Cache,
     BaseDbImpl<
         BigMoverChangeEvent,
         BigMoverRealtime,
         BigMoverQueryDao,
         BigMoverInsertDao,
         BigMoverDeleteDao,
-    >(),
-    BigMoverDb {
+    >() {
 
   private val queryCache =
       cachify<List<BigMoverReport>> {
         Enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query(true)
+        return@cachify realQueryDao.query()
       }
 
   override val deleteDao: BigMoverDeleteDao = this
@@ -70,13 +71,9 @@ internal constructor(
         onEvent(onChange)
       }
 
-  override suspend fun query(force: Boolean): List<BigMoverReport> =
+  override suspend fun query(): List<BigMoverReport> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        if (force) {
-          invalidate()
-        }
-
         return@withContext queryCache.call()
       }
 
@@ -85,8 +82,14 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
-            is DbInsert.InsertResult.Insert -> publish(BigMoverChangeEvent.Insert(result.data))
-            is DbInsert.InsertResult.Update -> publish(BigMoverChangeEvent.Update(result.data))
+            is DbInsert.InsertResult.Insert -> {
+              invalidate()
+              publish(BigMoverChangeEvent.Insert(result.data))
+            }
+            is DbInsert.InsertResult.Update -> {
+              invalidate()
+              publish(BigMoverChangeEvent.Update(result.data))
+            }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
           }
@@ -98,6 +101,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
+            invalidate()
             publish(BigMoverChangeEvent.Delete(o, offerUndo))
           }
         }

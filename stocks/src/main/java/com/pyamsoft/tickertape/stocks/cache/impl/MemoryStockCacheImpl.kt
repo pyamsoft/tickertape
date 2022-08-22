@@ -39,6 +39,13 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
         return@withContext quotes.remove(symbol)
       }
 
+  override suspend fun removeAllQuotes() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        quotes.clear()
+      }
+
   override suspend fun getQuotes(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<StockQuote>
@@ -59,6 +66,13 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
                 range = range,
             )
         return@withContext charts.remove(key)
+      }
+
+  override suspend fun removeAllCharts() =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        charts.clear()
       }
 
   override suspend fun getCharts(

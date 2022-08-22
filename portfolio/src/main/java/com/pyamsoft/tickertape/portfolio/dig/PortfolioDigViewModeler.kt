@@ -31,6 +31,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Named
 
 class PortfolioDigViewModeler
 @Inject
@@ -46,6 +46,7 @@ internal constructor(
     private val state: MutablePortfolioDigViewState,
     private val holdingId: DbHolding.Id,
     private val interactor: PortfolioDigInteractor,
+    private val interactorCache: PortfolioDigInteractor.Cache,
     private val equityType: EquityType,
     private val tradeSide: TradeSide,
     private val currentPrice: StockMoneyValue?,
@@ -54,6 +55,7 @@ internal constructor(
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
         interactor,
+        interactorCache,
         lookupSymbol,
     ) {
 
@@ -112,8 +114,11 @@ internal constructor(
 
   private suspend fun loadSplits(force: Boolean) {
     val s = state
+    if (force) {
+      interactorCache.invalidateSplits()
+    }
     interactor
-        .getSplits(force, holdingId)
+        .getSplits(holdingId)
         .onSuccess { sp ->
           s.apply {
             stockSplitError = null
@@ -129,8 +134,12 @@ internal constructor(
   }
 
   private suspend fun loadHolding(force: Boolean) {
+    if (force) {
+      interactorCache.invalidateHolding()
+    }
+
     interactor
-        .getHolding(force, holdingId)
+        .getHolding(holdingId)
         .onSuccess { h ->
           state.apply {
             holding = h
@@ -148,8 +157,13 @@ internal constructor(
   private suspend fun loadPositions(force: Boolean) {
     val s = state
     val splits = s.stockSplits
+
+    if (force) {
+      interactorCache.invalidatePositions()
+    }
+
     interactor
-        .getPositions(force, holdingId)
+        .getPositions(holdingId)
         .map { p -> p.map { createPositionStock(it, splits) } }
         .onSuccess { p ->
           s.apply {

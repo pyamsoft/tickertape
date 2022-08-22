@@ -22,9 +22,5 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface RecommendationSource {
 
-  @CheckResult
-  suspend fun getRecommendations(
-      force: Boolean,
-      symbol: StockSymbol,
-  ): StockRecommendations
+  @CheckResult suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations
 }

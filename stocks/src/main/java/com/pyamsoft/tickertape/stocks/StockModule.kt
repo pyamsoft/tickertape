@@ -74,6 +74,10 @@ abstract class StockModule {
   @CheckResult
   internal abstract fun bindRealInteractor(impl: StockInteractorImpl): StockInteractor
 
+  @Binds
+  @CheckResult
+  internal abstract fun bindInteractorCache(impl: StockInteractorImpl): StockInteractor.Cache
+
   @Module
   companion object {
 

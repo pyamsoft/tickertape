@@ -25,6 +25,8 @@ interface StockCache {
 
   suspend fun removeQuote(symbol: StockSymbol)
 
+  suspend fun removeAllQuotes()
+
   @CheckResult
   suspend fun getQuotes(
       symbols: List<StockSymbol>,
@@ -32,6 +34,8 @@ interface StockCache {
   ): List<StockQuote>
 
   suspend fun removeChart(symbol: StockSymbol, range: StockChart.IntervalRange)
+
+  suspend fun removeAllCharts()
 
   @CheckResult
   suspend fun getCharts(

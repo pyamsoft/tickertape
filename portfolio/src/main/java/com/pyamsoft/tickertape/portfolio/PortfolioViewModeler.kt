@@ -42,10 +42,16 @@ class PortfolioViewModeler
 internal constructor(
     private val state: MutablePortfolioViewState,
     private val interactor: PortfolioInteractor,
+    private val interactorCache: PortfolioInteractor.Cache,
 ) : AbstractViewModeler<PortfolioViewState>(state) {
 
   private val portfolioFetcher =
-      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { interactor.getPortfolio(it) }
+      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { force ->
+        if (force) {
+          interactorCache.invalidatePortfolio()
+        }
+        return@highlander interactor.getPortfolio()
+      }
 
   private val portfolioGenerator =
       highlander<PortfolioListGenerateResult, PortfolioViewState, List<PortfolioStock>> {

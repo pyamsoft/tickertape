@@ -17,10 +17,15 @@ package com.pyamsoft.tickertape.db.room
 
 import com.pyamsoft.tickertape.db.TickerDb
 import com.pyamsoft.tickertape.db.holding.HoldingDb
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverDb
+import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.position.PositionDb
+import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.split.SplitDb
+import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
+import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,18 +33,25 @@ import javax.inject.Singleton
 internal class TickerDbImpl
 @Inject
 internal constructor(
+    // DB
     override val symbols: SymbolDb,
     override val holdings: HoldingDb,
     override val positions: PositionDb,
     override val bigMovers: BigMoverDb,
     override val splits: SplitDb,
+    // Caches
+    private val symbolCache: SymbolQueryDao.Cache,
+    private val holdingCache: HoldingQueryDao.Cache,
+    private val positionCache: PositionQueryDao.Cache,
+    private val bigMoverCache: BigMoverQueryDao.Cache,
+    private val splitCache: SplitQueryDao.Cache,
 ) : TickerDb {
 
   override suspend fun invalidate() {
-    symbols.invalidate()
-    holdings.invalidate()
-    positions.invalidate()
-    bigMovers.invalidate()
-    splits.invalidate()
+    symbolCache.invalidate()
+    holdingCache.invalidate()
+    positionCache.invalidate()
+    bigMoverCache.invalidate()
+    splitCache.invalidate()
   }
 }

@@ -37,6 +37,7 @@ fun WatchlistScreen(
   val stocks = state.watchlist
   val search = state.query
   val tab = state.section
+  val sort = state.sort
 
   BaseListScreen(
       modifier = modifier,
@@ -58,6 +59,7 @@ fun WatchlistScreen(
             modifier =
                 Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             ticker = stock,
+            sort = sort,
             onSelect = onSelectTicker,
             onDelete = onDeleteTicker,
         )

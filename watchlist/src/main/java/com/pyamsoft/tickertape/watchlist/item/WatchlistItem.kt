@@ -16,6 +16,7 @@ import com.pyamsoft.tickertape.quote.CRYPTO_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.OPTIONS_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.QUOTE_DEFAULT_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.Quote
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForQuote
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -27,6 +28,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun WatchlistItem(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    sort: QuoteSort,
     onSelect: (Ticker) -> Unit,
     onDelete: (Ticker) -> Unit,
 ) {
@@ -55,6 +57,7 @@ fun WatchlistItem(
         backgroundColor =
             rememberCardBackgroundColorForQuote(
                 quote = quote,
+                sort = sort,
                 changeLimit = limitPercent,
             ),
         onClick = { onSelect(ticker) },
@@ -122,6 +125,7 @@ private fun PreviewWatchlistItem() {
                 quote = newTestQuote(symbol),
                 chart = null,
             ),
+        sort = QuoteSort.REGULAR,
         onSelect = {},
         onDelete = {},
     )

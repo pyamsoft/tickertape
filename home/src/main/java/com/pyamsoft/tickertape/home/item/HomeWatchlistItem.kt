@@ -4,6 +4,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -14,11 +15,13 @@ import com.pyamsoft.tickertape.watchlist.item.WatchlistItem
 fun HomeWatchlistItem(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    sort: QuoteSort,
     onClick: (Ticker) -> Unit,
 ) {
   WatchlistItem(
       modifier = modifier,
       ticker = ticker,
+      sort = sort,
       onSelect = onClick,
       onDelete = {},
   )
@@ -36,6 +39,7 @@ private fun PreviewHomeWatchlistItem() {
                 quote = newTestQuote(symbol),
                 chart = null,
             ),
+        sort = QuoteSort.REGULAR,
         onClick = {},
     )
   }

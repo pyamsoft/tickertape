@@ -41,6 +41,8 @@ interface HomeWatchListViewState : BaseState {
   val isLoadingWatchlist: Boolean
   val watchlist: List<Ticker>
   val watchlistError: Throwable?
+
+  val watchlistSort: QuoteSort
 }
 
 @Stable
@@ -114,7 +116,6 @@ interface HomeViewState :
     HomeMostActiveViewState {
 
   val fullWatchlist: List<Ticker>
-  val watchlistSort: QuoteSort
 }
 
 @Stable

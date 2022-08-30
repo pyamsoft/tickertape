@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeWatchlistItem
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -56,6 +57,7 @@ internal fun HomeWatchlist(
   val isLoading = state.isLoadingWatchlist
   val tickers = state.watchlist
   val error = state.watchlistError
+  val sort = state.watchlistSort
 
   val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
   val isVisible = remember(isEmptyTickers, isLoading) { !isEmptyTickers || isLoading }
@@ -92,6 +94,7 @@ internal fun HomeWatchlist(
               // Don't use matchParentSize here
               modifier = Modifier.fillMaxWidth(),
               tickers = tickers,
+              sort = sort,
               onClick = onClicked,
           )
 
@@ -122,7 +125,9 @@ private fun Loading(
     Box(
         modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
-    ) { CircularProgressIndicator() }
+    ) {
+      CircularProgressIndicator()
+    }
   }
 }
 
@@ -130,6 +135,7 @@ private fun Loading(
 private fun TickerList(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
+    sort: QuoteSort,
     onClick: (Ticker) -> Unit,
 ) {
   LazyRow(
@@ -151,6 +157,7 @@ private fun TickerList(
                   else -> this
                 }
               },
+          sort = sort,
           ticker = item,
           onClick = onClick,
       )
@@ -202,6 +209,7 @@ private fun PreviewWatchlist() {
                           chart = newTestChart(symbol),
                       ),
                   )
+              override val watchlistSort = QuoteSort.REGULAR
               override val watchlistError: Throwable? = null
               override val isLoadingWatchlist: Boolean = false
             },

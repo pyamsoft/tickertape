@@ -23,11 +23,11 @@ import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
-@Stable
-interface BaseState : UiViewState
+@Stable interface BaseState : UiViewState
 
 @Stable
 interface HomePortfolioViewState : UiViewState {
@@ -111,11 +111,18 @@ interface HomeViewState :
     HomeShortedViewState,
     HomeUndervaluedGrowthViewState,
     HomeGrowthTechViewState,
-    HomeMostActiveViewState
+    HomeMostActiveViewState {
+
+  val fullWatchlist: List<Ticker>
+  val watchlistSort: QuoteSort
+}
 
 @Stable
 @ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
+
+  override var watchlistSort by mutableStateOf(QuoteSort.REGULAR)
+  override var fullWatchlist by mutableStateOf(emptyList<Ticker>())
 
   override var isLoadingPortfolio by mutableStateOf(false)
   override var portfolio by mutableStateOf(PortfolioStockList.empty())

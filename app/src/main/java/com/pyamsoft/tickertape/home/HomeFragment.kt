@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
@@ -131,8 +132,11 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    viewModel.requireNotNull().restoreState(savedInstanceState)
     mainViewModel.requireNotNull().restoreState(savedInstanceState)
+    viewModel.requireNotNull().also { vm ->
+      vm.restoreState(savedInstanceState)
+      vm.bind(scope = viewLifecycleOwner.lifecycleScope)
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

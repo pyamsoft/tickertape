@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -66,6 +67,21 @@ internal constructor(
         .onFinally { onLoading(false) }
   }
 
+  private fun handleGenerateWatchlist(list: List<Ticker>) {
+    val s = state
+    val sorted = list.sortedWith(Ticker.createComparator(s.watchlistSort))
+    s.apply {
+      fullWatchlist = sorted
+      watchlist = sorted.take(WATCHLIST_COUNT)
+    }
+  }
+
+  private fun handleSortChanged(sort: QuoteSort) {
+    val s = state
+    s.watchlistSort = sort
+    handleGenerateWatchlist(s.fullWatchlist)
+  }
+
   fun handleFetchWatchlist(scope: CoroutineScope, force: Boolean) {
     val s = state
     s.isLoadingWatchlist = true
@@ -75,17 +91,14 @@ internal constructor(
       }
       watchlistInteractor
           .getQuotes()
-          .map { it.sortedWith(Ticker.COMPARATOR) }
-          .map { it.take(WATCHLIST_COUNT) }
-          .onSuccess {
-            s.apply {
-              watchlist = it
-              watchlistError = null
-            }
+          .onSuccess { list ->
+            handleGenerateWatchlist(list)
+            s.watchlistError = null
           }
           .onFailure { Timber.e(it, "Failed to fetch watchlist") }
           .onFailure {
             s.apply {
+              fullWatchlist = emptyList()
               watchlist = emptyList()
               watchlistError = it
             }
@@ -283,6 +296,12 @@ internal constructor(
             }
           }
           .onFinally { s.isLoadingTrending = false }
+    }
+  }
+
+  fun bind(scope: CoroutineScope) {
+    scope.launch(context = Dispatchers.Main) {
+      watchlistInteractor.listenForSortChanges { handleSortChanged(it) }
     }
   }
 

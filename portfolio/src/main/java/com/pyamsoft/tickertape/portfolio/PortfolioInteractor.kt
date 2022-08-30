@@ -22,8 +22,9 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
+import com.pyamsoft.tickertape.quote.BaseQuoteInteractor
 
-interface PortfolioInteractor {
+interface PortfolioInteractor : BaseQuoteInteractor {
 
   suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit)
 
@@ -38,6 +39,5 @@ interface PortfolioInteractor {
   interface Cache {
 
     suspend fun invalidatePortfolio()
-
   }
 }

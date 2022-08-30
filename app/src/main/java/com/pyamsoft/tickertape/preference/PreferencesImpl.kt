@@ -21,12 +21,16 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.booleanFlow
+import com.pyamsoft.pydroid.util.stringFlow
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
+import com.pyamsoft.tickertape.quote.QuotePreferences
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -34,7 +38,7 @@ internal class PreferencesImpl
 @Inject
 internal constructor(
     context: Context,
-) : TapePreferences, BigMoverPreferences {
+) : TapePreferences, BigMoverPreferences, QuotePreferences {
 
   private val preferences by lazy {
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
@@ -64,7 +68,22 @@ internal constructor(
         return@withContext preferences.booleanFlow(KEY_BIG_MOVER_NOTIFICATION, true)
       }
 
+  override suspend fun setQuoteSort(sort: QuoteSort) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext preferences.edit { putString(KEY_QUOTE_SORT, sort.name) }
+      }
+
+  override suspend fun listenForQuoteSortChanged(): Flow<QuoteSort> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext preferences
+            .stringFlow(KEY_BIG_MOVER_NOTIFICATION, QuoteSort.REGULAR.name)
+            .map { QuoteSort.valueOf(it) }
+      }
+
   companion object {
+    private const val KEY_QUOTE_SORT = "key_quote_sort_1"
     private const val KEY_TAPE_NOTIFICATION = "key_tape_notification_v1"
     private const val KEY_BIG_MOVER_NOTIFICATION = "key_big_mover_notification_v1"
   }

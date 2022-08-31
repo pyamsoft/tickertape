@@ -116,6 +116,7 @@ fun Quote(
     modifier: Modifier = Modifier,
     symbol: StockSymbol,
     ticker: Ticker?,
+    sort: QuoteSort,
     backgroundColor: Color,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -154,6 +155,7 @@ fun Quote(
 
         TickerPrice(
             ticker = ticker,
+            sort = sort,
             size = TickerSize.QUOTE,
         )
       }
@@ -177,6 +179,7 @@ private fun PreviewQuote() {
                   quote = newTestQuote(symbol),
                   chart = null,
               ),
+          sort = QuoteSort.REGULAR,
           onClick = {},
           onLongClick = {},
       )

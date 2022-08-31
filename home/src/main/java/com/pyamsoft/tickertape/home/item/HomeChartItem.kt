@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
@@ -41,6 +42,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 internal fun HomeChartItem(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    sort: QuoteSort,
     onClick: (Ticker) -> Unit,
 ) {
   // We can assume here the chart is not null
@@ -59,6 +61,7 @@ internal fun HomeChartItem(
       TickerPrice(
           modifier = Modifier.padding(start = MaterialTheme.keylines.content),
           ticker = ticker,
+          sort = sort,
           size = TickerSize.CHART,
       )
     }
@@ -80,6 +83,7 @@ private fun PreviewHomeChartItem() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol),
             ),
+        sort = QuoteSort.REGULAR,
         onClick = {},
     )
   }

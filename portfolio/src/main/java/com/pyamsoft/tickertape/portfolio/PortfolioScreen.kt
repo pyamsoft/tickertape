@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
@@ -15,11 +14,11 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.BaseListScreen
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 
 @Composable
 @JvmOverloads
@@ -34,24 +33,21 @@ fun PortfolioScreen(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onSortChanged: (QuoteSort) -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
-  val isLoading = state.isLoading
-  val pageError = state.error
-  val stocks = state.stocks
-  val search = state.query
-  val tab = state.section
-
   BaseListScreen(
       modifier = modifier,
       navBarBottomHeight = navBarBottomHeight,
       imageLoader = imageLoader,
-      isLoading = isLoading,
-      pageError = pageError,
-      list = stocks,
-      search = search,
-      tab = tab,
+      isLoading = state.isLoading,
+      pageError = state.error,
+      list = state.stocks,
+      search = state.query,
+      tab = state.section,
+      sort = state.sort,
       onRefresh = onRefresh,
+      onSortChanged = onSortChanged,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
       onFabClick = onFabClick,
@@ -64,11 +60,12 @@ fun PortfolioScreen(
             state = state,
         )
       },
-      renderListItem = { stock ->
+      renderListItem = { stock, sort ->
         PortfolioItem(
             modifier =
                 Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             stock = stock,
+            sort = sort,
             onSelect = onSelect,
             onDelete = onDelete,
         )
@@ -135,5 +132,6 @@ private fun PreviewPortfolioScreen() {
       onTabUpdated = {},
       onFabClick = {},
       onRegenerateList = {},
+      onSortChanged = {},
   )
 }

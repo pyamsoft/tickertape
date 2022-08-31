@@ -27,75 +27,75 @@ import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
 
-@Stable interface BaseState : UiViewState
+@Stable interface HomeBaseViewState : UiViewState {
+  val sort: QuoteSort
+}
 
 @Stable
-interface HomePortfolioViewState : UiViewState {
+interface HomePortfolioViewState : HomeBaseViewState {
   val isLoadingPortfolio: Boolean
   val portfolio: PortfolioStockList
   val portfolioError: Throwable?
 }
 
 @Stable
-interface HomeWatchListViewState : BaseState {
+interface HomeWatchListViewState : HomeBaseViewState {
   val isLoadingWatchlist: Boolean
   val watchlist: List<Ticker>
   val watchlistError: Throwable?
-
-  val watchlistSort: QuoteSort
 }
 
 @Stable
-interface HomeIndexesViewState : BaseState {
+interface HomeIndexesViewState : HomeBaseViewState {
   val isLoadingIndexes: Boolean
   val indexes: List<Ticker>
   val indexesError: Throwable?
 }
 
 @Stable
-interface HomeGainersViewState : BaseState {
+interface HomeGainersViewState : HomeBaseViewState {
   val isLoadingGainers: Boolean
   val gainers: List<Ticker>
   val gainersError: Throwable?
 }
 
 @Stable
-interface HomeLosersViewState : BaseState {
+interface HomeLosersViewState : HomeBaseViewState {
   val isLoadingLosers: Boolean
   val losers: List<Ticker>
   val losersError: Throwable?
 }
 
 @Stable
-interface HomeTrendingViewState : BaseState {
+interface HomeTrendingViewState : HomeBaseViewState {
   val isLoadingTrending: Boolean
   val trending: List<Ticker>
   val trendingError: Throwable?
 }
 
 @Stable
-interface HomeShortedViewState : BaseState {
+interface HomeShortedViewState : HomeBaseViewState {
   val isLoadingMostShorted: Boolean
   val mostShorted: List<Ticker>
   val mostShortedError: Throwable?
 }
 
 @Stable
-interface HomeGrowthTechViewState : BaseState {
+interface HomeGrowthTechViewState : HomeBaseViewState {
   val isLoadingGrowthTech: Boolean
   val growthTech: List<Ticker>
   val growthTechError: Throwable?
 }
 
 @Stable
-interface HomeUndervaluedGrowthViewState : BaseState {
+interface HomeUndervaluedGrowthViewState : HomeBaseViewState {
   val isLoadingUndervaluedGrowth: Boolean
   val undervaluedGrowth: List<Ticker>
   val undervaluedGrowthError: Throwable?
 }
 
 @Stable
-interface HomeMostActiveViewState : BaseState {
+interface HomeMostActiveViewState : HomeBaseViewState {
   val isLoadingMostActive: Boolean
   val mostActive: List<Ticker>
   val mostActiveError: Throwable?
@@ -122,13 +122,13 @@ interface HomeViewState :
 @ActivityScope
 internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
 
-  override var watchlistSort by mutableStateOf(QuoteSort.REGULAR)
-  override var fullWatchlist by mutableStateOf(emptyList<Ticker>())
+  override var sort by mutableStateOf(QuoteSort.REGULAR)
 
   override var isLoadingPortfolio by mutableStateOf(false)
   override var portfolio by mutableStateOf(PortfolioStockList.empty())
   override var portfolioError by mutableStateOf<Throwable?>(null)
 
+  override var fullWatchlist by mutableStateOf(emptyList<Ticker>())
   override var isLoadingWatchlist by mutableStateOf(false)
   override var watchlist by mutableStateOf(emptyList<Ticker>())
   override var watchlistError by mutableStateOf<Throwable?>(null)

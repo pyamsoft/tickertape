@@ -19,6 +19,6 @@ protected constructor(
   final override suspend fun listenForSortChanges(onChange: (sort: QuoteSort) -> Unit) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
-        preferences.listenForQuoteSortChanged().collectLatest(onChange)
+        preferences.listenForQuoteSortChanged().collectLatest { onChange(it) }
       }
 }

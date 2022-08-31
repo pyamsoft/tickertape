@@ -70,18 +70,18 @@ data class Ticker(
       val s2 = sessionMapper(q2)
 
       if (s1 == null && s2 == null) {
-        return q1.regular.percent.compareTo(q2.regular.percent)
+        return q2.regular.percent.compareTo(q1.regular.percent)
       }
 
       if (s1 == null) {
-        return -1
-      }
-
-      if (s2 == null) {
         return 1
       }
 
-      return s1.percent.compareTo(s2.percent)
+      if (s2 == null) {
+        return -1
+      }
+
+      return s2.percent.compareTo(s1.percent)
     }
 
     private val BASE_COMPARATOR =
@@ -94,14 +94,12 @@ data class Ticker(
             return@NullableComparator s2.symbol.compareTo(s1.symbol)
           }
 
-          // If either has a quote, it goes first
           if (q1 == null) {
-            return@NullableComparator -1
+            return@NullableComparator 1
           }
 
-          // If either has a quote, it goes first
           if (q2 == null) {
-            return@NullableComparator 1
+            return@NullableComparator -1
           }
 
           // Fallthrough

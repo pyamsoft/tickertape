@@ -18,7 +18,6 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.MarketState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -26,6 +25,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun TickerPrice(
     modifier: Modifier = Modifier,
     ticker: Ticker?,
+    sort: QuoteSort?,
     size: TickerSize,
 ) {
   val quote = ticker?.quote
@@ -42,7 +42,13 @@ fun TickerPrice(
           }
         }
 
-    val session = quote.currentSession
+    val session =
+        when (sort) {
+          QuoteSort.PRE_MARKET -> quote.preMarket ?: quote.regular
+          QuoteSort.REGULAR -> quote.regular
+          QuoteSort.AFTER_HOURS -> quote.afterHours ?: quote.regular
+          null -> quote.currentSession
+        }
 
     val direction = session.direction
     val directionSign = session.direction.sign
@@ -132,6 +138,7 @@ private fun PreviewTickerPrice() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol),
             ),
+        sort = null,
         size = TickerSize.QUOTE,
     )
   }

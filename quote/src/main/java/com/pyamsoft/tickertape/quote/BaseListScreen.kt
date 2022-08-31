@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ fun <T : Any> BaseListScreen(
     imageLoader: ImageLoader,
     isLoading: Boolean,
     pageError: Throwable?,
+    sort: QuoteSort,
     list: List<T>,
     search: String,
     tab: EquityType,
@@ -53,11 +55,12 @@ fun <T : Any> BaseListScreen(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
+    onSortChanged: (QuoteSort) -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
     renderHeader: (@Composable () -> Unit)? = null,
     renderEmptyState: @Composable () -> Unit,
-    renderListItem: @Composable (T) -> Unit,
+    renderListItem: @Composable (T, QuoteSort) -> Unit,
 ) {
   val scaffoldState = rememberScaffoldState()
 
@@ -75,6 +78,7 @@ fun <T : Any> BaseListScreen(
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
         onFabClick = onFabClick,
+        onSortChanged = onSortChanged,
         onRegenerateList = onRegenerateList,
         itemKey = itemKey,
         renderHeader = renderHeader,
@@ -84,6 +88,7 @@ fun <T : Any> BaseListScreen(
         list = list,
         search = search,
         tab = tab,
+        sort = sort,
     )
   }
 }
@@ -94,11 +99,13 @@ private fun <T : Any> Content(
     scaffoldPaddingValues: PaddingValues,
     imageLoader: ImageLoader,
     pageError: Throwable?,
+    sort: QuoteSort,
     list: List<T>,
     search: String,
     tab: EquityType,
     isLoading: Boolean,
     navBarBottomHeight: Int,
+    onSortChanged: (QuoteSort) -> Unit,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
@@ -107,7 +114,7 @@ private fun <T : Any> Content(
     itemKey: (Int, T) -> String,
     renderEmptyState: @Composable () -> Unit,
     renderHeader: (@Composable () -> Unit)? = null,
-    renderListItem: @Composable (T) -> Unit,
+    renderListItem: @Composable (T, QuoteSort) -> Unit,
 ) {
   val density = LocalDensity.current
 
@@ -117,13 +124,17 @@ private fun <T : Any> Content(
       remember(
           density,
           navBarBottomHeight,
-      ) { density.run { navBarBottomHeight.toDp() } }
+      ) {
+        density.run { navBarBottomHeight.toDp() }
+      }
 
   val fabBottomPadding =
       remember(
           bottomPaddingDp,
           contentPadding,
-      ) { bottomPaddingDp + contentPadding }
+      ) {
+        bottomPaddingDp + contentPadding
+      }
 
   Box(
       modifier = modifier,
@@ -143,11 +154,13 @@ private fun <T : Any> Content(
           onTabUpdated = onTabUpdated,
           onRefresh = onRefresh,
           onRegenerateList = onRegenerateList,
+          onSortChanged = onSortChanged,
           itemKey = itemKey,
           renderHeader = renderHeader,
           renderListItem = renderListItem,
           pageError = pageError,
           list = list,
+          sort = sort,
           search = search,
           tab = tab,
       )
@@ -171,18 +184,20 @@ private fun <T : Any> ListSection(
     scaffoldPaddingValues: PaddingValues,
     imageLoader: ImageLoader,
     pageError: Throwable?,
+    sort: QuoteSort,
     list: List<T>,
     search: String,
     tab: EquityType,
     navBarBottomHeight: Dp,
     renderEmptyState: @Composable () -> Unit,
     onSearchChanged: (String) -> Unit,
+    onSortChanged: (QuoteSort) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onRefresh: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
     renderHeader: (@Composable () -> Unit)? = null,
-    renderListItem: @Composable (T) -> Unit,
+    renderListItem: @Composable (T, QuoteSort) -> Unit,
 ) {
   val isEmptyList = remember(list) { list.isEmpty() }
 
@@ -205,8 +220,25 @@ private fun <T : Any> ListSection(
                   )
                   .padding(scaffoldPaddingValues),
       ) {
-        SearchBar(
+        Spacer(
             modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Spacer(
+              modifier = Modifier.weight(1F),
+          )
+
+          QuoteSortMenu(
+              sort = sort,
+              onSortChanged = onSortChanged,
+          )
+        }
+
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
             search = search,
             currentTab = tab,
             onSearchChanged = onSearchChanged,
@@ -242,7 +274,7 @@ private fun <T : Any> ListSection(
             )
           }
 
-          renderListItem(item)
+          renderListItem(item, sort)
 
           Spacer(
               modifier = Modifier.height(MaterialTheme.keylines.content),
@@ -311,6 +343,8 @@ private fun PreviewBaseListScreen() {
   BaseListScreen(
       modifier = Modifier.fillMaxSize(),
       imageLoader = createNewTestImageLoader(),
+      sort = QuoteSort.REGULAR,
+      onSortChanged = {},
       onRefresh = {},
       onSearchChanged = {},
       onTabUpdated = {},
@@ -320,7 +354,7 @@ private fun PreviewBaseListScreen() {
       list = emptyList(),
       tab = EquityType.STOCK,
       isLoading = false,
-      renderListItem = {},
+      renderListItem = { _, _ -> },
       renderHeader = null,
       renderEmptyState = {},
       itemKey = { _, _ -> "" },

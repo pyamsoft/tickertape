@@ -69,7 +69,7 @@ internal constructor(
 
   private fun handleGenerateWatchlist(list: List<Ticker>) {
     val s = state
-    val sorted = list.sortedWith(Ticker.createComparator(s.watchlistSort))
+    val sorted = list.sortedWith(Ticker.createComparator(s.sort))
     s.apply {
       fullWatchlist = sorted
       watchlist = sorted.take(WATCHLIST_COUNT)
@@ -78,7 +78,7 @@ internal constructor(
 
   private fun handleSortChanged(sort: QuoteSort) {
     val s = state
-    s.watchlistSort = sort
+    s.sort = sort
     handleGenerateWatchlist(s.fullWatchlist)
   }
 

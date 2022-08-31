@@ -42,6 +42,7 @@ import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
@@ -93,6 +94,15 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     )
   }
 
+  private fun handleSortUpdated(sort: QuoteSort) {
+    viewModel
+        .requireNotNull()
+        .handleSortUpdated(
+            scope = viewLifecycleOwner.lifecycleScope,
+            sort = sort,
+        )
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -124,6 +134,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                   onSearchChanged = { vm.handleSearch(it) },
                   onTabUpdated = { vm.handleSectionChanged(it) },
                   onFabClick = { handleFabClicked() },
+                  onSortChanged = { handleSortUpdated(it) },
                   onRegenerateList = { vm.handleRegenerateList(this) },
               )
             }

@@ -118,6 +118,7 @@ private fun RecommendationItem(
         TickerPrice(
             modifier = Modifier.fillMaxWidth(),
             ticker = recommendation,
+            sort = null,
             size = TickerSize.QUOTE,
         )
       }

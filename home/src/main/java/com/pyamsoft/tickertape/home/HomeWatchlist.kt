@@ -31,7 +31,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,17 +56,11 @@ internal fun HomeWatchlist(
   val isLoading = state.isLoadingWatchlist
   val tickers = state.watchlist
   val error = state.watchlistError
-  val sort = state.watchlistSort
 
   val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
   val isVisible = remember(isEmptyTickers, isLoading) { !isEmptyTickers || isLoading }
 
-  LaunchedEffect(isEmptyTickers) {
-    val scope = this
-
-    // Load even if not currently visible
-    scope.onRefresh()
-  }
+  FirstRenderEffect { onRefresh() }
 
   Crossfade(
       modifier = modifier,
@@ -94,7 +87,7 @@ internal fun HomeWatchlist(
               // Don't use matchParentSize here
               modifier = Modifier.fillMaxWidth(),
               tickers = tickers,
-              sort = sort,
+              sort = state.sort,
               onClick = onClicked,
           )
 
@@ -209,7 +202,7 @@ private fun PreviewWatchlist() {
                           chart = newTestChart(symbol),
                       ),
                   )
-              override val watchlistSort = QuoteSort.REGULAR
+              override val sort = QuoteSort.REGULAR
               override val watchlistError: Throwable? = null
               override val isLoadingWatchlist: Boolean = false
             },

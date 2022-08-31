@@ -171,7 +171,7 @@ internal constructor(
           return@Comparator 1
         }
 
-        return@Comparator o1.holding.symbol.compareTo(o2.holding.symbol)
+        return@Comparator o2.holding.symbol.compareTo(o1.holding.symbol)
       }
     }
   }

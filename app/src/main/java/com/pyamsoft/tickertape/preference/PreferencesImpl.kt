@@ -78,7 +78,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext preferences
-            .stringFlow(KEY_BIG_MOVER_NOTIFICATION, QuoteSort.REGULAR.name)
+            .stringFlow(KEY_QUOTE_SORT, QuoteSort.REGULAR.name)
             .map { QuoteSort.valueOf(it) }
       }
 

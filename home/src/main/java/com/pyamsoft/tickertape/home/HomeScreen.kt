@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.quote.QuoteSortMenu
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
@@ -71,7 +73,9 @@ fun HomeScreen(
       remember(
           density,
           navBarBottomHeight,
-      ) { density.run { navBarBottomHeight.toDp() } }
+      ) {
+        density.run { navBarBottomHeight.toDp() }
+      }
 
   Scaffold(
       modifier = modifier,
@@ -199,22 +203,25 @@ private fun HomeHeader(
     appName: String,
     onSettingsClicked: () -> Unit,
 ) {
-  Row(
+  Column(
       modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-        modifier = Modifier.weight(1F),
-        text = appName,
-        style = MaterialTheme.typography.h4,
-    )
-    IconButton(
-        onClick = onSettingsClicked,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-      Icon(
-          imageVector = Icons.Filled.Settings,
-          contentDescription = "Settings",
+      Text(
+          modifier = Modifier.weight(1F),
+          text = appName,
+          style = MaterialTheme.typography.h5,
       )
+      IconButton(
+          onClick = onSettingsClicked,
+      ) {
+        Icon(
+            imageVector = Icons.Filled.Settings,
+            contentDescription = "Settings",
+        )
+      }
     }
   }
 }

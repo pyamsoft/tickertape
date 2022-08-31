@@ -53,6 +53,7 @@ fun WatchlistItem(
     Quote(
         modifier = Modifier.fillMaxWidth(),
         symbol = ticker.symbol,
+        sort = sort,
         ticker = ticker,
         backgroundColor =
             rememberCardBackgroundColorForQuote(

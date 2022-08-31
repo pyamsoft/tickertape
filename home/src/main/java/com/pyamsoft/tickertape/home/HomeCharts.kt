@@ -32,8 +32,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeChartItem
+import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.ChartError
 import com.pyamsoft.tickertape.quote.test.newTestChart
@@ -62,6 +61,7 @@ internal fun HomeIndexes(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "USA Indexes",
+      sort = state.sort,
       isLoading = state.isLoadingIndexes,
       tickers = state.indexes,
       error = state.indexesError,
@@ -82,6 +82,7 @@ internal fun HomeGainers(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Gainers (USA)",
+      sort = state.sort,
       isLoading = state.isLoadingGainers,
       tickers = state.gainers,
       error = state.gainersError,
@@ -102,6 +103,7 @@ internal fun HomeLosers(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Losers (USA)",
+      sort = state.sort,
       isLoading = state.isLoadingLosers,
       tickers = state.losers,
       error = state.losersError,
@@ -122,6 +124,7 @@ internal fun HomeTrending(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Trending Stocks (USA)",
+      sort = state.sort,
       isLoading = state.isLoadingTrending,
       tickers = state.trending,
       error = state.trendingError,
@@ -142,6 +145,7 @@ internal fun HomeMostShorted(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Most Shorted Stocks",
+      sort = state.sort,
       isLoading = state.isLoadingMostShorted,
       tickers = state.mostShorted,
       error = state.mostShortedError,
@@ -162,6 +166,7 @@ internal fun HomeMostActive(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Most Active Stocks",
+      sort = state.sort,
       isLoading = state.isLoadingMostActive,
       tickers = state.mostActive,
       error = state.mostActiveError,
@@ -182,6 +187,7 @@ internal fun HomeGrowthTech(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Growth Tech Stocks",
+      sort = state.sort,
       isLoading = state.isLoadingGrowthTech,
       tickers = state.growthTech,
       error = state.growthTechError,
@@ -202,6 +208,7 @@ internal fun HomeUndervaluedGrowth(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Undervalued Growth Stocks",
+      sort = state.sort,
       isLoading = state.isLoadingUndervaluedGrowth,
       tickers = state.undervaluedGrowth,
       error = state.undervaluedGrowthError,
@@ -216,21 +223,13 @@ private fun HomeCharts(
     name: String,
     isLoading: Boolean,
     tickers: List<Ticker>,
+    sort: QuoteSort,
     error: Throwable?,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-
-  val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
-
-  // As long as we are blank
-  LaunchedEffect(isEmptyTickers) {
-    val scope = this
-
-    // Refresh when this composable enters the visual scope
-    scope.onRefresh()
-  }
+  FirstRenderEffect { onRefresh() }
 
   Crossfade(
       modifier = modifier,
@@ -257,6 +256,7 @@ private fun HomeCharts(
           ChartList(
               modifier = Modifier.matchParentSize(),
               tickers = tickers,
+              sort = sort,
               onClick = onChartClicked,
           )
 
@@ -288,7 +288,9 @@ private fun Loading(
     Box(
         modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
-    ) { CircularProgressIndicator() }
+    ) {
+      CircularProgressIndicator()
+    }
   }
 }
 
@@ -296,6 +298,7 @@ private fun Loading(
 private fun ChartList(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
+    sort: QuoteSort,
     onClick: (Ticker) -> Unit,
 ) {
   val onlyChartTickers = rememberInBackground(tickers) { tickers.filter { it.chart != null } }
@@ -320,6 +323,7 @@ private fun ChartList(
                     else -> this
                   }
                 },
+            sort = sort,
             ticker = item,
             onClick = onClick,
         )
@@ -343,6 +347,7 @@ private fun PreviewHomeCharts() {
                 ),
             ),
         imageLoader = createNewTestImageLoader(),
+        sort = QuoteSort.REGULAR,
         isLoading = false,
         name = "TEST STOCKS CHARTS",
         error = null,

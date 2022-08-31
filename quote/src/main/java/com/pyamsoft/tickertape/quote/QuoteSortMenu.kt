@@ -69,7 +69,10 @@ fun QuoteSortMenu(
         for (s in sorts) {
           val sortTitle = remember(sort) { getSortTitle(s) }
           DropdownMenuItem(
-              onClick = { onSortChanged(s) },
+              onClick = {
+                onSortChanged(s)
+                setExpanded(false)
+              },
           ) {
             RadioButton(
                 selected = sort == s,

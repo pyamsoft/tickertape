@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -69,17 +68,11 @@ internal constructor(
 
   private fun handleGenerateWatchlist(list: List<Ticker>) {
     val s = state
-    val sorted = list.sortedWith(Ticker.createComparator(s.sort))
+    val sorted = list.sortedWith(Ticker.COMPARATOR)
     s.apply {
       fullWatchlist = sorted
       watchlist = sorted.take(WATCHLIST_COUNT)
     }
-  }
-
-  private fun handleSortChanged(sort: QuoteSort) {
-    val s = state
-    s.sort = sort
-    handleGenerateWatchlist(s.fullWatchlist)
   }
 
   fun handleFetchWatchlist(scope: CoroutineScope, force: Boolean) {
@@ -296,12 +289,6 @@ internal constructor(
             }
           }
           .onFinally { s.isLoadingTrending = false }
-    }
-  }
-
-  fun bind(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Main) {
-      watchlistInteractor.listenForSortChanges { handleSortChanged(it) }
     }
   }
 

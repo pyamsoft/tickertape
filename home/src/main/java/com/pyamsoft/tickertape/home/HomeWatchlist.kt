@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeWatchlistItem
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -87,7 +86,6 @@ internal fun HomeWatchlist(
               // Don't use matchParentSize here
               modifier = Modifier.fillMaxWidth(),
               tickers = tickers,
-              sort = state.sort,
               onClick = onClicked,
           )
 
@@ -128,7 +126,6 @@ private fun Loading(
 private fun TickerList(
     modifier: Modifier = Modifier,
     tickers: List<Ticker>,
-    sort: QuoteSort,
     onClick: (Ticker) -> Unit,
 ) {
   LazyRow(
@@ -150,7 +147,6 @@ private fun TickerList(
                   else -> this
                 }
               },
-          sort = sort,
           ticker = item,
           onClick = onClick,
       )
@@ -202,7 +198,6 @@ private fun PreviewWatchlist() {
                           chart = newTestChart(symbol),
                       ),
                   )
-              override val sort = QuoteSort.REGULAR
               override val watchlistError: Throwable? = null
               override val isLoadingWatchlist: Boolean = false
             },

@@ -16,7 +16,6 @@ import com.pyamsoft.tickertape.quote.CRYPTO_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.OPTIONS_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.QUOTE_DEFAULT_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.Quote
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForPercentChange
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -28,7 +27,6 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 internal fun PortfolioItem(
     modifier: Modifier = Modifier,
     stock: PortfolioStock,
-    sort: QuoteSort,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
 ) {
@@ -61,7 +59,6 @@ internal fun PortfolioItem(
       modifier = modifier.fillMaxWidth(),
       symbol = stock.holding.symbol,
       ticker = stock.ticker,
-      sort = sort,
       backgroundColor =
           rememberCardBackgroundColorForPercentChange(
               percentChange = percentChange,
@@ -123,7 +120,6 @@ private fun PreviewPortfolioItem() {
                     ),
                 splits = emptyList(),
             ),
-        sort = QuoteSort.REGULAR,
         onSelect = {},
         onDelete = {},
     )

@@ -39,7 +39,6 @@ import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateComponent
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
 import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
-import com.pyamsoft.tickertape.quote.QuotePreferences
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
@@ -132,8 +131,6 @@ internal interface TickerComponent {
     @Binds
     @CheckResult
     abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
-
-    @Binds @CheckResult abstract fun bindQuotePreferences(impl: PreferencesImpl): QuotePreferences
 
     @Module
     companion object {

@@ -14,7 +14,6 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.BaseListScreen
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
@@ -33,7 +32,6 @@ fun PortfolioScreen(
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
-    onSortChanged: (QuoteSort) -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   BaseListScreen(
@@ -45,9 +43,7 @@ fun PortfolioScreen(
       list = state.stocks,
       search = state.query,
       tab = state.section,
-      sort = state.sort,
       onRefresh = onRefresh,
-      onSortChanged = onSortChanged,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
       onFabClick = onFabClick,
@@ -60,12 +56,11 @@ fun PortfolioScreen(
             state = state,
         )
       },
-      renderListItem = { stock, sort ->
+      renderListItem = { stock ->
         PortfolioItem(
             modifier =
                 Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             stock = stock,
-            sort = sort,
             onSelect = onSelect,
             onDelete = onDelete,
         )
@@ -132,6 +127,5 @@ private fun PreviewPortfolioScreen() {
       onTabUpdated = {},
       onFabClick = {},
       onRegenerateList = {},
-      onSortChanged = {},
   )
 }

@@ -23,8 +23,6 @@ import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
 import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
-import com.pyamsoft.tickertape.quote.BaseQuoteInteractorImpl
-import com.pyamsoft.tickertape.quote.QuotePreferences
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.getWatchListQuotes
@@ -45,8 +43,7 @@ internal constructor(
     private val symbolRealtime: SymbolRealtime,
     private val interactor: TickerInteractor,
     private val interactorCache: TickerInteractor.Cache,
-    preferences: QuotePreferences,
-) : WatchlistInteractor, WatchlistInteractor.Cache, BaseQuoteInteractorImpl(preferences) {
+) : WatchlistInteractor, WatchlistInteractor.Cache {
 
   override suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {

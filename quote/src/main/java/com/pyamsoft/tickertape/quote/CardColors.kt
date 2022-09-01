@@ -97,7 +97,6 @@ private fun decideCardBackgroundColorForPercentChange(
 @CheckResult
 fun rememberCardBackgroundColorForQuote(
     quote: StockQuote?,
-    sort: QuoteSort,
     changeLimit: Double = QUOTE_DEFAULT_LIMIT_PERCENT,
     defaultColor: Color = QUOTE_BACKGROUND_DEFAULT_COLOR,
 ): Color {
@@ -105,13 +104,8 @@ fun rememberCardBackgroundColorForQuote(
     return defaultColor
   }
 
-  return remember(quote, sort, changeLimit, defaultColor) {
-    val session = when (sort) {
-      QuoteSort.PRE_MARKET -> quote.preMarket ?: quote.regular
-      QuoteSort.AFTER_HOURS -> quote.afterHours ?: quote.regular
-      QuoteSort.REGULAR -> quote.regular
-    }
-    val percentChange = session.percent.value
+  return remember(quote, changeLimit, defaultColor) {
+    val percentChange = quote.currentSession.percent.value
     return@remember decideCardBackgroundColorForPercentChange(
         percentChange,
         changeLimit,

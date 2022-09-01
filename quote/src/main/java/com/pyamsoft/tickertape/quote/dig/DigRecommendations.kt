@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -87,6 +88,16 @@ private fun RecommendationItem(
 ) {
   val chart = recommendation.chart
 
+  val isRecommendationSpecialSession =
+      remember(recommendation) {
+        val quote = recommendation.quote
+        if (quote == null) {
+          return@remember false
+        } else {
+          return@remember quote.afterHours != null || quote.preMarket != null
+        }
+      }
+
   Card(
       modifier = modifier.clickable { onClick(recommendation) },
       elevation = CardDefaults.Elevation,
@@ -115,12 +126,24 @@ private fun RecommendationItem(
           modifier = Modifier.fillMaxWidth(),
           contentAlignment = Alignment.BottomEnd,
       ) {
-        TickerPrice(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            ticker = recommendation,
-            sort = null,
-            size = TickerSize.QUOTE,
-        )
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.End,
+        ) {
+          if (isRecommendationSpecialSession) {
+            TickerPrice(
+                modifier = Modifier.padding(end = MaterialTheme.keylines.content),
+                ticker = recommendation,
+                size = TickerSize.QUOTE_SPECIAL,
+            )
+          }
+
+          TickerPrice(
+              ticker = recommendation,
+              size = TickerSize.QUOTE,
+          )
+        }
       }
     }
   }

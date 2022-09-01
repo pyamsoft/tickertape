@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 fun TickerPrice(
     modifier: Modifier = Modifier,
     ticker: Ticker?,
-    sort: QuoteSort?,
     size: TickerSize,
 ) {
   val quote = ticker?.quote
@@ -39,22 +38,20 @@ fun TickerPrice(
           when (size) {
             TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
             TickerSize.QUOTE -> TickerSizes.price(typography, contentColor)
+            TickerSize.QUOTE_SPECIAL -> TickerSizes.specialPrice(typography, contentColor)
           }
         }
 
-    val session =
-        when (sort) {
-          QuoteSort.PRE_MARKET -> quote.preMarket ?: quote.regular
-          QuoteSort.REGULAR -> quote.regular
-          QuoteSort.AFTER_HOURS -> quote.afterHours ?: quote.regular
-          null -> quote.currentSession
-        }
+    // If we are a special quote, display the regular market info
+    val session = if (size == TickerSize.QUOTE_SPECIAL) quote.regular else quote.currentSession
 
     val direction = session.direction
     val directionSign = session.direction.sign
     val composeColor =
         remember(direction, size, colors) {
-          return@remember if (size == TickerSize.QUOTE || direction.isZero) {
+          return@remember if (size == TickerSize.QUOTE ||
+              size == TickerSize.QUOTE_SPECIAL ||
+              direction.isZero) {
             // If no direction or is a quote so bg is colored, unspecified
             Color.Unspecified
           } else {
@@ -73,7 +70,7 @@ fun TickerPrice(
                 MarketState.POST -> "After Hours"
                 MarketState.PRE -> "Pre-Market"
               },
-          style = MaterialTheme.typography.caption,
+          style = sizes.label,
       )
       PriceSection(
           value = session.price.display,
@@ -138,7 +135,6 @@ private fun PreviewTickerPrice() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol),
             ),
-        sort = null,
         size = TickerSize.QUOTE,
     )
   }

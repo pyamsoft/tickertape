@@ -47,8 +47,6 @@ internal fun WatchlistDigToolbar(
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
   val allTabs = remember { WatchlistDigSections.values() }
 
-  val contentColor = LocalContentColor.current
-
   Surface(
       modifier = modifier,
       elevation = AppBarDefaults.TopAppBarElevation,
@@ -66,7 +64,6 @@ internal fun WatchlistDigToolbar(
       TopAppBar(
           modifier = Modifier.fillMaxWidth().statusBarsPadding(),
           backgroundColor = Color.Transparent,
-          contentColor = contentColor,
           elevation = ZeroElevation,
           title = {
             Text(

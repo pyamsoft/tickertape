@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.BaseListScreen
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.AnnaGoldScreen
@@ -29,7 +28,6 @@ fun WatchlistScreen(
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
-    onSortChanged: (QuoteSort) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
     onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
@@ -40,23 +38,20 @@ fun WatchlistScreen(
       imageLoader = imageLoader,
       isLoading = state.isLoading,
       pageError = state.error,
-      sort = state.sort,
       list = state.watchlist,
       search = state.query,
       tab = state.section,
       onRefresh = onRefresh,
-      onSortChanged = onSortChanged,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
       onFabClick = onFabClick,
       onRegenerateList = onRegenerateList,
       itemKey = { index, stock -> "${stock.symbol.raw}-${index}" },
-      renderListItem = { stock, sort ->
+      renderListItem = { stock ->
         WatchlistItem(
             modifier =
                 Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
             ticker = stock,
-            sort = sort,
             onSelect = onSelectTicker,
             onDelete = onDeleteTicker,
         )
@@ -97,7 +92,6 @@ private fun PreviewWatchlistScreen() {
       state = MutableWatchlistViewState(),
       imageLoader = createNewTestImageLoader(),
       onRefresh = {},
-      onSortChanged = {},
       onDeleteTicker = {},
       onSelectTicker = {},
       onSearchChanged = {},

@@ -42,7 +42,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.quote.QuoteSortMenu
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope

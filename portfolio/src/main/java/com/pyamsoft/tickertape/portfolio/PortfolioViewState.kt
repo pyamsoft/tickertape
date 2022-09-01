@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
 
@@ -34,7 +33,6 @@ interface PortfolioViewState : UiViewState {
   val portfolio: PortfolioStockList
   val stocks: List<PortfolioStock>
   val error: Throwable?
-  val sort: QuoteSort
 }
 
 @Stable
@@ -42,7 +40,6 @@ interface PortfolioViewState : UiViewState {
 internal class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
   override var query by mutableStateOf("")
   override var section by mutableStateOf(EquityType.STOCK)
-  override var sort by mutableStateOf(QuoteSort.REGULAR)
   override var isLoading by mutableStateOf(false)
   override var portfolio by mutableStateOf(PortfolioStockList.empty())
   override var stocks by mutableStateOf(emptyList<PortfolioStock>())

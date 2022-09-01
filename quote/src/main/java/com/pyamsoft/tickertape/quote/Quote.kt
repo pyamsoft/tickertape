@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,12 +117,26 @@ fun Quote(
     modifier: Modifier = Modifier,
     symbol: StockSymbol,
     ticker: Ticker?,
-    sort: QuoteSort,
     backgroundColor: Color,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     content: @Composable QuoteScope.() -> Unit = {},
 ) {
+
+  val isSpecialSession =
+      remember(ticker) {
+        if (ticker == null) {
+          return@remember false
+        } else {
+          val quote = ticker.quote
+          if (quote == null) {
+            return@remember false
+          } else {
+            return@remember quote.afterHours != null || quote.preMarket != null
+          }
+        }
+      }
+
   Card(
       modifier = modifier,
       elevation = CardDefaults.Elevation,
@@ -153,11 +168,22 @@ fun Quote(
           QuoteScopeInstance.content()
         }
 
-        TickerPrice(
-            ticker = ticker,
-            sort = sort,
-            size = TickerSize.QUOTE,
-        )
+        Column(
+            horizontalAlignment = Alignment.End,
+        ) {
+          if (isSpecialSession) {
+            TickerPrice(
+                modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
+                ticker = ticker,
+                size = TickerSize.QUOTE_SPECIAL,
+            )
+          }
+
+          TickerPrice(
+              ticker = ticker,
+              size = TickerSize.QUOTE,
+          )
+        }
       }
     }
   }
@@ -179,7 +205,6 @@ private fun PreviewQuote() {
                   quote = newTestQuote(symbol),
                   chart = null,
               ),
-          sort = QuoteSort.REGULAR,
           onClick = {},
           onLongClick = {},
       )

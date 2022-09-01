@@ -39,8 +39,6 @@ internal fun PortfolioDigToolbar(
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
   val allTabs = remember { PortfolioDigSections.values() }
 
-  val contentColor = LocalContentColor.current
-
   Surface(
       modifier = modifier,
       elevation = AppBarDefaults.TopAppBarElevation,
@@ -58,7 +56,6 @@ internal fun PortfolioDigToolbar(
       TopAppBar(
           modifier = Modifier.statusBarsPadding().fillMaxWidth(),
           backgroundColor = Color.Transparent,
-          contentColor = contentColor,
           elevation = ZeroElevation,
           title = {
             Text(

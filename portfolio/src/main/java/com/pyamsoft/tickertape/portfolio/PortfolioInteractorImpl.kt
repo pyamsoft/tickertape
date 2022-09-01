@@ -33,8 +33,6 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
-import com.pyamsoft.tickertape.quote.BaseQuoteInteractorImpl
-import com.pyamsoft.tickertape.quote.QuotePreferences
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,8 +59,7 @@ internal constructor(
     private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val interactor: TickerInteractor,
     private val interactorCache: TickerInteractor.Cache,
-    preferences: QuotePreferences,
-) : PortfolioInteractor, PortfolioInteractor.Cache, BaseQuoteInteractorImpl(preferences) {
+) : PortfolioInteractor, PortfolioInteractor.Cache {
 
   override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {

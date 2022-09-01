@@ -29,7 +29,6 @@ import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
 import javax.inject.Inject
@@ -58,7 +57,7 @@ internal constructor(
       highlander<PortfolioListGenerateResult, PortfolioViewState, List<PortfolioStock>> {
           state,
           tickers ->
-        val full = tickers.sortedWith(PortfolioStock.createComparator(state.sort))
+        val full = tickers.sortedWith(PortfolioStock.COMPARATOR)
         val portfolio = PortfolioStockList.of(full)
         val stocks = state.asVisible(full)
         return@highlander PortfolioListGenerateResult(
@@ -203,12 +202,6 @@ internal constructor(
     // On delete, we don't need to re-fetch quotes from the network
   }
 
-  private fun CoroutineScope.handleSortChanged(sort: QuoteSort) {
-    val s = state
-    s.sort = sort
-    s.regeneratePortfolio(this) { s.fullPortfolio }
-  }
-
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
     savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
   }
@@ -235,10 +228,6 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) {
       interactor.listenForSplitChanges { handleSplitRealtimeEvent(it) }
     }
-
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForSortChanges { handleSortChanged(it) }
-    }
   }
 
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
@@ -260,16 +249,6 @@ internal constructor(
             }
           }
           .onFinally { state.isLoading = false }
-    }
-  }
-
-  fun handleSortUpdated(scope: CoroutineScope, sort: QuoteSort) {
-    // Update here visually instantly
-    state.sort = sort
-    scope.launch(context = Dispatchers.Main) {
-      // This will fire a pref changed which will be caught by listenForSortChanges and regenerate
-      // the list
-      interactor.applyNewSort(sort)
     }
   }
 

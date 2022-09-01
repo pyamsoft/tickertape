@@ -19,12 +19,10 @@ package com.pyamsoft.tickertape.watchlist
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
-import com.pyamsoft.tickertape.quote.BaseQuoteInteractor
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface WatchlistInteractor : BaseQuoteInteractor {
+interface WatchlistInteractor {
 
   suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit)
 
@@ -35,6 +33,5 @@ interface WatchlistInteractor : BaseQuoteInteractor {
   interface Cache {
 
     suspend fun invalidateQuotes()
-
   }
 }

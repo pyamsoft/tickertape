@@ -32,6 +32,7 @@ fun TickerName(
         when (size) {
           TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
           TickerSize.QUOTE -> TickerSizes.company(typography, contentColor)
+          else -> throw IllegalStateException("Can't use TickerName with size: $size")
         }
       }
 

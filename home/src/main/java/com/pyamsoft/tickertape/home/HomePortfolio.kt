@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
-import com.pyamsoft.tickertape.quote.QuoteSort
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -170,7 +169,6 @@ private fun PreviewPortfolio() {
               override val portfolio: PortfolioStockList = PortfolioStockList.empty()
               override val portfolioError: Throwable? = null
               override val isLoadingPortfolio: Boolean = false
-              override val sort = QuoteSort.REGULAR
             },
         onRefresh = {},
     )

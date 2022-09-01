@@ -16,14 +16,12 @@
 
 package com.pyamsoft.tickertape.portfolio
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.db.split.DbSplit
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
@@ -152,27 +150,25 @@ internal constructor(
 
   companion object {
 
-    @JvmStatic
-    @CheckResult
-    fun createComparator(sort: QuoteSort): Comparator<PortfolioStock> {
-      return Comparator { o1, o2 ->
-        val t1 = o1.ticker
-        val t2 = o2.ticker
-        
-        if (t1 != null && t2 != null) {
-          return@Comparator Ticker.createComparator(sort).compare(t1, t2)
-        }
+    @JvmField
+    val COMPARATOR =
+        Comparator<PortfolioStock> { o1, o2 ->
+          val t1 = o1.ticker
+          val t2 = o2.ticker
 
-        if (t1 == null) {
-          return@Comparator -1
-        }
+          if (t1 != null && t2 != null) {
+            return@Comparator Ticker.COMPARATOR.compare(t1, t2)
+          }
 
-        if (t2 == null) {
-          return@Comparator 1
-        }
+          if (t1 == null) {
+            return@Comparator -1
+          }
 
-        return@Comparator o2.holding.symbol.compareTo(o1.holding.symbol)
-      }
-    }
+          if (t2 == null) {
+            return@Comparator 1
+          }
+
+          return@Comparator o2.holding.symbol.compareTo(o1.holding.symbol)
+        }
   }
 }

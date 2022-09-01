@@ -24,7 +24,6 @@ import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
-import com.pyamsoft.tickertape.quote.QuoteSort
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -54,7 +53,7 @@ internal constructor(
 
   private val watchlistGenerator =
       highlander<ListGenerateResult<Ticker>, WatchlistViewState, List<Ticker>> { state, tickers ->
-        val all = tickers.sortedWith(Ticker.createComparator(state.sort))
+        val all = tickers.sortedWith(Ticker.COMPARATOR)
         val visible = state.asVisible(all)
         return@highlander ListGenerateResult.create(
             all = all,
@@ -140,12 +139,6 @@ internal constructor(
         .toList()
   }
 
-  private fun CoroutineScope.handleSortChanged(sort: QuoteSort) {
-    val s = state
-    s.sort = sort
-    s.regenerateTickers(this) { s.allTickers }
-  }
-
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
     savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
   }
@@ -185,20 +178,6 @@ internal constructor(
   fun bind(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
       interactor.listenForChanges { handleRealtimeEvent(it) }
-    }
-
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForSortChanges { handleSortChanged(it) }
-    }
-  }
-
-  fun handleSortUpdated(scope: CoroutineScope, sort: QuoteSort) {
-    // Update here visually instantly
-    state.sort = sort
-    scope.launch(context = Dispatchers.Main) {
-      // This will fire a pref changed which will be caught by listenForSortChanges and regenerate
-      // the list
-      interactor.applyNewSort(sort)
     }
   }
 

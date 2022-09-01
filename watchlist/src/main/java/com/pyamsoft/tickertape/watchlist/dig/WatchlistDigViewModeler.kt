@@ -40,9 +40,9 @@ internal constructor(
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
         state,
+        lookupSymbol,
         interactor,
         interactorCache,
-        lookupSymbol,
     ) {
 
   private val loadRunner =
@@ -66,6 +66,9 @@ internal constructor(
                 }
                 WatchlistDigSections.RECOMMENDATIONS -> {
                   add(async { loadRecommendations(force) })
+                }
+                WatchlistDigSections.OPTIONS_CHAIN -> {
+                  add(async { loadOptionsChain(force) })
                 }
               }.also {
                 // Just here for exhaustive when
@@ -118,21 +121,17 @@ internal constructor(
   }
 
   fun handleModifyWatchlist(scope: CoroutineScope) {
-    val s = state
-    if (!s.isAllowModifyWatchlist) {
-      throw IllegalStateException("Add to watchlist handler called but not allowed here!")
-    }
-
     scope.launch(context = Dispatchers.Main) {
       watchlistModifyRunner
           .call()
-          .onFailure { Timber.e(it, "Error adding symbol to watchlist") }
+          .onFailure { Timber.e(it, "Error modifying watchlist") }
           .onSuccess { s ->
-            Timber.d("Add symbol to watchlist: $s")
+            Timber.d("Modify watchlist: $s")
             state.isInWatchlist = s
           }
           .onFailure {
             // TODO handle error
+            Timber.e(it, "Failed to modify watchlist")
           }
     }
   }

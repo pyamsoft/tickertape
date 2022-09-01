@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 @Stable
 interface PortfolioDigViewState : DigViewState {
-  val isLoading: Boolean
   val section: PortfolioDigSections
 
   val stockSplits: List<DbSplit>
@@ -34,7 +33,6 @@ class MutablePortfolioDigViewState
 internal constructor(
     symbol: StockSymbol,
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
-  override var isLoading by mutableStateOf(false)
   override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
 
   override var stockSplitError by mutableStateOf<Throwable?>(null)

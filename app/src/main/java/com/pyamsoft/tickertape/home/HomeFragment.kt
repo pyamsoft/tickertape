@@ -71,7 +71,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             WatchlistDigFragment.Screen(
                 symbol = ticker.symbol,
                 lookupSymbol = lookupSymbol,
-                allowModifyWatchlist = false,
                 equityType = equityType,
             ),
         )

@@ -5,4 +5,5 @@ enum class WatchlistDigSections(val display: String) {
   STATISTICS("Details"),
   NEWS("News"),
   RECOMMENDATIONS("Recommendations"),
+  OPTIONS_CHAIN("Options Chain"),
 }

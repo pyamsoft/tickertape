@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist.dig
+package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import dagger.BindsInstance
-import dagger.Subcomponent
-import javax.inject.Named
 
-@Subcomponent
-internal interface WatchlistDigComponent {
+interface BaseTickerInteractor {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: WatchlistDigFragment)
+  @CheckResult suspend fun getOptionsChain(symbol: StockSymbol): ResultWrapper<StockOptions>
 
-  @Subcomponent.Factory
-  interface Factory {
+  interface Cache {
 
-    @CheckResult
-    fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance @Named("lookup") lookupSymbol: StockSymbol,
-        @BindsInstance equityType: EquityType,
-    ): WatchlistDigComponent
+    suspend fun invalidateOptionsChain(symbol: StockSymbol)
   }
 }

@@ -44,20 +44,47 @@ class PortfolioDigViewModeler
 @Inject
 internal constructor(
     private val state: MutablePortfolioDigViewState,
-    private val holdingId: DbHolding.Id,
-    private val interactor: PortfolioDigInteractor,
-    private val interactorCache: PortfolioDigInteractor.Cache,
     private val equityType: EquityType,
     private val tradeSide: TradeSide,
     private val currentPrice: StockMoneyValue?,
+    private val interactor: PortfolioDigInteractor,
     @Named("lookup") lookupSymbol: StockSymbol?,
+    interactorCache: PortfolioDigInteractor.Cache,
+    holdingId: DbHolding.Id,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
+        lookupSymbol,
         interactor,
         interactorCache,
-        lookupSymbol,
     ) {
+
+  private val splitLoadRunner =
+      highlander<ResultWrapper<List<DbSplit>>, Boolean> { force ->
+        if (force) {
+          interactorCache.invalidateSplits()
+        }
+        return@highlander interactor.getSplits(holdingId)
+      }
+
+  private val holdingLoadRunner =
+      highlander<ResultWrapper<DbHolding>, Boolean> { force ->
+        if (force) {
+          interactorCache.invalidateHolding()
+        }
+        return@highlander interactor.getHolding(holdingId)
+      }
+
+  private val positionsLoadRunner =
+      highlander<ResultWrapper<List<PositionStock>>, Boolean, List<DbSplit>> { force, splits ->
+        if (force) {
+          interactorCache.invalidatePositions()
+        }
+
+        return@highlander interactor.getPositions(holdingId).map { p ->
+          p.map { createPositionStock(it, splits) }
+        }
+      }
 
   private val positionDeleteRunner =
       highlander<ResultWrapper<Boolean>, DbPosition> { interactor.deletePosition(it) }
@@ -91,6 +118,9 @@ internal constructor(
                 PortfolioDigSections.RECOMMENDATIONS -> {
                   add(async { loadRecommendations(force) })
                 }
+                PortfolioDigSections.OPTIONS_CHAIN -> {
+                  add(async { loadOptionsChain(force) })
+                }
               }.also {
                 // Just here for exhaustive when
               }
@@ -114,11 +144,8 @@ internal constructor(
 
   private suspend fun loadSplits(force: Boolean) {
     val s = state
-    if (force) {
-      interactorCache.invalidateSplits()
-    }
-    interactor
-        .getSplits(holdingId)
+    splitLoadRunner
+        .call(force)
         .onSuccess { sp ->
           s.apply {
             stockSplitError = null
@@ -134,12 +161,8 @@ internal constructor(
   }
 
   private suspend fun loadHolding(force: Boolean) {
-    if (force) {
-      interactorCache.invalidateHolding()
-    }
-
-    interactor
-        .getHolding(holdingId)
+    holdingLoadRunner
+        .call(force)
         .onSuccess { h ->
           state.apply {
             holding = h
@@ -158,13 +181,8 @@ internal constructor(
     val s = state
     val splits = s.stockSplits
 
-    if (force) {
-      interactorCache.invalidatePositions()
-    }
-
-    interactor
-        .getPositions(holdingId)
-        .map { p -> p.map { createPositionStock(it, splits) } }
+    positionsLoadRunner
+        .call(force, splits)
         .onSuccess { p ->
           s.apply {
             positionsError = null

@@ -122,7 +122,6 @@ internal class MainActivity : PYDroidActivity() {
             WatchlistDigFragment.Screen(
                 symbol = symbol,
                 lookupSymbol = lookupSymbol,
-                allowModifyWatchlist = false,
                 equityType = equityType,
             ),
         )

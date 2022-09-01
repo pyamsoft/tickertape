@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
@@ -25,7 +24,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+
+private val HIDE_TABS_FOR_OPTIONS =
+    arrayOf(
+        PortfolioDigSections.OPTIONS_CHAIN,
+        PortfolioDigSections.NEWS,
+        PortfolioDigSections.RECOMMENDATIONS,
+        PortfolioDigSections.STATISTICS,
+    )
 
 @Composable
 internal fun PortfolioDigToolbar(
@@ -37,7 +45,23 @@ internal fun PortfolioDigToolbar(
   val ticker = state.ticker
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
-  val allTabs = remember { PortfolioDigSections.values() }
+
+  // Hide tabs in options
+  val allTabs =
+      remember(ticker.quote) {
+        PortfolioDigSections.values().filter { v ->
+          val q = ticker.quote
+          if (q == null) {
+            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+          } else {
+            if (q.type == EquityType.OPTION) {
+              return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+            } else {
+              return@filter true
+            }
+          }
+        }
+      }
 
   Surface(
       modifier = modifier,

@@ -65,7 +65,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 symbol = ticker.symbol,
                 lookupSymbol = ticker.symbol,
                 equityType = quote?.type ?: EquityType.STOCK,
-                allowModifyWatchlist = true,
             ),
         )
   }
@@ -92,16 +91,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         .getString(KEY_EQUITY_TYPE)
         .let { it.requireNotNull { "Must be created with $KEY_EQUITY_TYPE" } }
         .let { EquityType.valueOf(it) }
-  }
-
-  @CheckResult
-  private fun getAllowModifyWatchlist(): Boolean {
-    val args = requireArguments()
-    if (!args.containsKey(KEY_ALLOW_MODIFY)) {
-      throw IllegalArgumentException("Must be created with $KEY_ALLOW_MODIFY")
-    }
-
-    return args.getBoolean(KEY_ALLOW_MODIFY, false)
   }
 
   private fun handleModifyWatchlist() {
@@ -150,7 +139,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         .create(
             getSymbol(),
             getLookupSymbol(),
-            getAllowModifyWatchlist(),
             getEquityType(),
         )
         .inject(this)
@@ -222,7 +210,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         symbol = getSymbol(),
         lookupSymbol = getLookupSymbol(),
         equityType = getEquityType(),
-        allowModifyWatchlist = getAllowModifyWatchlist(),
     )
   }
 
@@ -230,7 +217,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       val symbol: StockSymbol,
       val lookupSymbol: StockSymbol,
       val equityType: EquityType,
-      val allowModifyWatchlist: Boolean,
   ) : MainPage
 
   companion object {
@@ -238,7 +224,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     private const val KEY_SYMBOL = "key_symbol"
     private const val KEY_LOOKUP_SYMBOL = "key_lookup_symbol"
     private const val KEY_EQUITY_TYPE = "key_equity_type"
-    private const val KEY_ALLOW_MODIFY = "key_allow_modify"
 
     @JvmStatic
     @CheckResult
@@ -246,7 +231,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         symbol: StockSymbol,
         lookupSymbol: StockSymbol,
         equityType: EquityType,
-        allowModifyWatchlist: Boolean,
     ): Fragment {
       return WatchlistDigFragment().apply {
         arguments =
@@ -254,7 +238,6 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
               putString(KEY_SYMBOL, symbol.raw)
               putString(KEY_LOOKUP_SYMBOL, lookupSymbol.raw)
               putString(KEY_EQUITY_TYPE, equityType.name)
-              putBoolean(KEY_ALLOW_MODIFY, allowModifyWatchlist)
             }
       }
     }

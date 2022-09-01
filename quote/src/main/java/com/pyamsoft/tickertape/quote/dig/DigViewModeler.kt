@@ -17,12 +17,16 @@
 package com.pyamsoft.tickertape.quote.dig
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.CoroutineScope
@@ -35,10 +39,72 @@ import timber.log.Timber
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
     private val state: S,
-    private val interactor: DigInteractor,
-    private val interactorCache: DigInteractor.Cache,
     private val lookupSymbol: StockSymbol?,
+    interactor: DigInteractor,
+    interactorCache: DigInteractor.Cache,
 ) : AbstractViewModeler<S>(state) {
+
+  private val optionsRunner =
+      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
+        if (force) {
+          interactorCache.invalidateOptionsChain(symbol)
+        }
+        return@highlander interactor.getOptionsChain(symbol)
+      }
+
+  private val statisticsRunner =
+      highlander<ResultWrapper<KeyStatistics>, Boolean, StockSymbol> { force, symbol ->
+        if (force) {
+          interactorCache.invalidateStatistics(symbol)
+        }
+        return@highlander interactor.getStatistics(symbol)
+      }
+
+  private val recommendationRunner =
+      highlander<ResultWrapper<StockRecommendations>, Boolean, StockSymbol> { force, symbol ->
+        if (force) {
+          interactorCache.invalidateRecommendations(symbol)
+        }
+        return@highlander interactor.getRecommendations(symbol)
+      }
+
+  private val newsRunner =
+      highlander<ResultWrapper<List<StockNews>>, Boolean, StockSymbol> { force, symbol ->
+        if (force) {
+          interactorCache.invalidateNews(symbol)
+        }
+
+        return@highlander interactor
+            .getNews(symbol)
+            // Sort news articles by published date
+            .map { news ->
+              // Run Off main thread
+              return@map withContext(context = Dispatchers.IO) {
+                Enforcer.assertOffMainThread()
+                return@withContext news.sortedByDescending { it.publishedAt }
+              }
+            }
+      }
+
+  private val chartRunner =
+      highlander<ResultWrapper<Ticker>, Boolean, StockSymbol, StockChart.IntervalRange> {
+          force,
+          symbol,
+          range ->
+        if (force) {
+          interactorCache.invalidateChart(symbol, range)
+        }
+
+        return@highlander interactor.getChart(symbol, range)
+      }
+
+  private val recommendationLookupRunner =
+      highlander<ResultWrapper<List<Ticker>>, StockRecommendations> { recs ->
+        interactor.getCharts(
+            symbols = recs.recommendations,
+            range = StockChart.IntervalRange.ONE_DAY,
+        )
+      }
 
   @CheckResult
   private fun StockSymbol.asTicker(): Ticker {
@@ -54,21 +120,38 @@ protected constructor(
     return lookupSymbol ?: state.ticker.symbol
   }
 
+  protected suspend fun loadOptionsChain(force: Boolean) {
+    val s = state
+    val symbol = getLookupSymbol()
+    optionsRunner
+        .call(force, symbol)
+        .onSuccess { o ->
+          s.apply {
+            optionsChain = o
+            optionsError = null
+          }
+        }
+        .onFailure { Timber.e(it, "Failed to load options chain for $symbol") }
+        .onFailure { e ->
+          s.apply {
+            optionsChain = null
+            optionsError = e
+          }
+        }
+  }
+
   protected suspend fun loadRecommendations(force: Boolean) {
     val s = state
     val symbol = getLookupSymbol()
-    if (force) {
-      interactorCache.invalidateRecommendations(symbol)
-    }
-
-    interactor
-        .getRecommendations(symbol)
+    recommendationRunner
+        .call(force, symbol)
         .onSuccess { r ->
           s.apply {
             recommendations = r.recommendations.map { it.asTicker() }
             recommendationError = null
           }
         }
+        .onFailure { Timber.e(it, "Failed to load recommendations for $symbol") }
         .onFailure { e ->
           s.apply {
             recommendations = emptyList()
@@ -81,19 +164,14 @@ protected constructor(
   private suspend fun loadQuotesForRecommendations(recommendations: StockRecommendations) =
       coroutineScope {
         launch(context = Dispatchers.Main) {
-          val symbols = recommendations.recommendations
-          val range = StockChart.IntervalRange.ONE_DAY
-          interactor
-              .getCharts(
-                  symbols = symbols,
-                  range,
-              )
+          recommendationLookupRunner
+              .call(recommendations)
               .onSuccess { rec ->
                 Timber.d("Loaded full recs for symbols: $rec")
                 state.recommendations = rec
               }
               .onFailure { e ->
-                Timber.e(e, "Failed to load full ticker quote for symbols: $symbols")
+                Timber.e(e, "Failed to load full ticker quote for recs: $recommendations")
               }
         }
       }
@@ -101,11 +179,8 @@ protected constructor(
   protected suspend fun loadStatistics(force: Boolean) {
     val s = state
     val symbol = getLookupSymbol()
-    if (force) {
-      interactorCache.invalidateStatistics(symbol)
-    }
-    interactor
-        .getStatistics(symbol)
+    statisticsRunner
+        .call(force, symbol)
         .onSuccess { n ->
           s.apply {
             statistics = n
@@ -123,20 +198,8 @@ protected constructor(
   protected suspend fun loadNews(force: Boolean) {
     val s = state
     val symbol = getLookupSymbol()
-    if (force) {
-      interactorCache.invalidateNews(symbol)
-    }
-    interactor
-        .getNews(symbol)
-        // Sort news articles by published date
-        .map { news ->
-          // Run Off main thread
-          withContext(context = Dispatchers.IO) {
-            Enforcer.assertOffMainThread()
-
-            return@withContext news.sortedByDescending { it.publishedAt }
-          }
-        }
+    newsRunner
+        .call(force, symbol)
         .onSuccess { n ->
           s.apply {
             news = n
@@ -157,13 +220,9 @@ protected constructor(
     val s = state
     val symbol = s.ticker.symbol
     val range = s.range
-    if (force) {
-      interactorCache.invalidateChart(symbol, range)
-    }
-
-    return interactor
-        .getChart(symbol, range)
-        .onSuccess { t -> s.apply { ticker = t } }
+    return chartRunner
+        .call(force, symbol, range)
+        .onSuccess { s.ticker = it }
         .onSuccess { ticker ->
           ticker.chart?.also { c ->
             if (c.dates.isEmpty()) {

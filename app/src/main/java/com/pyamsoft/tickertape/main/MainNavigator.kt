@@ -54,7 +54,6 @@ internal constructor(
             WatchlistDigFragment.newInstance(
                 symbol = screen.symbol,
                 lookupSymbol = screen.lookupSymbol,
-                allowModifyWatchlist = screen.allowModifyWatchlist,
                 equityType = screen.equityType,
             )
         is PortfolioDigFragment.Screen ->

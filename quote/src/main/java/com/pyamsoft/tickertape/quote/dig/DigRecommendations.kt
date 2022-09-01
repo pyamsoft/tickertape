@@ -28,15 +28,16 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 fun DigRecommendations(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
-    recommendations: List<Ticker>,
+    state: DigViewState,
     onRefresh: () -> Unit,
     onRecClick: (Ticker) -> Unit,
 ) {
+  val recommendations = state.recommendations
   val visible = remember(recommendations) { recommendations.isNotEmpty() }
 
   AnimatedVisibility(
@@ -45,7 +46,7 @@ fun DigRecommendations(
   ) {
     SwipeRefresh(
         modifier = modifier,
-        state = rememberSwipeRefreshState(isRefreshing = isLoading),
+        state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
         onRefresh = onRefresh,
     ) {
       RecommendationList(
@@ -152,8 +153,11 @@ private fun RecommendationItem(
 @Composable
 private fun PreviewDigRecommendations() {
   DigRecommendations(
-      isLoading = false,
-      recommendations = emptyList(),
+      state =
+      object :
+          MutableDigViewState(
+              symbol = "MSFT".asSymbol(),
+          ) {},
       onRefresh = {},
       onRecClick = {},
   )

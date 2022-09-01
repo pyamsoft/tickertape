@@ -24,14 +24,15 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 fun DigKeyStatistics(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
-    statistics: KeyStatistics?,
+    state: DigViewState,
     onRefresh: () -> Unit,
 ) {
+  val statistics = state.statistics
   val visible = remember(statistics) { statistics != null }
 
   AnimatedVisibility(
@@ -41,7 +42,7 @@ fun DigKeyStatistics(
     if (statistics != null) {
       SwipeRefresh(
           modifier = modifier,
-          state = rememberSwipeRefreshState(isRefreshing = isLoading),
+          state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
           onRefresh = onRefresh,
       ) {
         StatisticsGrid(
@@ -309,13 +310,13 @@ private fun LazyListScope.renderStockPriceHistory(
     )
   }
 
-    item {
-        StatisticsItem(
-            modifier = Modifier.fillMaxWidth(),
-            title = "S&P500 52-Week Change",
-            content = info.marketFiftyTwoWeekChange.fmt,
-        )
-    }
+  item {
+    StatisticsItem(
+        modifier = Modifier.fillMaxWidth(),
+        title = "S&P500 52-Week Change",
+        content = info.marketFiftyTwoWeekChange.fmt,
+    )
+  }
 }
 
 private fun LazyListScope.renderIncomeStatement(
@@ -452,8 +453,11 @@ private fun StatisticsItem(
 @Composable
 private fun PreviewDigKeyStatistics() {
   DigKeyStatistics(
-      isLoading = false,
-      statistics = null,
+      state =
+          object :
+              MutableDigViewState(
+                  symbol = "MSFT".asSymbol(),
+              ) {},
       onRefresh = {},
   )
 }

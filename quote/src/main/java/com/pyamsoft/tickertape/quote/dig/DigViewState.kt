@@ -10,11 +10,13 @@ import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
 @Stable
 interface DigViewState : UiViewState {
+  val isLoading: Boolean
 
   val ticker: Ticker
 
@@ -32,6 +34,9 @@ interface DigViewState : UiViewState {
 
   val recommendations: List<Ticker>
   val recommendationError: Throwable?
+
+  val optionsChain: StockOptions?
+  val optionsError: Throwable?
 }
 
 @Stable
@@ -39,6 +44,11 @@ abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
 ) : DigViewState {
+  final override var isLoading by mutableStateOf(false)
+
+  final override var optionsChain by mutableStateOf<StockOptions?>(null)
+  final override var optionsError by mutableStateOf<Throwable?>(null)
+
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)
 

@@ -19,13 +19,14 @@ import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
-import com.pyamsoft.tickertape.portfolio.dig.news.PositionNews
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
-import com.pyamsoft.tickertape.portfolio.dig.recs.PositionRecommendations
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
-import com.pyamsoft.tickertape.portfolio.dig.stats.PositionStats
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
+import com.pyamsoft.tickertape.quote.dig.DigNews
+import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
+import com.pyamsoft.tickertape.quote.dig.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
@@ -126,7 +127,7 @@ private fun Content(
         )
       }
       PortfolioDigSections.NEWS -> {
-        PositionNews(
+        DigNews(
             modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
@@ -144,7 +145,7 @@ private fun Content(
         )
       }
       PortfolioDigSections.STATISTICS -> {
-        PositionStats(
+        DigKeyStatistics(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
@@ -161,11 +162,17 @@ private fun Content(
         )
       }
       PortfolioDigSections.RECOMMENDATIONS -> {
-        PositionRecommendations(
+        DigRecommendations(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
             onRecClick = onRecClick,
+        )
+      }
+      PortfolioDigSections.OPTIONS_CHAIN -> {
+        DigOptionsChain(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
         )
       }
     }
@@ -179,7 +186,9 @@ private fun Loading(
   Box(
       modifier = modifier.padding(MaterialTheme.keylines.content),
       contentAlignment = Alignment.Center,
-  ) { CircularProgressIndicator() }
+  ) {
+    CircularProgressIndicator()
+  }
 }
 
 @Preview

@@ -33,6 +33,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
@@ -40,14 +41,13 @@ import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 @JvmOverloads
 fun DigNews(
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
     imageLoader: ImageLoader,
-    news: List<StockNews>,
+    state: DigViewState,
     onRefresh: () -> Unit,
 ) {
   SwipeRefresh(
       modifier = modifier,
-      state = rememberSwipeRefreshState(isRefreshing = isLoading),
+      state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
       onRefresh = onRefresh,
   ) {
     LazyColumn(
@@ -56,7 +56,7 @@ fun DigNews(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
       items(
-          items = news,
+          items = state.news,
           key = { it.id },
       ) { n ->
         NewsItem(
@@ -158,8 +158,11 @@ private fun PreviewDigNews() {
     Surface {
       DigNews(
           modifier = Modifier.padding(16.dp),
-          isLoading = false,
-          news = emptyList(),
+          state =
+              object :
+                  MutableDigViewState(
+                      symbol = "MSFT".asSymbol(),
+                  ) {},
           onRefresh = {},
           imageLoader = createNewTestImageLoader(),
       )

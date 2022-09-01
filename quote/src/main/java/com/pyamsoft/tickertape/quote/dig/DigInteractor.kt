@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.quote.dig
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.BaseTickerInteractor
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -25,7 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
-interface DigInteractor {
+interface DigInteractor : BaseTickerInteractor {
 
   @CheckResult suspend fun getStatistics(symbol: StockSymbol): ResultWrapper<KeyStatistics>
 
@@ -46,7 +47,7 @@ interface DigInteractor {
       range: StockChart.IntervalRange,
   ): ResultWrapper<List<Ticker>>
 
-  interface Cache {
+  interface Cache : BaseTickerInteractor.Cache {
 
     suspend fun invalidateStatistics(symbol: StockSymbol)
 

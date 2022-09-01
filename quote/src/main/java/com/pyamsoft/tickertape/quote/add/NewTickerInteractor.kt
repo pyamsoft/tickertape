@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.quote.BaseTickerInteractor
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
@@ -28,7 +29,7 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDateTime
 
-interface NewTickerInteractor {
+interface NewTickerInteractor : BaseTickerInteractor {
 
   @CheckResult suspend fun search(query: String): ResultWrapper<List<SearchResult>>
 
@@ -50,14 +51,10 @@ interface NewTickerInteractor {
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>>
 
-  @CheckResult suspend fun lookupOptionsData(symbol: StockSymbol): ResultWrapper<StockOptions>
-
-  interface Cache {
+  interface Cache : BaseTickerInteractor.Cache {
 
     suspend fun invalidateSearch(query: String)
 
     suspend fun invalidateTicker(symbol: StockSymbol)
-
-    suspend fun invalidateOptionsData(symbol: StockSymbol)
   }
 }

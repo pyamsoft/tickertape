@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
 import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.quote.BaseTickerInteractorImpl
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -55,7 +56,13 @@ internal constructor(
     private val stockInteractorCache: StockInteractor.Cache,
     private val tickerInteractor: TickerInteractor,
     private val tickerInteractorCache: TickerInteractor.Cache,
-) : NewTickerInteractor, NewTickerInteractor.Cache {
+) :
+    NewTickerInteractor,
+    NewTickerInteractor.Cache,
+    BaseTickerInteractorImpl(
+        stockInteractor,
+        stockInteractorCache,
+    ) {
 
   override suspend fun resolveTicker(symbol: StockSymbol): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
@@ -188,29 +195,6 @@ internal constructor(
             ResultWrapper.failure(e)
           }
         }
-      }
-
-  override suspend fun lookupOptionsData(symbol: StockSymbol): ResultWrapper<StockOptions> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
-          val options = stockInteractor.getOptions(listOf(symbol))
-          // Right now we only support 1 lookup at a time in the UI
-          val result = options.first()
-          ResultWrapper.success(result)
-        } catch (e: Throwable) {
-          e.ifNotCancellation {
-            Timber.e(e, "Failed to lookup options data: $symbol")
-            ResultWrapper.failure(e)
-          }
-        }
-      }
-
-  override suspend fun invalidateOptionsData(symbol: StockSymbol) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        stockInteractorCache.invalidateQuotes(listOf(symbol))
       }
 
   override suspend fun resolveOptionsIdentifier(

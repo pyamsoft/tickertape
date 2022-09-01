@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.quote.dig
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
+import com.pyamsoft.tickertape.quote.BaseTickerInteractorImpl
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -37,7 +38,13 @@ protected constructor(
     private val interactorCache: TickerInteractor.Cache,
     private val stockInteractor: StockInteractor,
     private val stockInteractorCache: StockInteractor.Cache,
-) : DigInteractor, DigInteractor.Cache {
+) :
+    DigInteractor,
+    DigInteractor.Cache,
+    BaseTickerInteractorImpl(
+        stockInteractor,
+        stockInteractorCache,
+    ) {
 
   final override suspend fun getRecommendations(
       symbol: StockSymbol

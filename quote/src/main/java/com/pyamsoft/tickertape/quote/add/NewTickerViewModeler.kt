@@ -58,9 +58,9 @@ internal constructor(
   private val optionLookupRunner =
       highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
         if (force) {
-          interactorCache.invalidateOptionsData(symbol)
+          interactorCache.invalidateOptionsChain(symbol)
         }
-        return@highlander interactor.lookupOptionsData(symbol)
+        return@highlander interactor.getOptionsChain(symbol)
       }
 
   private val optionResolverRunner =

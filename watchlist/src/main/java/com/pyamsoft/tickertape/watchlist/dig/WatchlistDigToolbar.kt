@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
@@ -26,8 +25,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.StarBorder
+
+private val HIDE_TABS_FOR_OPTIONS =
+    arrayOf(
+        WatchlistDigSections.OPTIONS_CHAIN,
+        WatchlistDigSections.NEWS,
+        WatchlistDigSections.RECOMMENDATIONS,
+        WatchlistDigSections.STATISTICS,
+    )
 
 @Composable
 internal fun WatchlistDigToolbar(
@@ -40,12 +48,27 @@ internal fun WatchlistDigToolbar(
   val isLoading = state.isLoading
   val ticker = state.ticker
   val isInWatchlist = state.isInWatchlist
-  val isAllowedToModifyWatchlist = state.isAllowModifyWatchlist
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
-  val allTabs = remember { WatchlistDigSections.values() }
+
+  // Hide tabs in options
+  val allTabs =
+      remember(ticker.quote) {
+        WatchlistDigSections.values().filter { v ->
+          val q = ticker.quote
+          if (q == null) {
+            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+          } else {
+            if (q.type == EquityType.OPTION) {
+              return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+            } else {
+              return@filter true
+            }
+          }
+        }
+      }
 
   Surface(
       modifier = modifier,
@@ -83,7 +106,7 @@ internal fun WatchlistDigToolbar(
             }
           },
           actions = {
-            if (!isLoading && isAllowedToModifyWatchlist && !hasIsInWatchlistError) {
+            if (!isLoading && !hasIsInWatchlistError) {
               IconButton(
                   onClick = onModifyWatchlist,
               ) {
@@ -143,7 +166,6 @@ private fun PreviewWatchlistDigToolbar() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
-              allowModifyWatchlist = true,
           ),
       onClose = {},
       onModifyWatchlist = {},

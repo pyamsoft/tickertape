@@ -19,12 +19,13 @@ import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigChart
+import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
+import com.pyamsoft.tickertape.quote.dig.DigNews
+import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
+import com.pyamsoft.tickertape.quote.dig.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import com.pyamsoft.tickertape.watchlist.dig.news.WatchlistNews
-import com.pyamsoft.tickertape.watchlist.dig.recs.WatchlistRecommendations
-import com.pyamsoft.tickertape.watchlist.dig.stats.WatchlistStats
 
 @Composable
 @JvmOverloads
@@ -108,7 +109,7 @@ private fun Content(
         )
       }
       WatchlistDigSections.NEWS -> {
-        WatchlistNews(
+        DigNews(
             modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
@@ -116,18 +117,24 @@ private fun Content(
         )
       }
       WatchlistDigSections.STATISTICS -> {
-        WatchlistStats(
+        DigKeyStatistics(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
         )
       }
       WatchlistDigSections.RECOMMENDATIONS -> {
-        WatchlistRecommendations(
+        DigRecommendations(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
             onRecClick = onRecClick,
+        )
+      }
+      WatchlistDigSections.OPTIONS_CHAIN -> {
+        DigOptionsChain(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
         )
       }
     }
@@ -141,7 +148,9 @@ private fun Loading(
   Box(
       modifier = modifier.padding(MaterialTheme.keylines.content),
       contentAlignment = Alignment.Center,
-  ) { CircularProgressIndicator() }
+  ) {
+    CircularProgressIndicator()
+  }
 }
 
 @Preview
@@ -152,7 +161,6 @@ private fun PreviewWatchlistDigScreen() {
       state =
           MutableWatchlistDigViewState(
               symbol = symbol,
-              allowModifyWatchlist = true,
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},

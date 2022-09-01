@@ -76,7 +76,6 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 symbol = ticker.symbol,
                 lookupSymbol = ticker.symbol,
                 equityType = quote?.type ?: EquityType.STOCK,
-                allowModifyWatchlist = true,
             ),
         )
   }

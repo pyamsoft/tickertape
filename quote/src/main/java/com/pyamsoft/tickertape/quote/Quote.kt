@@ -143,7 +143,7 @@ fun Quote(
       backgroundColor = backgroundColor,
       contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
-    Column(
+    Row(
         modifier =
             Modifier.combinedClickable(
                     onClick = onClick,
@@ -151,39 +151,42 @@ fun Quote(
                 )
                 .padding(MaterialTheme.keylines.baseline)
                 .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom,
     ) {
-      TickerName(
-          symbol = symbol,
-          ticker = ticker,
-          size = TickerSize.QUOTE,
-      )
-      Row(
-          modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.Bottom,
+      Column(
+          modifier = Modifier.weight(1F),
+          verticalArrangement = Arrangement.SpaceBetween,
       ) {
+        TickerName(
+            symbol = symbol,
+            ticker = ticker,
+            size = TickerSize.QUOTE,
+        )
+
         Column(
-            modifier = Modifier.weight(1F),
+            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
         ) {
           QuoteScopeInstance.content()
         }
+      }
 
-        Column(
-            horizontalAlignment = Alignment.End,
-        ) {
-          if (isSpecialSession) {
-            TickerPrice(
-                modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
-                ticker = ticker,
-                size = TickerSize.QUOTE_SPECIAL,
-            )
-          }
-
+      Column(
+          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+          horizontalAlignment = Alignment.End,
+      ) {
+        if (isSpecialSession) {
           TickerPrice(
+              modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
               ticker = ticker,
-              size = TickerSize.QUOTE,
+              size = TickerSize.QUOTE_SPECIAL,
           )
         }
+
+        TickerPrice(
+            ticker = ticker,
+            size = TickerSize.QUOTE,
+        )
       }
     }
   }

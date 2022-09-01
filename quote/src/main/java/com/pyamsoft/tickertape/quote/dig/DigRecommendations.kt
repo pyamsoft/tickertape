@@ -121,7 +121,6 @@ private fun RecommendationItem(
             chart = chart,
         )
       }
-
       Box(
           modifier = Modifier.fillMaxWidth(),
           contentAlignment = Alignment.BottomEnd,

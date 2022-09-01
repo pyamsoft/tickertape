@@ -61,9 +61,7 @@ fun WatchlistItem(
         onLongClick = { onDelete(ticker) },
     ) {
       if (quote != null) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+        Column {
           quote.dayPreviousClose?.also { close ->
             Info(
                 name = "Previous Close",

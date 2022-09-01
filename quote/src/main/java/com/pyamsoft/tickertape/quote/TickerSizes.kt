@@ -69,17 +69,18 @@ internal constructor(
             title =
                 typography.body1.copy(
                     color = color,
-                    fontWeight = FontWeight.W700,
+                    fontWeight = FontWeight.W400,
                 ),
             description =
                 typography.caption.copy(
                     color = color,
-                    fontWeight = FontWeight.W600,
+                    fontWeight = FontWeight.W100,
                 ),
             label =
                 typography.caption.copy(
                     color = color,
                     fontSize = 10.sp,
+                    fontWeight = FontWeight.W100,
                 ),
         )
   }

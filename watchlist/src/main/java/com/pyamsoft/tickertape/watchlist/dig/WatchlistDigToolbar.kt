@@ -32,8 +32,11 @@ import com.pyamsoft.tickertape.ui.icon.StarBorder
 private val HIDE_TABS_FOR_OPTIONS =
     arrayOf(
         WatchlistDigSections.OPTIONS_CHAIN,
-        WatchlistDigSections.NEWS,
-        WatchlistDigSections.RECOMMENDATIONS,
+    )
+
+private val HIDE_TABS_FOR_CRYPTO =
+    arrayOf(
+        WatchlistDigSections.OPTIONS_CHAIN,
         WatchlistDigSections.STATISTICS,
     )
 
@@ -53,22 +56,24 @@ internal fun WatchlistDigToolbar(
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
 
+
   // Hide tabs in options
+  val equityType = ticker.quote?.type
   val allTabs =
-      remember(ticker.quote) {
+      remember(equityType) {
         WatchlistDigSections.values().filter { v ->
-          val q = ticker.quote
-          if (q == null) {
+          if (equityType == null) {
             return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
           } else {
-            if (q.type == EquityType.OPTION) {
-              return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-            } else {
-              return@filter true
+            return@filter when (equityType) {
+              EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+              EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+              else -> true
             }
           }
         }
       }
+  val selectedTab = remember(section, allTabs) { allTabs.indexOf(section) }
 
   Surface(
       modifier = modifier,
@@ -122,7 +127,7 @@ internal fun WatchlistDigToolbar(
 
       ScrollableTabRow(
           backgroundColor = Color.Transparent,
-          selectedTabIndex = section.ordinal,
+          selectedTabIndex = selectedTab,
       ) {
         // If we use forEach here, compose compiler gives a ClassCastException
         for (tab in allTabs) {

@@ -30,9 +30,13 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 private val HIDE_TABS_FOR_OPTIONS =
     arrayOf(
         PortfolioDigSections.OPTIONS_CHAIN,
-        PortfolioDigSections.NEWS,
-        PortfolioDigSections.RECOMMENDATIONS,
+    )
+
+private val HIDE_TABS_FOR_CRYPTO =
+    arrayOf(
+        PortfolioDigSections.OPTIONS_CHAIN,
         PortfolioDigSections.STATISTICS,
+        PortfolioDigSections.SPLITS,
     )
 
 @Composable
@@ -42,26 +46,28 @@ internal fun PortfolioDigToolbar(
     onClose: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
+  val holding = state.holding
   val ticker = state.ticker
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
 
   // Hide tabs in options
+  val equityType = holding?.type
   val allTabs =
-      remember(ticker.quote) {
+      remember(equityType) {
         PortfolioDigSections.values().filter { v ->
-          val q = ticker.quote
-          if (q == null) {
+          if (equityType == null) {
             return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
           } else {
-            if (q.type == EquityType.OPTION) {
-              return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-            } else {
-              return@filter true
+            return@filter when (equityType) {
+              EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+              EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+              else -> true
             }
           }
         }
       }
+  val selectedTab = remember(section, allTabs) { allTabs.indexOf(section) }
 
   Surface(
       modifier = modifier,
@@ -102,7 +108,7 @@ internal fun PortfolioDigToolbar(
 
       ScrollableTabRow(
           backgroundColor = Color.Transparent,
-          selectedTabIndex = section.ordinal,
+          selectedTabIndex = selectedTab,
       ) {
         // If we use forEach here, compose compiler gives a ClassCastException
         for (tab in allTabs) {

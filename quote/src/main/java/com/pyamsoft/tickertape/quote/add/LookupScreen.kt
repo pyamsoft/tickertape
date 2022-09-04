@@ -205,7 +205,7 @@ private fun ResultItem(
                 fontWeight = FontWeight.W500,
             ),
     )
-    if (company.isValidCompany) {
+    if (company.isValid) {
       Text(
           text = company.company,
           style = MaterialTheme.typography.caption,

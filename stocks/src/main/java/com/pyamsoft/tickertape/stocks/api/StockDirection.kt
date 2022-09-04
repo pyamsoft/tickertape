@@ -33,9 +33,21 @@ interface StockDirection : StockNumberValue {
 
   companion object {
 
-    val NONE: StockDirection = StockDirectionImpl(0.0)
-    val UP: StockDirection = StockDirectionImpl(1.0)
-    val DOWN: StockDirection = StockDirectionImpl(-1.0)
+    val NONE: StockDirection =
+        StockDirectionImpl(
+            price = 0.0,
+            isValid = false,
+        )
+    val UP: StockDirection =
+        StockDirectionImpl(
+            price = 1.0,
+            isValid = true,
+        )
+    val DOWN: StockDirection =
+        StockDirectionImpl(
+            price = -1.0,
+            isValid = true,
+        )
   }
 }
 

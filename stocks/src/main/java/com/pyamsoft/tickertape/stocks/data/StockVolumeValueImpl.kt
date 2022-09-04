@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.VOLUME_FORMATTER
 
 internal data class StockVolumeValueImpl(
     override val value: Long,
+    override val isValid: Boolean,
 ) : StockVolumeValue {
 
   private val volume by

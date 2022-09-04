@@ -25,12 +25,18 @@ interface StockVolumeValue : StockLongValue {
 
   companion object {
 
-    val NONE: StockVolumeValue = 0L.asVolume()
-
+    val NONE: StockVolumeValue =
+        StockVolumeValueImpl(
+            value = 0L,
+            isValid = false,
+        )
   }
 }
 
 @CheckResult
 fun Long.asVolume(): StockVolumeValue {
-  return StockVolumeValueImpl(this)
+  return StockVolumeValueImpl(
+      value = this,
+      isValid = true,
+  )
 }

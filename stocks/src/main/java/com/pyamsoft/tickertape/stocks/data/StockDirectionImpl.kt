@@ -24,7 +24,10 @@ import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 
-internal data class StockDirectionImpl(private val price: Double) : StockDirection {
+internal data class StockDirectionImpl(
+    private val price: Double,
+    override val isValid: Boolean,
+) : StockDirection {
 
   override val sign: String
 

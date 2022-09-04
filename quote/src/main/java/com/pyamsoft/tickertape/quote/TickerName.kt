@@ -45,7 +45,7 @@ fun TickerName(
     )
 
     if (quote != null) {
-      if (quote.company.isValidCompany) {
+      if (quote.company.isValid) {
         Text(
             text = quote.company.company,
             style = sizes.description,

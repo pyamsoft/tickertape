@@ -25,8 +25,6 @@ interface StockMoneyValue : StockDoubleValue {
 
   @CheckResult fun compareTo(other: StockMoneyValue): Int
 
-  @get:CheckResult val isValid: Boolean
-
   companion object {
 
     val NONE: StockMoneyValue =

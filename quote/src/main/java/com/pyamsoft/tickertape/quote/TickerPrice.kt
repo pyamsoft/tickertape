@@ -51,7 +51,8 @@ fun TickerPrice(
         remember(direction, size, colors) {
           return@remember if (size == TickerSize.QUOTE ||
               size == TickerSize.QUOTE_SPECIAL ||
-              direction.isZero) {
+              direction.isZero ||
+              !direction.isValid) {
             // If no direction or is a quote so bg is colored, unspecified
             Color.Unspecified
           } else {

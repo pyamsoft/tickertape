@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.StockShareValue
 
 internal data class StockShareValueImpl(
     override val value: Double,
+    override val isValid: Boolean,
 ) : StockShareValue {
 
   private val share by

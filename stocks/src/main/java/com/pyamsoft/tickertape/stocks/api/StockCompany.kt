@@ -23,10 +23,10 @@ interface StockCompany {
 
   @get:CheckResult val company: String
 
-  @get:CheckResult val isValidCompany: Boolean
+  @get:CheckResult val isValid: Boolean
 }
 
 @CheckResult
 fun String.asCompany(): StockCompany {
-  return StockCompanyImpl(this)
+  return StockCompanyImpl(company = this, isValid = true)
 }

@@ -25,12 +25,18 @@ interface StockShareValue : StockDoubleValue {
 
   companion object {
 
-    val NONE: StockShareValue = 0.0.asShares()
-
+    val NONE: StockShareValue =
+        StockShareValueImpl(
+            value = 0.0,
+            isValid = false,
+        )
   }
 }
 
 @CheckResult
 fun Double.asShares(): StockShareValue {
-  return StockShareValueImpl(this)
+  return StockShareValueImpl(
+      value = this,
+      isValid = true,
+  )
 }

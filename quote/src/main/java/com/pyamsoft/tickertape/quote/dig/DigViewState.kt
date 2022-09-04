@@ -12,6 +12,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Stable
@@ -38,7 +39,7 @@ interface DigViewState : UiViewState {
   val optionsChain: StockOptions?
   val optionsError: Throwable?
   val optionsSection: StockOptions.Contract.Type
-  val optionsExpirationDate: LocalDateTime?
+  val optionsExpirationDate: LocalDate?
 }
 
 @Stable
@@ -51,7 +52,7 @@ protected constructor(
   final override var optionsChain by mutableStateOf<StockOptions?>(null)
   final override var optionsError by mutableStateOf<Throwable?>(null)
   final override var optionsSection by mutableStateOf(StockOptions.Contract.Type.CALL)
-  final override var optionsExpirationDate by mutableStateOf<LocalDateTime?>(null)
+  final override var optionsExpirationDate by mutableStateOf<LocalDate?>(null)
 
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)

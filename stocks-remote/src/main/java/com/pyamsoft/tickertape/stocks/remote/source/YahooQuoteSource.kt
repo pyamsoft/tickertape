@@ -32,10 +32,10 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
-import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
+import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.ZoneId
@@ -86,7 +86,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
     ): StockQuote {
       val underlyingSymbol = stock.underlyingSymbol.requireNotNull().asSymbol()
       val strikePrice = stock.strike?.asMoney()
-      val expirationDate = parseMarketTime(stock.expireDate.requireNotNull(), localId)
+      val expirationDate = parseUTCDate(stock.expireDate.requireNotNull(), localId)
       val companyName =
           "${underlyingSymbol.raw} ${expirationDate.format(formatter)}${if (strikePrice == null) "" else " ${strikePrice.display}"}"
       return StockOptionsQuote.create(

@@ -37,12 +37,12 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDateTime
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -199,7 +199,7 @@ internal constructor(
 
   override suspend fun resolveOptionsIdentifier(
       symbol: StockSymbol,
-      expirationDate: LocalDateTime,
+      expirationDate: LocalDate,
       strikePrice: StockMoneyValue,
       contractType: StockOptions.Contract.Type
   ): String =
@@ -207,7 +207,7 @@ internal constructor(
         Enforcer.assertOffMainThread()
         return@withContext stockInteractor.resolveOptionLookupIdentifier(
             symbol = symbol,
-            expirationDate = expirationDate.toLocalDate(),
+            expirationDate = expirationDate,
             strikePrice = strikePrice,
             contractType = contractType,
         )

@@ -21,14 +21,15 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal data class StockOptionsImpl
 internal constructor(
     override val symbol: StockSymbol,
-    override val expirationDates: List<LocalDateTime>,
+    override val expirationDates: List<LocalDate>,
     override val strikes: List<StockMoneyValue>,
-    override val date: LocalDateTime,
+    override val date: LocalDate,
     override val calls: List<StockOptions.Call>,
     override val puts: List<StockOptions.Put>
 ) : StockOptions {
@@ -45,7 +46,7 @@ internal constructor(
       override val iv: StockPercent,
       override val itm: Boolean,
       override val lastTradeDate: LocalDateTime,
-      override val expirationDate: LocalDateTime,
+      override val expirationDate: LocalDate,
       override val openInterest: Int,
       override val bid: StockMoneyValue,
       override val ask: StockMoneyValue,

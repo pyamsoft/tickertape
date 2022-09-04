@@ -37,11 +37,11 @@ import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class StockInteractorImpl
@@ -133,16 +133,24 @@ internal constructor(
         topCaches.key(screener).clear()
       }
 
-  override suspend fun getOptions(symbols: List<StockSymbol>): List<StockOptions> =
+  override suspend fun getOptions(
+      symbols: List<StockSymbol>,
+      expirationDate: LocalDate?,
+  ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext optionsCache.getOptions(symbols) { interactor.getOptions(it) }
+        return@withContext optionsCache.getOptions(symbols, expirationDate) { s, e ->
+          interactor.getOptions(s, e)
+        }
       }
 
-  override suspend fun invalidateOptions(symbols: List<StockSymbol>) =
+  override suspend fun invalidateOptions(
+      symbols: List<StockSymbol>,
+      expirationDate: LocalDate?,
+  ) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        symbols.forEach { optionsCache.removeOption(it) }
+        symbols.forEach { optionsCache.removeOption(it, expirationDate) }
       }
 
   override suspend fun resolveOptionLookupIdentifier(

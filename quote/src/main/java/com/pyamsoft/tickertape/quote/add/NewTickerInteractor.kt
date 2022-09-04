@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 interface NewTickerInteractor : BaseTickerInteractor {
 
@@ -38,7 +38,7 @@ interface NewTickerInteractor : BaseTickerInteractor {
   @CheckResult
   suspend fun resolveOptionsIdentifier(
       symbol: StockSymbol,
-      expirationDate: LocalDateTime,
+      expirationDate: LocalDate,
       strikePrice: StockMoneyValue,
       contractType: StockOptions.Contract.Type,
   ): String

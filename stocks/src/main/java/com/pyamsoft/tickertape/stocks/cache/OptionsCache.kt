@@ -19,14 +19,19 @@ package com.pyamsoft.tickertape.stocks.cache
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 
 interface OptionsCache {
 
-  suspend fun removeOption(symbol: StockSymbol)
+  suspend fun removeOption(
+      symbol: StockSymbol,
+      expirationDate: LocalDate?,
+  )
 
   @CheckResult
   suspend fun getOptions(
       symbols: List<StockSymbol>,
-      resolve: suspend (List<StockSymbol>) -> List<StockOptions>,
+      expirationDate: LocalDate?,
+      resolve: suspend (List<StockSymbol>, LocalDate?) -> List<StockOptions>,
   ): List<StockOptions>
 }

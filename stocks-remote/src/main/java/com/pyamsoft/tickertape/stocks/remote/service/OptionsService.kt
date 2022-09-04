@@ -20,10 +20,14 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkOptionResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface OptionsService {
 
   @CheckResult
   @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
-  suspend fun getOptions(@Path("symbol") symbol: String): NetworkOptionResponse
+  suspend fun getOptions(
+      @Path("symbol") symbol: String,
+      @Query("date") expirationDate: Long?,
+  ): NetworkOptionResponse
 }

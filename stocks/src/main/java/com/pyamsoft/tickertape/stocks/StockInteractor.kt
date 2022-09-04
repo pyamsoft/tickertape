@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import java.time.LocalDate
 
 interface StockInteractor :
     QuoteSource,
@@ -53,7 +54,10 @@ interface StockInteractor :
         range: StockChart.IntervalRange,
     )
 
-    suspend fun invalidateOptions(symbols: List<StockSymbol>)
+    suspend fun invalidateOptions(
+        symbols: List<StockSymbol>,
+        expirationDate: LocalDate?,
+    )
 
     suspend fun invalidateNews(symbols: List<StockSymbol>)
 

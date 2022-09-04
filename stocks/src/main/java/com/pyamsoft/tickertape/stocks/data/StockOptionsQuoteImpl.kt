@@ -23,12 +23,12 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 internal data class StockOptionsQuoteImpl(
     override val underlyingSymbol: StockSymbol,
     override val strike: StockMoneyValue?,
-    override val expireDate: LocalDateTime,
+    override val expireDate: LocalDate,
     override val symbol: StockSymbol,
     override val company: StockCompany,
     override val type: EquityType,

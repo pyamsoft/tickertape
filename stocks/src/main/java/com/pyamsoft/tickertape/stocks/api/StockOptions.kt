@@ -18,17 +18,18 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockOptionsImpl
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface StockOptions {
 
   @get:CheckResult val symbol: StockSymbol
 
-  @get:CheckResult val expirationDates: List<LocalDateTime>
+  @get:CheckResult val expirationDates: List<LocalDate>
 
   @get:CheckResult val strikes: List<StockMoneyValue>
 
-  @get:CheckResult val date: LocalDateTime
+  @get:CheckResult val date: LocalDate
 
   @get:CheckResult val calls: List<Call>
 
@@ -56,7 +57,7 @@ interface StockOptions {
 
     @get:CheckResult val openInterest: Int
 
-    @get:CheckResult val expirationDate: LocalDateTime
+    @get:CheckResult val expirationDate: LocalDate
 
     @get:CheckResult val lastTradeDate: LocalDateTime
 
@@ -85,7 +86,7 @@ interface StockOptions {
           iv: StockPercent,
           itm: Boolean,
           lastTradeDate: LocalDateTime,
-          expirationDate: LocalDateTime,
+          expirationDate: LocalDate,
           openInterest: Int,
           bid: StockMoneyValue,
           ask: StockMoneyValue,
@@ -121,7 +122,7 @@ interface StockOptions {
           iv: StockPercent,
           itm: Boolean,
           lastTradeDate: LocalDateTime,
-          expirationDate: LocalDateTime,
+          expirationDate: LocalDate,
           openInterest: Int,
           bid: StockMoneyValue,
           ask: StockMoneyValue,
@@ -157,9 +158,9 @@ interface StockOptions {
     @CheckResult
     fun create(
         symbol: StockSymbol,
-        expirationDates: List<LocalDateTime>,
+        expirationDates: List<LocalDate>,
         strikes: List<StockMoneyValue>,
-        date: LocalDateTime,
+        date: LocalDate,
         calls: List<Call>,
         puts: List<Put>
     ): StockOptions {

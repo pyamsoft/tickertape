@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Composable
 @JvmOverloads
@@ -43,7 +43,7 @@ fun WatchlistDigScreen(
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
-    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
+    onOptionExpirationDateChanged: (LocalDate) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -98,7 +98,7 @@ private fun Content(
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
-    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
+    onOptionExpirationDateChanged: (LocalDate) -> Unit,
 ) {
   val section = state.section
 

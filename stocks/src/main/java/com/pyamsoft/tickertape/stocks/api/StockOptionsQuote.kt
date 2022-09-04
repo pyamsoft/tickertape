@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockOptionsQuoteImpl
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 interface StockOptionsQuote : StockQuote {
 
@@ -26,7 +26,7 @@ interface StockOptionsQuote : StockQuote {
 
   @get:CheckResult val strike: StockMoneyValue?
 
-  @get:CheckResult val expireDate: LocalDateTime
+  @get:CheckResult val expireDate: LocalDate
 
   companion object {
     @JvmStatic
@@ -34,7 +34,7 @@ interface StockOptionsQuote : StockQuote {
     fun create(
         underlyingSymbol: StockSymbol,
         strike: StockMoneyValue?,
-        expireDate: LocalDateTime,
+        expireDate: LocalDate,
         symbol: StockSymbol,
         company: StockCompany,
         equityType: EquityType,

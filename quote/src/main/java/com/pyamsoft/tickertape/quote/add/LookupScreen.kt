@@ -47,8 +47,8 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
+import java.time.LocalDate
 
 @Composable
 @JvmOverloads
@@ -60,9 +60,9 @@ internal fun LookupScreen(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
     onTradeSideSelected: (TradeSide) -> Unit,
-    onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
+    onOptionTypeSelected: (StockOptions.Contract.Type) -> Unit,
     onResultsDismissed: () -> Unit,
-    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
     onAfterSymbolChanged: CoroutineScope.(String) -> Unit,
 ) {
@@ -85,7 +85,7 @@ internal fun LookupScreen(
         modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
         state = state,
         onTradeSideSelected = onTradeSideSelected,
-        onOptionTypeSlected = onOptionTypeSlected,
+        onOptionTypeSlected = onOptionTypeSelected,
         onStrikeSelected = onStrikeSelected,
         onExpirationDateSelected = onExpirationDateSelected,
     )
@@ -296,7 +296,7 @@ private fun PreviewLookupScreen() {
         onClear = {},
         onTradeSideSelected = {},
         onResultsDismissed = {},
-        onOptionTypeSlected = {},
+        onOptionTypeSelected = {},
         onExpirationDateSelected = {},
         onStrikeSelected = {},
         onAfterSymbolChanged = {},

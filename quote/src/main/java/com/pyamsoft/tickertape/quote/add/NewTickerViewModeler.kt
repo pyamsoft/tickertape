@@ -30,12 +30,12 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject
@@ -64,7 +64,7 @@ internal constructor(
       }
 
   private val optionResolverRunner =
-      highlander<String, StockSymbol, LocalDateTime, StockMoneyValue, StockOptions.Contract.Type> {
+      highlander<String, StockSymbol, LocalDate, StockMoneyValue, StockOptions.Contract.Type> {
           symbol,
           expirationDate,
           strikePrice,
@@ -302,7 +302,7 @@ internal constructor(
     state.clearInput()
   }
 
-  fun handleOptionExpirationDate(date: LocalDateTime) {
+  fun handleOptionExpirationDate(date: LocalDate) {
     state.optionExpirationDate = date
   }
 

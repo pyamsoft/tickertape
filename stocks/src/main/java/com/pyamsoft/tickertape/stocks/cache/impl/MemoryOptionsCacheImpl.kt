@@ -20,35 +20,56 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.OptionsCache
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class MemoryOptionsCacheImpl @Inject internal constructor() :
-    BaseMemoryCacheImpl<StockSymbol, StockOptions>(), OptionsCache {
+    BaseMemoryCacheImpl<MemoryOptionsCacheImpl.OptionsKey, StockOptions>(), OptionsCache {
 
-  override suspend fun removeOption(symbol: StockSymbol) =
+  internal data class OptionsKey(
+      val symbol: StockSymbol,
+      val expirationDate: LocalDate?,
+  )
+
+  override suspend fun removeOption(
+      symbol: StockSymbol,
+      expirationDate: LocalDate?,
+  ) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext remove(symbol)
+        return@withContext remove(OptionsKey(symbol, expirationDate))
       }
 
   override suspend fun getOptions(
       symbols: List<StockSymbol>,
-      resolve: suspend (List<StockSymbol>) -> List<StockOptions>
+      expirationDate: LocalDate?,
+      resolve: suspend (List<StockSymbol>, LocalDate?) -> List<StockOptions>
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext get(symbols, resolve)
+        val keys =
+            symbols.map { s ->
+              OptionsKey(
+                  symbol = s,
+                  expirationDate = expirationDate,
+              )
+            }
+
+        return@withContext get(keys) { resolve(it, expirationDate) }
       }
 
-  override fun getKeyFromValue(value: StockOptions): StockSymbol {
-    return value.symbol
+  override fun getKeyFromValue(value: StockOptions): OptionsKey {
+    return OptionsKey(
+        symbol = value.symbol,
+        expirationDate = value.date,
+    )
   }
 
-  override fun getSymbolFromKey(key: StockSymbol): StockSymbol {
-    return key
+  override fun getSymbolFromKey(key: OptionsKey): StockSymbol {
+    return key.symbol
   }
 }

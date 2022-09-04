@@ -10,6 +10,7 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /** Should only be used in tests/preview */
@@ -51,7 +52,7 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
 
     override val optionsError: Throwable? = null
 
-    override val optionsExpirationDate: LocalDateTime? = null
+    override val optionsExpirationDate: LocalDate? = null
 
     override val optionsSection: StockOptions.Contract.Type = StockOptions.Contract.Type.CALL
   }

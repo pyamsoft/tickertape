@@ -35,7 +35,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
@@ -277,7 +277,7 @@ protected constructor(
     state.optionsSection = section
   }
 
-  fun handleOptionsExpirationDateChanged(date: LocalDateTime) {
+  fun handleOptionsExpirationDateChanged(date: LocalDate) {
     state.optionsExpirationDate = date
   }
 

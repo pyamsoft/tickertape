@@ -37,7 +37,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.ui.rememberInBackground
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Composable
 internal fun OptionsSection(
@@ -45,7 +45,7 @@ internal fun OptionsSection(
     state: NewTickerViewState,
     onTradeSideSelected: (TradeSide) -> Unit,
     onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
-    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
   val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
@@ -80,7 +80,7 @@ internal fun OptionsSection(
 private fun OptionsStrikeExpiration(
     modifier: Modifier = Modifier,
     state: NewTickerViewState,
-    onExpirationDateSelected: (LocalDateTime) -> Unit,
+    onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
   val option = state.resolvedOption

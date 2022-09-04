@@ -36,6 +36,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +44,9 @@ import javax.inject.Singleton
 @Singleton
 internal class YahooOptionsSource
 @Inject
-internal constructor(@YahooApi private val service: OptionsService) : OptionsSource {
+internal constructor(
+    @YahooApi private val service: OptionsService,
+) : OptionsSource {
 
   companion object {
 
@@ -71,11 +74,11 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
           lastPrice = this.lastPrice.asMoney(),
           iv = this.impliedVolatility.asPercent(),
           itm = this.inTheMoney,
-          lastTradeDate = parseMarketTime(this.lastTradeDate, localId),
           openInterest = this.openInterest ?: 0,
           bid = this.bid?.asMoney() ?: StockMoneyValue.NONE,
           ask = this.ask?.asMoney() ?: StockMoneyValue.NONE,
-          expirationDate = parseMarketTime(this.expiration, localId),
+          lastTradeDate = parseUTCTime(this.lastTradeDate, localId),
+          expirationDate = parseUTCDate(this.expiration, localId),
       )
     }
   }
@@ -105,28 +108,39 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
 
     return StockOptions.create(
         symbol = symbol,
-        expirationDates = option.expirationDates.map { parseUTCTime(it, localId) },
+        expirationDates = option.expirationDates.map { parseUTCDate(it, localId) },
         strikes = option.strikes.map { it.asMoney() },
-        date = parseMarketTime(chain.expirationDate, localId),
+        date = parseUTCDate(chain.expirationDate, localId),
         calls = calls,
         puts = puts,
     )
   }
 
   @CheckResult
-  private suspend fun fetchOption(symbol: StockSymbol): StockOptions {
-    val resp = service.getOptions(symbol.raw)
+  private suspend fun fetchOption(
+      symbol: StockSymbol,
+      expirationDate: LocalDate?,
+  ): StockOptions {
+    val resp =
+        service.getOptions(
+            symbol = symbol.raw,
+            // If the expiration date is passed, YF gives us options info for that date
+            expirationDate = expirationDate?.atTime(0, 0)?.toEpochSecond(ZoneOffset.UTC),
+        )
     return parseOptionsResponse(resp)
   }
 
-  override suspend fun getOptions(symbols: List<StockSymbol>): List<StockOptions> =
+  override suspend fun getOptions(
+      symbols: List<StockSymbol>,
+      expirationDate: LocalDate?
+  ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         val jobs =
             mutableListOf<Deferred<StockOptions>>().apply {
               for (symbol in symbols) {
-                add(async { fetchOption(symbol) })
+                add(async { fetchOption(symbol, expirationDate) })
               }
             }
         return@withContext jobs.awaitAll()

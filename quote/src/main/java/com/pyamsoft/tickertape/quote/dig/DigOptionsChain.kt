@@ -42,7 +42,7 @@ import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Composable
 fun DigOptionsChain(
@@ -50,7 +50,7 @@ fun DigOptionsChain(
     state: DigViewState,
     onRefresh: () -> Unit,
     onSectionChanged: (StockOptions.Contract.Type) -> Unit,
-    onExpirationDateChanged: (LocalDateTime) -> Unit,
+    onExpirationDateChanged: (LocalDate) -> Unit,
 ) {
   val contentColor = LocalContentColor.current
   val allTypes = remember { StockOptions.Contract.Type.values() }
@@ -112,26 +112,24 @@ fun DigOptionsChain(
                       StockOptions.Contract.Type.PUT -> options.puts
                     }
 
-                return@remember chain.filter { it.expirationDate.isEqual(expirationDate) }
+                return@remember chain
+                //                return@remember chain.filter {
+                // it.expirationDate.isEqual(expirationDate) }
               }
 
-          Row(
+          LazyColumn(
               modifier = Modifier.fillMaxSize(),
+              contentPadding = PaddingValues(MaterialTheme.keylines.content),
+              verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
           ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(MaterialTheme.keylines.content),
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-            ) {
-              items(
-                  items = contractList,
-                  key = { it.strike.value },
-              ) { c ->
-                ContractItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    contract = c,
-                )
-              }
+            items(
+                items = contractList,
+                key = { it.strike.value },
+            ) { c ->
+              ContractItem(
+                  modifier = Modifier.fillMaxWidth(),
+                  contract = c,
+              )
             }
           }
         }
@@ -159,9 +157,9 @@ fun DigOptionsChain(
 @Composable
 private fun OptionsExpirationDropdown(
     modifier: Modifier = Modifier,
-    value: LocalDateTime?,
-    choices: List<LocalDateTime>,
-    onSelect: (LocalDateTime) -> Unit,
+    value: LocalDate?,
+    choices: List<LocalDate>,
+    onSelect: (LocalDate) -> Unit,
 ) {
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
   val displayValue =
@@ -291,11 +289,13 @@ private fun ContractItem(
         style = MaterialTheme.typography.caption,
     )
 
-    Text(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-        text = "IV: ${contract.iv}",
-        style = MaterialTheme.typography.caption,
-    )
+    if (!contract.iv.isZero) {
+      Text(
+          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
+          text = "IV: ${contract.iv.display}",
+          style = MaterialTheme.typography.caption,
+      )
+    }
   }
 }
 

@@ -37,7 +37,12 @@ protected constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val options = stockInteractor.getOptions(listOf(symbol))
+          val options =
+              stockInteractor.getOptions(
+                  symbols = listOf(symbol),
+                  // TODO pass ED
+                  expirationDate = null,
+              )
           // Right now we only support 1 lookup at a time in the UI
           val result = options.first()
           ResultWrapper.success(result)

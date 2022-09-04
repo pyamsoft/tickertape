@@ -38,12 +38,12 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class StockNetworkInteractor
@@ -87,10 +87,11 @@ internal constructor(
 
   override suspend fun getOptions(
       symbols: List<StockSymbol>,
+      expirationDate: LocalDate?,
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext optionsSource.getOptions(symbols)
+        return@withContext optionsSource.getOptions(symbols, expirationDate)
       }
 
   override suspend fun getTrending(count: Int): StockTrends =

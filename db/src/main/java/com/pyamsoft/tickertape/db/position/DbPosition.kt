@@ -24,7 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 interface DbPosition {
 
@@ -36,13 +36,13 @@ interface DbPosition {
 
   @get:CheckResult val shareCount: StockShareValue
 
-  @get:CheckResult val purchaseDate: LocalDateTime
+  @get:CheckResult val purchaseDate: LocalDate
 
   @CheckResult fun price(price: StockMoneyValue): DbPosition
 
   @CheckResult fun shareCount(shareCount: StockShareValue): DbPosition
 
-  @CheckResult fun purchaseDate(purchaseDate: LocalDateTime): DbPosition
+  @CheckResult fun purchaseDate(purchaseDate: LocalDate): DbPosition
 
   data class Id(override val raw: String) : IdType {
 

@@ -25,7 +25,7 @@ import androidx.room.PrimaryKey
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity(
     tableName = RoomDbSplit.TABLE_NAME,
@@ -49,7 +49,7 @@ internal constructor(
     @JvmField
     @ColumnInfo(name = COLUMN_POST_SPLIT_SHARE_COUNT)
     val dbPostSplitShareCount: StockShareValue,
-    @JvmField @ColumnInfo(name = COLUMN_SPLIT_DATE) val dbSplitDate: LocalDateTime,
+    @JvmField @ColumnInfo(name = COLUMN_SPLIT_DATE) val dbSplitDate: LocalDate,
 ) : DbSplit {
 
   @Ignore override val id: DbSplit.Id = dbId
@@ -60,7 +60,7 @@ internal constructor(
 
   @Ignore override val postSplitShareCount: StockShareValue = dbPostSplitShareCount
 
-  @Ignore override val splitDate: LocalDateTime = dbSplitDate
+  @Ignore override val splitDate: LocalDate = dbSplitDate
 
   @Ignore
   override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
@@ -73,7 +73,7 @@ internal constructor(
   }
 
   @Ignore
-  override fun splitDate(date: LocalDateTime): DbSplit {
+  override fun splitDate(date: LocalDate): DbSplit {
     return this.copy(dbSplitDate = date)
   }
 

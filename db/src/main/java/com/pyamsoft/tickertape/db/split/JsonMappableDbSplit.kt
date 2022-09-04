@@ -21,7 +21,7 @@ import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.squareup.moshi.JsonClass
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbSplit
@@ -30,7 +30,7 @@ internal constructor(
     override val holdingId: DbHolding.Id,
     override val preSplitShareCount: StockShareValue,
     override val postSplitShareCount: StockShareValue,
-    override val splitDate: LocalDateTime,
+    override val splitDate: LocalDate,
 ) : DbSplit {
 
   override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
@@ -41,7 +41,7 @@ internal constructor(
     return this.copy(postSplitShareCount = shareCount)
   }
 
-  override fun splitDate(date: LocalDateTime): DbSplit {
+  override fun splitDate(date: LocalDate): DbSplit {
     return this.copy(splitDate = splitDate)
   }
 
@@ -53,7 +53,7 @@ internal constructor(
         holdingId: DbHolding.Id,
         preSplitShareCount: StockShareValue,
         postSplitShareCount: StockShareValue,
-        splitDate: LocalDateTime,
+        splitDate: LocalDate,
         id: DbSplit.Id = DbSplit.Id(IdGenerator.generate()),
     ): DbSplit {
       return JsonMappableDbSplit(

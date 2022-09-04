@@ -3,7 +3,7 @@ package com.pyamsoft.tickertape.portfolio.test
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 internal fun newTestSplit(): DbSplit {
   return object : DbSplit {
@@ -11,7 +11,7 @@ internal fun newTestSplit(): DbSplit {
     override val holdingId: DbHolding.Id = DbHolding.Id.EMPTY
     override val preSplitShareCount: StockShareValue = StockShareValue.NONE
     override val postSplitShareCount: StockShareValue = StockShareValue.NONE
-    override val splitDate: LocalDateTime = LocalDateTime.now()
+    override val splitDate: LocalDate = LocalDate.now()
 
     override fun preSplitShareCount(shareCount: StockShareValue): DbSplit {
       return this
@@ -21,7 +21,7 @@ internal fun newTestSplit(): DbSplit {
       return this
     }
 
-    override fun splitDate(date: LocalDateTime): DbSplit {
+    override fun splitDate(date: LocalDate): DbSplit {
       return this
     }
   }

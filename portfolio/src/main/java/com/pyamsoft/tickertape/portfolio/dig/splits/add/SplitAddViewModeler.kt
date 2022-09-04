@@ -63,14 +63,14 @@ internal constructor(
               holdingId = holdingId,
               preSplitShareCount = preSplit.asShares(),
               postSplitShareCount = postSplit.asShares(),
-              splitDate = date.atTime(0, 0),
+              splitDate = date,
           )
           .also { Timber.d("Created new split: $it") }
     } else {
       existing
           .preSplitShareCount(preSplit.asShares())
           .postSplitShareCount(postSplit.asShares())
-          .splitDate(date.atTime(0, 0))
+          .splitDate(date)
           .also { Timber.d("Update existing split: $it") }
     }
   }
@@ -102,7 +102,7 @@ internal constructor(
       }
 
       // After date, check submittable
-      splitDate = existing.splitDate.toLocalDate()
+      splitDate = existing.splitDate
       checkSubmittable()
     }
   }

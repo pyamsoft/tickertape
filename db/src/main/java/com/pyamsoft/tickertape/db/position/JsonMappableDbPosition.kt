@@ -22,7 +22,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.squareup.moshi.JsonClass
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbPosition
@@ -31,7 +31,7 @@ internal constructor(
     override val holdingId: DbHolding.Id,
     override val shareCount: StockShareValue,
     override val price: StockMoneyValue,
-    override val purchaseDate: LocalDateTime,
+    override val purchaseDate: LocalDate,
 ) : DbPosition {
 
   override fun shareCount(shareCount: StockShareValue): DbPosition {
@@ -42,7 +42,7 @@ internal constructor(
     return this.copy(price = price)
   }
 
-  override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
+  override fun purchaseDate(purchaseDate: LocalDate): DbPosition {
     return this.copy(purchaseDate = purchaseDate)
   }
 
@@ -54,7 +54,7 @@ internal constructor(
         holdingId: DbHolding.Id,
         shareCount: StockShareValue,
         price: StockMoneyValue,
-        purchaseDate: LocalDateTime,
+        purchaseDate: LocalDate,
         id: DbPosition.Id = DbPosition.Id(IdGenerator.generate()),
     ): DbPosition {
       return JsonMappableDbPosition(

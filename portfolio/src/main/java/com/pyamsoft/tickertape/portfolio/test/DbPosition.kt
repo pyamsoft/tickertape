@@ -6,7 +6,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 internal fun newTestPosition(): DbPosition {
   return object : DbPosition {
@@ -14,7 +14,7 @@ internal fun newTestPosition(): DbPosition {
     override val holdingId: DbHolding.Id = DbHolding.Id.EMPTY
     override val price: StockMoneyValue = 1.0.asMoney()
     override val shareCount: StockShareValue = 5.0.asShares()
-    override val purchaseDate: LocalDateTime = LocalDateTime.now()
+    override val purchaseDate: LocalDate = LocalDate.now()
 
     override fun price(price: StockMoneyValue): DbPosition {
       return this
@@ -24,7 +24,7 @@ internal fun newTestPosition(): DbPosition {
       return this
     }
 
-    override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
+    override fun purchaseDate(purchaseDate: LocalDate): DbPosition {
       return this
     }
   }

@@ -27,12 +27,12 @@ import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class PositionAddViewModeler
 @Inject
@@ -64,15 +64,13 @@ internal constructor(
               holdingId = holdingId,
               shareCount = shareCount.asShares(),
               price = price.asMoney(),
-              purchaseDate = date.atTime(0, 0),
+              purchaseDate = date,
           )
           .also { Timber.d("Created new position: $it") }
     } else {
-      existing
-          .price(price.asMoney())
-          .shareCount(shareCount.asShares())
-          .purchaseDate(date.atTime(0, 0))
-          .also { Timber.d("Update existing position: $it") }
+      existing.price(price.asMoney()).shareCount(shareCount.asShares()).purchaseDate(date).also {
+        Timber.d("Update existing position: $it")
+      }
     }
   }
 
@@ -103,7 +101,7 @@ internal constructor(
       }
 
       // After date, check submittable
-      dateOfPurchase = existing.purchaseDate.toLocalDate()
+      dateOfPurchase = existing.purchaseDate
       checkSubmittable()
     }
   }

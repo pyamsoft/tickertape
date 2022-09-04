@@ -26,7 +26,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity(
     tableName = RoomDbPosition.TABLE_NAME,
@@ -46,7 +46,7 @@ internal constructor(
     @JvmField @ColumnInfo(name = COLUMN_HOLDING_ID, index = true) val dbHoldingId: DbHolding.Id,
     @JvmField @ColumnInfo(name = COLUMN_PRICE) val dbPrice: StockMoneyValue,
     @JvmField @ColumnInfo(name = COLUMN_SHARE_COUNT) val dbShareCount: StockShareValue,
-    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val dbPurchaseDate: LocalDateTime,
+    @JvmField @ColumnInfo(name = COLUMN_PURCHASE_DATE) val dbPurchaseDate: LocalDate,
 ) : DbPosition {
 
   @Ignore override val id: DbPosition.Id = dbId
@@ -57,7 +57,7 @@ internal constructor(
 
   @Ignore override val shareCount: StockShareValue = dbShareCount
 
-  @Ignore override val purchaseDate: LocalDateTime = dbPurchaseDate
+  @Ignore override val purchaseDate: LocalDate = dbPurchaseDate
 
   @Ignore
   override fun price(price: StockMoneyValue): DbPosition {
@@ -70,7 +70,7 @@ internal constructor(
   }
 
   @Ignore
-  override fun purchaseDate(purchaseDate: LocalDateTime): DbPosition {
+  override fun purchaseDate(purchaseDate: LocalDate): DbPosition {
     return this.copy(dbPurchaseDate = purchaseDate)
   }
 

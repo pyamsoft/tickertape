@@ -20,7 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockShareValue
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 interface DbSplit {
 
@@ -32,13 +32,13 @@ interface DbSplit {
 
   @get:CheckResult val postSplitShareCount: StockShareValue
 
-  @get:CheckResult val splitDate: LocalDateTime
+  @get:CheckResult val splitDate: LocalDate
 
   @CheckResult fun preSplitShareCount(shareCount: StockShareValue): DbSplit
 
   @CheckResult fun postSplitShareCount(shareCount: StockShareValue): DbSplit
 
-  @CheckResult fun splitDate(date: LocalDateTime): DbSplit
+  @CheckResult fun splitDate(date: LocalDate): DbSplit
 
   data class Id(override val raw: String) : IdType {
 

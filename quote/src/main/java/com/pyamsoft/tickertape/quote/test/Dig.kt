@@ -3,10 +3,10 @@ package com.pyamsoft.tickertape.quote.test
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -22,6 +22,8 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
             quote = newTestQuote(symbol),
             chart = newTestChart(symbol),
         )
+
+    override val isLoading: Boolean = false
 
     override val recommendationError: Throwable? = null
 
@@ -44,5 +46,13 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
     override val statistics: KeyStatistics? = null
 
     override val statisticsError: Throwable? = null
+
+    override val optionsChain: StockOptions? = null
+
+    override val optionsError: Throwable? = null
+
+    override val optionsExpirationDate: LocalDateTime? = null
+
+    override val optionsSection: StockOptions.Contract.Type = StockOptions.Contract.Type.CALL
   }
 }

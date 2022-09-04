@@ -28,17 +28,17 @@ import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.remote.service.OptionsService
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooOptionsSource
@@ -75,6 +75,7 @@ internal constructor(@YahooApi private val service: OptionsService) : OptionsSou
           openInterest = this.openInterest ?: 0,
           bid = this.bid?.asMoney() ?: StockMoneyValue.NONE,
           ask = this.ask?.asMoney() ?: StockMoneyValue.NONE,
+          expirationDate = parseMarketTime(this.expiration, localId),
       )
     }
   }

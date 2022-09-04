@@ -48,7 +48,6 @@ internal fun HomePortfolio(
 ) {
   val isLoading = state.isLoadingPortfolio
   val portfolio = state.portfolio
-  val error = state.portfolioError
 
   val isEmptyPortfolio = remember(portfolio) { portfolio.list.isEmpty() }
   val isVisible =
@@ -69,7 +68,7 @@ internal fun HomePortfolio(
 
   Crossfade(
       modifier = modifier,
-      targetState = error,
+      targetState = state.portfolioError,
   ) { err ->
     if (err == null) {
       Column {

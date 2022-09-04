@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.quote.dig
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,46 +37,41 @@ fun DigRecommendations(
     onRefresh: () -> Unit,
     onRecClick: (Ticker) -> Unit,
 ) {
-  val recommendations = state.recommendations
-  val visible = remember(recommendations) { recommendations.isNotEmpty() }
+  val error = state.recommendationError
 
-  AnimatedVisibility(
-      modifier = Modifier.padding(MaterialTheme.keylines.content),
-      visible = visible,
+  SwipeRefresh(
+      modifier = modifier.padding(MaterialTheme.keylines.content),
+      state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
+      onRefresh = onRefresh,
   ) {
-    SwipeRefresh(
-        modifier = modifier,
-        state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
-        onRefresh = onRefresh,
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
-      RecommendationList(
-          modifier = Modifier.fillMaxSize(),
-          recommendations = recommendations,
-          onRecClick = onRecClick,
-      )
-    }
-  }
-}
+      if (error == null) {
+        items(
+            items = state.recommendations,
+            key = { it.symbol.raw },
+        ) { rec ->
+          RecommendationItem(
+              modifier = Modifier.fillMaxWidth(),
+              recommendation = rec,
+              onClick = onRecClick,
+          )
+        }
+      } else {
+        item {
+          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
 
-@Composable
-private fun RecommendationList(
-    modifier: Modifier = Modifier,
-    recommendations: List<Ticker>,
-    onRecClick: (Ticker) -> Unit,
-) {
-  LazyColumn(
-      modifier = modifier,
-      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-  ) {
-    items(
-        items = recommendations,
-        key = { it.symbol.raw },
-    ) { rec ->
-      RecommendationItem(
-          modifier = Modifier.fillMaxWidth(),
-          recommendation = rec,
-          onClick = onRecClick,
-      )
+          Text(
+              text = errorMessage,
+              style =
+                  MaterialTheme.typography.h6.copy(
+                      color = MaterialTheme.colors.error,
+                  ),
+          )
+        }
+      }
     }
   }
 }
@@ -154,10 +149,10 @@ private fun RecommendationItem(
 private fun PreviewDigRecommendations() {
   DigRecommendations(
       state =
-      object :
-          MutableDigViewState(
-              symbol = "MSFT".asSymbol(),
-          ) {},
+          object :
+              MutableDigViewState(
+                  symbol = "MSFT".asSymbol(),
+              ) {},
       onRefresh = {},
       onRecClick = {},
   )

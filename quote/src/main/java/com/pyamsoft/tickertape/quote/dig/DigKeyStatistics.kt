@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.quote.dig
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
@@ -32,42 +31,39 @@ fun DigKeyStatistics(
     state: DigViewState,
     onRefresh: () -> Unit,
 ) {
-  val statistics = state.statistics
-  val visible = remember(statistics) { statistics != null }
+  val error = state.statisticsError
 
-  AnimatedVisibility(
-      modifier = Modifier.padding(MaterialTheme.keylines.content),
-      visible = visible,
+  SwipeRefresh(
+      modifier = modifier.padding(MaterialTheme.keylines.content),
+      state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
+      onRefresh = onRefresh,
   ) {
-    if (statistics != null) {
-      SwipeRefresh(
-          modifier = modifier,
-          state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
-          onRefresh = onRefresh,
-      ) {
-        StatisticsGrid(
-            modifier = Modifier.fillMaxSize(),
-            statistics = statistics,
-        )
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+      if (error == null) {
+        state.statistics?.let { stats ->
+          renderFinancialHighlights(
+              statistics = stats,
+          )
+          renderTradingInformation(
+              statistics = stats,
+          )
+        }
+      } else {
+        item {
+          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+
+          Text(
+              text = errorMessage,
+              style =
+                  MaterialTheme.typography.h6.copy(
+                      color = MaterialTheme.colors.error,
+                  ),
+          )
+        }
       }
     }
-  }
-}
-
-@Composable
-private fun StatisticsGrid(
-    modifier: Modifier = Modifier,
-    statistics: KeyStatistics,
-) {
-  LazyColumn(
-      modifier = modifier,
-  ) {
-    renderFinancialHighlights(
-        statistics = statistics,
-    )
-    renderTradingInformation(
-        statistics = statistics,
-    )
   }
 }
 

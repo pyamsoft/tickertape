@@ -37,6 +37,8 @@ interface DigViewState : UiViewState {
 
   val optionsChain: StockOptions?
   val optionsError: Throwable?
+  val optionsSection: StockOptions.Contract.Type
+  val optionsExpirationDate: LocalDateTime?
 }
 
 @Stable
@@ -48,6 +50,8 @@ protected constructor(
 
   final override var optionsChain by mutableStateOf<StockOptions?>(null)
   final override var optionsError by mutableStateOf<Throwable?>(null)
+  final override var optionsSection by mutableStateOf(StockOptions.Contract.Type.CALL)
+  final override var optionsExpirationDate by mutableStateOf<LocalDateTime?>(null)
 
   final override var statistics by mutableStateOf<KeyStatistics?>(null)
   final override var statisticsError by mutableStateOf<Throwable?>(null)

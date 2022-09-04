@@ -137,7 +137,6 @@ internal class PositionDialog : AppCompatDialogFragment() {
         val symbol = remember { getSymbol() }
 
         vm.Render { state ->
-          val positionId = state.positionId
 
           act.TickerTapeTheme(themeProvider) {
             PositionAddScreen(
@@ -150,7 +149,7 @@ internal class PositionDialog : AppCompatDialogFragment() {
                 onClose = { dismiss() },
                 onDateOfPurchaseClicked = { date ->
                   handleDateOfPurchaseClicked(
-                      positionId = positionId,
+                      positionId = state.positionId,
                       date = date,
                   )
                 },

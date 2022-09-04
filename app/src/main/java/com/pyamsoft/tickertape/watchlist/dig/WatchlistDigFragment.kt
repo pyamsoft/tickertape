@@ -104,7 +104,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun handleRangeSelected(range: StockChart.IntervalRange) {
     viewModel
         .requireNotNull()
-        .handleRangeSelected(
+        .handleChartRangeSelected(
             scope = viewLifecycleOwner.lifecycleScope,
             range = range,
         )
@@ -163,12 +163,14 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 state = state,
                 imageLoader = loader,
                 onClose = { act.onBackPressed() },
-                onScrub = { vm.handleDateScrubbed(it) },
-                onRangeSelected = { handleRangeSelected(it) },
+                onChartScrub = { vm.handleChartDateScrubbed(it) },
+                onChartRangeSelected = { handleRangeSelected(it) },
                 onModifyWatchlist = { handleModifyWatchlist() },
                 onRefresh = { handleRefresh(true) },
                 onTabUpdated = { handleTabUpdated(it) },
                 onRecClick = { handleRecommendationSelected(it) },
+                onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
+                onOptionExpirationDateChanged = { vm.handleOptionsExpirationDateChanged(it) },
             )
           }
         }

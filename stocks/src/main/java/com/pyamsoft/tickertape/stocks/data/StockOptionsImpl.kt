@@ -45,6 +45,7 @@ internal constructor(
       override val iv: StockPercent,
       override val itm: Boolean,
       override val lastTradeDate: LocalDateTime,
+      override val expirationDate: LocalDateTime,
       override val openInterest: Int,
       override val bid: StockMoneyValue,
       override val ask: StockMoneyValue,

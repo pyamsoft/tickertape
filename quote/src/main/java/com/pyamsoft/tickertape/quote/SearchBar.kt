@@ -44,8 +44,8 @@ fun SearchBar(
     onTabUpdated: (EquityType) -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
-  val allTypes = remember { EquityType.values() }
   val contentColor = LocalContentColor.current
+  val allTypes = remember { EquityType.values() }
   val selectedTabIndex = currentTab.ordinal
 
   LaunchedEffect(search, currentTab) {

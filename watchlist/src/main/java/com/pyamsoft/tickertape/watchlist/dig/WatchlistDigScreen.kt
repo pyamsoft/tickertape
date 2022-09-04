@@ -24,8 +24,10 @@ import com.pyamsoft.tickertape.quote.dig.DigNews
 import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import java.time.LocalDateTime
 
 @Composable
 @JvmOverloads
@@ -34,12 +36,14 @@ fun WatchlistDigScreen(
     state: WatchlistDigViewState,
     imageLoader: ImageLoader,
     onClose: () -> Unit,
-    onScrub: (Chart.Data?) -> Unit,
-    onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onTabUpdated: (WatchlistDigSections) -> Unit,
-    onModifyWatchlist: () -> Unit,
     onRefresh: () -> Unit,
+    onModifyWatchlist: () -> Unit,
+    onChartScrub: (Chart.Data?) -> Unit,
+    onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
+    onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
+    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -71,10 +75,12 @@ fun WatchlistDigScreen(
               modifier = Modifier.fillMaxWidth(),
               state = state,
               imageLoader = imageLoader,
-              onScrub = onScrub,
-              onRangeSelected = onRangeSelected,
+              onChartScrub = onChartScrub,
+              onChartRangeSelected = onChartRangeSelected,
               onRefresh = onRefresh,
               onRecClick = onRecClick,
+              onOptionSectionChanged = onOptionSectionChanged,
+              onOptionExpirationDateChanged = onOptionExpirationDateChanged,
           )
         }
       }
@@ -87,10 +93,12 @@ private fun Content(
     modifier: Modifier = Modifier,
     state: WatchlistDigViewState,
     imageLoader: ImageLoader,
-    onScrub: (Chart.Data?) -> Unit,
-    onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRefresh: () -> Unit,
+    onChartScrub: (Chart.Data?) -> Unit,
+    onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
+    onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
+    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
 ) {
   val section = state.section
 
@@ -104,8 +112,8 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
-            onScrub = onScrub,
-            onRangeSelected = onRangeSelected,
+            onScrub = onChartScrub,
+            onRangeSelected = onChartRangeSelected,
         )
       }
       WatchlistDigSections.NEWS -> {
@@ -135,6 +143,9 @@ private fun Content(
         DigOptionsChain(
             modifier = Modifier.fillMaxSize(),
             state = state,
+            onRefresh = onRefresh,
+            onExpirationDateChanged = onOptionExpirationDateChanged,
+            onSectionChanged = onOptionSectionChanged,
         )
       }
     }
@@ -164,11 +175,13 @@ private fun PreviewWatchlistDigScreen() {
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},
-      onScrub = {},
-      onRangeSelected = {},
+      onChartScrub = {},
+      onChartRangeSelected = {},
       onModifyWatchlist = {},
       onTabUpdated = {},
       onRefresh = {},
       onRecClick = {},
+      onOptionExpirationDateChanged = {},
+      onOptionSectionChanged = {},
   )
 }

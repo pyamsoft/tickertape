@@ -3,7 +3,6 @@ package com.pyamsoft.tickertape.quote.dig
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,9 +60,7 @@ fun DigChart(
 ) {
   val ticker = state.ticker
   val range = state.range
-  val currentDate = state.currentDate
-  val currentPrice = state.currentPrice
-  val openingPrice = state.openingPrice
+  val error = state.chartError
 
   val chart = ticker.chart
   val isOptions = remember(ticker) { ticker.quote?.type == EquityType.OPTION }
@@ -71,35 +68,42 @@ fun DigChart(
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
-    Ranges(
-        modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
-        range = range,
-        isOptions = isOptions,
-        onRangeSelected = onRangeSelected,
-    )
+    if (error == null) {
+      if (chart != null) {
+        Ranges(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
+            range = range,
+            isOptions = isOptions,
+            onRangeSelected = onRangeSelected,
+        )
 
-    Crossfade(
-        modifier = Modifier.fillMaxWidth(),
-        targetState = chart,
-    ) { c ->
-      if (c != null) {
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
           Chart(
               modifier = Modifier.fillMaxWidth().height(QuoteDefaults.getChartHeight()),
-              chart = c,
+              chart = chart,
               onScrub = onScrub,
           )
           CurrentScrub(
               modifier = Modifier.fillMaxWidth(),
               range = range,
-              date = currentDate,
-              price = currentPrice,
-              openingPrice = openingPrice,
+              date = state.currentDate,
+              price = state.currentPrice,
+              openingPrice = state.openingPrice,
           )
         }
       }
+    } else {
+      val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+
+      Text(
+          text = errorMessage,
+          style =
+              MaterialTheme.typography.h6.copy(
+                  color = MaterialTheme.colors.error,
+              ),
+      )
     }
   }
 }

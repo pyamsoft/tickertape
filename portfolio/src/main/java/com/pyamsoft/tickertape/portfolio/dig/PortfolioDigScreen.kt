@@ -28,8 +28,10 @@ import com.pyamsoft.tickertape.quote.dig.DigNews
 import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import java.time.LocalDateTime
 
 @Composable
 @JvmOverloads
@@ -38,17 +40,19 @@ fun PortfolioDigScreen(
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
     onClose: () -> Unit,
-    onScrub: (Chart.Data?) -> Unit,
-    onRangeSelected: (StockChart.IntervalRange) -> Unit,
-    onTabUpdated: (PortfolioDigSections) -> Unit,
     onRefresh: () -> Unit,
-    onAddPosition: () -> Unit,
-    onDeletePosition: (DbPosition) -> Unit,
-    onUpdatePosition: (DbPosition) -> Unit,
-    onAddSplit: () -> Unit,
-    onDeleteSplit: (DbSplit) -> Unit,
-    onUpdateSplit: (DbSplit) -> Unit,
+    onTabUpdated: (PortfolioDigSections) -> Unit,
+    onChartScrub: (Chart.Data?) -> Unit,
+    onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onPositionAdd: () -> Unit,
+    onPositionDelete: (DbPosition) -> Unit,
+    onPositionUpdate: (DbPosition) -> Unit,
+    onSplitAdd: () -> Unit,
+    onSplitDeleted: (DbSplit) -> Unit,
+    onSplitUpdated: (DbSplit) -> Unit,
     onRecClick: (Ticker) -> Unit,
+    onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
+    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -77,16 +81,18 @@ fun PortfolioDigScreen(
               modifier = Modifier.fillMaxSize(),
               state = state,
               imageLoader = imageLoader,
-              onScrub = onScrub,
-              onRangeSelected = onRangeSelected,
+              onChartScrub = onChartScrub,
+              onChartRangeSelected = onChartRangeSelected,
               onRefresh = onRefresh,
-              onAddPosition = onAddPosition,
-              onDeletePosition = onDeletePosition,
-              onUpdatePosition = onUpdatePosition,
-              onAddSplit = onAddSplit,
-              onDeleteSplit = onDeleteSplit,
-              onUpdateSplit = onUpdateSplit,
+              onPositionAdd = onPositionAdd,
+              onPositionDelete = onPositionDelete,
+              onPositionUpdate = onPositionUpdate,
+              onSplitAdd = onSplitAdd,
+              onSplitDeleted = onSplitDeleted,
+              onSplitUpdated = onSplitUpdated,
               onRecClick = onRecClick,
+              onOptionSectionChanged = onOptionSectionChanged,
+              onOptionExpirationDateChanged = onOptionExpirationDateChanged,
           )
         }
       }
@@ -99,16 +105,18 @@ private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
-    onScrub: (Chart.Data?) -> Unit,
-    onRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRefresh: () -> Unit,
-    onAddPosition: () -> Unit,
-    onDeletePosition: (DbPosition) -> Unit,
-    onUpdatePosition: (DbPosition) -> Unit,
-    onAddSplit: () -> Unit,
-    onDeleteSplit: (DbSplit) -> Unit,
-    onUpdateSplit: (DbSplit) -> Unit,
+    onChartScrub: (Chart.Data?) -> Unit,
+    onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
+    onPositionAdd: () -> Unit,
+    onPositionDelete: (DbPosition) -> Unit,
+    onPositionUpdate: (DbPosition) -> Unit,
+    onSplitAdd: () -> Unit,
+    onSplitDeleted: (DbSplit) -> Unit,
+    onSplitUpdated: (DbSplit) -> Unit,
     onRecClick: (Ticker) -> Unit,
+    onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
+    onOptionExpirationDateChanged: (LocalDateTime) -> Unit,
 ) {
   val section = state.section
 
@@ -122,8 +130,8 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             imageLoader = imageLoader,
-            onScrub = onScrub,
-            onRangeSelected = onRangeSelected,
+            onScrub = onChartScrub,
+            onRangeSelected = onChartRangeSelected,
         )
       }
       PortfolioDigSections.NEWS -> {
@@ -139,9 +147,9 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
-            onAddPosition = onAddPosition,
-            onDeletePosition = onDeletePosition,
-            onUpdatePosition = onUpdatePosition,
+            onAddPosition = onPositionAdd,
+            onDeletePosition = onPositionDelete,
+            onUpdatePosition = onPositionUpdate,
         )
       }
       PortfolioDigSections.STATISTICS -> {
@@ -156,9 +164,9 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onRefresh = onRefresh,
-            onAddSplit = onAddSplit,
-            onDeleteSplit = onDeleteSplit,
-            onUpdateSplit = onUpdateSplit,
+            onAddSplit = onSplitAdd,
+            onDeleteSplit = onSplitDeleted,
+            onUpdateSplit = onSplitUpdated,
         )
       }
       PortfolioDigSections.RECOMMENDATIONS -> {
@@ -173,6 +181,9 @@ private fun Content(
         DigOptionsChain(
             modifier = Modifier.fillMaxSize(),
             state = state,
+            onRefresh = onRefresh,
+            onSectionChanged = onOptionSectionChanged,
+            onExpirationDateChanged = onOptionExpirationDateChanged,
         )
       }
     }
@@ -202,16 +213,18 @@ private fun PreviewPortfolioDigScreen() {
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},
-      onScrub = {},
-      onRangeSelected = {},
+      onChartScrub = {},
+      onChartRangeSelected = {},
       onTabUpdated = {},
       onRefresh = {},
-      onAddPosition = {},
-      onDeletePosition = {},
-      onUpdatePosition = {},
-      onAddSplit = {},
-      onDeleteSplit = {},
-      onUpdateSplit = {},
+      onPositionAdd = {},
+      onPositionDelete = {},
+      onPositionUpdate = {},
+      onSplitAdd = {},
+      onSplitDeleted = {},
+      onSplitUpdated = {},
       onRecClick = {},
+      onOptionExpirationDateChanged = {},
+      onOptionSectionChanged = {},
   )
 }

@@ -45,6 +45,8 @@ fun DigNews(
     state: DigViewState,
     onRefresh: () -> Unit,
 ) {
+  val error = state.newsError
+
   SwipeRefresh(
       modifier = modifier,
       state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
@@ -55,15 +57,29 @@ fun DigNews(
         contentPadding = PaddingValues(MaterialTheme.keylines.content),
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
-      items(
-          items = state.news,
-          key = { it.id },
-      ) { n ->
-        NewsItem(
-            modifier = Modifier.fillMaxWidth(),
-            news = n,
-            imageLoader = imageLoader,
-        )
+      if (error == null) {
+        items(
+            items = state.news,
+            key = { it.id },
+        ) { n ->
+          NewsItem(
+              modifier = Modifier.fillMaxWidth(),
+              news = n,
+              imageLoader = imageLoader,
+          )
+        }
+      } else {
+        item {
+          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+
+          Text(
+              text = errorMessage,
+              style =
+                  MaterialTheme.typography.h6.copy(
+                      color = MaterialTheme.colors.error,
+                  ),
+          )
+        }
       }
     }
   }

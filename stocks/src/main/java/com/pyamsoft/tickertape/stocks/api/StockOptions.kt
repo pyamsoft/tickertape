@@ -56,6 +56,8 @@ interface StockOptions {
 
     @get:CheckResult val openInterest: Int
 
+    @get:CheckResult val expirationDate: LocalDateTime
+
     @get:CheckResult val lastTradeDate: LocalDateTime
 
     @get:CheckResult val mid: StockMoneyValue
@@ -64,9 +66,9 @@ interface StockOptions {
 
     @get:CheckResult val ask: StockMoneyValue
 
-    enum class Type {
-      CALL,
-      PUT
+    enum class Type(val display: String) {
+      CALL("Calls"),
+      PUT("Puts")
     }
 
     companion object {
@@ -83,6 +85,7 @@ interface StockOptions {
           iv: StockPercent,
           itm: Boolean,
           lastTradeDate: LocalDateTime,
+          expirationDate: LocalDateTime,
           openInterest: Int,
           bid: StockMoneyValue,
           ask: StockMoneyValue,
@@ -98,6 +101,7 @@ interface StockOptions {
             iv,
             itm,
             lastTradeDate,
+            expirationDate,
             openInterest,
             bid,
             ask,
@@ -117,6 +121,7 @@ interface StockOptions {
           iv: StockPercent,
           itm: Boolean,
           lastTradeDate: LocalDateTime,
+          expirationDate: LocalDateTime,
           openInterest: Int,
           bid: StockMoneyValue,
           ask: StockMoneyValue,
@@ -133,6 +138,7 @@ interface StockOptions {
             iv,
             itm,
             lastTradeDate,
+            expirationDate,
             openInterest,
             bid,
             ask,

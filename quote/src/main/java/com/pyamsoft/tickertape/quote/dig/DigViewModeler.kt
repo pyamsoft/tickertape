@@ -35,6 +35,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
@@ -123,12 +124,24 @@ protected constructor(
   protected suspend fun loadOptionsChain(force: Boolean) {
     val s = state
     val symbol = getLookupSymbol()
+
+    // Reset options if this is the first time call
+    if (s.optionsChain == null) {
+      s.optionsExpirationDate = null
+      s.optionsSection = StockOptions.Contract.Type.CALL
+    }
+
     optionsRunner
         .call(force, symbol)
         .onSuccess { o ->
           s.apply {
             optionsChain = o
             optionsError = null
+
+            // Set the expiration date to the first one
+            if (s.optionsExpirationDate == null) {
+              s.optionsExpirationDate = o.expirationDates.firstOrNull()
+            }
           }
         }
         .onFailure { Timber.e(it, "Failed to load options chain for $symbol") }
@@ -260,7 +273,15 @@ protected constructor(
     currentPrice = chart.currentPrice
   }
 
-  fun handleRangeSelected(
+  fun handleOptionsSectionChanged(section: StockOptions.Contract.Type) {
+    state.optionsSection = section
+  }
+
+  fun handleOptionsExpirationDateChanged(date: LocalDateTime) {
+    state.optionsExpirationDate = date
+  }
+
+  fun handleChartRangeSelected(
       scope: CoroutineScope,
       range: StockChart.IntervalRange,
   ) {
@@ -273,7 +294,7 @@ protected constructor(
     handleLoadTicker(scope = scope, force = true)
   }
 
-  fun handleDateScrubbed(data: Chart.Data?) {
+  fun handleChartDateScrubbed(data: Chart.Data?) {
     if (data == null) {
       return
     }

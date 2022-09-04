@@ -259,7 +259,7 @@ private fun ContractItem(
         style = MaterialTheme.typography.body2,
     )
 
-    if (!contract.bid.isZero) {
+    if (contract.bid.isValid) {
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           text = "Bid: ${contract.bid.display}",
@@ -267,7 +267,7 @@ private fun ContractItem(
       )
     }
 
-    if (!contract.ask.isZero) {
+    if (contract.ask.isValid) {
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           text = "Ask: ${contract.ask.display}",
@@ -275,7 +275,7 @@ private fun ContractItem(
       )
     }
 
-    if (!contract.mid.isZero) {
+    if (contract.mid.isValid) {
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           text = "Mid: ${contract.mid.display}",
@@ -289,7 +289,7 @@ private fun ContractItem(
         style = MaterialTheme.typography.caption,
     )
 
-    if (!contract.iv.isZero) {
+    if (contract.iv.isValid) {
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
           text = "IV: ${contract.iv.display}",

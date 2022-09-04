@@ -25,6 +25,7 @@ import kotlin.math.abs
 
 internal data class StockMoneyValueImpl(
     override val value: Double,
+    override val isValid: Boolean,
 ) : StockMoneyValue {
 
   private val money by

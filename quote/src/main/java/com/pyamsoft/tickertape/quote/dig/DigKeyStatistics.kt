@@ -226,7 +226,7 @@ private fun LazyListScope.renderManagementEffectiveness(
   item {
     StatisticsTitle(
         modifier = Modifier.fillMaxWidth(),
-        title = "Management Effectivenss",
+        title = "Management Effectiveness",
     )
   }
 

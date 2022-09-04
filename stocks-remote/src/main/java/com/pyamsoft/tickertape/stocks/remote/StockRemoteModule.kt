@@ -48,10 +48,9 @@ import com.pyamsoft.tickertape.stocks.sources.TopSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.converter.simplexml.SimpleXmlConverterFactory
+import javax.inject.Named
 
 @Module
 abstract class StockRemoteModule {
@@ -71,17 +70,12 @@ abstract class StockRemoteModule {
   @CheckResult
   internal abstract fun bindChartSource(impl: YahooChartSource): ChartSource
 
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindTopSource(impl: YahooTopSource): TopSource
+  @Binds @StockApi @CheckResult internal abstract fun bindTopSource(impl: YahooTopSource): TopSource
 
   @Binds
   @StockApi
   @CheckResult
-  internal abstract fun bindKeyStatisticsSource(
-      impl: YahooKeyStatisticsSource
-  ): KeyStatisticSource
+  internal abstract fun bindKeyStatisticsSource(impl: YahooKeyStatisticsSource): KeyStatisticSource
 
   @Binds
   @StockApi
@@ -108,7 +102,8 @@ abstract class StockRemoteModule {
     @CheckResult
     @Named("xml_converter")
     internal fun provideXmlConverterFactory(): Converter.Factory {
-      @Suppress("DEPRECATION") return SimpleXmlConverterFactory.createNonStrict()
+      @Suppress("DEPRECATION")
+      return retrofit2.converter.simplexml.SimpleXmlConverterFactory.createNonStrict()
     }
 
     @Provides

@@ -23,6 +23,7 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 
 internal data class StockPercentImpl(
     override val value: Double,
+    override val isValid: Boolean,
 ) : StockPercent {
 
   private val stockPercent by

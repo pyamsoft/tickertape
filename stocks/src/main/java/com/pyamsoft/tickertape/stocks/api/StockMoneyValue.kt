@@ -25,13 +25,22 @@ interface StockMoneyValue : StockDoubleValue {
 
   @CheckResult fun compareTo(other: StockMoneyValue): Int
 
+  @get:CheckResult val isValid: Boolean
+
   companion object {
 
-    val NONE: StockMoneyValue = 0.0.asMoney()
+    val NONE: StockMoneyValue =
+        StockMoneyValueImpl(
+            value = 0.0,
+            isValid = false,
+        )
   }
 }
 
 @CheckResult
 fun Double.asMoney(): StockMoneyValue {
-  return StockMoneyValueImpl(this)
+  return StockMoneyValueImpl(
+      value = this,
+      isValid = true,
+  )
 }

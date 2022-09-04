@@ -23,15 +23,24 @@ interface StockPercent : StockDoubleValue {
 
   @get:CheckResult val display: String
 
+  @get:CheckResult val isValid: Boolean
+
   @CheckResult fun compareTo(other: StockPercent): Int
 
   companion object {
 
-    val NONE: StockPercent = 0.0.asPercent()
+    val NONE: StockPercent =
+        StockPercentImpl(
+            value = 0.0,
+            isValid = false,
+        )
   }
 }
 
 @CheckResult
 fun Double.asPercent(): StockPercent {
-  return StockPercentImpl(this)
+  return StockPercentImpl(
+      value = this,
+      isValid = true,
+  )
 }

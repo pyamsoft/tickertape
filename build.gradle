@@ -67,7 +67,7 @@ buildscript {
     // Dagger
     dagger = "2.43.2"
 
-    moshi = "1.13.0"
+    moshi = "1.14.0"
     retrofit = "2.9.0"
     okhttp = "4.10.0"
 

@@ -247,7 +247,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 imageLoader = loader,
-                onClose = { act.onBackPressed() },
+                onClose = { act.onBackPressedDispatcher.onBackPressed() },
                 onChartScrub = { vm.handleChartDateScrubbed(it) },
                 onChartRangeSelected = { handleRangeSelected(it) },
                 onTabUpdated = { handleTabUpdated(it) },

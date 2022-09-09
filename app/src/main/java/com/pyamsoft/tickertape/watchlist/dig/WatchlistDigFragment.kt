@@ -162,7 +162,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 modifier = Modifier.fillMaxWidth(),
                 state = state,
                 imageLoader = loader,
-                onClose = { act.onBackPressed() },
+                onClose = { act.onBackPressedDispatcher.onBackPressed() },
                 onChartScrub = { vm.handleChartDateScrubbed(it) },
                 onChartRangeSelected = { handleRangeSelected(it) },
                 onModifyWatchlist = { handleModifyWatchlist() },

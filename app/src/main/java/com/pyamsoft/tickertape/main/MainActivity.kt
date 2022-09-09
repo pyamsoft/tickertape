@@ -205,16 +205,6 @@ internal class MainActivity : PYDroidActivity() {
     lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
   }
 
-  override fun onBackPressed() {
-    onBackPressedDispatcher.also { dispatcher ->
-      if (dispatcher.hasEnabledCallbacks()) {
-        dispatcher.onBackPressed()
-      } else {
-        super.onBackPressed()
-      }
-    }
-  }
-
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)

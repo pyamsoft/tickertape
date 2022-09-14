@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
+import com.pyamsoft.pydroid.notify.NotifyGuard
 import com.pyamsoft.tickertape.alert.AlertInternalApi
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
@@ -34,15 +35,16 @@ import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 
 @Singleton
 class BigMoverStandalone
 @Inject
 internal constructor(
+    private val guard: NotifyGuard,
     @AlertInternalApi private val notifier: Notifier,
     private val bigMoverQueryDao: BigMoverQueryDao,
     private val bigMoverInsertDao: BigMoverInsertDao,
@@ -111,8 +113,14 @@ internal constructor(
   }
 
   private fun postNotification(quote: StockQuote) {
+    if (!guard.canPostNotification()) {
+      Timber.w("Missing notification permission")
+      return
+    }
+
     val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { quote.symbol }
-    notifier.show(
+    notifier
+        .show(
             id = id,
             channelInfo = CHANNEL_INFO,
             notification = BigMoverNotificationData(quote = quote),

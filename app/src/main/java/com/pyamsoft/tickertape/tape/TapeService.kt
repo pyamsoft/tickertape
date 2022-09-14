@@ -24,12 +24,12 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class TapeService : Service() {
 
@@ -80,6 +80,7 @@ class TapeService : Service() {
   }
 
   private fun updateTape(intent: Intent?) {
+    val self = this
     val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, currentIndex) ?: currentIndex
     currentIndex = index
 
@@ -89,10 +90,12 @@ class TapeService : Service() {
       tapeRemote
           .requireNotNull()
           .updateNotification(
-              TapeRemote.NotificationOptions(
-                  index = index,
-                  forceRefresh = forceRefresh,
-              ),
+              service = self,
+              options =
+                  TapeRemote.NotificationOptions(
+                      index = index,
+                      forceRefresh = forceRefresh,
+                  ),
           )
     }
   }

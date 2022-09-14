@@ -20,6 +20,9 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
+import com.pyamsoft.pydroid.notify.NotifyGuard
+import com.pyamsoft.pydroid.notify.NotifyPermission
+import com.pyamsoft.pydroid.util.PermissionRequester
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationDispatcher
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.alert.work.alarm.AlarmFactoryImpl
@@ -28,6 +31,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class AlertInternalApi
 
@@ -48,6 +52,7 @@ abstract class AlertModule {
 
     @Provides
     @JvmStatic
+    @Singleton
     @CheckResult
     @AlertInternalApi
     internal fun provideNotifier(
@@ -56,6 +61,24 @@ abstract class AlertModule {
         context: Context
     ): Notifier {
       return Notifier.createDefault(context, dispatchers)
+    }
+
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideNotifyPermission(): PermissionRequester {
+      return NotifyPermission.createDefault()
+    }
+
+    @Provides
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideNotifyGuard(
+        context: Context,
+    ): NotifyGuard {
+      return NotifyGuard.createDefault(context)
     }
   }
 }

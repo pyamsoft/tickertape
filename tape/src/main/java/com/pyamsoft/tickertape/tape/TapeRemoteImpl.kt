@@ -29,11 +29,11 @@ import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class TapeRemoteImpl
@@ -82,7 +82,10 @@ internal constructor(
     return result.recover { emptyList() }
   }
 
-  override suspend fun updateNotification(options: TapeRemote.NotificationOptions) =
+  override suspend fun updateNotification(
+      service: Service,
+      options: TapeRemote.NotificationOptions
+  ) =
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
 
@@ -90,7 +93,8 @@ internal constructor(
         fetchQuotes(force)
             .onSuccess { quotes ->
               notifier
-                  .show(
+                  .startForeground(
+                      service = service,
                       id = NOTIFICATION_ID,
                       channelInfo = CHANNEL_INFO,
                       notification = TapeNotificationData(quotes = quotes, index = options.index),

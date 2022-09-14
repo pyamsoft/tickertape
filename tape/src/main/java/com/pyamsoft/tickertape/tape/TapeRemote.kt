@@ -22,9 +22,12 @@ interface TapeRemote {
 
   fun createNotification(service: Service)
 
-  suspend fun updateNotification(options: NotificationOptions)
-
   fun stopNotification(service: Service)
+
+  suspend fun updateNotification(
+      service: Service,
+      options: NotificationOptions,
+  )
 
   suspend fun onStopReceived(onStop: () -> Unit)
 

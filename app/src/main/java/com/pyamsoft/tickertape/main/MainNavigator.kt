@@ -117,15 +117,19 @@ internal constructor(
           when (newPage) {
             is HomeFragment ->
                 when (oldPage) {
-                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
+                  null,
+                  is WatchlistDigFragment,
+                  is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is WatchlistFragment, is PortfolioFragment ->
-                      R.anim.slide_in_left then R.anim.slide_out_right
+                  is WatchlistFragment,
+                  is PortfolioFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
                 }
             is WatchlistFragment ->
                 when (oldPage) {
-                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
+                  null,
+                  is WatchlistDigFragment,
+                  is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   is PortfolioFragment -> R.anim.slide_in_left then R.anim.slide_out_right
@@ -133,14 +137,16 @@ internal constructor(
                 }
             is PortfolioFragment ->
                 when (oldPage) {
-                  null, is WatchlistDigFragment, is PortfolioDigFragment ->
+                  null,
+                  is WatchlistDigFragment,
+                  is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is WatchlistFragment, is HomeFragment ->
-                      R.anim.slide_in_right then R.anim.slide_out_left
+                  is WatchlistFragment,
+                  is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null
                 }
-            is WatchlistDigFragment, is PortfolioDigFragment ->
-                R.anim.fragment_open_enter then R.anim.fragment_open_exit
+            is WatchlistDigFragment,
+            is PortfolioDigFragment -> R.anim.fragment_open_enter then R.anim.fragment_open_exit
             else -> null
           }
 

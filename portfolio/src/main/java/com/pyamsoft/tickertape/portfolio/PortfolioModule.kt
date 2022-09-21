@@ -41,7 +41,7 @@ abstract class PortfolioModule {
   @Binds
   @CheckResult
   internal abstract fun bindPortfolioDigInteractorCache(
-    impl: PortfolioDigInteractorImpl,
+      impl: PortfolioDigInteractorImpl,
   ): PortfolioDigInteractor.Cache
 
   @Binds

@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.ui.test
 
-
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -25,61 +24,61 @@ import kotlinx.coroutines.async
 /** Only use for tests/previews */
 private class TestImageLoader(context: Context) : ImageLoader {
 
-    private val context = context.applicationContext
-    private val loadingDrawable by lazy(LazyThreadSafetyMode.NONE) { ColorDrawable(Color.BLACK) }
-    private val successDrawable by lazy(LazyThreadSafetyMode.NONE) { ColorDrawable(Color.GREEN) }
+  private val context = context.applicationContext
+  private val loadingDrawable by lazy(LazyThreadSafetyMode.NONE) { ColorDrawable(Color.BLACK) }
+  private val successDrawable by lazy(LazyThreadSafetyMode.NONE) { ColorDrawable(Color.GREEN) }
 
-    private val disposable =
-        object : Disposable {
+  private val disposable =
+      object : Disposable {
 
-            override val isDisposed: Boolean = true
-            override val job: Deferred<ImageResult> =
-                MainScope().async<ImageResult> {
-                    ErrorResult(
-                        drawable = null,
-                        request = ImageRequest.Builder(context).build(),
-                        throwable = RuntimeException("Test"),
-                    )
-                }
+        override val isDisposed: Boolean = true
+        override val job: Deferred<ImageResult> =
+            MainScope().async<ImageResult> {
+              ErrorResult(
+                  drawable = null,
+                  request = ImageRequest.Builder(context).build(),
+                  throwable = RuntimeException("Test"),
+              )
+            }
 
-            override fun dispose() {}
-        }
+        override fun dispose() {}
+      }
 
-    override val components: ComponentRegistry = ComponentRegistry()
+  override val components: ComponentRegistry = ComponentRegistry()
 
-    override val defaults: DefaultRequestOptions = DefaultRequestOptions()
+  override val defaults: DefaultRequestOptions = DefaultRequestOptions()
 
-    override val diskCache: DiskCache? = null
+  override val diskCache: DiskCache? = null
 
-    override val memoryCache: MemoryCache? = null
+  override val memoryCache: MemoryCache? = null
 
-    override fun enqueue(request: ImageRequest): Disposable {
-        request.apply {
-            target?.onStart(placeholder = loadingDrawable)
-            target?.onSuccess(result = successDrawable)
-        }
-        return disposable
+  override fun enqueue(request: ImageRequest): Disposable {
+    request.apply {
+      target?.onStart(placeholder = loadingDrawable)
+      target?.onSuccess(result = successDrawable)
     }
+    return disposable
+  }
 
-    override suspend fun execute(request: ImageRequest): ImageResult {
-        return SuccessResult(
-            drawable = successDrawable,
-            request = request,
-            dataSource = MEMORY,
-        )
-    }
+  override suspend fun execute(request: ImageRequest): ImageResult {
+    return SuccessResult(
+        drawable = successDrawable,
+        request = request,
+        dataSource = MEMORY,
+    )
+  }
 
-    override fun newBuilder(): ImageLoader.Builder {
-        return ImageLoader.Builder(context)
-    }
+  override fun newBuilder(): ImageLoader.Builder {
+    return ImageLoader.Builder(context)
+  }
 
-    override fun shutdown() {}
+  override fun shutdown() {}
 }
 
 /** Only use for tests/previews */
 @Composable
 @CheckResult
 fun createNewTestImageLoader(): ImageLoader {
-    val context = LocalContext.current
-    return TestImageLoader(context)
+  val context = LocalContext.current
+  return TestImageLoader(context)
 }

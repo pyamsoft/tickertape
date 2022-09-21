@@ -172,7 +172,9 @@ private fun DateField(
       modifier =
           modifier.clickable(
               enabled = !readOnly,
-          ) { onDateClicked(date) },
+          ) {
+            onDateClicked(date)
+          },
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Icon(

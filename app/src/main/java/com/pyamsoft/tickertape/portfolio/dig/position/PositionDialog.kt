@@ -40,7 +40,6 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
@@ -49,6 +48,7 @@ import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateDialog
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber
@@ -137,7 +137,6 @@ internal class PositionDialog : AppCompatDialogFragment() {
         val symbol = remember { getSymbol() }
 
         vm.Render { state ->
-
           act.TickerTapeTheme(themeProvider) {
             PositionAddScreen(
                 modifier = Modifier.fillMaxWidth(),

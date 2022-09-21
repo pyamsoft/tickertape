@@ -35,10 +35,10 @@ import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asPercent
-import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 class BigMoverStandalone

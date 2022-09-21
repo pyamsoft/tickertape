@@ -27,12 +27,12 @@ import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
+import java.time.LocalDate
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
-import javax.inject.Inject
 
 class PositionAddViewModeler
 @Inject

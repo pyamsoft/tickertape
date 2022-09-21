@@ -15,11 +15,11 @@ abstract class WatchlistModule {
       impl: WatchlistInteractorImpl,
   ): WatchlistInteractor
 
-    @Binds
-    @CheckResult
-    internal abstract fun bindWatchlistInteractorCache(
-        impl: WatchlistInteractorImpl,
-    ): WatchlistInteractor.Cache
+  @Binds
+  @CheckResult
+  internal abstract fun bindWatchlistInteractorCache(
+      impl: WatchlistInteractorImpl,
+  ): WatchlistInteractor.Cache
 
   @Binds
   @CheckResult
@@ -27,9 +27,9 @@ abstract class WatchlistModule {
       impl: WatchlistDigInteractorImpl,
   ): WatchlistDigInteractor
 
-    @Binds
-    @CheckResult
-    internal abstract fun bindWatchlistDigInteractorCache(
-        impl: WatchlistDigInteractorImpl,
-    ): WatchlistDigInteractor.Cache
+  @Binds
+  @CheckResult
+  internal abstract fun bindWatchlistDigInteractorCache(
+      impl: WatchlistDigInteractorImpl,
+  ): WatchlistDigInteractor.Cache
 }

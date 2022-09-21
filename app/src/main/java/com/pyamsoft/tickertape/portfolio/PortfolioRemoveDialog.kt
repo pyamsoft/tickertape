@@ -39,11 +39,11 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.DeleteTicker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
 internal class PortfolioRemoveDialog : AppCompatDialogFragment() {

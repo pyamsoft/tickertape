@@ -29,11 +29,11 @@ import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class TapeRemoteImpl

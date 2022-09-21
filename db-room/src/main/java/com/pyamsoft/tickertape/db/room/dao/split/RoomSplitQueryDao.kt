@@ -28,8 +28,7 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSplitQueryDao : SplitQueryDao {
 
-  override suspend fun query(): List<DbSplit> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+  override suspend fun query(): List<DbSplit> = withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
   @Query("""SELECT * FROM ${RoomDbSplit.TABLE_NAME}""")

@@ -40,7 +40,6 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateDialog
@@ -48,6 +47,7 @@ import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import java.time.LocalDate
 import javax.inject.Inject
 import timber.log.Timber

@@ -80,7 +80,7 @@ internal fun PortfolioItem(
           value = stock.current.display,
       )
 
-        // These are only valid if we have current day quotes
+      // These are only valid if we have current day quotes
       if (stock.ticker != null) {
         Info(
             name = "Change Today",

@@ -21,9 +21,9 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.databinding.DialogSettingsBinding
 import com.pyamsoft.tickertape.main.MainComponent
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
 class SettingsDialog : AppCompatDialogFragment() {

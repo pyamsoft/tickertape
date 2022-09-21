@@ -38,12 +38,12 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Singleton
 internal class StockNetworkInteractor

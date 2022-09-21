@@ -50,7 +50,8 @@ enum class MarketState {
         // Other states from YF
         when (name) {
           PREPRE -> PRE
-          POSTPOST, CLOSED -> POST
+          POSTPOST,
+          CLOSED -> POST
           else -> {
             Timber.w(e, "Unmatched MarketState: $name")
             null

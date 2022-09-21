@@ -112,7 +112,9 @@ private fun rememberAttributedText(
       ) {
         withStyle(
             style = linkStyle,
-        ) { append(illustrationBy) }
+        ) {
+          append(illustrationBy)
+        }
       }
 
       append(" from ")
@@ -121,7 +123,9 @@ private fun rememberAttributedText(
       ) {
         withStyle(
             style = linkStyle,
-        ) { append(from) }
+        ) {
+          append(from)
+        }
       }
     }
     return@remember Illustration(
@@ -137,8 +141,7 @@ private fun onTextClicked(
     start: Int,
 ) {
   val url =
-      illustration
-          .text
+      illustration.text
           .getStringAnnotations(
               tag = EMPTY_ATTRIBUTION_TAG,
               start = start,

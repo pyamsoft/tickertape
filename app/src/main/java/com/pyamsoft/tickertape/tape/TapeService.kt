@@ -24,12 +24,12 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class TapeService : Service() {
 

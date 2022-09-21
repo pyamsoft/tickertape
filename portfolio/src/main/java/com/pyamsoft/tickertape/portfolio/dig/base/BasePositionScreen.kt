@@ -82,7 +82,9 @@ private fun <T : Any> PositionsList(
       items(
           items = items,
           key = { itemKey(it) },
-      ) { listItem(it) }
+      ) {
+        listItem(it)
+      }
 
       item {
         Spacer(

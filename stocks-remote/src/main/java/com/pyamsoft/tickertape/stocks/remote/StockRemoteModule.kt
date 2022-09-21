@@ -48,9 +48,9 @@ import com.pyamsoft.tickertape.stocks.sources.TopSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
 
 @Module
 abstract class StockRemoteModule {

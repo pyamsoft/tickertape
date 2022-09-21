@@ -56,7 +56,6 @@ internal fun WatchlistDigToolbar(
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
 
-
   // Hide tabs in options
   val equityType = ticker.quote?.type
   val allTabs =

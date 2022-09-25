@@ -205,6 +205,13 @@ internal class MainActivity : PYDroidActivity() {
     lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
   }
 
+  override fun onResume() {
+    super.onResume()
+
+    // Vitals
+    reportFullyDrawn()
+  }
+
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)

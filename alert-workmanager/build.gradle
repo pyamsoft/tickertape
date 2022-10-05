@@ -20,6 +20,8 @@ apply plugin: "kotlin-kapt"
 
 //noinspection GroovyMissingReturnStatement
 android {
+  namespace "com.pyamsoft.tickertape.alert.workmanager"
+
   compileSdkVersion rootProject.ext.compileSdk
 
   //noinspection GroovyMissingReturnStatement

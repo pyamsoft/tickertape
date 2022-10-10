@@ -23,64 +23,98 @@ internal constructor(
   companion object {
     @JvmStatic
     @CheckResult
-    fun chart(typography: Typography, color: Color) =
-        TickerSizes(
-            title = typography.body1.copy(color = color),
-            description = typography.body2.copy(color = color),
-            label = typography.caption.copy(color = color),
-        )
-
-    @JvmStatic
-    @CheckResult
-    fun company(typography: Typography, color: Color) =
+    fun chart(
+        typography: Typography,
+        color: Color,
+    ) =
         TickerSizes(
             title =
                 typography.h6.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
-                ),
-            description =
-                typography.body2.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
-                ),
-            label = typography.caption.copy(color = color),
-        )
-
-    @JvmStatic
-    @CheckResult
-    fun price(typography: Typography, color: Color) =
-        TickerSizes(
-            title =
-                typography.h5.copy(
                     color = color,
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.body2.copy(
                     color = color,
-                    fontWeight = FontWeight.W600,
+                    fontWeight = FontWeight.W400,
                 ),
-            label = typography.caption.copy(color = color),
+            label =
+                typography.caption.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
+                ),
         )
 
     @JvmStatic
     @CheckResult
-    fun specialPrice(typography: Typography, color: Color) =
+    fun quote(
+        typography: Typography,
+        color: Color,
+    ) =
         TickerSizes(
             title =
+                typography.h5.copy(
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    fontWeight = FontWeight.W700,
+                ),
+            description =
                 typography.body1.copy(
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    fontWeight = FontWeight.W400,
+                ),
+            label =
+                typography.caption.copy(
                     color = color,
                     fontWeight = FontWeight.W400,
                 ),
+        )
+
+    @JvmStatic
+    @CheckResult
+    fun price(
+        typography: Typography,
+        color: Color,
+    ) =
+        TickerSizes(
+            title =
+                typography.h4.copy(
+                    color = color,
+                    fontWeight = FontWeight.W700,
+                ),
             description =
+                typography.h6.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
+                ),
+            label =
                 typography.caption.copy(
                     color = color,
-                    fontWeight = FontWeight.W100,
+                    fontWeight = FontWeight.W400,
+                ),
+        )
+
+    @JvmStatic
+    @CheckResult
+    fun specialPrice(
+        typography: Typography,
+        color: Color,
+    ) =
+        TickerSizes(
+            title =
+                typography.h6.copy(
+                    color = color,
+                    fontWeight = FontWeight.W700,
+                ),
+            description =
+                typography.body2.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
                     color = color,
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.W100,
+                    fontWeight = FontWeight.W400,
                 ),
         )
   }

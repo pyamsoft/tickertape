@@ -2,16 +2,12 @@ package com.pyamsoft.tickertape.watchlist.item
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.CRYPTO_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.OPTIONS_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.QUOTE_DEFAULT_LIMIT_PERCENT
@@ -73,12 +69,6 @@ fun WatchlistItem(
             Info(
                 name = "Open",
                 value = open.display,
-            )
-          }
-
-          if (quote.dayLow != null || quote.dayHigh != null || quote.dayVolume != null) {
-            Spacer(
-                modifier = Modifier.height(MaterialTheme.keylines.baseline),
             )
           }
 

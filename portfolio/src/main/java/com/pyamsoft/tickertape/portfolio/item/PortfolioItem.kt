@@ -88,7 +88,6 @@ internal fun PortfolioItem(
         )
 
         Info(
-            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
             name = "$totalChangeTitle Amount",
             value = stock.totalGainLossAmount,
         )

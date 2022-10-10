@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -85,26 +86,39 @@ private object QuoteScopeInstance : QuoteScope {
       nameColor: Color,
       valueColor: Color,
   ) {
-    val captionStyle = MaterialTheme.typography.body2
-    val textStyle =
-        captionStyle.copy(
-            color = captionStyle.color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
-        )
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
+    val typography = MaterialTheme.typography
+
+    val labelStyle =
+        remember(typography, nameColor) {
+          typography.caption.copy(
+              color = nameColor.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+              fontWeight = FontWeight.W400,
+              fontSize = 10.sp,
+          )
+        }
+
+    val contentStyle =
+        remember(typography, valueColor) {
+          typography.body2.copy(
+              color = valueColor.copy(alpha = 1.0F),
+              fontWeight = FontWeight.W400,
+          )
+        }
+
+    val label = remember(name) { name.uppercase() }
+
+    Column(
+        modifier = modifier.padding(bottom = MaterialTheme.keylines.baseline),
+        horizontalAlignment = Alignment.Start,
     ) {
       Text(
-          text = name,
-          style = textStyle,
-          color = nameColor,
+          text = label,
+          style = labelStyle,
           maxLines = 1,
       )
       Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-          color = valueColor,
           text = value,
-          style = textStyle.copy(fontWeight = FontWeight.W700),
+          style = contentStyle,
           maxLines = 1,
       )
     }
@@ -143,7 +157,7 @@ fun Quote(
       backgroundColor = backgroundColor,
       contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
-    Row(
+    Column(
         modifier =
             Modifier.combinedClickable(
                     onClick = onClick,
@@ -151,42 +165,47 @@ fun Quote(
                 )
                 .padding(MaterialTheme.keylines.baseline)
                 .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom,
     ) {
-      Column(
-          modifier = Modifier.weight(1F),
-          verticalArrangement = Arrangement.SpaceBetween,
+      TickerName(
+          modifier = Modifier.fillMaxWidth(),
+          symbol = symbol,
+          ticker = ticker,
+          size = TickerSize.QUOTE,
+      )
+
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.Bottom,
       ) {
-        TickerName(
-            symbol = symbol,
-            ticker = ticker,
-            size = TickerSize.QUOTE,
-        )
+        Column(
+            modifier = Modifier.weight(1F),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+          Column(
+              modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+          ) {
+            QuoteScopeInstance.content()
+          }
+        }
 
         Column(
-            modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+            horizontalAlignment = Alignment.End,
         ) {
-          QuoteScopeInstance.content()
-        }
-      }
+          if (isSpecialSession) {
+            TickerPrice(
+                modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
+                ticker = ticker,
+                size = TickerSize.QUOTE_SPECIAL,
+            )
+          }
 
-      Column(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-          horizontalAlignment = Alignment.End,
-      ) {
-        if (isSpecialSession) {
           TickerPrice(
-              modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
               ticker = ticker,
-              size = TickerSize.QUOTE_SPECIAL,
+              size = TickerSize.QUOTE,
           )
         }
-
-        TickerPrice(
-            ticker = ticker,
-            size = TickerSize.QUOTE,
-        )
       }
     }
   }

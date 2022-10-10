@@ -83,7 +83,7 @@ internal fun HomePortfolio(
           Text(
               text = "My Portfolio Summary",
               style =
-                  MaterialTheme.typography.h6.copy(
+                  MaterialTheme.typography.body1.copy(
                       fontWeight = FontWeight.W700,
                   ),
           )

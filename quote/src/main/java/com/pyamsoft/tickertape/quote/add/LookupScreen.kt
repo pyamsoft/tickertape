@@ -47,8 +47,8 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
+import java.time.LocalDate
 
 @Composable
 @JvmOverloads
@@ -202,7 +202,7 @@ private fun ResultItem(
         text = symbol.raw,
         style =
             MaterialTheme.typography.body1.copy(
-                fontWeight = FontWeight.W500,
+                fontWeight = FontWeight.W400,
             ),
     )
     if (company.isValid) {

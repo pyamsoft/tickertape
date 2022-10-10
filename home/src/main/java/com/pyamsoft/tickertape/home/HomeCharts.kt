@@ -235,8 +235,8 @@ private fun HomeCharts(
                 ),
             text = name,
             style =
-                MaterialTheme.typography.h6.copy(
-                    fontWeight = FontWeight.W700,
+                MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.W400,
                 ),
         )
 

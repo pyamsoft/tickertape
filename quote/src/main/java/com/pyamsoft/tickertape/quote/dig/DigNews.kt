@@ -114,7 +114,7 @@ private fun NewsItem(
             text = d,
             style =
                 MaterialTheme.typography.caption.copy(
-                    fontWeight = FontWeight.W500,
+                    fontWeight = FontWeight.W400,
                 ),
         )
       }

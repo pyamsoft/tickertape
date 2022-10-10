@@ -130,13 +130,13 @@ private fun RecommendationItem(
             TickerPrice(
                 modifier = Modifier.padding(end = MaterialTheme.keylines.content),
                 ticker = recommendation,
-                size = TickerSize.QUOTE_SPECIAL,
+                size = TickerSize.RECOMMEND_QUOTE_EXTRA,
             )
           }
 
           TickerPrice(
               ticker = recommendation,
-              size = TickerSize.QUOTE,
+              size = TickerSize.RECOMMEND_QUOTE,
           )
         }
       }

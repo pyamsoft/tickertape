@@ -142,9 +142,9 @@ private fun previewThemeColors(
   val colors =
       remember(isDarkMode) {
         intArrayOf(
-            R2.color.primary,
-            R2.color.white,
             R2.color.secondary,
+            R2.color.white,
+            R2.color.primary,
             R2.color.white,
         )
       }

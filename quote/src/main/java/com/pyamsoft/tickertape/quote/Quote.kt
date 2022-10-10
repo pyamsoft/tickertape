@@ -197,7 +197,7 @@ fun Quote(
             TickerPrice(
                 modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
                 ticker = ticker,
-                size = TickerSize.QUOTE_SPECIAL,
+                size = TickerSize.QUOTE_EXTRA,
             )
           }
 

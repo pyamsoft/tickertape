@@ -38,19 +38,21 @@ fun TickerPrice(
           when (size) {
             TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
             TickerSize.QUOTE -> TickerSizes.price(typography, contentColor)
-            TickerSize.QUOTE_SPECIAL -> TickerSizes.specialPrice(typography, contentColor)
+            TickerSize.QUOTE_EXTRA -> TickerSizes.priceExtra(typography, contentColor)
+            TickerSize.RECOMMEND_QUOTE -> TickerSizes.recPrice(typography, contentColor)
+            TickerSize.RECOMMEND_QUOTE_EXTRA -> TickerSizes.recPriceExtra(typography, contentColor)
           }
         }
 
     // If we are a special quote, display the regular market info
-    val session = if (size == TickerSize.QUOTE_SPECIAL) quote.regular else quote.currentSession
+    val session = if (size.isSpecial) quote.regular else quote.currentSession
 
     val direction = session.direction
     val directionSign = session.direction.sign
     val composeColor =
         remember(direction, size, colors) {
           return@remember if (size == TickerSize.QUOTE ||
-              size == TickerSize.QUOTE_SPECIAL ||
+              size == TickerSize.QUOTE_EXTRA ||
               direction.isZero ||
               !direction.isValid) {
             // If no direction or is a quote so bg is colored, unspecified

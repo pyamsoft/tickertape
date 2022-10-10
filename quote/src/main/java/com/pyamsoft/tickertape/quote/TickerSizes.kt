@@ -7,10 +7,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-enum class TickerSize {
-  CHART,
-  QUOTE,
-  QUOTE_SPECIAL
+enum class TickerSize(val isSpecial: Boolean) {
+  CHART(isSpecial = false),
+
+  // Quotes
+  QUOTE(isSpecial = false),
+  QUOTE_EXTRA(isSpecial = true),
+
+  // Recommendations
+  RECOMMEND_QUOTE(isSpecial = false),
+  RECOMMEND_QUOTE_EXTRA(isSpecial = true)
 }
 
 data class TickerSizes
@@ -95,18 +101,67 @@ internal constructor(
 
     @JvmStatic
     @CheckResult
-    fun specialPrice(
+    fun priceExtra(
         typography: Typography,
         color: Color,
     ) =
         TickerSizes(
             title =
-                typography.h6.copy(
+                typography.h5.copy(
                     color = color,
                     fontWeight = FontWeight.W700,
                 ),
             description =
-                typography.body2.copy(
+                typography.body1.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
+                ),
+            label =
+                typography.caption.copy(
+                    color = color,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.W400,
+                ),
+        )
+
+    @JvmStatic
+    @CheckResult
+    fun recPrice(
+        typography: Typography,
+        color: Color,
+    ) =
+        TickerSizes(
+            title =
+                typography.h5.copy(
+                    color = color,
+                    fontWeight = FontWeight.W700,
+                ),
+            description =
+                typography.body1.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
+                ),
+            label =
+                typography.caption.copy(
+                    color = color,
+                    fontWeight = FontWeight.W400,
+                ),
+        )
+
+    @JvmStatic
+    @CheckResult
+    fun recPriceExtra(
+        typography: Typography,
+        color: Color,
+    ) =
+        TickerSizes(
+            title =
+                typography.body1.copy(
+                    color = color,
+                    fontWeight = FontWeight.W700,
+                ),
+            description =
+                typography.caption.copy(
                     color = color,
                     fontWeight = FontWeight.W400,
                 ),

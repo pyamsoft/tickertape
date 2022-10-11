@@ -204,7 +204,7 @@ private fun <T : Any> ListSection(
                   .background(
                       color =
                           MaterialTheme.colors.background.copy(
-                              alpha = 0.85F,
+                              alpha = 0.80F,
                           ),
                   )
                   .padding(scaffoldPaddingValues),

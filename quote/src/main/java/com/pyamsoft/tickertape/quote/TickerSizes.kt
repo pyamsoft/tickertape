@@ -19,6 +19,8 @@ enum class TickerSize(val isSpecial: Boolean) {
   RECOMMEND_QUOTE_EXTRA(isSpecial = true)
 }
 
+private const val EXTRA_CONTENT_DEFAULT_ALPHA = QUOTE_CONTENT_DEFAULT_ALPHA + 0.1F
+
 data class TickerSizes
 internal constructor(
     val title: TextStyle,
@@ -36,17 +38,17 @@ internal constructor(
         TickerSizes(
             title =
                 typography.h6.copy(
-                    color = color,
+                    color = color.copy(alpha = 1.0F),
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.body2.copy(
-                    color = color,
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
                     fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
-                    color = color,
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
                     fontWeight = FontWeight.W400,
                 ),
         )
@@ -60,7 +62,7 @@ internal constructor(
         TickerSizes(
             title =
                 typography.h5.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = 1.0F),
                     fontWeight = FontWeight.W700,
                 ),
             description =
@@ -70,7 +72,7 @@ internal constructor(
                 ),
             label =
                 typography.caption.copy(
-                    color = color,
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
                     fontWeight = FontWeight.W400,
                 ),
         )
@@ -80,73 +82,21 @@ internal constructor(
     fun price(
         typography: Typography,
         color: Color,
-    ) =
-        TickerSizes(
-            title =
-                typography.h4.copy(
-                    color = color,
-                    fontWeight = FontWeight.W700,
-                ),
-            description =
-                typography.h6.copy(
-                    color = color,
-                    fontWeight = FontWeight.W400,
-                ),
-            label =
-                typography.caption.copy(
-                    color = color,
-                    fontWeight = FontWeight.W400,
-                ),
-        )
+    ) = quote(typography, color)
 
     @JvmStatic
     @CheckResult
     fun priceExtra(
         typography: Typography,
         color: Color,
-    ) =
-        TickerSizes(
-            title =
-                typography.h5.copy(
-                    color = color,
-                    fontWeight = FontWeight.W700,
-                ),
-            description =
-                typography.body1.copy(
-                    color = color,
-                    fontWeight = FontWeight.W400,
-                ),
-            label =
-                typography.caption.copy(
-                    color = color,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.W400,
-                ),
-        )
+    ) = chart(typography, color)
 
     @JvmStatic
     @CheckResult
     fun recPrice(
         typography: Typography,
         color: Color,
-    ) =
-        TickerSizes(
-            title =
-                typography.h5.copy(
-                    color = color,
-                    fontWeight = FontWeight.W700,
-                ),
-            description =
-                typography.body1.copy(
-                    color = color,
-                    fontWeight = FontWeight.W400,
-                ),
-            label =
-                typography.caption.copy(
-                    color = color,
-                    fontWeight = FontWeight.W400,
-                ),
-        )
+    ) = priceExtra(typography, color)
 
     @JvmStatic
     @CheckResult
@@ -157,17 +107,17 @@ internal constructor(
         TickerSizes(
             title =
                 typography.body1.copy(
-                    color = color,
+                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.caption.copy(
-                    color = color,
+                    color = color.copy(alpha = EXTRA_CONTENT_DEFAULT_ALPHA),
                     fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
-                    color = color,
+                    color = color.copy(alpha = EXTRA_CONTENT_DEFAULT_ALPHA),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.W400,
                 ),

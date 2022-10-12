@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import timber.log.Timber
 
 private const val EMPTY_ATTRIBUTION_TAG = ""
@@ -66,8 +65,7 @@ fun Icons8RequiredAttribution(
         modifier = modifier,
         text = illustration.text,
         style =
-            MaterialTheme.typography.caption.copy(
-                fontSize = 10.sp,
+            MaterialTheme.typography.overline.copy(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onSurface,
             ),

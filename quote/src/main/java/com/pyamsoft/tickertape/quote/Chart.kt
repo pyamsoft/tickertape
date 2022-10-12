@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote
 
+import android.graphics.Color as ViewColor
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -55,7 +55,6 @@ import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
-import android.graphics.Color as ViewColor
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
 private const val LINE_ALPHA = 255
@@ -127,10 +126,7 @@ private fun ChartBound(
                 vertical = MaterialTheme.keylines.typography / 2,
             ),
         text = value,
-        style =
-            MaterialTheme.typography.caption.copy(
-                fontSize = 10.sp,
-            ),
+        style = MaterialTheme.typography.overline,
     )
   }
 }

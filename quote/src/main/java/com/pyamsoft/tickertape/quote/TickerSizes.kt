@@ -5,7 +5,6 @@ import androidx.compose.material.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
 enum class TickerSize(val isSpecial: Boolean) {
   CHART(isSpecial = false),
@@ -126,9 +125,8 @@ internal constructor(
                     fontWeight = FontWeight.W400,
                 ),
             label =
-                typography.caption.copy(
+                typography.overline.copy(
                     color = color.copy(alpha = alphaMedium),
-                    fontSize = 10.sp,
                     fontWeight = FontWeight.W400,
                 ),
         )

@@ -114,10 +114,9 @@ object DefaultQuoteScopeInstance : QuoteScope {
             nameColor,
             disabledAlpha,
         ) {
-          typography.caption.copy(
+          typography.overline.copy(
               color = nameColor.copy(alpha = disabledAlpha),
               fontWeight = FontWeight.W400,
-              fontSize = 10.sp,
           )
         }
 

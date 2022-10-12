@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,13 +21,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.BorderCard
 
 @Composable
 fun DigRecommendations(
@@ -94,12 +93,12 @@ private fun RecommendationItem(
         }
       }
 
-  Card(
-      modifier = modifier.clickable { onClick(recommendation) },
-      elevation = CardDefaults.Elevation,
+  BorderCard(
+      modifier = modifier,
   ) {
     Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline),
+        modifier =
+            Modifier.clickable { onClick(recommendation) }.padding(MaterialTheme.keylines.baseline),
     ) {
       TickerName(
           modifier = Modifier.fillMaxWidth(),

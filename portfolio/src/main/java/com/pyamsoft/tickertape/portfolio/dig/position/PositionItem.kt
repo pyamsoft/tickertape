@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -19,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
@@ -34,6 +32,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
+import com.pyamsoft.tickertape.ui.BorderCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
 @Composable
@@ -42,9 +41,9 @@ internal fun PositionItem(
     modifier: Modifier = Modifier,
     position: PositionStock,
 ) {
-  Card(
+
+  BorderCard(
       modifier = modifier,
-      elevation = CardDefaults.Elevation,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),

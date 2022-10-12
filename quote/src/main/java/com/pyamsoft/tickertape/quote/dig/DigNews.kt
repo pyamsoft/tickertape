@@ -34,6 +34,7 @@ import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.BorderCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
@@ -100,9 +101,9 @@ private fun NewsItem(
 
   val displayDate = remember(date) { date?.format(DATE_FORMATTER.get().requireNotNull()) }
 
-  Card(
+  BorderCard(
       modifier = modifier,
-      elevation = CardDefaults.Elevation,
+      borderColor = MaterialTheme.colors.secondary,
   ) {
     Column(
         modifier =

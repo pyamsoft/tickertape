@@ -75,8 +75,8 @@ internal fun HomeWatchlist(
               modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
               text = "My Watchlist",
               style =
-                  MaterialTheme.typography.h6.copy(
-                      fontWeight = FontWeight.W700,
+                  MaterialTheme.typography.body1.copy(
+                      fontWeight = FontWeight.W400,
                   ),
           )
         }

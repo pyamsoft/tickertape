@@ -23,7 +23,7 @@ import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
+import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.dig.DigNews
 import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.DigRecommendations

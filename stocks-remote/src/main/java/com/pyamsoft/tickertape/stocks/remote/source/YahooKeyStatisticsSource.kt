@@ -18,8 +18,6 @@ package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
@@ -71,6 +69,8 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
           return@coroutineScope jobs.awaitAll().map { paired ->
             return@map KeyStatistics.create(
+                // Quote is NULL here but may be paired in the future at the Interactor level
+                quote = null,
                 symbol = paired.symbol,
                 earnings = createEarnings(paired.response),
                 financials = createFinancials(paired.response),
@@ -107,7 +107,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         try {
           KeyStatistics.Financials.Recommendation.valueOf(this.uppercase())
         } catch (e: Throwable) {
-          Timber.e(e, "Unknown recommendation string: $this")
+          Timber.w(e, "Unknown recommendation string: $this, fallback to UNKNOWN")
           KeyStatistics.Financials.Recommendation.UNKNOWN
         }
       }
@@ -202,7 +202,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     }
 
     private data class YFInfo(
-        override val marketCap: KeyStatistics.DataPoint,
         override val beta: KeyStatistics.DataPoint,
         override val enterpriseValue: KeyStatistics.DataPoint,
         override val floatShares: KeyStatistics.DataPoint,
@@ -226,59 +225,10 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val enterpriseValueToEbitda: KeyStatistics.DataPoint,
         override val enterpriseValueToRevenue: KeyStatistics.DataPoint,
         override val priceToBook: KeyStatistics.DataPoint,
+        override val bookValue: KeyStatistics.DataPoint,
         override val fiftyTwoWeekChange: KeyStatistics.DataPoint,
         override val marketFiftyTwoWeekChange: KeyStatistics.DataPoint,
     ) : KeyStatistics.Info
-
-    private fun computeMarketCap(response: NetworkKeyStatisticsResponse): KeyStatistics.DataPoint {
-      val d = response.getData()
-
-      val data = d.defaultKeyStatistics ?: return KeyStatistics.DataPoint.EMPTY
-
-      val so = data.sharesOutstanding
-      val price = d.financialData?.currentPrice
-      if (so == null || price == null) {
-        return KeyStatistics.DataPoint.EMPTY
-      }
-
-      // We basically must expect these to always be numbers instead of "Infinity"
-      val sharesOutstandingValue = so.raw as? Double
-      val priceValue = price.raw as? Double
-      if (sharesOutstandingValue == null || priceValue == null) {
-        return KeyStatistics.DataPoint.EMPTY
-      }
-
-      val marketCapValue = sharesOutstandingValue * priceValue
-
-      // Also find the string suffix for units
-      var marketCapFinal = marketCapValue
-      var marketCapUnit = ""
-      while (marketCapFinal > 1000) {
-        marketCapFinal /= 1000
-        marketCapUnit =
-            when (marketCapUnit) {
-              "" -> "K"
-              "K" -> "M"
-              "M" -> "B"
-              "B" -> "T"
-              "T" -> "Q"
-              else -> " Unknown"
-            }
-      }
-
-      val formatter = BIG_MONEY_FORMATTER.get().requireNotNull()
-
-      // substring(1) removes the $ currency symbol
-      // NOTE(Peter): Will this be fucked up with locale currency being different from USD? Oh well
-      // for now, we only support USD.
-      val cleanNumberFormatNoDollarSign = formatter.format(marketCapFinal).substring(1)
-
-      return object : KeyStatistics.DataPoint {
-        override val raw: Double = marketCapValue
-        override val fmt: String = "${cleanNumberFormatNoDollarSign}${marketCapUnit}"
-        override val isEmpty: Boolean = false
-      }
-    }
 
     @JvmStatic
     @CheckResult
@@ -287,7 +237,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
       return if (data == null) null
       else {
         YFInfo(
-            marketCap = computeMarketCap(response),
             beta = data.beta.asDataPoint(),
             enterpriseValue = data.enterpriseValue.asDataPoint(),
             floatShares = data.floatShares.asDataPoint(),
@@ -307,6 +256,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
             forwardEps = data.forwardEps.asDataPoint(),
             trailingEps = data.trailingEps.asDataPoint(),
             pegRatio = data.pegRatio.asDataPoint(),
+            bookValue = data.bookValue.asDataPoint(),
             priceToBook = data.priceToBook.asDataPoint(),
             enterpriseValueToEbitda = data.enterpriseToEbitda.asDataPoint(),
             enterpriseValueToRevenue = data.enterpriseToRevenue.asDataPoint(),

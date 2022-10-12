@@ -3,10 +3,13 @@ package com.pyamsoft.tickertape.watchlist.item
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -33,7 +36,9 @@ fun WatchlistItem(
         onLongClick = { onDelete(ticker) },
     ) {
       if (quote != null) {
-        Column {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
+        ) {
           quote.dayPreviousClose?.also { close ->
             Info(
                 name = "Previous Close",

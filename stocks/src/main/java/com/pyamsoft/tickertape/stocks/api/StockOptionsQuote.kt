@@ -47,6 +47,7 @@ interface StockOptionsQuote : StockQuote {
         dayLow: StockMoneyValue,
         dayOpen: StockMoneyValue,
         dayVolume: StockVolumeValue,
+        extraDetails: StockQuote.Details,
     ): StockOptionsQuote {
       return StockOptionsQuoteImpl(
           underlyingSymbol,
@@ -64,6 +65,7 @@ interface StockOptionsQuote : StockQuote {
           dayLow,
           dayOpen,
           dayVolume,
+          extraDetails = extraDetails,
       )
     }
   }

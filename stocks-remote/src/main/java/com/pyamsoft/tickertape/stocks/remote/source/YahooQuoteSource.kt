@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asDirection
+import com.pyamsoft.tickertape.stocks.api.asMarketCap
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -132,6 +133,30 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                     state = MarketState.PRE,
                 )
               },
+          extraDetails = createExtraDetails(stock),
+      )
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun createExtraDetails(stock: NetworkQuoteResponse.Resp.Quote): StockQuote.Details {
+      return StockQuote.Details.create(
+          averageDailyVolume3Month = stock.averageDailyVolume3Month?.asVolume(),
+          averageDailyVolume10Day = stock.averageDailyVolume10Day?.asVolume(),
+          fiftyTwoWeekLowChange = stock.fiftyTwoWeekLowChange?.asMoney(),
+          fiftyTwoWeekLowChangePercent = stock.fiftyTwoWeekLowChangePercent?.asPercent(),
+          fiftyTwoWeekLow = stock.fiftyTwoWeekLow?.asMoney(),
+          fiftyTwoWeekHighChange = stock.fiftyTwoWeekHighChange?.asMoney(),
+          fiftyTwoWeekHighChangePercent = stock.fiftyTwoWeekHighChangePercent?.asPercent(),
+          fiftyTwoWeekHigh = stock.fiftyTwoWeekHigh?.asMoney(),
+          fiftyTwoWeekRange = stock.fiftyTwoWeekRange.orEmpty(),
+          fiftyDayAverage = stock.fiftyDayAverage?.asMoney(),
+          fiftyDayAverageChange = stock.fiftyDayAverageChange?.asMoney(),
+          fiftyDayAveragePercent = stock.fiftyDayAveragePercent?.asPercent(),
+          twoHundredDayAverage = stock.twoHundredDayAverage?.asMoney(),
+          twoHundredDayAverageChange = stock.twoHundredDayAverageChange?.asMoney(),
+          twoHundredDayAveragePercent = stock.twoHundredDayAveragePercent?.asPercent(),
+          marketCap = stock.marketCap?.asMarketCap(),
       )
     }
 
@@ -178,6 +203,7 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                     state = MarketState.PRE,
                 )
               },
+          extraDetails = createExtraDetails(stock),
       )
     }
 
@@ -211,6 +237,29 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                 "preMarketChangePercent",
                 // Options
                 "underlyingSymbol",
+
+                // Extra details
+
+                // Daily
+                "averageDailyVolume3Month",
+                "averageDailyVolume10Day",
+                // 52 week
+                "fiftyTwoWeekLowChange",
+                "fiftyTwoWeekLowChangePercent",
+                "fiftyTwoWeekLow",
+                "fiftyTwoWeekHighChange",
+                "fiftyTwoWeekHighChangePercent",
+                "fiftyTwoWeekHigh",
+                "fiftyTwoWeekRange",
+                // Moving Average
+                "fiftyDayAverage",
+                "fiftyDayAverageChange",
+                "fiftyDayAveragePercent",
+                "twoHundredDayAverage",
+                "twoHundredDayAverageChange",
+                "twoHundredDayAveragePercent",
+                // Market Cap
+                "marketCap",
             )
             .joinToString(",")
   }

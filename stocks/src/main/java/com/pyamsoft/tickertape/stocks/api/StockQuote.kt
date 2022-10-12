@@ -19,33 +19,100 @@ package com.pyamsoft.tickertape.stocks.api
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 
-interface StockQuote {
+interface StockQuote : BaseStockQuote {
 
-  @get:CheckResult val symbol: StockSymbol
+  @get:CheckResult val extraDetails: Details
 
-  @get:CheckResult val company: StockCompany
+  interface Details {
+    // Daily
+    @get:CheckResult val averageDailyVolume3Month: StockVolumeValue?
+    @get:CheckResult val averageDailyVolume10Day: StockVolumeValue?
+    // 52 week
+    @get:CheckResult val fiftyTwoWeekLowChange: StockMoneyValue?
+    @get:CheckResult val fiftyTwoWeekLowChangePercent: StockPercent?
+    @get:CheckResult val fiftyTwoWeekLow: StockMoneyValue?
+    @get:CheckResult val fiftyTwoWeekHighChange: StockMoneyValue?
+    @get:CheckResult val fiftyTwoWeekHighChangePercent: StockPercent?
+    @get:CheckResult val fiftyTwoWeekHigh: StockMoneyValue?
+    @get:CheckResult val fiftyTwoWeekRange: String
 
-  @get:CheckResult val type: EquityType
+    // Moving average
+    @get:CheckResult val fiftyDayAverage: StockMoneyValue?
+    @get:CheckResult val fiftyDayAverageChange: StockMoneyValue?
+    @get:CheckResult val fiftyDayAveragePercent: StockPercent?
+    @get:CheckResult val twoHundredDayAverage: StockMoneyValue?
+    @get:CheckResult val twoHundredDayAverageChange: StockMoneyValue?
+    @get:CheckResult val twoHundredDayAveragePercent: StockPercent?
 
-  @get:CheckResult val regular: StockMarketSession
+    // Market cap
+    @get:CheckResult val marketCap: StockMarketCap?
 
-  @get:CheckResult val preMarket: StockMarketSession?
+    companion object {
 
-  @get:CheckResult val afterHours: StockMarketSession?
+      @JvmStatic
+      @CheckResult
+      fun empty(): Details {
+        return object : Details {
+          override val averageDailyVolume3Month: StockVolumeValue? = null
+          override val averageDailyVolume10Day: StockVolumeValue? = null
+          override val fiftyTwoWeekLowChange: StockMoneyValue? = null
+          override val fiftyTwoWeekLowChangePercent: StockPercent? = null
+          override val fiftyTwoWeekLow: StockMoneyValue? = null
+          override val fiftyTwoWeekHighChange: StockMoneyValue? = null
+          override val fiftyTwoWeekHighChangePercent: StockPercent? = null
+          override val fiftyTwoWeekHigh: StockMoneyValue? = null
+          override val fiftyTwoWeekRange: String = ""
+          override val fiftyDayAverage: StockMoneyValue? = null
+          override val fiftyDayAverageChange: StockMoneyValue? = null
+          override val fiftyDayAveragePercent: StockPercent? = null
+          override val twoHundredDayAverage: StockMoneyValue? = null
+          override val twoHundredDayAverageChange: StockMoneyValue? = null
+          override val twoHundredDayAveragePercent: StockPercent? = null
+          override val marketCap: StockMarketCap? = null
+        }
+      }
 
-  @get:CheckResult val dataDelayBy: Long
-
-  @get:CheckResult val dayPreviousClose: StockMoneyValue?
-
-  @get:CheckResult val dayOpen: StockMoneyValue?
-
-  @get:CheckResult val dayHigh: StockMoneyValue?
-
-  @get:CheckResult val dayLow: StockMoneyValue?
-
-  @get:CheckResult val dayVolume: StockVolumeValue?
-
-  @get:CheckResult val currentSession: StockMarketSession
+      @JvmStatic
+      @CheckResult
+      fun create(
+          averageDailyVolume3Month: StockVolumeValue?,
+          averageDailyVolume10Day: StockVolumeValue?,
+          fiftyTwoWeekLowChange: StockMoneyValue?,
+          fiftyTwoWeekLowChangePercent: StockPercent?,
+          fiftyTwoWeekLow: StockMoneyValue?,
+          fiftyTwoWeekHighChange: StockMoneyValue?,
+          fiftyTwoWeekHighChangePercent: StockPercent?,
+          fiftyTwoWeekHigh: StockMoneyValue?,
+          fiftyTwoWeekRange: String,
+          fiftyDayAverage: StockMoneyValue?,
+          fiftyDayAverageChange: StockMoneyValue?,
+          fiftyDayAveragePercent: StockPercent?,
+          twoHundredDayAverage: StockMoneyValue?,
+          twoHundredDayAverageChange: StockMoneyValue?,
+          twoHundredDayAveragePercent: StockPercent?,
+          marketCap: StockMarketCap?,
+      ): Details {
+        return StockQuoteImpl.StockQuoteDetailsImpl(
+            averageDailyVolume3Month,
+            averageDailyVolume10Day,
+            fiftyTwoWeekLowChange,
+            fiftyTwoWeekLowChangePercent,
+            fiftyTwoWeekLow,
+            fiftyTwoWeekHighChange,
+            fiftyTwoWeekHighChangePercent,
+            fiftyTwoWeekHigh,
+            fiftyTwoWeekRange,
+            fiftyDayAverage,
+            fiftyDayAverageChange,
+            fiftyDayAveragePercent,
+            twoHundredDayAverage,
+            twoHundredDayAverageChange,
+            twoHundredDayAveragePercent,
+            marketCap,
+        )
+      }
+    }
+  }
 
   companion object {
 
@@ -64,6 +131,7 @@ interface StockQuote {
         dayLow: StockMoneyValue?,
         dayOpen: StockMoneyValue?,
         dayVolume: StockVolumeValue?,
+        extraDetails: Details,
     ): StockQuote {
       return StockQuoteImpl(
           symbol,
@@ -78,6 +146,7 @@ interface StockQuote {
           dayLow,
           dayOpen,
           dayVolume,
+          extraDetails,
       )
     }
   }

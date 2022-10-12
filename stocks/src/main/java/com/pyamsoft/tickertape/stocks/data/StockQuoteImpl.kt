@@ -18,8 +18,10 @@ package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockCompany
+import com.pyamsoft.tickertape.stocks.api.StockMarketCap
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
@@ -37,7 +39,30 @@ internal data class StockQuoteImpl(
     override val dayLow: StockMoneyValue?,
     override val dayOpen: StockMoneyValue?,
     override val dayVolume: StockVolumeValue?,
+    override val extraDetails: StockQuote.Details,
 ) : StockQuote {
 
   override val currentSession: StockMarketSession = preMarket ?: afterHours ?: regular
+
+  internal data class StockQuoteDetailsImpl(
+      override val averageDailyVolume3Month: StockVolumeValue?,
+      override val averageDailyVolume10Day: StockVolumeValue?,
+      // 52 week
+      override val fiftyTwoWeekLowChange: StockMoneyValue?,
+      override val fiftyTwoWeekLowChangePercent: StockPercent?,
+      override val fiftyTwoWeekLow: StockMoneyValue?,
+      override val fiftyTwoWeekHighChange: StockMoneyValue?,
+      override val fiftyTwoWeekHighChangePercent: StockPercent?,
+      override val fiftyTwoWeekHigh: StockMoneyValue?,
+      override val fiftyTwoWeekRange: String,
+      // Moving Average
+      override val fiftyDayAverage: StockMoneyValue?,
+      override val fiftyDayAverageChange: StockMoneyValue?,
+      override val fiftyDayAveragePercent: StockPercent?,
+      override val twoHundredDayAverage: StockMoneyValue?,
+      override val twoHundredDayAverageChange: StockMoneyValue?,
+      override val twoHundredDayAveragePercent: StockPercent?,
+      // Market Cap
+      override val marketCap: StockMarketCap?,
+  ) : StockQuote.Details
 }

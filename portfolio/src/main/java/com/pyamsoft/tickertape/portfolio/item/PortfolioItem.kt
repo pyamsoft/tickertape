@@ -45,7 +45,7 @@ internal fun PortfolioItem(
       onLongClick = { onDelete(stock) },
   ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.baseline),
+        modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
     ) {
       Info(
           name = if (isOption) "Contracts" else "Shares",

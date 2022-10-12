@@ -14,21 +14,30 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.data
+package com.pyamsoft.tickertape.stocks.api
 
-import com.pyamsoft.tickertape.stocks.api.KeyStatistics
-import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.data.StockMarketCapImpl
+import com.pyamsoft.tickertape.stocks.data.StockVolumeValueImpl
 
-internal data class KeyStatisticsImpl(
-    override val symbol: StockSymbol,
-    override val quote: StockQuote?,
-    override val earnings: KeyStatistics.Earnings?,
-    override val financials: KeyStatistics.Financials?,
-    override val info: KeyStatistics.Info?,
-) : KeyStatistics {
+interface StockMarketCap : StockLongValue {
 
-  override fun withQuote(quote: StockQuote?): KeyStatistics {
-    return this.copy(quote = quote)
+  @get:CheckResult val display: String
+
+  companion object {
+
+    val NONE: StockVolumeValue =
+        StockVolumeValueImpl(
+            value = 0L,
+            isValid = false,
+        )
   }
+}
+
+@CheckResult
+fun Long.asMarketCap(): StockMarketCap {
+  return StockMarketCapImpl(
+      value = this,
+      isValid = true,
+  )
 }

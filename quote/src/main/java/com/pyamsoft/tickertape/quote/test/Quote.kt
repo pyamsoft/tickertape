@@ -57,5 +57,6 @@ fun newTestQuote(symbol: StockSymbol): StockQuote {
     override val dayLow: StockMoneyValue? = null
     override val dayVolume: StockVolumeValue? = null
     override val currentSession: StockMarketSession = regular
+    override val extraDetails: StockQuote.Details = StockQuote.Details.empty()
   }
 }

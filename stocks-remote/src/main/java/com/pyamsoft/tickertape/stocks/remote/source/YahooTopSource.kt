@@ -149,6 +149,7 @@ internal constructor(@YahooApi private val service: TopService) : TopSource {
                                           state = MarketState.PRE,
                                       )
                                     },
+                                extraDetails = StockQuote.Details.empty()
                             )
                           }
                           .toList(),

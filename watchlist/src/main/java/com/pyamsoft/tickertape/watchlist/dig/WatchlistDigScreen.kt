@@ -19,7 +19,7 @@ import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigChart
-import com.pyamsoft.tickertape.quote.dig.DigKeyStatistics
+import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.dig.DigNews
 import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.DigRecommendations

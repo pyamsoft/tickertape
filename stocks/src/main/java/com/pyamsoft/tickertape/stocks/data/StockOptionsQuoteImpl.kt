@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.stocks.api.StockCompany
 import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.StockVolumeValue
 import java.time.LocalDate
@@ -41,6 +42,7 @@ internal data class StockOptionsQuoteImpl(
     override val dayLow: StockMoneyValue,
     override val dayOpen: StockMoneyValue,
     override val dayVolume: StockVolumeValue,
+    override val extraDetails: StockQuote.Details,
 ) : StockOptionsQuote {
 
   override val currentSession: StockMarketSession = preMarket ?: afterHours ?: regular

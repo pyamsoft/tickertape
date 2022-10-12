@@ -23,11 +23,15 @@ interface KeyStatistics {
 
   @get:CheckResult val symbol: StockSymbol
 
+  @get:CheckResult val quote: StockQuote?
+
   @get:CheckResult val earnings: Earnings?
 
   @get:CheckResult val financials: Financials?
 
   @get:CheckResult val info: Info?
+
+  @CheckResult fun withQuote(quote: StockQuote?): KeyStatistics
 
   interface Financials {
     val currentPrice: DataPoint
@@ -63,12 +67,12 @@ interface KeyStatistics {
       SELL,
       HOLD,
       STRONG_BUY,
+      UNDERPERFORM,
       UNKNOWN,
     }
   }
 
   interface Info {
-    val marketCap: DataPoint
     val beta: DataPoint
     val enterpriseValue: DataPoint
     val floatShares: DataPoint
@@ -90,6 +94,7 @@ interface KeyStatistics {
     val trailingEps: DataPoint
     val pegRatio: DataPoint
     val priceToBook: DataPoint
+    val bookValue: DataPoint
     val enterpriseValueToRevenue: DataPoint
     val enterpriseValueToEbitda: DataPoint
     val fiftyTwoWeekChange: DataPoint
@@ -130,12 +135,14 @@ interface KeyStatistics {
     @CheckResult
     fun create(
         symbol: StockSymbol,
+        quote: StockQuote?,
         earnings: Earnings?,
         financials: Financials?,
         info: Info?,
     ): KeyStatistics {
       return KeyStatisticsImpl(
           symbol = symbol,
+          quote = quote,
           earnings = earnings,
           financials = financials,
           info = info,

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.Enforcer
@@ -40,7 +41,10 @@ import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -82,11 +86,46 @@ internal constructor(
         interactor.getRecommendations(it)
       }
 
+  @CheckResult
+  private suspend fun getJustKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        // Key statistics but without a Quote pairing
+        return@withContext statisticsCache.getStatistics(symbols) {
+          interactor.getKeyStatistics(it)
+        }
+      }
+
   override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext statisticsCache.getStatistics(symbols) {
-          interactor.getKeyStatistics(it)
+
+        // Fetch stats and quote at the same time
+        val jobs =
+            mutableListOf<Deferred<*>>().apply {
+              // Get the stats
+              add(async { getJustKeyStatistics(symbols) })
+
+              // Get the quotes
+              add(async { getQuotes(symbols) })
+            }
+
+        val result = jobs.awaitAll()
+
+        // We can assume this based on job add order
+        @Suppress("UNCHECKED_CAST")
+        val stats: List<KeyStatistics> = result[0] as List<KeyStatistics>
+
+        // We can assume this based on job add order
+        @Suppress("UNCHECKED_CAST") val quotes: List<StockQuote> = result[1] as List<StockQuote>
+
+        return@withContext stats.map { stat ->
+          // Find the quote that pairs with this stat
+          val quote = quotes.find { q -> q.symbol == stat.symbol }
+
+          // Pair it up
+          return@map stat.withQuote(quote)
         }
       }
 

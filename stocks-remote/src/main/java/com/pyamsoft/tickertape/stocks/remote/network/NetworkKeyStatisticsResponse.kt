@@ -114,6 +114,7 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
           val pegRatio: YFData?,
           val trailingEps: YFData?,
           val priceToBook: YFData?,
+          val bookValue: YFData?,
           val enterpriseToRevenue: YFData?,
           val enterpriseToEbitda: YFData?,
           @Json(name = "52WeekChange") val fiftyTwoWeekChange: YFData?,

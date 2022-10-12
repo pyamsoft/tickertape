@@ -19,8 +19,6 @@ enum class TickerSize(val isSpecial: Boolean) {
   RECOMMEND_QUOTE_EXTRA(isSpecial = true)
 }
 
-private const val EXTRA_CONTENT_DEFAULT_ALPHA = QUOTE_CONTENT_DEFAULT_ALPHA + 0.1F
-
 data class TickerSizes
 internal constructor(
     val title: TextStyle,
@@ -34,21 +32,23 @@ internal constructor(
     fun chart(
         typography: Typography,
         color: Color,
+        alphaHigh: Float,
+        alphaMedium: Float,
     ) =
         TickerSizes(
             title =
                 typography.h6.copy(
-                    color = color.copy(alpha = 1.0F),
+                    color = color.copy(alpha = alphaHigh),
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.body2.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontWeight = FontWeight.W400,
                 ),
         )
@@ -58,21 +58,23 @@ internal constructor(
     fun quote(
         typography: Typography,
         color: Color,
+        alphaHigh: Float,
+        alphaMedium: Float,
     ) =
         TickerSizes(
             title =
                 typography.h5.copy(
-                    color = color.copy(alpha = 1.0F),
+                    color = color.copy(alpha = alphaHigh),
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.body1.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontWeight = FontWeight.W400,
                 ),
         )
@@ -82,42 +84,50 @@ internal constructor(
     fun price(
         typography: Typography,
         color: Color,
-    ) = quote(typography, color)
+        alphaHigh: Float,
+        alphaMedium: Float,
+    ) = quote(typography, color, alphaHigh, alphaMedium)
 
     @JvmStatic
     @CheckResult
     fun priceExtra(
         typography: Typography,
         color: Color,
-    ) = chart(typography, color)
+        alphaHigh: Float,
+        alphaMedium: Float,
+    ) = chart(typography, color, alphaHigh, alphaMedium)
 
     @JvmStatic
     @CheckResult
     fun recPrice(
         typography: Typography,
         color: Color,
-    ) = priceExtra(typography, color)
+        alphaHigh: Float,
+        alphaMedium: Float,
+    ) = priceExtra(typography, color, alphaHigh, alphaMedium)
 
     @JvmStatic
     @CheckResult
     fun recPriceExtra(
         typography: Typography,
         color: Color,
+        alphaHigh: Float,
+        alphaMedium: Float,
     ) =
         TickerSizes(
             title =
                 typography.body1.copy(
-                    color = color.copy(alpha = QUOTE_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaHigh),
                     fontWeight = FontWeight.W700,
                 ),
             description =
                 typography.caption.copy(
-                    color = color.copy(alpha = EXTRA_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontWeight = FontWeight.W400,
                 ),
             label =
                 typography.caption.copy(
-                    color = color.copy(alpha = EXTRA_CONTENT_DEFAULT_ALPHA),
+                    color = color.copy(alpha = alphaMedium),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.W400,
                 ),

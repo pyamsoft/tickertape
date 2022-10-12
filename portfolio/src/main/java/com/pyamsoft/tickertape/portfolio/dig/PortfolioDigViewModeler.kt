@@ -82,7 +82,7 @@ internal constructor(
         }
 
         return@highlander interactor.getPositions(holdingId).map { p ->
-          p.map { createPositionStock(it, splits) }
+          p.map { createPositionStock(it, splits) }.sortedBy { it.purchaseDate }
         }
       }
 

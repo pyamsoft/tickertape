@@ -1,25 +1,20 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -29,15 +24,14 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
-import com.pyamsoft.tickertape.quote.POSITION_CHANGE_LIMIT_PERCENT
+import com.pyamsoft.tickertape.quote.DefaultQuoteScopeInstance
 import com.pyamsoft.tickertape.quote.PriceSection
-import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_ALPHA
-import com.pyamsoft.tickertape.quote.QUOTE_CONTENT_DEFAULT_COLOR
+import com.pyamsoft.tickertape.quote.QuoteScope
 import com.pyamsoft.tickertape.quote.TickerSizes
-import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForPercentChange
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
@@ -51,89 +45,93 @@ internal fun PositionItem(
   Card(
       modifier = modifier,
       elevation = CardDefaults.Elevation,
-      backgroundColor =
-          rememberCardBackgroundColorForPercentChange(
-              position.gainLossPercent,
-              changeLimit = POSITION_CHANGE_LIMIT_PERCENT,
-          ),
-      contentColor = QUOTE_CONTENT_DEFAULT_COLOR,
   ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.baseline),
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
     ) {
-      PurchaseDate(
-          position = position,
-      )
-      NumberOfShares(
-          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
-          position = position,
-      )
-      CostBasis(
-          modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
-          position = position,
-      )
-
-      CurrentPrices(
+      Row(
           modifier = Modifier.fillMaxWidth(),
-          position = position,
-      )
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.Bottom,
+      ) {
+        Column(
+            modifier = Modifier.weight(1F),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+          DefaultQuoteScopeInstance.apply {
+            PurchaseDate(
+                modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
+                position = position,
+            )
+            NumberOfShares(
+                position = position,
+            )
+            CostBasis(
+                position = position,
+            )
+          }
+        }
+
+        Column(
+            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+            horizontalAlignment = Alignment.End,
+        ) {
+          CurrentPosition(
+              position = position,
+          )
+        }
+      }
     }
   }
 }
 
 @Composable
-private fun CurrentPrices(
+private fun CurrentPosition(
     modifier: Modifier = Modifier,
     position: PositionStock,
 ) {
-  val typography = MaterialTheme.typography
   val contentColor = LocalContentColor.current
+  val typography = MaterialTheme.typography
+  val highAlpha = ContentAlpha.high
+  val mediumAlpha = ContentAlpha.medium
 
   val sizes =
-      remember(typography, contentColor) {
+      remember(
+          typography,
+          contentColor,
+          highAlpha,
+          mediumAlpha,
+      ) {
         TickerSizes.price(
             typography,
             contentColor,
+            highAlpha,
+            mediumAlpha,
         )
       }
 
-  Column(
+  val composeColor =
+      remember(position) {
+        val direction = position.gainLossPercent.asDirection()
+        return@remember if (direction.isZero || !direction.isValid) {
+          Color.Unspecified
+        } else {
+          Color(direction.color)
+        }
+      }
+
+  PriceSection(
       modifier = modifier,
-  ) {
-    Info(
-        name = "Total ${if (position.isOption && position.isSell) "Premium" else "Cost"}",
-        value = position.cost,
-        textStyle = MaterialTheme.typography.body1,
-    )
-
-    // We need knowledge of the current price to show the change amounts
-    if (position.currentPrice != null) {
-      if (position.currentValue.isNotBlank() ||
-          position.displayGainLossPercent.isNotBlank() ||
-          position.displayGainLossAmount.isNotBlank()) {
-        Spacer(
-            modifier = Modifier.height(MaterialTheme.keylines.content),
-        )
-      }
-
-      Box(
-          modifier = Modifier.fillMaxWidth(),
-          contentAlignment = Alignment.BottomEnd,
-      ) {
-        PriceSection(
-            value = position.currentValue,
-            valueStyle = sizes.title,
-            changeAmount = position.displayGainLossAmount,
-            changePercent = position.displayGainLossPercent,
-            changeStyle = sizes.description,
-        )
-      }
-    }
-  }
+      value = position.currentValue,
+      valueStyle = sizes.title.copy(color = composeColor),
+      changeAmount = position.displayGainLossAmount,
+      changePercent = position.displayGainLossPercent,
+      changeStyle = sizes.description.copy(color = composeColor),
+  )
 }
 
 @Composable
-private fun PurchaseDate(
+private fun QuoteScope.PurchaseDate(
     modifier: Modifier = Modifier,
     position: DbPosition,
 ) {
@@ -143,15 +141,11 @@ private fun PurchaseDate(
   Info(
       modifier = modifier,
       value = displayPurchaseDate,
-      textStyle =
-          MaterialTheme.typography.body1.copy(
-              fontWeight = FontWeight.W700,
-          ),
   )
 }
 
 @Composable
-private fun CostBasis(
+private fun QuoteScope.CostBasis(
     modifier: Modifier = Modifier,
     position: PositionStock,
 ) {
@@ -197,11 +191,16 @@ private fun CostBasis(
         name = "${prefix}Cost Basis",
         value = displayAdjustedPrice,
     )
+
+    Info(
+        name = "Total ${if (position.isOption && position.isSell) "Premium" else "Cost"}",
+        value = position.cost,
+    )
   }
 }
 
 @Composable
-private fun NumberOfShares(
+private fun QuoteScope.NumberOfShares(
     modifier: Modifier = Modifier,
     position: PositionStock,
 ) {
@@ -249,47 +248,6 @@ private fun NumberOfShares(
     Info(
         name = "${prefix}${if (position.isOption) "Contracts" else "Shares"}",
         value = displayAdjustedShares,
-    )
-  }
-}
-
-@Composable
-private fun Info(
-    modifier: Modifier = Modifier,
-    name: String = "",
-    value: String,
-    valueColor: Color = Color.Unspecified,
-    textStyle: TextStyle = MaterialTheme.typography.body2,
-) {
-
-  val displayedTextStyle =
-      remember(textStyle) {
-        textStyle.copy(
-            color =
-                textStyle.color.copy(
-                    alpha = QUOTE_CONTENT_DEFAULT_ALPHA,
-                ),
-        )
-      }
-
-  Row(
-      modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    if (name.isNotBlank()) {
-      Text(
-          modifier = Modifier.padding(end = MaterialTheme.keylines.typography),
-          text = "${name}:",
-          style = displayedTextStyle,
-      )
-    }
-
-    Text(
-        color = valueColor,
-        text = value,
-        style = displayedTextStyle.copy(fontWeight = FontWeight.W700),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
     )
   }
 }

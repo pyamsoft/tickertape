@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -27,11 +28,32 @@ fun TickerName(
   val typography = MaterialTheme.typography
   val contentColor = LocalContentColor.current
 
+  val highAlpha = ContentAlpha.high
+  val mediumAlpha = ContentAlpha.medium
+
   val sizes =
-      remember(size, typography, contentColor) {
+      remember(
+          size,
+          typography,
+          contentColor,
+          highAlpha,
+          mediumAlpha,
+      ) {
         when (size) {
-          TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
-          TickerSize.QUOTE -> TickerSizes.quote(typography, contentColor)
+          TickerSize.CHART ->
+              TickerSizes.chart(
+                  typography,
+                  contentColor,
+                  highAlpha,
+                  mediumAlpha,
+              )
+          TickerSize.QUOTE ->
+              TickerSizes.quote(
+                  typography,
+                  contentColor,
+                  highAlpha,
+                  mediumAlpha,
+              )
           else -> throw IllegalStateException("Can't use TickerName with size: $size")
         }
       }

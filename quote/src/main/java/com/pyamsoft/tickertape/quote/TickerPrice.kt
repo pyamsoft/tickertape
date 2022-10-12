@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.quote
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -30,17 +31,56 @@ fun TickerPrice(
   val quote = ticker?.quote
   if (quote != null) {
     val typography = MaterialTheme.typography
-    val colors = MaterialTheme.colors
     val contentColor = LocalContentColor.current
+    val highAlpha = ContentAlpha.high
+    val mediumAlpha = ContentAlpha.medium
+    val disabledAlpha = ContentAlpha.disabled
 
     val sizes =
-        remember(size, typography, contentColor) {
+        remember(
+            size,
+            typography,
+            contentColor,
+            highAlpha,
+            mediumAlpha,
+            disabledAlpha,
+        ) {
           when (size) {
-            TickerSize.CHART -> TickerSizes.chart(typography, contentColor)
-            TickerSize.QUOTE -> TickerSizes.price(typography, contentColor)
-            TickerSize.QUOTE_EXTRA -> TickerSizes.priceExtra(typography, contentColor)
-            TickerSize.RECOMMEND_QUOTE -> TickerSizes.recPrice(typography, contentColor)
-            TickerSize.RECOMMEND_QUOTE_EXTRA -> TickerSizes.recPriceExtra(typography, contentColor)
+            TickerSize.CHART ->
+                TickerSizes.chart(
+                    typography,
+                    contentColor,
+                    highAlpha,
+                    mediumAlpha,
+                )
+            TickerSize.QUOTE ->
+                TickerSizes.price(
+                    typography,
+                    contentColor,
+                    highAlpha,
+                    mediumAlpha,
+                )
+            TickerSize.QUOTE_EXTRA ->
+                TickerSizes.priceExtra(
+                    typography,
+                    contentColor,
+                    mediumAlpha,
+                    disabledAlpha,
+                )
+            TickerSize.RECOMMEND_QUOTE ->
+                TickerSizes.recPrice(
+                    typography,
+                    contentColor,
+                    highAlpha,
+                    mediumAlpha,
+                )
+            TickerSize.RECOMMEND_QUOTE_EXTRA ->
+                TickerSizes.recPriceExtra(
+                    typography,
+                    contentColor,
+                    mediumAlpha,
+                    disabledAlpha,
+                )
           }
         }
 
@@ -50,12 +90,8 @@ fun TickerPrice(
     val direction = session.direction
     val directionSign = session.direction.sign
     val composeColor =
-        remember(direction, size, colors) {
-          return@remember if (size == TickerSize.QUOTE ||
-              size == TickerSize.QUOTE_EXTRA ||
-              direction.isZero ||
-              !direction.isValid) {
-            // If no direction or is a quote so bg is colored, unspecified
+        remember(direction) {
+          return@remember if (direction.isZero || !direction.isValid) {
             Color.Unspecified
           } else {
             Color(direction.color)

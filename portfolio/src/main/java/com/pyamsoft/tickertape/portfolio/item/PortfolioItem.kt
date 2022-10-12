@@ -12,14 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
-import com.pyamsoft.tickertape.quote.CRYPTO_LIMIT_PERCENT
-import com.pyamsoft.tickertape.quote.OPTIONS_LIMIT_PERCENT
-import com.pyamsoft.tickertape.quote.QUOTE_DEFAULT_LIMIT_PERCENT
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.rememberCardBackgroundColorForPercentChange
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -32,19 +27,6 @@ internal fun PortfolioItem(
 ) {
   val totalDirection = stock.totalDirection
   val isOption = stock.isOption
-
-  // Color the portfolio card based on the percent move today
-  // If this is a sell side position, we flip the percentage direction
-  val percentChange = remember(stock) { stock.todayPercent * if (stock.isSell) -1 else 1 }
-  // Decide limits based on equity type
-  val limitPercent =
-      remember(stock) {
-        when (stock.holding.type) {
-          EquityType.STOCK -> QUOTE_DEFAULT_LIMIT_PERCENT
-          EquityType.OPTION -> OPTIONS_LIMIT_PERCENT
-          EquityType.CRYPTOCURRENCY -> CRYPTO_LIMIT_PERCENT
-        }
-      }
 
   val totalChangeTitle =
       remember(totalDirection) {
@@ -59,11 +41,6 @@ internal fun PortfolioItem(
       modifier = modifier.fillMaxWidth(),
       symbol = stock.holding.symbol,
       ticker = stock.ticker,
-      backgroundColor =
-          rememberCardBackgroundColorForPercentChange(
-              percentChange = percentChange,
-              changeLimit = limitPercent,
-          ),
       onClick = { onSelect(stock) },
       onLongClick = { onDelete(stock) },
   ) {

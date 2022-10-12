@@ -46,8 +46,6 @@ class TickerTape : Application() {
 
   @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
 
-  private val applicationScope by lazy(LazyThreadSafetyMode.NONE) { MainScope() }
-
   private val component by lazy {
     val url = "https://github.com/pyamsoft/tickertape"
 
@@ -102,7 +100,7 @@ class TickerTape : Application() {
     // Coroutine start up is slow. What we can do instead is create a handler, which is cheap, and
     // post to the main thread to defer this work until after start up is done
     Handler(Looper.getMainLooper()).post {
-      applicationScope.launch(context = Dispatchers.Default) {
+      MainScope().launch(context = Dispatchers.Default) {
         alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
       }
     }

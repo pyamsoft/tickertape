@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.stocks.cache
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface NewsCache {
@@ -27,6 +27,6 @@ interface NewsCache {
   @CheckResult
   suspend fun getNews(
       symbols: List<StockSymbol>,
-      resolve: suspend (List<StockSymbol>) -> List<StockNews>
-  ): List<StockNews>
+      resolve: suspend (List<StockSymbol>) -> List<StockNewsList>
+  ): List<StockNewsList>
 }

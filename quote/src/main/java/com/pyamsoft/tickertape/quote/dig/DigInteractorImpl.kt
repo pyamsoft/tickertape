@@ -25,7 +25,7 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +92,7 @@ protected constructor(
 
   final override suspend fun getNews(
       symbol: StockSymbol,
-  ): ResultWrapper<List<StockNews>> =
+  ): ResultWrapper<StockNewsList> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext try {
@@ -100,7 +100,7 @@ protected constructor(
               stockInteractor
                   .getNews(listOf(symbol))
                   // Just make sure we are only returning news related to this symbol
-                  .filter { it.symbol == symbol },
+                  .first { it.symbol == symbol },
           )
         } catch (e: Throwable) {
           e.ifNotCancellation {

@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.data
 
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
@@ -31,3 +32,16 @@ internal data class StockNewsImpl(
     override val imageUrl: String,
     override val tickers: List<StockSymbol>,
 ) : StockNews
+
+internal data class StockNewsListImpl(
+    override val symbol: StockSymbol,
+    override val news: List<StockNews>
+) : StockNewsList {
+
+    override fun <R : Comparable<R>> sortedByDescending(selector: (StockNews) -> R?): StockNewsList {
+        return this.copy(
+            news = news.sortedByDescending(selector),
+        )
+    }
+
+}

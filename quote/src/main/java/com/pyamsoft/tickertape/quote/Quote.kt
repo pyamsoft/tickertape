@@ -72,7 +72,7 @@ fun Quote(
           verticalAlignment = Alignment.Bottom,
       ) {
         Column(
-            modifier = Modifier.weight(1F),
+            modifier = Modifier.weight(1F).padding(top = MaterialTheme.keylines.content),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
           DefaultQuoteScopeInstance.content()

@@ -19,15 +19,16 @@ package com.pyamsoft.tickertape.stocks.remote.source
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkNewsResponse
 import com.pyamsoft.tickertape.stocks.remote.service.NewsService
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 internal class NasdaqNewsSource
 @Inject
@@ -48,20 +49,30 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
     )
   }
 
-  override suspend fun getNews(symbols: List<StockSymbol>): List<StockNews> =
+  override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        return@withContext symbols
-            .map { symbol ->
+          val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
+          for (s in symbols) {
               val resp =
                   service.getNews(
-                      symbol = symbol.raw,
+                      symbol = s.raw,
                       userAgent = pickRandomUserAgent(),
                   )
-              return@map resp.news.map { it.toNews(symbol) }
-            }
-            .flatten()
+              val news = resp.news.map { it.toNews(s) }
+              for (n in news) {
+                  val list = newsList.getOrPut(n.symbol) { mutableSetOf() }
+                  list.add(n)
+              }
+          }
+
+          return@withContext newsList.map { entry ->
+              StockNewsList.create(
+                  symbol = entry.key,
+                  news = entry.value.toList(),
+              )
+          }
       }
 
   companion object {

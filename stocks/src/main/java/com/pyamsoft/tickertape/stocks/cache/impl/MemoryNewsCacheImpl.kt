@@ -17,17 +17,17 @@
 package com.pyamsoft.tickertape.stocks.cache.impl
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.NewsCache
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class MemoryNewsCacheImpl @Inject internal constructor() :
-    BaseMemoryCacheImpl<StockSymbol, StockNews>(), NewsCache {
+    BaseMemoryCacheImpl<StockSymbol, StockNewsList>(), NewsCache {
 
   override suspend fun removeNews(symbol: StockSymbol) =
       withContext(context = Dispatchers.IO) {
@@ -37,16 +37,15 @@ internal class MemoryNewsCacheImpl @Inject internal constructor() :
       }
 
   override suspend fun getNews(
-      symbols: List<StockSymbol>,
-      resolve: suspend (List<StockSymbol>) -> List<StockNews>
-  ): List<StockNews> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
+    symbols: List<StockSymbol>,
+    resolve: suspend (List<StockSymbol>) -> List<StockNewsList>
+  ): List<StockNewsList> = withContext(context = Dispatchers.IO) {
+    Enforcer.assertOffMainThread()
 
-        return@withContext get(symbols, resolve)
-      }
+    return@withContext get(symbols, resolve)
+  }
 
-  override fun getKeyFromValue(value: StockNews): StockSymbol {
+  override fun getKeyFromValue(value: StockNewsList): StockSymbol {
     return value.symbol
   }
 

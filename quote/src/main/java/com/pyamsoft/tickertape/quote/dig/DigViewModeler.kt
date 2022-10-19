@@ -25,17 +25,17 @@ import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
@@ -70,7 +70,7 @@ protected constructor(
       }
 
   private val newsRunner =
-      highlander<ResultWrapper<List<StockNews>>, Boolean, StockSymbol> { force, symbol ->
+      highlander<ResultWrapper<StockNewsList>, Boolean, StockSymbol> { force, symbol ->
         if (force) {
           interactorCache.invalidateNews(symbol)
         }
@@ -215,7 +215,7 @@ protected constructor(
         .call(force, symbol)
         .onSuccess { n ->
           s.apply {
-            news = n
+            news = n.news
             newsError = null
           }
         }

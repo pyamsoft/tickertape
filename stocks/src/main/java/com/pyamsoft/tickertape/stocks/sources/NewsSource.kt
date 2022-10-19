@@ -17,10 +17,10 @@
 package com.pyamsoft.tickertape.stocks.sources
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface NewsSource {
 
-  @CheckResult suspend fun getNews(symbols: List<StockSymbol>): List<StockNews>
+  @CheckResult suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList>
 }

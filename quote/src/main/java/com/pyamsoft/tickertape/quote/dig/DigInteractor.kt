@@ -22,7 +22,7 @@ import com.pyamsoft.tickertape.quote.BaseTickerInteractor
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockNews
+import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
@@ -33,7 +33,7 @@ interface DigInteractor : BaseTickerInteractor {
   @CheckResult
   suspend fun getRecommendations(symbol: StockSymbol): ResultWrapper<StockRecommendations>
 
-  @CheckResult suspend fun getNews(symbol: StockSymbol): ResultWrapper<List<StockNews>>
+  @CheckResult suspend fun getNews(symbol: StockSymbol): ResultWrapper<StockNewsList>
 
   @CheckResult
   suspend fun getChart(

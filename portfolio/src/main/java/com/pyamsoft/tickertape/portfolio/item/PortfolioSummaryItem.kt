@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.item
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,15 +19,37 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
-@JvmOverloads
 fun PorfolioSummaryItem(
     modifier: Modifier = Modifier,
     portfolio: PortfolioStockList,
     equityType: EquityType,
 ) {
   // Short circuit
-  val data = remember(portfolio, equityType) { portfolio.generateData(equityType) } ?: return
+  val data =
+      remember(
+          portfolio,
+          equityType,
+      ) {
+        portfolio.generateData(equityType)
+      }
 
+  AnimatedVisibility(
+      modifier = modifier,
+      visible = data != null,
+  ) {
+    if (data != null) {
+      DisplayPortfolioData(
+          data = data,
+      )
+    }
+  }
+}
+
+@Composable
+private fun DisplayPortfolioData(
+    modifier: Modifier = Modifier,
+    data: PortfolioStockList.Data,
+) {
   val typography = MaterialTheme.typography
 
   val totalComposeColor =

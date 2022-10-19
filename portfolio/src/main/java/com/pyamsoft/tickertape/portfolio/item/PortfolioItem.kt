@@ -2,19 +2,17 @@ package com.pyamsoft.tickertape.portfolio.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
+import com.pyamsoft.tickertape.stocks.api.asGainLoss
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -28,14 +26,7 @@ internal fun PortfolioItem(
   val totalDirection = stock.totalDirection
   val isOption = stock.isOption
 
-  val totalChangeTitle =
-      remember(totalDirection) {
-        when {
-          totalDirection.isUp -> "Gain"
-          totalDirection.isDown -> "Loss"
-          else -> "Change"
-        }
-      }
+  val totalChangeTitle = remember(totalDirection) { totalDirection.asGainLoss() }
 
   Quote(
       modifier = modifier.fillMaxWidth(),

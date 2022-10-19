@@ -52,6 +52,15 @@ interface StockDirection : StockNumberValue {
 }
 
 @CheckResult
+fun StockDirection.asGainLoss(): String {
+  return when {
+    this.isUp -> "Gain"
+    this.isDown -> "Loss"
+    else -> "Change"
+  }
+}
+
+@CheckResult
 fun Double.asDirection(): StockDirection {
   val comparison = this.compareTo(0)
   return when {

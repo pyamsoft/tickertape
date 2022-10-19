@@ -1,22 +1,26 @@
 package com.pyamsoft.tickertape.portfolio.item
 
+import androidx.annotation.CheckResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Colors
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockDirection
+import com.pyamsoft.tickertape.stocks.api.asGainLoss
 
 @Composable
 fun PorfolioSummaryItem(
@@ -45,21 +49,38 @@ fun PorfolioSummaryItem(
   }
 }
 
+@CheckResult
+private fun resolveDirectionColor(
+    direction: StockDirection,
+    colors: Colors,
+    alpha: Float,
+): Color {
+  return if (direction.isZero) {
+    colors.onBackground.copy(alpha = alpha)
+  } else {
+    Color(direction.color)
+  }
+}
+
 @Composable
 private fun DisplayPortfolioData(
     modifier: Modifier = Modifier,
     data: PortfolioStockList.Data,
 ) {
-  val typography = MaterialTheme.typography
+  val colors = MaterialTheme.colors
+  val mediumAlpha = ContentAlpha.medium
 
   val totalComposeColor =
-      remember(data.total.direction, typography) {
-        val direction = data.total.direction
-        if (direction.isZero) {
-          typography.caption.color
-        } else {
-          Color(direction.color)
-        }
+      remember(
+          data.total.direction,
+          colors,
+          mediumAlpha,
+      ) {
+        resolveDirectionColor(
+            data.total.direction,
+            colors,
+            mediumAlpha,
+        )
       }
 
   val totalGainLoss =
@@ -70,14 +91,19 @@ private fun DisplayPortfolioData(
         return@remember "$amount ($pct)"
       }
 
+  val totalGainLossLabel = remember(data.total) { data.total.direction.asGainLoss().uppercase() }
+
   val todayComposeColor =
-      remember(data.today.direction, typography) {
-        val direction = data.today.direction
-        if (direction.isZero) {
-          typography.caption.color
-        } else {
-          Color(direction.color)
-        }
+      remember(
+          data.today.direction,
+          colors,
+          mediumAlpha,
+      ) {
+        resolveDirectionColor(
+            data.today.direction,
+            colors,
+            mediumAlpha,
+        )
       }
 
   val todayGainLoss =
@@ -88,35 +114,73 @@ private fun DisplayPortfolioData(
         return@remember "$amount ($pct)"
       }
 
+  val todayGainLossLabel = remember(data.today) { data.today.direction.asGainLoss().uppercase() }
+
+  val labelColor =
+      remember(
+          colors,
+          mediumAlpha,
+      ) {
+        colors.onBackground.copy(
+            alpha = mediumAlpha,
+        )
+      }
+
   Column(
       modifier = modifier.fillMaxWidth(),
   ) {
     Text(
+        text = "CURRENT VALUE",
+        style =
+            MaterialTheme.typography.body1.copy(
+                fontWeight = FontWeight.W400,
+                color = labelColor,
+            ),
+    )
+    Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
         text = data.current.display,
-        style = MaterialTheme.typography.h3,
+        style =
+            MaterialTheme.typography.h3.copy(
+                fontWeight = FontWeight.W700,
+            ),
     )
 
     Text(
+        text = "TOTAL $totalGainLossLabel",
+        style =
+            MaterialTheme.typography.caption.copy(
+                fontWeight = FontWeight.W400,
+                color = labelColor,
+            ),
+    )
+    Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
         text = totalGainLoss,
-        style = MaterialTheme.typography.h5.copy(color = totalComposeColor),
+        style =
+            MaterialTheme.typography.h5.copy(
+                fontWeight = FontWeight.W400,
+                color = totalComposeColor,
+            ),
     )
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(
-          text = "Today",
-          style = MaterialTheme.typography.h6,
-      )
-
-      Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-          text = todayGainLoss,
-          style = MaterialTheme.typography.h6.copy(color = todayComposeColor),
-      )
-    }
+    Text(
+        text = "TODAY'S $todayGainLossLabel",
+        style =
+            MaterialTheme.typography.caption.copy(
+                fontWeight = FontWeight.W400,
+                color = labelColor,
+            ),
+    )
+    Text(
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+        text = todayGainLoss,
+        style =
+            MaterialTheme.typography.h5.copy(
+                fontWeight = FontWeight.W400,
+                color = todayComposeColor,
+            ),
+    )
   }
 }
 

@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -244,57 +245,131 @@ private fun ContractItem(
         contract.expirationDate.format(dateFormatter)
       }
 
-  Row(
+  val labelColor =
+      MaterialTheme.colors.onBackground.copy(
+          alpha = ContentAlpha.medium,
+      )
+
+  val labelStyle =
+      MaterialTheme.typography.overline.copy(
+          fontWeight = FontWeight.W400,
+          color = labelColor,
+      )
+
+  val strike =
+      remember(contract) {
+        val type =
+            when (contract.type) {
+              StockOptions.Contract.Type.CALL -> "C"
+              StockOptions.Contract.Type.PUT -> "P"
+            }
+        return@remember "${contract.strike.display}$type"
+      }
+
+  Column(
       modifier = modifier,
-      verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-        text = formatted,
-        style = MaterialTheme.typography.body2,
-    )
-
-    Text(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-        text = contract.strike.display,
-        style = MaterialTheme.typography.body2,
-    )
-
-    if (contract.bid.isValid) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
       Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-          text = "Bid: ${contract.bid.display}",
-          style = MaterialTheme.typography.caption,
+          text = formatted,
+          style =
+              MaterialTheme.typography.h6.copy(
+                  fontWeight = FontWeight.W700,
+                  color =
+                      MaterialTheme.colors.onBackground.copy(
+                          alpha = ContentAlpha.medium,
+                      ),
+              ),
+      )
+      Text(
+          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+          text = strike,
+          style =
+              MaterialTheme.typography.h6.copy(
+                  fontWeight = FontWeight.W700,
+              ),
       )
     }
 
-    if (contract.ask.isValid) {
-      Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-          text = "Ask: ${contract.ask.display}",
-          style = MaterialTheme.typography.caption,
-      )
+    Row(
+        modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      if (contract.bid.isValid) {
+        Column {
+          Text(
+              text = "BID",
+              style = labelStyle,
+          )
+          Text(
+              text = contract.bid.display,
+              style = MaterialTheme.typography.body2,
+          )
+        }
+      }
+
+      if (contract.ask.isValid) {
+        Column(
+            modifier = Modifier.padding(start = MaterialTheme.keylines.content),
+        ) {
+          Text(
+              text = "ASK",
+              style = labelStyle,
+          )
+          Text(
+              text = contract.ask.display,
+              style = MaterialTheme.typography.body2,
+          )
+        }
+      }
+
+      if (contract.mid.isValid) {
+        Column(
+            modifier = Modifier.padding(start = MaterialTheme.keylines.content),
+        ) {
+          Text(
+              text = "MID",
+              style = labelStyle,
+          )
+          Text(
+              text = contract.mid.display,
+              style = MaterialTheme.typography.body2,
+          )
+        }
+      }
     }
 
-    if (contract.mid.isValid) {
-      Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-          text = "Mid: ${contract.mid.display}",
-          style = MaterialTheme.typography.caption,
-      )
-    }
+    Row(
+        modifier = Modifier.padding(top = MaterialTheme.keylines.baseline),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Column {
+        Text(
+            text = "OI",
+            style = labelStyle,
+        )
+        Text(
+            text = "${contract.openInterest}",
+            style = MaterialTheme.typography.body2,
+        )
+      }
 
-    Text(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-        text = "OI: ${contract.openInterest}",
-        style = MaterialTheme.typography.caption,
-    )
-
-    if (contract.iv.isValid) {
-      Text(
-          modifier = Modifier.padding(start = MaterialTheme.keylines.typography),
-          text = "IV: ${contract.iv.display}",
-          style = MaterialTheme.typography.caption,
-      )
+      if (contract.iv.isValid) {
+        Column(
+            modifier = Modifier.padding(start = MaterialTheme.keylines.content),
+        ) {
+          Text(
+              text = "IV",
+              style = labelStyle,
+          )
+          Text(
+              text = contract.iv.display,
+              style = MaterialTheme.typography.body2,
+          )
+        }
+      }
     }
   }
 }

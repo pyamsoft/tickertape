@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -30,7 +30,6 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -116,6 +115,7 @@ private fun NewsItem(
             style =
                 MaterialTheme.typography.caption.copy(
                     fontWeight = FontWeight.W400,
+                    color = MaterialTheme.colors.onSurface,
                 ),
         )
       }
@@ -126,6 +126,10 @@ private fun NewsItem(
             style =
                 MaterialTheme.typography.caption.copy(
                     fontWeight = FontWeight.W700,
+                    color =
+                        MaterialTheme.colors.onSurface.copy(
+                            alpha = ContentAlpha.medium,
+                        ),
                 ),
         )
       }
@@ -157,7 +161,13 @@ private fun NewsItem(
           if (description.isNotBlank()) {
             Text(
                 text = description,
-                style = MaterialTheme.typography.body2,
+                style =
+                    MaterialTheme.typography.body2.copy(
+                        color =
+                            MaterialTheme.colors.onSurface.copy(
+                                alpha = ContentAlpha.medium,
+                            ),
+                    ),
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
             )

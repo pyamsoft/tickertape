@@ -20,6 +20,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.PERCENT_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockPercent
+import kotlin.math.abs
 
 internal data class StockPercentImpl(
     override val value: Double,
@@ -28,7 +29,8 @@ internal data class StockPercentImpl(
 
   private val stockPercent by
       lazy(LazyThreadSafetyMode.NONE) {
-        if (isZero) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(value / 100)
+        // Use abs() because the sign will be determined by StockDirection
+        if (isZero) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(abs(value) / 100)
       }
 
   override val isZero: Boolean = value.isZero()

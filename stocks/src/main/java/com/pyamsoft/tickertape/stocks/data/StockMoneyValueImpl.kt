@@ -33,7 +33,8 @@ internal data class StockMoneyValueImpl(
         // If its a small money < $10, allow more decimals
         val formatter =
             if (abs(value).compareTo(10) < 0) SMALL_MONEY_FORMATTER else BIG_MONEY_FORMATTER
-        return@lazy if (isZero) ZERO_VAL else formatter.get().requireNotNull().format(value)
+        // Use abs() because the sign will be determined by StockDirection
+        return@lazy if (isZero) ZERO_VAL else formatter.get().requireNotNull().format(abs(value))
       }
 
   override val isZero: Boolean = value.isZero()

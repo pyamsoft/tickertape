@@ -15,31 +15,54 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
 @JvmOverloads
 fun PorfolioSummaryItem(
     modifier: Modifier = Modifier,
     portfolio: PortfolioStockList,
+    equityType: EquityType,
 ) {
-  val totalAmount = portfolio.sumTotalAmount
-  val totalDirection = portfolio.sumTotalDirection
-  val changeToday = portfolio.changeTodayDisplayString
-  val todayDirection = portfolio.sumTodayDirection
-  val gainLoss = portfolio.gainLossDisplayString
+  // Short circuit
+  val data = remember(portfolio, equityType) { portfolio.generateData(equityType) } ?: return
+
+  val typography = MaterialTheme.typography
 
   val totalComposeColor =
-      if (totalDirection.isZero) {
-        MaterialTheme.typography.caption.color
-      } else {
-        remember(totalDirection) { Color(totalDirection.color) }
+      remember(data.total.direction, typography) {
+        val direction = data.total.direction
+        if (direction.isZero) {
+          typography.caption.color
+        } else {
+          Color(direction.color)
+        }
+      }
+
+  val totalGainLoss =
+      remember(data.total) {
+        val total = data.total
+        val amount = "${total.direction.sign}${total.change.display}"
+        val pct = "${total.direction.sign}${total.changePercent.display}"
+        return@remember "$amount ($pct)"
       }
 
   val todayComposeColor =
-      if (todayDirection.isZero) {
-        MaterialTheme.typography.caption.color
-      } else {
-        remember(todayDirection) { Color(todayDirection.color) }
+      remember(data.today.direction, typography) {
+        val direction = data.today.direction
+        if (direction.isZero) {
+          typography.caption.color
+        } else {
+          Color(direction.color)
+        }
+      }
+
+  val todayGainLoss =
+      remember(data.today) {
+        val today = data.today
+        val amount = "${today.direction.sign}${today.change.display}"
+        val pct = "${today.direction.sign}${today.changePercent.display}"
+        return@remember "$amount ($pct)"
       }
 
   Column(
@@ -47,13 +70,13 @@ fun PorfolioSummaryItem(
   ) {
     Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = totalAmount.display,
+        text = data.current.display,
         style = MaterialTheme.typography.h3,
     )
 
     Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = gainLoss,
+        text = totalGainLoss,
         style = MaterialTheme.typography.h5.copy(color = totalComposeColor),
     )
 
@@ -67,7 +90,7 @@ fun PorfolioSummaryItem(
 
       Text(
           modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-          text = changeToday,
+          text = todayGainLoss,
           style = MaterialTheme.typography.h6.copy(color = todayComposeColor),
       )
     }
@@ -76,10 +99,11 @@ fun PorfolioSummaryItem(
 
 @Preview
 @Composable
-private fun PreviewPorfolioSummaryItem() {
+private fun PreviewPortfolioSummaryItem() {
   Surface {
     PorfolioSummaryItem(
         portfolio = PortfolioStockList.empty(),
+        equityType = EquityType.STOCK,
     )
   }
 }

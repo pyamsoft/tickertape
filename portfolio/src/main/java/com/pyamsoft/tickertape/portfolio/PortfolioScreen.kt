@@ -99,7 +99,6 @@ private fun PortfolioSummary(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
 ) {
-  val portfolio = state.portfolio
 
   Column(
       modifier = modifier,
@@ -109,7 +108,8 @@ private fun PortfolioSummary(
             Modifier.fillMaxWidth()
                 .statusBarsPadding()
                 .padding(horizontal = MaterialTheme.keylines.baseline),
-        portfolio = portfolio,
+        portfolio = state.portfolio,
+        equityType = state.section,
     )
   }
 }

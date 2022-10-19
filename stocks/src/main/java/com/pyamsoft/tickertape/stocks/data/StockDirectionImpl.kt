@@ -43,8 +43,7 @@ internal data class StockDirectionImpl(
     sign =
         when {
           isUp -> "+"
-          // Direction sign not needed for negative numbers
-          isDown -> ""
+          isDown -> "-"
           isZero -> ""
           else -> ""
         }

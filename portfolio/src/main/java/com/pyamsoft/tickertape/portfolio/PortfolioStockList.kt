@@ -21,64 +21,105 @@ import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import timber.log.Timber
 
 class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
 
-  val sumTotalAmount: StockMoneyValue
-  val sumTotalDirection: StockDirection
-  val sumTodayDirection: StockDirection
-  val gainLossDisplayString: String
-  val changeTodayDisplayString: String
-  val isEmpty = list.isEmpty()
+  @CheckResult
+  fun generateData(equityType: EquityType): Data? {
+    if (equityType == EquityType.OPTION) {
+      Timber.w("Not generating any Data for Options type")
+      return null
+    }
 
-  init {
-    val filterOptions = { h: PortfolioStock -> h.holding.type == EquityType.OPTION }
-    val sumCostNumber =
-        if (isEmpty) 0.0 else list.asSequence().filterNot(filterOptions).map { it.costNumber }.sum()
+    val current: StockMoneyValue
+    val totalChange: StockMoneyValue
+    val totalChangePercent: StockPercent
+    val totalDirection: StockDirection
+    val todayChange: StockMoneyValue
+    val todayChangePercent: StockPercent
+    val todayDirection: StockDirection
 
-    val todays = list.asSequence().filterNot(filterOptions).map { it.todayNumber }.toList()
-    val isAnyDayInvalid = todays.any { it == null }
+    val matchingStocks = list.asSequence().filter { it.holding.type == equityType }
+    val totalValues = matchingStocks.map { it.todayNumber }
+    val isTotalInvalid = totalValues.any { it == null }
 
-    val sumTotalAmountNumber =
-        if (isAnyDayInvalid) 0.0
-        else {
-          val validTodays = todays.filterNotNull()
-          if (validTodays.isEmpty()) 0.0 else validTodays.sum()
+    // If we are missing some days, we cannot correctly calculate, so show none
+    if (isTotalInvalid) {
+      current = StockMoneyValue.NONE
+      totalChange = StockMoneyValue.NONE
+      totalChangePercent = StockPercent.NONE
+      totalDirection = StockDirection.NONE
+      todayChange = StockMoneyValue.NONE
+      todayChangePercent = StockPercent.NONE
+      todayDirection = StockDirection.NONE
+    } else {
+      val totalValue = totalValues.filterNotNull().sum()
+      current = totalValue.asMoney()
+
+      // If there are no entries, then sum is zero. We cannot divide without getting NaN
+      // so we cannot calculate
+      val totalCost = matchingStocks.map { it.costNumber }.sum()
+      if (totalCost.isZero()) {
+        totalChange = StockMoneyValue.NONE
+        totalChangePercent = StockPercent.NONE
+        totalDirection = StockDirection.NONE
+        todayChange = StockMoneyValue.NONE
+        todayChangePercent = StockPercent.NONE
+        todayDirection = StockDirection.NONE
+      } else {
+        val rawTotalChange = (totalValue - totalCost)
+        totalChange = rawTotalChange.asMoney()
+        totalChangePercent = (rawTotalChange / totalCost * 100).asPercent()
+        totalDirection = rawTotalChange.asDirection()
+
+        val todayValues = matchingStocks.map { it.todayChangeNumber }
+        val isTodayInvalid = todayValues.any { it == null }
+        if (isTodayInvalid) {
+          todayChange = StockMoneyValue.NONE
+          todayChangePercent = StockPercent.NONE
+          todayDirection = StockDirection.NONE
+        } else {
+          val rawTodayChange = todayValues.filterNotNull().sum()
+          todayChange = rawTodayChange.asMoney()
+          todayChangePercent = (rawTodayChange / totalCost * 100).asPercent()
+          todayDirection = rawTodayChange.asDirection()
         }
+      }
+    }
 
-    val isNoTotal = sumTotalAmountNumber.isZero()
-    val sumTotalGainLossNumber = if (isNoTotal) 0.0 else sumTotalAmountNumber - sumCostNumber
-    sumTotalAmount = sumTotalAmountNumber.asMoney()
+    return Data(
+        current = current,
+        total =
+            Data.Summary(
+                change = totalChange,
+                changePercent = totalChangePercent,
+                direction = totalDirection,
+            ),
+        today =
+            Data.Summary(
+                change = todayChange,
+                changePercent = todayChangePercent,
+                direction = todayDirection,
+            ),
+    )
+  }
 
-    val sumTotalPercentNumber =
-        if (sumCostNumber.isZero()) 0.0 else sumTotalGainLossNumber / sumCostNumber * 100
-    sumTotalDirection = (sumTotalAmountNumber - sumCostNumber).asDirection()
+  data class Data(
+      val current: StockMoneyValue,
+      val total: Summary,
+      val today: Summary,
+  ) {
 
-    val todayChanges =
-        list.asSequence().filterNot(filterOptions).map { it.todayChangeNumber }.toList()
-    val isAnyChangeInvalid = todayChanges.any { it == null }
-
-    val sumTodayChangeNumber =
-        if (isAnyChangeInvalid) 0.0
-        else {
-          val validChanges = todayChanges.filterNotNull()
-          if (validChanges.isEmpty()) 0.0 else validChanges.sum()
-        }
-    val sumTodayPercentNumber =
-        if (isNoTotal) 0.0 else sumTodayChangeNumber / sumTotalAmountNumber * 100
-    sumTodayDirection = sumTodayChangeNumber.asDirection()
-
-    val totalSign = sumTotalDirection.sign
-    gainLossDisplayString =
-        "${totalSign}${sumTotalGainLossNumber.asMoney().display} (${totalSign}${sumTotalPercentNumber.asPercent().display})"
-
-    val sumTodayChange = sumTodayChangeNumber.asMoney()
-    val sign = sumTodayDirection.sign
-    changeTodayDisplayString =
-        "${sign}${sumTodayChange.display} (${sign}${sumTodayPercentNumber.asPercent().display})"
+    data class Summary(
+        val change: StockMoneyValue,
+        val changePercent: StockPercent,
+        val direction: StockDirection,
+    )
   }
 
   companion object {

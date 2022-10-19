@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import timber.log.Timber
 
 // https://query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory
 
@@ -135,25 +136,30 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
 
 private data class YFDataPoint(
     override val raw: Double,
-    override val fmt: String,
-) : KeyStatistics.DataPoint {
-  override val isEmpty: Boolean = false
-}
+    override val fmt: String?,
+) : KeyStatistics.DataPoint
 
 @CheckResult
 internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
     long: Boolean = false
 ): KeyStatistics.DataPoint {
-  return if (this == null || this.raw == null || this.fmt == null) {
+  if (this == null || this.raw == null) {
+    return KeyStatistics.DataPoint.EMPTY
+  }
+  val r =
+      if (this.raw is Double) this.raw
+      else if (this.raw is String && this.raw == "Infinity") Double.POSITIVE_INFINITY
+      else {
+        Timber.w("Invalid raw value for DataPoint: ${this.raw}")
+        null
+      }
+
+  return if (r == null) {
     KeyStatistics.DataPoint.EMPTY
   } else {
-    val f = if (long) this.longFmt ?: this.fmt else this.fmt
     YFDataPoint(
-        raw =
-            if (this.raw is Double) this.raw
-            else if (this.raw is String && this.raw == "Infinity") Double.POSITIVE_INFINITY
-            else throw IllegalArgumentException("Invalid YFData.raw value: ${this.raw}"),
-        fmt = f.ifBlank { "N/A" },
+        raw = r,
+        fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
     )
   }
 }

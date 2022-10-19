@@ -44,28 +44,34 @@ private fun LazyListScope.renderStockPriceHistory(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Beta",
-        content = info.beta.fmt,
-    )
+  info.beta.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Beta",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "52-Week Change",
-        content = info.fiftyTwoWeekChange.fmt,
-    )
+  info.fiftyTwoWeekChange.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "52-Week Change",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "S&P500 52-Week Change",
-        content = info.marketFiftyTwoWeekChange.fmt,
-    )
+  info.marketFiftyTwoWeekChange.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "S&P500 52-Week Change",
+          content = v,
+      )
+    }
   }
 
   quote.extraDetails.fiftyTwoWeekHigh?.also { v ->
@@ -150,59 +156,73 @@ private fun LazyListScope.renderShareStatistics(
     }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Shares Outstanding",
-        content = info.sharesOutstanding.fmt,
-    )
+  info.sharesOutstanding.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Shares Outstanding",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Float",
-        content = info.floatShares.fmt,
-    )
+  info.floatShares.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Float",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "% Held by Insiders",
-        content = info.heldPercentInsiders.fmt,
-    )
+  info.heldPercentInsiders.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "% Held by Insiders",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "% Held by Institutions",
-        content = info.heldPercentInstitutions.fmt,
-    )
+  info.heldPercentInstitutions.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "% Held by Institutions",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Shares Short",
-        content = info.sharesShort.fmt,
-    )
+  info.sharesShort.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Shares Short",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Shares Ratio",
-        content = info.shortRatio.fmt,
-    )
+  info.shortRatio.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Shares Ratio",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Shares % of Float",
-        content = info.shortPercentOfFloat.fmt,
-    )
+  info.shortPercentOfFloat.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Shares % of Float",
+          content = v,
+      )
+    }
   }
 }

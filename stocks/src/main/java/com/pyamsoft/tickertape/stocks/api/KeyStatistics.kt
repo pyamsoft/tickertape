@@ -113,8 +113,7 @@ interface KeyStatistics {
 
   interface DataPoint {
     val raw: Double
-    val fmt: String
-    val isEmpty: Boolean
+    val fmt: String?
 
     companion object {
 
@@ -123,9 +122,7 @@ interface KeyStatistics {
 
             override val raw: Double = 0.0
 
-            override val fmt: String = "N/A"
-
-            override val isEmpty: Boolean = true
+            override val fmt: String? = null
           }
     }
   }

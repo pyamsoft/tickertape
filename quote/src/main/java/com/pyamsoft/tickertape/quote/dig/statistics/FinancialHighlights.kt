@@ -76,68 +76,84 @@ private fun LazyListScope.renderIncomeStatement(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Revenue",
-        content = financials.totalRevenue.fmt,
-    )
+  financials.totalRevenue.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Revenue",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Revenue per Share",
-        content = financials.revenuePerShare.fmt,
-    )
+  financials.revenuePerShare.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Revenue per Share",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Quarterly Revenue Growth",
-        content = financials.revenueGrowth.fmt,
-    )
+  financials.revenueGrowth.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Quarterly Revenue Growth",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Gross Profit",
-        content = financials.grossProfits.fmt,
-    )
+  financials.grossProfits.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Gross Profit",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "EBITDA",
-        content = financials.ebitda.fmt,
-    )
+  financials.ebitda.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "EBITDA",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Diluted EPS",
-        content = info.trailingEps.fmt,
-    )
+  info.trailingEps.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Diluted EPS",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Net Income to Common",
-        content = info.netIncomeToCommon.fmt,
-    )
+  info.netIncomeToCommon.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Net Income to Common",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Quarterly Earnings Growth",
-        content = financials.earningsGrowth.fmt,
-    )
+  financials.earningsGrowth.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Quarterly Earnings Growth",
+          content = v,
+      )
+    }
   }
 }
 
@@ -152,52 +168,64 @@ private fun LazyListScope.renderBalanceSheet(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Total Cash",
-        content = financials.totalCash.fmt,
-    )
+  financials.totalCash.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Total Cash",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Total Cash per Share",
-        content = financials.totalCashPerShare.fmt,
-    )
+  financials.totalCashPerShare.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Total Cash per Share",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Total Debt",
-        content = financials.totalDebt.fmt,
-    )
+  financials.totalDebt.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Total Debt",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Total Debt to Equity",
-        content = financials.debtToEquity.fmt,
-    )
+  financials.debtToEquity.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Total Debt to Equity",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Current Ratio",
-        content = financials.currentRatio.fmt,
-    )
+  financials.currentRatio.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Current Ratio",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Book Value per Share",
-        content = info.bookValue.fmt,
-    )
+  info.bookValue.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Book Value per Share",
+          content = v,
+      )
+    }
   }
 }
 
@@ -211,20 +239,24 @@ private fun LazyListScope.renderCashFlowStatement(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Operating Cash Flow",
-        content = financials.operatingCashflow.fmt,
-    )
+  financials.operatingCashflow.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Operating Cash Flow",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Levered Free Cash Flow",
-        content = financials.freeCashflow.fmt,
-    )
+  financials.freeCashflow.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Levered Free Cash Flow",
+          content = v,
+      )
+    }
   }
 }
 
@@ -249,52 +281,64 @@ private fun LazyListScope.renderValuationMeasures(
     }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Enterprise Value",
-        content = info.enterpriseValue.fmt,
-    )
+  info.enterpriseValue.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Enterprise Value",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Forward P/E",
-        content = info.forwardPE.fmt,
-    )
+  info.forwardPE.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Forward P/E",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "PEG Ratio",
-        content = info.pegRatio.fmt,
-    )
+  info.pegRatio.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "PEG Ratio",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Price/Book",
-        content = info.priceToBook.fmt,
-    )
+  info.priceToBook.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Price/Book",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Enterprise Value/Revenue",
-        content = info.enterpriseValueToRevenue.fmt,
-    )
+  info.enterpriseValueToRevenue.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Enterprise Value/Revenue",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Enterprise Value/EBITDA",
-        content = info.enterpriseValueToEbitda.fmt,
-    )
+  info.enterpriseValueToEbitda.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Enterprise Value/EBITDA",
+          content = v,
+      )
+    }
   }
 }
 
@@ -308,28 +352,34 @@ private fun LazyListScope.renderFiscalYear(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Previous Fiscal Year",
-        content = info.lastFiscalYearEnd.fmt,
-    )
+  info.lastFiscalYearEnd.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Previous Fiscal Year",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Fiscal Year Ends",
-        content = info.nextFiscalYearEnd.fmt,
-    )
+  info.nextFiscalYearEnd.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Fiscal Year Ends",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Most Recent Quarter",
-        content = info.mostRecentQuarter.fmt,
-    )
+  info.mostRecentQuarter.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Most Recent Quarter",
+          content = v,
+      )
+    }
   }
 }
 
@@ -343,19 +393,24 @@ private fun LazyListScope.renderProfitability(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Profit Margin",
-        content = financials.profitMargin.fmt)
+  financials.profitMargin.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Profit Margin",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Operating Margin",
-        content = financials.operatingMargin.fmt,
-    )
+  financials.operatingMargin.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Operating Margin",
+          content = v,
+      )
+    }
   }
 }
 
@@ -369,19 +424,23 @@ private fun LazyListScope.renderManagementEffectiveness(
     )
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Return on Assets",
-        content = financials.returnOnAssets.fmt,
-    )
+  financials.returnOnAssets.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Return on Assets",
+          content = v,
+      )
+    }
   }
 
-  item {
-    StatisticsItem(
-        modifier = Modifier.fillMaxWidth(),
-        title = "Return on Equity",
-        content = financials.returnOnEquity.fmt,
-    )
+  financials.returnOnEquity.fmt?.also { v ->
+    item {
+      StatisticsItem(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Return on Equity",
+          content = v,
+      )
+    }
   }
 }

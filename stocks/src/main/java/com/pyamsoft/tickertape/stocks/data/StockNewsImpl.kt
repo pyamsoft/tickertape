@@ -38,10 +38,9 @@ internal data class StockNewsListImpl(
     override val news: List<StockNews>
 ) : StockNewsList {
 
-    override fun <R : Comparable<R>> sortedByDescending(selector: (StockNews) -> R?): StockNewsList {
-        return this.copy(
-            news = news.sortedByDescending(selector),
-        )
-    }
-
+  override fun <R : Comparable<R>> sortedByDescending(selector: (StockNews) -> R?): StockNewsList {
+    return this.copy(
+        news = news.sortedByDescending(selector),
+    )
+  }
 }

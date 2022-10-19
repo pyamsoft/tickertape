@@ -26,9 +26,9 @@ import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkNewsResponse
 import com.pyamsoft.tickertape.stocks.remote.service.NewsService
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 internal class NasdaqNewsSource
 @Inject
@@ -53,26 +53,26 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-          val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
-          for (s in symbols) {
-              val resp =
-                  service.getNews(
-                      symbol = s.raw,
-                      userAgent = pickRandomUserAgent(),
-                  )
-              val news = resp.news.map { it.toNews(s) }
-              for (n in news) {
-                  val list = newsList.getOrPut(n.symbol) { mutableSetOf() }
-                  list.add(n)
-              }
-          }
-
-          return@withContext newsList.map { entry ->
-              StockNewsList.create(
-                  symbol = entry.key,
-                  news = entry.value.toList(),
+        val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
+        for (s in symbols) {
+          val resp =
+              service.getNews(
+                  symbol = s.raw,
+                  userAgent = pickRandomUserAgent(),
               )
+          val news = resp.news.map { it.toNews(s) }
+          for (n in news) {
+            val list = newsList.getOrPut(n.symbol) { mutableSetOf() }
+            list.add(n)
           }
+        }
+
+        return@withContext newsList.map { entry ->
+          StockNewsList.create(
+              symbol = entry.key,
+              news = entry.value.toList(),
+          )
+        }
       }
 
   companion object {
@@ -81,8 +81,20 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
         setOf(
             // Firefox 103
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:103.0) Gecko/20100101 Firefox/103.0",
+            // Firefox 104
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:103.0) Gecko/20100101 Firefox/104.0",
+            // Firefox 105
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:103.0) Gecko/20100101 Firefox/105.0",
+            // Firefox 106
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:103.0) Gecko/20100101 Firefox/106.0",
             // Chrome 104
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+            // Chrome 105
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
+            // Chrome 106
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
+            // Chrome 107
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
         )
 
     @JvmStatic

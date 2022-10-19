@@ -38,14 +38,14 @@ import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class StockInteractorImpl

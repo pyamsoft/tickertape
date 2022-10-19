@@ -23,30 +23,29 @@ import java.time.LocalDateTime
 
 interface StockNewsList {
 
-    @get:CheckResult val symbol: StockSymbol
+  @get:CheckResult val symbol: StockSymbol
 
-    @get:CheckResult val news: List<StockNews>
+  @get:CheckResult val news: List<StockNews>
 
+  @CheckResult
+  fun <R : Comparable<R>> sortedByDescending(
+      selector: (StockNews) -> R?,
+  ): StockNewsList
+
+  companion object {
+
+    @JvmStatic
     @CheckResult
-    fun <R : Comparable<R>> sortedByDescending(
-        selector: (StockNews) -> R?,
-    ): StockNewsList
-
-    companion object {
-
-        @JvmStatic
-        @CheckResult
-        fun create(
-            symbol: StockSymbol,
-            news: List<StockNews>,
-        ): StockNewsList {
-            return StockNewsListImpl(
-                symbol = symbol,
-                news = news,
-            )
-        }
+    fun create(
+        symbol: StockSymbol,
+        news: List<StockNews>,
+    ): StockNewsList {
+      return StockNewsListImpl(
+          symbol = symbol,
+          news = news,
+      )
     }
-
+  }
 }
 
 interface StockNews {

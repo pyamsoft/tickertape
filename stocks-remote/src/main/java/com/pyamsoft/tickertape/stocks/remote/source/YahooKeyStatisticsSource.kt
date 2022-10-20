@@ -81,17 +81,40 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
   companion object {
 
+      private val EMPTY_DOUBLE =
+          object : KeyStatistics.DataPoint<Double> {
+
+              override val raw: Double = 0.0
+
+              override val fmt: String? = null
+
+              override val isEmpty: Boolean = true
+          }
+
+      private val EMPTY_LONG =
+          object : KeyStatistics.DataPoint<Long> {
+
+              override val raw: Long = 0
+
+              override val fmt: String? = null
+
+              override val isEmpty: Boolean = true
+
+          }
+
     private data class YFDataPoint<T : Number>(
         override val raw: T,
         override val fmt: String?,
-    ) : KeyStatistics.DataPoint<T>
+    ) : KeyStatistics.DataPoint<T> {
+        override val isEmpty: Boolean = false
+    }
 
     @CheckResult
     internal fun NetworkKeyStatisticsResponse.YFData?.asLongDataPoint(
         long: Boolean = false
     ): KeyStatistics.DataPoint<Long> {
       if (this == null || this.raw == null) {
-        return KeyStatistics.DataPoint.EMPTY_LONG
+        return EMPTY_LONG
       }
 
       return if (this.raw is Long) {
@@ -101,7 +124,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         )
       } else {
         Timber.w("Invalid raw value for DataPoint<Long>: ${this.raw}")
-        KeyStatistics.DataPoint.EMPTY_LONG
+        EMPTY_LONG
       }
     }
 
@@ -110,7 +133,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         long: Boolean = false
     ): KeyStatistics.DataPoint<Double> {
       if (this == null || this.raw == null) {
-        return KeyStatistics.DataPoint.EMPTY_DOUBLE
+        return EMPTY_DOUBLE
       }
 
       val f = if (long) this.longFmt ?: this.fmt else this.fmt
@@ -126,7 +149,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         )
       } else {
         Timber.w("Invalid raw value for DataPoint<Double>: ${this.raw}")
-        KeyStatistics.DataPoint.EMPTY_DOUBLE
+        EMPTY_DOUBLE
       }
     }
 

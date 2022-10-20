@@ -114,25 +114,7 @@ interface KeyStatistics {
   interface DataPoint<T : Number> {
     val raw: T
     val fmt: String?
-
-    companion object {
-
-      val EMPTY_DOUBLE =
-          object : DataPoint<Double> {
-
-            override val raw: Double = 0.0
-
-            override val fmt: String? = null
-          }
-
-      val EMPTY_LONG =
-          object : DataPoint<Long> {
-
-            override val raw: Long = 0
-
-            override val fmt: String? = null
-          }
-    }
+    val isEmpty: Boolean
   }
 
   companion object {

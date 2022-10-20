@@ -125,6 +125,8 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
   internal data class YFData
   internal constructor(
       // Use Any because this may be a String, may be a Double, may be a Long, may be null
+      //
+      // Moshi encodes all number types as Double
       val raw: Any?,
       val fmt: String?,
       val longFmt: String?,

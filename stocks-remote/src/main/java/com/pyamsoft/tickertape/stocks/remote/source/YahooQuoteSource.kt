@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
+import com.pyamsoft.tickertape.stocks.parseUTCDate
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.remote.service.QuoteService

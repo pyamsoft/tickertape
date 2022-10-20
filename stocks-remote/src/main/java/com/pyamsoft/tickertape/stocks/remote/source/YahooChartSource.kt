@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.parseMarketTime
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.ChartService
 import com.pyamsoft.tickertape.stocks.sources.ChartSource

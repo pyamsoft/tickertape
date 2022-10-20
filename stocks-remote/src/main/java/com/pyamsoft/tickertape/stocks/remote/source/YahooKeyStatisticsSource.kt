@@ -81,32 +81,31 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
   companion object {
 
-      private val EMPTY_DOUBLE =
-          object : KeyStatistics.DataPoint<Double> {
+    private val EMPTY_DOUBLE =
+        object : KeyStatistics.DataPoint<Double> {
 
-              override val raw: Double = 0.0
+          override val raw: Double = 0.0
 
-              override val fmt: String? = null
+          override val fmt: String? = null
 
-              override val isEmpty: Boolean = true
-          }
+          override val isEmpty: Boolean = true
+        }
 
-      private val EMPTY_LONG =
-          object : KeyStatistics.DataPoint<Long> {
+    private val EMPTY_LONG =
+        object : KeyStatistics.DataPoint<Long> {
 
-              override val raw: Long = 0
+          override val raw: Long = 0
 
-              override val fmt: String? = null
+          override val fmt: String? = null
 
-              override val isEmpty: Boolean = true
-
-          }
+          override val isEmpty: Boolean = true
+        }
 
     private data class YFDataPoint<T : Number>(
         override val raw: T,
         override val fmt: String?,
     ) : KeyStatistics.DataPoint<T> {
-        override val isEmpty: Boolean = false
+      override val isEmpty: Boolean = false
     }
 
     @CheckResult
@@ -117,14 +116,27 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         return EMPTY_LONG
       }
 
-      return if (this.raw is Long) {
-        YFDataPoint(
-            raw = this.raw,
-            fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
-        )
-      } else {
-        Timber.w("Invalid raw value for DataPoint<Long>: ${this.raw}")
-        EMPTY_LONG
+      val f = if (long) this.longFmt ?: this.fmt else this.fmt
+      return when (this.raw) {
+        // Straight Long
+        is Long -> {
+          YFDataPoint(
+              raw = this.raw,
+              fmt = f,
+          )
+        }
+        // Double long like 1.6667E9
+        is Double -> {
+          YFDataPoint(
+              raw = this.raw.toLong(),
+              fmt = f,
+          )
+        }
+        else -> {
+          Timber.w(
+              "Invalid raw value for DataPoint<Long>: ${this.raw} ${this.raw::class.java.name}")
+          EMPTY_LONG
+        }
       }
     }
 
@@ -137,12 +149,13 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
       }
 
       val f = if (long) this.longFmt ?: this.fmt else this.fmt
-      return if (this.raw is Double) {
+      return if (this.raw is Number) {
         YFDataPoint(
-            raw = this.raw,
+            raw = this.raw.toDouble(),
             fmt = f,
         )
       } else if (this.raw is String && this.raw == "Infinity") {
+        // Infinity is special
         YFDataPoint(
             raw = Double.POSITIVE_INFINITY,
             fmt = f,

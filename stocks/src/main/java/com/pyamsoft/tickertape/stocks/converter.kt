@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.source
+package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
 import java.time.Instant
@@ -33,12 +33,18 @@ private val MARKET_TIME_ZONE = ZoneId.of("US/Eastern")
  * instead of an LD object for compatibility
  */
 @CheckResult
-internal fun parseUTCTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {
+fun parseUTCTime(
+    stamp: Long,
+    localZoneId: ZoneId = ZoneId.systemDefault(),
+): LocalDateTime {
   return parseUTCDate(stamp, localZoneId).atTime(0, 0)
 }
 
 @CheckResult
-internal fun parseUTCDate(stamp: Long, localZoneId: ZoneId): LocalDate {
+fun parseUTCDate(
+    stamp: Long,
+    localZoneId: ZoneId = ZoneId.systemDefault(),
+): LocalDate {
   return Instant.ofEpochSecond(stamp)
       .atZone(UTC_TIME_ZONE)
       .withZoneSameLocal(localZoneId)
@@ -52,7 +58,10 @@ internal fun parseUTCDate(stamp: Long, localZoneId: ZoneId): LocalDate {
  * time.
  */
 @CheckResult
-internal fun parseMarketTime(stamp: Long, localZoneId: ZoneId): LocalDateTime {
+fun parseMarketTime(
+    stamp: Long,
+    localZoneId: ZoneId = ZoneId.systemDefault(),
+): LocalDateTime {
   return Instant.ofEpochSecond(stamp)
       .atZone(MARKET_TIME_ZONE)
       .withZoneSameInstant(localZoneId)

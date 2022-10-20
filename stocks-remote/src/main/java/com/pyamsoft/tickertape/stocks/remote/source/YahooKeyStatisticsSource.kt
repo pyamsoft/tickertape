@@ -22,7 +22,6 @@ import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkKeyStatisticsResponse
-import com.pyamsoft.tickertape.stocks.remote.network.asDataPoint
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
 import javax.inject.Inject
@@ -82,14 +81,63 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
   companion object {
 
+    private data class YFDataPoint<T : Number>(
+        override val raw: T,
+        override val fmt: String?,
+    ) : KeyStatistics.DataPoint<T>
+
+    @CheckResult
+    internal fun NetworkKeyStatisticsResponse.YFData?.asLongDataPoint(
+        long: Boolean = false
+    ): KeyStatistics.DataPoint<Long> {
+      if (this == null || this.raw == null) {
+        return KeyStatistics.DataPoint.EMPTY_LONG
+      }
+
+      return if (this.raw is Long) {
+        YFDataPoint(
+            raw = this.raw,
+            fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
+        )
+      } else {
+        Timber.w("Invalid raw value for DataPoint<Long>: ${this.raw}")
+        KeyStatistics.DataPoint.EMPTY_LONG
+      }
+    }
+
+    @CheckResult
+    internal fun NetworkKeyStatisticsResponse.YFData?.asDoubleDataPoint(
+        long: Boolean = false
+    ): KeyStatistics.DataPoint<Double> {
+      if (this == null || this.raw == null) {
+        return KeyStatistics.DataPoint.EMPTY_DOUBLE
+      }
+
+      val f = if (long) this.longFmt ?: this.fmt else this.fmt
+      return if (this.raw is Double) {
+        YFDataPoint(
+            raw = this.raw,
+            fmt = f,
+        )
+      } else if (this.raw is String && this.raw == "Infinity") {
+        YFDataPoint(
+            raw = Double.POSITIVE_INFINITY,
+            fmt = f,
+        )
+      } else {
+        Timber.w("Invalid raw value for DataPoint<Double>: ${this.raw}")
+        KeyStatistics.DataPoint.EMPTY_DOUBLE
+      }
+    }
+
     private data class YFEarnings(
-        override val earningsDate: KeyStatistics.DataPoint,
-        override val earningsAverage: KeyStatistics.DataPoint,
-        override val earningsHigh: KeyStatistics.DataPoint,
-        override val earningsLow: KeyStatistics.DataPoint,
-        override val revenueAverage: KeyStatistics.DataPoint,
-        override val revenueHigh: KeyStatistics.DataPoint,
-        override val revenueLow: KeyStatistics.DataPoint,
+        override val earningsDate: KeyStatistics.DataPoint<Long>,
+        override val earningsAverage: KeyStatistics.DataPoint<Double>,
+        override val earningsHigh: KeyStatistics.DataPoint<Double>,
+        override val earningsLow: KeyStatistics.DataPoint<Double>,
+        override val revenueAverage: KeyStatistics.DataPoint<Long>,
+        override val revenueHigh: KeyStatistics.DataPoint<Long>,
+        override val revenueLow: KeyStatistics.DataPoint<Long>,
     ) : KeyStatistics.Earnings
 
     @CheckResult
@@ -120,45 +168,45 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
       return if (earnings == null) null
       else {
         YFEarnings(
-            earningsDate = earnings.earningsDate?.firstOrNull().asDataPoint(),
-            earningsAverage = earnings.earningsAverage.asDataPoint(),
-            earningsLow = earnings.earningsLow.asDataPoint(),
-            earningsHigh = earnings.earningsHigh.asDataPoint(),
-            revenueAverage = earnings.revenueAverage.asDataPoint(),
-            revenueLow = earnings.revenueLow.asDataPoint(),
-            revenueHigh = earnings.revenueHigh.asDataPoint(),
+            earningsDate = earnings.earningsDate?.firstOrNull().asLongDataPoint(),
+            earningsAverage = earnings.earningsAverage.asDoubleDataPoint(),
+            earningsLow = earnings.earningsLow.asDoubleDataPoint(),
+            earningsHigh = earnings.earningsHigh.asDoubleDataPoint(),
+            revenueAverage = earnings.revenueAverage.asLongDataPoint(),
+            revenueLow = earnings.revenueLow.asLongDataPoint(),
+            revenueHigh = earnings.revenueHigh.asLongDataPoint(),
         )
       }
     }
 
     private data class YFFinancials(
-        override val currentPrice: KeyStatistics.DataPoint,
-        override val targetHighPrice: KeyStatistics.DataPoint,
-        override val targetLowPrice: KeyStatistics.DataPoint,
-        override val targetMeanPrice: KeyStatistics.DataPoint,
-        override val recommendationMean: KeyStatistics.DataPoint,
-        override val numberOfAnalystOpinions: KeyStatistics.DataPoint,
+        override val currentPrice: KeyStatistics.DataPoint<Double>,
+        override val targetHighPrice: KeyStatistics.DataPoint<Double>,
+        override val targetLowPrice: KeyStatistics.DataPoint<Double>,
+        override val targetMeanPrice: KeyStatistics.DataPoint<Double>,
+        override val recommendationMean: KeyStatistics.DataPoint<Double>,
+        override val numberOfAnalystOpinions: KeyStatistics.DataPoint<Long>,
         override val recommendationKey: KeyStatistics.Financials.Recommendation,
-        override val returnOnAssets: KeyStatistics.DataPoint,
-        override val returnOnEquity: KeyStatistics.DataPoint,
-        override val profitMargin: KeyStatistics.DataPoint,
-        override val operatingMargin: KeyStatistics.DataPoint,
-        override val ebitdaMargin: KeyStatistics.DataPoint,
-        override val grossMargin: KeyStatistics.DataPoint,
-        override val revenuePerShare: KeyStatistics.DataPoint,
-        override val totalRevenue: KeyStatistics.DataPoint,
-        override val revenueGrowth: KeyStatistics.DataPoint,
-        override val grossProfits: KeyStatistics.DataPoint,
-        override val freeCashflow: KeyStatistics.DataPoint,
-        override val operatingCashflow: KeyStatistics.DataPoint,
-        override val currentRatio: KeyStatistics.DataPoint,
-        override val ebitda: KeyStatistics.DataPoint,
-        override val totalDebt: KeyStatistics.DataPoint,
-        override val totalCashPerShare: KeyStatistics.DataPoint,
-        override val quickRatio: KeyStatistics.DataPoint,
-        override val debtToEquity: KeyStatistics.DataPoint,
-        override val totalCash: KeyStatistics.DataPoint,
-        override val earningsGrowth: KeyStatistics.DataPoint,
+        override val returnOnAssets: KeyStatistics.DataPoint<Double>,
+        override val returnOnEquity: KeyStatistics.DataPoint<Double>,
+        override val profitMargin: KeyStatistics.DataPoint<Double>,
+        override val operatingMargin: KeyStatistics.DataPoint<Double>,
+        override val ebitdaMargin: KeyStatistics.DataPoint<Double>,
+        override val grossMargin: KeyStatistics.DataPoint<Double>,
+        override val revenuePerShare: KeyStatistics.DataPoint<Double>,
+        override val totalRevenue: KeyStatistics.DataPoint<Long>,
+        override val revenueGrowth: KeyStatistics.DataPoint<Double>,
+        override val grossProfits: KeyStatistics.DataPoint<Long>,
+        override val freeCashflow: KeyStatistics.DataPoint<Long>,
+        override val operatingCashflow: KeyStatistics.DataPoint<Long>,
+        override val currentRatio: KeyStatistics.DataPoint<Double>,
+        override val ebitda: KeyStatistics.DataPoint<Long>,
+        override val totalDebt: KeyStatistics.DataPoint<Long>,
+        override val totalCashPerShare: KeyStatistics.DataPoint<Double>,
+        override val quickRatio: KeyStatistics.DataPoint<Double>,
+        override val debtToEquity: KeyStatistics.DataPoint<Double>,
+        override val totalCash: KeyStatistics.DataPoint<Long>,
+        override val earningsGrowth: KeyStatistics.DataPoint<Double>,
     ) : KeyStatistics.Financials
 
     @JvmStatic
@@ -170,64 +218,64 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
       return if (data == null) null
       else {
         YFFinancials(
-            currentPrice = data.currentPrice.asDataPoint(),
-            targetHighPrice = data.targetHighPrice.asDataPoint(),
-            targetLowPrice = data.targetLowPrice.asDataPoint(),
-            targetMeanPrice = data.targetMeanPrice.asDataPoint(),
-            recommendationMean = data.recommendationMean.asDataPoint(),
+            currentPrice = data.currentPrice.asDoubleDataPoint(),
+            targetHighPrice = data.targetHighPrice.asDoubleDataPoint(),
+            targetLowPrice = data.targetLowPrice.asDoubleDataPoint(),
+            targetMeanPrice = data.targetMeanPrice.asDoubleDataPoint(),
+            recommendationMean = data.recommendationMean.asDoubleDataPoint(),
             recommendationKey = data.recommendationKey.asRecommendation(),
-            numberOfAnalystOpinions = data.numberOfAnalystOpinions.asDataPoint(),
-            profitMargin = data.profitMargins.asDataPoint(),
-            ebitdaMargin = data.ebitdaMargins.asDataPoint(),
-            operatingMargin = data.operatingMargins.asDataPoint(),
-            grossMargin = data.grossMargins.asDataPoint(),
-            returnOnAssets = data.returnOnAssets.asDataPoint(),
-            returnOnEquity = data.returnOnEquity.asDataPoint(),
-            totalRevenue = data.totalRevenue.asDataPoint(),
-            revenuePerShare = data.revenuePerShare.asDataPoint(),
-            revenueGrowth = data.revenueGrowth.asDataPoint(),
-            grossProfits = data.grossProfits.asDataPoint(),
-            freeCashflow = data.freeCashflow.asDataPoint(),
-            operatingCashflow = data.operatingCashflow.asDataPoint(),
-            currentRatio = data.currentRatio.asDataPoint(),
-            earningsGrowth = data.earningsGrowth.asDataPoint(),
-            ebitda = data.ebitda.asDataPoint(),
-            debtToEquity = data.debtToEquity.asDataPoint(),
-            totalCashPerShare = data.totalCashPerShare.asDataPoint(),
-            totalDebt = data.totalDebt.asDataPoint(),
-            quickRatio = data.quickRatio.asDataPoint(),
-            totalCash = data.totalCash.asDataPoint(),
+            numberOfAnalystOpinions = data.numberOfAnalystOpinions.asLongDataPoint(),
+            profitMargin = data.profitMargins.asDoubleDataPoint(),
+            ebitdaMargin = data.ebitdaMargins.asDoubleDataPoint(),
+            operatingMargin = data.operatingMargins.asDoubleDataPoint(),
+            grossMargin = data.grossMargins.asDoubleDataPoint(),
+            returnOnAssets = data.returnOnAssets.asDoubleDataPoint(),
+            returnOnEquity = data.returnOnEquity.asDoubleDataPoint(),
+            totalRevenue = data.totalRevenue.asLongDataPoint(),
+            revenuePerShare = data.revenuePerShare.asDoubleDataPoint(),
+            revenueGrowth = data.revenueGrowth.asDoubleDataPoint(),
+            grossProfits = data.grossProfits.asLongDataPoint(),
+            freeCashflow = data.freeCashflow.asLongDataPoint(),
+            operatingCashflow = data.operatingCashflow.asLongDataPoint(),
+            currentRatio = data.currentRatio.asDoubleDataPoint(),
+            earningsGrowth = data.earningsGrowth.asDoubleDataPoint(),
+            ebitda = data.ebitda.asLongDataPoint(),
+            debtToEquity = data.debtToEquity.asDoubleDataPoint(),
+            totalCashPerShare = data.totalCashPerShare.asDoubleDataPoint(),
+            totalDebt = data.totalDebt.asLongDataPoint(),
+            quickRatio = data.quickRatio.asDoubleDataPoint(),
+            totalCash = data.totalCash.asLongDataPoint(),
         )
       }
     }
 
     private data class YFInfo(
-        override val beta: KeyStatistics.DataPoint,
-        override val enterpriseValue: KeyStatistics.DataPoint,
-        override val floatShares: KeyStatistics.DataPoint,
-        override val sharesOutstanding: KeyStatistics.DataPoint,
-        override val sharesShort: KeyStatistics.DataPoint,
-        override val shortRatio: KeyStatistics.DataPoint,
-        override val heldPercentInsiders: KeyStatistics.DataPoint,
-        override val heldPercentInstitutions: KeyStatistics.DataPoint,
-        override val shortPercentOfFloat: KeyStatistics.DataPoint,
-        override val lastFiscalYearEnd: KeyStatistics.DataPoint,
-        override val nextFiscalYearEnd: KeyStatistics.DataPoint,
-        override val mostRecentQuarter: KeyStatistics.DataPoint,
-        override val netIncomeToCommon: KeyStatistics.DataPoint,
-        override val lastSplitDate: KeyStatistics.DataPoint,
-        override val lastDividendValue: KeyStatistics.DataPoint,
-        override val lastDividendDate: KeyStatistics.DataPoint,
-        override val forwardEps: KeyStatistics.DataPoint,
-        override val trailingEps: KeyStatistics.DataPoint,
-        override val forwardPE: KeyStatistics.DataPoint,
-        override val pegRatio: KeyStatistics.DataPoint,
-        override val enterpriseValueToEbitda: KeyStatistics.DataPoint,
-        override val enterpriseValueToRevenue: KeyStatistics.DataPoint,
-        override val priceToBook: KeyStatistics.DataPoint,
-        override val bookValue: KeyStatistics.DataPoint,
-        override val fiftyTwoWeekChange: KeyStatistics.DataPoint,
-        override val marketFiftyTwoWeekChange: KeyStatistics.DataPoint,
+        override val beta: KeyStatistics.DataPoint<Double>,
+        override val enterpriseValue: KeyStatistics.DataPoint<Long>,
+        override val floatShares: KeyStatistics.DataPoint<Long>,
+        override val sharesOutstanding: KeyStatistics.DataPoint<Long>,
+        override val sharesShort: KeyStatistics.DataPoint<Long>,
+        override val shortRatio: KeyStatistics.DataPoint<Double>,
+        override val heldPercentInsiders: KeyStatistics.DataPoint<Double>,
+        override val heldPercentInstitutions: KeyStatistics.DataPoint<Double>,
+        override val shortPercentOfFloat: KeyStatistics.DataPoint<Double>,
+        override val lastFiscalYearEnd: KeyStatistics.DataPoint<Long>,
+        override val nextFiscalYearEnd: KeyStatistics.DataPoint<Long>,
+        override val mostRecentQuarter: KeyStatistics.DataPoint<Long>,
+        override val netIncomeToCommon: KeyStatistics.DataPoint<Long>,
+        override val lastSplitDate: KeyStatistics.DataPoint<Long>,
+        override val lastDividendValue: KeyStatistics.DataPoint<Double>,
+        override val lastDividendDate: KeyStatistics.DataPoint<Long>,
+        override val forwardEps: KeyStatistics.DataPoint<Double>,
+        override val trailingEps: KeyStatistics.DataPoint<Double>,
+        override val forwardPE: KeyStatistics.DataPoint<Double>,
+        override val pegRatio: KeyStatistics.DataPoint<Double>,
+        override val enterpriseValueToEbitda: KeyStatistics.DataPoint<Double>,
+        override val enterpriseValueToRevenue: KeyStatistics.DataPoint<Double>,
+        override val priceToBook: KeyStatistics.DataPoint<Double>,
+        override val bookValue: KeyStatistics.DataPoint<Double>,
+        override val fiftyTwoWeekChange: KeyStatistics.DataPoint<Double>,
+        override val marketFiftyTwoWeekChange: KeyStatistics.DataPoint<Double>,
     ) : KeyStatistics.Info
 
     @JvmStatic
@@ -237,32 +285,32 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
       return if (data == null) null
       else {
         YFInfo(
-            beta = data.beta.asDataPoint(),
-            enterpriseValue = data.enterpriseValue.asDataPoint(),
-            floatShares = data.floatShares.asDataPoint(),
-            sharesOutstanding = data.sharesOutstanding.asDataPoint(),
-            sharesShort = data.sharesShort.asDataPoint(),
-            shortRatio = data.shortRatio.asDataPoint(),
-            heldPercentInsiders = data.heldPercentInsiders.asDataPoint(),
-            heldPercentInstitutions = data.heldPercentInstitutions.asDataPoint(),
-            shortPercentOfFloat = data.shortPercentOfFloat.asDataPoint(),
-            lastFiscalYearEnd = data.lastFiscalYearEnd.asDataPoint(),
-            nextFiscalYearEnd = data.nextFiscalYearEnd.asDataPoint(),
-            mostRecentQuarter = data.mostRecentQuarter.asDataPoint(),
-            netIncomeToCommon = data.netIncomeToCommon.asDataPoint(),
-            lastSplitDate = data.lastSplitDate.asDataPoint(),
-            lastDividendDate = data.lastDividendDate.asDataPoint(),
-            lastDividendValue = data.lastDividendValue.asDataPoint(),
-            forwardEps = data.forwardEps.asDataPoint(),
-            trailingEps = data.trailingEps.asDataPoint(),
-            pegRatio = data.pegRatio.asDataPoint(),
-            bookValue = data.bookValue.asDataPoint(),
-            priceToBook = data.priceToBook.asDataPoint(),
-            enterpriseValueToEbitda = data.enterpriseToEbitda.asDataPoint(),
-            enterpriseValueToRevenue = data.enterpriseToRevenue.asDataPoint(),
-            forwardPE = data.forwardPE.asDataPoint(),
-            fiftyTwoWeekChange = data.fiftyTwoWeekChange.asDataPoint(),
-            marketFiftyTwoWeekChange = data.marketFiftyTwoWeekChange.asDataPoint(),
+            beta = data.beta.asDoubleDataPoint(),
+            enterpriseValue = data.enterpriseValue.asLongDataPoint(),
+            floatShares = data.floatShares.asLongDataPoint(),
+            sharesOutstanding = data.sharesOutstanding.asLongDataPoint(),
+            sharesShort = data.sharesShort.asLongDataPoint(),
+            shortRatio = data.shortRatio.asDoubleDataPoint(),
+            heldPercentInsiders = data.heldPercentInsiders.asDoubleDataPoint(),
+            heldPercentInstitutions = data.heldPercentInstitutions.asDoubleDataPoint(),
+            shortPercentOfFloat = data.shortPercentOfFloat.asDoubleDataPoint(),
+            lastFiscalYearEnd = data.lastFiscalYearEnd.asLongDataPoint(),
+            nextFiscalYearEnd = data.nextFiscalYearEnd.asLongDataPoint(),
+            mostRecentQuarter = data.mostRecentQuarter.asLongDataPoint(),
+            netIncomeToCommon = data.netIncomeToCommon.asLongDataPoint(),
+            lastSplitDate = data.lastSplitDate.asLongDataPoint(),
+            lastDividendDate = data.lastDividendDate.asLongDataPoint(),
+            lastDividendValue = data.lastDividendValue.asDoubleDataPoint(),
+            forwardEps = data.forwardEps.asDoubleDataPoint(),
+            trailingEps = data.trailingEps.asDoubleDataPoint(),
+            pegRatio = data.pegRatio.asDoubleDataPoint(),
+            bookValue = data.bookValue.asDoubleDataPoint(),
+            priceToBook = data.priceToBook.asDoubleDataPoint(),
+            enterpriseValueToEbitda = data.enterpriseToEbitda.asDoubleDataPoint(),
+            enterpriseValueToRevenue = data.enterpriseToRevenue.asDoubleDataPoint(),
+            forwardPE = data.forwardPE.asDoubleDataPoint(),
+            fiftyTwoWeekChange = data.fiftyTwoWeekChange.asDoubleDataPoint(),
+            marketFiftyTwoWeekChange = data.marketFiftyTwoWeekChange.asDoubleDataPoint(),
         )
       }
     }

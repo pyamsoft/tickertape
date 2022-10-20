@@ -34,33 +34,33 @@ interface KeyStatistics {
   @CheckResult fun withQuote(quote: StockQuote?): KeyStatistics
 
   interface Financials {
-    val currentPrice: DataPoint
-    val targetHighPrice: DataPoint
-    val targetLowPrice: DataPoint
-    val targetMeanPrice: DataPoint
-    val recommendationMean: DataPoint
-    val numberOfAnalystOpinions: DataPoint
+    val currentPrice: DataPoint<Double>
+    val targetHighPrice: DataPoint<Double>
+    val targetLowPrice: DataPoint<Double>
+    val targetMeanPrice: DataPoint<Double>
+    val recommendationMean: DataPoint<Double>
+    val numberOfAnalystOpinions: DataPoint<Long>
     val recommendationKey: Recommendation
-    val profitMargin: DataPoint
-    val operatingMargin: DataPoint
-    val ebitdaMargin: DataPoint
-    val grossMargin: DataPoint
-    val returnOnAssets: DataPoint
-    val returnOnEquity: DataPoint
-    val totalRevenue: DataPoint
-    val revenuePerShare: DataPoint
-    val revenueGrowth: DataPoint
-    val grossProfits: DataPoint
-    val freeCashflow: DataPoint
-    val operatingCashflow: DataPoint
-    val ebitda: DataPoint
-    val totalDebt: DataPoint
-    val totalCashPerShare: DataPoint
-    val quickRatio: DataPoint
-    val currentRatio: DataPoint
-    val debtToEquity: DataPoint
-    val totalCash: DataPoint
-    val earningsGrowth: DataPoint
+    val profitMargin: DataPoint<Double>
+    val operatingMargin: DataPoint<Double>
+    val ebitdaMargin: DataPoint<Double>
+    val grossMargin: DataPoint<Double>
+    val returnOnAssets: DataPoint<Double>
+    val returnOnEquity: DataPoint<Double>
+    val totalRevenue: DataPoint<Long>
+    val revenuePerShare: DataPoint<Double>
+    val revenueGrowth: DataPoint<Double>
+    val grossProfits: DataPoint<Long>
+    val freeCashflow: DataPoint<Long>
+    val operatingCashflow: DataPoint<Long>
+    val ebitda: DataPoint<Long>
+    val totalDebt: DataPoint<Long>
+    val totalCashPerShare: DataPoint<Double>
+    val quickRatio: DataPoint<Double>
+    val currentRatio: DataPoint<Double>
+    val debtToEquity: DataPoint<Double>
+    val totalCash: DataPoint<Long>
+    val earningsGrowth: DataPoint<Double>
 
     enum class Recommendation {
       BUY,
@@ -73,54 +73,62 @@ interface KeyStatistics {
   }
 
   interface Info {
-    val beta: DataPoint
-    val enterpriseValue: DataPoint
-    val floatShares: DataPoint
-    val sharesOutstanding: DataPoint
-    val sharesShort: DataPoint
-    val shortRatio: DataPoint
-    val heldPercentInsiders: DataPoint
-    val heldPercentInstitutions: DataPoint
-    val shortPercentOfFloat: DataPoint
-    val lastFiscalYearEnd: DataPoint
-    val nextFiscalYearEnd: DataPoint
-    val mostRecentQuarter: DataPoint
-    val netIncomeToCommon: DataPoint
-    val lastSplitDate: DataPoint
-    val lastDividendValue: DataPoint
-    val lastDividendDate: DataPoint
-    val forwardEps: DataPoint
-    val forwardPE: DataPoint
-    val trailingEps: DataPoint
-    val pegRatio: DataPoint
-    val priceToBook: DataPoint
-    val bookValue: DataPoint
-    val enterpriseValueToRevenue: DataPoint
-    val enterpriseValueToEbitda: DataPoint
-    val fiftyTwoWeekChange: DataPoint
-    val marketFiftyTwoWeekChange: DataPoint
+    val beta: DataPoint<Double>
+    val enterpriseValue: DataPoint<Long>
+    val floatShares: DataPoint<Long>
+    val sharesOutstanding: DataPoint<Long>
+    val sharesShort: DataPoint<Long>
+    val shortRatio: DataPoint<Double>
+    val heldPercentInsiders: DataPoint<Double>
+    val heldPercentInstitutions: DataPoint<Double>
+    val shortPercentOfFloat: DataPoint<Double>
+    val lastFiscalYearEnd: DataPoint<Long>
+    val nextFiscalYearEnd: DataPoint<Long>
+    val mostRecentQuarter: DataPoint<Long>
+    val netIncomeToCommon: DataPoint<Long>
+    val lastSplitDate: DataPoint<Long>
+    val lastDividendValue: DataPoint<Double>
+    val lastDividendDate: DataPoint<Long>
+    val forwardEps: DataPoint<Double>
+    val forwardPE: DataPoint<Double>
+    val trailingEps: DataPoint<Double>
+    val pegRatio: DataPoint<Double>
+    val priceToBook: DataPoint<Double>
+    val bookValue: DataPoint<Double>
+    val enterpriseValueToRevenue: DataPoint<Double>
+    val enterpriseValueToEbitda: DataPoint<Double>
+    val fiftyTwoWeekChange: DataPoint<Double>
+    val marketFiftyTwoWeekChange: DataPoint<Double>
   }
 
   interface Earnings {
-    val earningsDate: DataPoint
-    val earningsAverage: DataPoint
-    val earningsLow: DataPoint
-    val earningsHigh: DataPoint
-    val revenueAverage: DataPoint
-    val revenueLow: DataPoint
-    val revenueHigh: DataPoint
+    val earningsDate: DataPoint<Long>
+    val earningsAverage: DataPoint<Double>
+    val earningsLow: DataPoint<Double>
+    val earningsHigh: DataPoint<Double>
+    val revenueAverage: DataPoint<Long>
+    val revenueLow: DataPoint<Long>
+    val revenueHigh: DataPoint<Long>
   }
 
-  interface DataPoint {
-    val raw: Double
+  interface DataPoint<T : Number> {
+    val raw: T
     val fmt: String?
 
     companion object {
 
-      val EMPTY =
-          object : DataPoint {
+      val EMPTY_DOUBLE =
+          object : DataPoint<Double> {
 
             override val raw: Double = 0.0
+
+            override val fmt: String? = null
+          }
+
+      val EMPTY_LONG =
+          object : DataPoint<Long> {
+
+            override val raw: Long = 0
 
             override val fmt: String? = null
           }

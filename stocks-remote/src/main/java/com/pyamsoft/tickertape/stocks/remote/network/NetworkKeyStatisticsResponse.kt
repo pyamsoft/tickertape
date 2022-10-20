@@ -16,11 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.remote.network
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import timber.log.Timber
 
 // https://query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory
 
@@ -127,39 +124,9 @@ internal data class NetworkKeyStatisticsResponse internal constructor(val quoteS
   @JsonClass(generateAdapter = true)
   internal data class YFData
   internal constructor(
-      // Use Any because this may be a String, may be a Double, may be null
+      // Use Any because this may be a String, may be a Double, may be a Long, may be null
       val raw: Any?,
       val fmt: String?,
       val longFmt: String?,
   )
-}
-
-private data class YFDataPoint(
-    override val raw: Double,
-    override val fmt: String?,
-) : KeyStatistics.DataPoint
-
-@CheckResult
-internal fun NetworkKeyStatisticsResponse.YFData?.asDataPoint(
-    long: Boolean = false
-): KeyStatistics.DataPoint {
-  if (this == null || this.raw == null) {
-    return KeyStatistics.DataPoint.EMPTY
-  }
-  val r =
-      if (this.raw is Double) this.raw
-      else if (this.raw is String && this.raw == "Infinity") Double.POSITIVE_INFINITY
-      else {
-        Timber.w("Invalid raw value for DataPoint: ${this.raw}")
-        null
-      }
-
-  return if (r == null) {
-    KeyStatistics.DataPoint.EMPTY
-  } else {
-    YFDataPoint(
-        raw = r,
-        fmt = if (long) this.longFmt ?: this.fmt else this.fmt,
-    )
-  }
 }

@@ -1,6 +1,9 @@
 package com.pyamsoft.tickertape.portfolio.dig.base
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -96,6 +99,7 @@ private fun <T : Any> PositionsList(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun PositionsAdd(
     modifier: Modifier = Modifier,
     label: String,
@@ -105,6 +109,10 @@ private fun PositionsAdd(
   AnimatedVisibility(
       modifier = modifier.padding(MaterialTheme.keylines.content),
       visible = isVisible,
+      // Normal FAB animation
+      // https://stackoverflow.com/questions/71141501/cant-animate-fab-visible-in-m3-scaffold
+      enter = scaleIn(),
+      exit = scaleOut(),
   ) {
     Box {
       FloatingActionButton(

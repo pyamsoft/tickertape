@@ -17,6 +17,9 @@
 package com.pyamsoft.tickertape.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -172,6 +175,7 @@ internal fun MainBottomNav(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun ActionButton(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
@@ -182,6 +186,10 @@ private fun ActionButton(
   ) {
     AnimatedVisibility(
         visible = page.showFab,
+        // Normal FAB animation
+        // https://stackoverflow.com/questions/71141501/cant-animate-fab-visible-in-m3-scaffold
+        enter = scaleIn(),
+        exit = scaleOut(),
     ) {
       FloatingActionButton(
           backgroundColor = MaterialTheme.colors.primary,

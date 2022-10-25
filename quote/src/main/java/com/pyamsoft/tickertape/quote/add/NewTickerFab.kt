@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
 @Composable
@@ -27,7 +26,6 @@ fun NewTickerFab(
       visible = visible,
   ) {
     FloatingActionButton(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline),
         backgroundColor = MaterialTheme.colors.primary,
         onClick = onClick,
     ) {

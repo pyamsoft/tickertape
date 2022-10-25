@@ -184,12 +184,7 @@ fun HomeScreen(
 
       item {
         Spacer(
-            modifier =
-                Modifier.padding(pv)
-                    .navigationBarsPadding()
-                    .height(
-                        bottomPaddingDp + MaterialTheme.keylines.content,
-                    ),
+            modifier = Modifier.padding(pv).navigationBarsPadding().height(bottomPaddingDp),
         )
       }
     }

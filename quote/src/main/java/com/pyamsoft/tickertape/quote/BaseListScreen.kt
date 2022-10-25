@@ -121,14 +121,6 @@ private fun <T : Any> Content(
         density.run { navBarBottomHeight.toDp() }
       }
 
-  val fabBottomPadding =
-      remember(
-          bottomPaddingDp,
-          contentPadding,
-      ) {
-        bottomPaddingDp + contentPadding
-      }
-
   Box(
       modifier = modifier,
       contentAlignment = Alignment.BottomCenter,
@@ -158,11 +150,8 @@ private fun <T : Any> Content(
     }
 
     NewTickerFab(
+        modifier = Modifier.navigationBarsPadding().padding(bottom = bottomPaddingDp / 2),
         visible = !isLoading,
-        modifier =
-            Modifier.padding(MaterialTheme.keylines.baseline)
-                .navigationBarsPadding()
-                .padding(bottom = fabBottomPadding),
         onClick = onFabClick,
     )
   }
@@ -264,11 +253,7 @@ private fun <T : Any> ListSection(
           modifier =
               Modifier.padding(scaffoldPaddingValues)
                   .navigationBarsPadding()
-                  .height(
-                      navBarBottomHeight +
-                          FabDefaults.FAB_OFFSET_DP +
-                          (MaterialTheme.keylines.content * 2),
-                  ),
+                  .height(navBarBottomHeight + FabDefaults.FAB_OFFSET_DP),
       )
     }
   }

@@ -193,6 +193,7 @@ private fun ActionButton(
     ) {
       FloatingActionButton(
           backgroundColor = MaterialTheme.colors.primary,
+          contentColor = Color.White,
           onClick = { onActionSelected(page) },
       ) {
         Icon(

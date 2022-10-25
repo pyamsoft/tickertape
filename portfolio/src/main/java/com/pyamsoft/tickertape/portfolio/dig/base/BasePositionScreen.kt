@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -116,6 +117,8 @@ private fun PositionsAdd(
   ) {
     Box {
       FloatingActionButton(
+          backgroundColor = MaterialTheme.colors.secondary,
+          contentColor = Color.White,
           onClick = onClick,
       ) {
         Icon(

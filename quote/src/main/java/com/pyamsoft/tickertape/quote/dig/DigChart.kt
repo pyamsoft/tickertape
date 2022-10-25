@@ -81,7 +81,7 @@ fun DigChart(
             modifier = Modifier.fillMaxWidth(),
         ) {
           Chart(
-              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.getChartHeight()),
+              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.rememberChartHeight()),
               chart = chart,
               onScrub = onScrub,
           )

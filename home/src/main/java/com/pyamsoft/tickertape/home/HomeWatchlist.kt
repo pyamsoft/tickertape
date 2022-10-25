@@ -140,7 +140,7 @@ private fun TickerList(
       // We can assume here the chart is not null
       HomeWatchlistItem(
           modifier =
-              Modifier.width(HomeScreenDefaults.getItemWidth()).run {
+              Modifier.width(HomeScreenDefaults.rememberItemWidth()).run {
                 when (index) {
                   0 -> padding(start = MaterialTheme.keylines.content)
                   tickers.lastIndex -> padding(end = MaterialTheme.keylines.content)

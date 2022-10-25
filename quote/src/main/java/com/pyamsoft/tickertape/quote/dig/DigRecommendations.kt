@@ -112,7 +112,7 @@ private fun RecommendationItem(
                 Modifier.fillMaxWidth()
                     .padding(top = MaterialTheme.keylines.content)
                     .padding(bottom = MaterialTheme.keylines.baseline)
-                    .height(DigDefaults.getChartHeight()),
+                    .height(DigDefaults.rememberChartHeight()),
             chart = chart,
         )
       }

@@ -31,11 +31,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
@@ -51,9 +50,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.ui.FabDefaults
@@ -106,6 +107,13 @@ internal fun MainBottomNav(
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
+      val color = MaterialTheme.colors.onBackground
+
+      Divider(
+          color = color.copy(alpha = ContentAlpha.disabled),
+          thickness = 2.dp,
+      )
+
       // Can't use BottomAppBar since we can't modify its Shape
       Surface(
           modifier =
@@ -113,14 +121,10 @@ internal fun MainBottomNav(
                 onHeightMeasured(it.height + additionalTopContentPadding)
                 setFabOffset(it.height / 2)
               },
-          contentColor = MaterialTheme.colors.onSurface,
-          color = MaterialTheme.colors.surface,
-          shape =
-              MaterialTheme.shapes.medium.copy(
-                  bottomEnd = ZeroCornerSize,
-                  bottomStart = ZeroCornerSize,
-              ),
-          elevation = AppBarDefaults.BottomAppBarElevation,
+          contentColor = color.copy(alpha = ContentAlpha.medium),
+          color = MaterialTheme.colors.background,
+          shape = RectangleShape,
+          elevation = ZeroElevation,
       ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -224,14 +228,14 @@ private fun RowScope.Item(
 
   val isSelected = remember(current, target) { current == target }
 
+  val currentColor = LocalContentColor.current
   val colors = MaterialTheme.colors
-  val mediumAlpha = ContentAlpha.medium
   val highAlpha = ContentAlpha.high
   val color =
       remember(
+          currentColor,
           isSelected,
           colors,
-          mediumAlpha,
           highAlpha,
       ) {
         if (isSelected) {
@@ -239,9 +243,7 @@ private fun RowScope.Item(
               alpha = highAlpha,
           )
         } else {
-          colors.onSurface.copy(
-              alpha = mediumAlpha,
-          )
+          currentColor
         }
       }
 

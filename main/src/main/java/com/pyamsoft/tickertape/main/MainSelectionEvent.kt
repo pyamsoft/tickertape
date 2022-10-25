@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.ui
+package com.pyamsoft.tickertape.main
 
-import android.app.Activity
-import com.pyamsoft.pydroid.ui.theme.ThemeProvider
-import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.core.ActivityScope
-import dagger.Module
-import dagger.Provides
-
-@Module
-object ThemeProviderModule {
-
-  @Provides
-  @JvmStatic
-  @ActivityScope
-  fun provideThemeProvider(activity: Activity, theming: Theming): ThemeProvider {
-    return ThemeProvider { theming.isDarkTheme(activity) }
-  }
-}
+data class MainSelectionEvent(
+    val page: TopLevelMainPage,
+)

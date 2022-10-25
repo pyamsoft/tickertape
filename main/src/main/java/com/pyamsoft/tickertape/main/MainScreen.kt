@@ -32,6 +32,7 @@ fun MainScreen(
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
+    onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
   Column(
       modifier = modifier,
@@ -44,6 +45,7 @@ fun MainScreen(
         onLoadWatchlist = onLoadWatchlist,
         onLoadPortfolio = onLoadPortfolio,
         onHeightMeasured = onBottomBarHeightMeasured,
+        onActionSelected = onActionSelected,
     )
   }
 }
@@ -57,5 +59,6 @@ private fun PreviewMainScreen() {
       onLoadHome = {},
       onLoadWatchlist = {},
       onLoadPortfolio = {},
+      onActionSelected = {},
   )
 }

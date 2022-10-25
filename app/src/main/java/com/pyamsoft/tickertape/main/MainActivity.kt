@@ -46,10 +46,10 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : PYDroidActivity() {
 
@@ -71,6 +71,15 @@ internal class MainActivity : PYDroidActivity() {
     lifecycleScope.launch(context = Dispatchers.Main) {
       alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
     }
+  }
+
+  private fun handleMainActionSelected(page: TopLevelMainPage) {
+    viewModel
+        .requireNotNull()
+        .handleMainActionSelected(
+            scope = lifecycleScope,
+            page = page,
+        )
   }
 
   private inline fun <T : Any> retrieveFromIntent(key: String, cast: (String) -> T): T? {
@@ -185,6 +194,7 @@ internal class MainActivity : PYDroidActivity() {
                   onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
                   onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
                   onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                  onActionSelected = { handleMainActionSelected(it) },
               )
             }
           }

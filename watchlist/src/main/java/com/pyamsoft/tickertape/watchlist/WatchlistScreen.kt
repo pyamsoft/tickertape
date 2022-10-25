@@ -29,7 +29,6 @@ fun WatchlistScreen(
     onDeleteTicker: (Ticker) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   BaseListScreen(
@@ -44,7 +43,6 @@ fun WatchlistScreen(
       onRefresh = onRefresh,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
-      onFabClick = onFabClick,
       onRegenerateList = onRegenerateList,
       itemKey = { index, stock -> "${stock.symbol.raw}-${index}" },
       renderListItem = { stock ->
@@ -96,7 +94,6 @@ private fun PreviewWatchlistScreen() {
       onSelectTicker = {},
       onSearchChanged = {},
       onTabUpdated = {},
-      onFabClick = {},
       onRegenerateList = {},
   )
 }

@@ -123,7 +123,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                   onDelete = { handleDeleteStock(it) },
                   onSearchChanged = { vm.handleSearch(it) },
                   onTabUpdated = { vm.handleSectionChanged(it) },
-                  onFabClick = { handleFabClicked() },
                   onRegenerateList = { vm.handleRegenerateList(this) },
               )
             }
@@ -137,7 +136,10 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     super.onViewCreated(view, savedInstanceState)
     viewModel.requireNotNull().also { vm ->
       vm.restoreState(savedInstanceState)
-      vm.bind(scope = viewLifecycleOwner.lifecycleScope)
+      vm.bind(
+          scope = viewLifecycleOwner.lifecycleScope,
+          onMainSelectionEvent = { handleFabClicked() },
+      )
     }
     mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }

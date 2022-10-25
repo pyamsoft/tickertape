@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -64,6 +65,7 @@ internal fun MainBottomNav(
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
     onHeightMeasured: (Int) -> Unit,
+    onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
   // Additional padding when taking into account the "height" of the bar
   //
@@ -89,8 +91,13 @@ internal fun MainBottomNav(
         density.run { fabOffset.toDp() }
       }
 
+  // We set the height here to the size of the bar (which is also FAB_SIZE_DP) + the size of the
+  // button when it peeks outside of the bar (FAB_SIZE_DP / 2)
+  //
+  // Failing to set the height here will make the bar jump up and down when the page scrolls from
+  // no-show-fab to show-fab
   Box(
-      modifier = modifier,
+      modifier = modifier.height(FabDefaults.FAB_SIZE_DP + FabDefaults.FAB_SIZE_DP / 2),
       contentAlignment = Alignment.BottomEnd,
   ) {
     Column(
@@ -159,6 +166,7 @@ internal fun MainBottomNav(
                 .padding(bottom = fabOffsetDp)
                 .width(FabDefaults.FAB_SIZE_DP),
         page = page,
+        onActionSelected = onActionSelected,
     )
   }
 }
@@ -167,6 +175,7 @@ internal fun MainBottomNav(
 private fun ActionButton(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
+    onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
   Box(
       modifier = modifier,
@@ -176,7 +185,7 @@ private fun ActionButton(
     ) {
       FloatingActionButton(
           backgroundColor = MaterialTheme.colors.primary,
-          onClick = {},
+          onClick = { onActionSelected(page) },
       ) {
         Icon(
             imageVector = Icons.Filled.Add,
@@ -262,5 +271,6 @@ private fun PreviewMainBottomNav() {
       onLoadHome = {},
       onLoadWatchlist = {},
       onLoadPortfolio = {},
+      onActionSelected = {},
   )
 }

@@ -21,18 +21,21 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.symbol.SymbolChangeEvent
+import com.pyamsoft.tickertape.main.MainSelectionEvent
+import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class WatchlistViewModeler
 @Inject
@@ -40,6 +43,7 @@ internal constructor(
     private val state: MutableWatchlistViewState,
     private val interactor: WatchlistInteractor,
     private val interactorCache: WatchlistInteractor.Cache,
+    private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
 ) : AbstractViewModeler<WatchlistViewState>(state) {
 
   private val quoteFetcher =
@@ -175,9 +179,20 @@ internal constructor(
     }
   }
 
-  fun bind(scope: CoroutineScope) {
+  fun bind(
+      scope: CoroutineScope,
+      onMainSelectionEvent: () -> Unit,
+  ) {
     scope.launch(context = Dispatchers.Main) {
       interactor.listenForChanges { handleRealtimeEvent(it) }
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      mainSelectionConsumer.onEvent { event ->
+        if (event.page == TopLevelMainPage.Watchlist) {
+          onMainSelectionEvent()
+        }
+      }
     }
   }
 

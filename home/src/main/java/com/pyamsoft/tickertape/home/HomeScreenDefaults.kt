@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.home
 
+import android.content.res.Configuration
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
@@ -11,16 +12,28 @@ internal object HomeScreenDefaults {
   @JvmStatic
   @Composable
   @CheckResult
-  fun getItemWidth(fraction: Float = 0.9F): Dp {
+  fun getItemWidth(): Dp {
     val configuration = LocalConfiguration.current
-    return configuration.screenWidthDp.dp * fraction
+    return if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+      // Almost the whole screen in portrait
+      configuration.screenWidthDp.dp * 0.9F
+    } else {
+      // Slightly more than half screen in landscape
+      configuration.screenWidthDp.dp * 0.6F
+    }
   }
 
   @JvmStatic
   @Composable
   @CheckResult
-  fun getChartHeight(fraction: Float = 0.25F): Dp {
+  fun getChartHeight(): Dp {
     val configuration = LocalConfiguration.current
-    return configuration.screenHeightDp.dp * fraction
+    return if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+      // One fourth the screen in portrait
+      configuration.screenHeightDp.dp * 0.25F
+    } else {
+      // Slightly less than half screen in landscape
+      configuration.screenHeightDp.dp * 0.45F
+    }
   }
 }

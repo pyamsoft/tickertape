@@ -31,7 +31,6 @@ fun PortfolioScreen(
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   BaseListScreen(
@@ -46,7 +45,6 @@ fun PortfolioScreen(
       onRefresh = onRefresh,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
-      onFabClick = onFabClick,
       onRegenerateList = onRegenerateList,
       itemKey = { index, stock -> "${stock.holding.symbol.raw}-${index}" },
       renderHeader = {
@@ -125,7 +123,6 @@ private fun PreviewPortfolioScreen() {
       onSelect = {},
       onSearchChanged = {},
       onTabUpdated = {},
-      onFabClick = {},
       onRegenerateList = {},
   )
 }

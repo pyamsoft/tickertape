@@ -20,7 +20,11 @@ import android.app.Activity
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
+import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModeler
@@ -28,6 +32,7 @@ class MainViewModeler
 internal constructor(
     private val state: MutableMainViewState,
     private val theming: Theming,
+    private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
 ) : AbstractViewModeler<MainViewState>(state) {
 
   fun handleMeasureBottomNavHeight(height: Int) {
@@ -37,6 +42,12 @@ internal constructor(
   fun handleSyncDarkTheme(activity: Activity) {
     val isDark = theming.isDarkTheme(activity)
     state.theme = if (isDark) Theming.Mode.DARK else Theming.Mode.LIGHT
+  }
+
+  fun handleMainActionSelected(scope: CoroutineScope, page: TopLevelMainPage) {
+    scope.launch(context = Dispatchers.Main) {
+      mainActionSelectionBus.send(MainSelectionEvent(page = page))
+    }
   }
 
   override fun saveState(outState: UiSavedStateWriter) {

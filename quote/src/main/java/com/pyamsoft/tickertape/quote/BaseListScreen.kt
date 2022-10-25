@@ -31,7 +31,6 @@ import coil.ImageLoader
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.quote.add.NewTickerFab
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
@@ -52,7 +51,6 @@ fun <T : Any> BaseListScreen(
     onRefresh: () -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
     renderHeader: (@Composable () -> Unit)? = null,
@@ -74,7 +72,6 @@ fun <T : Any> BaseListScreen(
         onRefresh = onRefresh,
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
-        onFabClick = onFabClick,
         onRegenerateList = onRegenerateList,
         itemKey = itemKey,
         renderHeader = renderHeader,
@@ -102,7 +99,6 @@ private fun <T : Any> Content(
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onFabClick: () -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
     itemKey: (Int, T) -> String,
     renderEmptyState: @Composable () -> Unit,
@@ -110,8 +106,6 @@ private fun <T : Any> Content(
     renderListItem: @Composable (T) -> Unit,
 ) {
   val density = LocalDensity.current
-
-  val contentPadding = MaterialTheme.keylines.content
 
   val bottomPaddingDp =
       remember(
@@ -148,12 +142,6 @@ private fun <T : Any> Content(
           tab = tab,
       )
     }
-
-    NewTickerFab(
-        modifier = Modifier.navigationBarsPadding().padding(bottom = bottomPaddingDp / 2),
-        visible = !isLoading,
-        onClick = onFabClick,
-    )
   }
 }
 
@@ -307,7 +295,6 @@ private fun PreviewBaseListScreen() {
       onRefresh = {},
       onSearchChanged = {},
       onTabUpdated = {},
-      onFabClick = {},
       onRegenerateList = {},
       pageError = null,
       list = emptyList(),

@@ -21,6 +21,7 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
 import com.pyamsoft.pydroid.util.ifNotCancellation
@@ -29,13 +30,15 @@ import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
+import com.pyamsoft.tickertape.main.MainSelectionEvent
+import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -43,6 +46,7 @@ internal constructor(
     private val state: MutablePortfolioViewState,
     private val interactor: PortfolioInteractor,
     private val interactorCache: PortfolioInteractor.Cache,
+    private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
 ) : AbstractViewModeler<PortfolioViewState>(state) {
 
   private val portfolioFetcher =
@@ -216,7 +220,10 @@ internal constructor(
     }
   }
 
-  fun bind(scope: CoroutineScope) {
+  fun bind(
+      scope: CoroutineScope,
+      onMainSelectionEvent: () -> Unit,
+  ) {
     scope.launch(context = Dispatchers.Main) {
       interactor.listenForHoldingChanges { handleHoldingRealtimeEvent(it) }
     }
@@ -227,6 +234,14 @@ internal constructor(
 
     scope.launch(context = Dispatchers.Main) {
       interactor.listenForSplitChanges { handleSplitRealtimeEvent(it) }
+    }
+
+    scope.launch(context = Dispatchers.Main) {
+      mainSelectionConsumer.onEvent { event ->
+        if (event.page == TopLevelMainPage.Portfolio) {
+          onMainSelectionEvent()
+        }
+      }
     }
   }
 

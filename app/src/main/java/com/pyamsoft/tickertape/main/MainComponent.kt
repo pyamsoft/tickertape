@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
 import androidx.annotation.IdRes
+import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
@@ -32,6 +34,7 @@ import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
 
 @ActivityScope
@@ -74,5 +77,23 @@ internal interface MainComponent {
     @Binds
     @CheckResult
     internal abstract fun bindBackstackNavigator(impl: MainNavigator): BackstackNavigator<MainPage>
+
+    @Binds
+    @CheckResult
+    internal abstract fun bindMainSelectionEventConsumer(
+        bus: EventBus<MainSelectionEvent>
+    ): EventConsumer<MainSelectionEvent>
+
+    @Module
+    companion object {
+
+      @Provides
+      @JvmStatic
+      @CheckResult
+      @ActivityScope
+      internal fun provideMainSelectionEventBus(): EventBus<MainSelectionEvent> {
+        return EventBus.create()
+      }
+    }
   }
 }

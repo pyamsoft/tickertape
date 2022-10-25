@@ -47,8 +47,8 @@ import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
@@ -131,7 +131,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                   onDeleteTicker = { handleDeleteTicker(it) },
                   onSearchChanged = { vm.handleSearch(it) },
                   onTabUpdated = { vm.handleSectionChanged(it) },
-                  onFabClick = { handleFabClicked() },
                   onSelectTicker = { handleOpenDigDialog(it) },
                   onRegenerateList = { vm.handleRegenerateList(this) },
               )
@@ -146,7 +145,10 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     super.onViewCreated(view, savedInstanceState)
     viewModel.requireNotNull().also { vm ->
       vm.restoreState(savedInstanceState)
-      vm.bind(scope = viewLifecycleOwner.lifecycleScope)
+      vm.bind(
+          scope = viewLifecycleOwner.lifecycleScope,
+          onMainSelectionEvent = { handleFabClicked() },
+      )
     }
     mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }

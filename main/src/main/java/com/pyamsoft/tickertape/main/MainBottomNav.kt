@@ -185,11 +185,15 @@ private fun ActionButton(
     page: TopLevelMainPage,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
+
+  val isFabVisible =
+      remember(page) { page == TopLevelMainPage.Portfolio || page == TopLevelMainPage.Watchlist }
+
   Box(
       modifier = modifier,
   ) {
     AnimatedVisibility(
-        visible = page.showFab,
+        visible = isFabVisible,
         // Normal FAB animation
         // https://stackoverflow.com/questions/71141501/cant-animate-fab-visible-in-m3-scaffold
         enter = scaleIn(),

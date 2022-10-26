@@ -20,11 +20,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventBus
-import java.time.DayOfWeek
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -54,10 +50,11 @@ internal constructor(
               }
             }
 
-        // If its market time or the client has passed alwaysStart flag
-        val canStart = options?.alwaysStart == true || itsMarketTime()
-
-        if (preferences.listenForTapeNotificationChanged().first() && canStart) {
+        if (preferences.listenForTapeNotificationChanged().first()) {
+          // If the market is not open, the notification will show different content
+          // But we keep this foreground service alive as long as the preference is not switched
+          // because
+          // we want the app to start FGS loaded
           Timber.d("Starting tape notification")
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             appContext.startForegroundService(service)
@@ -71,55 +68,10 @@ internal constructor(
         }
       }
 
-  companion object {
-
-    @CheckResult
-    private fun ZonedDateTime.cleanTimeTo(hour: Int, minute: Int? = null): ZonedDateTime {
-      return this.withHour(hour).withSecond(0).withNano(0).run {
-        if (minute != null) {
-          withMinute(minute)
-        } else {
-          withMinute(0)
-        }
-      }
-    }
-
-    @CheckResult
-    private fun DayOfWeek.isWeekend(): Boolean {
-      return this == DayOfWeek.SATURDAY || this == DayOfWeek.SUNDAY
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun itsMarketTime(): Boolean {
-      // NYSE decides if the market is "open"
-      val marketTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
-
-      // Weekend, no market
-      if (marketTime.dayOfWeek.isWeekend()) {
-        return false
-      }
-
-      val marketOpen = marketTime.cleanTimeTo(9, 30)
-      if (marketTime.isBefore(marketOpen)) {
-        return false
-      }
-
-      val marketClose = marketTime.cleanTimeTo(12 + 4)
-      if (marketTime.isAfter(marketClose)) {
-        return false
-      }
-
-      // TODO closed on holidays
-      return true
-    }
-  }
-
   data class Options
   @JvmOverloads
   constructor(
       val index: Int? = null,
       val forceRefresh: Boolean? = null,
-      val alwaysStart: Boolean? = null,
   )
 }

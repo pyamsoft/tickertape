@@ -2,13 +2,9 @@ package com.pyamsoft.tickertape.quote.dig.statistics
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.stocks.parseUTCDate
 
 internal fun LazyListScope.renderFinancialHighlights(
     statistics: KeyStatistics,
@@ -349,8 +345,6 @@ private fun LazyListScope.renderValuationMeasures(
 private fun LazyListScope.renderFiscalYear(
     info: KeyStatistics.Info,
 ) {
-  val formatter = DATE_FORMATTER.get().requireNotNull()
-
   item {
     StatisticsTitle(
         modifier = Modifier.fillMaxWidth(),
@@ -360,39 +354,30 @@ private fun LazyListScope.renderFiscalYear(
 
   if (!info.lastFiscalYearEnd.isEmpty) {
     item {
-      val parsedTime =
-          remember(info.lastFiscalYearEnd.raw) { parseUTCDate(info.lastFiscalYearEnd.raw) }
-
       StatisticsItem(
           modifier = Modifier.fillMaxWidth(),
           title = "Previous Fiscal Year",
-          content = parsedTime.format(formatter),
+          content = rememberParsedDate(info.lastFiscalYearEnd),
       )
     }
   }
 
   if (!info.nextFiscalYearEnd.isEmpty) {
     item {
-      val parsedTime =
-          remember(info.nextFiscalYearEnd.raw) { parseUTCDate(info.nextFiscalYearEnd.raw) }
-
       StatisticsItem(
           modifier = Modifier.fillMaxWidth(),
           title = "Fiscal Year Ends",
-          content = parsedTime.format(formatter),
+          content = rememberParsedDate(info.nextFiscalYearEnd),
       )
     }
   }
 
   if (!info.mostRecentQuarter.isEmpty) {
     item {
-      val parsedTime =
-          remember(info.mostRecentQuarter.raw) { parseUTCDate(info.mostRecentQuarter.raw) }
-
       StatisticsItem(
           modifier = Modifier.fillMaxWidth(),
           title = "Most Recent Quarter",
-          content = parsedTime.format(formatter),
+          content = rememberParsedDate(info.mostRecentQuarter),
       )
     }
   }

@@ -25,12 +25,21 @@ import kotlin.math.abs
 internal data class StockPercentImpl(
     override val value: Double,
     override val isValid: Boolean,
+    private val isPercentageOutOfHundred: Boolean,
 ) : StockPercent {
 
   private val stockPercent by
       lazy(LazyThreadSafetyMode.NONE) {
         // Use abs() because the sign will be determined by StockDirection
-        if (isZero) "0.00%" else PERCENT_FORMATTER.get().requireNotNull().format(abs(value) / 100)
+        val v = abs(value)
+        // If this percentage is out of 100, like 1.5% being 1.53 instead of 0.0153, divide by 100
+        val divisor = if (isPercentageOutOfHundred) 100 else 1
+
+        return@lazy if (isZero) "0.00%"
+        else {
+          val formatter = PERCENT_FORMATTER.get().requireNotNull()
+          formatter.format(v / divisor)
+        }
       }
 
   override val isZero: Boolean = value.isZero()

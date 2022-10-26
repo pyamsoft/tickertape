@@ -47,6 +47,10 @@ interface StockQuote : BaseStockQuote {
     // Market cap
     @get:CheckResult val marketCap: StockMarketCap?
 
+    // Dividend and split
+    @get:CheckResult val trailingAnnualDividendRate: Double?
+    @get:CheckResult val trailingAnnualDividendYield: StockPercent?
+
     companion object {
 
       @JvmStatic
@@ -69,6 +73,8 @@ interface StockQuote : BaseStockQuote {
           override val twoHundredDayAverageChange: StockMoneyValue? = null
           override val twoHundredDayAveragePercent: StockPercent? = null
           override val marketCap: StockMarketCap? = null
+          override val trailingAnnualDividendRate: Double? = null
+          override val trailingAnnualDividendYield: StockPercent? = null
         }
       }
 
@@ -91,6 +97,8 @@ interface StockQuote : BaseStockQuote {
           twoHundredDayAverageChange: StockMoneyValue?,
           twoHundredDayAveragePercent: StockPercent?,
           marketCap: StockMarketCap?,
+          trailingAnnualDividendRate: Double?,
+          trailingAnnualDividendYield: StockPercent?,
       ): Details {
         return StockQuoteImpl.StockQuoteDetailsImpl(
             averageDailyVolume3Month,
@@ -109,6 +117,8 @@ interface StockQuote : BaseStockQuote {
             twoHundredDayAverageChange,
             twoHundredDayAveragePercent,
             marketCap,
+            trailingAnnualDividendRate,
+            trailingAnnualDividendYield,
         )
       }
     }

@@ -78,6 +78,9 @@ internal data class NetworkQuoteResponse internal constructor(val quoteResponse:
         val twoHundredDayAveragePercent: Double?,
         // Market Cap
         val marketCap: Long?,
+        // Dividends and Splits
+        val trailingAnnualDividendRate: Double?,
+        val trailingAnnualDividendYield: Double?,
     ) {
 
       val name = shortName ?: longName

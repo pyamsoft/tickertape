@@ -64,5 +64,8 @@ internal data class StockQuoteImpl(
       override val twoHundredDayAveragePercent: StockPercent?,
       // Market Cap
       override val marketCap: StockMarketCap?,
+      // Dividends and Splits
+      override val trailingAnnualDividendRate: Double?,
+      override val trailingAnnualDividendYield: StockPercent?,
   ) : StockQuote.Details
 }

@@ -158,6 +158,15 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
           twoHundredDayAverageChange = stock.twoHundredDayAverageChange?.asMoney(),
           twoHundredDayAveragePercent = stock.twoHundredDayAveragePercent?.asPercent(),
           marketCap = stock.marketCap?.asMarketCap(),
+          trailingAnnualDividendRate = stock.trailingAnnualDividendRate,
+          trailingAnnualDividendYield =
+              stock.trailingAnnualDividendYield?.asPercent(
+                  // https://query1.finance.yahoo.com/v7/finance/quote?symbols=MSFT
+                  //
+                  // This comes as a float like 0.01003, but is meant to be 1%.
+                  // Multiply it by 100 to get the "expected" percentage
+                  isPercentageOutOfHundred = false,
+              ),
       )
     }
 
@@ -261,6 +270,9 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
                 "twoHundredDayAveragePercent",
                 // Market Cap
                 "marketCap",
+                // Dividends and Splits
+                "trailingAnnualDividendRate",
+                "trailingAnnualDividendYield",
             )
             .joinToString(",")
   }

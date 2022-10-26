@@ -174,6 +174,8 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val revenueAverage: KeyStatistics.DataPoint<Long>,
         override val revenueHigh: KeyStatistics.DataPoint<Long>,
         override val revenueLow: KeyStatistics.DataPoint<Long>,
+        override val exDividendDate: KeyStatistics.DataPoint<Long>,
+        override val dividendDate: KeyStatistics.DataPoint<Long>,
     ) : KeyStatistics.Earnings
 
     @CheckResult
@@ -200,18 +202,25 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
     @JvmStatic
     @CheckResult
     private fun createEarnings(response: NetworkKeyStatisticsResponse): KeyStatistics.Earnings? {
-      val earnings = response.getData().calendarEvents?.earnings
-      return if (earnings == null) null
-      else {
-        YFEarnings(
-            earningsDate = earnings.earningsDate?.firstOrNull().asLongDataPoint(),
-            earningsAverage = earnings.earningsAverage.asDoubleDataPoint(),
-            earningsLow = earnings.earningsLow.asDoubleDataPoint(),
-            earningsHigh = earnings.earningsHigh.asDoubleDataPoint(),
-            revenueAverage = earnings.revenueAverage.asLongDataPoint(),
-            revenueLow = earnings.revenueLow.asLongDataPoint(),
-            revenueHigh = earnings.revenueHigh.asLongDataPoint(),
-        )
+      val calendarEvents = response.getData().calendarEvents
+      if (calendarEvents == null) {
+        return null
+      } else {
+        val earnings = calendarEvents.earnings
+        return if (earnings == null) null
+        else {
+          YFEarnings(
+              earningsDate = earnings.earningsDate?.firstOrNull().asLongDataPoint(),
+              earningsAverage = earnings.earningsAverage.asDoubleDataPoint(),
+              earningsLow = earnings.earningsLow.asDoubleDataPoint(),
+              earningsHigh = earnings.earningsHigh.asDoubleDataPoint(),
+              revenueAverage = earnings.revenueAverage.asLongDataPoint(),
+              revenueLow = earnings.revenueLow.asLongDataPoint(),
+              revenueHigh = earnings.revenueHigh.asLongDataPoint(),
+              exDividendDate = calendarEvents.exDividendDate.asLongDataPoint(),
+              dividendDate = calendarEvents.dividendDate.asLongDataPoint(),
+          )
+        }
       }
     }
 
@@ -312,6 +321,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         override val bookValue: KeyStatistics.DataPoint<Double>,
         override val fiftyTwoWeekChange: KeyStatistics.DataPoint<Double>,
         override val marketFiftyTwoWeekChange: KeyStatistics.DataPoint<Double>,
+        override val lastSplitFactor: String,
     ) : KeyStatistics.Info
 
     @JvmStatic
@@ -347,6 +357,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
             forwardPE = data.forwardPE.asDoubleDataPoint(),
             fiftyTwoWeekChange = data.fiftyTwoWeekChange.asDoubleDataPoint(),
             marketFiftyTwoWeekChange = data.marketFiftyTwoWeekChange.asDoubleDataPoint(),
+            lastSplitFactor = data.lastSplitFactor.orEmpty().trim(),
         )
       }
     }

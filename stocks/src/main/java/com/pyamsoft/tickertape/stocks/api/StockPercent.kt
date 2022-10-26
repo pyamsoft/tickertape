@@ -31,14 +31,21 @@ interface StockPercent : StockDoubleValue {
         StockPercentImpl(
             value = 0.0,
             isValid = false,
+            isPercentageOutOfHundred = false,
         )
   }
 }
 
+/**
+ * Treat double as percent
+ * @param isPercentageOutOfHundred If this percentage is out of 100, like 1.5% being 1.53 instead of
+ * 0.0153, divide by 100
+ */
 @CheckResult
-fun Double.asPercent(): StockPercent {
+fun Double.asPercent(isPercentageOutOfHundred: Boolean = true): StockPercent {
   return StockPercentImpl(
       value = this,
       isValid = true,
+      isPercentageOutOfHundred = isPercentageOutOfHundred,
   )
 }

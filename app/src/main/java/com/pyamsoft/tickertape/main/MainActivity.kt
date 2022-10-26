@@ -35,21 +35,14 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
-import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
-import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.tape.TapeLauncher
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class MainActivity : PYDroidActivity() {
 
@@ -60,18 +53,9 @@ internal class MainActivity : PYDroidActivity() {
   private var viewBinding: ActivityMainBinding? = null
   private var injector: MainComponent? = null
 
+  @JvmField @Inject internal var launcher: MainAlarmLauncher? = null
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
-  @JvmField @Inject internal var notificationCanceller: NotificationCanceller? = null
-  @JvmField @Inject internal var tapeLauncher: TapeLauncher? = null
-  @JvmField @Inject internal var alerter: Alerter? = null
-  @JvmField @Inject internal var alarmFactory: AlarmFactory? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
-
-  private fun beginWork() {
-    lifecycleScope.launch(context = Dispatchers.Main) {
-      alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
-    }
-  }
 
   private fun handleMainActionSelected(page: TopLevelMainPage) {
     viewModel
@@ -82,7 +66,10 @@ internal class MainActivity : PYDroidActivity() {
         )
   }
 
-  private inline fun <T : Any> retrieveFromIntent(key: String, cast: (String) -> T): T? {
+  private inline fun <T : Any> retrieveFromIntent(
+      key: String,
+      cast: (String) -> T,
+  ): T? {
     val launchIntent = intent
     if (launchIntent == null) {
       Timber.w("Missing launch intent")
@@ -123,7 +110,7 @@ internal class MainActivity : PYDroidActivity() {
     }
 
     Timber.d("Launch intent with symbol: $symbol")
-    notificationCanceller.requireNotNull().cancelBigMoverNotification(symbol)
+    launcher.requireNotNull().cancelNotifications(symbol)
 
     navigator
         .requireNotNull()
@@ -163,7 +150,6 @@ internal class MainActivity : PYDroidActivity() {
     super.onCreate(savedInstanceState)
     stableLayoutHideNavigation()
 
-    beginWork()
     handleLaunchIntent()
 
     // Snackbar respects window offsets and hosts snackbar composables
@@ -206,13 +192,13 @@ internal class MainActivity : PYDroidActivity() {
 
     navi.restoreState(savedInstanceState)
     navi.loadIfEmpty { TopLevelMainPage.Home }
-  }
 
-  override fun onStart() {
-    super.onStart()
-
-    // Refreshes on every start and launches on initial
-    lifecycleScope.launch(context = Dispatchers.Main) { tapeLauncher.requireNotNull().start() }
+    launcher
+        .requireNotNull()
+        .bind(
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+        )
   }
 
   override fun onResume() {
@@ -253,12 +239,8 @@ internal class MainActivity : PYDroidActivity() {
     viewBinding?.apply { this.mainComposeBottom.dispose() }
     viewBinding = null
 
-    notificationCanceller = null
-    alarmFactory = null
-    alerter = null
-    notificationCanceller = null
+    launcher = null
     navigator = null
-    tapeLauncher = null
     viewModel = null
     injector = null
   }

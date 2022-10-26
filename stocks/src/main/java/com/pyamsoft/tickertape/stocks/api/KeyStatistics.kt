@@ -34,33 +34,33 @@ interface KeyStatistics {
   @CheckResult fun withQuote(quote: StockQuote?): KeyStatistics
 
   interface Financials {
-    val currentPrice: DataPoint<Double>
-    val targetHighPrice: DataPoint<Double>
-    val targetLowPrice: DataPoint<Double>
-    val targetMeanPrice: DataPoint<Double>
-    val recommendationMean: DataPoint<Double>
-    val numberOfAnalystOpinions: DataPoint<Long>
-    val recommendationKey: Recommendation
-    val profitMargin: DataPoint<Double>
-    val operatingMargin: DataPoint<Double>
-    val ebitdaMargin: DataPoint<Double>
-    val grossMargin: DataPoint<Double>
-    val returnOnAssets: DataPoint<Double>
-    val returnOnEquity: DataPoint<Double>
-    val totalRevenue: DataPoint<Long>
-    val revenuePerShare: DataPoint<Double>
-    val revenueGrowth: DataPoint<Double>
-    val grossProfits: DataPoint<Long>
-    val freeCashflow: DataPoint<Long>
-    val operatingCashflow: DataPoint<Long>
-    val ebitda: DataPoint<Long>
-    val totalDebt: DataPoint<Long>
-    val totalCashPerShare: DataPoint<Double>
-    val quickRatio: DataPoint<Double>
-    val currentRatio: DataPoint<Double>
-    val debtToEquity: DataPoint<Double>
-    val totalCash: DataPoint<Long>
-    val earningsGrowth: DataPoint<Double>
+    @get:CheckResult val currentPrice: DataPoint<Double>
+    @get:CheckResult val targetHighPrice: DataPoint<Double>
+    @get:CheckResult val targetLowPrice: DataPoint<Double>
+    @get:CheckResult val targetMeanPrice: DataPoint<Double>
+    @get:CheckResult val recommendationMean: DataPoint<Double>
+    @get:CheckResult val numberOfAnalystOpinions: DataPoint<Long>
+    @get:CheckResult val recommendationKey: Recommendation
+    @get:CheckResult val profitMargin: DataPoint<Double>
+    @get:CheckResult val operatingMargin: DataPoint<Double>
+    @get:CheckResult val ebitdaMargin: DataPoint<Double>
+    @get:CheckResult val grossMargin: DataPoint<Double>
+    @get:CheckResult val returnOnAssets: DataPoint<Double>
+    @get:CheckResult val returnOnEquity: DataPoint<Double>
+    @get:CheckResult val totalRevenue: DataPoint<Long>
+    @get:CheckResult val revenuePerShare: DataPoint<Double>
+    @get:CheckResult val revenueGrowth: DataPoint<Double>
+    @get:CheckResult val grossProfits: DataPoint<Long>
+    @get:CheckResult val freeCashflow: DataPoint<Long>
+    @get:CheckResult val operatingCashflow: DataPoint<Long>
+    @get:CheckResult val ebitda: DataPoint<Long>
+    @get:CheckResult val totalDebt: DataPoint<Long>
+    @get:CheckResult val totalCashPerShare: DataPoint<Double>
+    @get:CheckResult val quickRatio: DataPoint<Double>
+    @get:CheckResult val currentRatio: DataPoint<Double>
+    @get:CheckResult val debtToEquity: DataPoint<Double>
+    @get:CheckResult val totalCash: DataPoint<Long>
+    @get:CheckResult val earningsGrowth: DataPoint<Double>
 
     enum class Recommendation {
       BUY,
@@ -73,42 +73,45 @@ interface KeyStatistics {
   }
 
   interface Info {
-    val beta: DataPoint<Double>
-    val enterpriseValue: DataPoint<Long>
-    val floatShares: DataPoint<Long>
-    val sharesOutstanding: DataPoint<Long>
-    val sharesShort: DataPoint<Long>
-    val shortRatio: DataPoint<Double>
-    val heldPercentInsiders: DataPoint<Double>
-    val heldPercentInstitutions: DataPoint<Double>
-    val shortPercentOfFloat: DataPoint<Double>
-    val lastFiscalYearEnd: DataPoint<Long>
-    val nextFiscalYearEnd: DataPoint<Long>
-    val mostRecentQuarter: DataPoint<Long>
-    val netIncomeToCommon: DataPoint<Long>
-    val lastSplitDate: DataPoint<Long>
-    val lastDividendValue: DataPoint<Double>
-    val lastDividendDate: DataPoint<Long>
-    val forwardEps: DataPoint<Double>
-    val forwardPE: DataPoint<Double>
-    val trailingEps: DataPoint<Double>
-    val pegRatio: DataPoint<Double>
-    val priceToBook: DataPoint<Double>
-    val bookValue: DataPoint<Double>
-    val enterpriseValueToRevenue: DataPoint<Double>
-    val enterpriseValueToEbitda: DataPoint<Double>
-    val fiftyTwoWeekChange: DataPoint<Double>
-    val marketFiftyTwoWeekChange: DataPoint<Double>
+    @get:CheckResult val beta: DataPoint<Double>
+    @get:CheckResult val enterpriseValue: DataPoint<Long>
+    @get:CheckResult val floatShares: DataPoint<Long>
+    @get:CheckResult val sharesOutstanding: DataPoint<Long>
+    @get:CheckResult val sharesShort: DataPoint<Long>
+    @get:CheckResult val shortRatio: DataPoint<Double>
+    @get:CheckResult val heldPercentInsiders: DataPoint<Double>
+    @get:CheckResult val heldPercentInstitutions: DataPoint<Double>
+    @get:CheckResult val shortPercentOfFloat: DataPoint<Double>
+    @get:CheckResult val lastFiscalYearEnd: DataPoint<Long>
+    @get:CheckResult val nextFiscalYearEnd: DataPoint<Long>
+    @get:CheckResult val mostRecentQuarter: DataPoint<Long>
+    @get:CheckResult val netIncomeToCommon: DataPoint<Long>
+    @get:CheckResult val lastSplitDate: DataPoint<Long>
+    @get:CheckResult val lastSplitFactor: String
+    @get:CheckResult val lastDividendValue: DataPoint<Double>
+    @get:CheckResult val lastDividendDate: DataPoint<Long>
+    @get:CheckResult val forwardEps: DataPoint<Double>
+    @get:CheckResult val forwardPE: DataPoint<Double>
+    @get:CheckResult val trailingEps: DataPoint<Double>
+    @get:CheckResult val pegRatio: DataPoint<Double>
+    @get:CheckResult val priceToBook: DataPoint<Double>
+    @get:CheckResult val bookValue: DataPoint<Double>
+    @get:CheckResult val enterpriseValueToRevenue: DataPoint<Double>
+    @get:CheckResult val enterpriseValueToEbitda: DataPoint<Double>
+    @get:CheckResult val fiftyTwoWeekChange: DataPoint<Double>
+    @get:CheckResult val marketFiftyTwoWeekChange: DataPoint<Double>
   }
 
   interface Earnings {
-    val earningsDate: DataPoint<Long>
-    val earningsAverage: DataPoint<Double>
-    val earningsLow: DataPoint<Double>
-    val earningsHigh: DataPoint<Double>
-    val revenueAverage: DataPoint<Long>
-    val revenueLow: DataPoint<Long>
-    val revenueHigh: DataPoint<Long>
+    @get:CheckResult val earningsDate: DataPoint<Long>
+    @get:CheckResult val earningsAverage: DataPoint<Double>
+    @get:CheckResult val earningsLow: DataPoint<Double>
+    @get:CheckResult val earningsHigh: DataPoint<Double>
+    @get:CheckResult val revenueAverage: DataPoint<Long>
+    @get:CheckResult val revenueLow: DataPoint<Long>
+    @get:CheckResult val revenueHigh: DataPoint<Long>
+    @get:CheckResult val exDividendDate: DataPoint<Long>
+    @get:CheckResult val dividendDate: DataPoint<Long>
   }
 
   interface DataPoint<T : Number> {

@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.quote.dig.statistics
 
+import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
@@ -10,7 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
+import com.pyamsoft.tickertape.stocks.api.KeyStatistics
+import com.pyamsoft.tickertape.stocks.parseUTCDate
 
 @Composable
 internal fun StatisticsTitle(
@@ -62,4 +67,12 @@ internal fun StatisticsItem(
             ),
     )
   }
+}
+
+@Composable
+@CheckResult
+internal fun rememberParsedDate(date: KeyStatistics.DataPoint<Long>): String {
+  val formatter = DATE_FORMATTER.get().requireNotNull()
+  val parsedTime = remember(date.raw) { parseUTCDate(date.raw) }
+  return remember(parsedTime, formatter) { parsedTime.format(formatter) }
 }

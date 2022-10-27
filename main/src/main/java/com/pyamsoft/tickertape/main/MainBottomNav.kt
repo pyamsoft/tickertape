@@ -95,6 +95,10 @@ internal fun MainBottomNav(
         density.run { fabOffset.toDp() }
       }
 
+    // Space on th
+  val fabSpacerModifier =
+      Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
+
   // We set the height here to the size of the bar (which is also FAB_SIZE_DP) + the size of the
   // button when it peeks outside of the bar (FAB_SIZE_DP / 2)
   //
@@ -127,6 +131,7 @@ internal fun MainBottomNav(
           elevation = ZeroElevation,
       ) {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           BottomNavigation(
@@ -153,10 +158,7 @@ internal fun MainBottomNav(
           }
 
           Spacer(
-              modifier =
-                  Modifier.padding(horizontal = MaterialTheme.keylines.content)
-                      .padding(end = MaterialTheme.keylines.content)
-                      .width(FabDefaults.FAB_SIZE_DP),
+              modifier = fabSpacerModifier,
           )
         }
       }
@@ -167,11 +169,7 @@ internal fun MainBottomNav(
 
     // Float on top of the bar
     ActionButton(
-        modifier =
-            Modifier.padding(horizontal = MaterialTheme.keylines.content)
-                .padding(end = MaterialTheme.keylines.content)
-                .padding(bottom = fabOffsetDp)
-                .width(FabDefaults.FAB_SIZE_DP),
+        modifier = fabSpacerModifier.padding(bottom = fabOffsetDp),
         page = page,
         onActionSelected = onActionSelected,
     )

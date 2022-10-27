@@ -53,8 +53,7 @@ internal constructor(
         if (preferences.listenForTapeNotificationChanged().first()) {
           // If the market is not open, the notification will show different content
           // But we keep this foreground service alive as long as the preference is not switched
-          // because
-          // we want the app to start FGS loaded
+          // because we want the app to start FGS loaded
           Timber.d("Starting tape notification")
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             appContext.startForegroundService(service)

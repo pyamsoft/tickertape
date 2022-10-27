@@ -244,7 +244,7 @@ internal constructor(
     val adjustForMargin = 16 * 2
 
     // Minus margin available (guess HACK)
-    val adjustForNotificationShade = 8 * 2
+    val adjustForNotificationShade = 16 * 2
 
     return screenWidth - adjustForMargin - adjustForNotificationShade
   }

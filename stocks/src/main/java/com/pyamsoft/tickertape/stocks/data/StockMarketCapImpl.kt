@@ -59,10 +59,6 @@ internal data class StockMarketCapImpl(
             marketCapUnit = "K"
           }
 
-          if (marketCapUnit == "T") {
-            Timber.d("CAP: $marketCapBig $marketCapFinal")
-          }
-
           // substring(1) removes the $ currency symbol
           // NOTE(Peter): Will this be fucked up with locale currency being different from USD? Oh
           // well

@@ -28,6 +28,7 @@ import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.StockMarket
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,12 +52,16 @@ internal constructor(
       withContext(context = Dispatchers.IO) { stopBus.onEvent { onStop() } }
 
   override fun createNotification(service: Service) {
+    val notification =
+        if (StockMarket.isOpen()) EMPTY_TAPE_NOTIFICATION else TapeNotificationData.Closed
+
     notifier
         .startForeground(
             service = service,
             channelInfo = CHANNEL_INFO,
             id = NOTIFICATION_ID,
-            notification = EMPTY_TAPE_NOTIFICATION)
+            notification = notification,
+        )
         .also { id -> Timber.d("Started foreground notification: $id") }
     return
   }
@@ -89,20 +94,35 @@ internal constructor(
       withContext(context = Dispatchers.Default) {
         Enforcer.assertOffMainThread()
 
-        val force = options.forceRefresh
-        fetchQuotes(force)
-            .onSuccess { quotes ->
-              notifier
-                  .startForeground(
-                      service = service,
-                      id = NOTIFICATION_ID,
-                      channelInfo = CHANNEL_INFO,
-                      notification = TapeNotificationData(quotes = quotes, index = options.index),
-                  )
-                  .also { Timber.d("Update tape notification: $it") }
-            }
-            .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
-            .onFailure { Timber.e(it, "Unable to refresh notification") }
+        if (StockMarket.isOpen()) {
+          notifier
+              .startForeground(
+                  service = service,
+                  id = NOTIFICATION_ID,
+                  channelInfo = CHANNEL_INFO,
+                  notification = TapeNotificationData.Closed,
+              )
+              .also { Timber.d("Update tape notification: $it") }
+        } else {
+          val force = options.forceRefresh
+          fetchQuotes(force)
+              .onSuccess { quotes ->
+                notifier
+                    .startForeground(
+                        service = service,
+                        id = NOTIFICATION_ID,
+                        channelInfo = CHANNEL_INFO,
+                        notification =
+                            TapeNotificationData.Quotes(
+                                quotes = quotes,
+                                index = options.index,
+                            ),
+                    )
+                    .also { Timber.d("Update tape notification: $it") }
+              }
+              .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
+              .onFailure { Timber.e(it, "Unable to refresh notification") }
+        }
 
         // Unit
         return@withContext
@@ -115,7 +135,11 @@ internal constructor(
   companion object {
 
     private val NOTIFICATION_ID = 42069.toNotifyId()
-    private val EMPTY_TAPE_NOTIFICATION = TapeNotificationData(quotes = emptyList(), index = 0)
+    private val EMPTY_TAPE_NOTIFICATION =
+        TapeNotificationData.Quotes(
+            quotes = emptyList(),
+            index = 0,
+        )
 
     private val CHANNEL_INFO =
         NotifyChannelInfo(

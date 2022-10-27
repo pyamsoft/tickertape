@@ -95,9 +95,10 @@ internal fun MainBottomNav(
         density.run { fabOffset.toDp() }
       }
 
-    // Space on th
+  // Space on the bottom bar for the FAB
   val fabSpacerModifier =
-      Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
+      Modifier.padding(horizontal = MaterialTheme.keylines.content)
+          .width(FabDefaults.FAB_SIZE_DP)
 
   // We set the height here to the size of the bar (which is also FAB_SIZE_DP) + the size of the
   // button when it peeks outside of the bar (FAB_SIZE_DP / 2)

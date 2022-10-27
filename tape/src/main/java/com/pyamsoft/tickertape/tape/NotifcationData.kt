@@ -19,5 +19,10 @@ package com.pyamsoft.tickertape.tape
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-data class TapeNotificationData internal constructor(val quotes: List<StockQuote>, val index: Int) :
-    NotifyData
+internal sealed class TapeNotificationData : NotifyData {
+
+  internal data class Quotes internal constructor(val quotes: List<StockQuote>, val index: Int) :
+      TapeNotificationData()
+
+  internal object Closed : TapeNotificationData()
+}

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.tape
 
 import android.app.Service
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.IBinder
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
@@ -118,6 +119,13 @@ class TapeService : Service() {
     serviceScope.cancel()
 
     tapeRemote = null
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+
+    // Update tape notification on config change, but no intent to go off of
+    updateTape(null)
   }
 
   companion object {

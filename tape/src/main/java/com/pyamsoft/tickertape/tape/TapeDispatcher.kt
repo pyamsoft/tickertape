@@ -28,7 +28,6 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.annotation.CheckResult
-import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
@@ -37,7 +36,9 @@ import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Named
@@ -56,6 +57,34 @@ internal constructor(
 
   private val channelCreator by lazy {
     context.applicationContext.getSystemService<NotificationManager>().requireNotNull()
+  }
+
+  private val displayDensity by lazy {
+    val res = context.resources
+    res.displayMetrics.density
+  }
+
+  // The width of a data view in DP
+  private val dataWidthAmount by lazy {
+    val res = context.resources
+    res.getDimension(R.dimen.remote_view_data_width) / displayDensity
+  }
+
+  // The width of a medium data view in DP
+  private val mediumDataWidthAmount by lazy {
+    val res = context.resources
+    res.getDimension(R.dimen.remote_view_data_width_medium) / displayDensity
+  }
+
+  private val largeDataWidthAmount by lazy {
+    val res = context.resources
+    res.getDimension(R.dimen.remote_view_data_width_large) / displayDensity
+  }
+
+  // The width of a data margin in DP
+  private val marginWidthAmount by lazy {
+    val res = context.resources
+    res.getDimension(R.dimen.remote_view_data_margin) / displayDensity
   }
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {
@@ -128,47 +157,6 @@ internal constructor(
     }
   }
 
-  private fun updateTickerInfo(
-      remoteViews: RemoteViews,
-      index: Int,
-      quotes: List<StockQuote>,
-      remoteViewIdGroup: RemoteViewIds
-  ) {
-    val quote = quotes[index]
-    val session = quote.currentSession
-    val percent = session.percent.display
-    val changeAmount = session.amount.display
-    val directionSign = session.direction.sign
-    val color = session.direction.color
-    val priceText = session.price.display
-    val percentText = "(${directionSign}${percent})"
-    val changeText = "$directionSign${changeAmount}"
-
-    remoteViews.setTextViewText(remoteViewIdGroup.symbolViewId, quote.symbol.raw)
-
-    remoteViews.setTextViewText(remoteViewIdGroup.priceViewId, priceText)
-    remoteViews.setTextColor(remoteViewIdGroup.priceViewId, color)
-
-    remoteViews.setTextViewText(remoteViewIdGroup.changeViewId, changeText)
-    remoteViews.setTextColor(remoteViewIdGroup.changeViewId, color)
-
-    remoteViews.setTextViewText(remoteViewIdGroup.percentViewId, percentText)
-    remoteViews.setTextColor(remoteViewIdGroup.percentViewId, color)
-  }
-
-  private fun updateTickers(
-      remoteViews: RemoteViews,
-      quotes: List<StockQuote>,
-      index: Int,
-      pageSize: Int
-  ) {
-    for (loop in 0 until pageSize) {
-      val adjustedIndex = correctIndex(index + loop, quotes.size)
-      val remoteViewIdGroup = remoteViewIds[loop]
-      updateTickerInfo(remoteViews, adjustedIndex, quotes, remoteViewIdGroup)
-    }
-  }
-
   @CheckResult
   private fun generateNotificationAction(
       name: String,
@@ -198,24 +186,123 @@ internal constructor(
   }
 
   @CheckResult
-  private fun hydrateNotification(
+  private fun createBuilderWithRefreshAction(
       channelInfo: NotifyChannelInfo,
-      quotes: List<StockQuote>,
       index: Int
-  ): Notification {
+  ): NotificationCompat.Builder {
     guaranteeNotificationChannelExists(channelInfo)
+    return createNotificationBuilder(channelInfo).apply {
+      val options = PendingIntentOptions(index = index, forceRefresh = true)
+      val pe = getServicePendingIntent(REQUEST_CODE_REFRESH, options)
+      val refreshAction = generateNotificationAction("Refresh", pe)
+      addAction(refreshAction)
+    }
+  }
 
-    val safeIndex: Int
-    val builder =
-        createNotificationBuilder(channelInfo).apply {
-          safeIndex = if (quotes.isEmpty()) index else correctIndex(index, quotes.size)
-          addAction(
-              generateNotificationAction(
-                  "Refresh",
-                  getServicePendingIntent(
-                      REQUEST_CODE_REFRESH,
-                      PendingIntentOptions(index = safeIndex, forceRefresh = true))))
+  private fun addRemoteViewQuoteData(
+      remoteViews: RemoteViews,
+      quote: StockQuote,
+  ) {
+    val session = quote.currentSession
+    val color = session.direction.color
+    val priceText = session.price.display
+
+    val layoutId =
+        when {
+          session.price.isLarge() -> R.layout.remote_view_data_large
+          session.price.isMedium() -> R.layout.remote_view_data_medium
+          else -> R.layout.remote_view_data
         }
+
+    val view = RemoteViews(context.packageName, layoutId)
+    view.setTextViewText(R.id.remote_views_data_symbol, quote.symbol.raw)
+    view.setTextViewText(R.id.remote_views_data_price, priceText)
+    view.setTextColor(R.id.remote_views_data_price, color)
+    remoteViews.addView(R.id.remote_views, view)
+  }
+
+  private fun addRemoteViewSpacer(
+      remoteViews: RemoteViews,
+  ) {
+    val view = RemoteViews(context.packageName, R.layout.remote_view_spacer)
+    remoteViews.addView(R.id.remote_views, view)
+  }
+
+  private fun addRemoteViewMargin(
+      remoteViews: RemoteViews,
+  ) {
+    val view = RemoteViews(context.packageName, R.layout.remote_view_margin)
+    remoteViews.addView(R.id.remote_views, view)
+  }
+
+  @CheckResult
+  private fun getTotalDrawableWidth(): Int {
+    // Total screen width
+    val screenWidth = context.resources.configuration.screenWidthDp
+
+    // Minus margin available (guess HACK)
+    val adjustForMargin = 16 * 2
+
+    // Minus margin available (guess HACK)
+    val adjustForNotificationShade = 8 * 2
+
+    return screenWidth - adjustForMargin - adjustForNotificationShade
+  }
+
+  @CheckResult
+  private fun hydrateRemoteViewTickerData(
+      remoteViews: RemoteViews,
+      quotes: List<StockQuote>,
+      start: Int,
+  ): Int {
+    // Keep track
+    var index = start
+
+    // Starting spacer
+    addRemoteViewSpacer(remoteViews)
+
+    val totalAvailableAmount = getTotalDrawableWidth()
+    var totalConsumedWidthAmount = 0F
+
+    while (true) {
+      val quote = quotes[boundIndex(index, quotes.size)]
+
+      val expectedRequiredAmount =
+          when {
+            quote.isLarge() -> largeDataWidthAmount
+            quote.isMedium() -> mediumDataWidthAmount
+            else -> dataWidthAmount
+          }
+
+      // Can we still fit another data entry
+      if (totalConsumedWidthAmount + expectedRequiredAmount >= totalAvailableAmount) {
+        break
+      }
+      addRemoteViewQuoteData(remoteViews, quote)
+      totalConsumedWidthAmount += expectedRequiredAmount
+      index += 1
+
+      // Can we still fit another margin
+      if (totalConsumedWidthAmount + marginWidthAmount >= totalAvailableAmount) {
+        break
+      }
+
+      addRemoteViewMargin(remoteViews)
+      totalConsumedWidthAmount += marginWidthAmount
+    }
+
+    // Ending spacer
+    addRemoteViewSpacer(remoteViews)
+
+    return index
+  }
+
+  @CheckResult
+  private fun buildQuoteNotification(
+      builder: NotificationCompat.Builder,
+      start: Int,
+      quotes: List<StockQuote>
+  ): Notification {
 
     if (quotes.isEmpty()) {
       return builder
@@ -224,21 +311,38 @@ internal constructor(
           .build()
     }
 
-    val pageSize = getPageSize()
+    // Get how many we can show per notifcation "page"
+    val remoteViews = RemoteViews(context.packageName, R.layout.remote_view)
+    val nextPageStarts = hydrateRemoteViewTickerData(remoteViews, quotes, start)
 
-    val remoteViews = RemoteViews(context.applicationContext.packageName, R.layout.remote_view)
-    updateTickers(remoteViews, quotes, safeIndex, pageSize)
+    val nextOptions = PendingIntentOptions(index = start + nextPageStarts, forceRefresh = false)
+    val nextPe = getServicePendingIntent(REQUEST_CODE_NEXT, nextOptions)
 
     return builder
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setCustomContentView(remoteViews)
-        .addAction(
-            generateNotificationAction(
-                "Next",
-                getServicePendingIntent(
-                    REQUEST_CODE_NEXT,
-                    PendingIntentOptions(index = safeIndex + pageSize, forceRefresh = false))))
+        .addAction(generateNotificationAction("Next", nextPe))
         .build()
+  }
+
+  @CheckResult
+  private fun buildClosedNotification(builder: NotificationCompat.Builder): Notification {
+    return builder
+        .setContentTitle(context.getString(appNameRes))
+        .setContentText("Market is closed. Notification will refresh when market is open again.")
+        .build()
+  }
+
+  @CheckResult
+  private fun getBoundQuotePageIndex(notification: TapeNotificationData): Int {
+    return when (notification) {
+      is TapeNotificationData.Quotes -> {
+        val quotes = notification.quotes
+        // Safely bind between the size of the list
+        if (quotes.isEmpty()) notification.index else boundIndex(notification.index, quotes.size)
+      }
+      is TapeNotificationData.Closed -> 0
+    }
   }
 
   override fun build(
@@ -246,59 +350,68 @@ internal constructor(
       channelInfo: NotifyChannelInfo,
       notification: TapeNotificationData
   ): Notification {
-    return hydrateNotification(channelInfo, notification.quotes, notification.index)
+    // Index of the remote view "page"
+    val start = getBoundQuotePageIndex(notification)
+
+    // Create builder with Refresh action and pass to customizers
+    val builder = createBuilderWithRefreshAction(channelInfo = channelInfo, index = start)
+
+    return when (notification) {
+      is TapeNotificationData.Quotes -> buildQuoteNotification(builder, start, notification.quotes)
+      is TapeNotificationData.Closed -> buildClosedNotification(builder)
+    }
   }
 
   override fun canShow(notification: NotifyData): Boolean {
     return notification is TapeNotificationData
   }
 
-  private data class RemoteViewIds(
-      @IdRes val symbolViewId: Int,
-      @IdRes val priceViewId: Int,
-      @IdRes val changeViewId: Int,
-      @IdRes val percentViewId: Int
+  private data class PendingIntentOptions(
+      // Page index
+      val index: Int,
+
+      // Force refresh upon action triggered
+      val forceRefresh: Boolean,
   )
 
-  private data class PendingIntentOptions(val index: Int, val forceRefresh: Boolean)
-
   companion object {
-
-    @JvmStatic
-    @CheckResult
-    private fun getPageSize(): Int {
-      return remoteViewIds.size
-    }
-
-    private val remoteViewIds =
-        listOf(
-            RemoteViewIds(
-                symbolViewId = R.id.remote_views_symbol1,
-                priceViewId = R.id.remote_views_price1,
-                changeViewId = R.id.remote_views_change1,
-                percentViewId = R.id.remote_views_percent1),
-            RemoteViewIds(
-                symbolViewId = R.id.remote_views_symbol2,
-                priceViewId = R.id.remote_views_price2,
-                changeViewId = R.id.remote_views_change2,
-                percentViewId = R.id.remote_views_percent2),
-            RemoteViewIds(
-                symbolViewId = R.id.remote_views_symbol3,
-                priceViewId = R.id.remote_views_price3,
-                changeViewId = R.id.remote_views_change3,
-                percentViewId = R.id.remote_views_percent3),
-        )
 
     private const val REQUEST_CODE_ACTIVITY = 1337420
     private const val REQUEST_CODE_NEXT = REQUEST_CODE_ACTIVITY + 1
     private const val REQUEST_CODE_REFRESH = REQUEST_CODE_ACTIVITY + 2
 
+    // Once our dollar value is more than 10K, we must use the large layout
+    private val LARGE_MONEY = 10_000.00.asMoney()
+
+    // Once our dollar value is more than 1K, we must use the large layout
+    private val MEDIUM_MONEY = 1_000.00.asMoney()
+
+    @CheckResult
+    private fun StockQuote.isLarge(): Boolean {
+      return this.currentSession.price.isLarge()
+    }
+
+    @CheckResult
+    private fun StockMoneyValue.isLarge(): Boolean {
+      return this.compareTo(LARGE_MONEY) >= 0
+    }
+
+    @CheckResult
+    private fun StockQuote.isMedium(): Boolean {
+      return this.currentSession.price.isMedium()
+    }
+
+    @CheckResult
+    private fun StockMoneyValue.isMedium(): Boolean {
+      return this.compareTo(MEDIUM_MONEY) >= 0
+    }
+
     @JvmStatic
     @CheckResult
-    private fun correctIndex(index: Int, maxIndex: Int): Int {
+    private fun boundIndex(index: Int, maxIndex: Int): Int {
       return when {
         index >= maxIndex -> index % maxIndex
-        index < 0 -> correctIndex(maxIndex + index, maxIndex)
+        index < 0 -> boundIndex(maxIndex + index, maxIndex)
         else -> index
       }
     }

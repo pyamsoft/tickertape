@@ -17,12 +17,12 @@
 package com.pyamsoft.tickertape.quote
 
 import android.graphics.Color as ViewColor
-import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,7 @@ import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
+import timber.log.Timber
 
 private const val FILL_ALPHA = (0.2 * 255).toInt()
 private const val LINE_ALPHA = 255
@@ -180,8 +182,16 @@ private fun SparkChart(
   val chartAdapter =
       rememberInBackground(chart) { ChartAdapter(chart, chart.periodHigh(), chart.periodLow()) }
 
-  AndroidView(
-      modifier = modifier,
+
+    // TODO(Peter): Move to Vico for better charts
+    // https://patrykandpatryk.com/vico/wiki/core-topics/chart-types/
+
+
+    AndroidView(
+      modifier =
+          modifier.onSizeChanged {
+            density.run { Timber.d("CHART SIZED: H: ${it.height} W: ${it.width}") }
+          },
       factory = { context ->
         SparkView(context)
             .apply {

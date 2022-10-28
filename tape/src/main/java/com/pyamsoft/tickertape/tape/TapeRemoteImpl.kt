@@ -95,15 +95,6 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         if (StockMarket.isOpen()) {
-          notifier
-              .startForeground(
-                  service = service,
-                  id = NOTIFICATION_ID,
-                  channelInfo = CHANNEL_INFO,
-                  notification = TapeNotificationData.Closed,
-              )
-              .also { Timber.d("Update tape notification: $it") }
-        } else {
           val force = options.forceRefresh
           fetchQuotes(force)
               .onSuccess { quotes ->
@@ -122,9 +113,17 @@ internal constructor(
               }
               .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
               .onFailure { Timber.e(it, "Unable to refresh notification") }
+        } else {
+          notifier
+              .startForeground(
+                  service = service,
+                  id = NOTIFICATION_ID,
+                  channelInfo = CHANNEL_INFO,
+                  notification = TapeNotificationData.Closed,
+              )
+              .also { Timber.d("Update tape notification: $it") }
         }
 
-        // Unit
         return@withContext
       }
 

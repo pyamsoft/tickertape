@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.quote
 
 import android.graphics.Color as ViewColor
+import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,7 +71,7 @@ fun Chart(
       modifier = modifier,
   ) {
     SparkChart(
-        modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+        modifier = Modifier.matchParentSize().padding(start = MaterialTheme.keylines.baseline),
         chart = chart,
         onScrub = onScrub,
     )

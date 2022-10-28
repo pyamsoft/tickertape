@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.home.item
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -63,6 +64,7 @@ internal fun HomeChartItem(
       )
     }
     Chart(
+        modifier = Modifier.weight(1F).fillMaxWidth(),
         chart = ticker.chart.requireNotNull(),
     )
   }

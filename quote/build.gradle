@@ -72,7 +72,7 @@ dependencies {
 
   kapt "com.google.dagger:dagger-compiler:$dagger"
 
-  api "com.github.pyamsoft:spark:$spark"
+  implementation "com.patrykandpatryk.vico:compose:$vico"
 
   implementation project(':alert')
   implementation project(':db')

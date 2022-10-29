@@ -180,6 +180,11 @@ class TickerTape : Application() {
             "https://github.com/google/dagger",
             "A fast dependency injector for Android and Java.",
         )
+        add(
+            "Vico",
+            "https://github.com/patrykandpatryk/vico",
+            "A light and extensible chart library for Android.",
+        )
       }
     }
   }

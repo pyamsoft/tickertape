@@ -16,331 +16,28 @@
 
 package com.pyamsoft.tickertape.quote
 
-import android.graphics.Color as ViewColor
-import androidx.annotation.CheckResult
+import android.graphics.Color
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.theme.HairlineSize
-import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.spark.SparkAdapter
-import com.pyamsoft.spark.SparkView
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
+import com.patrykandpatryk.vico.compose.axis.horizontal.bottomAxis
+import com.patrykandpatryk.vico.compose.axis.vertical.startAxis
+import com.patrykandpatryk.vico.compose.chart.Chart as ComposeChart
+import com.patrykandpatryk.vico.compose.chart.line.lineChart
+import com.patrykandpatryk.vico.core.chart.line.LineChart
+import com.patrykandpatryk.vico.core.entry.entryModelOf
+import com.patrykandpatryk.vico.core.entry.entryOf
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.periodHigh
-import com.pyamsoft.tickertape.stocks.api.periodLow
-import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDateTime
-import timber.log.Timber
-
-private const val FILL_ALPHA = (0.2 * 255).toInt()
-private const val LINE_ALPHA = 255
-
-@Composable
-@JvmOverloads
-fun Chart(
-    modifier: Modifier = Modifier,
-    chart: StockChart,
-    onScrub: ((Chart.Data?) -> Unit)? = null,
-) {
-  Box(
-      modifier = modifier,
-  ) {
-    SparkChart(
-        modifier = Modifier.matchParentSize().padding(start = MaterialTheme.keylines.baseline),
-        chart = chart,
-        onScrub = onScrub,
-    )
-    Bounds(
-        modifier = Modifier.matchParentSize(),
-        chart = chart,
-    )
-  }
-}
-
-@Composable
-private fun Bounds(
-    modifier: Modifier = Modifier,
-    chart: StockChart,
-) {
-  val highMoney = rememberInBackground(chart) { chart.periodHigh().display }
-  val lowMoney = rememberInBackground(chart) { chart.periodLow().display }
-
-  Column(
-      modifier = modifier,
-  ) {
-    if (!highMoney.isNullOrBlank()) {
-      ChartBound(
-          value = highMoney,
-      )
-    }
-    Spacer(
-        modifier = Modifier.weight(1F),
-    )
-    if (!lowMoney.isNullOrBlank()) {
-      ChartBound(
-          value = lowMoney,
-      )
-    }
-  }
-}
-
-@Composable
-private fun ChartBound(
-    modifier: Modifier = Modifier,
-    value: String,
-) {
-  Surface(
-      modifier = modifier,
-      shape = MaterialTheme.shapes.small,
-      color = MaterialTheme.colors.primary,
-      contentColor = Color.White,
-  ) {
-    Text(
-        modifier =
-            Modifier.padding(
-                horizontal = MaterialTheme.keylines.typography,
-                vertical = MaterialTheme.keylines.typography / 2,
-            ),
-        text = value,
-        style = MaterialTheme.typography.overline,
-    )
-  }
-}
-
-@Composable
-private fun SparkChart(
-    modifier: Modifier = Modifier,
-    chart: StockChart,
-    onScrub: ((Chart.Data?) -> Unit)?,
-) {
-  val handleScrub by rememberUpdatedState(onScrub)
-  // Keep a ref of the constructed SparkView chart
-  val chartView = remember { mutableStateOf<SparkView?>(null) }
-
-  val density = LocalDensity.current
-  val baseLineSize = remember(density) { density.run { HairlineSize.toPx() } }
-
-  val onScrubListener = remember {
-    if (handleScrub == null) null
-    else
-        SparkView.OnScrubListener {
-          val callback = handleScrub.requireNotNull()
-          callback(it as? Chart.Data)
-        }
-  }
-
-  val isLight = MaterialTheme.colors.isLight
-  val baseColor =
-      remember(isLight) {
-        if (isLight) {
-          android.graphics.Color.BLACK
-        } else {
-          android.graphics.Color.WHITE
-        }
-      }
-
-  // When the composable falls out of effect, dispose of the Chart view
-  val cv = chartView.value
-  if (cv != null) {
-    DisposableEffect(cv) {
-      onDispose {
-        cv.teardown()
-
-        // Null out the ref
-        chartView.value = null
-      }
-    }
-  }
-
-  val chartAdapter =
-      rememberInBackground(chart) { ChartAdapter(chart, chart.periodHigh(), chart.periodLow()) }
-
-
-    // TODO(Peter): Move to Vico for better charts
-    // https://patrykandpatryk.com/vico/wiki/core-topics/chart-types/
-
-
-    AndroidView(
-      modifier =
-          modifier.onSizeChanged {
-            density.run { Timber.d("CHART SIZED: H: ${it.height} W: ${it.width}") }
-          },
-      factory = { context ->
-        SparkView(context)
-            .apply {
-              setLogger(createChartLogger())
-              isFilled = true
-
-              positiveLineColor =
-                  ViewColor.argb(
-                      LINE_ALPHA,
-                      ViewColor.red(DEFAULT_STOCK_UP_COLOR),
-                      ViewColor.green(DEFAULT_STOCK_UP_COLOR),
-                      ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
-                  )
-
-              positiveFillColor =
-                  ViewColor.argb(
-                      FILL_ALPHA,
-                      ViewColor.red(DEFAULT_STOCK_UP_COLOR),
-                      ViewColor.green(DEFAULT_STOCK_UP_COLOR),
-                      ViewColor.blue(DEFAULT_STOCK_UP_COLOR),
-                  )
-
-              negativeLineColor =
-                  ViewColor.argb(
-                      LINE_ALPHA,
-                      ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
-                      ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
-                      ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
-                  )
-
-              negativeFillColor =
-                  ViewColor.argb(
-                      FILL_ALPHA,
-                      ViewColor.red(DEFAULT_STOCK_DOWN_COLOR),
-                      ViewColor.green(DEFAULT_STOCK_DOWN_COLOR),
-                      ViewColor.blue(DEFAULT_STOCK_DOWN_COLOR),
-                  )
-            }
-            .also { chartView.value = it }
-      },
-      update = { sparkView ->
-        sparkView.apply {
-          // Guard to avoid Android View invalidate
-          if (scrubLineColor != baseColor) {
-            scrubLineColor = baseColor
-          }
-
-          // Guard to avoid Android View invalidate
-          if (baseLineColor != baseColor) {
-            baseLineColor = baseColor
-          }
-
-          // Guard to avoid Android View invalidate
-          if (baseLineWidth != baseLineSize) {
-            baseLineWidth = baseLineSize
-          }
-
-          // Guard to avoid Android View invalidate
-          if (adapter != chartAdapter) {
-            adapter = chartAdapter
-          }
-
-          // Guard to avoid Android View invalidate
-          if (scrubListener != onScrubListener) {
-            scrubListener = onScrubListener
-
-            // Once we have set the listener, if scrubbing is not enabled, turn it on, else turn it
-            // off
-            if (onScrubListener != null) {
-              if (!isScrubEnabled) {
-                isScrubEnabled = true
-              }
-            } else {
-              if (isScrubEnabled) {
-                isScrubEnabled = false
-              }
-            }
-          }
-        }
-      },
-  )
-}
-
-private class ChartAdapter(
-    chart: StockChart,
-    high: StockMoneyValue,
-    low: StockMoneyValue,
-) : SparkAdapter() {
-
-  private val chartData: List<Chart.Data>
-  private val baselineValue: Float
-
-  init {
-    Enforcer.assertOffMainThread()
-
-    val closes = chart.close
-    val baseline = chart.startingPrice
-
-    val data =
-        chart.dates.mapIndexed { index, date ->
-          val close = closes[index]
-          return@mapIndexed Chart.Data(
-              high = high,
-              low = low,
-              baseline = baseline,
-              range = chart.range,
-              date = date,
-              price = close,
-          )
-        }
-
-    baselineValue = baseline.value.toFloat()
-    chartData = data
-  }
-
-  @CheckResult
-  private fun getValue(item: Chart.Data): Float {
-    return item.price.value.toFloat()
-  }
-
-  override fun getCount(): Int {
-    return chartData.size
-  }
-
-  override fun getItem(index: Int): Chart.Data {
-    return chartData[index]
-  }
-
-  override fun getY(index: Int): Float {
-    // Offset the Y based on the baseline value which is either previous close or day's open
-    return getValue(getItem(index)) - baselineValue
-  }
-
-  override fun getBaseLine(): Float {
-    // Baseline of 0 to show the chart dipping below zero
-    return 0F
-  }
-}
-
-@Preview
-@Composable
-private fun PreviewChart() {
-  Surface {
-    Chart(
-        modifier = Modifier.width(320.dp).height(160.dp),
-        chart = newTestChart("MSFT".asSymbol()),
-    )
-  }
-}
 
 interface Chart {
 
@@ -353,4 +50,71 @@ interface Chart {
       val price: StockMoneyValue,
       val range: StockChart.IntervalRange,
   )
+}
+
+@Composable
+@JvmOverloads
+fun Chart(
+    modifier: Modifier = Modifier,
+    chart: StockChart,
+    onScrub: ((Chart.Data?) -> Unit)? = null,
+) {
+  val chartModel = remember {
+    entryModelOf(
+        listOf(
+            entryOf(0, 0),
+            entryOf(1, 1),
+            entryOf(2, 2),
+            entryOf(3, 4),
+            entryOf(4, 2),
+        ),
+        listOf(
+            entryOf(5, -1),
+            entryOf(6, -2),
+        ),
+        listOf(
+            entryOf(7, 2),
+            entryOf(8, 2),
+        ),
+        listOf(
+            entryOf(9, -3),
+            entryOf(10, 0),
+        ),
+    )
+  }
+
+  val lineChartSpecs = remember {
+    listOf(
+        LineChart.LineSpec(lineColor = Color.GREEN),
+        LineChart.LineSpec(lineColor = Color.RED),
+        LineChart.LineSpec(lineColor = Color.GREEN),
+        LineChart.LineSpec(lineColor = Color.RED),
+    )
+  }
+
+  Box(
+      modifier = modifier,
+  ) {
+    ComposeChart(
+        modifier = Modifier.matchParentSize(),
+        chart =
+            lineChart(
+                lines = lineChartSpecs,
+            ),
+        model = chartModel,
+        startAxis = startAxis(),
+        bottomAxis = bottomAxis(),
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun PreviewChart() {
+  Surface {
+    Chart(
+        modifier = Modifier.width(320.dp).height(160.dp),
+        chart = newTestChart("MSFT".asSymbol()),
+    )
+  }
 }

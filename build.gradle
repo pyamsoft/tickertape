@@ -51,7 +51,6 @@ buildscript {
     pydroid = "25.0.0"
     cachify = "0.1.0"
     highlander = "0.1.0"
-    spark = "2.0.2"
 
     // Jobs
     workmanager = "2.7.1"
@@ -84,6 +83,9 @@ buildscript {
 
     // Material Design
     materialDesign = "1.7.0"
+
+    // Vico charts
+    vico = "1.5.1"
   }
 
   dependencies {

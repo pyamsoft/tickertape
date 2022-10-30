@@ -16,8 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
-import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.quote.dig.DigChart
 import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.dig.DigNews
@@ -39,7 +40,7 @@ fun WatchlistDigScreen(
     onTabUpdated: (WatchlistDigSections) -> Unit,
     onRefresh: () -> Unit,
     onModifyWatchlist: () -> Unit,
-    onChartScrub: (Chart.Data?) -> Unit,
+    onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
@@ -94,7 +95,7 @@ private fun Content(
     state: WatchlistDigViewState,
     imageLoader: ImageLoader,
     onRefresh: () -> Unit,
-    onChartScrub: (Chart.Data?) -> Unit,
+    onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onRecClick: (Ticker) -> Unit,
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,

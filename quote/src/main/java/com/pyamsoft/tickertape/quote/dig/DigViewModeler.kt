@@ -21,8 +21,8 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.quote.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNewsList
@@ -294,11 +294,7 @@ protected constructor(
     handleLoadTicker(scope = scope, force = true)
   }
 
-  fun handleChartDateScrubbed(data: Chart.Data?) {
-    if (data == null) {
-      return
-    }
-
+  fun handleChartDateScrubbed(data: ChartData) {
     state.apply {
       currentDate = data.date
       currentPrice = data.price

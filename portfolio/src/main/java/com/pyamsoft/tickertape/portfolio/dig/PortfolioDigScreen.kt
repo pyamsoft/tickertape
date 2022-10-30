@@ -21,8 +21,9 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
-import com.pyamsoft.tickertape.quote.Chart
+import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.dig.DigNews
 import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
@@ -42,7 +43,7 @@ fun PortfolioDigScreen(
     onClose: () -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
-    onChartScrub: (Chart.Data?) -> Unit,
+    onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onPositionAdd: () -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
@@ -106,7 +107,7 @@ private fun Content(
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
     onRefresh: () -> Unit,
-    onChartScrub: (Chart.Data?) -> Unit,
+    onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     onPositionAdd: () -> Unit,
     onPositionDelete: (DbPosition) -> Unit,

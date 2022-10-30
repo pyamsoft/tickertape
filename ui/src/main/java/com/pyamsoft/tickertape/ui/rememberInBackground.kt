@@ -22,9 +22,11 @@ fun <T : Any> rememberInBackground(
   // Avoid firing the launched effect again on each calculate loop
   val handleCalculation by rememberUpdatedState(onCalculate)
 
-  LaunchedEffect(*arguments) {
+  LaunchedEffect(keys = arguments) {
+    val scope = this
+
     // Default for computation intensive task
-    this.launch(context = Dispatchers.Default) {
+    scope.launch(context = Dispatchers.Default) {
       val result = handleCalculation()
       setValue(result)
     }

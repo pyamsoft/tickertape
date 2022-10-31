@@ -49,11 +49,6 @@ internal fun PortfolioItem(
       // These are only valid if we have current day quotes
       if (stock.ticker != null) {
         Info(
-            name = "Change Today",
-            value = stock.changeTodayDisplayString,
-        )
-
-        Info(
             name = "$totalChangeTitle Amount",
             value = stock.totalGainLossAmount,
         )

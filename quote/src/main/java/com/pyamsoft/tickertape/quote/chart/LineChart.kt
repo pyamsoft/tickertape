@@ -30,8 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.patrykandpatryk.vico.compose.axis.horizontal.bottomAxis
@@ -39,15 +37,9 @@ import com.patrykandpatryk.vico.compose.axis.vertical.startAxis
 import com.patrykandpatryk.vico.compose.chart.Chart
 import com.patrykandpatryk.vico.compose.chart.line.lineChart
 import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
-import com.patrykandpatryk.vico.compose.component.shape.roundedCornerShape
-import com.patrykandpatryk.vico.compose.component.shape.textComponent
-import com.patrykandpatryk.vico.compose.dimensions.dimensionsOf
 import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
-import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatryk.vico.core.chart.line.LineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
-import com.patrykandpatryk.vico.core.component.shape.ShapeComponent
-import com.patrykandpatryk.vico.core.component.shape.Shapes
 import com.patrykandpatryk.vico.core.entry.ChartEntry
 import com.patrykandpatryk.vico.core.entry.ChartEntryModel
 import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
@@ -63,10 +55,10 @@ import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.stocks.api.flip
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
+import kotlin.math.roundToInt
 
 private data class ChartLines(
     val models: ChartEntryModel,
@@ -186,8 +178,8 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
     val lineSegments = mutableListOf<List<ChartDataEntry>>()
 
     var index = 0
-    var currentSegment = mutableListOf<ChartDataEntry>()
-    var currentDirection: StockDirection? = null
+    var lastData: ChartData? = null
+    val currentSegment = mutableListOf<ChartDataEntry>()
 
     while (true) {
       // If we have no more points, we are done
@@ -204,73 +196,28 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
           ),
       )
 
-      // Figure out the current direction if needed
-      if (currentDirection == null) {
-        currentDirection = data.resolvePriceDirection()
-      }
-
-      // Should we cut this segment off?
-      // Based on the next direction, if it switches, we decide how to adjust segments
-      val next = dataPoints.getOrNull(index + 1)
-      if (next == null) {
-        // Finish up
-        finishSegments(
-            lineSegments,
-            specSegments,
-            currentSegment,
-            currentDirection,
-        )
-        // We are done
-        break
-      }
-
-      // If the next direction is NONE, keep going in this segment as we aren't actually "changing"
-      val nextDirection = next.resolvePriceDirection()
-      if (currentDirection != nextDirection && nextDirection != StockDirection.NONE) {
-        // We are swapping, this is a hack but it kind of works
-        // Find the difference between data and next price
-        // Divide difference by 2 for a center point
-        // Mark a center point at X: x + 0.5, y: baseline + diff/2
-        // Add this center point to current segment before finishing
-        val priceDiff = data.price.value - next.price.value
-        val priceCenter = priceDiff / 2
-        val hackCenterPointY = (priceCenter + data.baseline.value).toFloat()
-        val hackCenterPointX = x + 0.5F
-
-        currentSegment.add(
-            ChartDataEntry(
-                data = null,
-                x = hackCenterPointX,
-                y = hackCenterPointY,
-            ),
-        )
-
-        // Finish up
-        finishSegments(
-            lineSegments,
-            specSegments,
-            currentSegment,
-            currentDirection,
-        )
-
-        // Direction changes for the next item, cut of this segment
-        currentSegment = mutableListOf()
-        currentDirection = currentDirection.flip()
-
-        // We pre-start this next segment at the center point at X: x + 0.5, y: baseline + diff/2
-        // Add this center point to new segment before processing loop starts
-        currentSegment.add(
-            ChartDataEntry(
-                data = null,
-                x = hackCenterPointX,
-                y = hackCenterPointY,
-            ),
-        )
-      }
-
       // Bump the index
+      lastData = data
       ++index
     }
+
+    // Only one segment, color the chart based on the final price compared to the baseline
+    lineSegments.add(currentSegment)
+    specSegments.add(
+        LineChart.LineSpec(
+            lineColor =
+                if (lastData == null) DEFAULT_STOCK_COLOR
+                else {
+                  val price = lastData.price.value
+                  val baseline = lastData.baseline.value
+                  when {
+                    price < baseline -> DEFAULT_STOCK_DOWN_COLOR
+                    price > baseline -> DEFAULT_STOCK_UP_COLOR
+                    else -> DEFAULT_STOCK_COLOR
+                  }
+                },
+        ),
+    )
 
     return@rememberInBackground ChartLines(
         models = ChartEntryModelProducer(lineSegments).getModel(),
@@ -279,19 +226,12 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
   }
 }
 
-private const val THRESHOLD_RANGE_START = 7f
-private const val THRESHOLD_RANGE_END = 14f
-private const val THRESHOLD_LINE_ALPHA = 0.16f
-private const val THRESHOLD_LINE_PADDING_DP = 4f
-private const val THRESHOLD_LINE_MARGINS_DP = 4f
-
 @Composable
 internal fun LineChart(
     modifier: Modifier = Modifier,
     chart: StockChart,
     onScrub: ((ChartData) -> Unit)? = null,
 ) {
-  val colors = MaterialTheme.colors
   val chartLines = rememberChartLines(chart)
 
   Crossfade(
@@ -316,45 +256,6 @@ internal fun LineChart(
             )
           }
 
-      val label =
-          textComponent(
-              color = Color.White,
-              padding = dimensionsOf(all = MaterialTheme.keylines.typography),
-              margins = dimensionsOf(all = MaterialTheme.keylines.typography),
-              background = ShapeComponent(
-                  shape = Shapes.roundedCornerShape(all = 4.dp),
-                  color = MaterialTheme.colors.secondary.toArgb(),
-              )
-          )
-
-      val decorations =
-          remember(
-              chart.startingPrice,
-              colors,
-              lines.models,
-              label,
-          ) {
-            val baseline = chart.startingPrice.value.toFloat()
-            if (baseline < lines.models.minY) {
-              // Baseline outside of chart, no decoration
-              return@remember null
-            } else {
-              val color = colors.secondary.toArgb()
-              return@remember listOf(
-                  ThresholdLine(
-                      thresholdValue = baseline,
-                      labelComponent = label,
-                      lineComponent =
-                          ShapeComponent(
-                              color = color,
-                              strokeColor = color,
-                              strokeWidthDp = 2F,
-                          ),
-                  ),
-              )
-            }
-          }
-
       Chart(
           modifier = Modifier.fillMaxSize(),
           isZoomEnabled = false,
@@ -362,7 +263,6 @@ internal fun LineChart(
               lineChart(
                   lines = lines.specs,
                   axisValuesOverrider = axisValuesOverrider,
-                  decorations = decorations,
               ),
           model = lines.models,
           startAxis =
@@ -380,7 +280,9 @@ internal fun LineChart(
                   valueFormatter = { _, _ -> "" },
                   tickPosition =
                       HorizontalAxis.TickPosition.Center(
-                          spacing = 100000,
+                          // Spacing so large there will not be any ticks
+                          // Offset by 1 to avoid a crash where Offset cannot be less than 1
+                          spacing = lines.models.maxX.roundToInt() * 2 + 1,
                       )),
           chartScrollSpec =
               rememberChartScrollSpec(

@@ -150,8 +150,8 @@ private fun finishSegments(
   )
 }
 
-@CheckResult
 @Composable
+@CheckResult
 private fun rememberChartLines(chart: StockChart): ChartLines? {
   return rememberInBackground(chart) {
     val high = chart.periodHigh()
@@ -216,8 +216,9 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
         break
       }
 
+      // If the next direction is NONE, keep going in this segment as we aren't actually "changing"
       val nextDirection = next.resolvePriceDirection()
-      if (currentDirection != nextDirection) {
+      if (currentDirection != nextDirection && nextDirection != StockDirection.NONE) {
         // We are swapping, this is a hack but it kind of works
         // Find the difference between data and next price
         // Divide difference by 2 for a center point
@@ -246,11 +247,7 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
 
         // Direction changes for the next item, cut of this segment
         currentSegment = mutableListOf()
-
-        // Keep current direction if NONE, else flip direction
-        if (!nextDirection.isZero) {
-          currentDirection = currentDirection.flip()
-        }
+        currentDirection = currentDirection.flip()
 
         // We pre-start this next segment at the center point at X: x + 0.5, y: baseline + diff/2
         // Add this center point to new segment before processing loop starts

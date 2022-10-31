@@ -30,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.patrykandpatryk.vico.compose.axis.horizontal.bottomAxis
@@ -37,9 +39,15 @@ import com.patrykandpatryk.vico.compose.axis.vertical.startAxis
 import com.patrykandpatryk.vico.compose.chart.Chart
 import com.patrykandpatryk.vico.compose.chart.line.lineChart
 import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
+import com.patrykandpatryk.vico.compose.component.shape.roundedCornerShape
+import com.patrykandpatryk.vico.compose.component.shape.textComponent
+import com.patrykandpatryk.vico.compose.dimensions.dimensionsOf
 import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
+import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatryk.vico.core.chart.line.LineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
+import com.patrykandpatryk.vico.core.component.shape.ShapeComponent
+import com.patrykandpatryk.vico.core.component.shape.Shapes
 import com.patrykandpatryk.vico.core.entry.ChartEntry
 import com.patrykandpatryk.vico.core.entry.ChartEntryModel
 import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
@@ -271,12 +279,19 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
   }
 }
 
+private const val THRESHOLD_RANGE_START = 7f
+private const val THRESHOLD_RANGE_END = 14f
+private const val THRESHOLD_LINE_ALPHA = 0.16f
+private const val THRESHOLD_LINE_PADDING_DP = 4f
+private const val THRESHOLD_LINE_MARGINS_DP = 4f
+
 @Composable
 internal fun LineChart(
     modifier: Modifier = Modifier,
     chart: StockChart,
     onScrub: ((ChartData) -> Unit)? = null,
 ) {
+  val colors = MaterialTheme.colors
   val chartLines = rememberChartLines(chart)
 
   Crossfade(
@@ -301,6 +316,45 @@ internal fun LineChart(
             )
           }
 
+      val label =
+          textComponent(
+              color = Color.White,
+              padding = dimensionsOf(all = MaterialTheme.keylines.typography),
+              margins = dimensionsOf(all = MaterialTheme.keylines.typography),
+              background = ShapeComponent(
+                  shape = Shapes.roundedCornerShape(all = 4.dp),
+                  color = MaterialTheme.colors.secondary.toArgb(),
+              )
+          )
+
+      val decorations =
+          remember(
+              chart.startingPrice,
+              colors,
+              lines.models,
+              label,
+          ) {
+            val baseline = chart.startingPrice.value.toFloat()
+            if (baseline < lines.models.minY) {
+              // Baseline outside of chart, no decoration
+              return@remember null
+            } else {
+              val color = colors.secondary.toArgb()
+              return@remember listOf(
+                  ThresholdLine(
+                      thresholdValue = baseline,
+                      labelComponent = label,
+                      lineComponent =
+                          ShapeComponent(
+                              color = color,
+                              strokeColor = color,
+                              strokeWidthDp = 2F,
+                          ),
+                  ),
+              )
+            }
+          }
+
       Chart(
           modifier = Modifier.fillMaxSize(),
           isZoomEnabled = false,
@@ -308,6 +362,7 @@ internal fun LineChart(
               lineChart(
                   lines = lines.specs,
                   axisValuesOverrider = axisValuesOverrider,
+                  decorations = decorations,
               ),
           model = lines.models,
           startAxis =

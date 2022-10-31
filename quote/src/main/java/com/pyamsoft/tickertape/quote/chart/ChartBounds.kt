@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.pyamsoft.pydroid.theme.keylines
@@ -31,6 +32,7 @@ internal fun ChartBounds(
           value = highMoney,
       )
     }
+
     Spacer(
         modifier = Modifier.weight(1F),
     )
@@ -47,11 +49,21 @@ internal fun ChartBounds(
 private fun ChartBound(
     modifier: Modifier = Modifier,
     value: String,
+    isBaseline: Boolean = false,
 ) {
+  val colors = MaterialTheme.colors
+  val color =
+      remember(
+          isBaseline,
+          colors,
+      ) {
+        if (isBaseline) colors.secondary else colors.primary
+      }
+
   Surface(
       modifier = modifier,
       shape = MaterialTheme.shapes.small,
-      color = MaterialTheme.colors.primary,
+      color = color,
       contentColor = Color.White,
   ) {
     Text(

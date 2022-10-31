@@ -303,6 +303,7 @@ internal fun LineChart(
 
       Chart(
           modifier = Modifier.fillMaxSize(),
+          isZoomEnabled = false,
           chart =
               lineChart(
                   lines = lines.specs,

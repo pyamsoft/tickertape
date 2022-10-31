@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote.chart
 
-import android.graphics.Color
 import androidx.annotation.CheckResult
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
@@ -28,6 +27,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,14 +37,27 @@ import com.patrykandpatryk.vico.compose.axis.vertical.startAxis
 import com.patrykandpatryk.vico.compose.chart.Chart
 import com.patrykandpatryk.vico.compose.chart.line.lineChart
 import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
+import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
 import com.patrykandpatryk.vico.core.chart.line.LineChart
+import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
+import com.patrykandpatryk.vico.core.entry.ChartEntry
 import com.patrykandpatryk.vico.core.entry.ChartEntryModel
-import com.patrykandpatryk.vico.core.entry.entryModelOf
-import com.patrykandpatryk.vico.core.entry.entryOf
+import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatryk.vico.core.entry.FloatEntry
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
+import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
+import com.pyamsoft.tickertape.core.isNegative
+import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.flip
+import com.pyamsoft.tickertape.stocks.api.periodHigh
+import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
 
 private data class ChartLines(
@@ -53,49 +66,210 @@ private data class ChartLines(
 )
 
 @CheckResult
+private fun ChartData.priceValueAdjustedToBaseline(): Double {
+  return this.price.value - this.baseline.value
+}
+
+private class ChartDataEntry(
+    private val data: ChartData?,
+    x: Float,
+    y: Float,
+) :
+    ChartEntry by FloatEntry(
+        x = x,
+        y = y,
+    ) {
+
+  @CheckResult
+  fun isDataPoint(): Boolean {
+    return data != null
+  }
+
+  @CheckResult
+  fun getData(): ChartData {
+    return data.requireNotNull { "Cannot get ChartData from empty data point" }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as ChartDataEntry
+
+    if (data != other.data) return false
+    if (x != other.x) return false
+    if (y != other.y) return false
+    return true
+  }
+
+  override fun toString(): String {
+    return if (isDataPoint()) {
+      "ChartDataEntry(x=$x, y=$y)"
+    } else {
+      "ChartDataEntry(Fake)"
+    }
+  }
+
+  override fun hashCode(): Int {
+    var result = data?.hashCode() ?: 0
+    result = 31 * result + x.hashCode()
+    result = 31 * result + y.hashCode()
+    return result
+  }
+}
+
+@CheckResult
+private fun ChartData.resolvePriceDirection(): StockDirection {
+  val adjusted = this.priceValueAdjustedToBaseline()
+  // Decide, based on the baseline value, where the direction is going
+  return when {
+    adjusted.isPositive() -> StockDirection.UP
+    adjusted.isNegative() -> StockDirection.DOWN
+    else -> StockDirection.NONE
+  }
+}
+
+private fun finishSegments(
+    lineSegments: MutableList<List<ChartDataEntry>>,
+    specSegments: MutableList<LineChart.LineSpec>,
+    currentSegment: List<ChartDataEntry>,
+    currentDirection: StockDirection,
+) {
+  // We are done with this segment, add it to the list of segments
+  lineSegments.add(currentSegment)
+  // Derive a color for the segment
+  specSegments.add(
+      LineChart.LineSpec(
+          lineColor =
+              when {
+                currentDirection.isUp -> DEFAULT_STOCK_UP_COLOR
+                currentDirection.isDown -> DEFAULT_STOCK_DOWN_COLOR
+                else -> DEFAULT_STOCK_COLOR
+              },
+      ),
+  )
+}
+
+@CheckResult
 @Composable
 private fun rememberChartLines(chart: StockChart): ChartLines? {
   return rememberInBackground(chart) {
-    val models =
-        entryModelOf(
-            listOf(
-                entryOf(0, 0),
-                entryOf(1, 1),
-                entryOf(2, 2),
-                entryOf(3, 4),
-                entryOf(4, 2),
-                entryOf(4.5, 0.5),
-            ),
-            listOf(
-                entryOf(4.5, 0.5),
-                entryOf(5, -1),
-                entryOf(6, -2),
-                entryOf(6.5, 0),
-            ),
-            listOf(
-                entryOf(6.5, 0),
-                entryOf(7, 2),
-                entryOf(8, 2),
-                entryOf(8.4, 0),
-            ),
-            listOf(
-                entryOf(8.4, 0),
-                entryOf(9, -3),
-                entryOf(10, 0),
+    val high = chart.periodHigh()
+    val low = chart.periodLow()
+    val range = chart.range
+
+    val closes = chart.close
+    val baseline = chart.startingPrice
+
+    val dataPoints =
+        chart.dates.mapIndexed { i, date ->
+          val close = closes[i]
+          ChartData(
+              high = high,
+              low = low,
+              baseline = baseline,
+              range = range,
+              date = date,
+              price = close,
+          )
+        }
+
+    val specSegments = mutableListOf<LineChart.LineSpec>()
+    val lineSegments = mutableListOf<List<ChartDataEntry>>()
+
+    var index = 0
+    var currentSegment = mutableListOf<ChartDataEntry>()
+    var currentDirection: StockDirection? = null
+
+    while (true) {
+      // If we have no more points, we are done
+      val data = dataPoints.getOrNull(index) ?: break
+
+      val x = index.toFloat()
+
+      // Grab a data point and chart it
+      currentSegment.add(
+          ChartDataEntry(
+              data = data,
+              x = x,
+              y = data.price.value.toFloat(),
+          ),
+      )
+
+      // Figure out the current direction if needed
+      if (currentDirection == null) {
+        currentDirection = data.resolvePriceDirection()
+      }
+
+      // Should we cut this segment off?
+      // Based on the next direction, if it switches, we decide how to adjust segments
+      val next = dataPoints.getOrNull(index + 1)
+      if (next == null) {
+        // Finish up
+        finishSegments(
+            lineSegments,
+            specSegments,
+            currentSegment,
+            currentDirection,
+        )
+        // We are done
+        break
+      }
+
+      val nextDirection = next.resolvePriceDirection()
+      if (currentDirection != nextDirection) {
+        // We are swapping, this is a hack but it kind of works
+        // Find the difference between data and next price
+        // Divide difference by 2 for a center point
+        // Mark a center point at X: x + 0.5, y: baseline + diff/2
+        // Add this center point to current segment before finishing
+        val priceDiff = data.price.value - next.price.value
+        val priceCenter = priceDiff / 2
+        val hackCenterPointY = (priceCenter + data.baseline.value).toFloat()
+        val hackCenterPointX = x + 0.5F
+
+        currentSegment.add(
+            ChartDataEntry(
+                data = null,
+                x = hackCenterPointX,
+                y = hackCenterPointY,
             ),
         )
 
-    val specs =
-        listOf(
-            LineChart.LineSpec(lineColor = Color.GREEN),
-            LineChart.LineSpec(lineColor = Color.RED),
-            LineChart.LineSpec(lineColor = Color.GREEN),
-            LineChart.LineSpec(lineColor = Color.RED),
+        // Finish up
+        finishSegments(
+            lineSegments,
+            specSegments,
+            currentSegment,
+            currentDirection,
         )
+
+        // Direction changes for the next item, cut of this segment
+        currentSegment = mutableListOf()
+
+        // Keep current direction if NONE, else flip direction
+        if (!nextDirection.isZero) {
+          currentDirection = currentDirection.flip()
+        }
+
+        // We pre-start this next segment at the center point at X: x + 0.5, y: baseline + diff/2
+        // Add this center point to new segment before processing loop starts
+        currentSegment.add(
+            ChartDataEntry(
+                data = null,
+                x = hackCenterPointX,
+                y = hackCenterPointY,
+            ),
+        )
+      }
+
+      // Bump the index
+      ++index
+    }
 
     return@rememberInBackground ChartLines(
-        models = models,
-        specs = specs,
+        models = ChartEntryModelProducer(lineSegments).getModel(),
+        specs = specSegments,
     )
   }
 }
@@ -120,23 +294,42 @@ internal fun LineChart(
         CircularProgressIndicator()
       }
     } else {
+      val axisValuesOverrider =
+          remember(lines.models) {
+            AxisValuesOverrider.fixed(
+                minX = lines.models.minX,
+                maxX = lines.models.maxX,
+                minY = lines.models.minY,
+                maxY = lines.models.maxY,
+            )
+          }
+
       Chart(
           modifier = Modifier.fillMaxSize(),
+          isZoomEnabled = false,
           chart =
               lineChart(
                   lines = lines.specs,
+                  axisValuesOverrider = axisValuesOverrider,
               ),
           model = lines.models,
           startAxis =
               startAxis(
+                  // No ticks
+                  tick = null,
                   // No labels on start axis
                   valueFormatter = { _, _ -> "" },
               ),
           bottomAxis =
               bottomAxis(
+                  // No ticks
+                  tick = null,
                   // No labels on bottom axis
                   valueFormatter = { _, _ -> "" },
-              ),
+                  tickPosition =
+                      HorizontalAxis.TickPosition.Center(
+                          spacing = 100000,
+                      )),
           chartScrollSpec =
               rememberChartScrollSpec(
                   isScrollEnabled = false,

@@ -52,6 +52,15 @@ interface StockDirection : StockNumberValue {
 }
 
 @CheckResult
+fun StockDirection.flip(): StockDirection {
+  return when {
+    this.isUp -> StockDirection.DOWN
+    this.isDown -> StockDirection.UP
+    else -> StockDirection.NONE
+  }
+}
+
+@CheckResult
 fun StockDirection.asGainLoss(): String {
   return when {
     this.isUp -> "Gain"

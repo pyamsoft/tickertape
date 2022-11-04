@@ -84,6 +84,12 @@ internal constructor(
     return result.recover { emptyList() }
   }
 
+  @CheckResult
+  private suspend fun getQuotesPageSize(): Int {
+    // TODO Use prefs
+    return 5
+  }
+
   override suspend fun updateNotification(
       service: Service,
       options: TapeRemote.NotificationOptions
@@ -103,6 +109,7 @@ internal constructor(
                           TapeNotificationData.Quotes(
                               quotes = quotes,
                               index = options.index,
+                              pageSize = getQuotesPageSize(),
                           ),
                   )
                   .also { Timber.d("Update tape notification: $it") }
@@ -124,6 +131,7 @@ internal constructor(
         TapeNotificationData.Quotes(
             quotes = emptyList(),
             index = 0,
+            pageSize = 0,
         )
 
     private val CHANNEL_INFO =

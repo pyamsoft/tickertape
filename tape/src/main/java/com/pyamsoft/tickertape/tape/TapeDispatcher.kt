@@ -180,7 +180,7 @@ internal constructor(
   ) {
     val session = quote.currentSession
     val color = session.direction.color
-      val sign = session.direction.sign
+    val sign = session.direction.sign
 
     // Company
     val view = RemoteViews(context.packageName, R.layout.remote_view_data)
@@ -200,18 +200,31 @@ internal constructor(
     remoteViews.addView(R.id.remote_views, view)
   }
 
+  private fun addRemoveViewSpacer(remoteViews: RemoteViews) {
+    val view = RemoteViews(context.packageName, R.layout.remote_view_spacer)
+    remoteViews.addView(R.id.remote_views, view)
+  }
+
   @CheckResult
   private fun hydrateRemoteViewTickerData(
       remoteViews: RemoteViews,
       quotes: List<StockQuote>,
       start: Int,
+      pageSize: Int,
   ): Int {
     var lastUsedIndex = 0
 
-    for (i in 0 until 5) {
-      val index = boundIndex(start + i, quotes.size)
-      val quote = quotes[index]
+    for (i in 0 until pageSize) {
+      val index = start + i
+      val quote = quotes.resolveItemAtCircularIndex(index)
+
+      // Add data
       addRemoteViewQuoteData(remoteViews, quote)
+
+      // Add bottom spacer
+      addRemoveViewSpacer(remoteViews)
+
+      // Track index used
       lastUsedIndex = index
     }
 
@@ -221,8 +234,9 @@ internal constructor(
   @CheckResult
   private fun buildQuoteNotification(
       builder: NotificationCompat.Builder,
+      quotes: List<StockQuote>,
       start: Int,
-      quotes: List<StockQuote>
+      pageSize: Int,
   ): Notification {
 
     if (quotes.isEmpty()) {
@@ -234,11 +248,11 @@ internal constructor(
 
     // Get how many we can show per notification "page"
     val remoteViews = RemoteViews(context.packageName, R.layout.remote_view)
-    val nextPageStarts = hydrateRemoteViewTickerData(remoteViews, quotes, start)
+    val nextPageStarts = hydrateRemoteViewTickerData(remoteViews, quotes, start, pageSize)
 
     val nextOptions =
         PendingIntentOptions(
-            index = boundIndex(nextPageStarts, quotes.size),
+            index = nextPageStarts,
             forceRefresh = false,
         )
     val nextPe = getServicePendingIntent(REQUEST_CODE_NEXT, nextOptions)
@@ -253,11 +267,7 @@ internal constructor(
   @CheckResult
   private fun getBoundQuotePageIndex(notification: TapeNotificationData): Int {
     return when (notification) {
-      is TapeNotificationData.Quotes -> {
-        val quotes = notification.quotes
-        // Safely bind between the size of the list
-        if (quotes.isEmpty()) notification.index else boundIndex(notification.index, quotes.size)
-      }
+      is TapeNotificationData.Quotes -> notification.index
     }
   }
 
@@ -273,7 +283,13 @@ internal constructor(
     val builder = createBuilderWithRefreshAction(channelInfo = channelInfo, index = start)
 
     return when (notification) {
-      is TapeNotificationData.Quotes -> buildQuoteNotification(builder, start, notification.quotes)
+      is TapeNotificationData.Quotes ->
+          buildQuoteNotification(
+              builder,
+              notification.quotes,
+              start,
+              notification.pageSize,
+          )
     }
   }
 
@@ -294,15 +310,5 @@ internal constructor(
     private const val REQUEST_CODE_ACTIVITY = 1337420
     private const val REQUEST_CODE_NEXT = REQUEST_CODE_ACTIVITY + 1
     private const val REQUEST_CODE_REFRESH = REQUEST_CODE_ACTIVITY + 2
-
-    @JvmStatic
-    @CheckResult
-    private fun boundIndex(index: Int, maxIndex: Int): Int {
-      return when {
-        index >= maxIndex -> index % maxIndex
-        index < 0 -> boundIndex(maxIndex + index, maxIndex)
-        else -> index
-      }
-    }
   }
 }

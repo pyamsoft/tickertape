@@ -21,6 +21,10 @@ import com.pyamsoft.tickertape.stocks.api.StockQuote
 
 internal sealed class TapeNotificationData : NotifyData {
 
-  internal data class Quotes internal constructor(val quotes: List<StockQuote>, val index: Int) :
-      TapeNotificationData()
+  internal data class Quotes
+  internal constructor(
+      val quotes: List<StockQuote>,
+      val index: Int,
+      val pageSize: Int,
+  ) : TapeNotificationData()
 }

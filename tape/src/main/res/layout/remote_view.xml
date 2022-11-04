@@ -19,7 +19,8 @@
     android:id="@+id/remote_views"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
     android:baselineAligned="false"
-    android:orientation="horizontal"
-    tools:layout_height="48dp"
-    tools:layout_width="320dp" />
+    android:orientation="vertical"
+    tools:layout_height="240dp"
+    tools:layout_width="match_parent" />

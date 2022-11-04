@@ -23,6 +23,4 @@ internal sealed class TapeNotificationData : NotifyData {
 
   internal data class Quotes internal constructor(val quotes: List<StockQuote>, val index: Int) :
       TapeNotificationData()
-
-  internal object Closed : TapeNotificationData()
 }

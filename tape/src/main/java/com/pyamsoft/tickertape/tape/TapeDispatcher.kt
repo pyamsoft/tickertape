@@ -180,6 +180,7 @@ internal constructor(
   ) {
     val session = quote.currentSession
     val color = session.direction.color
+      val sign = session.direction.sign
 
     // Company
     val view = RemoteViews(context.packageName, R.layout.remote_view_data)
@@ -190,8 +191,8 @@ internal constructor(
 
     // Price
     view.setTextViewText(R.id.remote_views_data_price, session.price.display)
-    view.setTextViewText(R.id.remote_views_data_change_amount, session.amount.display)
-    view.setTextViewText(R.id.remote_views_data_change_percent, session.percent.display)
+    view.setTextViewText(R.id.remote_views_data_change_amount, "${sign}${session.amount.display}")
+    view.setTextViewText(R.id.remote_views_data_change_percent, "${sign}${session.percent.display}")
 
     view.setTextColor(R.id.remote_views_data_price, color)
     view.setTextColor(R.id.remote_views_data_change_amount, color)

@@ -20,7 +20,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -97,8 +95,7 @@ internal fun MainBottomNav(
 
   // Space on the bottom bar for the FAB
   val fabSpacerModifier =
-      Modifier.padding(horizontal = MaterialTheme.keylines.content)
-          .width(FabDefaults.FAB_SIZE_DP)
+      Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
 
   // We set the height here to the size of the bar (which is also FAB_SIZE_DP) + the size of the
   // button when it peeks outside of the bar (FAB_SIZE_DP / 2)
@@ -255,23 +252,11 @@ private fun RowScope.Item(
       selected = isSelected,
       onClick = { onLoadPage() },
       icon = {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-          Icon(
-              imageVector = icon,
-              contentDescription = target.displayName,
-              tint = color,
-          )
-          Text(
-              text = target.displayName,
-              style =
-                  MaterialTheme.typography.body2.copy(
-                      color = color,
-                  ),
-          )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = target.displayName,
+            tint = color,
+        )
       },
   )
 }

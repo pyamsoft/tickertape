@@ -44,7 +44,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,15 +84,6 @@ internal fun MainBottomNav(
         density.run { keylines.content.roundToPx() }
       }
 
-  val (fabOffset, setFabOffset) = remember { mutableStateOf(0) }
-  val fabOffsetDp =
-      remember(
-          density,
-          fabOffset,
-      ) {
-        density.run { fabOffset.toDp() }
-      }
-
   // Space on the bottom bar for the FAB
   val fabSpacerModifier =
       Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
@@ -104,13 +94,17 @@ internal fun MainBottomNav(
   // Failing to set the height here will make the bar jump up and down when the page scrolls from
   // no-show-fab to show-fab
   Box(
-      modifier = modifier.height(FabDefaults.FAB_SIZE_DP + FabDefaults.FAB_SIZE_DP / 2),
-      contentAlignment = Alignment.BottomEnd,
+      modifier = modifier,
+      contentAlignment = Alignment.TopEnd,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
       val color = MaterialTheme.colors.onBackground
+
+      Spacer(
+          modifier = Modifier.height(FabDefaults.FAB_SIZE_DP / 2),
+      )
 
       Divider(
           color = color.copy(alpha = ContentAlpha.disabled),
@@ -122,7 +116,6 @@ internal fun MainBottomNav(
           modifier =
               Modifier.fillMaxWidth().onSizeChanged {
                 onHeightMeasured(it.height + additionalTopContentPadding)
-                setFabOffset(it.height / 2)
               },
           contentColor = color.copy(alpha = ContentAlpha.medium),
           color = MaterialTheme.colors.background,
@@ -180,7 +173,7 @@ internal fun MainBottomNav(
 
     // Float on top of the bar
     ActionButton(
-        modifier = fabSpacerModifier.padding(bottom = fabOffsetDp),
+        modifier = fabSpacerModifier,
         page = page,
         onActionSelected = onActionSelected,
     )
@@ -200,6 +193,7 @@ private fun ActionButton(
 
   Box(
       modifier = modifier,
+      contentAlignment = Alignment.TopCenter,
   ) {
     AnimatedVisibility(
         visible = isFabVisible,

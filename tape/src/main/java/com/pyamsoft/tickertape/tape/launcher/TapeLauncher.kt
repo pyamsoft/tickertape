@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.launcher
 
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.pyamsoft.pydroid.bus.EventBus
+import com.pyamsoft.tickertape.tape.TapeInternalApi
+import com.pyamsoft.tickertape.tape.TapePreferences
+import com.pyamsoft.tickertape.tape.remote.TapeRemote
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers

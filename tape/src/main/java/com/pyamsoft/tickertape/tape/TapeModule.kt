@@ -22,6 +22,9 @@ import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
+import com.pyamsoft.tickertape.tape.notification.TapeDispatcher
+import com.pyamsoft.tickertape.tape.remote.TapeRemote
+import com.pyamsoft.tickertape.tape.remote.TapeRemoteImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

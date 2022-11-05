@@ -25,7 +25,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
-import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

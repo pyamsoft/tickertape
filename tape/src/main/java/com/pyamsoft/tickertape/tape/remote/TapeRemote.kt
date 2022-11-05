@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.remote
 
 import android.app.Service
 
 interface TapeRemote {
+
+  suspend fun watchPageSize(onChange: (Int) -> Unit)
 
   fun createNotification(service: Service)
 
@@ -31,7 +33,11 @@ interface TapeRemote {
 
   suspend fun onStopReceived(onStop: () -> Unit)
 
-  data class NotificationOptions(val index: Int, val forceRefresh: Boolean)
+  data class NotificationOptions(
+      val index: Int,
+      val forceRefresh: Boolean,
+      val pageSize: Int,
+  )
 
   object StopCommand
 

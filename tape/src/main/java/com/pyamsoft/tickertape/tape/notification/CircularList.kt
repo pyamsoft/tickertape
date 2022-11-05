@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.notification
 
 import androidx.annotation.CheckResult
 

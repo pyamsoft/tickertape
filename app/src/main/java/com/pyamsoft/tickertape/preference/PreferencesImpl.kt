@@ -21,6 +21,7 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.booleanFlow
+import com.pyamsoft.pydroid.util.intFlow
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
@@ -43,29 +44,57 @@ internal constructor(
   override suspend fun setTapeNotificationEnabled(enabled: Boolean) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        preferences.edit { putBoolean(KEY_TAPE_NOTIFICATION, enabled) }
+        preferences.edit { putBoolean(Tape.KEY_NOTIFICATION_ENABLED, enabled) }
+      }
+
+  override suspend fun setTapePageSize(size: Int) =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        preferences.edit { putInt(Tape.KEY_PAGE_SIZE, size) }
+      }
+
+  override suspend fun listenForTapePageSizeChanged(): Flow<Int> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext preferences.intFlow(
+            Tape.KEY_PAGE_SIZE,
+            TapePreferences.VALUE_DEFAULT_PAGE_SIZE,
+        )
       }
 
   override suspend fun listenForTapeNotificationChanged(): Flow<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext preferences.booleanFlow(KEY_TAPE_NOTIFICATION, true)
+        return@withContext preferences.booleanFlow(
+            Tape.KEY_NOTIFICATION_ENABLED,
+            TapePreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
+        )
       }
 
   override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        preferences.edit { putBoolean(KEY_BIG_MOVER_NOTIFICATION, enabled) }
+        preferences.edit { putBoolean(BigMovers.KEY_NOTIFICATION_ENABLED, enabled) }
       }
 
   override suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext preferences.booleanFlow(KEY_BIG_MOVER_NOTIFICATION, true)
+        return@withContext preferences.booleanFlow(
+            BigMovers.KEY_NOTIFICATION_ENABLED,
+            BigMoverPreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
+        )
       }
 
-  companion object {
-    private const val KEY_TAPE_NOTIFICATION = "key_tape_notification_v1"
-    private const val KEY_BIG_MOVER_NOTIFICATION = "key_big_mover_notification_v1"
+  private object BigMovers {
+
+    const val KEY_NOTIFICATION_ENABLED = "key_big_mover_notification_v1"
+  }
+
+  private object Tape {
+
+    const val KEY_NOTIFICATION_ENABLED = "key_tape_notification_v1"
+
+    const val KEY_PAGE_SIZE = "key_tape_page_size_v1"
   }
 }

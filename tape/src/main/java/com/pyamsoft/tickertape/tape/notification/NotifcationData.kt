@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.notification
 
 import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.tickertape.stocks.api.StockQuote

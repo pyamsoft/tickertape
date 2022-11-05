@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.notification
 
 import android.app.Activity
 import android.app.Notification
@@ -37,6 +37,8 @@ import com.pyamsoft.pydroid.notify.NotifyData
 import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.tape.R
+import com.pyamsoft.tickertape.tape.remote.TapeRemote
 import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Named

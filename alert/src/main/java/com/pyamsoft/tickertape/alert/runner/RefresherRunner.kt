@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.alert.runner
 
 import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.tape.TapeLauncher
+import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.coroutineScope

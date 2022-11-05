@@ -21,7 +21,17 @@ import kotlinx.coroutines.flow.Flow
 
 interface TapePreferences {
 
+  suspend fun setTapePageSize(size: Int)
+
+  @CheckResult suspend fun listenForTapePageSizeChanged(): Flow<Int>
+
   suspend fun setTapeNotificationEnabled(enabled: Boolean)
 
   @CheckResult suspend fun listenForTapeNotificationChanged(): Flow<Boolean>
+
+  companion object {
+
+    const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
+    const val VALUE_DEFAULT_PAGE_SIZE = 5
+  }
 }

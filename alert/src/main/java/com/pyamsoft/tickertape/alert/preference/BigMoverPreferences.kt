@@ -24,4 +24,10 @@ interface BigMoverPreferences {
   suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
 
   @CheckResult suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean>
+
+  companion object {
+
+    const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
+
+  }
 }

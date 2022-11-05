@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
+import com.pyamsoft.tickertape.tape.remote.TapeRemote
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -34,17 +35,45 @@ import timber.log.Timber
 
 class TapeService : Service() {
 
-  /** CoroutineScope for the Service level */
-  private val serviceScope = MainScope()
-
   /** The custom notification */
   @Inject @JvmField internal var tapeRemote: TapeRemote? = null
 
-  /** The current page of symbol info */
-  private var currentIndex = DEFAULT_INDEX
+  /** CoroutineScope for the Service level */
+  private val serviceScope = MainScope()
 
-  /** Watch the screen ON state */
+  /**
+   * Watch the screen ON state
+   *
+   * Will refresh the tape on screen ON via TapeLauncher
+   */
   private var screenReceiverRegistration: ScreenReceiver.Registration? = null
+
+  /** Tape Notification bits */
+  private var currentIndex = DEFAULT_INDEX
+  private var pageSize = TapePreferences.VALUE_DEFAULT_PAGE_SIZE
+
+  private fun updateTape(intent: Intent?) {
+    val self = this
+
+    // Resolve current options from intent if possible, otherwise keep current
+    val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
+    val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, currentIndex) ?: currentIndex
+    currentIndex = index
+
+    serviceScope.launch(context = Dispatchers.Main) {
+      tapeRemote
+          .requireNotNull()
+          .updateNotification(
+              service = self,
+              options =
+                  TapeRemote.NotificationOptions(
+                      index = index,
+                      forceRefresh = forceRefresh,
+                      pageSize = pageSize,
+                  ),
+          )
+    }
+  }
 
   override fun onBind(intent: Intent?): IBinder? {
     return null
@@ -60,10 +89,20 @@ class TapeService : Service() {
       remote.createNotification(this)
 
       // Also open for listening for Stop commands
-      serviceScope.launch(context = Dispatchers.Default) {
+      serviceScope.launch(context = Dispatchers.Main) {
         remote.onStopReceived {
           Timber.w("Stop command received from remote. Stop TapeService")
           stopSelf()
+        }
+      }
+
+      // Also listen to page size
+      serviceScope.launch(context = Dispatchers.Main) {
+        remote.watchPageSize { newPageSize ->
+          pageSize = newPageSize
+
+          // Update the notification
+          updateTape(null)
         }
       }
     }
@@ -78,27 +117,6 @@ class TapeService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     updateTape(intent)
     return START_STICKY
-  }
-
-  private fun updateTape(intent: Intent?) {
-    val self = this
-    val index = intent?.getIntExtra(TapeRemote.KEY_CURRENT_INDEX, currentIndex) ?: currentIndex
-    currentIndex = index
-
-    val forceRefresh = intent?.getBooleanExtra(TapeRemote.KEY_FORCE_REFRESH, false) ?: false
-
-    serviceScope.launch(context = Dispatchers.Main) {
-      tapeRemote
-          .requireNotNull()
-          .updateNotification(
-              service = self,
-              options =
-                  TapeRemote.NotificationOptions(
-                      index = index,
-                      forceRefresh = forceRefresh,
-                  ),
-          )
-    }
   }
 
   override fun onDestroy() {

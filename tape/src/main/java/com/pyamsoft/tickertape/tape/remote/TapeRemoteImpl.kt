@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.tape
+package com.pyamsoft.tickertape.tape.remote
 
 import android.app.Service
 import androidx.annotation.CheckResult
@@ -29,9 +29,13 @@ import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.tape.TapeInternalApi
+import com.pyamsoft.tickertape.tape.TapePreferences
+import com.pyamsoft.tickertape.tape.notification.TapeNotificationData
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -41,27 +45,12 @@ internal class TapeRemoteImpl
 internal constructor(
     @TapeInternalApi private val stopBus: EventConsumer<TapeRemote.StopCommand>,
     @TapeInternalApi private val notifier: Notifier,
+    private val preferences: TapePreferences,
     private val symbolQueryDao: SymbolQueryDao,
     private val symbolQueryDaoCache: SymbolQueryDao.Cache,
     private val interactor: StockInteractor,
     private val interactorCache: StockInteractor.Cache,
 ) : TapeRemote {
-
-  override suspend fun onStopReceived(onStop: () -> Unit) =
-      withContext(context = Dispatchers.IO) { stopBus.onEvent { onStop() } }
-
-  override fun createNotification(service: Service) {
-
-    notifier
-        .startForeground(
-            service = service,
-            channelInfo = CHANNEL_INFO,
-            id = NOTIFICATION_ID,
-            notification = EMPTY_TAPE_NOTIFICATION,
-        )
-        .also { id -> Timber.d("Started foreground notification: $id") }
-    return
-  }
 
   @CheckResult
   private suspend fun fetchQuotes(force: Boolean): ResultWrapper<List<StockQuote>> {
@@ -84,21 +73,38 @@ internal constructor(
     return result.recover { emptyList() }
   }
 
-  @CheckResult
-  private suspend fun getQuotesPageSize(): Int {
-    // TODO Use prefs
-    return 5
+  override suspend fun watchPageSize(onChange: (Int) -> Unit) =
+      withContext(context = Dispatchers.IO) {
+        preferences.listenForTapePageSizeChanged().collectLatest { pageSize ->
+          withContext(context = Dispatchers.Main) { onChange(pageSize) }
+        }
+      }
+
+  override suspend fun onStopReceived(onStop: () -> Unit) =
+      withContext(context = Dispatchers.IO) {
+        stopBus.onEvent { withContext(context = Dispatchers.Main) { onStop() } }
+      }
+
+  override fun createNotification(service: Service) {
+    notifier
+        .startForeground(
+            service = service,
+            channelInfo = CHANNEL_INFO,
+            id = NOTIFICATION_ID,
+            notification = EMPTY_TAPE_NOTIFICATION,
+        )
+        .also { Timber.d("Started foreground notification: $it") }
+    return
   }
 
   override suspend fun updateNotification(
       service: Service,
       options: TapeRemote.NotificationOptions
   ) =
-      withContext(context = Dispatchers.Default) {
+      withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val force = options.forceRefresh
-        fetchQuotes(force)
+        fetchQuotes(force = options.forceRefresh)
             .onSuccess { quotes ->
               notifier
                   .startForeground(
@@ -109,12 +115,11 @@ internal constructor(
                           TapeNotificationData.Quotes(
                               quotes = quotes,
                               index = options.index,
-                              pageSize = getQuotesPageSize(),
+                              pageSize = options.pageSize,
                           ),
                   )
                   .also { Timber.d("Update tape notification: $it") }
             }
-            .onSuccess { Timber.d("Updated foreground notification $NOTIFICATION_ID") }
             .onFailure { Timber.e(it, "Unable to refresh notification") }
 
         return@withContext
@@ -127,6 +132,7 @@ internal constructor(
   companion object {
 
     private val NOTIFICATION_ID = 42069.toNotifyId()
+
     private val EMPTY_TAPE_NOTIFICATION =
         TapeNotificationData.Quotes(
             quotes = emptyList(),

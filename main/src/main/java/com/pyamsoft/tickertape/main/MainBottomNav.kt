@@ -229,6 +229,7 @@ private fun RowScope.Item(
     target: TopLevelMainPage,
     onLoadPage: () -> Unit,
 ) {
+  val currentColor = LocalContentColor.current
 
   val icon =
       remember(target) {
@@ -242,34 +243,20 @@ private fun RowScope.Item(
 
   val isSelected = remember(current, target) { current == target }
 
-  val currentColor = LocalContentColor.current
-  val colors = MaterialTheme.colors
-  val highAlpha = ContentAlpha.high
-  val color =
-      remember(
-          currentColor,
-          isSelected,
-          colors,
-          highAlpha,
-      ) {
-        if (isSelected) {
-          colors.primary.copy(
-              alpha = highAlpha,
-          )
-        } else {
-          currentColor
-        }
-      }
-
   BottomNavigationItem(
       modifier = modifier,
       selected = isSelected,
-      onClick = { onLoadPage() },
+      onClick = onLoadPage,
+      selectedContentColor =
+          MaterialTheme.colors.primary.copy(
+              alpha = ContentAlpha.high,
+          ),
+      unselectedContentColor = currentColor,
+      alwaysShowLabel = false,
       icon = {
         Icon(
             imageVector = icon,
             contentDescription = target.displayName,
-            tint = color,
         )
       },
   )

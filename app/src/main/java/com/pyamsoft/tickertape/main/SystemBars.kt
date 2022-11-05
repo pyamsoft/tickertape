@@ -19,20 +19,34 @@ package com.pyamsoft.tickertape.main
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pyamsoft.pydroid.ui.theme.Theming
 
 @Composable
-internal fun SystemBars(theme: Theming.Mode) {
-  val isLighStatusBar =
+internal fun SystemBars(
+    theme: Theming.Mode,
+    page: MainPage?,
+) {
+  val isDigPage = remember(page) { page != null && page !is TopLevelMainPage }
+
+  // Dark icons in Light mode only
+  var darkIcons =
       if (theme == Theming.Mode.SYSTEM) !isSystemInDarkTheme() else theme == Theming.Mode.LIGHT
+
+  // In light mode, when we dig, we should make the icons bright or else it looks weird
+  if (darkIcons) {
+    if (isDigPage) {
+      darkIcons = false
+    }
+  }
 
   val controller = rememberSystemUiController()
   SideEffect {
     controller.setSystemBarsColor(
         color = Color.Transparent,
-        darkIcons = isLighStatusBar,
+        darkIcons = darkIcons,
         isNavigationBarContrastEnforced = false,
     )
   }

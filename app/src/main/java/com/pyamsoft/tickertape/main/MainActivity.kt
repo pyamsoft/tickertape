@@ -167,7 +167,7 @@ internal class MainActivity : PYDroidActivity() {
       vm.Render { state ->
         val theme = state.theme
 
-        SystemBars(theme)
+        SystemBars(theme, screen)
         TickerTapeTheme(theme) {
           // Need to have box or snackbars push up bottom bar
           Box(

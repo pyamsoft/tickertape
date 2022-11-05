@@ -88,11 +88,12 @@ internal fun MainBottomNav(
   val fabSpacerModifier =
       Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
 
-  // We set the height here to the size of the bar (which is also FAB_SIZE_DP) + the size of the
-  // button when it peeks outside of the bar (FAB_SIZE_DP / 2)
+  // This Box is aligned like this as a Column
   //
-  // Failing to set the height here will make the bar jump up and down when the page scrolls from
-  // no-show-fab to show-fab
+  // SPACE - Half a FAB
+  // divider
+  // Surface
+  //   -- containing BottomNav and navbar padding
   Box(
       modifier = modifier,
       contentAlignment = Alignment.TopEnd,
@@ -102,16 +103,21 @@ internal fun MainBottomNav(
     ) {
       val color = MaterialTheme.colors.onBackground
 
+      // Space for FAB
+      // without this, top of FAB will be clipped
       Spacer(
           modifier = Modifier.height(FabDefaults.FAB_SIZE_DP / 2),
       )
 
+      // Divider, visual for page content
       Divider(
           color = color.copy(alpha = ContentAlpha.disabled),
           thickness = 2.dp,
       )
 
       // Can't use BottomAppBar since we can't modify its Shape
+      // Even though we use Rectangle (so we don't modify shape)
+      // I like Surface since it won't change API behavior like bottom app bar may
       Surface(
           modifier =
               Modifier.fillMaxWidth().onSizeChanged {
@@ -159,11 +165,14 @@ internal fun MainBottomNav(
               )
             }
 
+            // Leave this space forced empty for the FAB
+            // Since BottomNav stretches to fill space, we have to force it to be occupied
             Spacer(
                 modifier = fabSpacerModifier,
             )
           }
 
+          // Navbar padding inside of the colored surface
           Spacer(
               modifier = Modifier.navigationBarsPadding(),
           )

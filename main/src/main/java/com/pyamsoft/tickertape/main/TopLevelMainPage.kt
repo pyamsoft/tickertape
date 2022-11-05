@@ -8,4 +8,6 @@ sealed class TopLevelMainPage(val displayName: String) : MainPage {
   object Watchlist : TopLevelMainPage("Watchlist")
 
   object Portfolio : TopLevelMainPage("Portfolio")
+
+  object Notifications : TopLevelMainPage("Notifications")
 }

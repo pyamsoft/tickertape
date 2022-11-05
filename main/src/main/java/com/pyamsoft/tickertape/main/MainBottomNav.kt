@@ -42,6 +42,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -128,41 +129,53 @@ internal fun MainBottomNav(
           shape = RectangleShape,
           elevation = ZeroElevation,
       ) {
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-          BottomNavigation(
-              modifier = Modifier.weight(1F),
-              backgroundColor = Color.Transparent,
-              contentColor = LocalContentColor.current,
-              elevation = ZeroElevation,
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
           ) {
-            Item(
-                current = page,
-                target = TopLevelMainPage.Home,
-                onLoadPage = onLoadHome,
-            )
-            Item(
-                current = page,
-                target = TopLevelMainPage.Watchlist,
-                onLoadPage = onLoadWatchlist,
-            )
-            Item(
-                current = page,
-                target = TopLevelMainPage.Portfolio,
-                onLoadPage = onLoadPortfolio,
+            BottomNavigation(
+                modifier = Modifier.weight(1F),
+                backgroundColor = Color.Transparent,
+                contentColor = LocalContentColor.current,
+                elevation = ZeroElevation,
+            ) {
+              Item(
+                  current = page,
+                  target = TopLevelMainPage.Home,
+                  onLoadPage = onLoadHome,
+              )
+              Item(
+                  current = page,
+                  target = TopLevelMainPage.Watchlist,
+                  onLoadPage = onLoadWatchlist,
+              )
+              Item(
+                  current = page,
+                  target = TopLevelMainPage.Portfolio,
+                  onLoadPage = onLoadPortfolio,
+              )
+              Item(
+                  current = page,
+                  target = TopLevelMainPage.Notifications,
+                  onLoadPage = {
+                    // TODO Load Notification page
+                  },
+              )
+            }
+
+            Spacer(
+                modifier = fabSpacerModifier,
             )
           }
 
           Spacer(
-              modifier = fabSpacerModifier,
+              modifier = Modifier.navigationBarsPadding(),
           )
         }
       }
-      Spacer(
-          modifier = Modifier.navigationBarsPadding(),
-      )
     }
 
     // Float on top of the bar
@@ -223,6 +236,7 @@ private fun RowScope.Item(
           TopLevelMainPage.Home -> Icons.Filled.Home
           TopLevelMainPage.Watchlist -> Icons.Filled.BarChart
           TopLevelMainPage.Portfolio -> Icons.Filled.PieChart
+          TopLevelMainPage.Notifications -> Icons.Filled.Notifications
         }
       }
 

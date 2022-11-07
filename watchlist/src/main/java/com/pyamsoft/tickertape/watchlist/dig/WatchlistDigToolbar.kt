@@ -156,7 +156,9 @@ private fun WatchlistTab(
       onClick = { onTabUpdated(tab) },
   ) {
     Text(
-        modifier = Modifier.padding(vertical = MaterialTheme.keylines.typography),
+        modifier =
+            Modifier.padding(vertical = MaterialTheme.keylines.typography)
+                .padding(horizontal = MaterialTheme.keylines.baseline),
         text = tab.display,
     )
   }

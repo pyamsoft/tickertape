@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.db.room.converter.EquityTypeConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateTimeConverter
 import com.pyamsoft.tickertape.db.room.converter.MarketStateConverter
+import com.pyamsoft.tickertape.db.room.converter.PriceAlertIdConverter
 import com.pyamsoft.tickertape.db.room.converter.StockMoneyValueConverter
 import com.pyamsoft.tickertape.db.room.converter.StockPercentConverter
 import com.pyamsoft.tickertape.db.room.converter.StockShareValueConverter
@@ -39,26 +40,36 @@ import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
 import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSplit
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
+import com.pyamsoft.tickertape.db.room.entity.RoomPriceAlert
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities =
         [
+            // Version 1
             RoomDbSymbol::class,
             RoomDbHolding::class,
             RoomDbPosition::class,
             RoomBigMoverReport::class,
+
+            // Version 2
             RoomDbSplit::class,
+
+            // Version 3
+            RoomPriceAlert::class,
         ],
     autoMigrations =
         [
             // Adds DbSplit table
             AutoMigration(from = 1, to = 2),
+
+            // Adds PriceAlert table
+            AutoMigration(from = 2, to = 3),
         ],
 )
 @TypeConverters(
-    DbSplitIdConverter::class,
+    // Version 1
     DbSymbolIdConverter::class,
     DbHoldingIdConverter::class,
     DbPositionIdConverter::class,
@@ -72,5 +83,11 @@ import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
     StockPercentConverter::class,
     TradeSideConverter::class,
     LocalDateConverter::class,
+
+    // Version 2
+    DbSplitIdConverter::class,
+
+    // Version 3
+    PriceAlertIdConverter::class,
 )
 internal abstract class RoomTickerDbImpl internal constructor() : RoomDatabase(), RoomTickerDb

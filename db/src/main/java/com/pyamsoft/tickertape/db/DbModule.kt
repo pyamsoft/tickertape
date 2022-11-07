@@ -35,6 +35,12 @@ import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDbImpl
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDeleteDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertRealtime
 import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.split.SplitDbImpl
 import com.pyamsoft.tickertape.db.split.SplitDeleteDao
@@ -69,6 +75,10 @@ abstract class DbModule {
 
   @Binds @CheckResult internal abstract fun provideSplitDbImpl(impl: SplitDbImpl): SplitDb
 
+  @Binds
+  @CheckResult
+  internal abstract fun providePriceAlertDbImpl(impl: PriceAlertDbImpl): PriceAlertDb
+
   // Caches
 
   @Binds
@@ -90,6 +100,10 @@ abstract class DbModule {
   @Binds
   @CheckResult
   internal abstract fun provideSplitCache(impl: SplitDbImpl): SplitQueryDao.Cache
+
+  @Binds
+  @CheckResult
+  internal abstract fun providePriceAlertCache(impl: PriceAlertDbImpl): PriceAlertQueryDao.Cache
 
   @Module
   companion object {
@@ -271,6 +285,42 @@ abstract class DbModule {
     @Provides
     @CheckResult
     internal fun provideSplitDeleteDao(@InternalApi db: SplitDb): SplitDeleteDao {
+      return db.deleteDao
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    @InternalApi
+    internal fun providePriceAlertDb(db: TickerDb): PriceAlertDb {
+      return db.priceAlerts
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePriceAlertRealtimeDao(@InternalApi db: PriceAlertDb): PriceAlertRealtime {
+      return db.realtime
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePriceAlertQueryDao(@InternalApi db: PriceAlertDb): PriceAlertQueryDao {
+      return db.queryDao
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePriceAlertInsertDao(@InternalApi db: PriceAlertDb): PriceAlertInsertDao {
+      return db.insertDao
+    }
+
+    @JvmStatic
+    @Provides
+    @CheckResult
+    internal fun providePriceAlertDeleteDao(@InternalApi db: PriceAlertDb): PriceAlertDeleteDao {
       return db.deleteDao
     }
   }

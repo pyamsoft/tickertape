@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.mover
+package com.pyamsoft.tickertape.db.pricealert
 
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.pydroid.core.Enforcer
@@ -28,36 +28,36 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
-internal class BigMoverDbImpl
+internal class PriceAlertDbImpl
 @Inject
 internal constructor(
-    @DbApi realQueryDao: BigMoverQueryDao,
-    @DbApi private val realInsertDao: BigMoverInsertDao,
-    @DbApi private val realDeleteDao: BigMoverDeleteDao,
+    @DbApi realQueryDao: PriceAlertQueryDao,
+    @DbApi private val realInsertDao: PriceAlertInsertDao,
+    @DbApi private val realDeleteDao: PriceAlertDeleteDao,
 ) :
-    BigMoverDb,
-    BigMoverQueryDao.Cache,
+    PriceAlertDb,
+    PriceAlertQueryDao.Cache,
     BaseDbImpl<
-            BigMoverChangeEvent,
-        BigMoverRealtime,
-        BigMoverQueryDao,
-        BigMoverInsertDao,
-        BigMoverDeleteDao,
+            PriceAlertChangeEvent,
+        PriceAlertRealtime,
+        PriceAlertQueryDao,
+        PriceAlertInsertDao,
+        PriceAlertDeleteDao,
     >() {
 
   private val queryCache =
-      cachify<List<BigMoverReport>> {
+      cachify<List<PriceAlert>> {
         Enforcer.assertOffMainThread()
         return@cachify realQueryDao.query()
       }
 
-  override val deleteDao: BigMoverDeleteDao = this
+  override val deleteDao: PriceAlertDeleteDao = this
 
-  override val insertDao: BigMoverInsertDao = this
+  override val insertDao: PriceAlertInsertDao = this
 
-  override val queryDao: BigMoverQueryDao = this
+  override val queryDao: PriceAlertQueryDao = this
 
-  override val realtime: BigMoverRealtime = this
+  override val realtime: PriceAlertRealtime = this
 
   override suspend fun invalidate() =
       withContext(context = Dispatchers.IO) {
@@ -65,30 +65,30 @@ internal constructor(
         queryCache.clear()
       }
 
-  override suspend fun listenForChanges(onChange: (event: BigMoverChangeEvent) -> Unit) =
+  override suspend fun listenForChanges(onChange: (event: PriceAlertChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         onEvent(onChange)
       }
 
-  override suspend fun query(): List<BigMoverReport> =
+  override suspend fun query(): List<PriceAlert> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext queryCache.call()
       }
 
-  override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
+  override suspend fun insert(o: PriceAlert): DbInsert.InsertResult<PriceAlert> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
               invalidate()
-              publish(BigMoverChangeEvent.Insert(result.data))
+              publish(PriceAlertChangeEvent.Insert(result.data))
             }
             is DbInsert.InsertResult.Update -> {
               invalidate()
-              publish(BigMoverChangeEvent.Update(result.data))
+              publish(PriceAlertChangeEvent.Update(result.data))
             }
             is DbInsert.InsertResult.Fail ->
                 Timber.e(result.error, "Insert attempt failed: ${result.data}")
@@ -96,13 +96,13 @@ internal constructor(
         }
       }
 
-  override suspend fun delete(o: BigMoverReport, offerUndo: Boolean): Boolean =
+  override suspend fun delete(o: PriceAlert, offerUndo: Boolean): Boolean =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()
-            publish(BigMoverChangeEvent.Delete(o, offerUndo))
+            publish(PriceAlertChangeEvent.Delete(o, offerUndo))
           }
         }
       }

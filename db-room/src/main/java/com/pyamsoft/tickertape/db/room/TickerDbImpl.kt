@@ -22,6 +22,8 @@ import com.pyamsoft.tickertape.db.mover.BigMoverDb
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
@@ -39,12 +41,15 @@ internal constructor(
     override val positions: PositionDb,
     override val bigMovers: BigMoverDb,
     override val splits: SplitDb,
+    override val priceAlerts: PriceAlertDb,
+
     // Caches
     private val symbolCache: SymbolQueryDao.Cache,
     private val holdingCache: HoldingQueryDao.Cache,
     private val positionCache: PositionQueryDao.Cache,
     private val bigMoverCache: BigMoverQueryDao.Cache,
     private val splitCache: SplitQueryDao.Cache,
+    private val priceAlertCache: PriceAlertQueryDao.Cache,
 ) : TickerDb {
 
   override suspend fun invalidate() {
@@ -53,5 +58,6 @@ internal constructor(
     positionCache.invalidate()
     bigMoverCache.invalidate()
     splitCache.invalidate()
+    priceAlertCache.invalidate()
   }
 }

@@ -30,6 +30,9 @@ import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDeleteDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.db.split.SplitDeleteDao
 import com.pyamsoft.tickertape.db.split.SplitInsertDao
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
@@ -165,6 +168,27 @@ abstract class RoomModule {
     @JvmStatic
     internal fun provideRoomSplitDeleteDao(@InternalApi db: RoomTickerDb): SplitDeleteDao {
       return db.roomSplitDeleteDao
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPriceAlertQueryDao(@InternalApi db: RoomTickerDb): PriceAlertQueryDao {
+      return db.roomPriceAlertQueryDao
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPriceAlertInsertDao(@InternalApi db: RoomTickerDb): PriceAlertInsertDao {
+      return db.roomPriceAlertInsertDao
+    }
+
+    @DbApi
+    @Provides
+    @JvmStatic
+    internal fun provideRoomPriceAlertDeleteDao(@InternalApi db: RoomTickerDb): PriceAlertDeleteDao {
+      return db.roomPriceAlertDeleteDao
     }
   }
 }

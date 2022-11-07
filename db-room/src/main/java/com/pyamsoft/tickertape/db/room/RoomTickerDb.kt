@@ -26,6 +26,9 @@ import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverQueryDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionInsertDao
 import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionQueryDao
+import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertDeleteDao
+import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertInsertDao
+import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertQueryDao
 import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitDeleteDao
 import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitInsertDao
 import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitQueryDao
@@ -35,33 +38,33 @@ import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
 
 internal interface RoomTickerDb {
 
+  // Symbols
   @get:CheckResult val roomSymbolQueryDao: RoomSymbolQueryDao
-
   @get:CheckResult val roomSymbolInsertDao: RoomSymbolInsertDao
-
   @get:CheckResult val roomSymbolDeleteDao: RoomSymbolDeleteDao
 
+  // Holdings
   @get:CheckResult val roomHoldingQueryDao: RoomHoldingQueryDao
-
   @get:CheckResult val roomHoldingInsertDao: RoomHoldingInsertDao
-
   @get:CheckResult val roomHoldingDeleteDao: RoomHoldingDeleteDao
 
+  // Positions
   @get:CheckResult val roomPositionQueryDao: RoomPositionQueryDao
-
   @get:CheckResult val roomPositionInsertDao: RoomPositionInsertDao
-
   @get:CheckResult val roomPositionDeleteDao: RoomPositionDeleteDao
 
+  // Big Movers
   @get:CheckResult val roomBigMoverQueryDao: RoomBigMoverQueryDao
-
   @get:CheckResult val roomBigMoverInsertDao: RoomBigMoverInsertDao
-
   @get:CheckResult val roomBigMoverDeleteDao: RoomBigMoverDeleteDao
 
+  // Splits
   @get:CheckResult val roomSplitQueryDao: RoomSplitQueryDao
-
   @get:CheckResult val roomSplitInsertDao: RoomSplitInsertDao
-
   @get:CheckResult val roomSplitDeleteDao: RoomSplitDeleteDao
+
+  // Price Alerts
+  @get:CheckResult val roomPriceAlertQueryDao: RoomPriceAlertQueryDao
+  @get:CheckResult val roomPriceAlertInsertDao: RoomPriceAlertInsertDao
+  @get:CheckResult val roomPriceAlertDeleteDao: RoomPriceAlertDeleteDao
 }

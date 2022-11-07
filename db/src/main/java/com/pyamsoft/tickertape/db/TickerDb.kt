@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.holding.HoldingDb
 import com.pyamsoft.tickertape.db.mover.BigMoverDb
 import com.pyamsoft.tickertape.db.position.PositionDb
+import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
 import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
@@ -34,6 +35,8 @@ interface TickerDb {
   @get:CheckResult val bigMovers: BigMoverDb
 
   @get:CheckResult val splits: SplitDb
+
+  @get:CheckResult val priceAlerts: PriceAlertDb
 
   suspend fun invalidate()
 }

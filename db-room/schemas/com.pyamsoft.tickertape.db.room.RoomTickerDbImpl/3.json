@@ -1,0 +1,316 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "247109560431b662f016fa2ac50180f2",
+    "entities": [
+      {
+        "tableName": "room_symbol_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSymbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "room_holding_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `holding_type` TEXT NOT NULL, `holding_side` TEXT NOT NULL, `holding_real_type` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSymbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbType",
+            "columnName": "holding_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSide",
+            "columnName": "holding_side",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "realEquityType",
+            "columnName": "holding_real_type",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "room_position_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `price` REAL NOT NULL, `share_count` REAL NOT NULL, `purchase_date` INTEGER NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbHoldingId",
+            "columnName": "holding_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbPrice",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbShareCount",
+            "columnName": "share_count",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbPurchaseDate",
+            "columnName": "purchase_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_room_position_table_holding_id",
+            "unique": false,
+            "columnNames": [
+              "holding_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_room_position_table_holding_id` ON `${TABLE_NAME}` (`holding_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "room_holding_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "holding_id"
+            ],
+            "referencedColumns": [
+              "_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "room_big_mover_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `last_date` INTEGER NOT NULL, `last_percent` REAL NOT NULL, `last_price` REAL NOT NULL, `last_state` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSymbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbLastNotified",
+            "columnName": "last_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbLastPercent",
+            "columnName": "last_percent",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbLastPrice",
+            "columnName": "last_price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbLastState",
+            "columnName": "last_state",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "room_split_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `holding_id` TEXT NOT NULL, `pre_split_share_count` REAL NOT NULL, `post_split_share_count` REAL NOT NULL, `split_date` INTEGER NOT NULL, PRIMARY KEY(`_id`), FOREIGN KEY(`holding_id`) REFERENCES `room_holding_table`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbHoldingId",
+            "columnName": "holding_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbPreSplitShareCount",
+            "columnName": "pre_split_share_count",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbPostSplitShareCount",
+            "columnName": "post_split_share_count",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSplitDate",
+            "columnName": "split_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_room_split_table_holding_id",
+            "unique": false,
+            "columnNames": [
+              "holding_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_room_split_table_holding_id` ON `${TABLE_NAME}` (`holding_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "room_holding_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "holding_id"
+            ],
+            "referencedColumns": [
+              "_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "room_price_alert_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `last_date` INTEGER, `trigger_price_above` REAL, `trigger_price_below` REAL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "dbId",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbSymbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dbLastNotified",
+            "columnName": "last_date",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dbPriceAbove",
+            "columnName": "trigger_price_above",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dbPriceBelow",
+            "columnName": "trigger_price_below",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dbEnabled",
+            "columnName": "enabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '247109560431b662f016fa2ac50180f2')"
+    ]
+  }
+}

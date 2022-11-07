@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape
 
-import dagger.Subcomponent
+import com.pyamsoft.tickertape.alert.work.Alerter
+import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
 
-@Subcomponent
-interface AlertComponent {
+suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
+  cancel()
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: RefresherInjector)
-
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: BigMoverInjector)
+  scheduleAlarm(factory.bigMoverAlarm(BigMoverParameters(forceRefresh = false)))
+  scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
 }

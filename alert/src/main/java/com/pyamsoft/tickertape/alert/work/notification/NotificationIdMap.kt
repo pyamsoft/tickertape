@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.work.notification
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.notify.NotifyId

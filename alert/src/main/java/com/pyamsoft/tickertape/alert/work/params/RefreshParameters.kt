@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert.work.params
 
-data class BigMoverParameters(val forceRefresh: Boolean) : BaseParameters
+data class RefreshParameters(val forceRefresh: Boolean) : BaseParameters

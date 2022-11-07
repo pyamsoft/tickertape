@@ -25,6 +25,7 @@ import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.alert.AlertFragment
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
@@ -50,6 +51,7 @@ internal constructor(
         is TopLevelMainPage.Home -> HomeFragment.newInstance()
         is TopLevelMainPage.Watchlist -> WatchlistFragment.newInstance()
         is TopLevelMainPage.Portfolio -> PortfolioFragment.newInstance()
+        is TopLevelMainPage.Notifications -> AlertFragment.newInstance()
         is WatchlistDigFragment.Screen ->
             WatchlistDigFragment.newInstance(
                 symbol = screen.symbol,
@@ -122,7 +124,8 @@ internal constructor(
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is WatchlistFragment,
-                  is PortfolioFragment -> R.anim.slide_in_left then R.anim.slide_out_right
+                  is PortfolioFragment,
+                  is AlertFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
                 }
             is WatchlistFragment ->
@@ -132,7 +135,8 @@ internal constructor(
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
-                  is PortfolioFragment -> R.anim.slide_in_left then R.anim.slide_out_right
+                  is PortfolioFragment,
+                  is AlertFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
                 }
             is PortfolioFragment ->
@@ -143,6 +147,18 @@ internal constructor(
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is WatchlistFragment,
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
+                  is AlertFragment -> R.anim.slide_in_left then R.anim.slide_out_right
+                  else -> null
+                }
+            is AlertFragment ->
+                when (oldPage) {
+                  null,
+                  is WatchlistDigFragment,
+                  is PortfolioDigFragment ->
+                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
+                  is WatchlistFragment,
+                  is HomeFragment,
+                  is PortfolioFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null
                 }
             is WatchlistDigFragment,

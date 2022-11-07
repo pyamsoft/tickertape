@@ -28,7 +28,7 @@ import androidx.work.WorkRequest
 import androidx.work.Worker
 import com.google.common.util.concurrent.ListenableFuture
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.work.Alerter
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm

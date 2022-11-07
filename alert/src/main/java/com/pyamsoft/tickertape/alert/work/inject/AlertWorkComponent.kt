@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert.work.inject
 
-data class RefreshParameters(val forceRefresh: Boolean) : BaseParameters
+import dagger.Subcomponent
+
+@Subcomponent
+interface AlertWorkComponent {
+
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: RefresherInjector)
+
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: BigMoverInjector)
+}

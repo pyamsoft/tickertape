@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape
+package com.pyamsoft.tickertape.alert
 
-import com.pyamsoft.tickertape.alert.Alerter
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import androidx.annotation.CheckResult
+import dagger.Subcomponent
 
-suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
-  cancel()
+@Subcomponent
+internal interface AlertComponent {
 
-  scheduleAlarm(factory.bigMoverAlarm(BigMoverParameters(forceRefresh = false)))
-  scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: AlertFragment)
+
+  @Subcomponent.Factory
+  interface Factory {
+
+    @CheckResult fun create(): AlertComponent
+  }
 }

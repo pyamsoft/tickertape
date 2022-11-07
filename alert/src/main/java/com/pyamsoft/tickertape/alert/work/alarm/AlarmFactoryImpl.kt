@@ -17,8 +17,8 @@
 package com.pyamsoft.tickertape.alert.work.alarm
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmFactory

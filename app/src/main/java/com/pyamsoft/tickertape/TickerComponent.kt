@@ -23,8 +23,8 @@ import android.content.Context
 import androidx.annotation.CheckResult
 import coil.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.alert.AlertModule
-import com.pyamsoft.tickertape.alert.inject.AlertComponent
+import com.pyamsoft.tickertape.alert.work.AlertModule
+import com.pyamsoft.tickertape.alert.work.inject.AlertWorkComponent
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
@@ -83,7 +83,7 @@ internal interface TickerComponent {
   // HACKY INJECTORS
 
   /* FROM inside BigMoverInjector, RefresherInjector: See TickerTape Injector */
-  @CheckResult fun plusAlertComponent(): AlertComponent
+  @CheckResult fun plusAlertWorkComponent(): AlertWorkComponent
 
   // ===============================================
 

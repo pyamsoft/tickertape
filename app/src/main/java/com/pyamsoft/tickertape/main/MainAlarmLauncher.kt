@@ -18,8 +18,8 @@ package com.pyamsoft.tickertape.main
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.pyamsoft.tickertape.alert.Alerter
-import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
+import com.pyamsoft.tickertape.alert.work.Alerter
+import com.pyamsoft.tickertape.alert.work.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.initOnAppStart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert.work.inject
 
 import android.content.Context
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.params.BaseParameters
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.work.params.BaseParameters
+import com.pyamsoft.tickertape.alert.work.runner.WorkResult
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

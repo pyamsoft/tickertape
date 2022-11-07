@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 
 class RefresherAlarm internal constructor(private val params: RefreshParameters) : PeriodicAlarm() {

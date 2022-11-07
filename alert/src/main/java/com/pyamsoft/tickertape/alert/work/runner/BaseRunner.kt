@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.work.runner
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.params.BaseParameters
+import com.pyamsoft.tickertape.alert.work.params.BaseParameters
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

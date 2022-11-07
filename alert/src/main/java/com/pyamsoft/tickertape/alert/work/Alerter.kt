@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert.work
 
-interface BaseParameters
+interface Alerter {
+
+  suspend fun scheduleAlarm(alarm: Alarm)
+
+  suspend fun cancelAlarm(alarm: Alarm)
+
+  suspend fun cancel()
+}

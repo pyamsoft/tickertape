@@ -21,9 +21,9 @@ import androidx.annotation.CheckResult
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.pyamsoft.tickertape.alert.inject.BaseInjector
-import com.pyamsoft.tickertape.alert.params.BaseParameters
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.work.inject.BaseInjector
+import com.pyamsoft.tickertape.alert.work.params.BaseParameters
+import com.pyamsoft.tickertape.alert.work.runner.WorkResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

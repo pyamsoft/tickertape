@@ -19,9 +19,9 @@ package com.pyamsoft.tickertape.alert.workmanager.worker
 import android.content.Context
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.pyamsoft.tickertape.alert.inject.BaseInjector
-import com.pyamsoft.tickertape.alert.inject.RefresherInjector
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.work.inject.BaseInjector
+import com.pyamsoft.tickertape.alert.work.inject.RefresherInjector
+import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.alarm.RefresherAlarm
 
 internal class RefresherWorker internal constructor(context: Context, params: WorkerParameters) :

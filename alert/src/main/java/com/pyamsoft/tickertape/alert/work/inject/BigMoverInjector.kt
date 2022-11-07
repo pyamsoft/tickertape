@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert.work.inject
 
 import android.content.Context
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.runner.RefresherRunner
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.runner.BigMoverRunner
+import com.pyamsoft.tickertape.alert.work.runner.WorkResult
 import java.util.UUID
 import javax.inject.Inject
 
-class RefresherInjector(context: Context) : BaseInjector<RefreshParameters>(context) {
+class BigMoverInjector(context: Context) : BaseInjector<BigMoverParameters>(context) {
 
-  @JvmField @Inject internal var runner: RefresherRunner? = null
+  @JvmField @Inject internal var runner: BigMoverRunner? = null
 
   override suspend fun onExecute(
       context: Context,
       id: UUID,
       tags: Set<String>,
-      params: RefreshParameters
+      params: BigMoverParameters
   ): WorkResult {
-    Injector.obtainFromApplication<AlertComponent>(context).inject(this)
+    Injector.obtainFromApplication<AlertWorkComponent>(context).inject(this)
 
     return runner.requireNotNull().doWork(id, tags, params)
   }

@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.alert.work.alarm
 
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
 
 class BigMoverAlarm

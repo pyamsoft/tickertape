@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.work.runner
 
-enum class NotificationType {
-  BIG_MOVER
+sealed class WorkResult(open val id: String) {
+  data class Success internal constructor(override val id: String) : WorkResult(id)
+  data class Cancel internal constructor(override val id: String) : WorkResult(id)
+  data class Failure internal constructor(override val id: String) : WorkResult(id)
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.work.runner
 
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.standalone.BigMoverStandalone
+import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.work.standalone.BigMoverStandalone
 import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor

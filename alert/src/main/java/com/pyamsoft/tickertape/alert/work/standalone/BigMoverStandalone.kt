@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.standalone
+package com.pyamsoft.tickertape.alert.work.standalone
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
-import com.pyamsoft.tickertape.alert.AlertInternalApi
-import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
-import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
-import com.pyamsoft.tickertape.alert.notification.NotificationType
+import com.pyamsoft.tickertape.alert.work.AlertInternalApi
+import com.pyamsoft.tickertape.alert.work.notification.BigMoverNotificationData
+import com.pyamsoft.tickertape.alert.work.notification.NotificationIdMap
+import com.pyamsoft.tickertape.alert.work.notification.NotificationType
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao

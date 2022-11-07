@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert
+package com.pyamsoft.tickertape.alert.work
 
 import android.content.Context
 import androidx.annotation.CheckResult
@@ -23,8 +23,7 @@ import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyGuard
 import com.pyamsoft.pydroid.notify.NotifyPermission
 import com.pyamsoft.pydroid.util.PermissionRequester
-import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationDispatcher
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.work.notification.BigMoverNotificationDispatcher
 import com.pyamsoft.tickertape.alert.work.alarm.AlarmFactoryImpl
 import dagger.Binds
 import dagger.Module
@@ -57,8 +56,8 @@ abstract class AlertModule {
     @AlertInternalApi
     internal fun provideNotifier(
         // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
-        @AlertInternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
-        context: Context
+      @AlertInternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
+      context: Context
     ): Notifier {
       return Notifier.createDefault(context, dispatchers)
     }

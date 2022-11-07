@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
+import com.pyamsoft.tickertape.alert.AlertComponent
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
@@ -45,15 +46,17 @@ internal interface MainComponent {
 
   @CheckResult fun plusWatchlist(): WatchlistComponent.Factory
 
+  @CheckResult fun plusWatchlistDig(): WatchlistDigComponent.Factory
+
+  @CheckResult fun plusPortfolio(): PortfolioComponent.Factory
+
+  @CheckResult fun plusPortfolioDig(): PortfolioDigComponent.Factory
+
   @CheckResult fun plusSettings(): SettingsComponent.Factory
 
   @CheckResult fun plusAppSettings(): AppSettingsComponent.Factory
 
-  @CheckResult fun plusPortfolio(): PortfolioComponent.Factory
-
-  @CheckResult fun plusWatchlistDig(): WatchlistDigComponent.Factory
-
-  @CheckResult fun plusPortfolioDig(): PortfolioDigComponent.Factory
+  @CheckResult fun plusAlerts(): AlertComponent.Factory
 
   fun inject(activity: MainActivity)
 

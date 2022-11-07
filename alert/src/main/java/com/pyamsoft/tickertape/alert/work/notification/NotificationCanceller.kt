@@ -14,36 +14,26 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.work.notification
 
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
+import com.pyamsoft.pydroid.notify.Notifier
+import com.pyamsoft.tickertape.alert.work.AlertInternalApi
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 
 @Singleton
-internal class RefresherRunner
+class NotificationCanceller
 @Inject
 internal constructor(
-    private val tapeLauncher: TapeLauncher,
-) : BaseRunner<RefreshParameters>() {
+    @AlertInternalApi private val notifier: Notifier,
+    private val idMap: NotificationIdMap,
+) {
 
-  override suspend fun performWork(params: RefreshParameters) = coroutineScope {
-    val force = params.forceRefresh
-
-    try {
-      tapeLauncher.start(
-          options =
-              TapeLauncher.Options(
-                  forceRefresh = force,
-              ),
-      )
-    } catch (e: Throwable) {
-      Timber.e(e, "Error refreshing quotes")
-    }
-
-    return@coroutineScope
+  fun cancelBigMoverNotification(symbol: StockSymbol) {
+    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { symbol }
+    Timber.d("Cancel big mover notification: $symbol $id")
+    notifier.cancel(id)
   }
 }

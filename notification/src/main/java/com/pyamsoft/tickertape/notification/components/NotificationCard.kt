@@ -22,11 +22,6 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.CardDefaults
 import com.pyamsoft.tickertape.ui.icon.RadioButtonUnchecked
 
-enum class NotificationCardSize {
-  SMALL,
-  LARGE,
-}
-
 @Composable
 internal fun ColoredCard(
     modifier: Modifier = Modifier,
@@ -60,7 +55,6 @@ internal fun NotificationCard(
     modifier: Modifier = Modifier,
     isChecked: Boolean,
     title: String,
-    size: NotificationCardSize,
     onCheckedChanged: (Boolean) -> Unit,
     contentDescription: String? = null,
     contentDescriptionOn: String? = null,
@@ -87,11 +81,9 @@ internal fun NotificationCard(
       remember(
           typography,
           highContentAlpha,
-          size,
           color,
       ) {
-        val style = if (size == NotificationCardSize.LARGE) typography.h6 else typography.body2
-        return@remember style.copy(
+        return@remember typography.h6.copy(
             color = color.copy(alpha = highContentAlpha),
             fontWeight = FontWeight.W700,
         )
@@ -101,11 +93,9 @@ internal fun NotificationCard(
       remember(
           typography,
           mediumAlpha,
-          size,
           textColor,
       ) {
-        val style = if (size == NotificationCardSize.LARGE) typography.body2 else typography.caption
-        return@remember style.copy(
+        return@remember typography.body2.copy(
             color = textColor.copy(alpha = mediumAlpha),
             fontWeight = FontWeight.W400,
         )

@@ -100,6 +100,19 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) { tapePreferences.setTapePageSize(size) }
   }
 
+  fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
+    val s = state
+    val newEnabled = !s.isBigMoverEnabled
+
+    // Set state immediately for feedback
+    state.isBigMoverEnabled = newEnabled
+
+    // Fire pref change
+    scope.launch(context = Dispatchers.Main) {
+      bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
+    }
+  }
+
   companion object {
     private const val TAPE_IS_ENABLED = "key_tape_is_enabled"
     private const val TAPE_PAGE_SIZE = "key_tape_page_size"

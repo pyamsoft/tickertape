@@ -67,6 +67,14 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
+    private fun handleBigMoverNotificationToggled() {
+        viewModel
+            .requireNotNull()
+            .handleBigMoverNotificationToggled(
+                scope = viewLifecycleOwner.lifecycleScope,
+            )
+    }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -91,7 +99,8 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                   state = state,
                   navBarBottomHeight = mainState.bottomNavHeight,
                   onTapeNotificationToggled = { handleTapeNotificationToggled() },
-                  onPageSizeChanged = { handleTapePageSizeChanged(it) },
+                  onTapePageSizeChanged = { handleTapePageSizeChanged(it) },
+                  onBigMoverNotificationToggled = { handleBigMoverNotificationToggled() },
               )
             }
           }

@@ -114,7 +114,7 @@ internal constructor(
 
   private fun postNotification(quote: StockQuote) {
     if (!guard.canPostNotification()) {
-      Timber.w("Missing notification permission")
+      Timber.w("Missing notification permission, cannot post: $quote")
       return
     }
 

@@ -16,7 +16,7 @@ internal fun BigMoverNotifications(
   val isEnabled = state.isBigMoverEnabled
 
   NotificationCard(
-      modifier = modifier.padding(MaterialTheme.keylines.content),
+      modifier = modifier.padding(horizontal = MaterialTheme.keylines.content),
       title = "Big Mover Alerts",
       isChecked = isEnabled,
       onCheckedChanged = { onBigMoverNotificationToggled() },

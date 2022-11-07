@@ -67,7 +67,7 @@ fun NotificationScreen(
 
       item {
         TapeNotifications(
-            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.keylines.content),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onTapeNotificationToggled = onTapeNotificationToggled,
             onPageSizeChanged = onTapePageSizeChanged,

@@ -19,7 +19,9 @@ package com.pyamsoft.tickertape.notification
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
 import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
@@ -27,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class NotificationViewModeler
 @Inject
@@ -35,6 +38,7 @@ internal constructor(
     private val tapePreferences: TapePreferences,
     private val bigMoverPreferences: BigMoverPreferences,
     private val launcher: TapeLauncher,
+    private val alarmFactory: AlarmFactory,
 ) : AbstractViewModeler<NotificationViewState>(state) {
 
   fun bind(scope: CoroutineScope) {
@@ -84,6 +88,9 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) {
       tapePreferences.setTapeNotificationEnabled(newEnabled)
 
+      // Wait for completions
+      yield()
+
       // Restart the launcher to update if the notification fires
       launcher.start()
     }
@@ -110,6 +117,16 @@ internal constructor(
     // Fire pref change
     scope.launch(context = Dispatchers.Main) {
       bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
+
+      // Wait for completions
+      yield()
+
+      // Fire all big mover alarms in case this is going from disabled -> enabled
+      alarmFactory.bigMoverAlarm(
+          BigMoverParameters(
+              forceRefresh = false,
+          ),
+      )
     }
   }
 

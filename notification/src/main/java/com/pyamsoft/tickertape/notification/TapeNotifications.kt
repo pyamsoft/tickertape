@@ -29,7 +29,7 @@ internal fun TapeNotifications(
   val isEnabled = state.isTapeEnabled
 
   NotificationCard(
-      modifier = modifier.padding(MaterialTheme.keylines.content),
+      modifier = modifier.padding(horizontal = MaterialTheme.keylines.content),
       title = "Tape Notification",
       isChecked = isEnabled,
       onCheckedChanged = { onTapeNotificationToggled() },

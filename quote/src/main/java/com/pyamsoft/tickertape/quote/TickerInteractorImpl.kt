@@ -20,7 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
-import com.pyamsoft.tickertape.alert.work.standalone.BigMoverStandalone
+import com.pyamsoft.tickertape.alert.standalone.BigMoverStandalone
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote

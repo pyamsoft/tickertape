@@ -35,7 +35,7 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.alert.work.notification.BigMoverNotificationData
+import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -179,6 +179,7 @@ internal class MainActivity : PYDroidActivity() {
                   onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
                   onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
                   onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
+                  onLoadNotifications = { navi.navigateTo(TopLevelMainPage.Notifications) },
                   onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
                   onActionSelected = { handleMainActionSelected(it) },
               )

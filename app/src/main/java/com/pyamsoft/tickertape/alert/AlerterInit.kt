@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape
+package com.pyamsoft.tickertape.alert
 
-import com.pyamsoft.tickertape.alert.work.Alerter
-import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.params.RefreshParameters
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 
 suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {

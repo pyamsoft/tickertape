@@ -31,6 +31,7 @@ fun MainScreen(
     onLoadHome: () -> Unit,
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
+    onLoadNotifications: () -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
@@ -44,6 +45,7 @@ fun MainScreen(
         onLoadHome = onLoadHome,
         onLoadWatchlist = onLoadWatchlist,
         onLoadPortfolio = onLoadPortfolio,
+        onLoadNotifications = onLoadNotifications,
         onHeightMeasured = onBottomBarHeightMeasured,
         onActionSelected = onActionSelected,
     )
@@ -59,6 +61,7 @@ private fun PreviewMainScreen() {
       onLoadHome = {},
       onLoadWatchlist = {},
       onLoadPortfolio = {},
+      onLoadNotifications = {},
       onActionSelected = {},
   )
 }

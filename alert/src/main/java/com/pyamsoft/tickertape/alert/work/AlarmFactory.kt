@@ -17,8 +17,8 @@
 package com.pyamsoft.tickertape.alert.work
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.work.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.params.RefreshParameters
 
 interface AlarmFactory {
 

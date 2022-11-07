@@ -131,6 +131,7 @@ dependencies {
   implementation project(':db-room')
   implementation project(':home')
   implementation project(':main')
+  implementation project(':notification')
   implementation project(':portfolio')
   implementation project(':quote')
   implementation project(':stocks')

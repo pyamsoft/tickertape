@@ -66,6 +66,7 @@ internal fun MainBottomNav(
     onLoadHome: () -> Unit,
     onLoadWatchlist: () -> Unit,
     onLoadPortfolio: () -> Unit,
+    onLoadNotifications: () -> Unit,
     onHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
@@ -159,9 +160,7 @@ internal fun MainBottomNav(
               Item(
                   current = page,
                   target = TopLevelMainPage.Notifications,
-                  onLoadPage = {
-                    // TODO Load Notification page
-                  },
+                  onLoadPage = onLoadNotifications,
               )
             }
 
@@ -274,6 +273,7 @@ private fun PreviewMainBottomNav() {
       onLoadHome = {},
       onLoadWatchlist = {},
       onLoadPortfolio = {},
+      onLoadNotifications = {},
       onActionSelected = {},
   )
 }

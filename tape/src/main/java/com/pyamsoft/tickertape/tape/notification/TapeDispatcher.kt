@@ -180,6 +180,8 @@ internal constructor(
       remoteViews: RemoteViews,
       quote: StockQuote,
   ) {
+    Timber.d("Add RemoteViews quote: $quote")
+
     val session = quote.currentSession
     val color = session.direction.color
     val sign = session.direction.sign

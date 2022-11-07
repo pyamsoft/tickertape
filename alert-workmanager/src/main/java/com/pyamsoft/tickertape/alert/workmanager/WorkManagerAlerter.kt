@@ -28,12 +28,12 @@ import androidx.work.WorkRequest
 import androidx.work.Worker
 import com.google.common.util.concurrent.ListenableFuture
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.work.Alerter
+import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.work.Alarm
 import com.pyamsoft.tickertape.alert.work.AlarmParameters
-import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm
-import com.pyamsoft.tickertape.alert.work.alarm.PeriodicAlarm
-import com.pyamsoft.tickertape.alert.work.alarm.RefresherAlarm
+import com.pyamsoft.tickertape.alert.alarm.BigMoverAlarm
+import com.pyamsoft.tickertape.alert.alarm.PeriodicAlarm
+import com.pyamsoft.tickertape.alert.alarm.RefresherAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.RefresherWorker
 import java.util.concurrent.CancellationException

@@ -19,10 +19,10 @@ package com.pyamsoft.tickertape.alert.workmanager.worker
 import android.content.Context
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.pyamsoft.tickertape.alert.work.inject.BaseInjector
-import com.pyamsoft.tickertape.alert.work.inject.BigMoverInjector
-import com.pyamsoft.tickertape.alert.work.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.work.alarm.BigMoverAlarm
+import com.pyamsoft.tickertape.alert.inject.BaseInjector
+import com.pyamsoft.tickertape.alert.inject.BigMoverInjector
+import com.pyamsoft.tickertape.alert.params.BigMoverParameters
+import com.pyamsoft.tickertape.alert.alarm.BigMoverAlarm
 
 internal class BigMoverWorker internal constructor(context: Context, params: WorkerParameters) :
     BaseWorker<BigMoverParameters>(context.applicationContext, params) {

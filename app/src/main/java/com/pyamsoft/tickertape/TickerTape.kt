@@ -28,8 +28,9 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
-import com.pyamsoft.tickertape.alert.work.Alerter
-import com.pyamsoft.tickertape.alert.work.inject.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.initOnAppStart
+import com.pyamsoft.tickertape.alert.inject.AlertWorkComponent
 import com.pyamsoft.tickertape.alert.work.AlarmFactory
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL

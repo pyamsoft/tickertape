@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.alert.workmanager
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.work.Alerter
+import com.pyamsoft.tickertape.alert.Alerter
 import dagger.Binds
 import dagger.Module
 

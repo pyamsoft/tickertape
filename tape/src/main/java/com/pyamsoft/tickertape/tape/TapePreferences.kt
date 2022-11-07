@@ -32,6 +32,6 @@ interface TapePreferences {
   companion object {
 
     const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
-    const val VALUE_DEFAULT_PAGE_SIZE = 5
+    const val VALUE_DEFAULT_PAGE_SIZE = 4
   }
 }

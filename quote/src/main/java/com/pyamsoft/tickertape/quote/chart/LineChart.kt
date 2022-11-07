@@ -209,10 +209,10 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
                 if (lastData == null) DEFAULT_STOCK_COLOR
                 else {
                   val price = lastData.price.value
-                  val baseline = lastData.baseline.value
+                  val base = lastData.baseline.value
                   when {
-                    price < baseline -> DEFAULT_STOCK_DOWN_COLOR
-                    price > baseline -> DEFAULT_STOCK_UP_COLOR
+                    price < base -> DEFAULT_STOCK_DOWN_COLOR
+                    price > base -> DEFAULT_STOCK_UP_COLOR
                     else -> DEFAULT_STOCK_COLOR
                   }
                 },

@@ -22,9 +22,9 @@ import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
-import com.pyamsoft.tickertape.alert.AlertComponent
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
+import com.pyamsoft.tickertape.notification.NotificationComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.setting.AppSettingsComponent
@@ -56,7 +56,7 @@ internal interface MainComponent {
 
   @CheckResult fun plusAppSettings(): AppSettingsComponent.Factory
 
-  @CheckResult fun plusAlerts(): AlertComponent.Factory
+  @CheckResult fun plusAlerts(): NotificationComponent.Factory
 
   fun inject(activity: MainActivity)
 

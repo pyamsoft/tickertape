@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote.dig
+package com.pyamsoft.tickertape.quote.dig.options
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +39,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.quote.dig.DigViewState
+import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol

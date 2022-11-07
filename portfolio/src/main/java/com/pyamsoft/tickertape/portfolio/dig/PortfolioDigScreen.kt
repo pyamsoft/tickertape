@@ -21,13 +21,12 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
-import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
-import com.pyamsoft.tickertape.quote.dig.DigNews
-import com.pyamsoft.tickertape.quote.dig.DigOptionsChain
-import com.pyamsoft.tickertape.quote.dig.DigRecommendations
+import com.pyamsoft.tickertape.quote.dig.news.DigNews
+import com.pyamsoft.tickertape.quote.dig.options.DigOptionsChain
+import com.pyamsoft.tickertape.quote.dig.recommend.DigRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol

@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote.dig
+package com.pyamsoft.tickertape.quote.dig.chart
 
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
@@ -35,6 +35,7 @@ import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.chart.ChartData
+import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER

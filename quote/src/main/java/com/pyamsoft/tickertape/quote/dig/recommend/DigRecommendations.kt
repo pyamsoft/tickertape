@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote.dig
+package com.pyamsoft.tickertape.quote.dig.recommend
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +26,9 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
+import com.pyamsoft.tickertape.quote.dig.DigDefaults
+import com.pyamsoft.tickertape.quote.dig.DigViewState
+import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
 

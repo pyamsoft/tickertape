@@ -5,9 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
-import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.chart.ChartData
-import com.pyamsoft.tickertape.quote.dig.DigChart
+import com.pyamsoft.tickertape.quote.dig.chart.DigChart
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart

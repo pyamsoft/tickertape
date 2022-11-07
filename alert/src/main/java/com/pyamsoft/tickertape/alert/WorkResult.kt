@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert
 
-data class RefreshParameters(val forceRefresh: Boolean) : BaseParameters
+sealed class WorkResult(open val id: String) {
+  data class Success internal constructor(override val id: String) : WorkResult(id)
+  data class Cancel internal constructor(override val id: String) : WorkResult(id)
+  data class Failure internal constructor(override val id: String) : WorkResult(id)
+}

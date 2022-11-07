@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert.types.bigmover
 
-data class BigMoverParameters(val forceRefresh: Boolean) : BaseParameters
+import androidx.annotation.CheckResult
+import kotlinx.coroutines.flow.Flow
+
+interface BigMoverPreferences {
+
+  suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
+
+  @CheckResult suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean>
+
+  companion object {
+
+    const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
+
+  }
+}

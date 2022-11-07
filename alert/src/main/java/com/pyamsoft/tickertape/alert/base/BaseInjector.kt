@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert.base
 
 import android.content.Context
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.alert.params.BaseParameters
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.WorkResult
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-abstract class BaseInjector<P : BaseParameters>
+abstract class BaseInjector<P : BaseWorkerParameters>
 protected constructor(private val context: Context) {
 
   @CheckResult

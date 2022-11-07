@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.alarm
+package com.pyamsoft.tickertape.alert.types.bigmover
 
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.work.AlarmParameters
+import com.pyamsoft.pydroid.notify.NotifyData
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-class RefresherAlarm internal constructor(private val params: RefreshParameters) : PeriodicAlarm() {
-
-  override suspend fun tag(): String {
-    return "Refresher Alarm 1"
-  }
-
-  override suspend fun parameters(): AlarmParameters {
-    return AlarmParameters { putBoolean(FORCE_REFRESH, params.forceRefresh) }
-  }
-
-  override suspend fun isEnabled(): Boolean {
-    return true
-  }
+data class BigMoverNotificationData
+internal constructor(
+    val quote: StockQuote,
+) : NotifyData {
 
   companion object {
 
-    const val FORCE_REFRESH = "force_refresh_v1"
+    const val INTENT_KEY_SYMBOL = "intent_key_symbol"
+    const val INTENT_KEY_LOOKUP_SYMBOL = "intent_key_lookup_symbol"
+    const val INTENT_KEY_EQUITY_TYPE = "intent_key_equity_type"
   }
 }

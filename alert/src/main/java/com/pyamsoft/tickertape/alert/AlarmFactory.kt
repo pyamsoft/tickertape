@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.params
+package com.pyamsoft.tickertape.alert
 
-interface BaseParameters
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.alert.base.Alarm
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
+
+interface AlarmFactory {
+
+  @CheckResult suspend fun bigMoverAlarm(params: BigMoverWorkerParameters): Alarm
+
+  @CheckResult suspend fun refresherAlarm(params: RefreshWorkerParameters): Alarm
+}

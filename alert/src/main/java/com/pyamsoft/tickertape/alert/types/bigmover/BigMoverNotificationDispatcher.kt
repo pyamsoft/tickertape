@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.types.bigmover
 
 import android.app.Activity
 import android.app.Notification
@@ -47,8 +47,10 @@ import timber.log.Timber
 @Singleton
 internal class BigMoverNotificationDispatcher
 @Inject
-internal constructor(private val context: Context, private val activityClass: Class<out Activity>) :
-    NotifyDispatcher<BigMoverNotificationData> {
+internal constructor(
+    private val context: Context,
+    private val activityClass: Class<out Activity>,
+) : NotifyDispatcher<BigMoverNotificationData> {
 
   private val channelCreator by lazy {
     context.applicationContext.getSystemService<NotificationManager>().requireNotNull()

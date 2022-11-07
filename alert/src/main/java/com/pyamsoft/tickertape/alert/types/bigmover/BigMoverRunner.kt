@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.types.bigmover
 
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.standalone.BigMoverStandalone
+import com.pyamsoft.tickertape.alert.base.BaseRunner
 import com.pyamsoft.tickertape.db.getWatchListQuotes
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -35,9 +34,9 @@ internal constructor(
     private val stockInteractor: StockInteractor,
     private val stockInteractorCache: StockInteractor.Cache,
     private val standalone: BigMoverStandalone,
-) : BaseRunner<BigMoverParameters>() {
+) : BaseRunner<BigMoverWorkerParameters>() {
 
-  override suspend fun performWork(params: BigMoverParameters) = coroutineScope {
+  override suspend fun performWork(params: BigMoverWorkerParameters) = coroutineScope {
     val force = params.forceRefresh
     try {
       // Don't use TickerInteractor here since this is imported in TickerInteractor, which would

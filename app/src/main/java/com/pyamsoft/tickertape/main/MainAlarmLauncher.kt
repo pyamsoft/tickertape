@@ -20,7 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.alert.initOnAppStart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.tape.launcher.TapeLauncher

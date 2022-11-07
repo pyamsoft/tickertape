@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.standalone
+package com.pyamsoft.tickertape.alert.types.bigmover
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
@@ -22,7 +22,6 @@ import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
 import com.pyamsoft.tickertape.alert.AlertInternalApi
-import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationData
 import com.pyamsoft.tickertape.alert.notification.NotificationIdMap
 import com.pyamsoft.tickertape.alert.notification.NotificationType
 import com.pyamsoft.tickertape.db.DbInsert
@@ -44,17 +43,12 @@ import timber.log.Timber
 class BigMoverStandalone
 @Inject
 internal constructor(
-    private val guard: NotifyGuard,
     @AlertInternalApi private val notifier: Notifier,
+    private val guard: NotifyGuard,
     private val bigMoverQueryDao: BigMoverQueryDao,
     private val bigMoverInsertDao: BigMoverInsertDao,
     private val idMap: NotificationIdMap,
 ) {
-
-  suspend fun notifyForBigMovers(quotes: List<StockQuote>) {
-    val bigMovers = quotes.filterBigMovers()
-    postNotifications(bigMovers)
-  }
 
   @CheckResult
   private fun BigMoverReport.updateToSession(
@@ -156,6 +150,11 @@ internal constructor(
           return@filter value.compareTo(up) > 0 || value.compareTo(down) < 1
         }
         .toList()
+  }
+
+  suspend fun notifyForBigMovers(quotes: List<StockQuote>) {
+    val bigMovers = quotes.filterBigMovers()
+    postNotifications(bigMovers)
   }
 
   companion object {

@@ -23,9 +23,7 @@ import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyGuard
 import com.pyamsoft.pydroid.notify.NotifyPermission
 import com.pyamsoft.pydroid.util.PermissionRequester
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
-import com.pyamsoft.tickertape.alert.notification.BigMoverNotificationDispatcher
-import com.pyamsoft.tickertape.alert.alarm.AlarmFactoryImpl
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationDispatcher
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

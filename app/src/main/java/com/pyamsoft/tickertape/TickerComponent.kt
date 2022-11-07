@@ -24,8 +24,8 @@ import androidx.annotation.CheckResult
 import coil.ImageLoader
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
-import com.pyamsoft.tickertape.alert.inject.AlertWorkComponent
-import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule

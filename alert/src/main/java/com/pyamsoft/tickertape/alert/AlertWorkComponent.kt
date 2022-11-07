@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert
 
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverInjector
+import com.pyamsoft.tickertape.alert.types.refresh.RefresherInjector
 import dagger.Subcomponent
 
 @Subcomponent

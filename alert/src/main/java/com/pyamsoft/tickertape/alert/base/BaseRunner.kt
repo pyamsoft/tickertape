@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.base
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.params.BaseParameters
+import com.pyamsoft.tickertape.alert.WorkResult
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-internal abstract class BaseRunner<P : BaseParameters> protected constructor() {
+internal abstract class BaseRunner<P : BaseWorkerParameters> protected constructor() {
 
   @CheckResult
   protected suspend inline fun notification(crossinline func: suspend () -> Boolean): Boolean {

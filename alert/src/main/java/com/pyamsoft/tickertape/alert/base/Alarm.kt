@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.alarm
+package com.pyamsoft.tickertape.alert.base
 
-import com.pyamsoft.tickertape.alert.work.Alarm
-import java.util.concurrent.TimeUnit
+import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.alert.AlarmParameters
 
-abstract class PeriodicAlarm protected constructor() : Alarm {
+interface Alarm {
 
-  final override suspend fun period(): Long {
-    return PERIOD
-  }
+  @CheckResult suspend fun tag(): String
 
-  companion object {
-    private val PERIOD = TimeUnit.MINUTES.toMillis(15L)
-  }
+  @CheckResult suspend fun parameters(): AlarmParameters
+
+  @CheckResult suspend fun period(): Long
+
+  @CheckResult suspend fun isEnabled(): Boolean
 }

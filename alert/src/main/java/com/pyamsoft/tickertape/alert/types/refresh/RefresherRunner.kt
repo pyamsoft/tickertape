@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.runner
+package com.pyamsoft.tickertape.alert.types.refresh
 
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
+import com.pyamsoft.tickertape.alert.base.BaseRunner
 import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,9 +28,9 @@ internal class RefresherRunner
 @Inject
 internal constructor(
     private val tapeLauncher: TapeLauncher,
-) : BaseRunner<RefreshParameters>() {
+) : BaseRunner<RefreshWorkerParameters>() {
 
-  override suspend fun performWork(params: RefreshParameters) = coroutineScope {
+  override suspend fun performWork(params: RefreshWorkerParameters) = coroutineScope {
     val force = params.forceRefresh
 
     try {
@@ -41,7 +41,7 @@ internal constructor(
               ),
       )
     } catch (e: Throwable) {
-      Timber.e(e, "Error refreshing quotes")
+      Timber.e(e, "Error refreshing Tape notification")
     }
 
     return@coroutineScope

@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert.types.refresh
 
 import android.content.Context
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.runner.RefresherRunner
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.WorkResult
+import com.pyamsoft.tickertape.alert.base.BaseInjector
 import java.util.UUID
 import javax.inject.Inject
 
-class RefresherInjector(context: Context) : BaseInjector<RefreshParameters>(context) {
+class RefresherInjector
+private constructor(
+    context: Context,
+) :
+    BaseInjector<RefreshWorkerParameters>(
+        context,
+    ) {
 
   @JvmField @Inject internal var runner: RefresherRunner? = null
 
@@ -33,10 +40,19 @@ class RefresherInjector(context: Context) : BaseInjector<RefreshParameters>(cont
       context: Context,
       id: UUID,
       tags: Set<String>,
-      params: RefreshParameters
+      params: RefreshWorkerParameters
   ): WorkResult {
     Injector.obtainFromApplication<AlertWorkComponent>(context).inject(this)
 
     return runner.requireNotNull().doWork(id, tags, params)
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(context: Context): RefresherInjector {
+      return RefresherInjector(context.applicationContext)
+    }
   }
 }

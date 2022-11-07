@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.inject
+package com.pyamsoft.tickertape.alert.types.bigmover
 
 import android.content.Context
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.runner.BigMoverRunner
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.WorkResult
+import com.pyamsoft.tickertape.alert.base.BaseInjector
 import java.util.UUID
 import javax.inject.Inject
 
-class BigMoverInjector(context: Context) : BaseInjector<BigMoverParameters>(context) {
+class BigMoverInjector
+private constructor(
+    context: Context,
+) :
+    BaseInjector<BigMoverWorkerParameters>(
+        context,
+    ) {
 
   @JvmField @Inject internal var runner: BigMoverRunner? = null
 
@@ -33,10 +40,19 @@ class BigMoverInjector(context: Context) : BaseInjector<BigMoverParameters>(cont
       context: Context,
       id: UUID,
       tags: Set<String>,
-      params: BigMoverParameters
+      params: BigMoverWorkerParameters
   ): WorkResult {
     Injector.obtainFromApplication<AlertWorkComponent>(context).inject(this)
 
     return runner.requireNotNull().doWork(id, tags, params)
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(context: Context): BigMoverInjector {
+      return BigMoverInjector(context.applicationContext)
+    }
   }
 }

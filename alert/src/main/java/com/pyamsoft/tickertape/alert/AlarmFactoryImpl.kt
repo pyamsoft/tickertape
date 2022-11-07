@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.alarm
+package com.pyamsoft.tickertape.alert
 
 import com.pyamsoft.pydroid.core.Enforcer
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
-import com.pyamsoft.tickertape.alert.work.Alarm
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.base.Alarm
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
+import com.pyamsoft.tickertape.alert.types.refresh.RefresherAlarm
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -35,17 +36,19 @@ internal constructor(
     private val bigMoverPreferences: BigMoverPreferences,
 ) : AlarmFactory {
 
-  override suspend fun bigMoverAlarm(params: BigMoverParameters): Alarm =
+  override suspend fun bigMoverAlarm(params: BigMoverWorkerParameters): Alarm =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
+        val isEnabled = bigMoverPreferences.listenForBigMoverNotificationChanged().first()
+
         return@withContext BigMoverAlarm(
             params,
-            bigMoverPreferences.listenForBigMoverNotificationChanged().first(),
+            isEnabled,
         )
       }
 
-  override suspend fun refresherAlarm(params: RefreshParameters): Alarm =
+  override suspend fun refresherAlarm(params: RefreshWorkerParameters): Alarm =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
         return@withContext RefresherAlarm(params)

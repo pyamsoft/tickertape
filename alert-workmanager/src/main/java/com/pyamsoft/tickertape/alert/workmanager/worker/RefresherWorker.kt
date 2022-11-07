@@ -19,19 +19,28 @@ package com.pyamsoft.tickertape.alert.workmanager.worker
 import android.content.Context
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.pyamsoft.tickertape.alert.inject.BaseInjector
-import com.pyamsoft.tickertape.alert.inject.RefresherInjector
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.alarm.RefresherAlarm
+import com.pyamsoft.tickertape.alert.base.BaseInjector
+import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
+import com.pyamsoft.tickertape.alert.types.refresh.RefresherAlarm
+import com.pyamsoft.tickertape.alert.types.refresh.RefresherInjector
 
-internal class RefresherWorker internal constructor(context: Context, params: WorkerParameters) :
-    BaseWorker<RefreshParameters>(context.applicationContext, params) {
+internal class RefresherWorker
+internal constructor(
+    context: Context,
+    params: WorkerParameters,
+) :
+    BaseWorker<RefreshWorkerParameters>(
+        context,
+        params,
+    ) {
 
-  override fun getInjector(context: Context): BaseInjector<RefreshParameters> {
-    return RefresherInjector(context.applicationContext)
+  override fun getInjector(context: Context): BaseInjector<RefreshWorkerParameters> {
+    return RefresherInjector.create(context)
   }
 
-  override fun getParams(data: Data): RefreshParameters {
-    return RefreshParameters(forceRefresh = data.getBoolean(RefresherAlarm.FORCE_REFRESH, false))
+  override fun getParams(data: Data): RefreshWorkerParameters {
+    return RefreshWorkerParameters(
+        forceRefresh = data.getBoolean(RefresherAlarm.FORCE_REFRESH, false),
+    )
   }
 }

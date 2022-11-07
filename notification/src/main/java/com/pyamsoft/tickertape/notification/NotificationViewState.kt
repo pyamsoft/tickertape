@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 

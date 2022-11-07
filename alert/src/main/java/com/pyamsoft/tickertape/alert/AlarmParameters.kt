@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.work
+package com.pyamsoft.tickertape.alert
 
 import androidx.annotation.CheckResult
 
@@ -28,8 +28,10 @@ interface AlarmParameters {
 
     private val booleans = mutableMapOf<String, Boolean>()
 
-    @CheckResult
-    fun putBoolean(key: String, value: Boolean): Builder {
+    fun putBoolean(
+        key: String,
+        value: Boolean,
+    ): Builder {
       booleans[key] = value
       return this
     }

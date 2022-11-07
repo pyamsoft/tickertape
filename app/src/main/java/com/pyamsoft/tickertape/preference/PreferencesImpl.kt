@@ -22,7 +22,7 @@ import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.booleanFlow
 import com.pyamsoft.pydroid.util.intFlow
-import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import javax.inject.Singleton

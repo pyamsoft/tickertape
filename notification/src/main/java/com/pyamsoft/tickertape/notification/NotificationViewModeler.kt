@@ -19,9 +19,9 @@ package com.pyamsoft.tickertape.notification
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.preference.BigMoverPreferences
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
+import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
@@ -34,11 +34,11 @@ import kotlinx.coroutines.yield
 class NotificationViewModeler
 @Inject
 internal constructor(
-    private val state: MutableNotificationViewState,
-    private val tapePreferences: TapePreferences,
-    private val bigMoverPreferences: BigMoverPreferences,
-    private val launcher: TapeLauncher,
-    private val alarmFactory: AlarmFactory,
+  private val state: MutableNotificationViewState,
+  private val tapePreferences: TapePreferences,
+  private val bigMoverPreferences: BigMoverPreferences,
+  private val launcher: TapeLauncher,
+  private val alarmFactory: AlarmFactory,
 ) : AbstractViewModeler<NotificationViewState>(state) {
 
   fun bind(scope: CoroutineScope) {
@@ -123,7 +123,7 @@ internal constructor(
 
       // Fire all big mover alarms in case this is going from disabled -> enabled
       alarmFactory.bigMoverAlarm(
-          BigMoverParameters(
+          BigMoverWorkerParameters(
               forceRefresh = false,
           ),
       )

@@ -16,13 +16,24 @@
 
 package com.pyamsoft.tickertape.alert
 
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.params.RefreshParameters
-import com.pyamsoft.tickertape.alert.work.AlarmFactory
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
 
 suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
   cancel()
 
-  scheduleAlarm(factory.bigMoverAlarm(BigMoverParameters(forceRefresh = false)))
-  scheduleAlarm(factory.refresherAlarm(RefreshParameters(forceRefresh = false)))
+  scheduleAlarm(
+      factory.bigMoverAlarm(
+          BigMoverWorkerParameters(
+              forceRefresh = false,
+          ),
+      ),
+  )
+  scheduleAlarm(
+      factory.refresherAlarm(
+          RefreshWorkerParameters(
+              forceRefresh = false,
+          ),
+      ),
+  )
 }

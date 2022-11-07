@@ -21,22 +21,28 @@ import androidx.annotation.CheckResult
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.pyamsoft.tickertape.alert.inject.BaseInjector
-import com.pyamsoft.tickertape.alert.params.BaseParameters
-import com.pyamsoft.tickertape.alert.runner.WorkResult
+import com.pyamsoft.tickertape.alert.WorkResult
+import com.pyamsoft.tickertape.alert.base.BaseInjector
+import com.pyamsoft.tickertape.alert.base.BaseWorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-internal abstract class BaseWorker<P : BaseParameters>
-protected constructor(context: Context, params: WorkerParameters) :
-    CoroutineWorker(context.applicationContext, params) {
+internal abstract class BaseWorker<P : BaseWorkerParameters>
+protected constructor(
+    context: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(context.applicationContext, params) {
 
   final override suspend fun doWork(): Result =
       withContext(context = Dispatchers.Default) {
         val injector = getInjector(applicationContext)
         return@withContext when (val result =
-            injector.execute(id, tags.toSet(), getParams(inputData))) {
+            injector.execute(
+                id = id,
+                tags = tags.toSet(),
+                params = getParams(inputData),
+            )) {
           is WorkResult.Success -> {
             Timber.d("Work succeeded ${result.id}")
             Result.success()

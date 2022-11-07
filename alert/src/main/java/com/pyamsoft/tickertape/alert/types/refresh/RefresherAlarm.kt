@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.alarm
+package com.pyamsoft.tickertape.alert.types.refresh
 
-import com.pyamsoft.tickertape.alert.params.BigMoverParameters
-import com.pyamsoft.tickertape.alert.work.AlarmParameters
+import com.pyamsoft.tickertape.alert.AlarmParameters
+import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
-class BigMoverAlarm
+class RefresherAlarm
 internal constructor(
-    private val params: BigMoverParameters,
-    private val isEnabled: Boolean,
+    private val params: RefreshWorkerParameters,
 ) : PeriodicAlarm() {
 
   override suspend fun tag(): String {
-    return "Big Mover Alarm 1"
+    return "Refresher Alarm 1"
   }
 
   override suspend fun parameters(): AlarmParameters {
@@ -34,7 +33,7 @@ internal constructor(
   }
 
   override suspend fun isEnabled(): Boolean {
-    return isEnabled
+    return true
   }
 
   companion object {

@@ -16,7 +16,7 @@
 
 package com.pyamsoft.tickertape.alert
 
-import com.pyamsoft.tickertape.alert.work.Alarm
+import com.pyamsoft.tickertape.alert.base.Alarm
 
 interface Alerter {
 

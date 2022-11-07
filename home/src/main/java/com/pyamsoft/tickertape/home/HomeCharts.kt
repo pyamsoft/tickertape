@@ -41,7 +41,7 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.dig.ChartError
+import com.pyamsoft.tickertape.quote.dig.chart.ChartError
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -20,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
@@ -74,11 +74,7 @@ internal fun PortfolioDigToolbar(
       elevation = AppBarDefaults.TopAppBarElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
-      shape =
-          MaterialTheme.shapes.medium.copy(
-              topEnd = ZeroCornerSize,
-              topStart = ZeroCornerSize,
-          ),
+      shape = RectangleShape,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

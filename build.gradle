@@ -27,7 +27,6 @@ buildscript {
   repositories {
     mavenLocal()
     google()
-    mavenCentral()
 
     maven {
       url "https://jitpack.io"
@@ -40,6 +39,8 @@ buildscript {
     maven {
       url "https://plugins.gradle.org/m2/"
     }
+
+    mavenCentral()
   }
 
   ext {
@@ -85,7 +86,7 @@ buildscript {
     materialDesign = "1.7.0"
 
     // Vico charts
-    vico = "1.5.1"
+    vico = "1.5.2"
   }
 
   dependencies {
@@ -162,7 +163,6 @@ allprojects {
   repositories {
     mavenLocal()
     google()
-    mavenCentral()
 
     maven {
       url "https://jitpack.io"
@@ -175,6 +175,8 @@ allprojects {
     maven {
       url "https://plugins.gradle.org/m2/"
     }
+
+    mavenCentral()
   }
 
   tasks.withType(JavaCompile) {

@@ -39,7 +39,7 @@ internal fun SplitItem(
       borderColor = MaterialTheme.colors.secondary,
   ) {
     Column(
-        modifier = Modifier.padding(MaterialTheme.keylines.baseline).fillMaxWidth(),
+        modifier = Modifier.padding(MaterialTheme.keylines.content).fillMaxWidth(),
     ) {
       Text(
           modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),

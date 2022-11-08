@@ -28,13 +28,15 @@ import androidx.work.WorkRequest
 import androidx.work.Worker
 import com.google.common.util.concurrent.ListenableFuture
 import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.base.Alarm
-import com.pyamsoft.tickertape.alert.AlarmParameters
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
+import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
+import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
 import com.pyamsoft.tickertape.alert.types.refresh.RefresherAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
+import com.pyamsoft.tickertape.alert.workmanager.worker.PriceAlertWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.RefresherWorker
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
@@ -68,6 +70,7 @@ internal constructor(
         when (this) {
           is BigMoverAlarm -> BigMoverWorker::class.java
           is RefresherAlarm -> RefresherWorker::class.java
+          is PriceAlertAlarm -> PriceAlertWorker::class.java
           else -> throw AssertionError("Alarm must be work class $this")
         }
 

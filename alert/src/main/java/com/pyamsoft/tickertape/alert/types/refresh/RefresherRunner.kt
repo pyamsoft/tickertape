@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.alert.types.refresh
 
 import com.pyamsoft.tickertape.alert.base.BaseRunner
-import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.coroutineScope
@@ -27,19 +26,14 @@ import timber.log.Timber
 internal class RefresherRunner
 @Inject
 internal constructor(
-    private val tapeLauncher: TapeLauncher,
+    private val standalone: RefreshStandalone,
 ) : BaseRunner<RefreshWorkerParameters>() {
 
   override suspend fun performWork(params: RefreshWorkerParameters) = coroutineScope {
     val force = params.forceRefresh
 
     try {
-      tapeLauncher.start(
-          options =
-              TapeLauncher.Options(
-                  forceRefresh = force,
-              ),
-      )
+      standalone.refreshTape(force)
     } catch (e: Throwable) {
       Timber.e(e, "Error refreshing Tape notification")
     }

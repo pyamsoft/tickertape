@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.alert
 
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverInjector
+import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertInjector
 import com.pyamsoft.tickertape.alert.types.refresh.RefresherInjector
 import dagger.Subcomponent
 
@@ -28,4 +29,7 @@ interface AlertWorkComponent {
 
   // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
   fun inject(arg0: BigMoverInjector)
+
+  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
+  fun inject(arg0: PriceAlertInjector)
 }

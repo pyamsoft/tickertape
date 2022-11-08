@@ -39,21 +39,27 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 
   private val scope = MainScope()
 
-  private fun inject(context: Context) {
-    if (tapeLauncher != null) {
-      return
-    }
+  /**
+   * finalize() overrides JVM teardown
+   *
+   * DO NOT CALL THIS FUNCTION
+   */
+  internal fun finalize() {
+    scope.cancel()
 
-    Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+    tapeLauncher = null
   }
 
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action == Intent.ACTION_SCREEN_ON) {
-      Timber.d("Start service on screen on")
-      inject(context)
+      Injector.obtainFromApplication<TickerComponent>(context).inject(this)
 
       // Will refresh the Tape
-      scope.launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
+      scope.launch(context = Dispatchers.Default) {
+        Timber.d("Refresh tape on screen ON")
+
+        tapeLauncher.requireNotNull().start()
+      }
     }
   }
 

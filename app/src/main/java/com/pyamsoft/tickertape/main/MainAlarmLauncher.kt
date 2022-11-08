@@ -18,12 +18,11 @@ package com.pyamsoft.tickertape.main
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.pyamsoft.tickertape.alert.Alerter
-import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.alert.AlarmFactory
+import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.initOnAppStart
+import com.pyamsoft.tickertape.alert.notification.NotificationCanceller
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +32,6 @@ internal class MainAlarmLauncher
 @Inject
 internal constructor(
     private val notificationCanceller: NotificationCanceller,
-    private val tapeLauncher: TapeLauncher,
     private val alerter: Alerter,
     private val alarmFactory: AlarmFactory,
 ) {
@@ -48,8 +46,6 @@ internal constructor(
   ) {
     scope.launch(context = Dispatchers.Main) {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) { alerter.initOnAppStart(alarmFactory) }
-
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) { tapeLauncher.start() }
     }
   }
 }

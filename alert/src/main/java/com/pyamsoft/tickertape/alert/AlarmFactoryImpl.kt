@@ -21,8 +21,11 @@ import com.pyamsoft.tickertape.alert.base.Alarm
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
+import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertWorkerParameters
 import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
 import com.pyamsoft.tickertape.alert.types.refresh.RefresherAlarm
+import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +37,14 @@ internal class AlarmFactoryImpl
 @Inject
 internal constructor(
     private val bigMoverPreferences: BigMoverPreferences,
+    private val tapePreferences: TapePreferences,
 ) : AlarmFactory {
+
+  override suspend fun priceAlertAlarm(params: PriceAlertWorkerParameters): Alarm =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext PriceAlertAlarm(params)
+      }
 
   override suspend fun bigMoverAlarm(params: BigMoverWorkerParameters): Alarm =
       withContext(context = Dispatchers.IO) {
@@ -51,6 +61,12 @@ internal constructor(
   override suspend fun refresherAlarm(params: RefreshWorkerParameters): Alarm =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
-        return@withContext RefresherAlarm(params)
+
+        val isEnabled = tapePreferences.listenForTapeNotificationChanged().first()
+
+        return@withContext RefresherAlarm(
+            params,
+            isEnabled,
+        )
       }
 }

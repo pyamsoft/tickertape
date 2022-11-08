@@ -25,7 +25,9 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
-import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
+import com.pyamsoft.tickertape.alert.AlarmFactory
+import com.pyamsoft.tickertape.alert.Alerter
+import com.pyamsoft.tickertape.alert.initOnAppStart
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -34,21 +36,17 @@ import timber.log.Timber
 
 internal class BootReceiver internal constructor() : BroadcastReceiver() {
 
-  @Inject @JvmField internal var tapeLauncher: TapeLauncher? = null
-
-  private fun inject(context: Context) {
-    if (tapeLauncher != null) {
-      return
-    }
-
-    Injector.obtainFromApplication<TickerComponent>(context).inject(this)
-  }
+  @Inject @JvmField internal var alerter: Alerter? = null
+  @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
 
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-      Timber.d("Start service on boot")
-      inject(context)
-      MainScope().launch(context = Dispatchers.Default) { tapeLauncher.requireNotNull().start() }
+      Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+
+      MainScope().launch(context = Dispatchers.Default) {
+        Timber.d("Schedule alarms on boot")
+        alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
+      }
     }
   }
 

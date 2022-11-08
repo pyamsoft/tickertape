@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.types.pricealert
 
-enum class NotificationType {
-  BIG_MOVER,
-  PRICE_ALERT
-}
+import com.pyamsoft.pydroid.notify.NotifyData
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
+import com.pyamsoft.tickertape.stocks.api.StockQuote
+
+data class PriceAlertNotificationData
+internal constructor(
+    val quote: StockQuote,
+    val alert: PriceAlert,
+) : NotifyData

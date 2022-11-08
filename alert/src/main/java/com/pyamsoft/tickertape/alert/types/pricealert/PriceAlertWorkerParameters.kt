@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.types.pricealert
 
-enum class NotificationType {
-  BIG_MOVER,
-  PRICE_ALERT
-}
+import com.pyamsoft.tickertape.alert.base.BaseWorkerParameters
+
+data class PriceAlertWorkerParameters(
+    val forceRefresh: Boolean,
+) : BaseWorkerParameters

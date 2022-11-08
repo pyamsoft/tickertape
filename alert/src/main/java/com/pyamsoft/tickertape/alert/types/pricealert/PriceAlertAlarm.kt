@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.types.refresh
+package com.pyamsoft.tickertape.alert.types.pricealert
 
 import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
-class RefresherAlarm
+class PriceAlertAlarm
 internal constructor(
-    private val params: RefreshWorkerParameters,
-    private val isEnabled: Boolean,
+    private val params: PriceAlertWorkerParameters,
 ) : PeriodicAlarm() {
 
   override suspend fun tag(): String {
-    return "Refresher Alarm 1"
+    return "Price Alert Alarm 1"
   }
 
   override suspend fun parameters(): AlarmParameters {
@@ -34,7 +33,7 @@ internal constructor(
   }
 
   override suspend fun isEnabled(): Boolean {
-    return isEnabled
+    return true
   }
 
   companion object {

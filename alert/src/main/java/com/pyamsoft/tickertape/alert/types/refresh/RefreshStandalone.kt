@@ -14,9 +14,25 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.alert.notification
+package com.pyamsoft.tickertape.alert.types.refresh
 
-enum class NotificationType {
-  BIG_MOVER,
-  PRICE_ALERT
+import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class RefreshStandalone
+@Inject
+internal constructor(
+    private val launcher: TapeLauncher,
+) {
+
+  suspend fun refreshTape(force: Boolean) {
+    launcher.start(
+        options =
+            TapeLauncher.Options(
+                forceRefresh = force,
+            ),
+    )
+  }
 }

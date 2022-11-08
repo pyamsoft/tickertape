@@ -17,11 +17,22 @@
 package com.pyamsoft.tickertape.alert
 
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
+import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertWorkerParameters
 import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
 
 suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
   cancel()
 
+  // Periodically refresh the Tape
+  scheduleAlarm(
+      factory.refresherAlarm(
+          RefreshWorkerParameters(
+              forceRefresh = false,
+          ),
+      ),
+  )
+
+  // Periodically check for big movers
   scheduleAlarm(
       factory.bigMoverAlarm(
           BigMoverWorkerParameters(
@@ -29,9 +40,11 @@ suspend fun Alerter.initOnAppStart(factory: AlarmFactory) {
           ),
       ),
   )
+
+  // Periodically check for price alerts
   scheduleAlarm(
-      factory.refresherAlarm(
-          RefreshWorkerParameters(
+      factory.priceAlertAlarm(
+          PriceAlertWorkerParameters(
               forceRefresh = false,
           ),
       ),

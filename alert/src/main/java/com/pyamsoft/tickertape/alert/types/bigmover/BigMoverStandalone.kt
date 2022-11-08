@@ -37,6 +37,8 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
@@ -152,10 +154,11 @@ internal constructor(
         .toList()
   }
 
-  suspend fun notifyForBigMovers(quotes: List<StockQuote>) {
-    val bigMovers = quotes.filterBigMovers()
-    postNotifications(bigMovers)
-  }
+  suspend fun notifyForBigMovers(quotes: List<StockQuote>) =
+      withContext(context = Dispatchers.IO) {
+        val bigMovers = quotes.filterBigMovers()
+        postNotifications(bigMovers)
+      }
 
   companion object {
 

@@ -24,8 +24,8 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.alert.types.refresh.RefreshStandalone
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
-import com.pyamsoft.tickertape.tape.launcher.TapeLauncher
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -35,7 +35,7 @@ import timber.log.Timber
 
 internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 
-  @Inject @JvmField internal var tapeLauncher: TapeLauncher? = null
+  @Inject @JvmField internal var refreshStandalone: RefreshStandalone? = null
 
   private val scope = MainScope()
 
@@ -45,9 +45,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
    * DO NOT CALL THIS FUNCTION
    */
   internal fun finalize() {
-    scope.cancel()
-
-    tapeLauncher = null
+    destroy()
   }
 
   override fun onReceive(context: Context, intent: Intent) {
@@ -58,7 +56,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
       scope.launch(context = Dispatchers.Default) {
         Timber.d("Refresh tape on screen ON")
 
-        tapeLauncher.requireNotNull().start()
+        refreshStandalone.requireNotNull().refreshTape(false)
       }
     }
   }
@@ -66,6 +64,8 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
   internal fun destroy() {
     Timber.d("Destroy screen receiver")
     scope.cancel()
+
+    refreshStandalone = null
   }
 
   fun interface Registration {

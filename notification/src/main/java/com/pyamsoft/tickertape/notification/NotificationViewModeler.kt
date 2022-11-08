@@ -130,8 +130,14 @@ internal constructor(
                   forceRefresh = false,
               ),
           )
+
+      // Cancel existing alarms
       alerter.cancelAlarm(alarm)
-      alerter.scheduleAlarm(alarm)
+
+      // If we are enabled, fire
+      if (newEnabled) {
+        alerter.scheduleAlarm(alarm)
+      }
     }
   }
 

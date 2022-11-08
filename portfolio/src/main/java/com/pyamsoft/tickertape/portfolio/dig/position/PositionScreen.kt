@@ -11,15 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
-import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionScreen
+import com.pyamsoft.tickertape.portfolio.dig.PositionsPortfolioDigViewState
+import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun PositionScreen(
     modifier: Modifier = Modifier,
-    state: PortfolioDigViewState,
+    state: PositionsPortfolioDigViewState,
     onRefresh: () -> Unit,
     onAddPosition: () -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
@@ -36,7 +36,7 @@ internal fun PositionScreen(
         !isLoading && positionError == null && holdingError == null
       }
 
-  BasePositionScreen(
+  BaseDigListScreen(
       modifier = modifier,
       label = "Add Position",
       isAddVisible = isAddVisible,

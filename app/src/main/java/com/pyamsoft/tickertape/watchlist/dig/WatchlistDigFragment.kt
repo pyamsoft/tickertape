@@ -46,6 +46,7 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -181,6 +182,18 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 onRecClick = { handleRecommendationSelected(it) },
                 onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
                 onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
+                onAddPriceAlert = {
+                    // TODO Price alerts
+                    Timber.d("ADD PRICE ALERT!")
+                },
+                onUpdatePriceAlert = {
+                    // TODO Price alerts
+                    Timber.d("UPDATE PRICE ALERT: $it")
+                },
+                onDeletePriceAlert = {
+                    // TODO Price alerts
+                    Timber.d("DELETE PRICE ALERT: $it")
+                },
             )
           }
         }

@@ -12,14 +12,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
+import com.pyamsoft.tickertape.quote.dig.StatisticsDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 fun DigKeyStatistics(
     modifier: Modifier = Modifier,
-    state: DigViewState,
+    state: StatisticsDigViewState,
     onRefresh: () -> Unit,
 ) {
   val error = state.statisticsError

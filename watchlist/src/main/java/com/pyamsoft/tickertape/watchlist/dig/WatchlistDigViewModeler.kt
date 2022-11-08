@@ -55,6 +55,10 @@ internal constructor(
               // Based on the page
               @Suppress("ControlFlowWithEmptyBody")
               when (state.section) {
+                WatchlistDigSections.PRICE_ALERTS -> {
+                  // TODO add price alerts work
+                  add(async { loadTicker(force) })
+                }
                 WatchlistDigSections.CHART -> {
                   add(async { loadTicker(force) })
                 }

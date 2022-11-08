@@ -11,15 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigViewState
-import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionScreen
+import com.pyamsoft.tickertape.portfolio.dig.SplitsPortfolioDigViewState
+import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SplitScreen(
     modifier: Modifier = Modifier,
-    state: PortfolioDigViewState,
+    state: SplitsPortfolioDigViewState,
     onRefresh: () -> Unit,
     onAddSplit: () -> Unit,
     onDeleteSplit: (DbSplit) -> Unit,
@@ -28,15 +28,15 @@ internal fun SplitScreen(
   val isLoading = state.isLoading
   val splits = state.stockSplits
 
-  val positionError = state.positionsError
+  val splitError = state.stockSplitError
   val holdingError = state.holdingError
 
   val isAddVisible =
-      remember(isLoading, positionError, holdingError) {
-        !isLoading && positionError == null && holdingError == null
+      remember(isLoading, splitError, holdingError) {
+        !isLoading && splitError == null && holdingError == null
       }
 
-  BasePositionScreen(
+  BaseDigListScreen(
       modifier = modifier,
       label = "Add Stock Split",
       isAddVisible = isAddVisible,

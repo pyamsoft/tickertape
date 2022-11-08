@@ -98,6 +98,10 @@ internal constructor(
             .apply {
               @Suppress("ControlFlowWithEmptyBody")
               when (state.section) {
+                PortfolioDigSections.PRICE_ALERTS -> {
+                  // TODO add price alerts work
+                  add(async { loadTicker(force) })
+                }
                 PortfolioDigSections.CHART -> {
                   add(async { loadTicker(force) })
                 }

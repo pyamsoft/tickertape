@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.quote.add.TickerDestination
 import dagger.BindsInstance
 import dagger.Subcomponent
 

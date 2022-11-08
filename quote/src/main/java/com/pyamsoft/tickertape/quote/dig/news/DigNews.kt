@@ -30,8 +30,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
+import com.pyamsoft.tickertape.quote.dig.NewsDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -44,7 +44,7 @@ import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 fun DigNews(
     modifier: Modifier = Modifier,
     imageLoader: ImageLoader,
-    state: DigViewState,
+    state: NewsDigViewState,
     onRefresh: () -> Unit,
 ) {
   val error = state.newsError

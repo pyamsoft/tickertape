@@ -17,7 +17,6 @@ interface WatchlistDigViewState : DigViewState {
   val isInWatchlistError: Throwable?
 }
 
-// Public for WatchlistDigViewModeler constructor
 @Stable
 class MutableWatchlistDigViewState
 @Inject

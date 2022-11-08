@@ -17,16 +17,18 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.chart.PortfolioChart
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.chart.ChartData
-import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.dig.news.DigNews
 import com.pyamsoft.tickertape.quote.dig.options.DigOptionsChain
+import com.pyamsoft.tickertape.quote.dig.pricealert.DigPriceAlerts
 import com.pyamsoft.tickertape.quote.dig.recommend.DigRecommendations
+import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -42,17 +44,26 @@ fun PortfolioDigScreen(
     onClose: () -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
+    // Chart
     onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
+    // Positions
     onPositionAdd: () -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
     onPositionUpdate: (DbPosition) -> Unit,
+    // Splits
     onSplitAdd: () -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
     onSplitUpdated: (DbSplit) -> Unit,
+    // Recommendations
     onRecClick: (Ticker) -> Unit,
+    // Options
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
     onOptionExpirationDateChanged: (LocalDate) -> Unit,
+    // Price Alerts
+    onAddPriceAlert: () -> Unit,
+    onUpdatePriceAlert: (PriceAlert) -> Unit,
+    onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
   val isLoading = state.isLoading
 
@@ -93,6 +104,9 @@ fun PortfolioDigScreen(
               onRecClick = onRecClick,
               onOptionSectionChanged = onOptionSectionChanged,
               onOptionExpirationDateChanged = onOptionExpirationDateChanged,
+              onAddPriceAlert = onAddPriceAlert,
+              onUpdatePriceAlert = onUpdatePriceAlert,
+              onDeletePriceAlert = onDeletePriceAlert,
           )
         }
       }
@@ -106,17 +120,27 @@ private fun Content(
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
     onRefresh: () -> Unit,
+
+    // Chart
     onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
+    // Positions
     onPositionAdd: () -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
     onPositionUpdate: (DbPosition) -> Unit,
+    // Splits
     onSplitAdd: () -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
     onSplitUpdated: (DbSplit) -> Unit,
+    // Recommendations
     onRecClick: (Ticker) -> Unit,
+    // Options
     onOptionSectionChanged: (StockOptions.Contract.Type) -> Unit,
     onOptionExpirationDateChanged: (LocalDate) -> Unit,
+    // Price Alerts
+    onAddPriceAlert: () -> Unit,
+    onUpdatePriceAlert: (PriceAlert) -> Unit,
+    onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
   val section = state.section
 
@@ -140,6 +164,16 @@ private fun Content(
             state = state,
             imageLoader = imageLoader,
             onRefresh = onRefresh,
+        )
+      }
+      PortfolioDigSections.PRICE_ALERTS -> {
+        DigPriceAlerts(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
+            onAddPriceAlert = onAddPriceAlert,
+            onUpdatePriceAlert = onUpdatePriceAlert,
+            onDeletePriceAlert = onDeletePriceAlert,
         )
       }
       PortfolioDigSections.POSITIONS -> {
@@ -226,5 +260,8 @@ private fun PreviewPortfolioDigScreen() {
       onRecClick = {},
       onOptionExpirationDateChanged = {},
       onOptionSectionChanged = {},
+      onAddPriceAlert = {},
+      onUpdatePriceAlert = {},
+      onDeletePriceAlert = {},
   )
 }

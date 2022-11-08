@@ -7,24 +7,35 @@ import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 @Stable
-interface PortfolioDigViewState : DigViewState {
+interface BasePortfolioDigViewState : BaseDigViewState {
   val section: PortfolioDigSections
-
-  val stockSplits: List<DbSplit>
-  val stockSplitError: Throwable?
 
   val holding: DbHolding?
   val holdingError: Throwable?
+}
 
+@Stable
+interface PositionsPortfolioDigViewState : BasePortfolioDigViewState {
   val positions: List<PositionStock>
   val positionsError: Throwable?
 }
+
+@Stable
+interface SplitsPortfolioDigViewState : BasePortfolioDigViewState {
+  val stockSplits: List<DbSplit>
+  val stockSplitError: Throwable?
+}
+
+@Stable
+interface PortfolioDigViewState :
+    DigViewState, PositionsPortfolioDigViewState, SplitsPortfolioDigViewState
 
 // Public for PortfolioDigViewModeler constructor
 @Stable

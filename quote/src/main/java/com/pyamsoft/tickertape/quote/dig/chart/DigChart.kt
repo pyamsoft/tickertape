@@ -31,11 +31,11 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.R
+import com.pyamsoft.tickertape.quote.chart.Chart
 import com.pyamsoft.tickertape.quote.chart.ChartData
-import com.pyamsoft.tickertape.quote.dig.DigViewState
+import com.pyamsoft.tickertape.quote.dig.ChartDigViewState
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.DATE_TIME_FORMATTER
@@ -55,7 +55,7 @@ import kotlin.math.abs
 @Composable
 fun DigChart(
     modifier: Modifier = Modifier,
-    state: DigViewState,
+    state: ChartDigViewState,
     imageLoader: ImageLoader,
     onScrub: (ChartData) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,

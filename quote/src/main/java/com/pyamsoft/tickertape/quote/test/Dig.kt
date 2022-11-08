@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.quote.test
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
@@ -55,5 +56,7 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
     override val optionsExpirationDate: LocalDate? = null
 
     override val optionsSection: StockOptions.Contract.Type = StockOptions.Contract.Type.CALL
+
+    override val priceAlerts: List<PriceAlert> = emptyList()
   }
 }

@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.tickertape.quote.chart.ChartData
+import com.pyamsoft.tickertape.quote.dig.ChartDigViewState
 import com.pyamsoft.tickertape.quote.dig.chart.DigChart
-import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.test.newTestDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
@@ -15,7 +15,7 @@ import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 @Composable
 internal fun PortfolioChart(
     modifier: Modifier = Modifier,
-    state: DigViewState,
+    state: ChartDigViewState,
     imageLoader: ImageLoader,
     onScrub: (ChartData) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,

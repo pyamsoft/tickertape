@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.dig.base
+package com.pyamsoft.tickertape.quote.dig.base
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -32,8 +32,7 @@ import com.pyamsoft.pydroid.theme.keylines
 private const val FAB_OFFSET = 56 + 16
 
 @Composable
-@JvmOverloads
-internal fun <T : Any> BasePositionScreen(
+fun <T : Any> BaseDigListScreen(
     modifier: Modifier = Modifier,
     label: String,
     isAddVisible: Boolean,
@@ -48,7 +47,7 @@ internal fun <T : Any> BasePositionScreen(
       modifier = modifier,
       contentAlignment = Alignment.BottomEnd,
   ) {
-    PositionsList(
+    DigList(
         modifier = Modifier.matchParentSize(),
         items = items,
         isLoading = isLoading,
@@ -57,7 +56,7 @@ internal fun <T : Any> BasePositionScreen(
         listItem = renderListItem,
     )
 
-    PositionsAdd(
+    DigAdd(
         label = label,
         isVisible = isAddVisible,
         onClick = onAddClicked,
@@ -66,7 +65,7 @@ internal fun <T : Any> BasePositionScreen(
 }
 
 @Composable
-private fun <T : Any> PositionsList(
+private fun <T : Any> DigList(
     modifier: Modifier = Modifier,
     items: List<T>,
     isLoading: Boolean,
@@ -101,7 +100,7 @@ private fun <T : Any> PositionsList(
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
-private fun PositionsAdd(
+private fun DigAdd(
     modifier: Modifier = Modifier,
     label: String,
     isVisible: Boolean,
@@ -132,9 +131,9 @@ private fun PositionsAdd(
 
 @Preview
 @Composable
-private fun PreviewBasePositionScreen() {
+private fun PreviewBaseDigListScreen() {
   Surface {
-    BasePositionScreen(
+    BaseDigListScreen(
         modifier = Modifier.fillMaxSize(),
         label = "Test",
         isAddVisible = true,

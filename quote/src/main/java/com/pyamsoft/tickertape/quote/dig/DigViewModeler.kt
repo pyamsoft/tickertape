@@ -46,11 +46,14 @@ protected constructor(
 ) : AbstractViewModeler<S>(state) {
 
   private val optionsRunner =
-      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
+      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol, LocalDate?> {
+          force,
+          symbol,
+          expirationDate ->
         if (force) {
           interactorCache.invalidateOptionsChain(symbol)
         }
-        return@highlander interactor.getOptionsChain(symbol)
+        return@highlander interactor.getOptionsChain(symbol, expirationDate)
       }
 
   private val statisticsRunner =
@@ -132,7 +135,7 @@ protected constructor(
     }
 
     optionsRunner
-        .call(force, symbol)
+        .call(force, symbol, s.optionsExpirationDate)
         .onSuccess { o ->
           s.apply {
             optionsChain = o
@@ -277,8 +280,11 @@ protected constructor(
     state.optionsSection = section
   }
 
-  fun handleOptionsExpirationDateChanged(date: LocalDate) {
+  fun handleOptionsExpirationDateChanged(scope: CoroutineScope, date: LocalDate) {
     state.optionsExpirationDate = date
+
+    // Reload options
+    scope.launch(context = Dispatchers.Main) { loadOptionsChain(false) }
   }
 
   fun handleChartRangeSelected(

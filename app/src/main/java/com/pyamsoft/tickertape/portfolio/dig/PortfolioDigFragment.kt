@@ -57,6 +57,7 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import java.time.LocalDate
 import javax.inject.Inject
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
@@ -65,6 +66,15 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
+
+  private fun handleOptionsExpirationDateChanged(date: LocalDate) {
+    viewModel
+        .requireNotNull()
+        .handleOptionsExpirationDateChanged(
+            scope = viewLifecycleOwner.lifecycleScope,
+            date = date,
+        )
+  }
 
   private fun handleRecommendationSelected(ticker: Ticker) {
     val quote = ticker.quote
@@ -260,7 +270,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
                 onSplitUpdated = { handleUpdateSplit(it) },
                 onRecClick = { handleRecommendationSelected(it) },
                 onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
-                onOptionExpirationDateChanged = { vm.handleOptionsExpirationDateChanged(it) },
+                onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
             )
           }
         }

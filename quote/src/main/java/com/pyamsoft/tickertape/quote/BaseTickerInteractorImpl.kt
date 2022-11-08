@@ -22,6 +22,7 @@ import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -32,7 +33,10 @@ protected constructor(
     private val stockInteractorCache: StockInteractor.Cache,
 ) : BaseTickerInteractor, BaseTickerInteractor.Cache {
 
-  final override suspend fun getOptionsChain(symbol: StockSymbol): ResultWrapper<StockOptions> =
+  final override suspend fun getOptionsChain(
+      symbol: StockSymbol,
+      expirationDate: LocalDate?,
+  ): ResultWrapper<StockOptions> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
@@ -40,8 +44,7 @@ protected constructor(
           val options =
               stockInteractor.getOptions(
                   symbols = listOf(symbol),
-                  // TODO pass ED
-                  expirationDate = null,
+                  expirationDate = expirationDate,
               )
           // Right now we only support 1 lookup at a time in the UI
           val result = options.first()

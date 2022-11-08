@@ -56,11 +56,14 @@ internal constructor(
       }
 
   private val optionLookupRunner =
-      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol> { force, symbol ->
+      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol, LocalDate?> {
+          force,
+          symbol,
+          expirationDate ->
         if (force) {
           interactorCache.invalidateOptionsChain(symbol)
         }
-        return@highlander interactor.getOptionsChain(symbol)
+        return@highlander interactor.getOptionsChain(symbol, expirationDate)
       }
 
   private val optionResolverRunner =
@@ -221,13 +224,14 @@ internal constructor(
   }
 
   private fun performLookupOptionData(scope: CoroutineScope, symbol: StockSymbol) {
+    val s = state
     scope.launch(context = Dispatchers.Main) {
       optionLookupRunner
-          .call(false, symbol)
+          .call(false, symbol, s.optionExpirationDate)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
           .onSuccess { Timber.d("Options data: $it") }
-          .onSuccess { state.resolvedOption = it }
-          .onFailure { state.resolvedOption = null }
+          .onSuccess { s.resolvedOption = it }
+          .onFailure { s.resolvedOption = null }
     }
   }
 

@@ -20,10 +20,15 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 
 interface BaseTickerInteractor {
 
-  @CheckResult suspend fun getOptionsChain(symbol: StockSymbol): ResultWrapper<StockOptions>
+  @CheckResult
+  suspend fun getOptionsChain(
+      symbol: StockSymbol,
+      expirationDate: LocalDate?,
+  ): ResultWrapper<StockOptions>
 
   interface Cache {
 

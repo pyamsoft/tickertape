@@ -84,6 +84,13 @@ internal constructor(
         // For each alert in price alerts
         // If the price of the stock quote has passed an alert direction
         // mark as alerted and trigger alert notification
+        val alerts =
+            priceAlertQueryDao.query().filter {
+              // Alert must be enabled
+              // Alert must have a trigger price set in some direction
+              it.enabled && (it.triggerPriceAbove != null || it.triggerPriceBelow != null)
+            }
+        Timber.d("FUTURE: PROCESS PRICE ALERTS: $quotes $alerts")
       }
 
   companion object {

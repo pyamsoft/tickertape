@@ -52,15 +52,17 @@ internal constructor(
               // Always this
               add(async { checkIsInWatchlist(force) })
 
+              // Always load ticker
+              add(async { loadTicker(force) })
+
               // Based on the page
-              @Suppress("ControlFlowWithEmptyBody")
+              @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
               when (state.section) {
                 WatchlistDigSections.PRICE_ALERTS -> {
                   // TODO add price alerts work
-                  add(async { loadTicker(force) })
                 }
                 WatchlistDigSections.CHART -> {
-                  add(async { loadTicker(force) })
+                  // Chart doesn't need anything specific
                 }
                 WatchlistDigSections.NEWS -> {
                   add(async { loadNews(force) })

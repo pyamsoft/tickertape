@@ -92,18 +92,22 @@ internal constructor(
   private val splitDeleteRunner =
       highlander<ResultWrapper<Boolean>, DbSplit> { interactor.deleteSplit(it) }
 
+  @Suppress("ControlFlowWithEmptyBody")
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
         mutableListOf<Deferred<*>>()
             .apply {
-              @Suppress("ControlFlowWithEmptyBody")
+
+              // Always load the ticker
+              add(async { loadTicker(force) })
+
+              @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
               when (state.section) {
                 PortfolioDigSections.PRICE_ALERTS -> {
                   // TODO add price alerts work
-                  add(async { loadTicker(force) })
                 }
                 PortfolioDigSections.CHART -> {
-                  add(async { loadTicker(force) })
+                  // Chart doesn't need anything specific
                 }
                 PortfolioDigSections.NEWS -> {
                   add(async { loadNews(force) })

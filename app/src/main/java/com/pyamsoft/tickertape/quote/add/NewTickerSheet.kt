@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.ticker.add
+package com.pyamsoft.tickertape.quote.add
 
 import android.content.res.Configuration
 import android.os.Bundle

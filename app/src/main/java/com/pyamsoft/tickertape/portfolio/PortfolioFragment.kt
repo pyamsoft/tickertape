@@ -43,7 +43,7 @@ import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.TickerDestination
-import com.pyamsoft.tickertape.ticker.add.NewTickerSheet
+import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 

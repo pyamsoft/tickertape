@@ -45,18 +45,17 @@ internal fun PositionScreen(
       onRefresh = onRefresh,
       onAddClicked = onAddPosition,
       itemKey = { it.id.raw },
-      renderListItem = { position ->
-        PositionItem(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onUpdatePosition(position) },
-                        onLongClick = { onDeletePosition(position) },
-                    ),
-            position = position,
-        )
-      },
-  )
+  ) { position ->
+    PositionItem(
+        modifier =
+            Modifier.fillMaxWidth()
+                .combinedClickable(
+                    onClick = { onUpdatePosition(position) },
+                    onLongClick = { onDeletePosition(position) },
+                ),
+        position = position,
+    )
+  }
 }
 
 @Preview

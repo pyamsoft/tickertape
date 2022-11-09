@@ -45,18 +45,17 @@ internal fun SplitScreen(
       onRefresh = onRefresh,
       onAddClicked = onAddSplit,
       itemKey = { it.id.raw },
-      renderListItem = { split ->
-        SplitItem(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onUpdateSplit(split) },
-                        onLongClick = { onDeleteSplit(split) },
-                    ),
-            split = split,
-        )
-      },
-  )
+  ) { split ->
+    SplitItem(
+        modifier =
+            Modifier.fillMaxWidth()
+                .combinedClickable(
+                    onClick = { onUpdateSplit(split) },
+                    onLongClick = { onDeleteSplit(split) },
+                ),
+        split = split,
+    )
+  }
 }
 
 @Preview

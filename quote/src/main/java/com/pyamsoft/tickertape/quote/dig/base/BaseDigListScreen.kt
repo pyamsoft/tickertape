@@ -142,7 +142,6 @@ private fun PreviewBaseDigListScreen() {
         itemKey = { "" },
         onAddClicked = {},
         onRefresh = {},
-        renderListItem = {},
-    )
+    ) {}
   }
 }

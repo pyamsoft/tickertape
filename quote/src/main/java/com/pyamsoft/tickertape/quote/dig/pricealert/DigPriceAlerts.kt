@@ -36,18 +36,17 @@ fun DigPriceAlerts(
       onRefresh = onRefresh,
       onAddClicked = onAddPriceAlert,
       itemKey = { it.id.raw },
-      renderListItem = { priceAlert ->
-        PriceAlertItem(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onUpdatePriceAlert(priceAlert) },
-                        onLongClick = { onDeletePriceAlert(priceAlert) },
-                    ),
-            priceAlert = priceAlert,
-        )
-      },
-  )
+  ) { priceAlert ->
+    PriceAlertItem(
+        modifier =
+            Modifier.fillMaxWidth()
+                .combinedClickable(
+                    onClick = { onUpdatePriceAlert(priceAlert) },
+                    onLongClick = { onDeletePriceAlert(priceAlert) },
+                ),
+        priceAlert = priceAlert,
+    )
+  }
 }
 
 @Preview

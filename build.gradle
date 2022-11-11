@@ -56,7 +56,7 @@ buildscript {
     workmanager = "2.7.1"
 
     // Leak Canary
-    leakCanary = "2.9.1"
+    leakCanary = "2.10"
 
     // Logging
     timber = "5.0.1"

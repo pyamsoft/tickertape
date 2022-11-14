@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import java.time.LocalDate
 import javax.inject.Inject
 
 internal class NewTickerSheet : BottomSheetDialogFragment() {
@@ -49,6 +50,15 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
     } else {
       this.handleClearEquityType()
     }
+  }
+
+  private fun handleOptionExpirationDate(date: LocalDate) {
+    viewModel
+        .requireNotNull()
+        .handleOptionExpirationDate(
+            scope = viewLifecycleOwner.lifecycleScope,
+            date = date,
+        )
   }
 
   private fun handleSearchResultSelected(result: SearchResult) {
@@ -106,7 +116,7 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
                 onResultsDismissed = { vm.handleSearchResultsDismissed() },
                 onOptionTypeSlected = { vm.handleOptionType(it) },
                 onStrikeSelected = { vm.handleOptionStrikePrice(it) },
-                onExpirationDateSelected = { vm.handleOptionExpirationDate(it) },
+                onExpirationDateSelected = { handleOptionExpirationDate(it) },
                 onAfterSymbolChanged = { vm.handleAfterSymbolChanged(scope = this, symbol = it) },
             )
           }

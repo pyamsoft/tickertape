@@ -230,7 +230,18 @@ internal constructor(
           .call(false, symbol, s.optionExpirationDate)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
           .onSuccess { Timber.d("Options data: $it") }
-          .onSuccess { s.resolvedOption = it }
+          .onSuccess { option ->
+            s.resolvedOption = option
+
+            val strike = s.optionStrikePrice
+            if (strike != null) {
+              // Clear price if it is not present in Strike price list for current Option expiration
+              // date
+              if (!option.strikes.map { it.value }.contains(strike.value)) {
+                s.optionStrikePrice = null
+              }
+            }
+          }
           .onFailure { s.resolvedOption = null }
     }
   }

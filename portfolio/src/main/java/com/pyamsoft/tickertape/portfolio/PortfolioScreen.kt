@@ -13,7 +13,7 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
-import com.pyamsoft.tickertape.quote.BaseListScreen
+import com.pyamsoft.tickertape.quote.base.BaseListScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader

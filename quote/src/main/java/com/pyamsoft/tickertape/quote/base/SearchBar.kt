@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.base
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -35,8 +35,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-@JvmOverloads
-fun SearchBar(
+internal fun SearchBar(
     modifier: Modifier = Modifier,
     search: String,
     currentTab: EquityType,

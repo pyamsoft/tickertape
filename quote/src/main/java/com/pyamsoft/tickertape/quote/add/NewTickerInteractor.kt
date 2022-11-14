@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.quote.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.quote.BaseTickerInteractor
+import com.pyamsoft.tickertape.quote.base.BaseTickerInteractor
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult

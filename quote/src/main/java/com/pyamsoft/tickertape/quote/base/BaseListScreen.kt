@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.base
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

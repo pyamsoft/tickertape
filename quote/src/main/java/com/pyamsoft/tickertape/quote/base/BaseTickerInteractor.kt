@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.quote
+package com.pyamsoft.tickertape.quote.base
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper

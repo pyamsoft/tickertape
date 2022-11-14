@@ -306,8 +306,16 @@ internal constructor(
     state.clearInput()
   }
 
-  fun handleOptionExpirationDate(date: LocalDate) {
-    state.optionExpirationDate = date
+  fun handleOptionExpirationDate(scope: CoroutineScope, date: LocalDate) {
+    val s = state
+
+    s.optionExpirationDate = date
+
+    // Retrigger options lookup for new expiration date
+    val symbol = s.validSymbol
+    if (s.equityType == EquityType.OPTION && symbol != null) {
+      performLookupOptionData(scope, symbol)
+    }
   }
 
   fun handleOptionStrikePrice(price: StockMoneyValue) {

@@ -27,7 +27,7 @@ import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
 import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
-import com.pyamsoft.tickertape.quote.BaseTickerInteractorImpl
+import com.pyamsoft.tickertape.quote.base.BaseTickerInteractorImpl
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.StockInteractor

@@ -33,6 +33,7 @@ import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
+import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
@@ -47,6 +48,8 @@ import timber.log.Timber
 internal class MainActivity : PYDroidActivity() {
 
   override val applicationIcon = R.mipmap.ic_launcher
+
+  override val applicationVersionCode = BuildConfig.VERSION_CODE
 
   override val changelog: ChangeLogBuilder = buildChangeLog {}
 

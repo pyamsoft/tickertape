@@ -49,8 +49,8 @@ buildscript {
 
     // Us
     pydroid = "25.1.0-SNAPSHOT"
-    cachify = "0.1.0"
-    highlander = "0.1.0"
+    cachify = "0.2.0-SNAPSHOT"
+    highlander = "0.2.0-SNAPSHOT"
 
     // Jobs
     workmanager = "2.7.1"

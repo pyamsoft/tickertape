@@ -17,8 +17,8 @@
 package com.pyamsoft.tickertape.stocks.cache
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.cachify.CacheStorage
-import com.pyamsoft.cachify.MemoryCacheStorage
+import com.pyamsoft.cachify.storage.CacheStorage
+import com.pyamsoft.cachify.storage.MemoryCacheStorage
 import java.util.concurrent.TimeUnit
 
 @CheckResult

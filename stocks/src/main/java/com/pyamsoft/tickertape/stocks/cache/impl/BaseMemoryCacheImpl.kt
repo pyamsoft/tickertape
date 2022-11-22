@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.stocks.cache.impl
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.cachify.CacheStorage
+import com.pyamsoft.cachify.storage.CacheStorage
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage

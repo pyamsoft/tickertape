@@ -38,7 +38,7 @@ internal class AppSettings : SettingsFragment(), FragmentNavigator.Screen<Settin
 
   override val hideClearAll: Boolean = false
 
-  override val hideUpgradeInformation: Boolean = true
+  override val hideUpgradeInformation: Boolean = false
 
   @Inject @JvmField internal var viewModel: SettingsViewModeler? = null
 

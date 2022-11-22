@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.ui.NewVersionWidget
 
 @Composable
 fun NotificationScreen(
@@ -62,6 +63,12 @@ fun NotificationScreen(
       item {
         Spacer(
             modifier = Modifier.padding(pv).statusBarsPadding(),
+        )
+      }
+
+      item {
+        NewVersionWidget(
+            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
         )
       }
 

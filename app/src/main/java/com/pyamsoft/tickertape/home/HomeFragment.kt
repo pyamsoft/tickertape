@@ -23,18 +23,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.pydroid.ui.version.VersionUpgradeAvailable
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
@@ -43,6 +48,7 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.ui.NewVersionWidget
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
@@ -88,6 +94,7 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     val act = requireActivity()
     Injector.obtainFromActivity<MainComponent>(act).plusHome().create().inject(this)
 
+    val appName = act.getString(R.string.app_name)
     val vm = viewModel.requireNotNull()
     val mainVM = mainViewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
@@ -95,8 +102,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
       id = R.id.screen_home
-
-      val appName = act.getString(R.string.app_name)
 
       setContent {
         vm.Render { state ->

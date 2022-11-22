@@ -34,6 +34,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
+import com.pyamsoft.tickertape.ui.NewVersionWidget
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -170,6 +171,13 @@ private fun <T : Any> ListSection(
   LazyColumn(
       modifier = modifier,
   ) {
+    item {
+      NewVersionWidget(
+          modifier =
+              Modifier.fillMaxWidth().statusBarsPadding().padding(MaterialTheme.keylines.content),
+      )
+    }
+
     if (renderHeader != null) {
       item { renderHeader() }
     }

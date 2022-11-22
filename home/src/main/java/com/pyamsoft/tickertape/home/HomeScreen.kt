@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.ui.NewVersionWidget
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -84,12 +85,21 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
       item {
-        HomeHeader(
+        Spacer(
+            modifier = Modifier.fillMaxWidth().padding(pv).statusBarsPadding(),
+        )
+      }
+      item {
+        NewVersionWidget(
             modifier =
                 Modifier.fillMaxWidth()
-                    .padding(pv)
-                    .statusBarsPadding()
-                    .padding(MaterialTheme.keylines.content),
+                    .padding(horizontal = MaterialTheme.keylines.content),
+        )
+      }
+
+      item {
+        HomeHeader(
+            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
             appName = appName,
             onSettingsClicked = onSettingsClicked,
         )

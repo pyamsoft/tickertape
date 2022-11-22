@@ -70,6 +70,12 @@ class TickerTape : Application() {
                   content = content,
               )
             },
+            debug =
+                PYDroid.DebugParameters(
+                    enabled = true,
+                    upgradeAvailable = true,
+                    ratingAvailable = false,
+                ),
         )
 
     return@lazy createComponent(PYDroid.init(this, parameters), lazyImageLoader)

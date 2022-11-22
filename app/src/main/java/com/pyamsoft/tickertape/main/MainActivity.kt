@@ -40,12 +40,13 @@ import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.BaseActivity
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class MainActivity : PYDroidActivity() {
+internal class MainActivity : BaseActivity() {
 
   override val applicationIcon = R.mipmap.ic_launcher
 

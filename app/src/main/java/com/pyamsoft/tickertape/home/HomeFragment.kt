@@ -23,23 +23,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
-import com.pyamsoft.pydroid.ui.version.VersionUpgradeAvailable
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
@@ -48,7 +43,6 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
-import com.pyamsoft.tickertape.ui.NewVersionWidget
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
@@ -104,30 +98,26 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_home
 
       setContent {
-        vm.Render { state ->
-          mainVM.Render { mainState ->
-            act.TickerTapeTheme(themeProvider) {
-              HomeScreen(
-                  modifier = Modifier.fillMaxSize(),
-                  state = state,
-                  appName = appName,
-                  imageLoader = loader,
-                  navBarBottomHeight = mainState.bottomNavHeight,
-                  onSettingsClicked = { handleOpenSettingsDialog() },
-                  onChartClicked = { handleOpenDigDialog(it) },
-                  onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
-                  onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
-                  onRefreshTrending = { vm.handleFetchTrending(this, false) },
-                  onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
-                  onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
-                  onRefreshLosers = { vm.handleFetchLosers(this, false) },
-                  onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
-                  onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
-                  onRefreshGainers = { vm.handleFetchGainers(this, false) },
-                  onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
-              )
-            }
-          }
+        act.TickerTapeTheme(themeProvider) {
+          HomeScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state(),
+              appName = appName,
+              imageLoader = loader,
+              navBarBottomHeight = mainVM.state().bottomNavHeight,
+              onSettingsClicked = { handleOpenSettingsDialog() },
+              onChartClicked = { handleOpenDigDialog(it) },
+              onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
+              onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
+              onRefreshTrending = { vm.handleFetchTrending(this, false) },
+              onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
+              onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
+              onRefreshLosers = { vm.handleFetchLosers(this, false) },
+              onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
+              onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
+              onRefreshGainers = { vm.handleFetchGainers(this, false) },
+              onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
+          )
         }
       }
     }

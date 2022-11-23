@@ -125,27 +125,24 @@ internal class SplitDialog : AppCompatDialogFragment() {
 
       setContent {
         val symbol = remember { getSymbol() }
+        val state = vm.state()
 
-        vm.Render { state ->
-          val splitId = state.splitId
-
-          act.TickerTapeTheme(themeProvider) {
-            SplitAddScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                symbol = symbol,
-                onPreSplitCountChanged = { vm.handlePreSplitShareCountChanged(it) },
-                onPostSplitCountChanged = { vm.handlePostSplitShareCountChanged(it) },
-                onSubmit = { handleSubmit() },
-                onClose = { dismiss() },
-                onSplitDateClicked = { date ->
-                  handleSplitDateClicked(
-                      splitId = splitId,
-                      date = date,
-                  )
-                },
-            )
-          }
+        act.TickerTapeTheme(themeProvider) {
+          SplitAddScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              symbol = symbol,
+              onPreSplitCountChanged = { vm.handlePreSplitShareCountChanged(it) },
+              onPostSplitCountChanged = { vm.handlePostSplitShareCountChanged(it) },
+              onSubmit = { handleSubmit() },
+              onClose = { dismiss() },
+              onSplitDateClicked = { date ->
+                handleSplitDateClicked(
+                    splitId = state.splitId,
+                    date = date,
+                )
+              },
+          )
         }
       }
     }

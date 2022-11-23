@@ -96,30 +96,29 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
       id = R.id.bottom_sheet_new_ticker
 
       setContent {
-        vm.Render { state ->
-          val equityType = state.equityType
+        val state = vm.state()
+        val equityType = state.equityType
 
-          act.TickerTapeTheme(themeProvider) {
-            BackHandler(
-                onBack = { vm.handleCloseClicked(equityType) },
-            )
-            NewTickerScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                onClose = { vm.handleCloseClicked(equityType) },
-                onTypeSelected = { vm.handleEquityTypeSelected(it) },
-                onSymbolChanged = { vm.handleSymbolChanged(it) },
-                onSearchResultSelected = { handleSearchResultSelected(it) },
-                onSubmit = { handleSubmit() },
-                onClear = { vm.handleClear() },
-                onTradeSideSelected = { vm.handleTradeSideChanged(it) },
-                onResultsDismissed = { vm.handleSearchResultsDismissed() },
-                onOptionTypeSlected = { vm.handleOptionType(it) },
-                onStrikeSelected = { vm.handleOptionStrikePrice(it) },
-                onExpirationDateSelected = { handleOptionExpirationDate(it) },
-                onAfterSymbolChanged = { vm.handleAfterSymbolChanged(scope = this, symbol = it) },
-            )
-          }
+        act.TickerTapeTheme(themeProvider) {
+          BackHandler(
+              onBack = { vm.handleCloseClicked(equityType) },
+          )
+          NewTickerScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              onClose = { vm.handleCloseClicked(equityType) },
+              onTypeSelected = { vm.handleEquityTypeSelected(it) },
+              onSymbolChanged = { vm.handleSymbolChanged(it) },
+              onSearchResultSelected = { handleSearchResultSelected(it) },
+              onSubmit = { handleSubmit() },
+              onClear = { vm.handleClear() },
+              onTradeSideSelected = { vm.handleTradeSideChanged(it) },
+              onResultsDismissed = { vm.handleSearchResultsDismissed() },
+              onOptionTypeSlected = { vm.handleOptionType(it) },
+              onStrikeSelected = { vm.handleOptionStrikePrice(it) },
+              onExpirationDateSelected = { handleOptionExpirationDate(it) },
+              onAfterSymbolChanged = { vm.handleAfterSymbolChanged(scope = this, symbol = it) },
+          )
         }
       }
     }

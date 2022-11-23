@@ -110,14 +110,12 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_portfolio
 
       setContent {
-        vm.Render { state ->
-          mainVM.Render { mainState ->
             act.TickerTapeTheme(themeProvider) {
               PortfolioScreen(
                   modifier = Modifier.fillMaxSize(),
-                  state = state,
+                  state = vm.state(),
                   imageLoader = loader,
-                  navBarBottomHeight = mainState.bottomNavHeight,
+                  navBarBottomHeight = mainVM.state().bottomNavHeight,
                   onRefresh = { handleRefresh(true) },
                   onSelect = { handleOpenManageDialog(it) },
                   onDelete = { handleDeleteStock(it) },
@@ -126,8 +124,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
                   onRegenerateList = { vm.handleRegenerateList(this) },
               )
             }
-          }
-        }
       }
     }
   }

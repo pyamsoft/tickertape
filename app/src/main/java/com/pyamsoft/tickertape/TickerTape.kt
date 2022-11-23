@@ -25,7 +25,6 @@ import androidx.annotation.CheckResult
 import coil.ImageLoader
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
 import com.pyamsoft.tickertape.alert.AlarmFactory
@@ -39,62 +38,71 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class TickerTape : Application() {
+
+  // Must be lazy since Coil calls getSystemService() internally,
+  // leading to SO exception
+  private val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
+
+  // The order that the PYDroid instance and TickerComponent instance are created is very specific.
+  //
+  // Coil lazy loader must be first, then PYDroid, and then Component
+  private var pydroid: PYDroid? = null
+  private var component: TickerComponent? = null
 
   @Inject @JvmField internal var alerter: Alerter? = null
 
   @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
 
-  private val component by lazy {
-    val url = "https://github.com/pyamsoft/tickertape"
+  private fun installPYDroid() {
+    if (pydroid == null) {
+      val url = "https://github.com/pyamsoft/tickertape"
 
-    val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
+      installLogger()
 
-    installLogger()
-
-    val parameters =
-        PYDroid.Parameters(
-            // Must be lazy since Coil calls getSystemService() internally, leading to SO exception
-            lazyImageLoader = lazyImageLoader,
-            viewSourceUrl = url,
-            bugReportUrl = "$url/issues",
-            privacyPolicyUrl = PRIVACY_POLICY_URL,
-            termsConditionsUrl = TERMS_CONDITIONS_URL,
-            version = BuildConfig.VERSION_CODE,
-            logger = createLogger(),
-            theme = TickerTapeThemeProvider,
-            debug =
-                PYDroid.DebugParameters(
-                    enabled = true,
-                    upgradeAvailable = true,
-                    ratingAvailable = false,
-                ),
-        )
-
-    return@lazy createComponent(PYDroid.init(this, parameters), lazyImageLoader)
+      pydroid =
+          PYDroid.init(
+              this,
+              PYDroid.Parameters(
+                  // Must be lazy since Coil calls getSystemService() internally,
+                  // leading to SO exception
+                  lazyImageLoader = lazyImageLoader,
+                  viewSourceUrl = url,
+                  bugReportUrl = "$url/issues",
+                  privacyPolicyUrl = PRIVACY_POLICY_URL,
+                  termsConditionsUrl = TERMS_CONDITIONS_URL,
+                  version = BuildConfig.VERSION_CODE,
+                  logger = createLogger(),
+                  theme = TickerTapeThemeProvider,
+                  debug =
+                      PYDroid.DebugParameters(
+                          enabled = true,
+                          upgradeAvailable = true,
+                          ratingAvailable = false,
+                      ),
+              ),
+          )
+    } else {
+      Timber.w("Cannot install PYDroid again")
+    }
   }
 
-  @CheckResult
-  private fun createComponent(
-      provider: ModuleProvider,
-      lazyImageLoader: Lazy<ImageLoader>,
-  ): TickerComponent {
-    return DaggerTickerComponent.factory()
-        .create(
-            application = this,
-            debug = isDebugMode(),
-            lazyImageLoader = lazyImageLoader,
-            theming = provider.get().theming(),
-        )
-        .also { addLibraries() }
-  }
-
-  override fun onCreate() {
-    super.onCreate()
-    component.inject(this)
-    ensureBootReceiverEnabled()
-    beginWork()
+  private fun installComponent() {
+    if (component == null) {
+      val p = pydroid.requireNotNull { "Must install PYDroid before installing TickerComponent" }
+      component =
+          DaggerTickerComponent.factory()
+              .create(
+                  application = this,
+                  debug = isDebugMode(),
+                  lazyImageLoader = lazyImageLoader,
+                  theming = p.modules().theming(),
+              )
+    } else {
+      Timber.w("Cannot install TickerComponent again")
+    }
   }
 
   private fun beginWork() {
@@ -107,37 +115,48 @@ class TickerTape : Application() {
     }
   }
 
-  override fun getSystemService(name: String): Any? {
-    // Use component here in a weird way to guarantee the lazy is initialized.
-    return component.run { PYDroid.getSystemService(name) } ?: fallbackGetSystemService(name)
+  @CheckResult
+  private fun componentGraph(): TickerComponent {
+    return component.requireNotNull { "TickerComponent was not installed, something is wrong." }
   }
 
   @CheckResult
   private fun fallbackGetSystemService(name: String): Any? {
-    return if (name == TickerComponent::class.java.name) component
-    else {
-      provideModuleDependencies(name) ?: super.getSystemService(name)
-    }
+    return if (name == TickerComponent::class.java.name) componentGraph()
+    else provideModuleDependencies(name) ?: super.getSystemService(name)
   }
 
   @CheckResult
   private fun provideModuleDependencies(name: String): Any? {
-    return component.run {
-      when (name) {
-        AlertWorkComponent::class.java.name -> plusAlertWorkComponent()
-        else -> null
-      }
+    return when (name) {
+      AlertWorkComponent::class.java.name -> componentGraph().plusAlertWorkComponent()
+      else -> null
     }
   }
 
   /** Ensure the BootReceiver is set to state enabled */
   private fun ensureBootReceiverEnabled() {
-    val component = ComponentName(this, BootReceiver::class.java)
+    val componentName = ComponentName(this, BootReceiver::class.java)
     packageManager.setComponentEnabledSetting(
-        component,
+        componentName,
         PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
         PackageManager.DONT_KILL_APP,
     )
+  }
+
+  override fun onCreate() {
+    super.onCreate()
+    installPYDroid()
+    installComponent()
+
+    componentGraph().inject(this)
+    addLibraries()
+    ensureBootReceiverEnabled()
+    beginWork()
+  }
+
+  override fun getSystemService(name: String): Any? {
+    return pydroid?.getSystemService(name) ?: fallbackGetSystemService(name)
   }
 
   companion object {

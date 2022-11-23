@@ -67,13 +67,13 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-    private fun handleBigMoverNotificationToggled() {
-        viewModel
-            .requireNotNull()
-            .handleBigMoverNotificationToggled(
-                scope = viewLifecycleOwner.lifecycleScope,
-            )
-    }
+  private fun handleBigMoverNotificationToggled() {
+    viewModel
+        .requireNotNull()
+        .handleBigMoverNotificationToggled(
+            scope = viewLifecycleOwner.lifecycleScope,
+        )
+  }
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -91,19 +91,15 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_notifications
 
       setContent {
-        vm.Render { state ->
-          mainVM.Render { mainState ->
-            act.TickerTapeTheme(themeProvider) {
-              NotificationScreen(
-                  modifier = Modifier.fillMaxSize(),
-                  state = state,
-                  navBarBottomHeight = mainState.bottomNavHeight,
-                  onTapeNotificationToggled = { handleTapeNotificationToggled() },
-                  onTapePageSizeChanged = { handleTapePageSizeChanged(it) },
-                  onBigMoverNotificationToggled = { handleBigMoverNotificationToggled() },
-              )
-            }
-          }
+        act.TickerTapeTheme(themeProvider) {
+          NotificationScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state(),
+              navBarBottomHeight = mainVM.state().bottomNavHeight,
+              onTapeNotificationToggled = { handleTapeNotificationToggled() },
+              onTapePageSizeChanged = { handleTapePageSizeChanged(it) },
+              onBigMoverNotificationToggled = { handleBigMoverNotificationToggled() },
+          )
         }
       }
     }

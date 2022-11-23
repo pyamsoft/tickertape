@@ -42,13 +42,13 @@ import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
-import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
@@ -119,23 +119,19 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_watchlist
 
       setContent {
-        vm.Render { state ->
-          mainVM.Render { mainState ->
-            act.TickerTapeTheme(themeProvider) {
-              WatchlistScreen(
-                  modifier = Modifier.fillMaxSize(),
-                  state = state,
-                  imageLoader = loader,
-                  navBarBottomHeight = mainState.bottomNavHeight,
-                  onRefresh = { handleRefresh(true) },
-                  onDeleteTicker = { handleDeleteTicker(it) },
-                  onSearchChanged = { vm.handleSearch(it) },
-                  onTabUpdated = { vm.handleSectionChanged(it) },
-                  onSelectTicker = { handleOpenDigDialog(it) },
-                  onRegenerateList = { vm.handleRegenerateList(this) },
-              )
-            }
-          }
+        act.TickerTapeTheme(themeProvider) {
+          WatchlistScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state(),
+              imageLoader = loader,
+              navBarBottomHeight = mainVM.state().bottomNavHeight,
+              onRefresh = { handleRefresh(true) },
+              onDeleteTicker = { handleDeleteTicker(it) },
+              onSearchChanged = { vm.handleSearch(it) },
+              onTabUpdated = { vm.handleSectionChanged(it) },
+              onSelectTicker = { handleOpenDigDialog(it) },
+              onRegenerateList = { vm.handleRegenerateList(this) },
+          )
         }
       }
     }

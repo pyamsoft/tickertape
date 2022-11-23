@@ -26,14 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.PYDroidActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
-import com.pyamsoft.tickertape.BuildConfig
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
@@ -49,8 +47,6 @@ import timber.log.Timber
 internal class MainActivity : BaseActivity() {
 
   override val applicationIcon = R.mipmap.ic_launcher
-
-  override val applicationVersionCode = BuildConfig.VERSION_CODE
 
   override val changelog: ChangeLogBuilder = buildChangeLog {}
 
@@ -168,26 +164,25 @@ internal class MainActivity : BaseActivity() {
       val screen by navi.currentScreenState()
       val page = remember(screen) { screen as? TopLevelMainPage }
 
-      vm.Render { state ->
-        val theme = state.theme
+      val state = vm.state()
+      val theme = state.theme
 
-        SystemBars(theme, screen)
-        TickerTapeTheme(theme) {
-          // Need to have box or snackbars push up bottom bar
-          Box(
-              contentAlignment = Alignment.BottomCenter,
-          ) {
-            if (page != null) {
-              MainScreen(
-                  page = page,
-                  onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
-                  onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
-                  onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
-                  onLoadNotifications = { navi.navigateTo(TopLevelMainPage.Notifications) },
-                  onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                  onActionSelected = { handleMainActionSelected(it) },
-              )
-            }
+      SystemBars(theme, screen)
+      TickerTapeTheme(theme) {
+        // Need to have box or snackbars push up bottom bar
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+          if (page != null) {
+            MainScreen(
+                page = page,
+                onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
+                onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
+                onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
+                onLoadNotifications = { navi.navigateTo(TopLevelMainPage.Notifications) },
+                onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
+                onActionSelected = { handleMainActionSelected(it) },
+            )
           }
         }
       }

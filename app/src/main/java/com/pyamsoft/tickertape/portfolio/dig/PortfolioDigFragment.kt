@@ -248,44 +248,42 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       id = R.id.dialog_portfolio_dig
 
       setContent {
-        vm.Render { state ->
-          act.TickerTapeTheme(themeProvider) {
-            BackHandler(
-                onBack = { navi.goBack() },
-            )
+        act.TickerTapeTheme(themeProvider) {
+          BackHandler(
+              onBack = { navi.goBack() },
+          )
 
-            PortfolioDigScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                imageLoader = loader,
-                onClose = { act.onBackPressedDispatcher.onBackPressed() },
-                onChartScrub = { vm.handleChartDateScrubbed(it) },
-                onChartRangeSelected = { handleRangeSelected(it) },
-                onTabUpdated = { handleTabUpdated(it) },
-                onRefresh = { handleRefresh(true) },
-                onPositionAdd = { handleAddPosition() },
-                onPositionDelete = { handleDeletePosition(it) },
-                onPositionUpdate = { handleUpdatePosition(it) },
-                onSplitAdd = { handleAddSplit() },
-                onSplitDeleted = { handleDeleteSplit(it) },
-                onSplitUpdated = { handleUpdateSplit(it) },
-                onRecClick = { handleRecommendationSelected(it) },
-                onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
-                onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
-                onAddPriceAlert = {
-                  // TODO Price alerts
-                  Timber.d("ADD PRICE ALERT!")
-                },
-                onUpdatePriceAlert = {
-                  // TODO Price alerts
-                  Timber.d("UPDATE PRICE ALERT: $it")
-                },
-                onDeletePriceAlert = {
-                  // TODO Price alerts
-                  Timber.d("DELETE PRICE ALERT: $it")
-                },
-            )
-          }
+          PortfolioDigScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = vm.state(),
+              imageLoader = loader,
+              onClose = { act.onBackPressedDispatcher.onBackPressed() },
+              onChartScrub = { vm.handleChartDateScrubbed(it) },
+              onChartRangeSelected = { handleRangeSelected(it) },
+              onTabUpdated = { handleTabUpdated(it) },
+              onRefresh = { handleRefresh(true) },
+              onPositionAdd = { handleAddPosition() },
+              onPositionDelete = { handleDeletePosition(it) },
+              onPositionUpdate = { handleUpdatePosition(it) },
+              onSplitAdd = { handleAddSplit() },
+              onSplitDeleted = { handleDeleteSplit(it) },
+              onSplitUpdated = { handleUpdateSplit(it) },
+              onRecClick = { handleRecommendationSelected(it) },
+              onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
+              onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
+              onAddPriceAlert = {
+                // TODO Price alerts
+                Timber.d("ADD PRICE ALERT!")
+              },
+              onUpdatePriceAlert = {
+                // TODO Price alerts
+                Timber.d("UPDATE PRICE ALERT: $it")
+              },
+              onDeletePriceAlert = {
+                // TODO Price alerts
+                Timber.d("DELETE PRICE ALERT: $it")
+              },
+          )
         }
       }
     }

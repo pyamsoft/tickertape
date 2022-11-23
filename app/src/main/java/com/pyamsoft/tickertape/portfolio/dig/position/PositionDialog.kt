@@ -134,26 +134,25 @@ internal class PositionDialog : AppCompatDialogFragment() {
       id = R.id.dialog_position_add
 
       setContent {
+        val state = vm.state()
         val symbol = remember { getSymbol() }
 
-        vm.Render { state ->
-          act.TickerTapeTheme(themeProvider) {
-            PositionAddScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                symbol = symbol,
-                onPriceChanged = { vm.handlePriceChanged(it) },
-                onNumberChanged = { vm.handleNumberChanged(it) },
-                onSubmit = { handleSubmit() },
-                onClose = { dismiss() },
-                onDateOfPurchaseClicked = { date ->
-                  handleDateOfPurchaseClicked(
-                      positionId = state.positionId,
-                      date = date,
-                  )
-                },
-            )
-          }
+        act.TickerTapeTheme(themeProvider) {
+          PositionAddScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              symbol = symbol,
+              onPriceChanged = { vm.handlePriceChanged(it) },
+              onNumberChanged = { vm.handleNumberChanged(it) },
+              onSubmit = { handleSubmit() },
+              onClose = { dismiss() },
+              onDateOfPurchaseClicked = { date ->
+                handleDateOfPurchaseClicked(
+                    positionId = state.positionId,
+                    date = date,
+                )
+              },
+          )
         }
       }
     }

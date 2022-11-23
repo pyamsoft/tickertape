@@ -46,9 +46,9 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
@@ -163,39 +163,37 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       id = R.id.dialog_watchlist_dig
 
       setContent {
-        vm.Render { state ->
-          act.TickerTapeTheme(themeProvider) {
-            BackHandler(
-                onBack = { navi.goBack() },
-            )
+        act.TickerTapeTheme(themeProvider) {
+          BackHandler(
+              onBack = { navi.goBack() },
+          )
 
-            WatchlistDigScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                imageLoader = loader,
-                onClose = { act.onBackPressedDispatcher.onBackPressed() },
-                onChartScrub = { vm.handleChartDateScrubbed(it) },
-                onChartRangeSelected = { handleRangeSelected(it) },
-                onModifyWatchlist = { handleModifyWatchlist() },
-                onRefresh = { handleRefresh(true) },
-                onTabUpdated = { handleTabUpdated(it) },
-                onRecClick = { handleRecommendationSelected(it) },
-                onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
-                onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
-                onAddPriceAlert = {
-                    // TODO Price alerts
-                    Timber.d("ADD PRICE ALERT!")
-                },
-                onUpdatePriceAlert = {
-                    // TODO Price alerts
-                    Timber.d("UPDATE PRICE ALERT: $it")
-                },
-                onDeletePriceAlert = {
-                    // TODO Price alerts
-                    Timber.d("DELETE PRICE ALERT: $it")
-                },
-            )
-          }
+          WatchlistDigScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = vm.state(),
+              imageLoader = loader,
+              onClose = { act.onBackPressedDispatcher.onBackPressed() },
+              onChartScrub = { vm.handleChartDateScrubbed(it) },
+              onChartRangeSelected = { handleRangeSelected(it) },
+              onModifyWatchlist = { handleModifyWatchlist() },
+              onRefresh = { handleRefresh(true) },
+              onTabUpdated = { handleTabUpdated(it) },
+              onRecClick = { handleRecommendationSelected(it) },
+              onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
+              onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
+              onAddPriceAlert = {
+                // TODO Price alerts
+                Timber.d("ADD PRICE ALERT!")
+              },
+              onUpdatePriceAlert = {
+                // TODO Price alerts
+                Timber.d("UPDATE PRICE ALERT: $it")
+              },
+              onDeletePriceAlert = {
+                // TODO Price alerts
+                Timber.d("DELETE PRICE ALERT: $it")
+              },
+          )
         }
       }
     }

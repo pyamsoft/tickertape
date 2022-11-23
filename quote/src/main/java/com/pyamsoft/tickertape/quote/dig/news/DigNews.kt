@@ -26,8 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
@@ -37,6 +35,7 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.SwipeRefresh
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
@@ -51,7 +50,7 @@ fun DigNews(
 
   SwipeRefresh(
       modifier = modifier,
-      state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
+      isRefreshing = state.isLoading,
       onRefresh = onRefresh,
   ) {
     LazyColumn(

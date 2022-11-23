@@ -9,12 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.StatisticsDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.SwipeRefresh
 
 @Composable
 fun DigKeyStatistics(
@@ -26,7 +25,7 @@ fun DigKeyStatistics(
 
   SwipeRefresh(
       modifier = modifier.padding(MaterialTheme.keylines.content),
-      state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
+      isRefreshing = state.isLoading,
       onRefresh = onRefresh,
   ) {
     LazyColumn(

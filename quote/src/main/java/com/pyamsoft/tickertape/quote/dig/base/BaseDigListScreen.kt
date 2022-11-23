@@ -25,9 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.ui.SwipeRefresh
 
 private const val FAB_OFFSET = 56 + 16
 
@@ -75,7 +74,7 @@ private fun <T : Any> DigList(
 ) {
   SwipeRefresh(
       modifier = modifier,
-      state = rememberSwipeRefreshState(isRefreshing = isLoading),
+      isRefreshing = isLoading,
       onRefresh = onRefresh,
   ) {
     LazyColumn(

@@ -28,13 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import coil.ImageLoader
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
 import com.pyamsoft.tickertape.ui.NewVersionWidget
+import com.pyamsoft.tickertape.ui.SwipeRefresh
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -121,7 +120,7 @@ private fun <T : Any> Content(
       contentAlignment = Alignment.BottomCenter,
   ) {
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = isLoading),
+        isRefreshing = isLoading,
         onRefresh = onRefresh,
     ) {
       ListSection(

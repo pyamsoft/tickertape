@@ -35,8 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
@@ -45,6 +43,7 @@ import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.SwipeRefresh
 import java.time.LocalDate
 
 @Composable
@@ -98,7 +97,7 @@ fun DigOptionsChain(
     }
 
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = state.isLoading),
+        isRefreshing = state.isLoading,
         onRefresh = onRefresh,
     ) {
       if (error == null) {

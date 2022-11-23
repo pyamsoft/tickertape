@@ -99,7 +99,7 @@ fun HomeScreen(
 
       item {
         HomeHeader(
-            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
             appName = appName,
             onSettingsClicked = onSettingsClicked,
         )

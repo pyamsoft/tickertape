@@ -35,7 +35,6 @@ import com.pyamsoft.tickertape.alert.initOnAppStart
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.receiver.BootReceiver
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -64,12 +63,13 @@ class TickerTape : Application() {
             termsConditionsUrl = TERMS_CONDITIONS_URL,
             version = BuildConfig.VERSION_CODE,
             logger = createLogger(),
-            theme = { activity, themeProvider, content ->
-              activity.TickerTapeTheme(
-                  themeProvider = themeProvider,
-                  content = content,
-              )
-            },
+            theme = TickerTapeThemeProvider,
+            debug =
+                PYDroid.DebugParameters(
+                    enabled = true,
+                    upgradeAvailable = true,
+                    ratingAvailable = false,
+                ),
         )
 
     return@lazy createComponent(PYDroid.init(this, parameters), lazyImageLoader)

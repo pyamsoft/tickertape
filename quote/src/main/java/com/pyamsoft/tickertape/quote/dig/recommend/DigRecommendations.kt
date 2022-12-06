@@ -29,7 +29,7 @@ import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.RecommendationDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.tickertape.ui.SwipeRefresh
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 
 @Composable
 fun DigRecommendations(

@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.ui.NewVersionWidget
+import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
 
 @Composable
 fun NotificationScreen(

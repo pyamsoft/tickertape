@@ -35,7 +35,7 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.tickertape.ui.SwipeRefresh
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable

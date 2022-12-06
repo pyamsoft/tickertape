@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
@@ -62,9 +64,11 @@ fun WatchlistDigScreen(
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Bottom,
     ) {
       WatchlistDigToolbar(
-          modifier = Modifier.fillMaxWidth(),
+          // Z-Index to place it above the SwipeRefresh indicator
+          modifier = Modifier.fillMaxWidth().zIndex(1F),
           state = state,
           onClose = onClose,
           onModifyWatchlist = onModifyWatchlist,

@@ -43,7 +43,7 @@ import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.tickertape.ui.SwipeRefresh
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import java.time.LocalDate
 
 @Composable

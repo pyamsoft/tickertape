@@ -32,8 +32,8 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
-import com.pyamsoft.tickertape.ui.NewVersionWidget
-import com.pyamsoft.tickertape.ui.SwipeRefresh
+import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 

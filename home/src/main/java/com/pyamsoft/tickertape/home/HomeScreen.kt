@@ -43,7 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.ui.NewVersionWidget
+import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 

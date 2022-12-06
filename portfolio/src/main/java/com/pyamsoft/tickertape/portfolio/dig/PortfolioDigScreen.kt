@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
@@ -75,6 +76,8 @@ fun PortfolioDigScreen(
         modifier = Modifier.fillMaxWidth(),
     ) {
       PortfolioDigToolbar(
+          // Z-Index to place it above the SwipeRefresh indicator
+          modifier = Modifier.fillMaxWidth().zIndex(1F),
           state = state,
           onClose = onClose,
           onTabUpdated = onTabUpdated,

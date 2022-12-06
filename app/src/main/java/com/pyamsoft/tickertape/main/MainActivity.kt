@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
+import com.pyamsoft.pydroid.ui.app.PYDroidActivity
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
@@ -38,13 +39,12 @@ import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.ui.BaseActivity
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class MainActivity : BaseActivity() {
+internal class MainActivity : PYDroidActivity() {
 
   override val applicationIcon = R.mipmap.ic_launcher
 

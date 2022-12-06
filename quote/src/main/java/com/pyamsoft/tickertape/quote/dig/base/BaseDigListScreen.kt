@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.ui.SwipeRefresh
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 
 private const val FAB_OFFSET = 56 + 16
 

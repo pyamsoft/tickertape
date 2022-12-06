@@ -22,7 +22,6 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
-import coil.ImageLoader
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.PYDroid
@@ -41,10 +40,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TickerTape : Application() {
-
-  // Must be lazy since Coil calls getSystemService() internally,
-  // leading to SO exception
-  private val lazyImageLoader = lazy(LazyThreadSafetyMode.NONE) { ImageLoader(this) }
 
   // The order that the PYDroid instance and TickerComponent instance are created is very specific.
   //
@@ -66,9 +61,6 @@ class TickerTape : Application() {
           PYDroid.init(
               this,
               PYDroid.Parameters(
-                  // Must be lazy since Coil calls getSystemService() internally,
-                  // leading to SO exception
-                  lazyImageLoader = lazyImageLoader,
                   viewSourceUrl = url,
                   bugReportUrl = "$url/issues",
                   privacyPolicyUrl = PRIVACY_POLICY_URL,
@@ -92,13 +84,14 @@ class TickerTape : Application() {
   private fun installComponent() {
     if (component == null) {
       val p = pydroid.requireNotNull { "Must install PYDroid before installing TickerComponent" }
+      val mods = p.modules()
       component =
           DaggerTickerComponent.factory()
               .create(
                   application = this,
                   debug = isDebugMode(),
-                  lazyImageLoader = lazyImageLoader,
-                  theming = p.modules().theming(),
+                  imageLoader = mods.imageLoader(),
+                  theming = mods.theming(),
               )
     } else {
       Timber.w("Cannot install TickerComponent again")

@@ -85,7 +85,7 @@ buildscript {
     materialDesign = "1.7.0"
 
     // Vico charts
-    vico = "1.5.2"
+    vico = "1.6.0"
   }
 
   dependencies {

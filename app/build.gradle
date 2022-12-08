@@ -118,6 +118,7 @@ dependencies {
   implementation "com.squareup.leakcanary:plumber-android:$leakCanary"
 
   debugImplementation "com.github.pyamsoft.pydroid:autopsy:$pydroid"
+  implementation "com.github.pyamsoft.pydroid:inject:$pydroid"
 
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist"
 

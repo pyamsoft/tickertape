@@ -24,7 +24,9 @@ import android.os.Looper
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
+import com.pyamsoft.pydroid.ui.installPYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
 import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.alert.AlertWorkComponent
@@ -41,50 +43,38 @@ import timber.log.Timber
 
 class TickerTape : Application() {
 
-  // The order that the PYDroid instance and TickerComponent instance are created is very specific.
-  //
-  // Coil lazy loader must be first, then PYDroid, and then Component
-  private var pydroid: PYDroid? = null
   private var component: TickerComponent? = null
 
   @Inject @JvmField internal var alerter: Alerter? = null
 
   @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
 
-  private fun installPYDroid() {
-    if (pydroid == null) {
-      val url = "https://github.com/pyamsoft/tickertape"
+  @CheckResult
+  private fun installPYDroid(): ModuleProvider {
+    val url = "https://github.com/pyamsoft/tickertape"
 
-      installLogger()
-
-      pydroid =
-          PYDroid.init(
-              this,
-              PYDroid.Parameters(
-                  viewSourceUrl = url,
-                  bugReportUrl = "$url/issues",
-                  privacyPolicyUrl = PRIVACY_POLICY_URL,
-                  termsConditionsUrl = TERMS_CONDITIONS_URL,
-                  version = BuildConfig.VERSION_CODE,
-                  logger = createLogger(),
-                  theme = TickerTapeThemeProvider,
-                  debug =
-                      PYDroid.DebugParameters(
-                          enabled = true,
-                          upgradeAvailable = true,
-                          ratingAvailable = false,
-                      ),
-              ),
-          )
-    } else {
-      Timber.w("Cannot install PYDroid again")
-    }
+    return installPYDroid(
+        PYDroid.Parameters(
+            viewSourceUrl = url,
+            bugReportUrl = "$url/issues",
+            privacyPolicyUrl = PRIVACY_POLICY_URL,
+            termsConditionsUrl = TERMS_CONDITIONS_URL,
+            version = BuildConfig.VERSION_CODE,
+            logger = createLogger(),
+            theme = TickerTapeThemeProvider,
+            debug =
+                PYDroid.DebugParameters(
+                    enabled = true,
+                    upgradeAvailable = true,
+                    ratingAvailable = false,
+                ),
+        ),
+    )
   }
 
-  private fun installComponent() {
+  private fun installComponent(moduleProvider: ModuleProvider) {
     if (component == null) {
-      val p = pydroid.requireNotNull { "Must install PYDroid before installing TickerComponent" }
-      val mods = p.modules()
+      val mods = moduleProvider.get()
       component =
           DaggerTickerComponent.factory()
               .create(
@@ -114,12 +104,6 @@ class TickerTape : Application() {
   }
 
   @CheckResult
-  private fun fallbackGetSystemService(name: String): Any? {
-    return if (name == TickerComponent::class.java.name) componentGraph()
-    else provideModuleDependencies(name) ?: super.getSystemService(name)
-  }
-
-  @CheckResult
   private fun provideModuleDependencies(name: String): Any? {
     return when (name) {
       AlertWorkComponent::class.java.name -> componentGraph().plusAlertWorkComponent()
@@ -139,8 +123,10 @@ class TickerTape : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    installPYDroid()
-    installComponent()
+
+    installLogger()
+    val modules = installPYDroid()
+    installComponent(modules)
 
     componentGraph().inject(this)
     addLibraries()
@@ -149,7 +135,8 @@ class TickerTape : Application() {
   }
 
   override fun getSystemService(name: String): Any? {
-    return pydroid?.getSystemService(name) ?: fallbackGetSystemService(name)
+    return if (name == TickerComponent::class.java.name) componentGraph()
+    else provideModuleDependencies(name) ?: super.getSystemService(name)
   }
 
   companion object {
@@ -161,6 +148,9 @@ class TickerTape : Application() {
 
       // We are using pydroid-autopsy
       OssLibraries.usingAutopsy = true
+
+      // We are using pydroid-inject
+      OssLibraries.usingInject = true
 
       OssLibraries.apply {
         add(

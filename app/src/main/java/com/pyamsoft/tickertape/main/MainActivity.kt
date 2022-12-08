@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.pydroid.ui.app.PYDroidActivity
+import com.pyamsoft.pydroid.ui.app.installPYDroid
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
+import com.pyamsoft.pydroid.ui.changelog.ChangeLogProvider
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.pydroid.util.doOnCreate
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.TickerComponent
@@ -44,11 +47,7 @@ import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import timber.log.Timber
 
-internal class MainActivity : PYDroidActivity() {
-
-  override val applicationIcon = R.mipmap.ic_launcher
-
-  override val changelog: ChangeLogBuilder = buildChangeLog {}
+internal class MainActivity : AppCompatActivity() {
 
   private var viewBinding: ActivityMainBinding? = null
   private var injector: MainComponent? = null
@@ -56,6 +55,20 @@ internal class MainActivity : PYDroidActivity() {
   @JvmField @Inject internal var launcher: MainAlarmLauncher? = null
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
+
+  init {
+    doOnCreate {
+      installPYDroid(
+          provider =
+              object : ChangeLogProvider {
+
+                override val applicationIcon = R.mipmap.ic_launcher
+
+                override val changelog: ChangeLogBuilder = buildChangeLog {}
+              },
+      )
+    }
+  }
 
   private fun handleMainActionSelected(page: TopLevelMainPage) {
     viewModel

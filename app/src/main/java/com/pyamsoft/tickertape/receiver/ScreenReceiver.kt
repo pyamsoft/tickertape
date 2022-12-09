@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.CheckResult
+import androidx.core.content.ContextCompat
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.tickertape.TickerComponent
@@ -85,7 +86,12 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
       val appContext = context.applicationContext
 
       Timber.d("Register new ScreenReceiver")
-      appContext.registerReceiver(receiver, filter)
+      ContextCompat.registerReceiver(
+          appContext,
+          receiver,
+          filter,
+          ContextCompat.RECEIVER_EXPORTED,
+      )
 
       return Registration {
         if (registered) {

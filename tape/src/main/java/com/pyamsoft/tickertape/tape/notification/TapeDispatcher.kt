@@ -39,11 +39,11 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.tape.R
 import com.pyamsoft.tickertape.tape.remote.TapeRemote
-import com.pyamsoft.tickertape.ui.R as R2
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import timber.log.Timber
+import com.pyamsoft.tickertape.ui.R as R2
 
 @Singleton
 internal class TapeDispatcher
@@ -57,11 +57,6 @@ internal constructor(
 
   private val channelCreator by lazy {
     context.applicationContext.getSystemService<NotificationManager>().requireNotNull()
-  }
-
-  private val displayDensity by lazy {
-    val res = context.resources
-    res.displayMetrics.density
   }
 
   private fun guaranteeNotificationChannelExists(channelInfo: NotifyChannelInfo) {

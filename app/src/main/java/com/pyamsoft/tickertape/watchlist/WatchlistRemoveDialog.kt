@@ -30,15 +30,14 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.makeFullWidth
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.ui.util.show
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.quote.DeleteTicker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -74,7 +73,8 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
       savedInstanceState: Bundle?,
   ): View {
     val act = requireActivity()
-    Injector.obtainFromApplication<TickerComponent>(act).inject(this)
+
+    ObjectGraph.ApplicationScope.retrieve(act).inject(this)
 
     val symbol = getSymbol()
 

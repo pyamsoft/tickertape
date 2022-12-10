@@ -29,21 +29,18 @@ import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.ui.installPYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
 import com.pyamsoft.tickertape.alert.AlarmFactory
-import com.pyamsoft.tickertape.alert.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.AlertObjectGraph
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.initOnAppStart
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.receiver.BootReceiver
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import javax.inject.Inject
 
 class TickerTape : Application() {
-
-  private var component: TickerComponent? = null
 
   @Inject @JvmField internal var alerter: Alerter? = null
 
@@ -62,30 +59,23 @@ class TickerTape : Application() {
             version = BuildConfig.VERSION_CODE,
             logger = createLogger(),
             theme = TickerTapeThemeProvider,
-            debug =
-                PYDroid.DebugParameters(
-                    enabled = true,
-                    upgradeAvailable = true,
-                    ratingAvailable = false,
-                ),
         ),
     )
   }
 
   private fun installComponent(moduleProvider: ModuleProvider) {
-    if (component == null) {
-      val mods = moduleProvider.get()
-      component =
-          DaggerTickerComponent.factory()
-              .create(
-                  application = this,
-                  debug = isDebugMode(),
-                  imageLoader = mods.imageLoader(),
-                  theming = mods.theming(),
-              )
-    } else {
-      Timber.w("Cannot install TickerComponent again")
-    }
+    val mods = moduleProvider.get()
+    val component =
+        DaggerTickerComponent.factory()
+            .create(
+                application = this,
+                debug = isDebugMode(),
+                imageLoader = mods.imageLoader(),
+                theming = mods.theming(),
+            )
+    component.inject(this)
+    ObjectGraph.ApplicationScope.install(this, component)
+    AlertObjectGraph.WorkerScope.install(this, component.plusAlertWorkComponent())
   }
 
   private fun beginWork() {
@@ -95,19 +85,6 @@ class TickerTape : Application() {
       MainScope().launch(context = Dispatchers.Default) {
         alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
       }
-    }
-  }
-
-  @CheckResult
-  private fun componentGraph(): TickerComponent {
-    return component.requireNotNull { "TickerComponent was not installed, something is wrong." }
-  }
-
-  @CheckResult
-  private fun provideModuleDependencies(name: String): Any? {
-    return when (name) {
-      AlertWorkComponent::class.java.name -> componentGraph().plusAlertWorkComponent()
-      else -> null
     }
   }
 
@@ -128,15 +105,9 @@ class TickerTape : Application() {
     val modules = installPYDroid()
     installComponent(modules)
 
-    componentGraph().inject(this)
     addLibraries()
     ensureBootReceiverEnabled()
     beginWork()
-  }
-
-  override fun getSystemService(name: String): Any? {
-    return if (name == TickerComponent::class.java.name) componentGraph()
-    else provideModuleDependencies(name) ?: super.getSystemService(name)
   }
 
   companion object {
@@ -148,9 +119,6 @@ class TickerTape : Application() {
 
       // We are using pydroid-autopsy
       OssLibraries.usingAutopsy = true
-
-      // We are using pydroid-inject
-      OssLibraries.usingInject = true
 
       OssLibraries.apply {
         add(

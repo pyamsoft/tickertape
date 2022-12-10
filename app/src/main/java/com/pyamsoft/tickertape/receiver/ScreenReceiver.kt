@@ -23,16 +23,15 @@ import android.content.IntentFilter
 import androidx.annotation.CheckResult
 import androidx.core.content.ContextCompat
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.alert.types.refresh.RefreshStandalone
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 
@@ -51,7 +50,7 @@ internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action == Intent.ACTION_SCREEN_ON) {
-      Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+      ObjectGraph.ApplicationScope.retrieve(context).inject(this)
 
       // Will refresh the Tape
       scope.launch(context = Dispatchers.Default) {

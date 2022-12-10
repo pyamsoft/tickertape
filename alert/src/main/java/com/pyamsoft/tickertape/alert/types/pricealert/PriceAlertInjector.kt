@@ -19,11 +19,10 @@ package com.pyamsoft.tickertape.alert.types.pricealert
 import android.content.Context
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.alert.AlertWorkComponent
+import com.pyamsoft.tickertape.alert.AlertObjectGraph
 import com.pyamsoft.tickertape.alert.WorkResult
 import com.pyamsoft.tickertape.alert.base.BaseInjector
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 class PriceAlertInjector
@@ -42,7 +41,7 @@ private constructor(
       tags: Set<String>,
       params: PriceAlertWorkerParameters
   ): WorkResult {
-    Injector.obtainFromApplication<AlertWorkComponent>(context).inject(this)
+    AlertObjectGraph.WorkerScope.retrieve(context).inject(this)
 
     return runner.requireNotNull().doWork(id, tags, params)
   }

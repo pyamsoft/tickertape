@@ -29,21 +29,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
-import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
+import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
@@ -99,7 +98,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       savedInstanceState: Bundle?
   ): View {
     val act = requireActivity()
-    Injector.obtainFromActivity<MainComponent>(act).plusPortfolio().create().inject(this)
+    ObjectGraph.ActivityScope.retrieve(act).plusPortfolio().create().inject(this)
 
     val vm = viewModel.requireNotNull()
     val mainVM = mainViewModel.requireNotNull()
@@ -110,20 +109,20 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_portfolio
 
       setContent {
-            act.TickerTapeTheme(themeProvider) {
-              PortfolioScreen(
-                  modifier = Modifier.fillMaxSize(),
-                  state = vm.state(),
-                  imageLoader = loader,
-                  navBarBottomHeight = mainVM.state().bottomNavHeight,
-                  onRefresh = { handleRefresh(true) },
-                  onSelect = { handleOpenManageDialog(it) },
-                  onDelete = { handleDeleteStock(it) },
-                  onSearchChanged = { vm.handleSearch(it) },
-                  onTabUpdated = { vm.handleSectionChanged(it) },
-                  onRegenerateList = { vm.handleRegenerateList(this) },
-              )
-            }
+        act.TickerTapeTheme(themeProvider) {
+          PortfolioScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state(),
+              imageLoader = loader,
+              navBarBottomHeight = mainVM.state().bottomNavHeight,
+              onRefresh = { handleRefresh(true) },
+              onSelect = { handleOpenManageDialog(it) },
+              onDelete = { handleDeleteStock(it) },
+              onSearchChanged = { vm.handleSearch(it) },
+              onTabUpdated = { vm.handleSectionChanged(it) },
+              onRegenerateList = { vm.handleRegenerateList(this) },
+          )
+        }
       }
     }
   }

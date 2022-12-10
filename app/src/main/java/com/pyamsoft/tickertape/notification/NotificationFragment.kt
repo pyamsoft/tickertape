@@ -28,15 +28,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
@@ -81,7 +80,7 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       savedInstanceState: Bundle?
   ): View {
     val act = requireActivity()
-    Injector.obtainFromActivity<MainComponent>(act).plusAlerts().create().inject(this)
+    ObjectGraph.ActivityScope.retrieve(act).plusAlerts().create().inject(this)
 
     val vm = viewModel.requireNotNull()
     val mainVM = mainViewModel.requireNotNull()

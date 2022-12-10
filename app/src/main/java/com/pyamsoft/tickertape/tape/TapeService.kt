@@ -21,17 +21,16 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.IBinder
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.tape.remote.TapeRemote
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class TapeService : Service() {
 
@@ -82,7 +81,7 @@ class TapeService : Service() {
   override fun onCreate() {
     super.onCreate()
 
-    Injector.obtainFromApplication<TickerComponent>(this).plusTapeComponent().create().inject(this)
+    ObjectGraph.ApplicationScope.retrieve(this).plusTapeComponent().create().inject(this)
 
     tapeRemote.requireNotNull().also { remote ->
       // Launch notification immediately

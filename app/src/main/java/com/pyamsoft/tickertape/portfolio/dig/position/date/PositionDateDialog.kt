@@ -6,9 +6,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.util.show
-import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.ui.BaseDateDialog
@@ -33,7 +32,7 @@ internal class PositionDateDialog : BaseDateDialog() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    Injector.obtainFromApplication<TickerComponent>(requireContext())
+    ObjectGraph.ApplicationScope.retrieve(requireActivity())
         .plusPositionDateComponent()
         .create(getPositionId())
         .inject(this)

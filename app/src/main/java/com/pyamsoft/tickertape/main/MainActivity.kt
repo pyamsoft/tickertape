@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.app.installPYDroid
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogProvider
@@ -36,21 +35,20 @@ import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.pydroid.util.doOnCreate
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.TickerComponent
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
   private var viewBinding: ActivityMainBinding? = null
-  private var injector: MainComponent? = null
 
   @JvmField @Inject internal var launcher: MainAlarmLauncher? = null
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
@@ -151,14 +149,16 @@ internal class MainActivity : AppCompatActivity() {
     val binding = ActivityMainBinding.inflate(layoutInflater).apply { viewBinding = this }
     setContentView(binding.root)
 
-    injector =
-        Injector.obtainFromApplication<TickerComponent>(this)
+    val component =
+        ObjectGraph.ApplicationScope.retrieve(this)
             .plusMainComponent()
             .create(
                 this,
                 binding.mainFragmentContainerView.id,
             )
-            .also { c -> c.inject(this) }
+    component.inject(this)
+    ObjectGraph.ActivityScope.install(this, component)
+
     setTheme(R.style.Theme_TickerTape)
     super.onCreate(savedInstanceState)
     stableLayoutHideNavigation()
@@ -239,22 +239,13 @@ internal class MainActivity : AppCompatActivity() {
     navigator?.saveState(outState)
   }
 
-  override fun getSystemService(name: String): Any? {
-    return when (name) {
-      // Must be defined before super.onCreate or throws npe
-      MainComponent::class.java.name -> injector.requireNotNull()
-      else -> super.getSystemService(name)
-    }
-  }
-
   override fun onDestroy() {
     super.onDestroy()
     viewBinding?.apply { this.mainComposeBottom.dispose() }
-    viewBinding = null
 
+    viewBinding = null
     launcher = null
     navigator = null
     viewModel = null
-    injector = null
   }
 }

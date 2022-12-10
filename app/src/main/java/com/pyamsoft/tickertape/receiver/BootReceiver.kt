@@ -23,16 +23,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
-import com.pyamsoft.tickertape.TickerComponent
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.initOnAppStart
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class BootReceiver internal constructor() : BroadcastReceiver() {
 
@@ -41,7 +40,7 @@ internal class BootReceiver internal constructor() : BroadcastReceiver() {
 
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-      Injector.obtainFromApplication<TickerComponent>(context).inject(this)
+      ObjectGraph.ApplicationScope.retrieve(context).inject(this)
 
       MainScope().launch(context = Dispatchers.Default) {
         Timber.d("Schedule alarms on boot")

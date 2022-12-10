@@ -30,18 +30,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.inject.Injector
 import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
-import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitDialog
@@ -57,9 +56,9 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
@@ -227,7 +226,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   ): View {
     val act = requireActivity()
 
-    Injector.obtainFromActivity<MainComponent>(act)
+    ObjectGraph.ActivityScope.retrieve(act)
         .plusPortfolioDig()
         .create(
             getSymbol(),

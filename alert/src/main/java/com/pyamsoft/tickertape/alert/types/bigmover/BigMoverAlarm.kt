@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.alert.types.bigmover
 import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
-class BigMoverAlarm
+data class BigMoverAlarm
 internal constructor(
   private val params: BigMoverWorkerParameters,
   private val isEnabled: Boolean,

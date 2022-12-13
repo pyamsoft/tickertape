@@ -27,11 +27,6 @@ import timber.log.Timber
 
 internal abstract class BaseRunner<P : BaseWorkerParameters> protected constructor() {
 
-  @CheckResult
-  protected suspend inline fun notification(crossinline func: suspend () -> Boolean): Boolean {
-    return func()
-  }
-
   // Don't mark inline or you get an Inaccessible error from the JVM at runtime
   @CheckResult
   suspend fun doWork(

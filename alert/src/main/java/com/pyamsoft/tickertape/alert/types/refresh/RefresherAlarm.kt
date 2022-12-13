@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.alert.types.refresh
 import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
-class RefresherAlarm
+data class RefresherAlarm
 internal constructor(
     private val params: RefreshWorkerParameters,
     private val isEnabled: Boolean,

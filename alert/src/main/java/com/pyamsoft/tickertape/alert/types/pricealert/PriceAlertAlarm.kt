@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.alert.types.pricealert
 import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
-class PriceAlertAlarm
+data class PriceAlertAlarm
 internal constructor(
     private val params: PriceAlertWorkerParameters,
 ) : PeriodicAlarm() {

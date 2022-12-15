@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.patrykandpatryk.vico.compose.axis.horizontal.bottomAxis
@@ -37,6 +38,7 @@ import com.patrykandpatryk.vico.compose.axis.vertical.startAxis
 import com.patrykandpatryk.vico.compose.chart.Chart
 import com.patrykandpatryk.vico.compose.chart.line.lineChart
 import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
+import com.patrykandpatryk.vico.compose.component.shape.shader.verticalGradient
 import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
 import com.patrykandpatryk.vico.core.chart.line.LineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
@@ -201,21 +203,33 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
       ++index
     }
 
+    val lineColor =
+        if (lastData == null) DEFAULT_STOCK_COLOR
+        else {
+          val price = lastData.price.value
+          val base = lastData.baseline.value
+          when {
+            price < base -> DEFAULT_STOCK_DOWN_COLOR
+            price > base -> DEFAULT_STOCK_UP_COLOR
+            else -> DEFAULT_STOCK_COLOR
+          }
+        }
+
+    val fillColor = Color(lineColor)
+
     // Only one segment, color the chart based on the final price compared to the baseline
     lineSegments.add(currentSegment)
     specSegments.add(
         LineChart.LineSpec(
-            lineColor =
-                if (lastData == null) DEFAULT_STOCK_COLOR
-                else {
-                  val price = lastData.price.value
-                  val base = lastData.baseline.value
-                  when {
-                    price < base -> DEFAULT_STOCK_DOWN_COLOR
-                    price > base -> DEFAULT_STOCK_UP_COLOR
-                    else -> DEFAULT_STOCK_COLOR
-                  }
-                },
+            lineColor = lineColor,
+            lineBackgroundShader =
+                verticalGradient(
+                    colors =
+                        arrayOf(
+                            fillColor.copy(alpha = 0.7F),
+                            fillColor.copy(alpha = 0.3F),
+                        ),
+                ),
         ),
     )
 
@@ -283,7 +297,8 @@ internal fun LineChart(
                           // Spacing so large there will not be any ticks
                           // Offset by 1 to avoid a crash where Offset cannot be less than 1
                           spacing = lines.models.maxX.roundToInt() * 2 + 1,
-                      )),
+                      ),
+              ),
           chartScrollSpec =
               rememberChartScrollSpec(
                   isScrollEnabled = false,

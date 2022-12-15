@@ -51,6 +51,7 @@ internal constructor(
   val totalShares: StockShareValue
   val totalGainLossAmount: String
   val totalGainLossPercent: String
+  val overallCostBasis: StockMoneyValue
 
   // Used in PortfolioStockList
   internal val costNumber: Double
@@ -104,6 +105,7 @@ internal constructor(
       totalDirection = StockDirection.NONE
       totalGainLoss = StockMoneyValue.NONE
       totalGainLossPercent = StockPercent.NONE
+      overallCostBasis = StockMoneyValue.NONE
     } else {
       val totalGainLossNumber = tempTodayNumber - cost
       val isNoTotalChange = totalGainLossNumber.isZero()
@@ -121,6 +123,9 @@ internal constructor(
       val totalGainLossPercentNumber =
           if (isNoTotalChange) NO_POSITION else totalGainLossNumber / cost * 100
       totalGainLossPercent = (totalGainLossPercentNumber * sellSideModifier).asPercent()
+
+      // Overall cost basis is the sum of all cost / number of shares received, adjusted for the trade side
+      overallCostBasis = (cost / totalSharesNumber * sellSideModifier).asMoney()
     }
 
     val sign = totalDirection.sign

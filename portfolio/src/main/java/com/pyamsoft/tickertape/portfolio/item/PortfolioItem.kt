@@ -46,6 +46,11 @@ internal fun PortfolioItem(
           value = stock.current.display,
       )
 
+      Info(
+          name = "Avg Cost Basis",
+          value = stock.overallCostBasis.display,
+      )
+
       // These are only valid if we have current day quotes
       if (stock.ticker != null) {
         Info(

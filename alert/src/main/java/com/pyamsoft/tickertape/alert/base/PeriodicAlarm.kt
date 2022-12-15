@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit
 abstract class PeriodicAlarm protected constructor() : Alarm {
 
   final override suspend fun period(): Long {
-    return PERIOD
+    return 15
   }
 
-  companion object {
-    private val PERIOD = TimeUnit.MINUTES.toMillis(15L)
+  final override suspend fun periodUnit(): TimeUnit {
+    return TimeUnit.MINUTES
   }
 }

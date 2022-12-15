@@ -95,8 +95,10 @@ internal constructor(
             work = alarm.asWork(),
             tag = tag,
             period = alarm.period(),
+            periodUnit = alarm.periodUnit(),
             isPeriodicWork = alarm is PeriodicAlarm,
-            inputData = alarm.parameters().toInputData())
+            inputData = alarm.parameters().toInputData(),
+        )
 
     workManager().enqueue(request)
     Timber.d("Queue work [$tag]: ${request.id}")
@@ -118,8 +120,6 @@ internal constructor(
       }
 
   companion object {
-
-    private val ALARM_UNIT = TimeUnit.MINUTES
 
     private val alerterExecutor = Executor { it.run() }
 
@@ -186,20 +186,21 @@ internal constructor(
         work: Class<out Worker>,
         tag: String,
         period: Long,
+        periodUnit: TimeUnit,
         isPeriodicWork: Boolean,
         inputData: Data
     ): WorkRequest {
       Enforcer.assertOffMainThread()
 
       return if (isPeriodicWork) {
-        PeriodicWorkRequest.Builder(work, period, ALARM_UNIT)
+        PeriodicWorkRequest.Builder(work, period, periodUnit)
             .addTag(tag)
             .setConstraints(generateConstraints())
             .setInputData(inputData)
             .build()
       } else {
         OneTimeWorkRequest.Builder(work)
-            .setInitialDelay(period, ALARM_UNIT)
+            .setInitialDelay(period, periodUnit)
             .addTag(tag)
             .setConstraints(generateConstraints())
             .setInputData(inputData)

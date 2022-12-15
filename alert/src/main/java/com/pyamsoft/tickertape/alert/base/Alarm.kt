@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.alert.base
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.alert.AlarmParameters
+import java.util.concurrent.TimeUnit
 
 interface Alarm {
 
@@ -26,6 +27,8 @@ interface Alarm {
   @CheckResult suspend fun parameters(): AlarmParameters
 
   @CheckResult suspend fun period(): Long
+
+  @CheckResult suspend fun periodUnit(): TimeUnit
 
   @CheckResult suspend fun isEnabled(): Boolean
 }

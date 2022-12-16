@@ -46,11 +46,13 @@ import com.patrykandpatryk.vico.core.chart.decoration.Decoration
 import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatryk.vico.core.chart.line.LineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
+import com.patrykandpatryk.vico.core.dimensions.MutableDimensions
 import com.patrykandpatryk.vico.core.entry.ChartEntry
 import com.patrykandpatryk.vico.core.entry.ChartEntryModel
 import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatryk.vico.core.entry.FloatEntry
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
@@ -76,9 +78,7 @@ private fun ChartData.priceValueAdjustedToBaseline(): Double {
   return this.price.value - this.baseline.value
 }
 
-/**
- * Can't be data class
- */
+/** Can't be data class */
 private class ChartDataEntry(
     private val data: ChartData?,
     x: Float,
@@ -250,8 +250,32 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
 @Composable
 @CheckResult
 private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
-  val lineShape = shapeComponent(color = MaterialTheme.colors.onSurface)
-  val lineText = textComponent(color = MaterialTheme.colors.onSurface)
+  val lineShape =
+      shapeComponent(
+          color = MaterialTheme.colors.secondary,
+          strokeWidth = HairlineSize,
+          strokeColor = MaterialTheme.colors.secondary,
+      )
+  val lineText =
+      textComponent(
+          color = MaterialTheme.colors.onSecondary,
+          textSize = MaterialTheme.typography.overline.fontSize,
+          margins =
+              MutableDimensions(
+                  horizontalDp = MaterialTheme.keylines.typography.value / 2,
+                  verticalDp = MaterialTheme.keylines.typography.value,
+              ),
+          padding =
+              MutableDimensions(
+                  horizontalDp = MaterialTheme.keylines.typography.value,
+                  verticalDp = 0F,
+              ),
+          background =
+              shapeComponent(
+                  color = MaterialTheme.colors.secondary,
+                  shape = MaterialTheme.shapes.small,
+              ),
+      )
 
   val baselineDecoration =
       remember(

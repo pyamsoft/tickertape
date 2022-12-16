@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
+import com.pyamsoft.tickertape.ui.renderPYDroidExtras
 
 @Composable
 fun NotificationScreen(
@@ -66,11 +66,7 @@ fun NotificationScreen(
         )
       }
 
-      item {
-        NewVersionWidget(
-            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
-        )
-      }
+      renderPYDroidExtras()
 
       item {
         TapeNotifications(

@@ -29,11 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
-import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
+import com.pyamsoft.tickertape.ui.renderPYDroidExtras
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -171,11 +171,12 @@ private fun <T : Any> ListSection(
       modifier = modifier,
   ) {
     item {
-      NewVersionWidget(
-          modifier =
-              Modifier.fillMaxWidth().statusBarsPadding().padding(MaterialTheme.keylines.content),
+      Spacer(
+          modifier = Modifier.fillMaxWidth().statusBarsPadding(),
       )
     }
+
+    renderPYDroidExtras()
 
     if (renderHeader != null) {
       item { renderHeader() }

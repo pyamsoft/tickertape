@@ -2,6 +2,10 @@ package com.pyamsoft.tickertape.portfolio.item
 
 import androidx.annotation.CheckResult
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,12 +44,12 @@ fun PorfolioSummaryItem(
   AnimatedVisibility(
       modifier = modifier,
       visible = data != null,
+      enter = fadeIn() + slideInVertically(),
+      exit = slideOutVertically() + fadeOut(),
   ) {
-    if (data != null) {
-      DisplayPortfolioData(
-          data = data,
-      )
-    }
+    DisplayPortfolioData(
+        data = data,
+    )
   }
 }
 
@@ -65,56 +69,88 @@ private fun resolveDirectionColor(
 @Composable
 private fun DisplayPortfolioData(
     modifier: Modifier = Modifier,
-    data: PortfolioStockList.Data,
+    data: PortfolioStockList.Data?,
 ) {
   val colors = MaterialTheme.colors
   val mediumAlpha = ContentAlpha.medium
 
   val totalComposeColor =
       remember(
-          data.total.direction,
+          data?.total?.direction,
           colors,
           mediumAlpha,
       ) {
-        resolveDirectionColor(
-            data.total.direction,
-            colors,
-            mediumAlpha,
-        )
+        val d = data?.total?.direction
+        if (d == null) Color.Unspecified
+        else {
+          resolveDirectionColor(
+              d,
+              colors,
+              mediumAlpha,
+          )
+        }
       }
 
   val totalGainLoss =
-      remember(data.total) {
-        val total = data.total
-        val amount = "${total.direction.sign}${total.change.display}"
-        val pct = "${total.direction.sign}${total.changePercent.display}"
-        return@remember "$amount ($pct)"
+      remember(data?.total) {
+        val total = data?.total
+        if (total == null) {
+          return@remember ""
+        } else {
+          val amount = "${total.direction.sign}${total.change.display}"
+          val pct = "${total.direction.sign}${total.changePercent.display}"
+          return@remember "$amount ($pct)"
+        }
       }
 
-  val totalGainLossLabel = remember(data.total) { data.total.direction.asGainLoss().uppercase() }
+  val totalGainLossLabel =
+      remember(data?.total) {
+        val total = data?.total
+        if (total == null) {
+          return@remember ""
+        } else {
+          return@remember total.direction.asGainLoss().uppercase()
+        }
+      }
 
   val todayComposeColor =
       remember(
-          data.today.direction,
+          data?.today?.direction,
           colors,
           mediumAlpha,
       ) {
-        resolveDirectionColor(
-            data.today.direction,
-            colors,
-            mediumAlpha,
-        )
+        val d = data?.today?.direction
+        if (d == null) Color.Unspecified
+        else {
+          resolveDirectionColor(
+              d,
+              colors,
+              mediumAlpha,
+          )
+        }
       }
 
   val todayGainLoss =
-      remember(data.today) {
-        val today = data.today
-        val amount = "${today.direction.sign}${today.change.display}"
-        val pct = "${today.direction.sign}${today.changePercent.display}"
-        return@remember "$amount ($pct)"
+      remember(data?.today) {
+        val today = data?.today
+        if (today == null) {
+          return@remember ""
+        } else {
+          val amount = "${today.direction.sign}${today.change.display}"
+          val pct = "${today.direction.sign}${today.changePercent.display}"
+          return@remember "$amount ($pct)"
+        }
       }
 
-  val todayGainLossLabel = remember(data.today) { data.today.direction.asGainLoss().uppercase() }
+  val todayGainLossLabel =
+      remember(data?.today) {
+        val today = data?.today
+        if (today == null) {
+          return@remember ""
+        } else {
+          return@remember today.direction.asGainLoss().uppercase()
+        }
+      }
 
   val labelColor =
       remember(
@@ -139,7 +175,7 @@ private fun DisplayPortfolioData(
     )
     Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = data.current.display,
+        text = data?.current?.display.orEmpty(),
         style =
             MaterialTheme.typography.h3.copy(
                 fontWeight = FontWeight.W700,

@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.portfolio
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -49,8 +48,7 @@ fun PortfolioScreen(
       itemKey = { index, stock -> "${stock.holding.symbol.raw}-${index}" },
       renderHeader = {
         PortfolioSummary(
-            modifier =
-                Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.baseline),
+            modifier = Modifier.fillMaxWidth(),
             state = state,
         )
       },
@@ -97,19 +95,15 @@ private fun PortfolioSummary(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
 ) {
-
-  Column(
-      modifier = modifier,
-  ) {
-    PorfolioSummaryItem(
-        modifier =
-            Modifier.fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = MaterialTheme.keylines.baseline),
-        portfolio = state.portfolio,
-        equityType = state.section,
-    )
-  }
+  PorfolioSummaryItem(
+      modifier =
+          modifier
+              .statusBarsPadding()
+              .padding(horizontal = MaterialTheme.keylines.content)
+              .padding(top = MaterialTheme.keylines.baseline),
+      portfolio = state.portfolio,
+      equityType = state.section,
+  )
 }
 
 @Preview

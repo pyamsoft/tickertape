@@ -250,8 +250,8 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
 @Composable
 @CheckResult
 private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
-  val lineShape = shapeComponent(color = Color.White)
-  val lineText = textComponent(color = Color.White)
+  val lineShape = shapeComponent(color = MaterialTheme.colors.onSurface)
+  val lineText = textComponent(color = MaterialTheme.colors.onSurface)
 
   val baselineDecoration =
       remember(

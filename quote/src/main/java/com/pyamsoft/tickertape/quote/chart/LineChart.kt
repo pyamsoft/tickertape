@@ -39,7 +39,11 @@ import com.patrykandpatryk.vico.compose.chart.Chart
 import com.patrykandpatryk.vico.compose.chart.line.lineChart
 import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
 import com.patrykandpatryk.vico.compose.component.shape.shader.verticalGradient
+import com.patrykandpatryk.vico.compose.component.shapeComponent
+import com.patrykandpatryk.vico.compose.component.textComponent
 import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
+import com.patrykandpatryk.vico.core.chart.decoration.Decoration
+import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatryk.vico.core.chart.line.LineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatryk.vico.core.entry.ChartEntry
@@ -72,6 +76,9 @@ private fun ChartData.priceValueAdjustedToBaseline(): Double {
   return this.price.value - this.baseline.value
 }
 
+/**
+ * Can't be data class
+ */
 private class ChartDataEntry(
     private val data: ChartData?,
     x: Float,
@@ -241,6 +248,28 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
 }
 
 @Composable
+@CheckResult
+private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
+  val lineShape = shapeComponent(color = Color.White)
+  val lineText = textComponent(color = Color.White)
+
+  val baselineDecoration =
+      remember(
+          chart.startingPrice,
+          lineShape,
+          lineText,
+      ) {
+        ThresholdLine(
+            thresholdValue = chart.startingPrice.value.toFloat(),
+            lineComponent = lineShape,
+            labelComponent = lineText,
+        )
+      }
+
+  return remember(baselineDecoration) { listOf(baselineDecoration) }
+}
+
+@Composable
 internal fun LineChart(
     modifier: Modifier = Modifier,
     chart: StockChart,
@@ -260,6 +289,8 @@ internal fun LineChart(
         CircularProgressIndicator()
       }
     } else {
+      val decorations = rememberLineDecorations(chart)
+
       val axisValuesOverrider =
           remember(lines.models) {
             AxisValuesOverrider.fixed(
@@ -277,6 +308,7 @@ internal fun LineChart(
               lineChart(
                   lines = lines.specs,
                   axisValuesOverrider = axisValuesOverrider,
+                  decorations = decorations,
               ),
           model = lines.models,
           startAxis =

@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.home
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -82,7 +81,6 @@ fun HomeScreen(
   ) { pv ->
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
     ) {
       item {
         Spacer(

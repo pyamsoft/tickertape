@@ -172,7 +172,7 @@ private fun <T : Any> ListSection(
   ) {
     item {
       Spacer(
-          modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+          modifier = Modifier.fillMaxWidth().padding(scaffoldPaddingValues).statusBarsPadding(),
       )
     }
 
@@ -191,22 +191,20 @@ private fun <T : Any> ListSection(
                           MaterialTheme.colors.background.copy(
                               alpha = 0.80F,
                           ),
-                  )
-                  .padding(scaffoldPaddingValues),
-      ) {
-        Spacer(
-            modifier = Modifier.statusBarsPadding().fillMaxWidth(),
-        )
+                  )) {
+            Spacer(
+                modifier = Modifier.statusBarsPadding().fillMaxWidth(),
+            )
 
-        SearchBar(
-            modifier = Modifier.fillMaxWidth(),
-            search = search,
-            currentTab = tab,
-            onSearchChanged = onSearchChanged,
-            onTabUpdated = onTabUpdated,
-            onRegenerateList = onRegenerateList,
-        )
-      }
+            SearchBar(
+                modifier = Modifier.fillMaxWidth(),
+                search = search,
+                currentTab = tab,
+                onSearchChanged = onSearchChanged,
+                onTabUpdated = onTabUpdated,
+                onRegenerateList = onRegenerateList,
+            )
+          }
     }
 
     when {

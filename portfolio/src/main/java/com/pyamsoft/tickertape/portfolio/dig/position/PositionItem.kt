@@ -9,6 +9,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -18,7 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.isShortTerm
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.portfolio.test.newTestPosition
@@ -136,11 +139,37 @@ private fun QuoteScope.PurchaseDate(
 ) {
   val displayPurchaseDate =
       remember(position) { position.purchaseDate.format(DATE_FORMATTER.get().requireNotNull()) }
+  val isShortTerm = remember(position) { position.isShortTerm() }
 
-  Info(
+  Column(
       modifier = modifier,
-      value = displayPurchaseDate,
-  )
+  ) {
+    Info(
+        value = displayPurchaseDate,
+    )
+
+    Surface(
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+        color = if (isShortTerm) MaterialTheme.colors.secondary else MaterialTheme.colors.primary,
+        contentColor =
+            if (isShortTerm) MaterialTheme.colors.onSecondary else MaterialTheme.colors.onPrimary,
+        shape = MaterialTheme.shapes.small,
+        elevation = ZeroElevation,
+    ) {
+      Text(
+          modifier =
+              Modifier.padding(
+                  horizontal = MaterialTheme.keylines.baseline,
+                  vertical = MaterialTheme.keylines.typography,
+              ),
+          text = if (isShortTerm) "Short Term" else "Long Term",
+          style =
+              MaterialTheme.typography.overline.copy(
+                  color = LocalContentColor.current,
+              ),
+      )
+    }
+  }
 }
 
 @Composable

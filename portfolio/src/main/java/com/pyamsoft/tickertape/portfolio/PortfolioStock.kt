@@ -19,6 +19,8 @@ package com.pyamsoft.tickertape.portfolio
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.position.isLongTerm
+import com.pyamsoft.tickertape.db.position.isShortTerm
 import com.pyamsoft.tickertape.db.position.priceWithSplits
 import com.pyamsoft.tickertape.db.position.shareCountWithSplits
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -33,6 +35,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
+import java.time.LocalDate
 
 private const val NO_POSITION = 0.0
 
@@ -52,6 +55,9 @@ internal constructor(
   val totalGainLossAmount: String
   val totalGainLossPercent: String
   val overallCostBasis: StockMoneyValue
+
+  val shortTermPositions: Int
+  val longTermPositions: Int
 
   // Used in PortfolioStockList
   internal val costNumber: Double
@@ -124,13 +130,23 @@ internal constructor(
           if (isNoTotalChange) NO_POSITION else totalGainLossNumber / cost * 100
       totalGainLossPercent = (totalGainLossPercentNumber * sellSideModifier).asPercent()
 
-      // Overall cost basis is the sum of all cost / number of shares received, adjusted for the trade side
+      // Overall cost basis is the sum of all cost / number of shares received, adjusted for the
+      // trade side
       overallCostBasis = (cost / totalSharesNumber * sellSideModifier).asMoney()
     }
 
     val sign = totalDirection.sign
     totalGainLossAmount = "${sign}${totalGainLoss.display}"
     this.totalGainLossPercent = "${sign}${totalGainLossPercent.display}"
+
+    if (isNoPosition) {
+      shortTermPositions = 0
+      longTermPositions = 0
+    } else {
+      val today = LocalDate.now()
+      shortTermPositions = positions.count { it.isShortTerm(today) }
+      longTermPositions = positions.count { it.isLongTerm(today) }
+    }
   }
 
   companion object {

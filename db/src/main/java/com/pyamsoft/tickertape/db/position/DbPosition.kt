@@ -108,3 +108,30 @@ fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
 
   return raw.asShares()
 }
+
+/**
+ * Cannot use Duration.between(start, end) which internally attempts to convert to seconds since
+ * LocalDate doesn't work with seconds
+ *
+ * Internally though, it calls this, so just do this directly
+ */
+@CheckResult
+private fun DbPosition.getDaysSincePurchase(now: LocalDate): Long {
+  return now.toEpochDay() - this.purchaseDate.toEpochDay()
+}
+
+@CheckResult
+@JvmOverloads
+fun DbPosition.isShortTerm(
+    now: LocalDate = LocalDate.now(),
+): Boolean {
+  return this.getDaysSincePurchase(now) < 365
+}
+
+@CheckResult
+@JvmOverloads
+fun DbPosition.isLongTerm(
+    now: LocalDate = LocalDate.now(),
+): Boolean {
+  return this.getDaysSincePurchase(now) >= 365
+}

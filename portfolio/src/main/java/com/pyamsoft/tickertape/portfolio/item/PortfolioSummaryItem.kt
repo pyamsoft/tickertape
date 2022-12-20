@@ -162,6 +162,16 @@ private fun DisplayPortfolioData(
         )
       }
 
+  val positions =
+      remember(data?.positions) {
+        val positions = data?.positions
+        if (positions == null) {
+          return@remember ""
+        } else {
+          return@remember "Short Term: ${positions.shortTerm} Long Term: ${positions.longTerm}"
+        }
+      }
+
   Column(
       modifier = modifier.fillMaxWidth(),
   ) {
@@ -215,6 +225,23 @@ private fun DisplayPortfolioData(
             MaterialTheme.typography.h5.copy(
                 fontWeight = FontWeight.W400,
                 color = todayComposeColor,
+            ),
+    )
+
+    Text(
+        text = "POSITIONS",
+        style =
+            MaterialTheme.typography.caption.copy(
+                fontWeight = FontWeight.W400,
+                color = labelColor,
+            ),
+    )
+    Text(
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+        text = positions,
+        style =
+            MaterialTheme.typography.body1.copy(
+                fontWeight = FontWeight.W400,
             ),
     )
   }

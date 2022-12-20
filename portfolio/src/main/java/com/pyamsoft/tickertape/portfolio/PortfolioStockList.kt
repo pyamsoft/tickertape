@@ -36,6 +36,9 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
       return null
     }
 
+    val totalShortTermPositions: Int
+    val totalLongTermPositions: Int
+
     val current: StockMoneyValue
     val totalChange: StockMoneyValue
     val totalChangePercent: StockPercent
@@ -57,6 +60,9 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
       todayChange = StockMoneyValue.NONE
       todayChangePercent = StockPercent.NONE
       todayDirection = StockDirection.NONE
+
+      totalShortTermPositions = 0
+      totalLongTermPositions = 0
     } else {
       val totalValue = totalValues.filterNotNull().sum()
       current = totalValue.asMoney()
@@ -90,6 +96,9 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
           todayDirection = rawTodayChange.asDirection()
         }
       }
+
+      totalShortTermPositions = matchingStocks.sumOf { it.shortTermPositions }
+      totalLongTermPositions = matchingStocks.sumOf { it.longTermPositions }
     }
 
     return Data(
@@ -106,6 +115,11 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
                 changePercent = todayChangePercent,
                 direction = todayDirection,
             ),
+        positions =
+            Data.Positions(
+                shortTerm = totalShortTermPositions,
+                longTerm = totalLongTermPositions,
+            ),
     )
   }
 
@@ -113,12 +127,18 @@ class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
       val current: StockMoneyValue,
       val total: Summary,
       val today: Summary,
+      val positions: Positions,
   ) {
 
     data class Summary(
         val change: StockMoneyValue,
         val changePercent: StockPercent,
         val direction: StockDirection,
+    )
+
+    data class Positions(
+        val shortTerm: Int,
+        val longTerm: Int,
     )
   }
 

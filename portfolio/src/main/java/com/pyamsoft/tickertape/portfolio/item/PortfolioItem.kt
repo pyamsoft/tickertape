@@ -1,10 +1,13 @@
 package com.pyamsoft.tickertape.portfolio.item
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
@@ -50,6 +53,21 @@ internal fun PortfolioItem(
           name = "Avg Cost Basis",
           value = stock.overallCostBasis.display,
       )
+
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceEvenly,
+      ) {
+        Info(
+            name = "Short Term",
+            value = "${stock.shortTermPositions}",
+        )
+
+        Info(
+            name = "Long Term",
+            value = "${stock.shortTermPositions}",
+        )
+      }
 
       // These are only valid if we have current day quotes
       if (stock.ticker != null) {

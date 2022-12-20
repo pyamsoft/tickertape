@@ -12,6 +12,9 @@ object AlertObjectGraph {
 
     private val trackingMap = mutableMapOf<Application, AlertWorkComponent>()
 
+    /**
+     * Called from Application
+     */
     fun install(
         application: Application,
         component: AlertWorkComponent,
@@ -21,12 +24,12 @@ object AlertObjectGraph {
     }
 
     @CheckResult
-    fun retrieve(context: Context): AlertWorkComponent {
+    internal fun retrieve(context: Context): AlertWorkComponent {
       return retrieve(context.applicationContext as Application)
     }
 
     @CheckResult
-    fun retrieve(application: Application): AlertWorkComponent {
+    internal fun retrieve(application: Application): AlertWorkComponent {
       return trackingMap[application].requireNotNull {
         "Could not find ApplicationScoped internals for Application: $application"
       }

@@ -84,7 +84,12 @@ fun HomeScreen(
     ) {
       item {
         Spacer(
-            modifier = Modifier.fillMaxWidth().padding(pv).statusBarsPadding(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(pv)
+                    .statusBarsPadding()
+                    // Little extra space
+                    .padding(top = MaterialTheme.keylines.baseline),
         )
       }
 

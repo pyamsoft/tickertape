@@ -7,8 +7,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Colors
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -16,6 +19,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +29,8 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
+import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
+import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
 
 @Composable
 fun PorfolioSummaryItem(
@@ -228,22 +234,62 @@ private fun DisplayPortfolioData(
             ),
     )
 
-    Text(
-        text = "POSITIONS",
-        style =
-            MaterialTheme.typography.caption.copy(
-                fontWeight = FontWeight.W400,
-                color = labelColor,
-            ),
-    )
-    Text(
-        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = positions,
-        style =
-            MaterialTheme.typography.body1.copy(
-                fontWeight = FontWeight.W400,
-            ),
-    )
+    val pos = data?.positions
+    if (pos != null) {
+      Column(
+          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+      ) {
+        if (pos.shortTerm > 0 || pos.longTerm > 0) {
+          Text(
+              modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+              text = "POSITIONS",
+              style =
+                  MaterialTheme.typography.caption.copy(
+                      fontWeight = FontWeight.W400,
+                      color = labelColor,
+                  ),
+          )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          if (pos.shortTerm > 0) {
+            ShortTermPurchaseDateTag(
+                style = MaterialTheme.typography.body2,
+            )
+            Text(
+                modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+                text = "${pos.shortTerm}",
+                style =
+                    MaterialTheme.typography.body1.copy(
+                        fontWeight = FontWeight.W400,
+                    ),
+            )
+          }
+
+          if (pos.shortTerm > 0 && pos.longTerm > 0) {
+            Spacer(
+                modifier = Modifier.width(MaterialTheme.keylines.content),
+            )
+          }
+
+          if (pos.longTerm > 0) {
+            LongTermPurchaseDateTag(
+                style = MaterialTheme.typography.body2,
+            )
+            Text(
+                modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+                text = "${pos.longTerm}",
+                style =
+                    MaterialTheme.typography.body1.copy(
+                        fontWeight = FontWeight.W400,
+                    ),
+            )
+          }
+        }
+      }
+    }
   }
 }
 

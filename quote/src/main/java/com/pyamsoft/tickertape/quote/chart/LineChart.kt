@@ -316,12 +316,20 @@ internal fun LineChart(
       val decorations = rememberLineDecorations(chart)
 
       val axisValuesOverrider =
-          remember(lines.models) {
-            AxisValuesOverrider.fixed(
+          remember(
+              lines.models,
+              chart.startingPrice,
+          ) {
+            // Adjust the Y axis to include the baseline starting price if needed
+            val baseline = chart.startingPrice.value.toFloat()
+            val models = lines.models
+            val adjustedMinY = if (baseline < models.minY) baseline else models.minY
+            val adjustedMaxY = if (baseline > models.maxY) baseline else models.maxY
+            return@remember AxisValuesOverrider.fixed(
                 minX = lines.models.minX,
                 maxX = lines.models.maxX,
-                minY = lines.models.minY,
-                maxY = lines.models.maxY,
+                minY = adjustedMinY,
+                maxY = adjustedMaxY,
             )
           }
 

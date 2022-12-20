@@ -17,6 +17,8 @@
 package com.pyamsoft.tickertape.db.position
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.core.isLongTermPurchase
+import com.pyamsoft.tickertape.core.isShortTermPurchase
 import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -109,23 +111,12 @@ fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
   return raw.asShares()
 }
 
-/**
- * Cannot use Duration.between(start, end) which internally attempts to convert to seconds since
- * LocalDate doesn't work with seconds
- *
- * Internally though, it calls this, so just do this directly
- */
-@CheckResult
-private fun DbPosition.getDaysSincePurchase(now: LocalDate): Long {
-  return now.toEpochDay() - this.purchaseDate.toEpochDay()
-}
-
 @CheckResult
 @JvmOverloads
 fun DbPosition.isShortTerm(
     now: LocalDate = LocalDate.now(),
 ): Boolean {
-  return this.getDaysSincePurchase(now) < 365
+  return this.purchaseDate.isShortTermPurchase(now)
 }
 
 @CheckResult
@@ -133,5 +124,5 @@ fun DbPosition.isShortTerm(
 fun DbPosition.isLongTerm(
     now: LocalDate = LocalDate.now(),
 ): Boolean {
-  return this.getDaysSincePurchase(now) >= 365
+  return this.purchaseDate.isLongTermPurchase(now)
 }

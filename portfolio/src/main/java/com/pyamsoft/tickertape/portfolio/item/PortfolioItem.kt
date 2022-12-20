@@ -1,15 +1,18 @@
 package com.pyamsoft.tickertape.portfolio.item
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.theme.ZeroSize
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
@@ -17,6 +20,8 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
+import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
 
 @Composable
 @JvmOverloads
@@ -54,21 +59,6 @@ internal fun PortfolioItem(
           value = stock.overallCostBasis.display,
       )
 
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceEvenly,
-      ) {
-        Info(
-            name = "Short Term",
-            value = "${stock.shortTermPositions}",
-        )
-
-        Info(
-            name = "Long Term",
-            value = "${stock.shortTermPositions}",
-        )
-      }
-
       // These are only valid if we have current day quotes
       if (stock.ticker != null) {
         Info(
@@ -80,6 +70,45 @@ internal fun PortfolioItem(
             name = "$totalChangeTitle Percent",
             value = stock.totalGainLossPercent,
         )
+      }
+
+      if (stock.shortTermPositions > 0 || stock.longTermPositions > 0) {
+        Info(
+            modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+            name = "Positions",
+            // No value here
+            value = "",
+        )
+      }
+
+      if (stock.shortTermPositions > 0) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          ShortTermPurchaseDateTag()
+          Info(
+              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+              value = "${stock.shortTermPositions}",
+          )
+        }
+      }
+
+      if (stock.longTermPositions > 0) {
+        Row(
+            modifier =
+                Modifier.padding(
+                    top =
+                        if (stock.shortTermPositions > 0) MaterialTheme.keylines.baseline
+                        else ZeroSize,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          LongTermPurchaseDateTag()
+          Info(
+              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+              value = "${stock.longTermPositions}",
+          )
+        }
       }
     }
   }

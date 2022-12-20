@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.pyamsoft.pydroid.theme.ZeroSize
 import com.pyamsoft.pydroid.theme.keylines
 
 interface QuoteScope {
@@ -134,7 +135,7 @@ object DefaultQuoteScopeInstance : QuoteScope {
     val label = remember(name) { name.uppercase() }
 
     Column(
-        modifier = modifier.padding(bottom = MaterialTheme.keylines.baseline),
+        modifier = modifier,
         horizontalAlignment = Alignment.Start,
     ) {
       if (label.isNotBlank()) {
@@ -145,11 +146,18 @@ object DefaultQuoteScopeInstance : QuoteScope {
         )
       }
 
-      Text(
-          text = value,
-          style = contentStyle,
-          maxLines = 1,
-      )
+      if (value.isNotBlank()) {
+        Text(
+            modifier =
+                Modifier.padding(
+                    // Only add bottom padding if we are a full Info
+                    bottom = if (label.isNotBlank()) MaterialTheme.keylines.baseline else ZeroSize,
+                ),
+            text = value,
+            style = contentStyle,
+            maxLines = 1,
+        )
+      }
     }
   }
 }

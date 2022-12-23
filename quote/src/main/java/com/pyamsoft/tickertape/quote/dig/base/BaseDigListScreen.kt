@@ -106,14 +106,15 @@ private fun DigAdd(
     onClick: () -> Unit,
 ) {
   AnimatedVisibility(
-      modifier = modifier.padding(MaterialTheme.keylines.content),
       visible = isVisible,
       // Normal FAB animation
       // https://stackoverflow.com/questions/71141501/cant-animate-fab-visible-in-m3-scaffold
       enter = scaleIn(),
       exit = scaleOut(),
   ) {
-    Box {
+    Box(
+        modifier = modifier.padding(MaterialTheme.keylines.content),
+    ) {
       FloatingActionButton(
           backgroundColor = MaterialTheme.colors.secondary,
           contentColor = Color.White,

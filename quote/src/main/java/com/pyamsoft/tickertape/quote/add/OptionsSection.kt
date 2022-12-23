@@ -50,10 +50,11 @@ internal fun OptionsSection(
 ) {
   val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
   AnimatedVisibility(
-      modifier = modifier,
       visible = show,
   ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
       OptionsSide(
           modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
           state = state,
@@ -91,7 +92,6 @@ private fun OptionsStrikeExpiration(
   val selectedStrikePrice = state.optionStrikePrice
 
   AnimatedVisibility(
-      modifier = modifier,
       visible = isOptionResolved,
   ) {
     if (option != null) {
@@ -99,7 +99,7 @@ private fun OptionsStrikeExpiration(
       val allStrikes = option.strikes
 
       Row(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = modifier.fillMaxWidth(),
           verticalAlignment = Alignment.CenterVertically,
       ) {
         OptionsDropdown(

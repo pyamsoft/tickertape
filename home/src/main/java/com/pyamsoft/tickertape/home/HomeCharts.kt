@@ -272,11 +272,10 @@ private fun Loading(
     modifier: Modifier = Modifier,
 ) {
   AnimatedVisibility(
-      modifier = modifier,
       visible = isLoading,
   ) {
     Box(
-        modifier = Modifier.padding(MaterialTheme.keylines.content),
+        modifier = modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) {
       CircularProgressIndicator()

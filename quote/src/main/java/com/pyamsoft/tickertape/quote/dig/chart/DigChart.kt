@@ -119,7 +119,6 @@ private fun CurrentScrub(
     openingPrice: StockMoneyValue?,
 ) {
   AnimatedVisibility(
-      modifier = modifier,
       visible = price != null,
   ) {
     if (price != null) {
@@ -130,7 +129,7 @@ private fun CurrentScrub(
           }
 
       Column(
-          modifier = Modifier.padding(MaterialTheme.keylines.content),
+          modifier = modifier.padding(MaterialTheme.keylines.content),
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center,
       ) {

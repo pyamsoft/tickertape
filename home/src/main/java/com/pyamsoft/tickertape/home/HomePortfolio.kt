@@ -73,14 +73,14 @@ internal fun HomePortfolio(
     if (err == null) {
       Column {
         AnimatedVisibility(
-            modifier =
-                Modifier.padding(
-                    start = MaterialTheme.keylines.content,
-                    bottom = MaterialTheme.keylines.baseline,
-                ),
             visible = isVisible,
         ) {
           Text(
+              modifier =
+                  Modifier.padding(
+                      start = MaterialTheme.keylines.content,
+                      bottom = MaterialTheme.keylines.baseline,
+                  ),
               text = "My Portfolio Summary",
               style =
                   MaterialTheme.typography.body1.copy(
@@ -119,10 +119,9 @@ private fun Loading(
 ) {
   AnimatedVisibility(
       visible = isLoading,
-      modifier = modifier,
   ) {
     Box(
-        modifier = Modifier.padding(MaterialTheme.keylines.content),
+        modifier = modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) {
       CircularProgressIndicator()

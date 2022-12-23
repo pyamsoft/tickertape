@@ -48,12 +48,12 @@ fun PorfolioSummaryItem(
       }
 
   AnimatedVisibility(
-      modifier = modifier,
       visible = data != null,
       enter = fadeIn() + slideInVertically(),
       exit = slideOutVertically() + fadeOut(),
   ) {
     DisplayPortfolioData(
+        modifier = modifier,
         data = data,
     )
   }

@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -44,6 +46,7 @@ import com.pyamsoft.tickertape.setting.SettingsDialog
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,7 +58,7 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  private fun handleOpenDigDialog(ticker: Ticker) {
+  private fun onOpenDigDialog(ticker: Ticker) {
     val quote = ticker.quote
     if (quote == null) {
       Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}")
@@ -75,7 +78,7 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleOpenSettingsDialog() {
+  private fun onOpenSettingsDialog() {
     SettingsDialog.show(requireActivity())
   }
 
@@ -98,6 +101,48 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_home
 
       setContent {
+        val handleOpenSettings by rememberUpdatedState { onOpenSettingsDialog() }
+
+        val handleChartClicked by rememberUpdatedState { ticker: Ticker -> onOpenDigDialog(ticker) }
+
+        val handleRefreshWatchlist by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchWatchlist(this, false) }
+
+        val handleRefreshUndervaluedGrowth by
+            rememberUpdatedState<CoroutineScope.() -> Unit> {
+              vm.handleFetchUndervaluedGrowth(this, false)
+            }
+
+        val handleRefreshTrending by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchTrending(this, false) }
+
+        val handleRefreshPortfolio by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchPortfolio(this, false) }
+
+        val handleRefreshMostShorted by
+            rememberUpdatedState<CoroutineScope.() -> Unit> {
+              vm.handleFetchMostShorted(this, false)
+            }
+
+        val handleRefreshLosers by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchLosers(this, false) }
+
+        val handleRefreshGainers by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchGainers(this, false) }
+
+        val handleRefreshIndexes by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleFetchIndexes(this, false) }
+
+        val handleRefreshGrowthTech by
+            rememberUpdatedState<CoroutineScope.() -> Unit> {
+              vm.handleFetchGrowthTech(this, false)
+            }
+
+        val handleRefreshMostActive by
+            rememberUpdatedState<CoroutineScope.() -> Unit> {
+              vm.handleFetchMostActive(this, false)
+            }
+
         act.TickerTapeTheme(themeProvider) {
           HomeScreen(
               modifier = Modifier.fillMaxSize(),
@@ -105,18 +150,18 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
               appName = appName,
               imageLoader = loader,
               navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onSettingsClicked = { handleOpenSettingsDialog() },
-              onChartClicked = { handleOpenDigDialog(it) },
-              onRefreshWatchlist = { vm.handleFetchWatchlist(this, false) },
-              onRefreshUndervaluedGrowth = { vm.handleFetchUndervaluedGrowth(this, false) },
-              onRefreshTrending = { vm.handleFetchTrending(this, false) },
-              onRefreshPortfolio = { vm.handleFetchPortfolio(this, false) },
-              onRefreshMostShorted = { vm.handleFetchMostShorted(this, false) },
-              onRefreshLosers = { vm.handleFetchLosers(this, false) },
-              onRefreshIndexes = { vm.handleFetchIndexes(this, false) },
-              onRefreshGrowthTech = { vm.handleFetchGrowthTech(this, false) },
-              onRefreshGainers = { vm.handleFetchGainers(this, false) },
-              onRefreshMostActive = { vm.handleFetchMostActive(this, false) },
+              onSettingsClicked = handleOpenSettings,
+              onChartClicked = handleChartClicked,
+              onRefreshWatchlist = handleRefreshWatchlist,
+              onRefreshUndervaluedGrowth = handleRefreshUndervaluedGrowth,
+              onRefreshTrending = handleRefreshTrending,
+              onRefreshPortfolio = handleRefreshPortfolio,
+              onRefreshMostShorted = handleRefreshMostShorted,
+              onRefreshLosers = handleRefreshLosers,
+              onRefreshIndexes = handleRefreshIndexes,
+              onRefreshGrowthTech = handleRefreshGrowthTech,
+              onRefreshGainers = handleRefreshGainers,
+              onRefreshMostActive = handleRefreshMostActive,
           )
         }
       }

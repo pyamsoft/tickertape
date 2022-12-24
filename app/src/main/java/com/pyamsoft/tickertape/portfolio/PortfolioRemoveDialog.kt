@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -66,7 +68,7 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
         .let { DbHolding.Id(it) }
   }
 
-  private fun handleDelete(holdingId: DbHolding.Id) {
+  private fun onDelete(holdingId: DbHolding.Id) {
     presenter
         .requireNotNull()
         .handleRemove(
@@ -84,7 +86,7 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
     val act = requireActivity()
     ObjectGraph.ApplicationScope.retrieve(act).inject(this)
 
-    val holding = getHolding()
+    val holdingId = getHolding()
     val symbol = getSymbol()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
@@ -92,12 +94,16 @@ internal class PortfolioRemoveDialog : AppCompatDialogFragment() {
       id = R.id.dialog_watchlist_dig
 
       setContent {
+        val handleDelete by rememberUpdatedState { onDelete(holdingId) }
+
+        val handleDismiss by rememberUpdatedState { dismiss() }
+
         act.TickerTapeTheme(themeProvider) {
           DeleteTicker(
               modifier = Modifier.fillMaxWidth(),
               symbol = symbol,
-              onCancel = { dismiss() },
-              onConfirm = { handleDelete(holding) },
+              onCancel = handleDismiss,
+              onConfirm = handleDelete,
           )
         }
       }

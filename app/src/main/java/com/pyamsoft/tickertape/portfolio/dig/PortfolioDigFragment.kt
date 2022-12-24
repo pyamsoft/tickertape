@@ -24,14 +24,16 @@ import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
+import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -40,14 +42,17 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitDialog
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -62,12 +67,12 @@ import javax.inject.Inject
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
-  @JvmField @Inject internal var navigator: BackstackNavigator<MainPage>? = null
+  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  private fun handleOptionsExpirationDateChanged(date: LocalDate) {
+  private fun onOptionsExpirationDateChanged(date: LocalDate) {
     viewModel
         .requireNotNull()
         .handleOptionsExpirationDateChanged(
@@ -76,7 +81,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRecommendationSelected(ticker: Ticker) {
+  private fun onRecommendationSelected(ticker: Ticker) {
     val quote = ticker.quote
 
     navigator
@@ -90,7 +95,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRangeSelected(range: StockChart.IntervalRange) {
+  private fun onRangeSelected(range: StockChart.IntervalRange) {
     viewModel
         .requireNotNull()
         .handleChartRangeSelected(
@@ -99,7 +104,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRefresh(force: Boolean) {
+  private fun onRefresh(force: Boolean) {
     viewModel
         .requireNotNull()
         .handleLoadTicker(
@@ -108,7 +113,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleAddSplit() {
+  private fun onAddSplit() {
     SplitDialog.create(
         activity = requireActivity(),
         symbol = getSymbol(),
@@ -116,7 +121,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     )
   }
 
-  private fun handleUpdateSplit(split: DbSplit) {
+  private fun onUpdateSplit(split: DbSplit) {
     SplitDialog.update(
         activity = requireActivity(),
         symbol = getSymbol(),
@@ -125,7 +130,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     )
   }
 
-  private fun handleDeleteSplit(split: DbSplit) {
+  private fun onDeleteSplit(split: DbSplit) {
     viewModel
         .requireNotNull()
         .handleDeleteSplit(
@@ -134,7 +139,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleAddPosition() {
+  private fun onAddPosition() {
     PositionDialog.create(
         activity = requireActivity(),
         symbol = getSymbol(),
@@ -143,7 +148,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     )
   }
 
-  private fun handleUpdatePosition(position: DbPosition) {
+  private fun onUpdatePosition(position: DbPosition) {
     PositionDialog.update(
         activity = requireActivity(),
         symbol = getSymbol(),
@@ -153,7 +158,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
     )
   }
 
-  private fun handleDeletePosition(position: DbPosition) {
+  private fun onDeletePosition(position: DbPosition) {
     viewModel
         .requireNotNull()
         .handleDeletePosition(
@@ -162,7 +167,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleTabUpdated(section: PortfolioDigSections) {
+  private fun onTabUpdated(section: PortfolioDigSections) {
     viewModel
         .requireNotNull()
         .handleTabUpdated(
@@ -240,48 +245,98 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
 
     val vm = viewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
-    val navi = navigator.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
       setContent {
+        val handleBack by rememberUpdatedState { act.onBackPressedDispatcher.onBackPressed() }
+
+        val handleRefresh by rememberUpdatedState { onRefresh(true) }
+
+        val handleChartScrubbed by rememberUpdatedState { data: ChartData ->
+          vm.handleChartDateScrubbed(data)
+        }
+
+        val handleChartRangeSelected by rememberUpdatedState { range: StockChart.IntervalRange ->
+          onRangeSelected(range)
+        }
+
+        val handleTabChanged by rememberUpdatedState { tab: PortfolioDigSections ->
+          onTabUpdated(tab)
+        }
+
+        val handleAddPosition by rememberUpdatedState { onAddPosition() }
+
+        val handleDeletePosition by rememberUpdatedState { position: DbPosition ->
+          onDeletePosition(position)
+        }
+
+        val handleUpdatePosition by rememberUpdatedState { position: DbPosition ->
+          onUpdatePosition(position)
+        }
+
+        val handleAddSplit by rememberUpdatedState { onAddSplit() }
+
+        val handleDeleteSplit by rememberUpdatedState { split: DbSplit -> onDeleteSplit(split) }
+
+        val handleUpdateSplit by rememberUpdatedState { split: DbSplit -> onUpdateSplit(split) }
+
+        val handleRecommendSelected by rememberUpdatedState { ticker: Ticker ->
+          onRecommendationSelected(ticker)
+        }
+
+        val handleOptionSectionChanged by rememberUpdatedState { section: StockOptions.Contract.Type
+          ->
+          vm.handleOptionsSectionChanged(section)
+        }
+
+        val handleOptionsDateChanged by rememberUpdatedState { date: LocalDate ->
+          onOptionsExpirationDateChanged(date)
+        }
+
+        val handleAddPriceAlert by rememberUpdatedState {
+          // TODO Price alerts
+          Timber.d("ADD PRICE ALERT!")
+        }
+
+        val handleDeletePriceAlert by rememberUpdatedState { alert: PriceAlert ->
+          // TODO Price alerts
+          Timber.d("DELETE PRICE ALERT: $alert")
+        }
+
+        val handleUpdatePriceAlert by rememberUpdatedState { alert: PriceAlert ->
+          // TODO Price alerts
+          Timber.d("UPDATE PRICE ALERT: $alert")
+        }
+
         act.TickerTapeTheme(themeProvider) {
           BackHandler(
-              onBack = { navi.goBack() },
+              onBack = handleBack,
           )
 
           PortfolioDigScreen(
               modifier = Modifier.fillMaxWidth(),
               state = vm.state(),
               imageLoader = loader,
-              onClose = { act.onBackPressedDispatcher.onBackPressed() },
-              onChartScrub = { vm.handleChartDateScrubbed(it) },
-              onChartRangeSelected = { handleRangeSelected(it) },
-              onTabUpdated = { handleTabUpdated(it) },
-              onRefresh = { handleRefresh(true) },
-              onPositionAdd = { handleAddPosition() },
-              onPositionDelete = { handleDeletePosition(it) },
-              onPositionUpdate = { handleUpdatePosition(it) },
-              onSplitAdd = { handleAddSplit() },
-              onSplitDeleted = { handleDeleteSplit(it) },
-              onSplitUpdated = { handleUpdateSplit(it) },
-              onRecClick = { handleRecommendationSelected(it) },
-              onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
-              onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
-              onAddPriceAlert = {
-                // TODO Price alerts
-                Timber.d("ADD PRICE ALERT!")
-              },
-              onUpdatePriceAlert = {
-                // TODO Price alerts
-                Timber.d("UPDATE PRICE ALERT: $it")
-              },
-              onDeletePriceAlert = {
-                // TODO Price alerts
-                Timber.d("DELETE PRICE ALERT: $it")
-              },
+              onClose = handleBack,
+              onChartScrub = handleChartScrubbed,
+              onChartRangeSelected = handleChartRangeSelected,
+              onTabUpdated = handleTabChanged,
+              onRefresh = handleRefresh,
+              onPositionAdd = handleAddPosition,
+              onPositionDelete = handleDeletePosition,
+              onPositionUpdate = handleUpdatePosition,
+              onSplitAdd = handleAddSplit,
+              onSplitDeleted = handleDeleteSplit,
+              onSplitUpdated = handleUpdateSplit,
+              onRecClick = handleRecommendSelected,
+              onOptionSectionChanged = handleOptionSectionChanged,
+              onOptionExpirationDateChanged = handleOptionsDateChanged,
+              onAddPriceAlert = handleAddPriceAlert,
+              onUpdatePriceAlert = handleUpdatePriceAlert,
+              onDeletePriceAlert = handleDeletePriceAlert,
           )
         }
       }
@@ -298,7 +353,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       vm.bind(scope = viewLifecycleOwner.lifecycleScope)
     }
 
-    handleRefresh(false)
+    onRefresh(force = false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

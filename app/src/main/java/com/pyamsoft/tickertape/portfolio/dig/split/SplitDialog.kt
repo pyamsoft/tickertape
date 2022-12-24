@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -80,7 +82,7 @@ internal class SplitDialog : AppCompatDialogFragment() {
         .let { DbSplit.Id(it) }
   }
 
-  private fun handleSubmit() {
+  private fun onSubmit() {
     viewModel
         .requireNotNull()
         .handleSubmit(
@@ -89,7 +91,7 @@ internal class SplitDialog : AppCompatDialogFragment() {
         )
   }
 
-  private fun handleSplitDateClicked(
+  private fun onSplitDateClicked(
       splitId: DbSplit.Id,
       date: LocalDate?,
   ) {
@@ -126,21 +128,35 @@ internal class SplitDialog : AppCompatDialogFragment() {
         val symbol = remember { getSymbol() }
         val state = vm.state()
 
+        val handleDismiss by rememberUpdatedState { dismiss() }
+
+        val handleSubmit by rememberUpdatedState { onSubmit() }
+
+        val handlePreCountChanged by rememberUpdatedState { number: String ->
+          vm.handlePreSplitShareCountChanged(number)
+        }
+
+        val handlePostCountChanged by rememberUpdatedState { number: String ->
+          vm.handlePostSplitShareCountChanged(number)
+        }
+
+        val handleSplitDateClicked by rememberUpdatedState { date: LocalDate? ->
+          onSplitDateClicked(
+              splitId = state.splitId,
+              date = date,
+          )
+        }
+
         act.TickerTapeTheme(themeProvider) {
           SplitAddScreen(
               modifier = Modifier.fillMaxWidth(),
               state = state,
               symbol = symbol,
-              onPreSplitCountChanged = { vm.handlePreSplitShareCountChanged(it) },
-              onPostSplitCountChanged = { vm.handlePostSplitShareCountChanged(it) },
-              onSubmit = { handleSubmit() },
-              onClose = { dismiss() },
-              onSplitDateClicked = { date ->
-                handleSplitDateClicked(
-                    splitId = state.splitId,
-                    date = date,
-                )
-              },
+              onPreSplitCountChanged = handlePreCountChanged,
+              onPostSplitCountChanged = handlePostCountChanged,
+              onSubmit = handleSubmit,
+              onClose = handleDismiss,
+              onSplitDateClicked = handleSplitDateClicked,
           )
         }
       }

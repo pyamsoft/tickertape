@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -49,7 +51,7 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
 
-  private fun handleTapePageSizeChanged(size: Int) {
+  private fun onTapePageSizeChanged(size: Int) {
     viewModel
         .requireNotNull()
         .handleTapePageSizeChanged(
@@ -58,7 +60,7 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleTapeNotificationToggled() {
+  private fun onTapeNotificationToggled() {
     viewModel
         .requireNotNull()
         .handleTapeNotificationToggled(
@@ -66,7 +68,7 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleBigMoverNotificationToggled() {
+  private fun onBigMoverNotificationToggled() {
     viewModel
         .requireNotNull()
         .handleBigMoverNotificationToggled(
@@ -90,14 +92,22 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_notifications
 
       setContent {
+        val handleTapeToggled by rememberUpdatedState { onTapeNotificationToggled() }
+
+        val handleTapePageSizeChanged by rememberUpdatedState { size: Int ->
+          onTapePageSizeChanged(size)
+        }
+
+        val handleBigMoverToggled by rememberUpdatedState { onBigMoverNotificationToggled() }
+
         act.TickerTapeTheme(themeProvider) {
           NotificationScreen(
               modifier = Modifier.fillMaxSize(),
               state = vm.state(),
               navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onTapeNotificationToggled = { handleTapeNotificationToggled() },
-              onTapePageSizeChanged = { handleTapePageSizeChanged(it) },
-              onBigMoverNotificationToggled = { handleBigMoverNotificationToggled() },
+              onTapeNotificationToggled = handleTapeToggled,
+              onTapePageSizeChanged = handleTapePageSizeChanged,
+              onBigMoverNotificationToggled = handleBigMoverToggled,
           )
         }
       }

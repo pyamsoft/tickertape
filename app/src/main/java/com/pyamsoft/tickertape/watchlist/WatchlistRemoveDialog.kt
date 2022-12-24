@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -57,7 +59,7 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
         .asSymbol()
   }
 
-  private fun handleDelete(symbol: StockSymbol) {
+  private fun onDelete(symbol: StockSymbol) {
     presenter
         .requireNotNull()
         .handleRemove(
@@ -83,12 +85,16 @@ internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
       id = R.id.dialog_watchlist_dig
 
       setContent {
+        val handleDelete by rememberUpdatedState { onDelete(symbol) }
+
+        val handleDismiss by rememberUpdatedState { dismiss() }
+
         act.TickerTapeTheme(themeProvider) {
           DeleteTicker(
               modifier = Modifier.fillMaxWidth(),
               symbol = symbol,
-              onCancel = { dismiss() },
-              onConfirm = { handleDelete(symbol) },
+              onCancel = handleDismiss,
+              onConfirm = handleDelete,
           )
         }
       }

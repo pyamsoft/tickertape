@@ -28,10 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun MainScreen(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
-    onLoadHome: () -> Unit,
-    onLoadWatchlist: () -> Unit,
-    onLoadPortfolio: () -> Unit,
-    onLoadNotifications: () -> Unit,
+    onLoadPage: (TopLevelMainPage) -> Unit,
     onBottomBarHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
@@ -42,10 +39,7 @@ fun MainScreen(
     MainBottomNav(
         modifier = Modifier.fillMaxWidth(),
         page = page,
-        onLoadHome = onLoadHome,
-        onLoadWatchlist = onLoadWatchlist,
-        onLoadPortfolio = onLoadPortfolio,
-        onLoadNotifications = onLoadNotifications,
+        onLoadPage = onLoadPage,
         onHeightMeasured = onBottomBarHeightMeasured,
         onActionSelected = onActionSelected,
     )
@@ -58,10 +52,7 @@ private fun PreviewMainScreen() {
   MainScreen(
       page = TopLevelMainPage.Home,
       onBottomBarHeightMeasured = {},
-      onLoadHome = {},
-      onLoadWatchlist = {},
-      onLoadPortfolio = {},
-      onLoadNotifications = {},
+      onLoadPage = {},
       onActionSelected = {},
   )
 }

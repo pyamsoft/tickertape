@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -43,9 +45,11 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,7 +61,7 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  private fun handleOpenDigDialog(ticker: Ticker) {
+  private fun onOpenDigDialog(ticker: Ticker) {
     val quote = ticker.quote
     if (quote == null) {
       Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}")
@@ -78,14 +82,14 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleDeleteTicker(ticker: Ticker) {
+  private fun onDeleteTicker(ticker: Ticker) {
     WatchlistRemoveDialog.show(
         requireActivity(),
         symbol = ticker.symbol,
     )
   }
 
-  private fun handleRefresh(force: Boolean) {
+  private fun onRefresh(force: Boolean) {
     viewModel
         .requireNotNull()
         .handleRefreshList(
@@ -94,7 +98,7 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleFabClicked() {
+  private fun onFabClicked() {
     NewTickerSheet.show(
         requireActivity(),
         TickerDestination.WATCHLIST,
@@ -119,18 +123,37 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_watchlist
 
       setContent {
+        val handleRefresh by rememberUpdatedState { onRefresh(true) }
+
+        val handleOpenManageDialog by rememberUpdatedState { ticker: Ticker ->
+          onOpenDigDialog(ticker)
+        }
+
+        val handleDeleteTicker by rememberUpdatedState { ticker: Ticker -> onDeleteTicker(ticker) }
+
+        val handleSearchChanged by rememberUpdatedState { search: String ->
+          vm.handleSearch(search)
+        }
+
+        val handleTabChanged by rememberUpdatedState { tab: EquityType ->
+          vm.handleSectionChanged(tab)
+        }
+
+        val handleRegenerateList by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
+
         act.TickerTapeTheme(themeProvider) {
           WatchlistScreen(
               modifier = Modifier.fillMaxSize(),
               state = vm.state(),
               imageLoader = loader,
               navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onRefresh = { handleRefresh(true) },
-              onDeleteTicker = { handleDeleteTicker(it) },
-              onSearchChanged = { vm.handleSearch(it) },
-              onTabUpdated = { vm.handleSectionChanged(it) },
-              onSelectTicker = { handleOpenDigDialog(it) },
-              onRegenerateList = { vm.handleRegenerateList(this) },
+              onRefresh = handleRefresh,
+              onDeleteTicker = handleDeleteTicker,
+              onSearchChanged = handleSearchChanged,
+              onTabUpdated = handleTabChanged,
+              onSelectTicker = handleOpenManageDialog,
+              onRegenerateList = handleRegenerateList,
           )
         }
       }
@@ -143,7 +166,7 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       vm.restoreState(savedInstanceState)
       vm.bind(
           scope = viewLifecycleOwner.lifecycleScope,
-          onMainSelectionEvent = { handleFabClicked() },
+          onMainSelectionEvent = { onFabClicked() },
       )
     }
     mainViewModel.requireNotNull().restoreState(savedInstanceState)
@@ -151,7 +174,7 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   override fun onStart() {
     super.onStart()
-    handleRefresh(force = false)
+    onRefresh(force = false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

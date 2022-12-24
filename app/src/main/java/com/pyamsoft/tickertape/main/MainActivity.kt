@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -68,7 +69,7 @@ internal class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun handleMainActionSelected(page: TopLevelMainPage) {
+  private fun onMainActionSelected(page: TopLevelMainPage) {
     viewModel
         .requireNotNull()
         .handleMainActionSelected(
@@ -186,15 +187,24 @@ internal class MainActivity : AppCompatActivity() {
         Box(
             contentAlignment = Alignment.BottomCenter,
         ) {
-          if (page != null) {
+          page?.also { p ->
+            val handleNavigate by rememberUpdatedState { page: TopLevelMainPage ->
+              navi.navigateTo(page)
+            }
+
+            val handleBottomBarHeightMeasured by rememberUpdatedState { height: Int ->
+              vm.handleMeasureBottomNavHeight(height)
+            }
+
+            val handleMainActionSelected by rememberUpdatedState { page: TopLevelMainPage ->
+              onMainActionSelected(page)
+            }
+
             MainScreen(
-                page = page,
-                onLoadHome = { navi.navigateTo(TopLevelMainPage.Home) },
-                onLoadWatchlist = { navi.navigateTo(TopLevelMainPage.Watchlist) },
-                onLoadPortfolio = { navi.navigateTo(TopLevelMainPage.Portfolio) },
-                onLoadNotifications = { navi.navigateTo(TopLevelMainPage.Notifications) },
-                onBottomBarHeightMeasured = { vm.handleMeasureBottomNavHeight(it) },
-                onActionSelected = { handleMainActionSelected(it) },
+                page = p,
+                onLoadPage = handleNavigate,
+                onBottomBarHeightMeasured = handleBottomBarHeightMeasured,
+                onActionSelected = handleMainActionSelected,
             )
           }
         }

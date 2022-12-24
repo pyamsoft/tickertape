@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -43,7 +45,9 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
@@ -54,7 +58,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  private fun handleOpenManageDialog(stock: PortfolioStock) {
+  private fun onOpenManageDialog(stock: PortfolioStock) {
     val quote = stock.ticker?.quote
     val session = quote?.currentSession
 
@@ -69,14 +73,14 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleDeleteStock(stock: PortfolioStock) {
+  private fun onDeleteStock(stock: PortfolioStock) {
     PortfolioRemoveDialog.show(
         requireActivity(),
         holding = stock.holding,
     )
   }
 
-  private fun handleRefresh(force: Boolean) {
+  private fun onRefresh(force: Boolean) {
     viewModel
         .requireNotNull()
         .handleRefreshList(
@@ -109,18 +113,39 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       id = R.id.screen_portfolio
 
       setContent {
+        val handleRefresh by rememberUpdatedState { onRefresh(true) }
+
+        val handleOpenManageDialog by rememberUpdatedState { stock: PortfolioStock ->
+          onOpenManageDialog(stock)
+        }
+
+        val handleDeleteStock by rememberUpdatedState { stock: PortfolioStock ->
+          onDeleteStock(stock)
+        }
+
+        val handleSearchChanged by rememberUpdatedState { search: String ->
+          vm.handleSearch(search)
+        }
+
+        val handleTabChanged by rememberUpdatedState { tab: EquityType ->
+          vm.handleSectionChanged(tab)
+        }
+
+        val handleRegenerateList by
+            rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
+
         act.TickerTapeTheme(themeProvider) {
           PortfolioScreen(
               modifier = Modifier.fillMaxSize(),
               state = vm.state(),
               imageLoader = loader,
               navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onRefresh = { handleRefresh(true) },
-              onSelect = { handleOpenManageDialog(it) },
-              onDelete = { handleDeleteStock(it) },
-              onSearchChanged = { vm.handleSearch(it) },
-              onTabUpdated = { vm.handleSectionChanged(it) },
-              onRegenerateList = { vm.handleRegenerateList(this) },
+              onRefresh = handleRefresh,
+              onSelect = handleOpenManageDialog,
+              onDelete = handleDeleteStock,
+              onSearchChanged = handleSearchChanged,
+              onTabUpdated = handleTabChanged,
+              onRegenerateList = handleRegenerateList,
           )
         }
       }
@@ -141,7 +166,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   override fun onStart() {
     super.onStart()
-    handleRefresh(force = false)
+    onRefresh(force = false)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

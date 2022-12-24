@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -38,10 +40,13 @@ import com.pyamsoft.pydroid.ui.util.dispose
 import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
+import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
@@ -56,7 +61,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  private fun handleOptionsExpirationDateChanged(date: LocalDate) {
+  private fun onOptionsExpirationDateChanged(date: LocalDate) {
     viewModel
         .requireNotNull()
         .handleOptionsExpirationDateChanged(
@@ -65,7 +70,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRecommendationSelected(ticker: Ticker) {
+  private fun onRecommendationSelected(ticker: Ticker) {
     val quote = ticker.quote
 
     navigator
@@ -103,7 +108,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         .let { EquityType.valueOf(it) }
   }
 
-  private fun handleModifyWatchlist() {
+  private fun onModifyWatchlist() {
     viewModel
         .requireNotNull()
         .handleModifyWatchlist(
@@ -111,7 +116,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRangeSelected(range: StockChart.IntervalRange) {
+  private fun onRangeSelected(range: StockChart.IntervalRange) {
     viewModel
         .requireNotNull()
         .handleChartRangeSelected(
@@ -120,7 +125,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleTabUpdated(section: WatchlistDigSections) {
+  private fun onTabUpdated(section: WatchlistDigSections) {
     viewModel
         .requireNotNull()
         .handleTabUpdated(
@@ -129,7 +134,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
         )
   }
 
-  private fun handleRefresh(force: Boolean) {
+  private fun onRefresh(force: Boolean) {
     viewModel
         .requireNotNull()
         .handleLoadTicker(
@@ -162,36 +167,73 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       id = R.id.dialog_watchlist_dig
 
       setContent {
+        val handleBack by rememberUpdatedState { act.onBackPressedDispatcher.onBackPressed() }
+
+        val handleRefresh by rememberUpdatedState { onRefresh(true) }
+
+        val handleChartScrubbed by rememberUpdatedState { data: ChartData ->
+          vm.handleChartDateScrubbed(data)
+        }
+
+        val handleChartRangeSelected by rememberUpdatedState { range: StockChart.IntervalRange ->
+          onRangeSelected(range)
+        }
+
+        val handleTabChanged by rememberUpdatedState { tab: WatchlistDigSections ->
+          onTabUpdated(tab)
+        }
+
+        val handleUpdateWatchlist by rememberUpdatedState { onModifyWatchlist() }
+
+        val handleRecommendSelected by rememberUpdatedState { ticker: Ticker ->
+          onRecommendationSelected(ticker)
+        }
+
+        val handleOptionSectionChanged by rememberUpdatedState { section: StockOptions.Contract.Type
+          ->
+          vm.handleOptionsSectionChanged(section)
+        }
+
+        val handleOptionsDateChanged by rememberUpdatedState { date: LocalDate ->
+          onOptionsExpirationDateChanged(date)
+        }
+
+        val handleAddPriceAlert by rememberUpdatedState {
+          // TODO Price alerts
+          Timber.d("ADD PRICE ALERT!")
+        }
+
+        val handleDeletePriceAlert by rememberUpdatedState { alert: PriceAlert ->
+          // TODO Price alerts
+          Timber.d("DELETE PRICE ALERT: $alert")
+        }
+
+        val handleUpdatePriceAlert by rememberUpdatedState { alert: PriceAlert ->
+          // TODO Price alerts
+          Timber.d("UPDATE PRICE ALERT: $alert")
+        }
+
         act.TickerTapeTheme(themeProvider) {
           BackHandler(
-              onBack = { navi.goBack() },
+              onBack = handleBack,
           )
 
           WatchlistDigScreen(
               modifier = Modifier.fillMaxWidth(),
               state = vm.state(),
               imageLoader = loader,
-              onClose = { act.onBackPressedDispatcher.onBackPressed() },
-              onChartScrub = { vm.handleChartDateScrubbed(it) },
-              onChartRangeSelected = { handleRangeSelected(it) },
-              onModifyWatchlist = { handleModifyWatchlist() },
-              onRefresh = { handleRefresh(true) },
-              onTabUpdated = { handleTabUpdated(it) },
-              onRecClick = { handleRecommendationSelected(it) },
-              onOptionSectionChanged = { vm.handleOptionsSectionChanged(it) },
-              onOptionExpirationDateChanged = { handleOptionsExpirationDateChanged(it) },
-              onAddPriceAlert = {
-                // TODO Price alerts
-                Timber.d("ADD PRICE ALERT!")
-              },
-              onUpdatePriceAlert = {
-                // TODO Price alerts
-                Timber.d("UPDATE PRICE ALERT: $it")
-              },
-              onDeletePriceAlert = {
-                // TODO Price alerts
-                Timber.d("DELETE PRICE ALERT: $it")
-              },
+              onClose = handleBack,
+              onChartScrub = handleChartScrubbed,
+              onChartRangeSelected = handleChartRangeSelected,
+              onModifyWatchlist = handleUpdateWatchlist,
+              onRefresh = handleRefresh,
+              onTabUpdated = handleTabChanged,
+              onRecClick = handleRecommendSelected,
+              onOptionSectionChanged = handleOptionSectionChanged,
+              onOptionExpirationDateChanged = handleOptionsDateChanged,
+              onAddPriceAlert = handleAddPriceAlert,
+              onUpdatePriceAlert = handleUpdatePriceAlert,
+              onDeletePriceAlert = handleDeletePriceAlert,
           )
         }
       }
@@ -204,7 +246,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   ) {
     super.onViewCreated(view, savedInstanceState)
     viewModel.requireNotNull().restoreState(savedInstanceState)
-    handleRefresh(force = false)
+    onRefresh(force = false)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

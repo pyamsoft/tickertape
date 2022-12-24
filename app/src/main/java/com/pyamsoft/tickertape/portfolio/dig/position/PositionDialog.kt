@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -89,7 +91,7 @@ internal class PositionDialog : AppCompatDialogFragment() {
         .let { EquityType.valueOf(it) }
   }
 
-  private fun handleSubmit() {
+  private fun onSubmit() {
     viewModel
         .requireNotNull()
         .handleSubmit(
@@ -98,7 +100,7 @@ internal class PositionDialog : AppCompatDialogFragment() {
         )
   }
 
-  private fun handleDateOfPurchaseClicked(
+  private fun onDateOfPurchaseClicked(
       positionId: DbPosition.Id,
       date: LocalDate?,
   ) {
@@ -136,21 +138,35 @@ internal class PositionDialog : AppCompatDialogFragment() {
         val state = vm.state()
         val symbol = remember { getSymbol() }
 
+        val handleDismiss by rememberUpdatedState { dismiss() }
+
+        val handleSubmit by rememberUpdatedState { onSubmit() }
+
+        val handlePriceChanged by rememberUpdatedState { price: String ->
+          vm.handlePriceChanged(price)
+        }
+
+        val handleNumberChanged by rememberUpdatedState { number: String ->
+          vm.handleNumberChanged(number)
+        }
+
+        val handleDateOfPurchaseClicked by rememberUpdatedState { date: LocalDate? ->
+          onDateOfPurchaseClicked(
+              positionId = state.positionId,
+              date = date,
+          )
+        }
+
         act.TickerTapeTheme(themeProvider) {
           PositionAddScreen(
               modifier = Modifier.fillMaxWidth(),
               state = state,
               symbol = symbol,
-              onPriceChanged = { vm.handlePriceChanged(it) },
-              onNumberChanged = { vm.handleNumberChanged(it) },
-              onSubmit = { handleSubmit() },
-              onClose = { dismiss() },
-              onDateOfPurchaseClicked = { date ->
-                handleDateOfPurchaseClicked(
-                    positionId = state.positionId,
-                    date = date,
-                )
-              },
+              onPriceChanged = handlePriceChanged,
+              onNumberChanged = handleNumberChanged,
+              onSubmit = handleSubmit,
+              onClose = handleDismiss,
+              onDateOfPurchaseClicked = handleDateOfPurchaseClicked,
           )
         }
       }

@@ -63,10 +63,7 @@ import com.pyamsoft.tickertape.ui.icon.PieChart
 internal fun MainBottomNav(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
-    onLoadHome: () -> Unit,
-    onLoadWatchlist: () -> Unit,
-    onLoadPortfolio: () -> Unit,
-    onLoadNotifications: () -> Unit,
+    onLoadPage: (TopLevelMainPage) -> Unit,
     onHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
@@ -145,22 +142,22 @@ internal fun MainBottomNav(
               Item(
                   current = page,
                   target = TopLevelMainPage.Home,
-                  onLoadPage = onLoadHome,
+                  onLoadPage = onLoadPage,
               )
               Item(
                   current = page,
                   target = TopLevelMainPage.Watchlist,
-                  onLoadPage = onLoadWatchlist,
+                  onLoadPage = onLoadPage,
               )
               Item(
                   current = page,
                   target = TopLevelMainPage.Portfolio,
-                  onLoadPage = onLoadPortfolio,
+                  onLoadPage = onLoadPage,
               )
               Item(
                   current = page,
                   target = TopLevelMainPage.Notifications,
-                  onLoadPage = onLoadNotifications,
+                  onLoadPage = onLoadPage,
               )
             }
 
@@ -229,7 +226,7 @@ private fun RowScope.Item(
     modifier: Modifier = Modifier,
     current: TopLevelMainPage,
     target: TopLevelMainPage,
-    onLoadPage: () -> Unit,
+    onLoadPage: (TopLevelMainPage) -> Unit,
 ) {
   val currentColor = LocalContentColor.current
 
@@ -248,7 +245,7 @@ private fun RowScope.Item(
   BottomNavigationItem(
       modifier = modifier,
       selected = isSelected,
-      onClick = onLoadPage,
+      onClick = { onLoadPage(target) },
       selectedContentColor =
           MaterialTheme.colors.primary.copy(
               alpha = ContentAlpha.high,
@@ -270,10 +267,7 @@ private fun PreviewMainBottomNav() {
   MainBottomNav(
       page = TopLevelMainPage.Home,
       onHeightMeasured = {},
-      onLoadHome = {},
-      onLoadWatchlist = {},
-      onLoadPortfolio = {},
-      onLoadNotifications = {},
+      onLoadPage = {},
       onActionSelected = {},
   )
 }

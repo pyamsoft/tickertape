@@ -6,8 +6,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.widget.BillingUpsellWidget
 import com.pyamsoft.pydroid.ui.widget.NewVersionWidget
-import com.pyamsoft.pydroid.ui.widget.ShowBillingUpsellWidget
 import com.pyamsoft.pydroid.ui.widget.ShowChangeLogWidget
 import com.pyamsoft.pydroid.ui.widget.UpdateProgressWidget
 
@@ -40,7 +40,7 @@ fun LazyListScope.renderPYDroidExtras() {
   }
 
   item {
-    ShowBillingUpsellWidget(
+    BillingUpsellWidget(
         modifier =
             Modifier.fillMaxWidth()
                 .padding(horizontal = MaterialTheme.keylines.content)

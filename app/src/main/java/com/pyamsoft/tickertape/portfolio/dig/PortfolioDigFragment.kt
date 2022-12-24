@@ -32,8 +32,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
-import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.pydroid.ui.util.dispose
@@ -67,7 +67,7 @@ import javax.inject.Inject
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
-  @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
+  @JvmField @Inject internal var navigator: BackstackNavigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
@@ -245,12 +245,15 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
 
     val vm = viewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
+    val navi = navigator.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
       id = R.id.dialog_portfolio_dig
 
       setContent {
+        val handleGoBack by rememberUpdatedState { navi.goBack() }
+
         val handleBack by rememberUpdatedState { act.onBackPressedDispatcher.onBackPressed() }
 
         val handleRefresh by rememberUpdatedState { onRefresh(true) }
@@ -313,7 +316,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
 
         act.TickerTapeTheme(themeProvider) {
           BackHandler(
-              onBack = handleBack,
+              onBack = handleGoBack,
           )
 
           PortfolioDigScreen(

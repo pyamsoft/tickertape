@@ -167,6 +167,8 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
       id = R.id.dialog_watchlist_dig
 
       setContent {
+        val handleGoBack by rememberUpdatedState { navi.goBack() }
+
         val handleBack by rememberUpdatedState { act.onBackPressedDispatcher.onBackPressed() }
 
         val handleRefresh by rememberUpdatedState { onRefresh(true) }
@@ -215,7 +217,7 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
 
         act.TickerTapeTheme(themeProvider) {
           BackHandler(
-              onBack = handleBack,
+              onBack = handleGoBack,
           )
 
           WatchlistDigScreen(

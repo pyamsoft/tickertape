@@ -17,18 +17,17 @@
 package com.pyamsoft.tickertape.quote.chart
 
 import androidx.annotation.CheckResult
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -299,22 +298,17 @@ internal fun LineChart(
     chart: StockChart,
     onScrub: ((ChartData) -> Unit)? = null,
 ) {
-  val chartLines = rememberChartLines(chart)
+  val lines = rememberChartLines(chart)
 
-  Crossfade(
+  val decorations = rememberLineDecorations(chart)
+
+  AnimatedVisibility(
       modifier = modifier,
-      targetState = chartLines,
-  ) { lines ->
-    if (lines == null) {
-      Box(
-          modifier = Modifier.fillMaxSize().padding(MaterialTheme.keylines.content),
-          contentAlignment = Alignment.Center,
-      ) {
-        CircularProgressIndicator()
-      }
-    } else {
-      val decorations = rememberLineDecorations(chart)
-
+      visible = lines != null,
+      enter = fadeIn(),
+      exit = fadeOut(),
+  ) {
+    if (lines != null) {
       val axisValuesOverrider =
           remember(
               lines.models,
@@ -334,7 +328,7 @@ internal fun LineChart(
           }
 
       Chart(
-          modifier = Modifier.fillMaxSize(),
+          modifier = Modifier.fillMaxSize().padding(start = MaterialTheme.keylines.baseline),
           isZoomEnabled = false,
           chart =
               lineChart(

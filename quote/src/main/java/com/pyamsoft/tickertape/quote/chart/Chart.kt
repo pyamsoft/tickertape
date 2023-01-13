@@ -53,7 +53,7 @@ fun Chart(
       modifier = modifier,
   ) {
     LineChart(
-        modifier = Modifier.matchParentSize().padding(start = MaterialTheme.keylines.baseline),
+        modifier = Modifier.matchParentSize(),
         chart = chart,
         onScrub = onScrub,
     )

@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -251,8 +253,8 @@ private fun HomeCharts(
           )
 
           Loading(
-              isLoading = isLoading,
               modifier = Modifier.matchParentSize(),
+              isLoading = isLoading,
           )
         }
       }
@@ -268,14 +270,17 @@ private fun HomeCharts(
 
 @Composable
 private fun Loading(
-    isLoading: Boolean,
     modifier: Modifier = Modifier,
+    isLoading: Boolean,
 ) {
   AnimatedVisibility(
+      modifier = modifier,
       visible = isLoading,
+      enter = fadeIn(),
+      exit = fadeOut(),
   ) {
     Box(
-        modifier = modifier.padding(MaterialTheme.keylines.content),
+        modifier = Modifier.padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) {
       CircularProgressIndicator()

@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,20 +12,27 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.YFJumpLink
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -42,9 +50,33 @@ private val HIDE_TABS_FOR_CRYPTO =
     )
 
 @Composable
+@CheckResult
+internal fun rememberTabs(ticker: Ticker): List<WatchlistDigSections> {
+  val equityType = ticker.quote?.type
+
+  // Hide tabs in options
+  return remember(equityType) {
+    WatchlistDigSections.values().filter { v ->
+      if (equityType == null) {
+        return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+      } else {
+        return@filter when (equityType) {
+          EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+          EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+          else -> true
+        }
+      }
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalPagerApi::class)
 internal fun WatchlistDigToolbar(
     modifier: Modifier = Modifier,
     state: WatchlistDigViewState,
+    pagerState: PagerState,
+    allTabs: List<WatchlistDigSections>,
     onClose: () -> Unit,
     onModifyWatchlist: () -> Unit,
     onTabUpdated: (WatchlistDigSections) -> Unit,
@@ -56,24 +88,6 @@ internal fun WatchlistDigToolbar(
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
   val isInWatchlistError = state.isInWatchlistError
   val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
-
-  // Hide tabs in options
-  val equityType = ticker.quote?.type
-  val allTabs =
-      remember(equityType) {
-        WatchlistDigSections.values().filter { v ->
-          if (equityType == null) {
-            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-          } else {
-            return@filter when (equityType) {
-              EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-              EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-              else -> true
-            }
-          }
-        }
-      }
-  val selectedTab = remember(section, allTabs) { allTabs.indexOf(section) }
 
   Surface(
       modifier = modifier,
@@ -127,7 +141,12 @@ internal fun WatchlistDigToolbar(
 
       ScrollableTabRow(
           backgroundColor = Color.Transparent,
-          selectedTabIndex = selectedTab,
+          selectedTabIndex = pagerState.currentPage,
+          indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+            )
+          },
       ) {
         // If we use forEach here, compose compiler gives a ClassCastException
         for (tab in allTabs) {
@@ -167,13 +186,17 @@ private fun WatchlistTab(
 
 @Preview
 @Composable
+@OptIn(ExperimentalPagerApi::class)
 private fun PreviewWatchlistDigToolbar() {
   val symbol = "MSFT".asSymbol()
+  val state =
+      MutableWatchlistDigViewState(
+          symbol = symbol,
+      )
   WatchlistDigToolbar(
-      state =
-          MutableWatchlistDigViewState(
-              symbol = symbol,
-          ),
+      state = state,
+      pagerState = rememberPagerState(),
+      allTabs = rememberTabs(state.ticker),
       onClose = {},
       onModifyWatchlist = {},
       onTabUpdated = {},

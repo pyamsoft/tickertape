@@ -96,5 +96,9 @@ dependencies {
   // PYDroid
   api "com.github.pyamsoft.pydroid:ui:$pydroid"
 
+  // Accompanist Pager
+  api "com.google.accompanist:accompanist-pager:$accompanist"
+  api "com.google.accompanist:accompanist-pager-indicators:$accompanist"
+
   api project(':core')
 }

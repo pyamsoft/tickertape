@@ -35,10 +35,10 @@ import com.pyamsoft.tickertape.alert.initOnAppStart
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.receiver.BootReceiver
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -155,6 +155,18 @@ class TickerTape : Application() {
             "Vico",
             "https://github.com/patrykandpatryk/vico",
             "A light and extensible chart library for Android.",
+        )
+
+        add(
+            "Accompanist System UI Controller",
+            "https://google.github.io/accompanist/systemuicontroller/",
+            "System UI Controller provides easy-to-use utilities for updating the System UI bar colors within Jetpack Compose.",
+        )
+
+        add(
+            "Accompanist Pager",
+            "https://google.github.io/accompanist/pager/",
+            "A library which provides paging layouts for Jetpack Compose.",
         )
       }
     }

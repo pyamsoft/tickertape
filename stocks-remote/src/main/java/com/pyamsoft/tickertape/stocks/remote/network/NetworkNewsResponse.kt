@@ -76,9 +76,9 @@ internal constructor() {
 
     /** This needs to be a var because SimpleXML is weird yo */
     @get:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
-    @get:Element(name = "creator")
+    @get:Element(name = "creator", required = false)
     @set:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
-    @set:Element(name = "creator")
+    @set:Element(name = "creator", required = false)
     internal var articleCreator: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */

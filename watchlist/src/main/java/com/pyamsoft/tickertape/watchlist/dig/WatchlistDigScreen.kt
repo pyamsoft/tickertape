@@ -75,7 +75,7 @@ fun WatchlistDigScreen(
   val handleTabUpdated = rememberUpdatedState(onTabUpdated)
   LaunchedEffect(pagerState, allTabs, handleTabUpdated) {
     snapshotFlow { pagerState.currentPage }
-        .collectLatest { page -> handleTabUpdated.value.invoke(allTabs[page]) }
+        .collectLatest { handleTabUpdated.value.invoke(allTabs[it]) }
   }
 
   Surface(

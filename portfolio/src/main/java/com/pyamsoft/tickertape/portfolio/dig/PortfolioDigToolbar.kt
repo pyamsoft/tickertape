@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -22,8 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -41,34 +48,38 @@ private val HIDE_TABS_FOR_CRYPTO =
     )
 
 @Composable
+@CheckResult
+internal fun rememberTabs(holding: DbHolding?): List<PortfolioDigSections> {
+  // Hide tabs in options
+  val equityType = holding?.type
+  return remember(equityType) {
+    PortfolioDigSections.values().filter { v ->
+      if (equityType == null) {
+        return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+      } else {
+        return@filter when (equityType) {
+          EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+          EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+          else -> true
+        }
+      }
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalPagerApi::class)
 internal fun PortfolioDigToolbar(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
+    pagerState: PagerState,
+    allTabs: List<PortfolioDigSections>,
     onClose: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
-  val holding = state.holding
   val ticker = state.ticker
   val section = state.section
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
-
-  // Hide tabs in options
-  val equityType = holding?.type
-  val allTabs =
-      remember(equityType) {
-        PortfolioDigSections.values().filter { v ->
-          if (equityType == null) {
-            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-          } else {
-            return@filter when (equityType) {
-              EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-              EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-              else -> true
-            }
-          }
-        }
-      }
-  val selectedTab = remember(section, allTabs) { allTabs.indexOf(section) }
 
   Surface(
       modifier = modifier,
@@ -110,7 +121,12 @@ internal fun PortfolioDigToolbar(
 
       ScrollableTabRow(
           backgroundColor = Color.Transparent,
-          selectedTabIndex = selectedTab,
+          selectedTabIndex = pagerState.currentPage,
+          indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+            )
+          },
       ) {
         // If we use forEach here, compose compiler gives a ClassCastException
         for (tab in allTabs) {
@@ -147,13 +163,17 @@ private fun PortfolioTab(
 
 @Preview
 @Composable
+@OptIn(ExperimentalPagerApi::class)
 private fun PreviewPortfolioDigToolbar() {
   val symbol = "MSFT".asSymbol()
+  val state =
+      MutablePortfolioDigViewState(
+          symbol = symbol,
+      )
   PortfolioDigToolbar(
-      state =
-          MutablePortfolioDigViewState(
-              symbol = symbol,
-          ),
+      state = state,
+      pagerState = rememberPagerState(),
+      allTabs = rememberTabs(state.holding),
       onClose = {},
       onTabUpdated = {},
   )

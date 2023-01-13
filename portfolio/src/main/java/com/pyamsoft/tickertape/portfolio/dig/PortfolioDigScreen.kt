@@ -10,11 +10,19 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import coil.ImageLoader
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -35,9 +43,10 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDate
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-@JvmOverloads
+@OptIn(ExperimentalPagerApi::class)
 fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
@@ -68,6 +77,16 @@ fun PortfolioDigScreen(
 ) {
   val isLoading = state.isLoading
 
+  val allTabs = rememberTabs(state.holding)
+  val pagerState = rememberPagerState()
+
+  // Watch for a swipe causing a page change and update accordingly
+  val handleTabUpdated = rememberUpdatedState(onTabUpdated)
+  LaunchedEffect(pagerState, allTabs, handleTabUpdated) {
+    snapshotFlow { pagerState.currentPage }
+        .collectLatest { handleTabUpdated.value.invoke(allTabs[it]) }
+  }
+
   Surface(
       modifier = modifier,
       elevation = DialogDefaults.Elevation,
@@ -79,6 +98,8 @@ fun PortfolioDigScreen(
           // Z-Index to place it above the SwipeRefresh indicator
           modifier = Modifier.fillMaxWidth().zIndex(1F),
           state = state,
+          pagerState = pagerState,
+          allTabs = allTabs,
           onClose = onClose,
           onTabUpdated = onTabUpdated,
       )
@@ -96,6 +117,8 @@ fun PortfolioDigScreen(
               modifier = Modifier.fillMaxSize(),
               state = state,
               imageLoader = imageLoader,
+              pagerState = pagerState,
+              allTabs = allTabs,
               onChartScrub = onChartScrub,
               onChartRangeSelected = onChartRangeSelected,
               onRefresh = onRefresh,
@@ -119,10 +142,13 @@ fun PortfolioDigScreen(
 }
 
 @Composable
+@OptIn(ExperimentalPagerApi::class)
 private fun Content(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
+    pagerState: PagerState,
+    allTabs: List<PortfolioDigSections>,
     onRefresh: () -> Unit,
 
     // Chart
@@ -146,13 +172,19 @@ private fun Content(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val section = state.section
-
-  Crossfade(
-      modifier = modifier.fillMaxWidth(),
-      targetState = section,
-  ) { s ->
-    return@Crossfade when (s) {
+  HorizontalPager(
+      modifier = modifier,
+      count = allTabs.size,
+      state = pagerState,
+  ) { page ->
+    val section =
+        remember(
+            page,
+            allTabs,
+        ) {
+          allTabs[page]
+        }
+    when (section) {
       PortfolioDigSections.CHART -> {
         PortfolioChart(
             modifier = Modifier.fillMaxSize(),

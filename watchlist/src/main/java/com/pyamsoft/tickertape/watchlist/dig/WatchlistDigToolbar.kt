@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +37,12 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.StarBorder
 
+private val HIDE_TABS_FOR_INDEXES =
+    arrayOf(
+        WatchlistDigSections.OPTIONS_CHAIN,
+        WatchlistDigSections.STATISTICS,
+    )
+
 private val HIDE_TABS_FOR_OPTIONS =
     arrayOf(
         WatchlistDigSections.OPTIONS_CHAIN,
@@ -52,18 +57,28 @@ private val HIDE_TABS_FOR_CRYPTO =
 @Composable
 @CheckResult
 internal fun rememberTabs(ticker: Ticker): List<WatchlistDigSections> {
+  val symbol = ticker.symbol
   val equityType = ticker.quote?.type
 
   // Hide tabs in options
-  return remember(equityType) {
+  return remember(
+      equityType,
+      symbol,
+  ) {
     WatchlistDigSections.values().filter { v ->
       if (equityType == null) {
+        // Just provide something so that we have a visual placeholder
         return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
       } else {
-        return@filter when (equityType) {
-          EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-          EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-          else -> true
+        val raw = symbol.raw
+        return@filter if (raw.startsWith("^") || raw.contains("=")) {
+          !HIDE_TABS_FOR_INDEXES.contains(v)
+        } else {
+          when (equityType) {
+            EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+            EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+            else -> true
+          }
         }
       }
     }

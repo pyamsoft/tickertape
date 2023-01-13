@@ -77,7 +77,7 @@ fun PortfolioDigScreen(
 ) {
   val isLoading = state.isLoading
 
-  val allTabs = rememberTabs(state.holding)
+  val allTabs = rememberTabs(state.ticker.symbol, state.holding)
   val pagerState = rememberPagerState()
 
   // Watch for a swipe causing a page change and update accordingly

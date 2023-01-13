@@ -33,7 +33,15 @@ import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+
+private val HIDE_TABS_FOR_INDEXES =
+    arrayOf(
+        PortfolioDigSections.OPTIONS_CHAIN,
+        PortfolioDigSections.STATISTICS,
+        PortfolioDigSections.SPLITS,
+    )
 
 private val HIDE_TABS_FOR_OPTIONS =
     arrayOf(
@@ -49,18 +57,27 @@ private val HIDE_TABS_FOR_CRYPTO =
 
 @Composable
 @CheckResult
-internal fun rememberTabs(holding: DbHolding?): List<PortfolioDigSections> {
+internal fun rememberTabs(symbol: StockSymbol, holding: DbHolding?): List<PortfolioDigSections> {
   // Hide tabs in options
   val equityType = holding?.type
-  return remember(equityType) {
+  return remember(
+      equityType,
+      symbol,
+  ) {
     PortfolioDigSections.values().filter { v ->
       if (equityType == null) {
+        // Just provide something so that we have a visual placeholder
         return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
       } else {
-        return@filter when (equityType) {
-          EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-          EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-          else -> true
+        val raw = symbol.raw
+        return@filter if (raw.startsWith("^") || raw.contains("=")) {
+          !HIDE_TABS_FOR_INDEXES.contains(v)
+        } else {
+          when (equityType) {
+            EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+            EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+            else -> true
+          }
         }
       }
     }
@@ -173,7 +190,7 @@ private fun PreviewPortfolioDigToolbar() {
   PortfolioDigToolbar(
       state = state,
       pagerState = rememberPagerState(),
-      allTabs = rememberTabs(state.holding),
+      allTabs = rememberTabs(symbol, state.holding),
       onClose = {},
       onTabUpdated = {},
   )

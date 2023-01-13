@@ -84,11 +84,12 @@ fun PortfolioDigScreen(
       )
 
       Crossfade(
+          modifier = Modifier.fillMaxWidth().weight(1F),
           targetState = isLoading,
       ) { loading ->
         if (loading) {
           Loading(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxSize(),
           )
         } else {
           Content(

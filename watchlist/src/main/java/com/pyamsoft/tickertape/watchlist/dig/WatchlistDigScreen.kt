@@ -76,16 +76,16 @@ fun WatchlistDigScreen(
       )
 
       Crossfade(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().weight(1F),
           targetState = isLoading,
       ) { loading ->
         if (loading) {
           Loading(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxSize(),
           )
         } else {
           Content(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxSize(),
               state = state,
               imageLoader = imageLoader,
               onChartScrub = onChartScrub,

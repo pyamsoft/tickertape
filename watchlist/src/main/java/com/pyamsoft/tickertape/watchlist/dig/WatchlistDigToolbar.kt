@@ -33,6 +33,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.YFJumpLink
+import com.pyamsoft.tickertape.quote.isIndex
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.icon.StarBorder
@@ -70,8 +71,7 @@ internal fun rememberTabs(ticker: Ticker): List<WatchlistDigSections> {
         // Just provide something so that we have a visual placeholder
         return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
       } else {
-        val raw = symbol.raw
-        return@filter if (raw.startsWith("^") || raw.contains("=")) {
+        return@filter if (symbol.isIndex()) {
           !HIDE_TABS_FOR_INDEXES.contains(v)
         } else {
           when (equityType) {

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -54,4 +55,11 @@ data class Ticker(
           return@Comparator s2.percent.compareTo(s1.percent)
         }
   }
+}
+
+
+@CheckResult
+fun StockSymbol.isIndex(): Boolean {
+    val raw = this.raw
+    return raw.contains("=") || raw.startsWith("^")
 }

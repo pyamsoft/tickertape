@@ -32,6 +32,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
+import com.pyamsoft.tickertape.quote.isIndex
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -69,8 +70,7 @@ internal fun rememberTabs(symbol: StockSymbol, holding: DbHolding?): List<Portfo
         // Just provide something so that we have a visual placeholder
         return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
       } else {
-        val raw = symbol.raw
-        return@filter if (raw.startsWith("^") || raw.contains("=")) {
+        return@filter if (symbol.isIndex()) {
           !HIDE_TABS_FOR_INDEXES.contains(v)
         } else {
           when (equityType) {

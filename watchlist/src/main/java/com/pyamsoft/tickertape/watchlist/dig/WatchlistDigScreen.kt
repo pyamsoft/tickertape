@@ -13,7 +13,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +40,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDate
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 @JvmOverloads
@@ -72,10 +72,12 @@ fun WatchlistDigScreen(
   val pagerState = rememberPagerState()
 
   // Watch for a swipe causing a page change and update accordingly
-  val handleTabUpdated = rememberUpdatedState(onTabUpdated)
-  LaunchedEffect(pagerState, allTabs, handleTabUpdated) {
+  LaunchedEffect(pagerState, allTabs,) {
     snapshotFlow { pagerState.currentPage }
-        .collectLatest { handleTabUpdated.value.invoke(allTabs[it]) }
+        .collectLatest { index ->
+          val page = allTabs[index]
+          Timber.d("Page updated: $page")
+        }
   }
 
   Surface(

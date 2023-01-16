@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -36,6 +37,8 @@ import com.pyamsoft.tickertape.quote.isIndex
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private val HIDE_TABS_FOR_INDEXES =
     arrayOf(
@@ -136,21 +139,36 @@ internal fun PortfolioDigToolbar(
           },
       )
 
+      val currentPage = pagerState.currentPage
       ScrollableTabRow(
           backgroundColor = Color.Transparent,
-          selectedTabIndex = pagerState.currentPage,
+          selectedTabIndex = currentPage,
           indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
             )
           },
       ) {
-        // If we use forEach here, compose compiler gives a ClassCastException
-        for (tab in allTabs) {
+        val scope = rememberCoroutineScope()
+        for (index in allTabs.indices) {
+          val tab = allTabs[index]
+          val isSelected =
+              remember(
+                  index,
+                  currentPage,
+              ) {
+                index == currentPage
+              }
+
           PortfolioTab(
-              current = section,
               tab = tab,
-              onTabUpdated = onTabUpdated,
+              isSelected = isSelected,
+              onSelected = {
+                // Click fires the index to update
+                // The index updating is caught by the snapshot flow
+                // Which then triggers the page update function
+                scope.launch(context = Dispatchers.Main) { pagerState.animateScrollToPage(index) }
+              },
           )
         }
       }
@@ -160,14 +178,15 @@ internal fun PortfolioDigToolbar(
 
 @Composable
 private fun PortfolioTab(
+    modifier: Modifier = Modifier,
     tab: PortfolioDigSections,
-    current: PortfolioDigSections,
-    onTabUpdated: (PortfolioDigSections) -> Unit,
+    isSelected: Boolean,
+    onSelected: () -> Unit,
 ) {
-  val isSelected = remember(tab, current) { tab == current }
   Tab(
+      modifier = modifier,
       selected = isSelected,
-      onClick = { onTabUpdated(tab) },
+      onClick = onSelected,
   ) {
     Text(
         modifier =

@@ -16,35 +16,42 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface PortfolioViewState : UiViewState {
-  val query: String
-  val section: EquityType
-  val isLoading: Boolean
-  val portfolio: PortfolioStockList
-  val stocks: List<PortfolioStock>
-  val error: Throwable?
+  val query: StateFlow<String>
+  val section: StateFlow<EquityType>
+  val loadingState: StateFlow<LoadingState>
+  val portfolio: StateFlow<PortfolioStockList>
+  val stocks: StateFlow<List<PortfolioStock>>
+  val error: StateFlow<Throwable?>
+
+  @Stable
+  @Immutable
+  enum class LoadingState {
+    NONE,
+    LOADING,
+    DONE
+  }
 }
 
 @Stable
 @ActivityScope
-internal class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
-  override var query by mutableStateOf("")
-  override var section by mutableStateOf(EquityType.STOCK)
-  override var isLoading by mutableStateOf(false)
-  override var portfolio by mutableStateOf(PortfolioStockList.empty())
-  override var stocks by mutableStateOf(emptyList<PortfolioStock>())
-  override var error by mutableStateOf<Throwable?>(null)
-
-  // Used by PortfolioViewModeler
-  internal var fullPortfolio by mutableStateOf(emptyList<PortfolioStock>())
+class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
+  override val query = MutableStateFlow("")
+  override val section = MutableStateFlow(EquityType.STOCK)
+  override val loadingState = MutableStateFlow(PortfolioViewState.LoadingState.NONE)
+  override val portfolio = MutableStateFlow(PortfolioStockList.empty())
+  override val stocks = MutableStateFlow(emptyList<PortfolioStock>())
+  override val error = MutableStateFlow<Throwable?>(null)
 }

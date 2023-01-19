@@ -29,8 +29,8 @@ internal fun PortfolioChart(
   )
 }
 
-@Composable
 @Preview
+@Composable
 private fun PreviewPortfolioChart() {
   Surface {
     PortfolioChart(

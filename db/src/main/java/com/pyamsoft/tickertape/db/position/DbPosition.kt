@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.db.position
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.core.isLongTermPurchase
 import com.pyamsoft.tickertape.core.isShortTermPurchase
 import com.pyamsoft.tickertape.db.IdType
@@ -28,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
 import java.time.LocalDate
 
+@Stable
 interface DbPosition {
 
   @get:CheckResult val id: Id
@@ -46,7 +48,10 @@ interface DbPosition {
 
   @CheckResult fun purchaseDate(purchaseDate: LocalDate): DbPosition
 
-  data class Id(override val raw: String) : IdType {
+  @Stable
+  data class Id(
+      override val raw: String,
+  ) : IdType {
 
     override val isEmpty: Boolean = raw.isBlank()
 

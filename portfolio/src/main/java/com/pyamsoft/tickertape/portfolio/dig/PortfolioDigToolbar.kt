@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -18,8 +17,12 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -61,29 +64,34 @@ private val HIDE_TABS_FOR_CRYPTO =
 
 @Composable
 @CheckResult
-internal fun rememberTabs(symbol: StockSymbol, holding: DbHolding?): List<PortfolioDigSections> {
+internal fun rememberTabs(
+    symbol: StockSymbol,
+    holding: DbHolding?
+): SnapshotStateList<PortfolioDigSections> {
   // Hide tabs in options
   val equityType = holding?.type
   return remember(
       equityType,
       symbol,
   ) {
-    PortfolioDigSections.values().filter { v ->
-      if (equityType == null) {
-        // Just provide something so that we have a visual placeholder
-        return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-      } else {
-        return@filter if (symbol.isIndex()) {
-          !HIDE_TABS_FOR_INDEXES.contains(v)
-        } else {
-          when (equityType) {
-            EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-            EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-            else -> true
+    PortfolioDigSections.values()
+        .filter { v ->
+          if (equityType == null) {
+            // Just provide something so that we have a visual placeholder
+            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+          } else {
+            return@filter if (symbol.isIndex()) {
+              !HIDE_TABS_FOR_INDEXES.contains(v)
+            } else {
+              when (equityType) {
+                EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+                EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+                else -> true
+              }
+            }
           }
         }
-      }
-    }
+        .toMutableStateList()
   }
 }
 
@@ -93,17 +101,16 @@ internal fun PortfolioDigToolbar(
     modifier: Modifier = Modifier,
     state: PortfolioDigViewState,
     pagerState: PagerState,
-    allTabs: List<PortfolioDigSections>,
+    allTabs: SnapshotStateList<PortfolioDigSections>,
     onClose: () -> Unit,
-    onTabUpdated: (PortfolioDigSections) -> Unit,
 ) {
-  val ticker = state.ticker
-  val section = state.section
+  val ticker by state.ticker.collectAsState()
+
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
 
   Surface(
       modifier = modifier,
-      elevation = AppBarDefaults.TopAppBarElevation,
+      elevation = ZeroElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
       shape = RectangleShape,
@@ -134,7 +141,7 @@ internal fun PortfolioDigToolbar(
           },
           actions = {
             YFJumpLink(
-                symbol = state.ticker.symbol,
+                symbol = ticker.symbol,
             )
           },
       )
@@ -206,11 +213,12 @@ private fun PreviewPortfolioDigToolbar() {
       MutablePortfolioDigViewState(
           symbol = symbol,
       )
+  val holding by state.holding.collectAsState()
+
   PortfolioDigToolbar(
       state = state,
       pagerState = rememberPagerState(),
-      allTabs = rememberTabs(symbol, state.holding),
+      allTabs = rememberTabs(symbol, holding),
       onClose = {},
-      onTabUpdated = {},
   )
 }

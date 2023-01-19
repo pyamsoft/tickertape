@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.PositionsPortfolioDigViewState
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
@@ -25,16 +29,19 @@ internal fun PositionScreen(
     onDeletePosition: (DbPosition) -> Unit,
     onUpdatePosition: (DbPosition) -> Unit,
 ) {
-  val isLoading = state.loadingState
-  val positions = state.positions
-
-  val positionError = state.positionsError
-  val holdingError = state.holdingError
+  val loadingState by state.loadingState.collectAsState()
+  val positionError by state.positionsError.collectAsState()
+  val holdingError by state.holdingError.collectAsState()
+  val positions = state.positions.collectAsStateList()
 
   val isAddVisible =
-      remember(isLoading, positionError, holdingError) {
-        !isLoading && positionError == null && holdingError == null
+      remember(loadingState, positionError, holdingError) {
+        loadingState == BaseDigViewState.LoadingState.DONE &&
+            positionError == null &&
+            holdingError == null
       }
+
+  val isLoading = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   BaseDigListScreen(
       modifier = modifier,

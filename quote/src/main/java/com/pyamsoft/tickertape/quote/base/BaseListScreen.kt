@@ -20,7 +20,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -38,13 +40,12 @@ import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-@JvmOverloads
 fun <T : Any> BaseListScreen(
     modifier: Modifier = Modifier,
     imageLoader: ImageLoader,
     isLoading: Boolean,
     pageError: Throwable?,
-    list: List<T>,
+    list: SnapshotStateList<T>,
     search: String,
     tab: EquityType,
     navBarBottomHeight: Int = 0,
@@ -303,7 +304,7 @@ private fun PreviewBaseListScreen() {
       onTabUpdated = {},
       onRegenerateList = {},
       pageError = null,
-      list = emptyList(),
+      list = remember { mutableStateListOf() },
       tab = EquityType.STOCK,
       isLoading = false,
       renderListItem = {},

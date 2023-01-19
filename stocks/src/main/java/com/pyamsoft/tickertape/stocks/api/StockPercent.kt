@@ -17,12 +17,10 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
 
 @Stable
-@Immutable
 interface StockPercent : StockDoubleValue {
 
   @get:CheckResult val display: String
@@ -42,8 +40,9 @@ interface StockPercent : StockDoubleValue {
 
 /**
  * Treat double as percent
+ *
  * @param isPercentageOutOfHundred If this percentage is out of 100, like 1.5% being 1.53 instead of
- * 0.0153, divide by 100
+ *   0.0153, divide by 100
  */
 @CheckResult
 fun Double.asPercent(isPercentageOutOfHundred: Boolean = true): StockPercent {

@@ -49,9 +49,9 @@ import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class SplitDialog : AppCompatDialogFragment() {
 
@@ -125,40 +125,42 @@ internal class SplitDialog : AppCompatDialogFragment() {
       id = R.id.dialog_position_add
 
       setContent {
-          val symbol = remember { getSymbol() }
-          val state = vm.state
+        val symbol = remember { getSymbol() }
+        val state = vm.state
 
-          val handleDismiss by rememberUpdatedState { dismiss() }
+        val handleDismiss by rememberUpdatedState { dismiss() }
 
-          val handleSubmit by rememberUpdatedState { onSubmit() }
+        val handleSubmit by rememberUpdatedState { onSubmit() }
 
-          val handlePreCountChanged by rememberUpdatedState { number: String ->
-              vm.handlePreSplitShareCountChanged(number)
+        val handlePreCountChanged by rememberUpdatedState { number: String ->
+          vm.handlePreSplitShareCountChanged(number)
+        }
+
+        val handlePostCountChanged by rememberUpdatedState { number: String ->
+          vm.handlePostSplitShareCountChanged(number)
+        }
+
+        val handleSplitDateClicked by rememberUpdatedState { date: LocalDate? ->
+          vm.handleOpenDateDialog { splitId ->
+            onSplitDateClicked(
+                splitId = splitId,
+                date = date,
+            )
           }
+        }
 
-          val handlePostCountChanged by rememberUpdatedState { number: String ->
-              vm.handlePostSplitShareCountChanged(number)
-          }
-
-          val handleSplitDateClicked by rememberUpdatedState { date: LocalDate? ->
-              onSplitDateClicked(
-                  splitId = state.splitId,
-                  date = date,
-              )
-          }
-
-          act.TickerTapeTheme(themeProvider) {
-              SplitAddScreen(
-                  modifier = Modifier.fillMaxWidth(),
-                  state = state,
-                  symbol = symbol,
-                  onPreSplitCountChanged = handlePreCountChanged,
-                  onPostSplitCountChanged = handlePostCountChanged,
-                  onSubmit = handleSubmit,
-                  onClose = handleDismiss,
-                  onSplitDateClicked = handleSplitDateClicked,
-              )
-          }
+        act.TickerTapeTheme(themeProvider) {
+          SplitAddScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              symbol = symbol,
+              onPreSplitCountChanged = handlePreCountChanged,
+              onPostSplitCountChanged = handlePostCountChanged,
+              onSubmit = handleSubmit,
+              onClose = handleDismiss,
+              onSplitDateClicked = handleSplitDateClicked,
+          )
+        }
       }
     }
   }

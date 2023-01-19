@@ -2,7 +2,6 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -12,25 +11,27 @@ import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface BasePortfolioDigViewState : BaseDigViewState {
-  val section: PortfolioDigSections
+  val section: StateFlow<PortfolioDigSections>
 
-  val holding: DbHolding?
-  val holdingError: Throwable?
+  val holding: StateFlow<DbHolding?>
+  val holdingError: StateFlow<Throwable?>
 }
 
 @Stable
 interface PositionsPortfolioDigViewState : BasePortfolioDigViewState {
-  val positions: List<PositionStock>
-  val positionsError: Throwable?
+  val positions: StateFlow<List<PositionStock>>
+  val positionsError: StateFlow<Throwable?>
 }
 
 @Stable
 interface SplitsPortfolioDigViewState : BasePortfolioDigViewState {
-  val stockSplits: List<DbSplit>
-  val stockSplitError: Throwable?
+  val stockSplits: StateFlow<List<DbSplit>>
+  val stockSplitError: StateFlow<Throwable?>
 }
 
 @Stable
@@ -44,29 +45,35 @@ class MutablePortfolioDigViewState
 internal constructor(
     symbol: StockSymbol,
 ) : MutableDigViewState(symbol), PortfolioDigViewState {
-  override var section by mutableStateOf(PortfolioDigSections.POSITIONS)
+  override val section = MutableStateFlow(PortfolioDigSections.POSITIONS)
 
-  override var stockSplitError by mutableStateOf<Throwable?>(null)
-  override var stockSplits by mutableStateOf(emptyList<DbSplit>())
-    private set
+  override val stockSplitError = MutableStateFlow<Throwable?>(null)
+  override val stockSplits: StateFlow<List<DbSplit>>
 
-  override var holding by mutableStateOf<DbHolding?>(null)
-  override var holdingError by mutableStateOf<Throwable?>(null)
+  override val holding = MutableStateFlow<DbHolding?>(null)
+  override val holdingError = MutableStateFlow<Throwable?>(null)
 
-  override var positionsError by mutableStateOf<Throwable?>(null)
-  override var positions by mutableStateOf(emptyList<PositionStock>())
-    private set
+  override val positionsError = MutableStateFlow<Throwable?>(null)
+  override val positions: StateFlow<List<PositionStock>>
+
+  private val realPositions = MutableStateFlow(emptyList<PositionStock>())
+  private val realSplit = MutableStateFlow(emptyList<DbSplit>())
+
+  init {
+    positions = realPositions
+    stockSplits = realSplit
+  }
 
   /**
    * This function ensures along with private setters, that positions and splits are always updated
    * together to be consistent
    */
   internal fun handlePositionListRegenOnSplitsUpdated(
-      positions: List<PositionStock> = this.positions,
-      splits: List<DbSplit> = this.stockSplits,
+      positions: List<PositionStock> = this.positions.value,
+      splits: List<DbSplit> = this.stockSplits.value,
   ) {
     val self = this
-    self.stockSplits = splits
-    self.positions = positions.map { it.copy(splits = splits) }
+    self.realSplit.value = splits
+    self.realPositions.value = positions.map { it.copy(splits = splits) }
   }
 }

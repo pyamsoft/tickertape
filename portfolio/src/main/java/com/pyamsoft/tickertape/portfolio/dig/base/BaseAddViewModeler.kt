@@ -29,9 +29,9 @@ import timber.log.Timber
 
 abstract class BaseAddViewModeler<S : UiViewState, Id : IdType>
 protected constructor(
+    override val state: S,
     private val datePickerEventBus: EventConsumer<DateSelectedEvent<Id>>,
     private val existingId: Id,
-    state: S,
 ) : AbstractViewModeler<S>(state) {
 
   private fun handleDateChanged(date: LocalDate) {

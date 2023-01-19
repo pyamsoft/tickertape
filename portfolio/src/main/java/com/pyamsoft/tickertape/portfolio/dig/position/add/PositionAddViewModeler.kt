@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -37,11 +38,11 @@ import timber.log.Timber
 class PositionAddViewModeler
 @Inject
 internal constructor(
-    private val state: MutablePositionAddViewState,
+    override val state: MutablePositionAddViewState,
     private val holdingId: DbHolding.Id,
     private val interactor: PositionAddInteractor,
+    private val existingPositionId: DbPosition.Id,
     datePickerEventBus: EventConsumer<DateSelectedEvent<DbPosition.Id>>,
-    existingPositionId: DbPosition.Id,
 ) :
     BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
         state = state,
@@ -49,18 +50,29 @@ internal constructor(
         existingId = existingPositionId,
     ) {
 
+  private var existingPosition: DbPosition? = null
+  private var positionId = decideInitialPositionId(existingPositionId)
+
+  private fun newPosition() {
+    if (existingPositionId.isEmpty) {
+      positionId = generateNewPositionId()
+    } else {
+      throw IllegalStateException("Do not use newPosition() with existing ID: $existingPositionId")
+    }
+  }
+
   @CheckResult
   private fun resolvePosition(existing: DbPosition?): DbPosition {
     val s = state
-    val price = s.pricePerShare.toDouble()
-    val shareCount = s.numberOfShares.toDouble()
-    val date = s.dateOfPurchase.requireNotNull()
+    val price = s.pricePerShare.value.toDouble()
+    val shareCount = s.numberOfShares.value.toDouble()
+    val date = s.dateOfPurchase.value.requireNotNull()
 
     return if (existing == null) {
-      Timber.d("No existing position, make new one for holding: ${s.positionId} $holdingId")
+      Timber.d("No existing position, make new one for holding: $positionId $holdingId")
       JsonMappableDbPosition.create(
               // Use the positionId here, this will be changed if newPosition() is called
-              id = s.positionId,
+              id = positionId,
               holdingId = holdingId,
               shareCount = shareCount.asShares(),
               price = price.asMoney(),
@@ -83,7 +95,7 @@ internal constructor(
       // Make sure this number is good (it should be, but just to be safe)
       existing.price.value.toString().also { p ->
         if (isSafe(p)) {
-          pricePerShare = p
+          pricePerShare.value = p
           // We always check at the end
           //
           // checkSubmittable()
@@ -93,7 +105,7 @@ internal constructor(
       // Make sure this number is good (it should be, but just to be safe)
       existing.shareCount.value.toString().also { p ->
         if (isSafe(p)) {
-          numberOfShares = p
+          numberOfShares.value = p
           // We always check at the end
           //
           // checkSubmittable()
@@ -101,7 +113,7 @@ internal constructor(
       }
 
       // After date, check submittable
-      dateOfPurchase = existing.purchaseDate
+      dateOfPurchase.value = existing.purchaseDate
       checkSubmittable()
     }
   }
@@ -109,19 +121,19 @@ internal constructor(
   override fun checkSubmittable() {
     state.apply {
       val isAllValuesDefined =
-          pricePerShare.toDoubleOrNull() != null &&
-              numberOfShares.toDoubleOrNull() != null &&
-              dateOfPurchase != null
-      isSubmittable = isAllValuesDefined
+          pricePerShare.value.toDoubleOrNull() != null &&
+              numberOfShares.value.toDoubleOrNull() != null &&
+              dateOfPurchase.value != null
+      isSubmittable.value = isAllValuesDefined
     }
   }
 
   override fun onDateChanged(date: LocalDate) {
-    state.dateOfPurchase = date
+    state.dateOfPurchase.value = date
   }
 
   override fun isCurrentId(id: DbPosition.Id): Boolean {
-    return id == state.positionId
+    return id == positionId
   }
 
   override fun handleSubmit(
@@ -130,14 +142,14 @@ internal constructor(
   ) {
     val s = state
     s.apply {
-      if (isSubmitting || !isSubmittable) {
+      if (isSubmitting.value || !isSubmittable.value) {
         return
       }
     }
 
-    s.isSubmitting = true
+    s.isSubmitting.value = true
     scope.launch(context = Dispatchers.Main) {
-      val position = resolvePosition(s.existingPosition)
+      val position = resolvePosition(existingPosition)
       interactor
           .submitPosition(position)
           .onFailure { Timber.e(it, "Error when submitting position: $position") }
@@ -145,7 +157,7 @@ internal constructor(
             when (result) {
               is DbInsert.InsertResult.Insert -> Timber.d("Position was inserted: ${result.data}")
               is DbInsert.InsertResult.Update ->
-                  Timber.d("Position was updated: ${result.data} from ${s.existingPosition}")
+                  Timber.d("Position was updated: ${result.data} from $existingPosition")
               is DbInsert.InsertResult.Fail -> {
                 Timber.e(result.error, "Failed to submit position: $position")
                 // Caught by the onFailure below
@@ -155,9 +167,9 @@ internal constructor(
           }
           .onSuccess {
             s.apply {
-              dateOfPurchase = null
-              numberOfShares = ""
-              pricePerShare = ""
+              dateOfPurchase.value = null
+              numberOfShares.value = ""
+              pricePerShare.value = ""
 
               if (existingPosition == null) {
                 Timber.d("New position created, prep for another entry")
@@ -169,9 +181,10 @@ internal constructor(
             }
           }
           .onFailure {
+            Timber.e(it, "Failed to add new position")
             // TODO handle position add error
           }
-          .onFinally { s.isSubmitting = false }
+          .onFinally { s.isSubmitting.value = false }
     }
   }
 
@@ -188,10 +201,32 @@ internal constructor(
   }
 
   fun handlePriceChanged(pricePerShare: String) {
-    handleNumberAsStringChange(pricePerShare) { state.pricePerShare = it }
+    handleNumberAsStringChange(pricePerShare) { state.pricePerShare.value = it }
   }
 
   fun handleNumberChanged(numberOfShares: String) {
-    handleNumberAsStringChange(numberOfShares) { state.numberOfShares = it }
+    handleNumberAsStringChange(numberOfShares) { state.numberOfShares.value = it }
+  }
+
+  fun handleOpenDateDialog(block: (DbPosition.Id) -> Unit) {
+    block(positionId)
+  }
+
+  companion object {
+
+    @CheckResult
+    private fun decideInitialPositionId(existingPositionId: DbPosition.Id): DbPosition.Id {
+      return if (existingPositionId.isEmpty) {
+        generateNewPositionId().also { Timber.d("Initial position ID created: $it") }
+      } else {
+        existingPositionId.also { Timber.d("Initial existing position ID: $it") }
+      }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun generateNewPositionId(): DbPosition.Id {
+      return DbPosition.Id(IdGenerator.generate())
+    }
   }
 }

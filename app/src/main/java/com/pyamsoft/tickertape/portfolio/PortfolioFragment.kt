@@ -40,21 +40,19 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
-  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
@@ -105,7 +103,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     ObjectGraph.ActivityScope.retrieve(act).plusPortfolio().create().inject(this)
 
     val vm = viewModel.requireNotNull()
-    val mainVM = mainViewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
@@ -135,18 +132,17 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-            PortfolioScreen(
-                modifier = Modifier.fillMaxSize(),
-                state = vm.state,
-                imageLoader = loader,
-                navBarBottomHeight = mainVM.state.bottomNavHeight,
-                onRefresh = handleRefresh,
-                onSelect = handleOpenManageDialog,
-                onDelete = handleDeleteStock,
-                onSearchChanged = handleSearchChanged,
-                onTabUpdated = handleTabChanged,
-                onRegenerateList = handleRegenerateList,
-            )
+          PortfolioScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state,
+              imageLoader = loader,
+              onRefresh = handleRefresh,
+              onSelect = handleOpenManageDialog,
+              onDelete = handleDeleteStock,
+              onSearchChanged = handleSearchChanged,
+              onTabUpdated = handleTabChanged,
+              onRegenerateList = handleRegenerateList,
+          )
         }
       }
     }
@@ -161,7 +157,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
           onMainSelectionEvent = { handleFabClicked() },
       )
     }
-    mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onStart() {
@@ -172,7 +167,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
-    mainViewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -185,7 +179,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     dispose()
 
     viewModel = null
-    mainViewModel = null
     theming = null
     imageLoader = null
   }

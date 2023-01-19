@@ -6,10 +6,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.base.BaseListScreen
@@ -24,7 +28,6 @@ fun PortfolioScreen(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
     imageLoader: ImageLoader,
-    navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
@@ -32,20 +35,27 @@ fun PortfolioScreen(
     onTabUpdated: (EquityType) -> Unit,
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.loadingState.collectAsState()
+  val pageError by state.error.collectAsState()
+  val search by state.query.collectAsState()
+  val tab by state.section.collectAsState()
+  val list = state.stocks.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState == PortfolioViewState.LoadingState.LOADING }
+
   BaseListScreen(
       modifier = modifier,
-      navBarBottomHeight = navBarBottomHeight,
       imageLoader = imageLoader,
-      isLoading = state.isLoading,
-      pageError = state.error,
-      list = state.stocks,
-      search = state.query,
-      tab = state.section,
+      isLoading = isLoading,
+      pageError = pageError,
+      list = list,
+      search = search,
+      tab = tab,
       onRefresh = onRefresh,
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
       onRegenerateList = onRegenerateList,
-      itemKey = { index, stock -> "${stock.holding.symbol.raw}-${index}" },
+      itemKey = { _, stock -> stock.holding.symbol.raw },
       renderHeader = {
         PortfolioSummary(
             modifier = Modifier.fillMaxWidth(),
@@ -95,14 +105,17 @@ private fun PortfolioSummary(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
 ) {
+  val portfolio by state.portfolio.collectAsState()
+  val section by state.section.collectAsState()
+
   PorfolioSummaryItem(
       modifier =
           modifier
               .statusBarsPadding()
               .padding(horizontal = MaterialTheme.keylines.content)
               .padding(top = MaterialTheme.keylines.baseline),
-      portfolio = state.portfolio,
-      equityType = state.section,
+      portfolio = portfolio,
+      equityType = section,
   )
 }
 

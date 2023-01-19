@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
@@ -34,20 +35,22 @@ import com.pyamsoft.tickertape.main.MainSelectionEvent
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
 internal constructor(
-    private val state: MutablePortfolioViewState,
+    override val state: MutablePortfolioViewState,
     private val interactor: PortfolioInteractor,
     private val interactorCache: PortfolioInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
 ) : AbstractViewModeler<PortfolioViewState>(state) {
+
+  private var internalFullPortfolio: List<PortfolioStock> = emptyList()
 
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { force ->
@@ -88,7 +91,7 @@ internal constructor(
     val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
-      s.fullPortfolio.map { stock ->
+      internalFullPortfolio.map { stock ->
         return@map if (stock.holding.id != position.holdingId) stock
         else {
           val newPositions = stock.positions.map { if (doesPositionMatch(it)) position else it }
@@ -101,7 +104,7 @@ internal constructor(
   private fun CoroutineScope.handleInsertPosition(position: DbPosition) {
     val s = state
     s.regeneratePortfolio(this) {
-      s.fullPortfolio.map { stock ->
+      internalFullPortfolio.map { stock ->
         return@map if (stock.holding.id != position.holdingId) stock
         else stock.copy(positions = stock.positions + position)
       }
@@ -112,7 +115,7 @@ internal constructor(
     val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
-      s.fullPortfolio.map { stock ->
+      internalFullPortfolio.map { stock ->
         if (stock.holding.id != position.holdingId) {
           return@map stock
         } else {
@@ -147,17 +150,17 @@ internal constructor(
       // Cancel any old processing
       try {
         val result = portfolioGenerator.call(state, stocks())
-        self.fullPortfolio = result.all
-        self.portfolio = result.portfolio
-        self.stocks = result.visible
+        internalFullPortfolio = result.all
+        self.portfolio.value = result.portfolio
+        self.stocks.value = result.visible
       } catch (e: Throwable) {
         e.ifNotCancellation {
           Timber.e(e, "Error occurred while regenerating list")
 
           // Clear data on bad processing
-          self.fullPortfolio = emptyList()
-          self.portfolio = PortfolioStockList.empty()
-          self.stocks = emptyList()
+          internalFullPortfolio = emptyList()
+          self.portfolio.value = PortfolioStockList.empty()
+          self.stocks.value = emptyList()
         }
       }
     }
@@ -165,8 +168,8 @@ internal constructor(
 
   @CheckResult
   private fun PortfolioViewState.asVisible(tickers: List<PortfolioStock>): List<PortfolioStock> {
-    val search = this.query
-    val section = this.section
+    val search = this.query.value
+    val section = this.section.value
     return tickers
         .asSequence()
         .filter { ps ->
@@ -200,24 +203,39 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
     val s = state
-    s.regeneratePortfolio(this) { s.fullPortfolio.filterNot { it.holding.id == holding.id } }
+    s.regeneratePortfolio(this) { internalFullPortfolio.filterNot { it.holding.id == holding.id } }
     // TODO offer up undo ability
 
     // On delete, we don't need to re-fetch quotes from the network
   }
 
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
+    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query.value = it }
   }
 
   override fun saveState(outState: UiSavedStateWriter) {
-    state.query.also { search ->
+    state.query.value.also { search ->
       if (search.isBlank()) {
         outState.remove(KEY_SEARCH)
       } else {
         outState.put(KEY_SEARCH, search.trim())
       }
     }
+  }
+
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(KEY_SEARCH) { s.query }.also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry.consumeRestored(KEY_SEARCH)?.let { it as String }?.also { s.query.value = it }
   }
 
   fun bind(
@@ -246,38 +264,42 @@ internal constructor(
   }
 
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
-    state.isLoading = true
+    if (state.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
+      return
+    }
+
+    state.loadingState.value = PortfolioViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
       portfolioFetcher
           .call(force)
           .onSuccess { list ->
             state.apply {
               regeneratePortfolio(scope) { list }
-              error = null
+              error.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to refresh entry list") }
           .onFailure {
             state.apply {
               regeneratePortfolio(scope) { emptyList() }
-              error = it
+              error.value = it
             }
           }
-          .onFinally { state.isLoading = false }
+          .onFinally { state.loadingState.value = PortfolioViewState.LoadingState.DONE }
     }
   }
 
   fun handleSearch(query: String) {
-    state.query = query
+    state.query.value = query
   }
 
   fun handleSectionChanged(tab: EquityType) {
-    state.section = tab
+    state.section.value = tab
   }
 
   fun handleRegenerateList(scope: CoroutineScope) {
     val s = state
-    s.regeneratePortfolio(scope) { s.fullPortfolio }
+    s.regeneratePortfolio(scope) { internalFullPortfolio }
   }
 
   private data class PortfolioListGenerateResult(

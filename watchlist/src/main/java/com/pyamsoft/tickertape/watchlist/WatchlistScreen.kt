@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.base.BaseListScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -25,7 +26,6 @@ fun WatchlistScreen(
     modifier: Modifier = Modifier,
     state: WatchlistViewState,
     imageLoader: ImageLoader,
-    navBarBottomHeight: Int = 0,
     onRefresh: () -> Unit,
     onSelectTicker: (Ticker) -> Unit,
     onDeleteTicker: (Ticker) -> Unit,
@@ -35,15 +35,14 @@ fun WatchlistScreen(
 ) {
   val loadingState by state.loadingState.collectAsState()
   val pageError by state.error.collectAsState()
-  val list by state.watchlist.collectAsState()
   val search by state.query.collectAsState()
   val tab by state.section.collectAsState()
+  val list = state.watchlist.collectAsStateList()
 
   val isLoading = remember(loadingState) { loadingState == WatchlistViewState.LoadingState.LOADING }
 
   BaseListScreen(
       modifier = modifier,
-      navBarBottomHeight = navBarBottomHeight,
       imageLoader = imageLoader,
       isLoading = isLoading,
       pageError = pageError,
@@ -54,7 +53,7 @@ fun WatchlistScreen(
       onSearchChanged = onSearchChanged,
       onTabUpdated = onTabUpdated,
       onRegenerateList = onRegenerateList,
-      itemKey = { index, stock -> "${stock.symbol.raw}-${index}" },
+      itemKey = { _, stock -> stock.symbol.raw },
       renderListItem = { stock ->
         WatchlistItem(
             modifier =

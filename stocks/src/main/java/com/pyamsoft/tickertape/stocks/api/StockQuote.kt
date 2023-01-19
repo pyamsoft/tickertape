@@ -17,18 +17,15 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockQuoteImpl
 
 @Stable
-@Immutable
 interface StockQuote : BaseStockQuote {
 
   @get:CheckResult val extraDetails: Details
 
   @Stable
-  @Immutable
   interface Details {
     // Daily
     @get:CheckResult val averageDailyVolume3Month: StockVolumeValue?

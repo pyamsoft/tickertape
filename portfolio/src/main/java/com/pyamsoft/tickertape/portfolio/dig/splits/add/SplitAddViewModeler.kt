@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.dig.splits.add
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
+import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -36,11 +37,11 @@ import timber.log.Timber
 class SplitAddViewModeler
 @Inject
 internal constructor(
-    private val state: MutableSplitAddViewState,
+    override val state: MutableSplitAddViewState,
     private val holdingId: DbHolding.Id,
     private val interactor: SplitAddInteractor,
+    private val existingSplitId: DbSplit.Id,
     datePickerEventBus: EventConsumer<DateSelectedEvent<DbSplit.Id>>,
-    existingSplitId: DbSplit.Id,
 ) :
     BaseAddViewModeler<SplitAddViewState, DbSplit.Id>(
         state = state,
@@ -48,18 +49,29 @@ internal constructor(
         existingId = existingSplitId,
     ) {
 
+  private var existingSplit: DbSplit? = null
+  private var splitId = decideInitialSplitId(existingSplitId)
+
+  private fun newSplit() {
+    if (existingSplitId.isEmpty) {
+      splitId = generateNewSplitId()
+    } else {
+      throw IllegalStateException("Do not use newPosition() with existing ID: $existingSplitId")
+    }
+  }
+
   @CheckResult
   private fun resolveSplit(existing: DbSplit?): DbSplit {
     val s = state
-    val preSplit = s.preSplitShareCount.toDouble()
-    val postSplit = s.postSplitShareCount.toDouble()
-    val date = s.splitDate.requireNotNull()
+    val preSplit = s.preSplitShareCount.value.toDouble()
+    val postSplit = s.postSplitShareCount.value.toDouble()
+    val date = s.splitDate.value.requireNotNull()
 
     return if (existing == null) {
-      Timber.d("No existing split, make new one for holding: ${s.splitId} $holdingId")
+      Timber.d("No existing split, make new one for holding: $splitId $holdingId")
       JsonMappableDbSplit.create(
               // Use the splitId here, this will be changed if newPosition() is called
-              id = s.splitId,
+              id = splitId,
               holdingId = holdingId,
               preSplitShareCount = preSplit.asShares(),
               postSplitShareCount = postSplit.asShares(),
@@ -84,7 +96,7 @@ internal constructor(
       // Make sure this number is good (it should be, but just to be safe)
       existing.preSplitShareCount.value.toString().also { p ->
         if (isSafe(p)) {
-          preSplitShareCount = p
+          preSplitShareCount.value = p
           // We always check at the end
           //
           // checkSubmittable()
@@ -94,7 +106,7 @@ internal constructor(
       // Make sure this number is good (it should be, but just to be safe)
       existing.postSplitShareCount.value.toString().also { p ->
         if (isSafe(p)) {
-          postSplitShareCount = p
+          postSplitShareCount.value = p
           // We always check at the end
           //
           // checkSubmittable()
@@ -102,27 +114,27 @@ internal constructor(
       }
 
       // After date, check submittable
-      splitDate = existing.splitDate
+      splitDate.value = existing.splitDate
       checkSubmittable()
     }
   }
 
   override fun onDateChanged(date: LocalDate) {
-    state.splitDate = date
+    state.splitDate.value = date
   }
 
   override fun checkSubmittable() {
     state.apply {
       val isAllValuesDefined =
-          preSplitShareCount.toDoubleOrNull() != null &&
-              postSplitShareCount.toDoubleOrNull() != null &&
-              splitDate != null
-      isSubmittable = isAllValuesDefined
+          preSplitShareCount.value.toDoubleOrNull() != null &&
+              postSplitShareCount.value.toDoubleOrNull() != null &&
+              splitDate.value != null
+      isSubmittable.value = isAllValuesDefined
     }
   }
 
   override fun isCurrentId(id: DbSplit.Id): Boolean {
-    return id == state.splitId
+    return id == splitId
   }
 
   override fun handleSubmit(
@@ -131,14 +143,14 @@ internal constructor(
   ) {
     val s = state
     s.apply {
-      if (isSubmitting || !isSubmittable) {
+      if (isSubmitting.value || !isSubmittable.value) {
         return
       }
     }
 
-    s.isSubmitting = true
+    s.isSubmitting.value = true
     scope.launch(context = Dispatchers.Main) {
-      val split = resolveSplit(s.existingSplit)
+      val split = resolveSplit(existingSplit)
       interactor
           .submitSplit(split)
           .onFailure { Timber.e(it, "Error when submitting split: $split") }
@@ -146,7 +158,7 @@ internal constructor(
             when (result) {
               is DbInsert.InsertResult.Insert -> Timber.d("Split was inserted: ${result.data}")
               is DbInsert.InsertResult.Update ->
-                  Timber.d("Split was updated: ${result.data} from ${s.existingSplit}")
+                  Timber.d("Split was updated: ${result.data} from $existingSplit")
               is DbInsert.InsertResult.Fail -> {
                 Timber.e(result.error, "Failed to submit split: $split")
                 // Caught by the onFailure below
@@ -156,9 +168,9 @@ internal constructor(
           }
           .onSuccess {
             s.apply {
-              splitDate = null
-              preSplitShareCount = ""
-              postSplitShareCount = ""
+              splitDate.value = null
+              preSplitShareCount.value = ""
+              postSplitShareCount.value = ""
 
               if (existingSplit == null) {
                 Timber.d("New split created, prep for another entry")
@@ -170,9 +182,10 @@ internal constructor(
             }
           }
           .onFailure {
+            Timber.e(it, "Error adding new split")
             // TODO handle split add error
           }
-          .onFinally { s.isSubmitting = false }
+          .onFinally { s.isSubmitting.value = false }
     }
   }
 
@@ -189,10 +202,33 @@ internal constructor(
   }
 
   fun handlePreSplitShareCountChanged(preSplitCount: String) {
-    handleNumberAsStringChange(preSplitCount) { state.preSplitShareCount = it }
+    handleNumberAsStringChange(preSplitCount) { state.preSplitShareCount.value = it }
   }
 
   fun handlePostSplitShareCountChanged(postSplitCount: String) {
-    handleNumberAsStringChange(postSplitCount) { state.postSplitShareCount = it }
+    handleNumberAsStringChange(postSplitCount) { state.postSplitShareCount.value = it }
+  }
+
+  fun handleOpenDateDialog(block: (DbSplit.Id) -> Unit) {
+    block(splitId)
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    private fun decideInitialSplitId(existingSplitId: DbSplit.Id): DbSplit.Id {
+      return if (existingSplitId.isEmpty) {
+        generateNewSplitId().also { Timber.d("Initial split ID created: $it") }
+      } else {
+        existingSplitId.also { Timber.d("Initial existing split ID: $it") }
+      }
+    }
+
+    @JvmStatic
+    @CheckResult
+    private fun generateNewSplitId(): DbSplit.Id {
+      return DbSplit.Id(IdGenerator.generate())
+    }
   }
 }

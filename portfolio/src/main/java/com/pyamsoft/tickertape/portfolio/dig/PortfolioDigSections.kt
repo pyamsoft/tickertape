@@ -1,5 +1,10 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+
+@Stable
+@Immutable
 enum class PortfolioDigSections(val display: String) {
   POSITIONS("Positions"),
   SPLITS("Stock Splits"),

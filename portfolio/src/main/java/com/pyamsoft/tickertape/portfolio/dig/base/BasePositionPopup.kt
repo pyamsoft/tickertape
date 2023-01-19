@@ -40,6 +40,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.pydroid.ui.defaults.ImageDefaults
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.pydroid.ui.util.Stabilized
 import com.pyamsoft.tickertape.ui.icon.Paid
 import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
@@ -55,12 +56,12 @@ internal fun BasePositionPopup(
     title: String,
     topFieldLabel: String,
     topFieldValue: String,
+    dateLabel: String,
+    dateField: Stabilized<LocalDate?>,
     onTopFieldChanged: (String) -> Unit,
     bottomFieldLabel: String,
     bottomFieldValue: String,
     onBottomFieldChanged: (String) -> Unit,
-    dateLabel: String,
-    dateField: LocalDate?,
     onDateClicked: (LocalDate?) -> Unit,
     onSubmit: () -> Unit,
     onClose: () -> Unit,
@@ -69,7 +70,9 @@ internal fun BasePositionPopup(
   val focusRequester = remember { FocusRequester() }
 
   // Request focus to top field on launch
-  LaunchedEffect(Unit) { focusRequester.requestFocus() }
+  LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+
+  val date = dateField.data
 
   Surface(
       modifier = modifier,
@@ -105,14 +108,14 @@ internal fun BasePositionPopup(
               label = bottomFieldLabel,
               value = bottomFieldValue,
               onChange = onBottomFieldChanged,
-              onNext = { onDateClicked(dateField) },
+              onNext = { onDateClicked(date) },
           )
 
           DateField(
               modifier = Modifier.padding(MaterialTheme.keylines.baseline),
               readOnly = isReadOnly,
               contentDescription = dateLabel,
-              date = dateField,
+              date = date,
               onDateClicked = onDateClicked,
           )
 
@@ -326,7 +329,10 @@ private fun PreviewBasePositionPopup() {
       bottomFieldLabel = "Bottom",
       bottomFieldValue = "Bottom",
       onBottomFieldChanged = {},
-      dateField = null,
+      dateField =
+          object : Stabilized<LocalDate?> {
+            override val data: LocalDate? = null
+          },
       dateLabel = "Date",
       onDateClicked = {},
       onSubmit = {},

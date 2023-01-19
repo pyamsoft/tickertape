@@ -17,6 +17,8 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
@@ -27,7 +29,11 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import timber.log.Timber
 
-class PortfolioStockList private constructor(val list: List<PortfolioStock>) {
+@Stable
+class PortfolioStockList
+private constructor(
+    val list: List<PortfolioStock>,
+) {
 
   @CheckResult
   fun generateData(equityType: EquityType): Data? {

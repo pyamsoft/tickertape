@@ -17,11 +17,13 @@
 package com.pyamsoft.tickertape.db.holding
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 
+@Stable
 interface DbHolding {
 
   @get:CheckResult val id: Id

@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -43,7 +44,7 @@ import timber.log.Timber
 class PortfolioDigViewModeler
 @Inject
 internal constructor(
-    private val state: MutablePortfolioDigViewState,
+    override val state: MutablePortfolioDigViewState,
     private val equityType: EquityType,
     private val tradeSide: TradeSide,
     private val currentPrice: StockMoneyValue?,
@@ -102,7 +103,7 @@ internal constructor(
               add(async { loadTicker(force) })
 
               @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
-              when (state.section) {
+              when (state.section.value) {
                 PortfolioDigSections.PRICE_ALERTS -> {
                   // TODO add price alerts work
                 }
@@ -129,8 +130,6 @@ internal constructor(
                 PortfolioDigSections.OPTIONS_CHAIN -> {
                   add(async { loadOptionsChain(force) })
                 }
-              }.also {
-                // Just here for exhaustive when
               }
             }
             .awaitAll()
@@ -156,13 +155,13 @@ internal constructor(
         .call(force)
         .onSuccess { sp ->
           s.apply {
-            stockSplitError = null
+            stockSplitError.value = null
             s.handlePositionListRegenOnSplitsUpdated(splits = sp)
           }
         }
         .onFailure { e ->
           s.apply {
-            stockSplitError = e
+            stockSplitError.value = e
             s.handlePositionListRegenOnSplitsUpdated(splits = emptyList())
           }
         }
@@ -173,33 +172,33 @@ internal constructor(
         .call(force)
         .onSuccess { h ->
           state.apply {
-            holding = h
-            holdingError = null
+            holding.value = h
+            holdingError.value = null
           }
         }
         .onFailure { e ->
           state.apply {
-            holding = null
-            holdingError = e
+            holding.value = null
+            holdingError.value = e
           }
         }
   }
 
   private suspend fun loadPositions(force: Boolean) {
     val s = state
-    val splits = s.stockSplits
+    val splits = s.stockSplits.value
 
     positionsLoadRunner
         .call(force, splits)
         .onSuccess { p ->
           s.apply {
-            positionsError = null
+            positionsError.value = null
             s.handlePositionListRegenOnSplitsUpdated(positions = p)
           }
         }
         .onFailure { e ->
           s.apply {
-            positionsError = e
+            positionsError.value = e
             s.handlePositionListRegenOnSplitsUpdated(positions = emptyList())
           }
         }
@@ -218,10 +217,10 @@ internal constructor(
     s.handlePositionListRegenOnSplitsUpdated(
         positions =
             insertOrUpdate(
-                s.positions,
+                s.positions.value,
                 createPositionStock(
                     position,
-                    s.stockSplits,
+                    s.stockSplits.value,
                 ),
             ) {
               it.holdingId == position.holdingId && it.id == position.id
@@ -241,7 +240,7 @@ internal constructor(
     // TODO handle offerUndo?
     val s = state
     s.handlePositionListRegenOnSplitsUpdated(
-        positions = s.positions.filterNot { it.id == position.id })
+        positions = s.positions.value.filterNot { it.id == position.id })
   }
 
   private fun onSplitChangeEvent(event: SplitChangeEvent) {
@@ -256,7 +255,7 @@ internal constructor(
     val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         splits =
-            insertOrUpdate(s.stockSplits, split) {
+            insertOrUpdate(s.stockSplits.value, split) {
               it.holdingId == split.holdingId && it.id == split.id
             })
   }
@@ -272,13 +271,18 @@ internal constructor(
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
     // TODO handle offerUndo?
     val s = state
-    s.handlePositionListRegenOnSplitsUpdated(splits = s.stockSplits.filterNot { it.id == split.id })
+    s.handlePositionListRegenOnSplitsUpdated(
+        splits = s.stockSplits.value.filterNot { it.id == split.id })
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-    state.loadingState = true
+    if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
+      return
+    }
+
+    state.loadingState.value = BaseDigViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
-      loadRunner.call(force).also { state.loadingState = false }
+      loadRunner.call(force).also { state.loadingState.value = BaseDigViewState.LoadingState.DONE }
     }
   }
 
@@ -327,7 +331,7 @@ internal constructor(
   }
 
   fun handleTabUpdated(scope: CoroutineScope, section: PortfolioDigSections) {
-    state.section = section
+    state.section.value = section
     handleLoadTicker(scope, force = false)
   }
 

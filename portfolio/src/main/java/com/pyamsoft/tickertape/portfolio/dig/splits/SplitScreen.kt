@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
 import com.pyamsoft.tickertape.portfolio.dig.SplitsPortfolioDigViewState
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
@@ -25,16 +29,19 @@ internal fun SplitScreen(
     onDeleteSplit: (DbSplit) -> Unit,
     onUpdateSplit: (DbSplit) -> Unit,
 ) {
-  val isLoading = state.loadingState
-  val splits = state.stockSplits
-
-  val splitError = state.stockSplitError
-  val holdingError = state.holdingError
+  val loadingState by state.loadingState.collectAsState()
+  val splitError by state.stockSplitError.collectAsState()
+  val holdingError by state.holdingError.collectAsState()
+  val splits = state.stockSplits.collectAsStateList()
 
   val isAddVisible =
-      remember(isLoading, splitError, holdingError) {
-        !isLoading && splitError == null && holdingError == null
+      remember(loadingState, splitError, holdingError) {
+        loadingState == BaseDigViewState.LoadingState.DONE &&
+            splitError == null &&
+            holdingError == null
       }
+
+  val isLoading = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   BaseDigListScreen(
       modifier = modifier,

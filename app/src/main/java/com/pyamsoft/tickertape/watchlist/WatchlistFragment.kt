@@ -40,7 +40,6 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
@@ -49,15 +48,14 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: WatchlistViewModeler? = null
-  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
@@ -115,7 +113,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     ObjectGraph.ActivityScope.retrieve(act).plusWatchlist().create().inject(this)
 
     val vm = viewModel.requireNotNull()
-    val mainVM = mainViewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
@@ -143,18 +140,17 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-            WatchlistScreen(
-                modifier = Modifier.fillMaxSize(),
-                state = vm.state,
-                imageLoader = loader,
-                navBarBottomHeight = mainVM.state.bottomNavHeight,
-                onRefresh = handleRefresh,
-                onDeleteTicker = handleDeleteTicker,
-                onSearchChanged = handleSearchChanged,
-                onTabUpdated = handleTabChanged,
-                onSelectTicker = handleOpenManageDialog,
-                onRegenerateList = handleRegenerateList,
-            )
+          WatchlistScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state,
+              imageLoader = loader,
+              onRefresh = handleRefresh,
+              onDeleteTicker = handleDeleteTicker,
+              onSearchChanged = handleSearchChanged,
+              onTabUpdated = handleTabChanged,
+              onSelectTicker = handleOpenManageDialog,
+              onRegenerateList = handleRegenerateList,
+          )
         }
       }
     }
@@ -169,7 +165,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
           onMainSelectionEvent = { onFabClicked() },
       )
     }
-    mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onStart() {
@@ -180,7 +175,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
-    mainViewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -193,7 +187,6 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     dispose()
 
     viewModel = null
-    mainViewModel = null
     theming = null
     imageLoader = null
     navigator = null

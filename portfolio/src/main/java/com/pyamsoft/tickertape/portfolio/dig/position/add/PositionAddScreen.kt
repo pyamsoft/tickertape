@@ -1,10 +1,12 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.pydroid.ui.util.rememberStable
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionPopup
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -22,12 +24,12 @@ fun PositionAddScreen(
     onSubmit: () -> Unit,
     onClose: () -> Unit,
 ) {
-  val isSubmitting = state.isSubmitting
-  val isSubmittable = state.isSubmittable
-  val pricePerShare = state.pricePerShare
-  val numberOfShares = state.numberOfShares
-  val dateOfPurchase = state.dateOfPurchase
-  val equityType = state.equityType
+  val isSubmitting by state.isSubmitting.collectAsState()
+  val isSubmittable by state.isSubmittable.collectAsState()
+  val pricePerShare by state.pricePerShare.collectAsState()
+  val numberOfShares by state.numberOfShares.collectAsState()
+  val dateOfPurchase by state.dateOfPurchase.collectAsState()
+  val equityType by state.equityType.collectAsState()
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
 
   val isSubmitEnabled = remember(isSubmittable, isSubmitting) { isSubmittable && !isSubmitting }
@@ -47,7 +49,7 @@ fun PositionAddScreen(
       bottomFieldValue = pricePerShare,
       onBottomFieldChanged = onPriceChanged,
       dateLabel = "Date of Purchase",
-      dateField = dateOfPurchase,
+      dateField = dateOfPurchase.rememberStable(),
       onDateClicked = onDateOfPurchaseClicked,
       onSubmit = onSubmit,
       onClose = onClose,
@@ -62,7 +64,6 @@ private fun PreviewPositionAddScreen() {
       state =
           MutablePositionAddViewState(
               equityType = EquityType.STOCK,
-              existingPositionId = DbPosition.Id.EMPTY,
           ),
       symbol = symbol,
       onPriceChanged = {},

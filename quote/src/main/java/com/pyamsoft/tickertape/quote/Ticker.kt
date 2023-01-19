@@ -17,14 +17,12 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 @Stable
-@Immutable
 data class Ticker(
     val symbol: StockSymbol,
     val quote: StockQuote?,

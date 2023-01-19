@@ -50,9 +50,9 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class PositionDialog : AppCompatDialogFragment() {
 
@@ -135,40 +135,42 @@ internal class PositionDialog : AppCompatDialogFragment() {
       id = R.id.dialog_position_add
 
       setContent {
-          val state = vm.state
-          val symbol = remember { getSymbol() }
+        val state = vm.state
+        val symbol = remember { getSymbol() }
 
-          val handleDismiss by rememberUpdatedState { dismiss() }
+        val handleDismiss by rememberUpdatedState { dismiss() }
 
-          val handleSubmit by rememberUpdatedState { onSubmit() }
+        val handleSubmit by rememberUpdatedState { onSubmit() }
 
-          val handlePriceChanged by rememberUpdatedState { price: String ->
-              vm.handlePriceChanged(price)
+        val handlePriceChanged by rememberUpdatedState { price: String ->
+          vm.handlePriceChanged(price)
+        }
+
+        val handleNumberChanged by rememberUpdatedState { number: String ->
+          vm.handleNumberChanged(number)
+        }
+
+        val handleDateOfPurchaseClicked by rememberUpdatedState { date: LocalDate? ->
+          vm.handleOpenDateDialog { positionId ->
+            onDateOfPurchaseClicked(
+                positionId = positionId,
+                date = date,
+            )
           }
+        }
 
-          val handleNumberChanged by rememberUpdatedState { number: String ->
-              vm.handleNumberChanged(number)
-          }
-
-          val handleDateOfPurchaseClicked by rememberUpdatedState { date: LocalDate? ->
-              onDateOfPurchaseClicked(
-                  positionId = state.positionId,
-                  date = date,
-              )
-          }
-
-          act.TickerTapeTheme(themeProvider) {
-              PositionAddScreen(
-                  modifier = Modifier.fillMaxWidth(),
-                  state = state,
-                  symbol = symbol,
-                  onPriceChanged = handlePriceChanged,
-                  onNumberChanged = handleNumberChanged,
-                  onSubmit = handleSubmit,
-                  onClose = handleDismiss,
-                  onDateOfPurchaseClicked = handleDateOfPurchaseClicked,
-              )
-          }
+        act.TickerTapeTheme(themeProvider) {
+          PositionAddScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = state,
+              symbol = symbol,
+              onPriceChanged = handlePriceChanged,
+              onNumberChanged = handleNumberChanged,
+              onSubmit = handleSubmit,
+              onClose = handleDismiss,
+              onDateOfPurchaseClicked = handleDateOfPurchaseClicked,
+          )
+        }
       }
     }
   }

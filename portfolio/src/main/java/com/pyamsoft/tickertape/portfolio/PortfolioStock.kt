@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -39,6 +40,7 @@ import java.time.LocalDate
 
 private const val NO_POSITION = 0.0
 
+@Stable
 data class PortfolioStock
 internal constructor(
     val holding: DbHolding,

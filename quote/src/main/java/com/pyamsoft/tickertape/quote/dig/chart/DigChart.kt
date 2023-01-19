@@ -21,6 +21,8 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import coil.ImageLoader
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.quote.QuoteDefaults
 import com.pyamsoft.tickertape.quote.R
 import com.pyamsoft.tickertape.quote.chart.Chart
@@ -49,7 +52,6 @@ import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import java.time.LocalDateTime
 import kotlin.math.abs
 
 @Composable
@@ -60,9 +62,9 @@ fun DigChart(
     onScrub: (ChartData) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  val ticker = state.ticker
-  val range = state.range
-  val error = state.chartError
+  val ticker by state.ticker.collectAsState()
+  val range by state.range.collectAsState()
+  val chartError by state.chartError.collectAsState()
 
   val chart = ticker.chart
   val isOptions = remember(ticker) { ticker.quote?.type == EquityType.OPTION }
@@ -70,7 +72,7 @@ fun DigChart(
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
-    if (error == null) {
+    if (chartError == null) {
       if (chart != null) {
         Ranges(
             modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
@@ -89,15 +91,15 @@ fun DigChart(
           )
           CurrentScrub(
               modifier = Modifier.fillMaxWidth(),
-              range = range,
-              date = state.currentDate,
-              price = state.currentPrice,
-              openingPrice = state.openingPrice,
+              state = state,
           )
         }
       }
     } else {
-      val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+      val errorMessage =
+          remember(chartError) {
+            chartError.requireNotNull().message ?: "An unexpected error occurred"
+          }
 
       Text(
           text = errorMessage,
@@ -113,15 +115,17 @@ fun DigChart(
 @Composable
 private fun CurrentScrub(
     modifier: Modifier = Modifier,
-    range: StockChart.IntervalRange,
-    date: LocalDateTime,
-    price: StockMoneyValue?,
-    openingPrice: StockMoneyValue?,
+    state: ChartDigViewState,
 ) {
+  val range by state.range.collectAsState()
+  val currentDate by state.currentDate.collectAsState()
+  val currentPrice by state.currentPrice.collectAsState()
+  val openingPrice by state.openingPrice.collectAsState()
+
   AnimatedVisibility(
-      visible = price != null,
+      visible = currentPrice != null,
   ) {
-    if (price != null) {
+    if (currentPrice != null) {
       val dateFormatter =
           remember(range) {
             if (range < StockChart.IntervalRange.THREE_MONTH) DATE_TIME_FORMATTER
@@ -134,17 +138,17 @@ private fun CurrentScrub(
           verticalArrangement = Arrangement.Center,
       ) {
         Text(
-            text = date.format(dateFormatter.get().requireNotNull()),
+            text = currentDate.format(dateFormatter.get().requireNotNull()),
             style = MaterialTheme.typography.body1,
         )
         Row(
             modifier = Modifier.padding(top = MaterialTheme.keylines.typography),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          if (openingPrice != null) {
+          openingPrice?.also { op ->
             Text(
                 modifier = Modifier.weight(0.6F),
-                text = openingPrice.display,
+                text = op.display,
                 style = MaterialTheme.typography.body1,
             )
 
@@ -155,7 +159,7 @@ private fun CurrentScrub(
 
           CurrentPriceDisplay(
               modifier = Modifier.weight(1F),
-              price = price,
+              price = rememberNotNull(currentPrice),
               openingPrice = openingPrice,
           )
         }

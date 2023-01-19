@@ -1,5 +1,6 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.priceWithSplits
@@ -12,6 +13,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 
+@Stable
 data class PositionStock
 internal constructor(
     private val position: DbPosition,

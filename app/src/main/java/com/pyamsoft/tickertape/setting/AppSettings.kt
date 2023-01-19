@@ -73,14 +73,14 @@ internal class AppSettings : SettingsFragment(), FragmentNavigator.Screen<Settin
     return emptyList()
   }
 
-  @Composable
-  override fun customTopItemMargin(): Dp {
-    val state = viewModel.requireNotNull().state()
+    @Composable
+    override fun customTopItemMargin(): Dp {
+        val state = viewModel.requireNotNull().state
 
-    val density = LocalDensity.current
-    val height = state.topBarOffset
-    return remember(density, height) { density.run { height.toDp() } }
-  }
+        val density = LocalDensity.current
+        val height = state.topBarOffset
+        return remember(density, height) { density.run { height.toDp() } }
+    }
 
   @Composable
   override fun customBottomItemMargin(): Dp {

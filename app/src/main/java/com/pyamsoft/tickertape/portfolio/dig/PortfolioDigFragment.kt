@@ -319,28 +319,28 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
               onBack = handleGoBack,
           )
 
-          PortfolioDigScreen(
-              modifier = Modifier.fillMaxWidth(),
-              state = vm.state(),
-              imageLoader = loader,
-              onClose = handleBack,
-              onChartScrub = handleChartScrubbed,
-              onChartRangeSelected = handleChartRangeSelected,
-              onTabUpdated = handleTabChanged,
-              onRefresh = handleRefresh,
-              onPositionAdd = handleAddPosition,
-              onPositionDelete = handleDeletePosition,
-              onPositionUpdate = handleUpdatePosition,
-              onSplitAdd = handleAddSplit,
-              onSplitDeleted = handleDeleteSplit,
-              onSplitUpdated = handleUpdateSplit,
-              onRecClick = handleRecommendSelected,
-              onOptionSectionChanged = handleOptionSectionChanged,
-              onOptionExpirationDateChanged = handleOptionsDateChanged,
-              onAddPriceAlert = handleAddPriceAlert,
-              onUpdatePriceAlert = handleUpdatePriceAlert,
-              onDeletePriceAlert = handleDeletePriceAlert,
-          )
+            PortfolioDigScreen(
+                modifier = Modifier.fillMaxWidth(),
+                state = vm.state,
+                imageLoader = loader,
+                onClose = handleBack,
+                onChartScrub = handleChartScrubbed,
+                onChartRangeSelected = handleChartRangeSelected,
+                onTabUpdated = handleTabChanged,
+                onRefresh = handleRefresh,
+                onPositionAdd = handleAddPosition,
+                onPositionDelete = handleDeletePosition,
+                onPositionUpdate = handleUpdatePosition,
+                onSplitAdd = handleAddSplit,
+                onSplitDeleted = handleDeleteSplit,
+                onSplitUpdated = handleUpdateSplit,
+                onRecClick = handleRecommendSelected,
+                onOptionSectionChanged = handleOptionSectionChanged,
+                onOptionExpirationDateChanged = handleOptionsDateChanged,
+                onAddPriceAlert = handleAddPriceAlert,
+                onUpdatePriceAlert = handleUpdatePriceAlert,
+                onDeletePriceAlert = handleDeletePriceAlert,
+            )
         }
       }
     }

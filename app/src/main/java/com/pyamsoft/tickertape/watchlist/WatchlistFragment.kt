@@ -143,18 +143,18 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-          WatchlistScreen(
-              modifier = Modifier.fillMaxSize(),
-              state = vm.state(),
-              imageLoader = loader,
-              navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onRefresh = handleRefresh,
-              onDeleteTicker = handleDeleteTicker,
-              onSearchChanged = handleSearchChanged,
-              onTabUpdated = handleTabChanged,
-              onSelectTicker = handleOpenManageDialog,
-              onRegenerateList = handleRegenerateList,
-          )
+            WatchlistScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = vm.state,
+                imageLoader = loader,
+                navBarBottomHeight = mainVM.state.bottomNavHeight,
+                onRefresh = handleRefresh,
+                onDeleteTicker = handleDeleteTicker,
+                onSearchChanged = handleSearchChanged,
+                onTabUpdated = handleTabChanged,
+                onSelectTicker = handleOpenManageDialog,
+                onRegenerateList = handleRegenerateList,
+            )
         }
       }
     }

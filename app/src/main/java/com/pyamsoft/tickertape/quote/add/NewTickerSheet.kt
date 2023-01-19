@@ -102,76 +102,76 @@ internal class NewTickerSheet : BottomSheetDialogFragment() {
       id = R.id.bottom_sheet_new_ticker
 
       setContent {
-        val state = vm.state()
-        val equityType = state.equityType
+          val state = vm.state
+          val equityType = state.equityType
 
-        val handleClose by rememberUpdatedState { vm.handleCloseClicked(equityType) }
+          val handleClose by rememberUpdatedState { vm.handleCloseClicked(equityType) }
 
-        val handleSubmit by rememberUpdatedState { onSubmit() }
+          val handleSubmit by rememberUpdatedState { onSubmit() }
 
-        val handleClear by rememberUpdatedState { vm.handleClear() }
+          val handleClear by rememberUpdatedState { vm.handleClear() }
 
-        val handleEquityTypeSelected by rememberUpdatedState { type: EquityType ->
-          vm.handleEquityTypeSelected(type)
-        }
+          val handleEquityTypeSelected by rememberUpdatedState { type: EquityType ->
+              vm.handleEquityTypeSelected(type)
+          }
 
-        val handleSymbolChanged by rememberUpdatedState { symbol: String ->
-          vm.handleSymbolChanged(symbol)
-        }
+          val handleSymbolChanged by rememberUpdatedState { symbol: String ->
+              vm.handleSymbolChanged(symbol)
+          }
 
-        val handleSearchResultSelected by rememberUpdatedState { result: SearchResult ->
-          onSearchResultSelected(result)
-        }
+          val handleSearchResultSelected by rememberUpdatedState { result: SearchResult ->
+              onSearchResultSelected(result)
+          }
 
-        val handleSearchResultDismissed by rememberUpdatedState {
-          vm.handleSearchResultsDismissed()
-        }
+          val handleSearchResultDismissed by rememberUpdatedState {
+              vm.handleSearchResultsDismissed()
+          }
 
-        val handleTradeSideChanged by rememberUpdatedState { side: TradeSide ->
-          vm.handleTradeSideChanged(side)
-        }
+          val handleTradeSideChanged by rememberUpdatedState { side: TradeSide ->
+              vm.handleTradeSideChanged(side)
+          }
 
-        val handleOptionTypeChanged by rememberUpdatedState { type: StockOptions.Contract.Type ->
-          vm.handleOptionType(type)
-        }
+          val handleOptionTypeChanged by rememberUpdatedState { type: StockOptions.Contract.Type ->
+              vm.handleOptionType(type)
+          }
 
-        val handleOptionPriceChanged by rememberUpdatedState { price: StockMoneyValue ->
-          vm.handleOptionStrikePrice(price)
-        }
+          val handleOptionPriceChanged by rememberUpdatedState { price: StockMoneyValue ->
+              vm.handleOptionStrikePrice(price)
+          }
 
-        val handleOptionExpirationChanged by rememberUpdatedState { date: LocalDate ->
-          onOptionExpirationDate(date)
-        }
+          val handleOptionExpirationChanged by rememberUpdatedState { date: LocalDate ->
+              onOptionExpirationDate(date)
+          }
 
-        val handleAfterSymbolChangedCallback by
-            rememberUpdatedState<CoroutineScope.(String) -> Unit> { symbol ->
+          val handleAfterSymbolChangedCallback by
+          rememberUpdatedState<CoroutineScope.(String) -> Unit> { symbol ->
               vm.handleAfterSymbolChanged(
                   scope = this,
                   symbol = symbol,
               )
-            }
+          }
 
-        act.TickerTapeTheme(themeProvider) {
-          BackHandler(
-              onBack = handleClose,
-          )
-          NewTickerScreen(
-              modifier = Modifier.fillMaxWidth(),
-              state = state,
-              onClose = handleClose,
-              onTypeSelected = handleEquityTypeSelected,
-              onSymbolChanged = handleSymbolChanged,
-              onSearchResultSelected = handleSearchResultSelected,
-              onSubmit = handleSubmit,
-              onClear = handleClear,
-              onTradeSideSelected = handleTradeSideChanged,
-              onResultsDismissed = handleSearchResultDismissed,
-              onOptionTypeSlected = handleOptionTypeChanged,
-              onStrikeSelected = handleOptionPriceChanged,
-              onExpirationDateSelected = handleOptionExpirationChanged,
-              onAfterSymbolChanged = handleAfterSymbolChangedCallback,
-          )
-        }
+          act.TickerTapeTheme(themeProvider) {
+              BackHandler(
+                  onBack = handleClose,
+              )
+              NewTickerScreen(
+                  modifier = Modifier.fillMaxWidth(),
+                  state = state,
+                  onClose = handleClose,
+                  onTypeSelected = handleEquityTypeSelected,
+                  onSymbolChanged = handleSymbolChanged,
+                  onSearchResultSelected = handleSearchResultSelected,
+                  onSubmit = handleSubmit,
+                  onClear = handleClear,
+                  onTradeSideSelected = handleTradeSideChanged,
+                  onResultsDismissed = handleSearchResultDismissed,
+                  onOptionTypeSlected = handleOptionTypeChanged,
+                  onStrikeSelected = handleOptionPriceChanged,
+                  onExpirationDateSelected = handleOptionExpirationChanged,
+                  onAfterSymbolChanged = handleAfterSymbolChangedCallback,
+              )
+          }
       }
     }
   }

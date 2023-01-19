@@ -220,23 +220,23 @@ internal class WatchlistDigFragment : Fragment(), FragmentNavigator.Screen<MainP
               onBack = handleGoBack,
           )
 
-          WatchlistDigScreen(
-              modifier = Modifier.fillMaxWidth(),
-              state = vm.state(),
-              imageLoader = loader,
-              onClose = handleBack,
-              onChartScrub = handleChartScrubbed,
-              onChartRangeSelected = handleChartRangeSelected,
-              onModifyWatchlist = handleUpdateWatchlist,
-              onRefresh = handleRefresh,
-              onTabUpdated = handleTabChanged,
-              onRecClick = handleRecommendSelected,
-              onOptionSectionChanged = handleOptionSectionChanged,
-              onOptionExpirationDateChanged = handleOptionsDateChanged,
-              onAddPriceAlert = handleAddPriceAlert,
-              onUpdatePriceAlert = handleUpdatePriceAlert,
-              onDeletePriceAlert = handleDeletePriceAlert,
-          )
+            WatchlistDigScreen(
+                modifier = Modifier.fillMaxWidth(),
+                state = vm.state,
+                imageLoader = loader,
+                onClose = handleBack,
+                onChartScrub = handleChartScrubbed,
+                onChartRangeSelected = handleChartRangeSelected,
+                onModifyWatchlist = handleUpdateWatchlist,
+                onRefresh = handleRefresh,
+                onTabUpdated = handleTabChanged,
+                onRecClick = handleRecommendSelected,
+                onOptionSectionChanged = handleOptionSectionChanged,
+                onOptionExpirationDateChanged = handleOptionsDateChanged,
+                onAddPriceAlert = handleAddPriceAlert,
+                onUpdatePriceAlert = handleUpdatePriceAlert,
+                onDeletePriceAlert = handleDeletePriceAlert,
+            )
         }
       }
     }

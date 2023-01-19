@@ -175,40 +175,40 @@ internal class MainActivity : AppCompatActivity() {
     vm.restoreState(savedInstanceState)
 
     binding.mainComposeBottom.setContent {
-      val screen by navi.currentScreenState()
-      val page = remember(screen) { screen as? TopLevelMainPage }
+        val screen by navi.currentScreenState()
+        val page = remember(screen) { screen as? TopLevelMainPage }
 
-      val state = vm.state()
-      val theme = state.theme
+        val state = vm.state
+        val theme = state.theme
 
-      SystemBars(theme, screen)
-      TickerTapeTheme(theme) {
-        // Need to have box or snackbars push up bottom bar
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-          page?.also { p ->
-            val handleNavigate by rememberUpdatedState { page: TopLevelMainPage ->
-              navi.navigateTo(page)
+        SystemBars(theme, screen)
+        TickerTapeTheme(theme) {
+            // Need to have box or snackbars push up bottom bar
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                page?.also { p ->
+                    val handleNavigate by rememberUpdatedState { page: TopLevelMainPage ->
+                        navi.navigateTo(page)
+                    }
+
+                    val handleBottomBarHeightMeasured by rememberUpdatedState { height: Int ->
+                        vm.handleMeasureBottomNavHeight(height)
+                    }
+
+                    val handleMainActionSelected by rememberUpdatedState { page: TopLevelMainPage ->
+                        onMainActionSelected(page)
+                    }
+
+                    MainScreen(
+                        page = p,
+                        onLoadPage = handleNavigate,
+                        onBottomBarHeightMeasured = handleBottomBarHeightMeasured,
+                        onActionSelected = handleMainActionSelected,
+                    )
+                }
             }
-
-            val handleBottomBarHeightMeasured by rememberUpdatedState { height: Int ->
-              vm.handleMeasureBottomNavHeight(height)
-            }
-
-            val handleMainActionSelected by rememberUpdatedState { page: TopLevelMainPage ->
-              onMainActionSelected(page)
-            }
-
-            MainScreen(
-                page = p,
-                onLoadPage = handleNavigate,
-                onBottomBarHeightMeasured = handleBottomBarHeightMeasured,
-                onActionSelected = handleMainActionSelected,
-            )
-          }
         }
-      }
     }
 
     vm.handleSyncDarkTheme(this)

@@ -144,25 +144,25 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             }
 
         act.TickerTapeTheme(themeProvider) {
-          HomeScreen(
-              modifier = Modifier.fillMaxSize(),
-              state = vm.state(),
-              appName = appName,
-              imageLoader = loader,
-              navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onSettingsClicked = handleOpenSettings,
-              onChartClicked = handleChartClicked,
-              onRefreshWatchlist = handleRefreshWatchlist,
-              onRefreshUndervaluedGrowth = handleRefreshUndervaluedGrowth,
-              onRefreshTrending = handleRefreshTrending,
-              onRefreshPortfolio = handleRefreshPortfolio,
-              onRefreshMostShorted = handleRefreshMostShorted,
-              onRefreshLosers = handleRefreshLosers,
-              onRefreshIndexes = handleRefreshIndexes,
-              onRefreshGrowthTech = handleRefreshGrowthTech,
-              onRefreshGainers = handleRefreshGainers,
-              onRefreshMostActive = handleRefreshMostActive,
-          )
+            HomeScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = vm.state,
+                appName = appName,
+                imageLoader = loader,
+                navBarBottomHeight = mainVM.state.bottomNavHeight,
+                onSettingsClicked = handleOpenSettings,
+                onChartClicked = handleChartClicked,
+                onRefreshWatchlist = handleRefreshWatchlist,
+                onRefreshUndervaluedGrowth = handleRefreshUndervaluedGrowth,
+                onRefreshTrending = handleRefreshTrending,
+                onRefreshPortfolio = handleRefreshPortfolio,
+                onRefreshMostShorted = handleRefreshMostShorted,
+                onRefreshLosers = handleRefreshLosers,
+                onRefreshIndexes = handleRefreshIndexes,
+                onRefreshGrowthTech = handleRefreshGrowthTech,
+                onRefreshGainers = handleRefreshGainers,
+                onRefreshMostActive = handleRefreshMostActive,
+            )
         }
       }
     }

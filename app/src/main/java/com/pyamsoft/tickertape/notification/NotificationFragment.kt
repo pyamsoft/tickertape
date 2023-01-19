@@ -101,14 +101,14 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         val handleBigMoverToggled by rememberUpdatedState { onBigMoverNotificationToggled() }
 
         act.TickerTapeTheme(themeProvider) {
-          NotificationScreen(
-              modifier = Modifier.fillMaxSize(),
-              state = vm.state(),
-              navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onTapeNotificationToggled = handleTapeToggled,
-              onTapePageSizeChanged = handleTapePageSizeChanged,
-              onBigMoverNotificationToggled = handleBigMoverToggled,
-          )
+            NotificationScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = vm.state,
+                navBarBottomHeight = mainVM.state.bottomNavHeight,
+                onTapeNotificationToggled = handleTapeToggled,
+                onTapePageSizeChanged = handleTapePageSizeChanged,
+                onBigMoverNotificationToggled = handleBigMoverToggled,
+            )
         }
       }
     }

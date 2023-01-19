@@ -135,18 +135,18 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-          PortfolioScreen(
-              modifier = Modifier.fillMaxSize(),
-              state = vm.state(),
-              imageLoader = loader,
-              navBarBottomHeight = mainVM.state().bottomNavHeight,
-              onRefresh = handleRefresh,
-              onSelect = handleOpenManageDialog,
-              onDelete = handleDeleteStock,
-              onSearchChanged = handleSearchChanged,
-              onTabUpdated = handleTabChanged,
-              onRegenerateList = handleRegenerateList,
-          )
+            PortfolioScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = vm.state,
+                imageLoader = loader,
+                navBarBottomHeight = mainVM.state.bottomNavHeight,
+                onRefresh = handleRefresh,
+                onSelect = handleOpenManageDialog,
+                onDelete = handleDeleteStock,
+                onSearchChanged = handleSearchChanged,
+                onTabUpdated = handleTabChanged,
+                onRegenerateList = handleRegenerateList,
+            )
         }
       }
     }

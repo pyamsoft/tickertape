@@ -39,7 +39,7 @@ import timber.log.Timber
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
-    private val state: S,
+    override val state: S,
     private val lookupSymbol: StockSymbol?,
     interactor: DigInteractor,
     interactorCache: DigInteractor.Cache,
@@ -121,7 +121,7 @@ protected constructor(
 
   @CheckResult
   private fun getLookupSymbol(): StockSymbol {
-    return lookupSymbol ?: state.ticker.symbol
+    return lookupSymbol ?: state.ticker.value.symbol
   }
 
   protected suspend fun loadOptionsChain(force: Boolean) {
@@ -129,29 +129,29 @@ protected constructor(
     val symbol = getLookupSymbol()
 
     // Reset options if this is the first time call
-    if (s.optionsChain == null) {
-      s.optionsExpirationDate = null
-      s.optionsSection = StockOptions.Contract.Type.CALL
+    if (s.optionsChain.value == null) {
+      s.optionsExpirationDate.value = null
+      s.optionsSection.value = StockOptions.Contract.Type.CALL
     }
 
     optionsRunner
-        .call(force, symbol, s.optionsExpirationDate)
+        .call(force, symbol, s.optionsExpirationDate.value)
         .onSuccess { o ->
           s.apply {
-            optionsChain = o
-            optionsError = null
+            optionsChain.value = o
+            optionsError.value = null
 
             // Set the expiration date to the first one
-            if (s.optionsExpirationDate == null) {
-              s.optionsExpirationDate = o.expirationDates.firstOrNull()
+            if (s.optionsExpirationDate.value == null) {
+              s.optionsExpirationDate.value = o.expirationDates.firstOrNull()
             }
           }
         }
         .onFailure { Timber.e(it, "Failed to load options chain for $symbol") }
         .onFailure { e ->
           s.apply {
-            optionsChain = null
-            optionsError = e
+            optionsChain.value = null
+            optionsError.value = e
           }
         }
   }
@@ -163,15 +163,15 @@ protected constructor(
         .call(force, symbol)
         .onSuccess { r ->
           s.apply {
-            recommendations = r.recommendations.map { it.asTicker() }
-            recommendationError = null
+            recommendations.value = r.recommendations.map { it.asTicker() }
+            recommendationError.value = null
           }
         }
         .onFailure { Timber.e(it, "Failed to load recommendations for $symbol") }
         .onFailure { e ->
           s.apply {
-            recommendations = emptyList()
-            recommendationError = e
+            recommendations.value = emptyList()
+            recommendationError.value = e
           }
         }
         .onSuccess { loadQuotesForRecommendations(it) }
@@ -184,7 +184,7 @@ protected constructor(
               .call(recommendations)
               .onSuccess { rec ->
                 Timber.d("Loaded full recs for symbols: $rec")
-                state.recommendations = rec
+                state.recommendations.value = rec
               }
               .onFailure { e ->
                 Timber.e(e, "Failed to load full ticker quote for recs: $recommendations")
@@ -199,14 +199,14 @@ protected constructor(
         .call(force, symbol)
         .onSuccess { n ->
           s.apply {
-            statistics = n
-            statisticsError = null
+            statistics.value = n
+            statisticsError.value = null
           }
         }
         .onFailure { e ->
           s.apply {
-            statistics = null
-            statisticsError = e
+            statistics.value = null
+            statisticsError.value = e
           }
         }
   }
@@ -218,14 +218,14 @@ protected constructor(
         .call(force, symbol)
         .onSuccess { n ->
           s.apply {
-            news = n.news
-            newsError = null
+            news.value = n.news
+            newsError.value = null
           }
         }
         .onFailure { e ->
           s.apply {
-            news = emptyList()
-            newsError = e
+            news.value = emptyList()
+            newsError.value = e
           }
         }
   }
@@ -234,11 +234,11 @@ protected constructor(
       force: Boolean,
   ): ResultWrapper<Ticker> {
     val s = state
-    val symbol = s.ticker.symbol
+    val symbol = s.ticker.value.symbol
     val range = s.range
     return chartRunner
-        .call(force, symbol, range)
-        .onSuccess { s.ticker = it }
+        .call(force, symbol, range.value)
+        .onSuccess { s.ticker.value = it }
         .onSuccess { ticker ->
           ticker.chart?.also { c ->
             if (c.dates.isEmpty()) {
@@ -250,38 +250,38 @@ protected constructor(
               onInitialLoad(c)
 
               // Set the opening price based on the current chart
-              openingPrice = c.startingPrice
+              openingPrice.value = c.startingPrice
 
               // Clear the error on load success
-              chartError = null
+              chartError.value = null
             }
           }
         }
         .onFailure { Timber.e(it, "Failed to load Ticker") }
         .onFailure { e ->
           s.apply {
-            currentPrice = null
-            openingPrice = null
-            chartError = e
+            currentPrice.value = null
+            openingPrice.value = null
+            chartError.value = e
           }
         }
   }
 
   private fun MutableDigViewState.onInitialLoad(chart: StockChart) {
-    if (currentPrice != null) {
+    if (currentPrice.value != null) {
       return
     }
 
-    currentDate = chart.currentDate
-    currentPrice = chart.currentPrice
+    currentDate.value = chart.currentDate
+    currentPrice.value = chart.currentPrice
   }
 
   fun handleOptionsSectionChanged(section: StockOptions.Contract.Type) {
-    state.optionsSection = section
+    state.optionsSection.value = section
   }
 
   fun handleOptionsExpirationDateChanged(scope: CoroutineScope, date: LocalDate) {
-    state.optionsExpirationDate = date
+    state.optionsExpirationDate.value = date
 
     // Reload options
     scope.launch(context = Dispatchers.Main) { loadOptionsChain(false) }
@@ -291,19 +291,19 @@ protected constructor(
       scope: CoroutineScope,
       range: StockChart.IntervalRange,
   ) {
-    val oldRange = state.range
+    val oldRange = state.range.value
     if (oldRange == range) {
       return
     }
 
-    state.range = range
+    state.range.value = range
     handleLoadTicker(scope = scope, force = true)
   }
 
   fun handleChartDateScrubbed(data: ChartData) {
     state.apply {
-      currentDate = data.date
-      currentPrice = data.price
+      currentDate.value = data.date
+      currentPrice.value = data.price
     }
   }
 

@@ -34,7 +34,7 @@ import timber.log.Timber
 class WatchlistDigViewModeler
 @Inject
 internal constructor(
-    private val state: MutableWatchlistDigViewState,
+    override val state: MutableWatchlistDigViewState,
     private val interactor: WatchlistDigInteractor,
     private val interactorCache: WatchlistDigInteractor.Cache,
     @Named("lookup") lookupSymbol: StockSymbol?,

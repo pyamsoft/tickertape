@@ -25,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -115,7 +114,7 @@ private fun SearchInput(
   val (isSearchFocused, setSearchFocused) = remember { mutableStateOf(false) }
 
   val hasSearchQuery = remember(search) { search.isNotBlank() }
-  val handleClearSearch by rememberUpdatedState { onSearchChanged("") }
+  val handleClearSearch = { onSearchChanged("") }
 
   // If search bar is populated and focused, back gesture clears
   if (isSearchFocused && hasSearchQuery) {

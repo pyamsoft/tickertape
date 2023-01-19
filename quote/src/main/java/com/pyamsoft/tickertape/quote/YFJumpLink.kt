@@ -4,8 +4,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -18,13 +16,9 @@ fun YFJumpLink(
 ) {
   val uriHandler = LocalUriHandler.current
 
-  val handleClick by rememberUpdatedState {
-    uriHandler.openUri("https://finance.yahoo.com/quote/${symbol.raw}")
-  }
-
   IconButton(
       modifier = modifier,
-      onClick = handleClick,
+      onClick = { uriHandler.openUri("https://finance.yahoo.com/quote/${symbol.raw}") },
   ) {
     Icon(
         imageVector = Icons.Filled.OpenInNew,

@@ -18,22 +18,21 @@ package com.pyamsoft.tickertape.main
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.core.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface MainViewState : UiViewState {
-  val theme: Theming.Mode
-  val bottomNavHeight: Int
+  val theme: StateFlow<Theming.Mode>
 }
 
 @Stable
 @ActivityScope
-internal class MutableMainViewState @Inject internal constructor() : MainViewState {
-  override var theme by mutableStateOf(Theming.Mode.SYSTEM)
-  override var bottomNavHeight by mutableStateOf(0)
+class MutableMainViewState @Inject internal constructor() : MainViewState {
+  override val theme = MutableStateFlow(Theming.Mode.SYSTEM)
 }

@@ -6,14 +6,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.StatisticsDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 
 @Composable
 fun DigKeyStatistics(
@@ -21,18 +25,23 @@ fun DigKeyStatistics(
     state: StatisticsDigViewState,
     onRefresh: () -> Unit,
 ) {
-  val error = state.statisticsError
+  val error by state.statisticsError.collectAsState()
+  val loadingState by state.loadingState.collectAsState()
+  val statistics by state.statistics.collectAsState()
+
+  val isRefreshing =
+      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   SwipeRefresh(
       modifier = modifier.padding(MaterialTheme.keylines.content),
-      isRefreshing = state.loadingState,
+      isRefreshing = isRefreshing,
       onRefresh = onRefresh,
   ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
     ) {
       if (error == null) {
-        state.statistics?.let { stats ->
+        statistics?.let { stats ->
           renderFinancialHighlights(
               statistics = stats,
           )
@@ -42,7 +51,8 @@ fun DigKeyStatistics(
         }
       } else {
         item {
-          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+          val errorMessage =
+              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
           Text(
               text = errorMessage,

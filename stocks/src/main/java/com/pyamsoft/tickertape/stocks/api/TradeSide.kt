@@ -16,6 +16,11 @@
 
 package com.pyamsoft.tickertape.stocks.api
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+
+@Stable
+@Immutable
 enum class TradeSide {
   BUY,
   SELL

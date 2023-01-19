@@ -27,7 +27,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,9 +70,10 @@ import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
 import kotlin.math.roundToInt
 
+@Stable
 private data class ChartLines(
     val models: ChartEntryModel,
-    val specs: List<LineChart.LineSpec>,
+    val specs: SnapshotStateList<LineChart.LineSpec>,
 )
 
 @CheckResult
@@ -78,6 +82,7 @@ private fun ChartData.priceValueAdjustedToBaseline(): Double {
 }
 
 /** Can't be data class */
+@Stable
 private class ChartDataEntry(
     private val data: ChartData?,
     x: Float,
@@ -182,12 +187,12 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
           )
         }
 
-    val specSegments = mutableListOf<LineChart.LineSpec>()
-    val lineSegments = mutableListOf<List<ChartDataEntry>>()
+    val specSegments = mutableStateListOf<LineChart.LineSpec>()
+    val lineSegments = mutableStateListOf<List<ChartDataEntry>>()
 
     var index = 0
     var lastData: ChartData? = null
-    val currentSegment = mutableListOf<ChartDataEntry>()
+    val currentSegment = mutableStateListOf<ChartDataEntry>()
 
     while (true) {
       // If we have no more points, we are done

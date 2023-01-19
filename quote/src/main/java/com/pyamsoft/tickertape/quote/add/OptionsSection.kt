@@ -20,10 +20,13 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.rememberAsStateList
+import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -48,7 +53,9 @@ internal fun OptionsSection(
     onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val show = remember(state.equityType) { state.equityType == EquityType.OPTION }
+  val equityType by state.equityType.collectAsState()
+  val show = remember(equityType) { equityType == EquityType.OPTION }
+
   AnimatedVisibility(
       visible = show,
   ) {
@@ -84,19 +91,20 @@ private fun OptionsStrikeExpiration(
     onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val option = state.resolvedOption
-  val isOptionResolved = remember(option) { option != null }
+  val option by state.resolvedOption.collectAsState()
+  val selectedExpirationDate by state.optionExpirationDate.collectAsState()
+  val selectedStrikePrice by state.optionStrikePrice.collectAsState()
 
+  val isOptionResolved = remember(option) { option != null }
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
-  val selectedExpirationDate = state.optionExpirationDate
-  val selectedStrikePrice = state.optionStrikePrice
 
   AnimatedVisibility(
       visible = isOptionResolved,
   ) {
     if (option != null) {
-      val allExpirationDates = option.expirationDates
-      val allStrikes = option.strikes
+      val o = rememberNotNull(option)
+      val allExpirationDates = o.expirationDates.rememberAsStateList()
+      val allStrikes = o.strikes.rememberAsStateList()
 
       Row(
           modifier = modifier.fillMaxWidth(),
@@ -132,10 +140,12 @@ private fun OptionsType(
     state: NewTickerViewState,
     onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
 ) {
-  val type = state.optionType
+  val type by state.optionType.collectAsState()
+  val isReverse = remember(type) { type == StockOptions.Contract.Type.PUT }
+
   ButtonBar(
       modifier = modifier,
-      isReverse = type == StockOptions.Contract.Type.PUT,
+      isReverse = isReverse,
       onFirstButtonClicked = { onOptionTypeSlected(StockOptions.Contract.Type.CALL) },
       onSecondButtonClicked = { onOptionTypeSlected(StockOptions.Contract.Type.PUT) },
       firstButtonContent = {
@@ -151,6 +161,7 @@ private fun OptionsType(
   )
 }
 
+@Stable
 private data class OptionsDropdownItem<T>(
     val display: String,
     val value: T,
@@ -160,7 +171,7 @@ private data class OptionsDropdownItem<T>(
 private fun <T : Any> OptionsDropdown(
     modifier: Modifier = Modifier,
     value: T?,
-    choices: List<T>,
+    choices: SnapshotStateList<T>,
     onDisplayChoice: (T) -> String,
     onSelect: (T) -> Unit,
 ) {
@@ -230,10 +241,12 @@ private fun OptionsSide(
     state: NewTickerViewState,
     onTradeSideSelected: (TradeSide) -> Unit,
 ) {
-  val side = state.tradeSide
+  val side by state.tradeSide.collectAsState()
+  val isReverse = remember(side) { side == TradeSide.SELL }
+
   ButtonBar(
       modifier = modifier,
-      isReverse = side == TradeSide.SELL,
+      isReverse = isReverse,
       onFirstButtonClicked = { onTradeSideSelected(TradeSide.BUY) },
       onSecondButtonClicked = { onTradeSideSelected(TradeSide.SELL) },
       firstButtonContent = {

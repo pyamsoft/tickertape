@@ -24,12 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-@JvmOverloads
 fun MainScreen(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
     onLoadPage: (TopLevelMainPage) -> Unit,
-    onBottomBarHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
   Column(
@@ -40,7 +38,6 @@ fun MainScreen(
         modifier = Modifier.fillMaxWidth(),
         page = page,
         onLoadPage = onLoadPage,
-        onHeightMeasured = onBottomBarHeightMeasured,
         onActionSelected = onActionSelected,
     )
   }
@@ -51,7 +48,6 @@ fun MainScreen(
 private fun PreviewMainScreen() {
   MainScreen(
       page = TopLevelMainPage.Home,
-      onBottomBarHeightMeasured = {},
       onLoadPage = {},
       onActionSelected = {},
   )

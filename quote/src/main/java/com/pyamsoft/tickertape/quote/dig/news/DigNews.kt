@@ -15,6 +15,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,9 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.NewsDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
@@ -35,22 +40,25 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
-@JvmOverloads
 fun DigNews(
     modifier: Modifier = Modifier,
     imageLoader: ImageLoader,
     state: NewsDigViewState,
     onRefresh: () -> Unit,
 ) {
-  val error = state.newsError
+  val error by state.newsError.collectAsState()
+  val loadingState by state.loadingState.collectAsState()
+  val news = state.news.collectAsStateList()
+
+  val isRefreshing =
+      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   SwipeRefresh(
       modifier = modifier,
-      isRefreshing = state.loadingState,
+      isRefreshing = isRefreshing,
       onRefresh = onRefresh,
   ) {
     LazyColumn(
@@ -60,18 +68,19 @@ fun DigNews(
     ) {
       if (error == null) {
         items(
-            items = state.news,
+            items = news,
             key = { it.id },
         ) { n ->
           NewsItem(
               modifier = Modifier.fillMaxWidth(),
-              news = n,
               imageLoader = imageLoader,
+              news = n,
           )
         }
       } else {
         item {
-          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+          val errorMessage =
+              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
           Text(
               text = errorMessage,
@@ -89,8 +98,8 @@ fun DigNews(
 @Composable
 private fun NewsItem(
     modifier: Modifier = Modifier,
-    news: StockNews,
     imageLoader: ImageLoader,
+    news: StockNews,
 ) {
   val title = news.title
   val description = news.description

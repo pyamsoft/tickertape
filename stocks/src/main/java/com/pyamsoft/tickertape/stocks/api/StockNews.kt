@@ -17,10 +17,12 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockNewsImpl
 import com.pyamsoft.tickertape.stocks.data.StockNewsListImpl
 import java.time.LocalDateTime
 
+@Stable
 interface StockNewsList {
 
   @get:CheckResult val symbol: StockSymbol
@@ -48,6 +50,7 @@ interface StockNewsList {
   }
 }
 
+@Stable
 interface StockNews {
 
   @get:CheckResult val id: String

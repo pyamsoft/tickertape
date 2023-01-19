@@ -40,7 +40,7 @@ import timber.log.Timber
 class NewTickerViewModeler
 @Inject
 internal constructor(
-    private val state: MutableNewTickerViewState,
+    override val state: MutableNewTickerViewState,
     interactor: NewTickerInteractor,
     interactorCache: NewTickerInteractor.Cache,
     destination: TickerDestination,
@@ -86,8 +86,8 @@ internal constructor(
         interactor.insertNewTicker(
             symbol = symbol.asSymbol(),
             destination = destination,
-            equityType = s.equityType.requireNotNull(),
-            tradeSide = s.tradeSide,
+            equityType = s.equityType.value.requireNotNull(),
+            tradeSide = s.tradeSide.value,
         )
       }
 
@@ -105,7 +105,7 @@ internal constructor(
       symbol: String,
   ) {
     val s = state
-    s.resolvedTicker = null
+    s.resolvedTicker.value = null
 
     if (symbol.isBlank()) {
       Timber.w("Cannot resolve for empty symbol")
@@ -117,9 +117,9 @@ internal constructor(
       tickerResolutionRunner
           .call(false, sym)
           .onSuccess { Timber.d("Resolved ticker for $sym $it") }
-          .onSuccess { s.resolvedTicker = it }
+          .onSuccess { s.resolvedTicker.value = it }
           .onFailure { Timber.e(it, "Error resolving ticker for $sym") }
-          .onFailure { s.resolvedTicker = null }
+          .onFailure { s.resolvedTicker.value = null }
           .onSuccess { ticker ->
             ticker.quote?.also { q ->
               // Auto select the valid symbol if we found a quote for it
@@ -142,8 +142,8 @@ internal constructor(
     if (symbol.isBlank()) {
       Timber.w("Cannot lookup for empty symbol")
       s.apply {
-        lookupError = null
-        lookupResults = emptyList()
+        lookupError.value = null
+        lookupResults.value = emptyList()
       }
       return
     }
@@ -156,8 +156,8 @@ internal constructor(
           .map { processLookupResults(it) }
           .onSuccess { r ->
             s.apply {
-              lookupError = null
-              lookupResults = r
+              lookupError.value = null
+              lookupResults.value = r
             }
           }
           .onSuccess { r ->
@@ -173,8 +173,8 @@ internal constructor(
           }
           .onFailure { e ->
             s.apply {
-              lookupError = e
-              lookupResults = emptyList()
+              lookupError.value = e
+              lookupResults.value = emptyList()
             }
           }
     }
@@ -182,7 +182,7 @@ internal constructor(
 
   @CheckResult
   private fun processLookupResults(results: List<SearchResult>): List<SearchResult> {
-    val equityType = state.equityType
+    val equityType = state.equityType.value
     return if (equityType == null) {
       emptyList()
     } else {
@@ -198,27 +198,27 @@ internal constructor(
   }
 
   private fun MutableNewTickerViewState.clearInput() {
-    symbol = ""
+    symbol.value = ""
 
     // Not null but these are the defaults
-    tradeSide = TradeSide.BUY
-    optionType = StockOptions.Contract.Type.CALL
+    tradeSide.value = TradeSide.BUY
+    optionType.value = StockOptions.Contract.Type.CALL
 
-    validSymbol = null
-    optionStrikePrice = null
-    optionExpirationDate = null
+    validSymbol.value = null
+    optionStrikePrice.value = null
+    optionExpirationDate.value = null
   }
 
   @CheckResult
   private suspend fun MutableNewTickerViewState.resolveSubmission(): String {
-    return if (equityType != EquityType.OPTION) {
-      symbol
+    return if (equityType.value != EquityType.OPTION) {
+      symbol.value
     } else {
       optionResolverRunner.call(
-          validSymbol.requireNotNull(),
-          optionExpirationDate.requireNotNull(),
-          optionStrikePrice.requireNotNull(),
-          optionType.requireNotNull(),
+          validSymbol.value.requireNotNull(),
+          optionExpirationDate.value.requireNotNull(),
+          optionStrikePrice.value.requireNotNull(),
+          optionType.value.requireNotNull(),
       )
     }
   }
@@ -227,28 +227,28 @@ internal constructor(
     val s = state
     scope.launch(context = Dispatchers.Main) {
       optionLookupRunner
-          .call(false, symbol, s.optionExpirationDate)
+          .call(false, symbol, s.optionExpirationDate.value)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
           .onSuccess { Timber.d("Options data: $it") }
           .onSuccess { option ->
-            s.resolvedOption = option
+            s.resolvedOption.value = option
 
-            val strike = s.optionStrikePrice
+            val strike = s.optionStrikePrice.value
             if (strike != null) {
               // Clear price if it is not present in Strike price list for current Option expiration
               // date
               if (!option.strikes.map { it.value }.contains(strike.value)) {
-                s.optionStrikePrice = null
+                s.optionStrikePrice.value = null
               }
             }
           }
-          .onFailure { s.resolvedOption = null }
+          .onFailure { s.resolvedOption.value = null }
     }
   }
 
   private fun MutableNewTickerViewState.dismissSearchResultsPopup() {
-    lookupResults = emptyList()
-    lookupError = null
+    lookupResults.value = emptyList()
+    lookupError.value = null
   }
 
   private fun onSearchResultSelected(
@@ -258,15 +258,15 @@ internal constructor(
   ) {
     val s = state
     s.apply {
-      validSymbol = symbol
-      this.symbol = symbol.raw
+      validSymbol.value = symbol
+      this.symbol.value = symbol.raw
 
       if (dismiss) {
         dismissSearchResultsPopup()
       }
     }
 
-    if (s.equityType == EquityType.OPTION) {
+    if (s.equityType.value == EquityType.OPTION) {
       performLookupOptionData(scope, symbol)
     }
   }
@@ -282,21 +282,21 @@ internal constructor(
 
   fun handleSymbolChanged(symbol: String) {
     state.apply {
-      this.symbol = symbol
-      validSymbol = null
+      this.symbol.value = symbol
+      validSymbol.value = null
     }
   }
 
   fun handleEquityTypeSelected(type: EquityType) {
     state.apply {
-      equityType = type
+      equityType.value = type
       clearInput()
     }
   }
 
   fun handleClearEquityType() {
     state.apply {
-      equityType = null
+      equityType.value = null
       clearInput()
     }
   }
@@ -320,21 +320,21 @@ internal constructor(
   fun handleOptionExpirationDate(scope: CoroutineScope, date: LocalDate) {
     val s = state
 
-    s.optionExpirationDate = date
+    s.optionExpirationDate.value = date
 
     // Retrigger options lookup for new expiration date
-    val symbol = s.validSymbol
-    if (s.equityType == EquityType.OPTION && symbol != null) {
+    val symbol = s.validSymbol.value
+    if (s.equityType.value == EquityType.OPTION && symbol != null) {
       performLookupOptionData(scope, symbol)
     }
   }
 
   fun handleOptionStrikePrice(price: StockMoneyValue) {
-    state.optionStrikePrice = price
+    state.optionStrikePrice.value = price
   }
 
   fun handleOptionType(type: StockOptions.Contract.Type) {
-    state.optionType = type
+    state.optionType.value = type
   }
 
   fun handleSubmit(
@@ -347,7 +347,7 @@ internal constructor(
     }
 
     s.apply {
-      s.isSubmitting = true
+      s.isSubmitting.value = true
       scope.launch(context = Dispatchers.Main) {
         val sym = resolveSubmission()
 
@@ -355,7 +355,7 @@ internal constructor(
         if (sym.isBlank()) {
           Timber.w(
               "Invalid lookup symbol generated: $symbol $validSymbol $optionExpirationDate $optionStrikePrice $optionType")
-          s.isSubmitting = false
+          s.isSubmitting.value = false
           throw InvalidLookupException
         }
 
@@ -374,12 +374,12 @@ internal constructor(
               }
             }
             .onSuccess { onSubmit() }
-            .onFinally { s.isSubmitting = false }
+            .onFinally { s.isSubmitting.value = false }
       }
     }
   }
 
   fun handleTradeSideChanged(side: TradeSide) {
-    state.tradeSide = side
+    state.tradeSide.value = side
   }
 }

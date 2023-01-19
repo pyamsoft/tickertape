@@ -25,6 +25,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +49,8 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import kotlinx.coroutines.CoroutineScope
 import java.time.LocalDate
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @JvmOverloads
@@ -105,8 +107,8 @@ private fun SubmissionSection(
     onSubmit: () -> Unit,
     onClear: () -> Unit,
 ) {
+  val isSubmitting by state.isSubmitting.collectAsState()
   val canSubmit = state.canSubmit()
-  val isSubmitting = state.isSubmitting
 
   Column(
       modifier = modifier,
@@ -154,7 +156,7 @@ private fun LookupResults(
     onSearchResultSelected: (SearchResult) -> Unit,
     onResultsDismissed: () -> Unit,
 ) {
-  val results = state.lookupResults
+  val results by state.lookupResults.collectAsState()
   val isOpen = remember(results) { results.isNotEmpty() }
 
   DropdownMenu(
@@ -222,8 +224,9 @@ private fun SymbolLookup(
     onSubmit: () -> Unit,
     onAfterSymbolChanged: CoroutineScope.(String) -> Unit,
 ) {
-  val symbol = state.symbol
-  val isSubmitOnEnter = remember(state.equityType) { state.equityType != EquityType.OPTION }
+  val symbol by state.symbol.collectAsState()
+  val equityType by state.equityType.collectAsState()
+  val isSubmitOnEnter = remember(equityType) { equityType != EquityType.OPTION }
 
   val focusManager = LocalFocusManager.current
 

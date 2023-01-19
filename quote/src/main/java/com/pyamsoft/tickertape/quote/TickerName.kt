@@ -17,7 +17,6 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-@JvmOverloads
 fun TickerName(
     modifier: Modifier = Modifier,
     symbol: StockSymbol,

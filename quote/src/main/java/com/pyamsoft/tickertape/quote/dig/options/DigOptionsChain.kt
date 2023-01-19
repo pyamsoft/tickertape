@@ -26,8 +26,12 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,13 +41,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.Stabilized
+import com.pyamsoft.pydroid.ui.util.rememberAsStateList
+import com.pyamsoft.pydroid.ui.util.rememberStable
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.OptionsChainDigViewState
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import java.time.LocalDate
 
 @Composable
@@ -55,14 +63,19 @@ fun DigOptionsChain(
     onExpirationDateChanged: (LocalDate) -> Unit,
 ) {
   val contentColor = LocalContentColor.current
-  val allTypes = remember { StockOptions.Contract.Type.values() }
-  val section = state.optionsSection
+  val allTypes = remember { StockOptions.Contract.Type.values().toList().toMutableStateList() }
+
+  val section by state.optionsSection.collectAsState()
+
+  val error by state.optionsError.collectAsState()
+  val options by state.optionsChain.collectAsState()
+  val expirationDate by state.optionsExpirationDate.collectAsState()
+  val loadingState by state.loadingState.collectAsState()
+
+  val isRefreshing =
+      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
+
   val selectedTabIndex = section.ordinal
-
-  val error = state.optionsError
-  val options = state.optionsChain
-
-  val expirationDate = state.optionsExpirationDate
 
   Column(
       modifier = modifier,
@@ -72,8 +85,9 @@ fun DigOptionsChain(
         backgroundColor = Color.Transparent,
         contentColor = contentColor,
         indicator = { tabPositions ->
+          val tabPosition = tabPositions[selectedTabIndex]
           TabRowDefaults.Indicator(
-              modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+              modifier = Modifier.tabIndicatorOffset(tabPosition),
               color = MaterialTheme.colors.secondary,
           )
         },
@@ -87,17 +101,17 @@ fun DigOptionsChain(
       }
     }
 
-    if (options != null) {
+    options?.let { o ->
       OptionsExpirationDropdown(
           modifier = Modifier.padding(vertical = MaterialTheme.keylines.baseline),
-          value = expirationDate,
-          choices = options.expirationDates,
+          value = expirationDate.rememberStable(),
+          choices = o.expirationDates.rememberAsStateList(),
           onSelect = onExpirationDateChanged,
       )
     }
 
     SwipeRefresh(
-        isRefreshing = state.loadingState,
+        isRefreshing = isRefreshing,
         onRefresh = onRefresh,
     ) {
       if (error == null) {
@@ -106,17 +120,17 @@ fun DigOptionsChain(
               remember(
                   options,
                   section,
+                  // Whenever this date changes, refresh the list of options
+                  // TODO filter by date
                   expirationDate,
               ) {
-                val chain =
+                val o = options.requireNotNull()
+                val contracts =
                     when (section) {
-                      StockOptions.Contract.Type.CALL -> options.calls
-                      StockOptions.Contract.Type.PUT -> options.puts
+                      StockOptions.Contract.Type.CALL -> o.calls
+                      StockOptions.Contract.Type.PUT -> o.puts
                     }
-
-                return@remember chain
-                //                return@remember chain.filter {
-                // it.expirationDate.isEqual(expirationDate) }
+                return@remember contracts.toMutableStateList()
               }
 
           LazyColumn(
@@ -141,7 +155,8 @@ fun DigOptionsChain(
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
         ) {
-          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+          val errorMessage =
+              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
           Text(
               text = errorMessage,
@@ -159,13 +174,15 @@ fun DigOptionsChain(
 @Composable
 private fun OptionsExpirationDropdown(
     modifier: Modifier = Modifier,
-    value: LocalDate?,
-    choices: List<LocalDate>,
+    value: Stabilized<LocalDate?>,
+    choices: SnapshotStateList<LocalDate>,
     onSelect: (LocalDate) -> Unit,
 ) {
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
+  val data = value.data
   val displayValue =
-      remember(value, dateFormatter) { if (value == null) "" else value.format(dateFormatter) }
+      remember(data, dateFormatter) { if (data == null) "" else data.format(dateFormatter) }
+
   val (isDropdownOpen, setDropdownOpen) = remember { mutableStateOf(false) }
 
   Column(
@@ -179,7 +196,9 @@ private fun OptionsExpirationDropdown(
         readOnly = true,
         singleLine = true,
         value = displayValue,
-        onValueChange = {},
+        onValueChange = {
+          // TODO what do
+        },
     )
 
     DropdownMenu(
@@ -198,7 +217,6 @@ private fun OptionsExpirationDropdown(
             ),
     ) {
       for (choice in choices) {
-
         DropdownMenuItem(
             onClick = { onSelect(choice) },
         ) {

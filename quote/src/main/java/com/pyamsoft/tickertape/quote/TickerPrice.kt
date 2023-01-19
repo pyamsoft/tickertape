@@ -22,7 +22,6 @@ import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-@JvmOverloads
 fun TickerPrice(
     modifier: Modifier = Modifier,
     ticker: Ticker?,

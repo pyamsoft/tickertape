@@ -1,10 +1,8 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -15,58 +13,63 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface NewTickerViewState : UiViewState {
-  val isSubmitting: Boolean
+  val isSubmitting: StateFlow<Boolean>
 
-  val symbol: String
+  val symbol: StateFlow<String>
 
-  val optionExpirationDate: LocalDate?
-  val optionStrikePrice: StockMoneyValue?
-  val optionType: StockOptions.Contract.Type
+  val optionExpirationDate: StateFlow<LocalDate?>
+  val optionStrikePrice: StateFlow<StockMoneyValue?>
+  val optionType: StateFlow<StockOptions.Contract.Type>
 
-  val equityType: EquityType?
-  val tradeSide: TradeSide
+  val equityType: StateFlow<EquityType?>
+  val tradeSide: StateFlow<TradeSide>
 
-  val resolvedTicker: Ticker?
-  val resolvedOption: StockOptions?
+  val resolvedTicker: StateFlow<Ticker?>
+  val resolvedOption: StateFlow<StockOptions?>
 
-  val lookupError: Throwable?
-  val lookupResults: List<SearchResult>
+  val lookupError: StateFlow<Throwable?>
+  val lookupResults: StateFlow<List<SearchResult>>
 
+  // TODO move into vm
   @CheckResult fun canSubmit(): Boolean
 }
 
 @Stable
-internal class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
-  internal var validSymbol by mutableStateOf<StockSymbol?>(null)
+class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewState {
+  internal val validSymbol = MutableStateFlow<StockSymbol?>(null)
 
-  override var isSubmitting by mutableStateOf(false)
-  override var symbol by mutableStateOf("")
+  override val isSubmitting = MutableStateFlow(false)
+  override val symbol = MutableStateFlow("")
 
-  override var equityType by mutableStateOf<EquityType?>(null)
-  override var tradeSide by mutableStateOf(TradeSide.BUY)
+  override val equityType = MutableStateFlow<EquityType?>(null)
+  override val tradeSide = MutableStateFlow(TradeSide.BUY)
 
-  override var optionExpirationDate by mutableStateOf<LocalDate?>(null)
-  override var optionStrikePrice by mutableStateOf<StockMoneyValue?>(null)
-  override var optionType by mutableStateOf(StockOptions.Contract.Type.CALL)
+  override val optionExpirationDate = MutableStateFlow<LocalDate?>(null)
+  override val optionStrikePrice = MutableStateFlow<StockMoneyValue?>(null)
+  override val optionType = MutableStateFlow(StockOptions.Contract.Type.CALL)
 
-  override var resolvedTicker by mutableStateOf<Ticker?>(null)
-  override var resolvedOption by mutableStateOf<StockOptions?>(null)
+  override val resolvedTicker = MutableStateFlow<Ticker?>(null)
+  override val resolvedOption = MutableStateFlow<StockOptions?>(null)
 
-  override var lookupError by mutableStateOf<Throwable?>(null)
-  override var lookupResults by mutableStateOf(emptyList<SearchResult>())
+  override val lookupError = MutableStateFlow<Throwable?>(null)
+  override val lookupResults = MutableStateFlow(emptyList<SearchResult>())
 
   override fun canSubmit(): Boolean {
-    return if (isSubmitting || symbol.isBlank() || validSymbol == null) {
+    return if (isSubmitting.value || symbol.value.isBlank() || validSymbol.value == null) {
       false
-    } else if (equityType != EquityType.OPTION) {
+    } else if (equityType.value != EquityType.OPTION) {
       true
     } else {
-      optionExpirationDate != null && optionStrikePrice != null
+      optionExpirationDate.value != null && optionStrikePrice.value != null
     }
   }
 }
 
+@Stable
+@Immutable
 object InvalidLookupException : IllegalArgumentException("Invalid lookup expression")

@@ -22,9 +22,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -43,10 +43,13 @@ internal fun SearchBar(
     onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val contentColor = LocalContentColor.current
-  val allTypes = remember { EquityType.values() }
+  val allTypes = remember { EquityType.values().toList().toMutableStateList() }
   val selectedTabIndex = currentTab.ordinal
 
-  LaunchedEffect(search, currentTab) {
+  LaunchedEffect(
+      search,
+      currentTab,
+  ) {
     val scope = this
 
     // Fire the processing effect after the search or tab changes
@@ -67,8 +70,9 @@ internal fun SearchBar(
         backgroundColor = Color.Transparent,
         contentColor = contentColor,
         indicator = { tabPositions ->
+          val tabPosition = tabPositions[selectedTabIndex]
           TabRowDefaults.Indicator(
-              modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+              modifier = Modifier.tabIndicatorOffset(tabPosition),
               color = MaterialTheme.colors.secondary,
           )
         },

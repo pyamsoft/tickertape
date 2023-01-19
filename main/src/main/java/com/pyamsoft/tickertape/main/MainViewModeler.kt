@@ -17,31 +17,28 @@
 package com.pyamsoft.tickertape.main
 
 import android.app.Activity
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class MainViewModeler
 @Inject
 internal constructor(
-    private val state: MutableMainViewState,
+    override val state: MutableMainViewState,
     private val theming: Theming,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
 ) : AbstractViewModeler<MainViewState>(state) {
 
-  fun handleMeasureBottomNavHeight(height: Int) {
-    state.bottomNavHeight = height
-  }
-
   fun handleSyncDarkTheme(activity: Activity) {
     val isDark = theming.isDarkTheme(activity)
-    state.theme = if (isDark) Theming.Mode.DARK else Theming.Mode.LIGHT
+    state.theme.value = if (isDark) Theming.Mode.DARK else Theming.Mode.LIGHT
   }
 
   fun handleMainActionSelected(scope: CoroutineScope, page: TopLevelMainPage) {
@@ -50,20 +47,31 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(KEY_THEME) { s.theme.value.name }.also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry
+        .consumeRestored(KEY_THEME)
+        ?.let { it as String }
+        ?.let { Theming.Mode.valueOf(it) }
+        ?.also { s.theme.value = it }
+  }
+
   override fun saveState(outState: UiSavedStateWriter) {
-    state.theme.also { theme ->
+    state.theme.value.also { theme ->
       if (theme != Theming.Mode.SYSTEM) {
         outState.put(KEY_THEME, theme.name)
       } else {
         outState.remove(KEY_THEME)
-      }
-    }
-
-    state.bottomNavHeight.also { height ->
-      if (height > 0) {
-        outState.put(KEY_BOTTOM_NAV, height)
-      } else {
-        outState.remove(KEY_BOTTOM_NAV)
       }
     }
   }
@@ -71,15 +79,12 @@ internal constructor(
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
     savedInstanceState.get<String>(KEY_THEME)?.also { themeName ->
       val theme = Theming.Mode.valueOf(themeName)
-      state.theme = theme
+      state.theme.value = theme
     }
-
-    savedInstanceState.get<Int>(KEY_BOTTOM_NAV)?.also { height -> state.bottomNavHeight = height }
   }
 
   companion object {
 
     private const val KEY_THEME = "theme"
-    private const val KEY_BOTTOM_NAV = "bottom_nav"
   }
 }

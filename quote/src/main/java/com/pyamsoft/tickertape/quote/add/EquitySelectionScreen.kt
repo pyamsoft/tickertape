@@ -14,6 +14,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,12 +23,11 @@ import com.pyamsoft.pydroid.ui.defaults.ListItemDefaults
 import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
-@JvmOverloads
 internal fun EquitySelectionScreen(
     modifier: Modifier = Modifier,
     onTypeSelected: (EquityType) -> Unit,
 ) {
-  val possibleTypes = remember { EquityType.values() }
+  val possibleTypes = remember { EquityType.values().toList().toMutableStateList() }
 
   LazyColumn(
       modifier = modifier,

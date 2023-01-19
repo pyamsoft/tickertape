@@ -17,8 +17,11 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.KeyStatisticsImpl
 
+@Stable
 interface KeyStatistics {
 
   @get:CheckResult val symbol: StockSymbol
@@ -62,6 +65,8 @@ interface KeyStatistics {
     @get:CheckResult val totalCash: DataPoint<Long>
     @get:CheckResult val earningsGrowth: DataPoint<Double>
 
+    @Stable
+    @Immutable
     enum class Recommendation {
       BUY,
       SELL,
@@ -72,6 +77,7 @@ interface KeyStatistics {
     }
   }
 
+  @Stable
   interface Info {
     @get:CheckResult val beta: DataPoint<Double>
     @get:CheckResult val enterpriseValue: DataPoint<Long>
@@ -102,6 +108,7 @@ interface KeyStatistics {
     @get:CheckResult val marketFiftyTwoWeekChange: DataPoint<Double>
   }
 
+  @Stable
   interface Earnings {
     @get:CheckResult val earningsDate: DataPoint<Long>
     @get:CheckResult val earningsAverage: DataPoint<Double>
@@ -114,6 +121,7 @@ interface KeyStatistics {
     @get:CheckResult val dividendDate: DataPoint<Long>
   }
 
+  @Stable
   interface DataPoint<T : Number> {
     val raw: T
     val fmt: String?

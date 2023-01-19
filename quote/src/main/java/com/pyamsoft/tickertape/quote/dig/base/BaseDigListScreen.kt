@@ -20,6 +20,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +38,7 @@ fun <T : Any> BaseDigListScreen(
     modifier: Modifier = Modifier,
     label: String,
     isAddVisible: Boolean,
-    items: List<T>,
+    items: SnapshotStateList<T>,
     isLoading: Boolean,
     onRefresh: () -> Unit,
     onAddClicked: () -> Unit,
@@ -66,7 +69,7 @@ fun <T : Any> BaseDigListScreen(
 @Composable
 private fun <T : Any> DigList(
     modifier: Modifier = Modifier,
-    items: List<T>,
+    items: SnapshotStateList<T>,
     isLoading: Boolean,
     onRefresh: () -> Unit,
     itemKey: (T) -> String,
@@ -138,7 +141,7 @@ private fun PreviewBaseDigListScreen() {
         label = "Test",
         isAddVisible = true,
         isLoading = false,
-        items = emptyList<String>(),
+        items = remember { mutableStateListOf<String>() },
         itemKey = { "" },
         onAddClicked = {},
         onRefresh = {},

@@ -49,8 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
@@ -64,24 +62,8 @@ internal fun MainBottomNav(
     modifier: Modifier = Modifier,
     page: TopLevelMainPage,
     onLoadPage: (TopLevelMainPage) -> Unit,
-    onHeightMeasured: (Int) -> Unit,
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
-  // Additional padding when taking into account the "height" of the bar
-  //
-  // We add this here instead of applying at the usage site because a usage site should not care
-  // about padding from an implementation of the BottomNav, it should be given a "safe area" and
-  // simply draw into it
-  val density = LocalDensity.current
-  val keylines = MaterialTheme.keylines
-  val additionalTopContentPadding =
-      remember(
-          density,
-          keylines,
-      ) {
-        density.run { keylines.content.roundToPx() }
-      }
-
   // Space on the bottom bar for the FAB
   val fabSpacerModifier =
       Modifier.padding(horizontal = MaterialTheme.keylines.content).width(FabDefaults.FAB_SIZE_DP)
@@ -117,10 +99,7 @@ internal fun MainBottomNav(
       // Even though we use Rectangle (so we don't modify shape)
       // I like Surface since it won't change API behavior like bottom app bar may
       Surface(
-          modifier =
-              Modifier.fillMaxWidth().onSizeChanged {
-                onHeightMeasured(it.height + additionalTopContentPadding)
-              },
+          modifier = Modifier.fillMaxWidth(),
           contentColor = color.copy(alpha = ContentAlpha.medium),
           color = MaterialTheme.colors.background,
           shape = RectangleShape,
@@ -266,7 +245,6 @@ private fun RowScope.Item(
 private fun PreviewMainBottomNav() {
   MainBottomNav(
       page = TopLevelMainPage.Home,
-      onHeightMeasured = {},
       onLoadPage = {},
       onActionSelected = {},
   )

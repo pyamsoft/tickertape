@@ -17,10 +17,13 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockOptionsImpl
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Stable
 interface StockOptions {
 
   @get:CheckResult val symbol: StockSymbol
@@ -35,6 +38,7 @@ interface StockOptions {
 
   @get:CheckResult val puts: List<Put>
 
+  @Stable
   interface Contract {
 
     @get:CheckResult val type: Type
@@ -67,6 +71,8 @@ interface StockOptions {
 
     @get:CheckResult val ask: StockMoneyValue
 
+    @Stable
+    @Immutable
     enum class Type(val display: String) {
       CALL("Calls"),
       PUT("Puts")
@@ -149,8 +155,9 @@ interface StockOptions {
     }
   }
 
-  interface Call : Contract
-  interface Put : Contract
+  @Stable interface Call : Contract
+
+  @Stable interface Put : Contract
 
   companion object {
 

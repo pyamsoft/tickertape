@@ -14,22 +14,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.quote.chart.Chart
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigDefaults
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.RecommendationDigViewState
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 
 @Composable
 fun DigRecommendations(
@@ -38,11 +42,16 @@ fun DigRecommendations(
     onRefresh: () -> Unit,
     onRecClick: (Ticker) -> Unit,
 ) {
-  val error = state.recommendationError
+  val error by state.recommendationError.collectAsState()
+  val loadingState by state.loadingState.collectAsState()
+  val recommendations by state.recommendations.collectAsState()
+
+  val isRefreshing =
+      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   SwipeRefresh(
       modifier = modifier.padding(MaterialTheme.keylines.content),
-      isRefreshing = state.loadingState,
+      isRefreshing = isRefreshing,
       onRefresh = onRefresh,
   ) {
     LazyColumn(
@@ -51,7 +60,7 @@ fun DigRecommendations(
     ) {
       if (error == null) {
         items(
-            items = state.recommendations,
+            items = recommendations,
             key = { it.symbol.raw },
         ) { rec ->
           RecommendationItem(
@@ -62,7 +71,8 @@ fun DigRecommendations(
         }
       } else {
         item {
-          val errorMessage = remember(error) { error.message ?: "An unexpected error occurred" }
+          val errorMessage =
+              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
           Text(
               text = errorMessage,

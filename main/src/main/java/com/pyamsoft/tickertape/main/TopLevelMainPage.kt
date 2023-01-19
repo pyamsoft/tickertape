@@ -1,13 +1,19 @@
 package com.pyamsoft.tickertape.main
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+
 interface MainPage
 
+@Stable
+@Immutable
 sealed class TopLevelMainPage(val displayName: String) : MainPage {
-  object Home : TopLevelMainPage("Home")
 
-  object Watchlist : TopLevelMainPage("Watchlist")
+  @Stable @Immutable object Home : TopLevelMainPage("Home")
 
-  object Portfolio : TopLevelMainPage("Portfolio")
+  @Stable @Immutable object Watchlist : TopLevelMainPage("Watchlist")
 
-  object Notifications : TopLevelMainPage("Notifications")
+  @Stable @Immutable object Portfolio : TopLevelMainPage("Portfolio")
+
+  @Stable @Immutable object Notifications : TopLevelMainPage("Notifications")
 }

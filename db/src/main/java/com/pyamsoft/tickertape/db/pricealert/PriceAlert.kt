@@ -17,11 +17,13 @@
 package com.pyamsoft.tickertape.db.pricealert
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDateTime
 
+@Stable
 interface PriceAlert {
 
   @get:CheckResult val id: Id
@@ -50,6 +52,7 @@ interface PriceAlert {
 
   @CheckResult fun disable(): PriceAlert
 
+  @Stable
   data class Id(override val raw: String) : IdType {
 
     override val isEmpty: Boolean = raw.isBlank()

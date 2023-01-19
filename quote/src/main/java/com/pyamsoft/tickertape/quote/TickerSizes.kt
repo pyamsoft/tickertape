@@ -2,10 +2,14 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
 import androidx.compose.material.Typography
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 
+@Stable
+@Immutable
 enum class TickerSize(val isSpecial: Boolean) {
   CHART(isSpecial = false),
 
@@ -18,6 +22,7 @@ enum class TickerSize(val isSpecial: Boolean) {
   RECOMMEND_QUOTE_EXTRA(isSpecial = true)
 }
 
+@Stable
 data class TickerSizes
 internal constructor(
     val title: TextStyle,

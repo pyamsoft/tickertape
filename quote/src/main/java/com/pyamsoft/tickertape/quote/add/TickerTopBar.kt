@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-@JvmOverloads
 internal fun TickerAddTopBar(
     modifier: Modifier = Modifier,
     hasEquitySelection: Boolean,

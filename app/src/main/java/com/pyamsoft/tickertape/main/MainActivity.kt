@@ -21,9 +21,9 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
@@ -44,8 +44,8 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class MainActivity : AppCompatActivity() {
 
@@ -175,40 +175,28 @@ internal class MainActivity : AppCompatActivity() {
     vm.restoreState(savedInstanceState)
 
     binding.mainComposeBottom.setContent {
-        val screen by navi.currentScreenState()
-        val page = remember(screen) { screen as? TopLevelMainPage }
+      val screen by navi.currentScreenState()
+      val page = remember(screen) { screen as? TopLevelMainPage }
 
-        val state = vm.state
-        val theme = state.theme
+      val state = vm.state
+      val theme by state.theme.collectAsState()
 
+      TickerTapeTheme(theme) {
         SystemBars(theme, screen)
-        TickerTapeTheme(theme) {
-            // Need to have box or snackbars push up bottom bar
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                page?.also { p ->
-                    val handleNavigate by rememberUpdatedState { page: TopLevelMainPage ->
-                        navi.navigateTo(page)
-                    }
 
-                    val handleBottomBarHeightMeasured by rememberUpdatedState { height: Int ->
-                        vm.handleMeasureBottomNavHeight(height)
-                    }
-
-                    val handleMainActionSelected by rememberUpdatedState { page: TopLevelMainPage ->
-                        onMainActionSelected(page)
-                    }
-
-                    MainScreen(
-                        page = p,
-                        onLoadPage = handleNavigate,
-                        onBottomBarHeightMeasured = handleBottomBarHeightMeasured,
-                        onActionSelected = handleMainActionSelected,
-                    )
-                }
-            }
+        // Need to have box or snackbars push up bottom bar
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+          page?.also { p ->
+            MainScreen(
+                page = p,
+                onLoadPage = { navi.navigateTo(it) },
+                onActionSelected = { onMainActionSelected(it) },
+            )
+          }
         }
+      }
     }
 
     vm.handleSyncDarkTheme(this)

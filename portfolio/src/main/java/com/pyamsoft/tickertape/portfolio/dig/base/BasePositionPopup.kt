@@ -41,6 +41,7 @@ import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.pydroid.ui.defaults.ImageDefaults
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.pydroid.ui.util.Stabilized
+import com.pyamsoft.pydroid.ui.util.stabilized
 import com.pyamsoft.tickertape.ui.icon.Paid
 import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
@@ -329,10 +330,7 @@ private fun PreviewBasePositionPopup() {
       bottomFieldLabel = "Bottom",
       bottomFieldValue = "Bottom",
       onBottomFieldChanged = {},
-      dateField =
-          object : Stabilized<LocalDate?> {
-            override val data: LocalDate? = null
-          },
+      dateField = stabilized(null),
       dateLabel = "Date",
       onDateClicked = {},
       onSubmit = {},

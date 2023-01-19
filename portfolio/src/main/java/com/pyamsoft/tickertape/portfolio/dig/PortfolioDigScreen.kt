@@ -75,7 +75,7 @@ fun PortfolioDigScreen(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val isLoading = state.loadingState
 
   val allTabs = rememberTabs(state.ticker.symbol, state.holding)
   val pagerState = rememberPagerState()

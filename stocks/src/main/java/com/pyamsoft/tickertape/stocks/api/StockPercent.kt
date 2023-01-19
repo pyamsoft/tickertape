@@ -17,8 +17,12 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockPercentImpl
 
+@Stable
+@Immutable
 interface StockPercent : StockDoubleValue {
 
   @get:CheckResult val display: String

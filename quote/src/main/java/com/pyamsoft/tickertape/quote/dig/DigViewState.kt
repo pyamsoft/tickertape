@@ -1,8 +1,8 @@
 package com.pyamsoft.tickertape.quote.dig
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
@@ -15,51 +15,61 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface BaseDigViewState : UiViewState {
-  val isLoading: Boolean
-  val ticker: Ticker
+  val loadingState: StateFlow<LoadingState>
+  val ticker: StateFlow<Ticker>
+
+  @Stable
+  @Immutable
+  enum class LoadingState {
+    NONE,
+    LOADING,
+    DONE
+  }
 }
 
 @Stable
 interface ChartDigViewState : BaseDigViewState {
-  val range: StockChart.IntervalRange
-  val currentDate: LocalDateTime
-  val currentPrice: StockMoneyValue?
-  val openingPrice: StockMoneyValue?
-  val chartError: Throwable?
+  val range: StateFlow<StockChart.IntervalRange>
+  val currentDate: StateFlow<LocalDateTime>
+  val currentPrice: StateFlow<StockMoneyValue?>
+  val openingPrice: StateFlow<StockMoneyValue?>
+  val chartError: StateFlow<Throwable?>
 }
 
 @Stable
 interface NewsDigViewState : BaseDigViewState {
-  val news: List<StockNews>
-  val newsError: Throwable?
+  val news: StateFlow<List<StockNews>>
+  val newsError: StateFlow<Throwable?>
 }
 
 @Stable
 interface StatisticsDigViewState : BaseDigViewState {
-  val statistics: KeyStatistics?
-  val statisticsError: Throwable?
+  val statistics: StateFlow<KeyStatistics?>
+  val statisticsError: StateFlow<Throwable?>
 }
 
 @Stable
 interface RecommendationDigViewState : BaseDigViewState {
-  val recommendations: List<Ticker>
-  val recommendationError: Throwable?
+  val recommendations: StateFlow<List<Ticker>>
+  val recommendationError: StateFlow<Throwable?>
 }
 
 @Stable
 interface OptionsChainDigViewState : BaseDigViewState {
-  val optionsChain: StockOptions?
-  val optionsError: Throwable?
-  val optionsSection: StockOptions.Contract.Type
-  val optionsExpirationDate: LocalDate?
+  val optionsChain: StateFlow<StockOptions?>
+  val optionsError: StateFlow<Throwable?>
+  val optionsSection: StateFlow<StockOptions.Contract.Type>
+  val optionsExpirationDate: StateFlow<LocalDate?>
 }
 
 @Stable
 interface PriceAlertDigViewState : BaseDigViewState {
-  val priceAlerts: List<PriceAlert>
+  val priceAlerts: StateFlow<List<PriceAlert>>
 }
 
 @Stable
@@ -76,32 +86,32 @@ abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
 ) : DigViewState {
-  final override var isLoading by mutableStateOf(false)
+  final override val loadingState = MutableStateFlow(BaseDigViewState.LoadingState.NONE)
 
-  final override var optionsChain by mutableStateOf<StockOptions?>(null)
-  final override var optionsError by mutableStateOf<Throwable?>(null)
-  final override var optionsSection by mutableStateOf(StockOptions.Contract.Type.CALL)
-  final override var optionsExpirationDate by mutableStateOf<LocalDate?>(null)
+  final override val optionsChain = MutableStateFlow<StockOptions?>(null)
+  final override val optionsError = MutableStateFlow<Throwable?>(null)
+  final override val optionsSection = MutableStateFlow(StockOptions.Contract.Type.CALL)
+  final override val optionsExpirationDate = MutableStateFlow<LocalDate?>(null)
 
-  final override var statistics by mutableStateOf<KeyStatistics?>(null)
-  final override var statisticsError by mutableStateOf<Throwable?>(null)
+  final override val statistics = MutableStateFlow<KeyStatistics?>(null)
+  final override val statisticsError = MutableStateFlow<Throwable?>(null)
 
-  final override var recommendations by mutableStateOf(emptyList<Ticker>())
-  final override var recommendationError by mutableStateOf<Throwable?>(null)
+  final override val recommendations = MutableStateFlow(emptyList<Ticker>())
+  final override val recommendationError = MutableStateFlow<Throwable?>(null)
 
-  final override var news by mutableStateOf(emptyList<StockNews>())
-  final override var newsError by mutableStateOf<Throwable?>(null)
+  final override val news = MutableStateFlow(emptyList<StockNews>())
+  final override val newsError = MutableStateFlow<Throwable?>(null)
 
-  final override var chartError by mutableStateOf<Throwable?>(null)
-  final override var range by mutableStateOf(StockChart.IntervalRange.ONE_DAY)
-  final override var currentDate by mutableStateOf<LocalDateTime>(LocalDateTime.now())
-  final override var currentPrice by mutableStateOf<StockMoneyValue?>(null)
-  final override var openingPrice by mutableStateOf<StockMoneyValue?>(null)
+  final override val chartError = MutableStateFlow<Throwable?>(null)
+  final override val range = MutableStateFlow(StockChart.IntervalRange.ONE_DAY)
+  final override val currentDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
+  final override val currentPrice = MutableStateFlow<StockMoneyValue?>(null)
+  final override val openingPrice = MutableStateFlow<StockMoneyValue?>(null)
 
-  final override var priceAlerts by mutableStateOf(emptyList<PriceAlert>())
+  final override val priceAlerts = MutableStateFlow(emptyList<PriceAlert>())
 
-  final override var ticker by
-      mutableStateOf(
+  final override val ticker =
+      MutableStateFlow(
           Ticker(
               symbol = symbol,
               quote = null,

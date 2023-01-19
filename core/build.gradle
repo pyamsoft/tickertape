@@ -84,4 +84,7 @@ dependencies {
   // Dagger
   api "com.google.dagger:dagger:$dagger"
   kapt "com.google.dagger:dagger-compiler:$dagger"
+
+  // Annotations
+  api "androidx.compose.runtime:runtime:$compose_version"
 }

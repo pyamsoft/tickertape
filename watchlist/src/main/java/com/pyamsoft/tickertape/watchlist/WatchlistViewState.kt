@@ -16,34 +16,39 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface WatchlistViewState : UiViewState {
-  val query: String
-  val section: EquityType
-  val isLoading: Boolean
-  val watchlist: List<Ticker>
-  val error: Throwable?
+  val query: StateFlow<String>
+  val section: StateFlow<EquityType>
+  val loadingState: StateFlow<LoadingState>
+  val watchlist: StateFlow<List<Ticker>>
+  val error: StateFlow<Throwable?>
+
+  @Stable
+  @Immutable
+  enum class LoadingState {
+    NONE,
+    LOADING,
+    DONE
+  }
 }
 
 @Stable
 @ActivityScope
-internal class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewState {
-  override var query by mutableStateOf("")
-  override var section by mutableStateOf(EquityType.STOCK)
-  override var isLoading by mutableStateOf(false)
-  override var watchlist by mutableStateOf(emptyList<Ticker>())
-  override var error by mutableStateOf<Throwable?>(null)
-
-  // Used in WatchlistViewModeler to track all tickers, even non visible
-  internal var allTickers by mutableStateOf(emptyList<Ticker>())
+class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewState {
+  override val query = MutableStateFlow("")
+  override val section = MutableStateFlow(EquityType.STOCK)
+  override val loadingState = MutableStateFlow(WatchlistViewState.LoadingState.NONE)
+  override val watchlist = MutableStateFlow(emptyList<Ticker>())
+  override val error = MutableStateFlow<Throwable?>(null)
 }

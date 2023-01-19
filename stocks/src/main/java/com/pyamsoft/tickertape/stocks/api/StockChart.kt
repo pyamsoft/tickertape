@@ -18,11 +18,14 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
 import java.time.LocalDateTime
 
+@Stable
 interface StockChart {
 
   @get:CheckResult val symbol: StockSymbol
@@ -41,6 +44,8 @@ interface StockChart {
 
   @get:CheckResult val close: List<StockMoneyValue>
 
+  @Stable
+  @Immutable
   enum class IntervalTime(val apiValue: String, val display: String) {
     ONE_MINUTE("1m", "1 Minute"),
     TWO_MINUTES("2m", "2 Minutes"),
@@ -52,6 +57,8 @@ interface StockChart {
     ONE_MONTH("1mo", "1 Month"),
   }
 
+  @Stable
+  @Immutable
   enum class IntervalRange(val apiValue: String, val display: String) {
     ONE_DAY("1d", "1 Day"),
     FIVE_DAY("5d", "5 Days"),

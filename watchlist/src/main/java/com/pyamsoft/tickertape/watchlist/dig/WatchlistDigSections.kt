@@ -1,6 +1,13 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
-enum class WatchlistDigSections(val display: String) {
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+
+@Stable
+@Immutable
+enum class WatchlistDigSections(
+    val display: String,
+) {
   CHART("Chart"),
   STATISTICS("Details"),
   PRICE_ALERTS("Price Alerts"),

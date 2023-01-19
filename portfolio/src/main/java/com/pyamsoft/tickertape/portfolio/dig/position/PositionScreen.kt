@@ -25,7 +25,7 @@ internal fun PositionScreen(
     onDeletePosition: (DbPosition) -> Unit,
     onUpdatePosition: (DbPosition) -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val isLoading = state.loadingState
   val positions = state.positions
 
   val positionError = state.positionsError

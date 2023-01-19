@@ -17,8 +17,12 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockMarketSessionImpl
 
+@Stable
+@Immutable
 interface StockMarketSession {
 
   @get:CheckResult val direction: StockDirection

@@ -97,7 +97,7 @@ fun DigOptionsChain(
     }
 
     SwipeRefresh(
-        isRefreshing = state.isLoading,
+        isRefreshing = state.loadingState,
         onRefresh = onRefresh,
     ) {
       if (error == null) {

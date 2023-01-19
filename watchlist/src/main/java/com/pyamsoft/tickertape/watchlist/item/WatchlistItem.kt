@@ -13,7 +13,6 @@ import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
-@JvmOverloads
 fun WatchlistItem(
     modifier: Modifier = Modifier,
     ticker: Ticker,

@@ -25,7 +25,7 @@ internal fun SplitScreen(
     onDeleteSplit: (DbSplit) -> Unit,
     onUpdateSplit: (DbSplit) -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val isLoading = state.loadingState
   val splits = state.stockSplits
 
   val splitError = state.stockSplitError

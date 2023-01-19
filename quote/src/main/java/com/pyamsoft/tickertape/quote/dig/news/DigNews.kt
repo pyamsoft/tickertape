@@ -50,7 +50,7 @@ fun DigNews(
 
   SwipeRefresh(
       modifier = modifier,
-      isRefreshing = state.isLoading,
+      isRefreshing = state.loadingState,
       onRefresh = onRefresh,
   ) {
     LazyColumn(

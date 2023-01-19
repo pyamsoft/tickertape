@@ -17,7 +17,11 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
+@Stable
+@Immutable
 enum class EquityType(val display: String) {
   STOCK("Stock"),
   OPTION("Option"),

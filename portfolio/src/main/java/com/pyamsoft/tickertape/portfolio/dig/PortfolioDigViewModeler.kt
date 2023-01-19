@@ -276,9 +276,9 @@ internal constructor(
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-    state.isLoading = true
+    state.loadingState = true
     scope.launch(context = Dispatchers.Main) {
-      loadRunner.call(force).also { state.isLoading = false }
+      loadRunner.call(force).also { state.loadingState = false }
     }
   }
 

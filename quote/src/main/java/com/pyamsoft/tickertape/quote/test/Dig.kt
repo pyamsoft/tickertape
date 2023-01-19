@@ -25,7 +25,7 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
             chart = newTestChart(symbol),
         )
 
-    override val isLoading: Boolean = false
+    override val loadingState: Boolean = false
 
     override val recommendationError: Throwable? = null
 

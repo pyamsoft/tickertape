@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.watchlist
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
@@ -31,20 +32,22 @@ import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.ListGenerateResult
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchlistViewModeler
 @Inject
 internal constructor(
-    private val state: MutableWatchlistViewState,
+    override val state: MutableWatchlistViewState,
     private val interactor: WatchlistInteractor,
     private val interactorCache: WatchlistInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
 ) : AbstractViewModeler<WatchlistViewState>(state) {
+
+  private var internalAllTickers: List<Ticker> = emptyList()
 
   private val quoteFetcher =
       highlander<ResultWrapper<List<Ticker>>, Boolean> { force ->
@@ -88,7 +91,7 @@ internal constructor(
 
   private fun CoroutineScope.handleDeleteSymbol(symbol: StockSymbol, offerUndo: Boolean) {
     val s = state
-    s.regenerateTickers(this) { s.allTickers.filterNot { it.symbol == symbol } }
+    s.regenerateTickers(this) { internalAllTickers.filterNot { it.symbol == symbol } }
 
     // TODO offer up undo ability
     // On delete, we don't need to re-fetch quotes from the network
@@ -105,15 +108,15 @@ internal constructor(
       // Cancel any old processing
       try {
         val result = watchlistGenerator.call(self, tickers())
-        self.allTickers = result.all
-        self.watchlist = result.visible
+        internalAllTickers = result.all
+        self.watchlist.value = result.visible
       } catch (e: Throwable) {
         e.ifNotCancellation {
           Timber.e(e, "Error occurred while regenerating list")
 
           // Clear data on bad processing
-          self.allTickers = emptyList()
-          self.watchlist = emptyList()
+          internalAllTickers = emptyList()
+          self.watchlist.value = emptyList()
         }
       }
     }
@@ -121,8 +124,8 @@ internal constructor(
 
   @CheckResult
   private fun WatchlistViewState.asVisible(tickers: List<Ticker>): List<Ticker> {
-    val search = this.query
-    val section = this.section
+    val search = this.query.value
+    val section = this.section.value
     return tickers
         .asSequence()
         .filter { qs ->
@@ -144,11 +147,11 @@ internal constructor(
   }
 
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query = it }
+    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query.value = it }
   }
 
   override fun saveState(outState: UiSavedStateWriter) {
-    state.query.also { search ->
+    state.query.value.also { search ->
       if (search.isBlank()) {
         outState.remove(KEY_SEARCH)
       } else {
@@ -157,25 +160,44 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(KEY_SEARCH) { s.query }.also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry.consumeRestored(KEY_SEARCH)?.let { it as String }?.also { s.query.value = it }
+  }
+
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
-    state.isLoading = true
+    if (state.loadingState.value == WatchlistViewState.LoadingState.LOADING) {
+      return
+    }
+
+    state.loadingState.value = WatchlistViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
       quoteFetcher
           .call(force)
           .onSuccess { list ->
             state.apply {
               regenerateTickers(scope) { list }
-              error = null
+              error.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to refresh entry list") }
           .onFailure {
             state.apply {
               regenerateTickers(scope) { emptyList() }
-              error = it
+              error.value = it
             }
           }
-          .onFinally { state.isLoading = false }
+          .onFinally { state.loadingState.value = WatchlistViewState.LoadingState.DONE }
     }
   }
 
@@ -197,16 +219,16 @@ internal constructor(
   }
 
   fun handleSearch(query: String) {
-    state.query = query
+    state.query.value = query
   }
 
   fun handleSectionChanged(tab: EquityType) {
-    state.section = tab
+    state.section.value = tab
   }
 
   fun handleRegenerateList(scope: CoroutineScope) {
     val s = state
-    s.regenerateTickers(scope) { s.allTickers }
+    s.regenerateTickers(scope) { internalAllTickers }
   }
 
   companion object {

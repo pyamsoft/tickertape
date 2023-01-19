@@ -19,8 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -60,7 +64,7 @@ private val HIDE_TABS_FOR_CRYPTO =
 
 @Composable
 @CheckResult
-internal fun rememberTabs(ticker: Ticker): List<WatchlistDigSections> {
+internal fun rememberTabs(ticker: Ticker): SnapshotStateList<WatchlistDigSections> {
   val symbol = ticker.symbol
   val equityType = ticker.quote?.type
 
@@ -69,22 +73,25 @@ internal fun rememberTabs(ticker: Ticker): List<WatchlistDigSections> {
       equityType,
       symbol,
   ) {
-    WatchlistDigSections.values().filter { v ->
-      if (equityType == null) {
-        // Just provide something so that we have a visual placeholder
-        return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-      } else {
-        return@filter if (symbol.isIndex()) {
-          !HIDE_TABS_FOR_INDEXES.contains(v)
-        } else {
-          when (equityType) {
-            EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-            EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-            else -> true
+    val list =
+        WatchlistDigSections.values().filter { v ->
+          if (equityType == null) {
+            // Just provide something so that we have a visual placeholder
+            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
+          } else {
+            return@filter if (symbol.isIndex()) {
+              !HIDE_TABS_FOR_INDEXES.contains(v)
+            } else {
+              when (equityType) {
+                EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+                EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+                else -> true
+              }
+            }
           }
         }
-      }
-    }
+
+    return@remember mutableStateListOf(*list.toTypedArray())
   }
 }
 
@@ -94,18 +101,14 @@ internal fun WatchlistDigToolbar(
     modifier: Modifier = Modifier,
     state: WatchlistDigViewState,
     pagerState: PagerState,
-    allTabs: List<WatchlistDigSections>,
+    allTabs: SnapshotStateList<WatchlistDigSections>,
     onClose: () -> Unit,
     onModifyWatchlist: () -> Unit,
-    onTabUpdated: (WatchlistDigSections) -> Unit,
 ) {
-  val isLoading = state.isLoading
-  val ticker = state.ticker
-  val isInWatchlist = state.isInWatchlist
-  val section = state.section
+  val ticker by state.ticker.collectAsState()
+  val watchlistStatus by state.watchlistStatus.collectAsState()
+
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
-  val isInWatchlistError = state.isInWatchlistError
-  val hasIsInWatchlistError = remember(isInWatchlistError) { isInWatchlistError != null }
 
   Surface(
       modifier = modifier,
@@ -139,7 +142,11 @@ internal fun WatchlistDigToolbar(
             }
           },
           actions = {
-            if (!isLoading && !hasIsInWatchlistError) {
+            if (watchlistStatus != WatchlistDigViewState.WatchlistStatus.NONE) {
+              val isInWatchlist =
+                  remember(watchlistStatus) {
+                    watchlistStatus == WatchlistDigViewState.WatchlistStatus.IN_LIST
+                  }
               IconButton(
                   onClick = onModifyWatchlist,
               ) {
@@ -152,7 +159,7 @@ internal fun WatchlistDigToolbar(
             }
 
             YFJumpLink(
-                symbol = state.ticker.symbol,
+                symbol = ticker.symbol,
             )
           },
       )
@@ -224,12 +231,12 @@ private fun PreviewWatchlistDigToolbar() {
       MutableWatchlistDigViewState(
           symbol = symbol,
       )
+  val ticker by state.ticker.collectAsState()
   WatchlistDigToolbar(
       state = state,
       pagerState = rememberPagerState(),
-      allTabs = rememberTabs(state.ticker),
+      allTabs = rememberTabs(ticker),
       onClose = {},
       onModifyWatchlist = {},
-      onTabUpdated = {},
   )
 }

@@ -17,8 +17,12 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import timber.log.Timber
 
+@Stable
+@Immutable
 enum class MarketState {
   /** Normal market */
   REGULAR,

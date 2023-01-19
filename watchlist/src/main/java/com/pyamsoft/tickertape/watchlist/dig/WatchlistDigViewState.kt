@@ -1,20 +1,28 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface WatchlistDigViewState : DigViewState {
-  val section: WatchlistDigSections
+  val section: StateFlow<WatchlistDigSections>
 
-  val isInWatchlist: Boolean
-  val isInWatchlistError: Throwable?
+  val watchlistStatus: StateFlow<WatchlistStatus>
+  val isInWatchlistError: StateFlow<Throwable?>
+
+  @Stable
+  @Immutable
+  enum class WatchlistStatus {
+    NONE,
+    IN_LIST,
+    NOT_IN_LIST
+  }
 }
 
 @Stable
@@ -24,8 +32,8 @@ internal constructor(
     symbol: StockSymbol,
 ) : MutableDigViewState(symbol), WatchlistDigViewState {
 
-  override var section by mutableStateOf(WatchlistDigSections.CHART)
+  override val section = MutableStateFlow(WatchlistDigSections.CHART)
 
-  override var isInWatchlist by mutableStateOf(false)
-  override var isInWatchlistError by mutableStateOf<Throwable?>(null)
+  override val watchlistStatus = MutableStateFlow(WatchlistDigViewState.WatchlistStatus.NONE)
+  override val isInWatchlistError = MutableStateFlow<Throwable?>(null)
 }

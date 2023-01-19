@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
@@ -57,7 +58,7 @@ internal constructor(
 
               // Based on the page
               @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
-              when (state.section) {
+              when (state.section.value) {
                 WatchlistDigSections.PRICE_ALERTS -> {
                   // TODO add price alerts work
                 }
@@ -86,7 +87,7 @@ internal constructor(
   private val watchlistModifyRunner =
       highlander<ResultWrapper<Boolean>> {
         interactor.modifyWatchlist(
-            symbol = state.ticker.symbol,
+            symbol = state.ticker.value.symbol,
         )
       }
 
@@ -97,31 +98,37 @@ internal constructor(
     }
 
     interactor
-        .isInWatchlist(state.ticker.symbol)
+        .isInWatchlist(state.ticker.value.symbol)
         .onSuccess { isIn ->
           Timber.d("Symbol is in watchlist: $isIn")
           s.apply {
-            isInWatchlist = isIn
-            isInWatchlistError = null
+            watchlistStatus.value =
+                if (isIn) WatchlistDigViewState.WatchlistStatus.IN_LIST
+                else WatchlistDigViewState.WatchlistStatus.NOT_IN_LIST
+            isInWatchlistError.value = null
           }
         }
         .onFailure { e ->
           Timber.e(e, "Error loading symbol in watchlist")
           // Don't need to clear the ticker since last loaded state was valid
           s.apply {
-            isInWatchlist = false
-            isInWatchlistError = e
+            watchlistStatus.value = WatchlistDigViewState.WatchlistStatus.NONE
+            isInWatchlistError.value = e
           }
         }
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-    state.isLoading = true
+    if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
+      return
+    }
+
+    state.loadingState.value = BaseDigViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
       try {
         loadRunner.call(force)
       } finally {
-        state.isLoading = false
+        state.loadingState.value = BaseDigViewState.LoadingState.DONE
       }
     }
   }
@@ -133,7 +140,9 @@ internal constructor(
           .onFailure { Timber.e(it, "Error modifying watchlist") }
           .onSuccess { s ->
             Timber.d("Modify watchlist: $s")
-            state.isInWatchlist = s
+            state.watchlistStatus.value =
+                if (s) WatchlistDigViewState.WatchlistStatus.IN_LIST
+                else WatchlistDigViewState.WatchlistStatus.NOT_IN_LIST
           }
           .onFailure {
             // TODO handle error
@@ -142,8 +151,11 @@ internal constructor(
     }
   }
 
-  fun handleTabUpdated(scope: CoroutineScope, section: WatchlistDigSections) {
-    state.section = section
+  fun handleTabUpdated(
+      scope: CoroutineScope,
+      section: WatchlistDigSections,
+  ) {
+    state.section.value = section
     handleLoadTicker(scope, force = false)
   }
 }

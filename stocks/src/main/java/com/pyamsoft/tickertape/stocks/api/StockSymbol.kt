@@ -17,8 +17,12 @@
 package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockSymbolImpl
 
+@Stable
+@Immutable
 interface StockSymbol {
 
   @get:CheckResult val raw: String

@@ -23,7 +23,7 @@ fun DigPriceAlerts(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val isLoading = state.loadingState
 
   val isAddVisible = remember(isLoading) { !isLoading }
 

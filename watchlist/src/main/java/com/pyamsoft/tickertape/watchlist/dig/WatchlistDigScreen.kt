@@ -12,8 +12,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +32,7 @@ import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.chart.ChartData
+import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.chart.DigChart
 import com.pyamsoft.tickertape.quote.dig.news.DigNews
 import com.pyamsoft.tickertape.quote.dig.options.DigOptionsChain
@@ -40,10 +45,8 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import java.time.LocalDate
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
-@JvmOverloads
 @OptIn(ExperimentalPagerApi::class)
 fun WatchlistDigScreen(
     modifier: Modifier = Modifier,
@@ -66,17 +69,23 @@ fun WatchlistDigScreen(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val isLoading = state.isLoading
+  val loadingState by state.loadingState.collectAsState()
+  val ticker by state.ticker.collectAsState()
 
-  val allTabs = rememberTabs(state.ticker)
+  val allTabs = rememberTabs(ticker)
   val pagerState = rememberPagerState()
 
+  val handleTabUpdated by rememberUpdatedState(onTabUpdated)
+
   // Watch for a swipe causing a page change and update accordingly
-  LaunchedEffect(pagerState, allTabs,) {
+  LaunchedEffect(
+      pagerState,
+      allTabs,
+  ) {
     snapshotFlow { pagerState.currentPage }
         .collectLatest { index ->
           val page = allTabs[index]
-          Timber.d("Page updated: $page")
+          handleTabUpdated(page)
         }
   }
 
@@ -89,41 +98,43 @@ fun WatchlistDigScreen(
         verticalArrangement = Arrangement.Bottom,
     ) {
       WatchlistDigToolbar(
-          // Z-Index to place it above the SwipeRefresh indicator
           modifier = Modifier.fillMaxWidth().zIndex(1F),
           state = state,
           pagerState = pagerState,
           allTabs = allTabs,
           onClose = onClose,
           onModifyWatchlist = onModifyWatchlist,
-          onTabUpdated = onTabUpdated,
       )
 
       Crossfade(
           modifier = Modifier.fillMaxWidth().weight(1F),
-          targetState = isLoading,
+          targetState = loadingState,
       ) { loading ->
-        if (loading) {
-          Loading(
-              modifier = Modifier.fillMaxSize(),
-          )
-        } else {
-          Content(
-              modifier = Modifier.fillMaxSize(),
-              state = state,
-              imageLoader = imageLoader,
-              pagerState = pagerState,
-              allTabs = allTabs,
-              onChartScrub = onChartScrub,
-              onChartRangeSelected = onChartRangeSelected,
-              onRefresh = onRefresh,
-              onRecClick = onRecClick,
-              onOptionSectionChanged = onOptionSectionChanged,
-              onOptionExpirationDateChanged = onOptionExpirationDateChanged,
-              onAddPriceAlert = onAddPriceAlert,
-              onUpdatePriceAlert = onUpdatePriceAlert,
-              onDeletePriceAlert = onDeletePriceAlert,
-          )
+        when (loading) {
+          BaseDigViewState.LoadingState.NONE,
+          BaseDigViewState.LoadingState.LOADING -> {
+            Loading(
+                modifier = Modifier.fillMaxSize(),
+            )
+          }
+          BaseDigViewState.LoadingState.DONE -> {
+            Content(
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                imageLoader = imageLoader,
+                pagerState = pagerState,
+                allTabs = allTabs,
+                onChartScrub = onChartScrub,
+                onChartRangeSelected = onChartRangeSelected,
+                onRefresh = onRefresh,
+                onRecClick = onRecClick,
+                onOptionSectionChanged = onOptionSectionChanged,
+                onOptionExpirationDateChanged = onOptionExpirationDateChanged,
+                onAddPriceAlert = onAddPriceAlert,
+                onUpdatePriceAlert = onUpdatePriceAlert,
+                onDeletePriceAlert = onDeletePriceAlert,
+            )
+          }
         }
       }
     }
@@ -137,7 +148,7 @@ private fun Content(
     state: WatchlistDigViewState,
     imageLoader: ImageLoader,
     pagerState: PagerState,
-    allTabs: List<WatchlistDigSections>,
+    allTabs: SnapshotStateList<WatchlistDigSections>,
     onRefresh: () -> Unit,
     // Chart
     onChartScrub: (ChartData) -> Unit,

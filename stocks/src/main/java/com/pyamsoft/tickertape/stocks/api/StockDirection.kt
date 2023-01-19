@@ -18,8 +18,12 @@ package com.pyamsoft.tickertape.stocks.api
 
 import androidx.annotation.CheckResult
 import androidx.annotation.ColorInt
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.data.StockDirectionImpl
 
+@Stable
+@Immutable
 interface StockDirection : StockNumberValue {
 
   @get:CheckResult val sign: String

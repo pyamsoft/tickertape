@@ -42,7 +42,7 @@ fun DigRecommendations(
 
   SwipeRefresh(
       modifier = modifier.padding(MaterialTheme.keylines.content),
-      isRefreshing = state.isLoading,
+      isRefreshing = state.loadingState,
       onRefresh = onRefresh,
   ) {
     LazyColumn(

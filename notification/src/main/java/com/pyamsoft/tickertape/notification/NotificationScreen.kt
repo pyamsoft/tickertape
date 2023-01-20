@@ -18,18 +18,14 @@ package com.pyamsoft.tickertape.notification
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.ui.renderPYDroidExtras
@@ -38,26 +34,12 @@ import com.pyamsoft.tickertape.ui.renderPYDroidExtras
 fun NotificationScreen(
     modifier: Modifier = Modifier,
     state: NotificationViewState,
-    navBarBottomHeight: Int,
     onTapeNotificationToggled: () -> Unit,
     onTapePageSizeChanged: (Int) -> Unit,
     onBigMoverNotificationToggled: () -> Unit,
 ) {
-  val density = LocalDensity.current
-
-  val bottomPaddingDp =
-      remember(
-          density,
-          navBarBottomHeight,
-      ) {
-        density.run { navBarBottomHeight.toDp() }
-      }
-
-  val scaffoldState = rememberScaffoldState()
-
   Scaffold(
       modifier = modifier,
-      scaffoldState = scaffoldState,
   ) { pv ->
     LazyColumn {
       item {
@@ -87,7 +69,7 @@ fun NotificationScreen(
 
       item {
         Spacer(
-            modifier = Modifier.padding(pv).navigationBarsPadding().height(bottomPaddingDp),
+            modifier = Modifier.padding(pv).navigationBarsPadding(),
         )
       }
     }
@@ -99,7 +81,6 @@ fun NotificationScreen(
 private fun PreviewNotificationScreen() {
   NotificationScreen(
       state = MutableNotificationViewState(),
-      navBarBottomHeight = 0,
       onTapeNotificationToggled = {},
       onTapePageSizeChanged = {},
       onBigMoverNotificationToggled = {},

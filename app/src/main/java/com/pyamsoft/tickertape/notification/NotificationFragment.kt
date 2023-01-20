@@ -39,7 +39,6 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
@@ -48,7 +47,6 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
   @JvmField @Inject internal var viewModel: NotificationViewModeler? = null
-  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
 
   private fun onTapePageSizeChanged(size: Int) {
@@ -85,7 +83,6 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     ObjectGraph.ActivityScope.retrieve(act).plusAlerts().create().inject(this)
 
     val vm = viewModel.requireNotNull()
-    val mainVM = mainViewModel.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
     return ComposeView(act).apply {
@@ -101,14 +98,13 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         val handleBigMoverToggled by rememberUpdatedState { onBigMoverNotificationToggled() }
 
         act.TickerTapeTheme(themeProvider) {
-            NotificationScreen(
-                modifier = Modifier.fillMaxSize(),
-                state = vm.state,
-                navBarBottomHeight = mainVM.state.bottomNavHeight,
-                onTapeNotificationToggled = handleTapeToggled,
-                onTapePageSizeChanged = handleTapePageSizeChanged,
-                onBigMoverNotificationToggled = handleBigMoverToggled,
-            )
+          NotificationScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state,
+              onTapeNotificationToggled = handleTapeToggled,
+              onTapePageSizeChanged = handleTapePageSizeChanged,
+              onBigMoverNotificationToggled = handleBigMoverToggled,
+          )
         }
       }
     }
@@ -120,13 +116,11 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       vm.restoreState(savedInstanceState)
       vm.bind(scope = viewLifecycleOwner.lifecycleScope)
     }
-    mainViewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
-    mainViewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -139,7 +133,6 @@ class NotificationFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
     dispose()
 
     viewModel = null
-    mainViewModel = null
     theming = null
     navigator = null
   }

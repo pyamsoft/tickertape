@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.notification
 
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiSavedStateReader
 import com.pyamsoft.pydroid.arch.UiSavedStateWriter
@@ -35,7 +36,7 @@ import kotlinx.coroutines.yield
 class NotificationViewModeler
 @Inject
 internal constructor(
-    private val state: MutableNotificationViewState,
+    override val state: MutableNotificationViewState,
     private val tapePreferences: TapePreferences,
     private val bigMoverPreferences: BigMoverPreferences,
     private val refreshStandalone: RefreshStandalone,
@@ -47,16 +48,18 @@ internal constructor(
     val s = state
 
     scope.launch(context = Dispatchers.Main) {
-      tapePreferences.listenForTapeNotificationChanged().collectLatest { s.isTapeEnabled = it }
+      tapePreferences.listenForTapeNotificationChanged().collectLatest {
+        s.isTapeEnabled.value = it
+      }
     }
 
     scope.launch(context = Dispatchers.Main) {
-      tapePreferences.listenForTapePageSizeChanged().collectLatest { s.tapePageSize = it }
+      tapePreferences.listenForTapePageSizeChanged().collectLatest { s.tapePageSize.value = it }
     }
 
     scope.launch(context = Dispatchers.Main) {
       bigMoverPreferences.listenForBigMoverNotificationChanged().collectLatest {
-        s.isBigMoverEnabled = it
+        s.isBigMoverEnabled.value = it
       }
     }
   }
@@ -73,18 +76,44 @@ internal constructor(
   override fun restoreState(savedInstanceState: UiSavedStateReader) {
     val s = state
 
-    savedInstanceState.get<Boolean>(TAPE_IS_ENABLED)?.also { s.isTapeEnabled = it }
-    savedInstanceState.get<Int>(TAPE_PAGE_SIZE)?.also { s.tapePageSize = it }
+    savedInstanceState.get<Boolean>(TAPE_IS_ENABLED)?.also { s.isTapeEnabled.value = it }
+    savedInstanceState.get<Int>(TAPE_PAGE_SIZE)?.also { s.tapePageSize.value = it }
+    savedInstanceState.get<Boolean>(BIGMOVER_IS_ENABLED)?.also { s.isBigMoverEnabled.value = it }
+  }
 
-    savedInstanceState.get<Boolean>(BIGMOVER_IS_ENABLED)?.also { s.isBigMoverEnabled = it }
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(TAPE_IS_ENABLED) { s.isTapeEnabled.value }.also { add(it) }
+        registry.registerProvider(TAPE_PAGE_SIZE) { s.tapePageSize.value }.also { add(it) }
+        registry
+            .registerProvider(BIGMOVER_IS_ENABLED) { s.isBigMoverEnabled.value }
+            .also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry
+        .consumeRestored(TAPE_IS_ENABLED)
+        ?.let { it as Boolean }
+        ?.also { s.isTapeEnabled.value = it }
+    registry.consumeRestored(TAPE_PAGE_SIZE)?.let { it as Int }?.also { s.tapePageSize.value = it }
+    registry
+        .consumeRestored(BIGMOVER_IS_ENABLED)
+        ?.let { it as Boolean }
+        ?.also { s.isBigMoverEnabled.value = it }
   }
 
   fun handleTapeNotificationToggled(scope: CoroutineScope) {
     val s = state
-    val newEnabled = !s.isTapeEnabled
+    val newEnabled = !s.isTapeEnabled.value
 
     // Set state immediately for feedback
-    state.isTapeEnabled = newEnabled
+    state.isTapeEnabled.value = newEnabled
 
     // Fire pref change
     scope.launch(context = Dispatchers.Main) {
@@ -103,7 +132,7 @@ internal constructor(
       size: Int,
   ) {
     // Set state immediately for feedback
-    state.tapePageSize = size
+    state.tapePageSize.value = size
 
     // Fire pref change
     scope.launch(context = Dispatchers.Main) { tapePreferences.setTapePageSize(size) }
@@ -111,10 +140,10 @@ internal constructor(
 
   fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
     val s = state
-    val newEnabled = !s.isBigMoverEnabled
+    val newEnabled = !s.isBigMoverEnabled.value
 
     // Set state immediately for feedback
-    state.isBigMoverEnabled = newEnabled
+    state.isBigMoverEnabled.value = newEnabled
 
     // Fire pref change
     scope.launch(context = Dispatchers.Main) {

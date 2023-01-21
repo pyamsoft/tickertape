@@ -17,10 +17,14 @@
 package com.pyamsoft.tickertape.watchlist
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
+import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
@@ -52,16 +56,20 @@ internal fun WatchlistRemoveDialog(
 
   val scope = rememberCoroutineScope()
 
-  DeleteTicker(
-      modifier = Modifier.fillMaxWidth(),
-      symbol = symbol,
-      onCancel = onDismiss,
-      onConfirm = {
-        presenter.handleRemove(
-            scope = scope,
-            symbol = symbol,
-            onRemoved = onDismiss,
-        )
-      },
-  )
+  Dialog(
+      onDismissRequest = onDismiss,
+  ) {
+    DeleteTicker(
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
+        symbol = symbol,
+        onCancel = onDismiss,
+        onConfirm = {
+          presenter.handleRemove(
+              scope = scope,
+              symbol = symbol,
+              onRemoved = onDismiss,
+          )
+        },
+    )
+  }
 }

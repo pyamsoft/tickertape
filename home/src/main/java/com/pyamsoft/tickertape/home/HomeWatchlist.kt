@@ -21,6 +21,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -99,8 +100,8 @@ internal fun HomeWatchlist(
           )
 
           Loading(
-              isLoading = isLoading,
               modifier = Modifier.matchParentSize(),
+              isLoading = isLoading,
           )
         }
       }
@@ -119,10 +120,11 @@ private fun Loading(
     modifier: Modifier = Modifier,
 ) {
   AnimatedVisibility(
+      modifier = modifier,
       visible = isLoading,
   ) {
     Box(
-        modifier = modifier.padding(MaterialTheme.keylines.content),
+        modifier = Modifier.fillMaxSize().padding(MaterialTheme.keylines.content),
         contentAlignment = Alignment.Center,
     ) {
       CircularProgressIndicator()

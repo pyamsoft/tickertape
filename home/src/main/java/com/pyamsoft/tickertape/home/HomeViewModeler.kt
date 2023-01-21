@@ -35,7 +35,7 @@ import timber.log.Timber
 class HomeViewModeler
 @Inject
 internal constructor(
-    private val state: MutableHomeViewState,
+    override val state: MutableHomeViewState,
     private val homeInteractor: HomeInteractor,
     private val homeInteractorCache: HomeInteractor.Cache,
     private val portfolioInteractor: PortfolioInteractor,
@@ -46,38 +46,41 @@ internal constructor(
     private val tickerInteractorCache: TickerInteractor.Cache,
 ) : AbstractViewModeler<HomeViewState>(state) {
 
+  private var internalFullWatchlist: List<Ticker> = emptyList()
+
   @CheckResult
   private suspend inline fun handleFetchScreener(
       force: Boolean,
       screener: StockScreener,
-      onLoading: (Boolean) -> Unit,
+      onLoading: (HomeBaseViewState.LoadingState) -> Unit,
       onFetched: (List<Ticker>, Throwable?) -> Unit,
   ) {
     if (force) {
       homeInteractorCache.invalidateScreener(screener)
     }
 
-    onLoading(true)
+    onLoading(HomeBaseViewState.LoadingState.LOADING)
     homeInteractor
         .getScreener(screener, WATCHLIST_COUNT)
         .onSuccess { onFetched(it, null) }
         .onFailure { Timber.e(it, "Failed to fetch screener: $screener") }
         .onFailure { onFetched(emptyList(), it) }
-        .onFinally { onLoading(false) }
+        .onFinally { onLoading(HomeBaseViewState.LoadingState.DONE) }
   }
 
   private fun handleGenerateWatchlist(list: List<Ticker>) {
     val s = state
     val sorted = list.sortedWith(Ticker.COMPARATOR)
     s.apply {
-      fullWatchlist = sorted
-      watchlist = sorted.take(WATCHLIST_COUNT)
+      internalFullWatchlist = sorted
+      watchlist.value = sorted.take(WATCHLIST_COUNT)
     }
   }
 
   fun handleFetchWatchlist(scope: CoroutineScope, force: Boolean) {
     val s = state
-    s.isLoadingWatchlist = true
+
+    s.isLoadingWatchlist.value = HomeBaseViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
       if (force) {
         watchlistInteractorCache.invalidateQuotes()
@@ -86,24 +89,24 @@ internal constructor(
           .getQuotes()
           .onSuccess { list ->
             handleGenerateWatchlist(list)
-            s.watchlistError = null
+            s.watchlistError.value = null
           }
           .onFailure { Timber.e(it, "Failed to fetch watchlist") }
           .onFailure {
             s.apply {
-              fullWatchlist = emptyList()
-              watchlist = emptyList()
-              watchlistError = it
+              internalFullWatchlist = emptyList()
+              watchlist.value = emptyList()
+              watchlistError.value = it
             }
           }
-          .onFinally { s.isLoadingWatchlist = false }
+          .onFinally { s.isLoadingWatchlist.value = HomeBaseViewState.LoadingState.DONE }
     }
   }
 
   fun handleFetchPortfolio(scope: CoroutineScope, force: Boolean) {
     val s = state
     scope.launch(context = Dispatchers.Main) {
-      s.isLoadingPortfolio = true
+      s.isLoadingPortfolio.value = HomeBaseViewState.LoadingState.LOADING
 
       if (force) {
         portfolioInteractorCache.invalidatePortfolio()
@@ -113,25 +116,25 @@ internal constructor(
           .getPortfolio()
           .onSuccess {
             s.apply {
-              portfolio = PortfolioStockList.of(it)
-              portfolioError = null
+              portfolio.value = PortfolioStockList.of(it)
+              portfolioError.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to fetch portfolio") }
           .onFailure {
             s.apply {
-              portfolio = PortfolioStockList.empty()
-              portfolioError = it
+              portfolio.value = PortfolioStockList.empty()
+              portfolioError.value = it
             }
           }
-          .onFinally { s.isLoadingPortfolio = false }
+          .onFinally { s.isLoadingPortfolio.value = HomeBaseViewState.LoadingState.DONE }
     }
   }
 
   fun handleFetchIndexes(scope: CoroutineScope, force: Boolean) {
     val s = state
     scope.launch(context = Dispatchers.Main) {
-      s.isLoadingIndexes = true
+      s.isLoadingIndexes.value = HomeBaseViewState.LoadingState.LOADING
 
       if (force) {
         tickerInteractorCache.invalidateCharts(
@@ -148,18 +151,18 @@ internal constructor(
           )
           .onSuccess {
             s.apply {
-              indexes = it
-              indexesError = null
+              indexes.value = it
+              indexesError.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to fetch indexes") }
           .onFailure {
             s.apply {
-              indexes = emptyList()
-              indexesError = null
+              indexes.value = emptyList()
+              indexesError.value = null
             }
           }
-          .onFinally { s.isLoadingIndexes = false }
+          .onFinally { s.isLoadingIndexes.value = HomeBaseViewState.LoadingState.DONE }
     }
   }
 
@@ -169,11 +172,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.DAY_GAINERS,
-          onLoading = { s.isLoadingGainers = it },
+          onLoading = { s.isLoadingGainers.value = it },
           onFetched = { list, error ->
             s.apply {
-              gainers = list
-              gainersError = error
+              gainers.value = list
+              gainersError.value = error
             }
           },
       )
@@ -186,11 +189,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.GROWTH_TECHNOLOGY_STOCKS,
-          onLoading = { s.isLoadingGrowthTech = it },
+          onLoading = { s.isLoadingGrowthTech.value = it },
           onFetched = { list, error ->
             s.apply {
-              growthTech = list
-              growthTechError = error
+              growthTech.value = list
+              growthTechError.value = error
             }
           },
       )
@@ -203,11 +206,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.UNDERVALUED_GROWTH_STOCKS,
-          onLoading = { s.isLoadingUndervaluedGrowth = it },
+          onLoading = { s.isLoadingUndervaluedGrowth.value = it },
           onFetched = { list, error ->
             s.apply {
-              undervaluedGrowth = list
-              undervaluedGrowthError = error
+              undervaluedGrowth.value = list
+              undervaluedGrowthError.value = error
             }
           },
       )
@@ -220,11 +223,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.MOST_ACTIVES,
-          onLoading = { s.isLoadingMostActive = it },
+          onLoading = { s.isLoadingMostActive.value = it },
           onFetched = { list, error ->
             s.apply {
-              mostActive = list
-              mostActiveError = error
+              mostActive.value = list
+              mostActiveError.value = error
             }
           },
       )
@@ -237,11 +240,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.DAY_LOSERS,
-          onLoading = { s.isLoadingLosers = it },
+          onLoading = { s.isLoadingLosers.value = it },
           onFetched = { list, error ->
             s.apply {
-              losers = list
-              losersError = error
+              losers.value = list
+              losersError.value = error
             }
           },
       )
@@ -254,11 +257,11 @@ internal constructor(
       handleFetchScreener(
           force,
           StockScreener.MOST_SHORTED_STOCKS,
-          onLoading = { s.isLoadingMostShorted = it },
+          onLoading = { s.isLoadingMostShorted.value = it },
           onFetched = { list, error ->
             s.apply {
-              mostShorted = list
-              mostShortedError = error
+              mostShorted.value = list
+              mostShortedError.value = error
             }
           },
       )
@@ -267,7 +270,7 @@ internal constructor(
 
   fun handleFetchTrending(scope: CoroutineScope, force: Boolean) {
     val s = state
-    s.isLoadingTrending = true
+    s.isLoadingTrending.value = HomeBaseViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
       if (force) {
         homeInteractorCache.invalidateTrending()
@@ -277,18 +280,18 @@ internal constructor(
           .getTrending(TRENDING_COUNT)
           .onSuccess {
             s.apply {
-              trending = it
-              trendingError = null
+              trending.value = it
+              trendingError.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to fetch trending") }
           .onFailure {
             s.apply {
-              trending = emptyList()
-              trendingError = it
+              trending.value = emptyList()
+              trendingError.value = it
             }
           }
-          .onFinally { s.isLoadingTrending = false }
+          .onFinally { s.isLoadingTrending.value = HomeBaseViewState.LoadingState.DONE }
     }
   }
 

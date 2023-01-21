@@ -16,86 +16,96 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import com.pyamsoft.tickertape.quote.Ticker
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-@Stable interface HomeBaseViewState : UiViewState
+@Stable
+interface HomeBaseViewState : UiViewState {
+
+  @Stable
+  @Immutable
+  enum class LoadingState {
+    NONE,
+    LOADING,
+    DONE
+  }
+}
 
 @Stable
 interface HomePortfolioViewState : HomeBaseViewState {
-  val isLoadingPortfolio: Boolean
-  val portfolio: PortfolioStockList
-  val portfolioError: Throwable?
+  val isLoadingPortfolio: StateFlow<HomeBaseViewState.LoadingState>
+  val portfolio: StateFlow<PortfolioStockList>
+  val portfolioError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeWatchListViewState : HomeBaseViewState {
-  val isLoadingWatchlist: Boolean
-  val watchlist: List<Ticker>
-  val watchlistError: Throwable?
+  val isLoadingWatchlist: StateFlow<HomeBaseViewState.LoadingState>
+  val watchlist: StateFlow<List<Ticker>>
+  val watchlistError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeIndexesViewState : HomeBaseViewState {
-  val isLoadingIndexes: Boolean
-  val indexes: List<Ticker>
-  val indexesError: Throwable?
+  val isLoadingIndexes: StateFlow<HomeBaseViewState.LoadingState>
+  val indexes: StateFlow<List<Ticker>>
+  val indexesError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeGainersViewState : HomeBaseViewState {
-  val isLoadingGainers: Boolean
-  val gainers: List<Ticker>
-  val gainersError: Throwable?
+  val isLoadingGainers: StateFlow<HomeBaseViewState.LoadingState>
+  val gainers: StateFlow<List<Ticker>>
+  val gainersError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeLosersViewState : HomeBaseViewState {
-  val isLoadingLosers: Boolean
-  val losers: List<Ticker>
-  val losersError: Throwable?
+  val isLoadingLosers: StateFlow<HomeBaseViewState.LoadingState>
+  val losers: StateFlow<List<Ticker>>
+  val losersError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeTrendingViewState : HomeBaseViewState {
-  val isLoadingTrending: Boolean
-  val trending: List<Ticker>
-  val trendingError: Throwable?
+  val isLoadingTrending: StateFlow<HomeBaseViewState.LoadingState>
+  val trending: StateFlow<List<Ticker>>
+  val trendingError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeShortedViewState : HomeBaseViewState {
-  val isLoadingMostShorted: Boolean
-  val mostShorted: List<Ticker>
-  val mostShortedError: Throwable?
+  val isLoadingMostShorted: StateFlow<HomeBaseViewState.LoadingState>
+  val mostShorted: StateFlow<List<Ticker>>
+  val mostShortedError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeGrowthTechViewState : HomeBaseViewState {
-  val isLoadingGrowthTech: Boolean
-  val growthTech: List<Ticker>
-  val growthTechError: Throwable?
+  val isLoadingGrowthTech: StateFlow<HomeBaseViewState.LoadingState>
+  val growthTech: StateFlow<List<Ticker>>
+  val growthTechError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeUndervaluedGrowthViewState : HomeBaseViewState {
-  val isLoadingUndervaluedGrowth: Boolean
-  val undervaluedGrowth: List<Ticker>
-  val undervaluedGrowthError: Throwable?
+  val isLoadingUndervaluedGrowth: StateFlow<HomeBaseViewState.LoadingState>
+  val undervaluedGrowth: StateFlow<List<Ticker>>
+  val undervaluedGrowthError: StateFlow<Throwable?>
 }
 
 @Stable
 interface HomeMostActiveViewState : HomeBaseViewState {
-  val isLoadingMostActive: Boolean
-  val mostActive: List<Ticker>
-  val mostActiveError: Throwable?
+  val isLoadingMostActive: StateFlow<HomeBaseViewState.LoadingState>
+  val mostActive: StateFlow<List<Ticker>>
+  val mostActiveError: StateFlow<Throwable?>
 }
 
 @Stable
@@ -110,53 +120,49 @@ interface HomeViewState :
     HomeShortedViewState,
     HomeUndervaluedGrowthViewState,
     HomeGrowthTechViewState,
-    HomeMostActiveViewState {
-
-  val fullWatchlist: List<Ticker>
-}
+    HomeMostActiveViewState
 
 @Stable
 @ActivityScope
-internal class MutableHomeViewState @Inject internal constructor() : HomeViewState {
+class MutableHomeViewState @Inject internal constructor() : HomeViewState {
 
-  override var isLoadingPortfolio by mutableStateOf(false)
-  override var portfolio by mutableStateOf(PortfolioStockList.empty())
-  override var portfolioError by mutableStateOf<Throwable?>(null)
+  override val isLoadingPortfolio = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val portfolio = MutableStateFlow(PortfolioStockList.empty())
+  override val portfolioError = MutableStateFlow<Throwable?>(null)
 
-  override var fullWatchlist by mutableStateOf(emptyList<Ticker>())
-  override var isLoadingWatchlist by mutableStateOf(false)
-  override var watchlist by mutableStateOf(emptyList<Ticker>())
-  override var watchlistError by mutableStateOf<Throwable?>(null)
+  override val isLoadingWatchlist = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val watchlist = MutableStateFlow(emptyList<Ticker>())
+  override val watchlistError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingIndexes by mutableStateOf(false)
-  override var indexes by mutableStateOf(emptyList<Ticker>())
-  override var indexesError by mutableStateOf<Throwable?>(null)
+  override val isLoadingIndexes = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val indexes = MutableStateFlow(emptyList<Ticker>())
+  override val indexesError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingGainers by mutableStateOf(false)
-  override var gainers by mutableStateOf(emptyList<Ticker>())
-  override var gainersError by mutableStateOf<Throwable?>(null)
+  override val isLoadingGainers = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val gainers = MutableStateFlow(emptyList<Ticker>())
+  override val gainersError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingLosers by mutableStateOf(false)
-  override var losers by mutableStateOf(emptyList<Ticker>())
-  override var losersError by mutableStateOf<Throwable?>(null)
+  override val isLoadingLosers = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val losers = MutableStateFlow(emptyList<Ticker>())
+  override val losersError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingTrending by mutableStateOf(false)
-  override var trending by mutableStateOf(emptyList<Ticker>())
-  override var trendingError by mutableStateOf<Throwable?>(null)
+  override val isLoadingTrending = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val trending = MutableStateFlow(emptyList<Ticker>())
+  override val trendingError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingMostShorted by mutableStateOf(false)
-  override var mostShorted by mutableStateOf(emptyList<Ticker>())
-  override var mostShortedError by mutableStateOf<Throwable?>(null)
+  override val isLoadingMostShorted = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val mostShorted = MutableStateFlow(emptyList<Ticker>())
+  override val mostShortedError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingGrowthTech by mutableStateOf(false)
-  override var growthTech by mutableStateOf(emptyList<Ticker>())
-  override var growthTechError by mutableStateOf<Throwable?>(null)
+  override val isLoadingGrowthTech = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val growthTech = MutableStateFlow(emptyList<Ticker>())
+  override val growthTechError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingUndervaluedGrowth by mutableStateOf(false)
-  override var undervaluedGrowth by mutableStateOf(emptyList<Ticker>())
-  override var undervaluedGrowthError by mutableStateOf<Throwable?>(null)
+  override val isLoadingUndervaluedGrowth = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val undervaluedGrowth = MutableStateFlow(emptyList<Ticker>())
+  override val undervaluedGrowthError = MutableStateFlow<Throwable?>(null)
 
-  override var isLoadingMostActive by mutableStateOf(false)
-  override var mostActive by mutableStateOf(emptyList<Ticker>())
-  override var mostActiveError by mutableStateOf<Throwable?>(null)
+  override val isLoadingMostActive = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
+  override val mostActive = MutableStateFlow(emptyList<Ticker>())
+  override val mostActiveError = MutableStateFlow<Throwable?>(null)
 }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -34,10 +33,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
@@ -53,7 +50,6 @@ fun HomeScreen(
     state: HomeViewState,
     appName: String,
     imageLoader: ImageLoader,
-    navBarBottomHeight: Int = 0,
     onSettingsClicked: () -> Unit,
     onChartClicked: (Ticker) -> Unit,
     onRefreshIndexes: CoroutineScope.() -> Unit,
@@ -67,15 +63,6 @@ fun HomeScreen(
     onRefreshGrowthTech: CoroutineScope.() -> Unit,
     onRefreshMostShorted: CoroutineScope.() -> Unit,
 ) {
-  val density = LocalDensity.current
-  val bottomPaddingDp =
-      remember(
-          density,
-          navBarBottomHeight,
-      ) {
-        density.run { navBarBottomHeight.toDp() }
-      }
-
   Scaffold(
       modifier = modifier,
   ) { pv ->
@@ -192,7 +179,7 @@ fun HomeScreen(
 
       item {
         Spacer(
-            modifier = Modifier.padding(pv).navigationBarsPadding().height(bottomPaddingDp),
+            modifier = Modifier.padding(pv).navigationBarsPadding(),
         )
       }
     }

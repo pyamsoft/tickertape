@@ -3,7 +3,6 @@ package com.pyamsoft.tickertape.setting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
@@ -26,7 +25,7 @@ fun SettingsToolbar(
 ) {
   Surface(
       modifier = modifier,
-      elevation = AppBarDefaults.TopAppBarElevation,
+      elevation = ZeroElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
       shape =

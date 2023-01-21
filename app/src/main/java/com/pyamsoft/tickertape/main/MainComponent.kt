@@ -27,8 +27,6 @@ import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.notification.NotificationComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
-import com.pyamsoft.tickertape.setting.AppSettingsComponent
-import com.pyamsoft.tickertape.setting.SettingsComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import com.pyamsoft.tickertape.watchlist.WatchlistComponent
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent

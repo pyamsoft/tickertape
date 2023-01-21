@@ -35,12 +35,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.chart.ChartError
@@ -59,13 +65,19 @@ internal fun HomeIndexes(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingIndexes.collectAsState()
+  val error by state.indexesError.collectAsState()
+  val tickers = state.indexes.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "USA Indexes",
-      isLoading = state.isLoadingIndexes,
-      tickers = state.indexes,
-      error = state.indexesError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -79,13 +91,19 @@ internal fun HomeGainers(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingGainers.collectAsState()
+  val error by state.gainersError.collectAsState()
+  val tickers = state.gainers.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Gainers (USA)",
-      isLoading = state.isLoadingGainers,
-      tickers = state.gainers,
-      error = state.gainersError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -99,13 +117,19 @@ internal fun HomeLosers(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingLosers.collectAsState()
+  val error by state.losersError.collectAsState()
+  val tickers = state.losers.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Losers (USA)",
-      isLoading = state.isLoadingLosers,
-      tickers = state.losers,
-      error = state.losersError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -119,13 +143,19 @@ internal fun HomeTrending(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingTrending.collectAsState()
+  val error by state.trendingError.collectAsState()
+  val tickers = state.trending.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Top Trending Stocks (USA)",
-      isLoading = state.isLoadingTrending,
-      tickers = state.trending,
-      error = state.trendingError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -139,13 +169,19 @@ internal fun HomeMostShorted(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingMostShorted.collectAsState()
+  val error by state.mostShortedError.collectAsState()
+  val tickers = state.mostShorted.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Most Shorted Stocks",
-      isLoading = state.isLoadingMostShorted,
-      tickers = state.mostShorted,
-      error = state.mostShortedError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -159,13 +195,19 @@ internal fun HomeMostActive(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingMostActive.collectAsState()
+  val error by state.mostActiveError.collectAsState()
+  val tickers = state.mostActive.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Today's Most Active Stocks",
-      isLoading = state.isLoadingMostActive,
-      tickers = state.mostActive,
-      error = state.mostActiveError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -179,13 +221,19 @@ internal fun HomeGrowthTech(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingGrowthTech.collectAsState()
+  val error by state.growthTechError.collectAsState()
+  val tickers = state.growthTech.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Growth Tech Stocks",
-      isLoading = state.isLoadingGrowthTech,
-      tickers = state.growthTech,
-      error = state.growthTechError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -199,13 +247,19 @@ internal fun HomeUndervaluedGrowth(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
+  val loadingState by state.isLoadingUndervaluedGrowth.collectAsState()
+  val error by state.undervaluedGrowthError.collectAsState()
+  val tickers = state.undervaluedGrowth.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
+
   HomeCharts(
       modifier = modifier,
       imageLoader = imageLoader,
       name = "Undervalued Growth Stocks",
-      isLoading = state.isLoadingUndervaluedGrowth,
-      tickers = state.undervaluedGrowth,
-      error = state.undervaluedGrowthError,
+      isLoading = isLoading,
+      tickers = tickers,
+      error = error,
       onChartClicked = onChartClicked,
       onRefresh = onRefresh,
   )
@@ -216,7 +270,7 @@ private fun HomeCharts(
     modifier: Modifier = Modifier,
     name: String,
     isLoading: Boolean,
-    tickers: List<Ticker>,
+    tickers: SnapshotStateList<Ticker>,
     error: Throwable?,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
@@ -331,13 +385,15 @@ private fun PreviewHomeCharts() {
   Surface {
     HomeCharts(
         tickers =
-            listOf(
-                Ticker(
-                    symbol = symbol,
-                    quote = newTestQuote(symbol),
-                    chart = newTestChart(symbol),
-                ),
-            ),
+            remember {
+              mutableStateListOf(
+                  Ticker(
+                      symbol = symbol,
+                      quote = newTestQuote(symbol),
+                      chart = newTestChart(symbol),
+                  ),
+              )
+            },
         imageLoader = createNewTestImageLoader(),
         isLoading = false,
         name = "TEST STOCKS CHARTS",

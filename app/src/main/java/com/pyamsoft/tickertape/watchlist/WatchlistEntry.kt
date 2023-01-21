@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -121,43 +122,47 @@ fun WatchlistEntry(
   val deleteTicker by state.deleteTicker.collectAsState()
   val digTicker by state.digTicker.collectAsState()
 
-  WatchlistScreen(
-      modifier = modifier,
-      state = state,
-      imageLoader = imageLoader,
-      onRefresh = { handleRefresh(true) },
-      onDeleteTicker = { viewModel.handleOpenDeleteTicker(it.symbol) },
-      onSearchChanged = { viewModel.handleSearch(it) },
-      onTabUpdated = { viewModel.handleSectionChanged(it) },
-      onSelectTicker = { viewModel.handleOpenDig(it) },
-      onRegenerateList = { viewModel.handleRegenerateList(this) },
-  )
+  Crossfade(
+      targetState = digTicker,
+  ) { dig ->
+    if (dig == null) {
+      WatchlistScreen(
+          modifier = modifier,
+          state = state,
+          imageLoader = imageLoader,
+          onRefresh = { handleRefresh(true) },
+          onDeleteTicker = { viewModel.handleOpenDeleteTicker(it.symbol) },
+          onSearchChanged = { viewModel.handleSearch(it) },
+          onTabUpdated = { viewModel.handleSectionChanged(it) },
+          onSelectTicker = { viewModel.handleOpenDig(it) },
+          onRegenerateList = { viewModel.handleRegenerateList(this) },
+      )
 
-  deleteTicker?.also { ticker ->
-    WatchlistRemoveDialog(
-        symbol = ticker,
-        onDismiss = { viewModel.handleCloseDeleteTicker() },
-    )
-  }
+      deleteTicker?.also { ticker ->
+        WatchlistRemoveDialog(
+            symbol = ticker,
+            onDismiss = { viewModel.handleCloseDeleteTicker() },
+        )
+      }
+    } else {
+      val quote = dig.quote
+      if (quote == null) {
+        LaunchedEffect(true) { Timber.w("Can't show dig dialog, missing quote: $dig") }
+        return@Crossfade
+      }
 
-  digTicker?.also { ticker ->
-    val quote = ticker.quote
-    if (quote == null) {
-      LaunchedEffect(true) { Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}") }
-      return@also
+      val params =
+          remember(quote) {
+            WatchlistDigParams(
+                symbol = quote.symbol,
+                lookupSymbol =
+                    if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
+                equityType = quote.type)
+          }
+      WatchlistDigEntry(
+          params = params,
+          onGoBack = { viewModel.handleCloseDig() },
+      )
     }
-
-    val params =
-        remember(quote) {
-          WatchlistDigParams(
-              symbol = quote.symbol,
-              lookupSymbol =
-                  if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
-              equityType = quote.type)
-        }
-    WatchlistDigEntry(
-        params = params,
-        onGoBack = { viewModel.handleCloseDig() },
-    )
   }
 }

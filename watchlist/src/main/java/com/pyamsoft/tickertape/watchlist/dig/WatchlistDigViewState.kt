@@ -28,6 +28,7 @@ interface WatchlistDigViewState : DigViewState {
   }
 }
 
+// No ActivityScope since we want a new one made each time
 @Stable
 class MutableWatchlistDigViewState
 @Inject

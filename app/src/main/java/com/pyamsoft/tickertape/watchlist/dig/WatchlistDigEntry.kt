@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
@@ -107,64 +108,68 @@ internal fun WatchlistDigEntry(
 
   val state = viewModel.state
 
-  MountHooks(
-      onRefresh = { handleRefresh(false) },
-  )
-  BackHandler(
-      onBack = onGoBack,
-  )
-  WatchlistDigScreen(
-      modifier = modifier,
-      state = state,
-      imageLoader = imageLoader,
-      onClose = onGoBack,
-      onChartScrub = { viewModel.handleChartDateScrubbed(it) },
-      onChartRangeSelected = { range ->
-        viewModel.handleChartRangeSelected(
-            scope = scope,
-            range = range,
-        )
-      },
-      onModifyWatchlist = { viewModel.handleModifyWatchlist(scope = scope) },
-      onRefresh = { handleRefresh(true) },
-      onTabUpdated = { section ->
-        viewModel.handleTabUpdated(
-            scope = scope,
-            section = section,
-        )
-      },
-      onRecClick = { viewModel.handleOpenRecommendation(it) },
-      onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
-      onOptionExpirationDateChanged = { date ->
-        viewModel.handleOptionsExpirationDateChanged(
-            scope = scope,
-            date = date,
-        )
-      },
-      onAddPriceAlert = {
-        // TODO add alert
-      },
-      onUpdatePriceAlert = { alert ->
-        // TODO update alert
-      },
-      onDeletePriceAlert = { alert ->
-        // TODO delete alert
-      },
-  )
-
   val recommendation by state.digRecommendation.collectAsState()
-  recommendation?.also { rec ->
-    val recParams =
-        remember(rec) {
-          WatchlistDigParams(
-              symbol = rec.symbol,
-              lookupSymbol = rec.symbol,
-              equityType = rec.quote?.type ?: EquityType.STOCK)
-        }
-    WatchlistDigEntry(
-        modifier = modifier,
-        params = recParams,
-        onGoBack = { viewModel.handleCloseRecommendation() },
-    )
+  Crossfade(
+      targetState = recommendation,
+  ) { rec ->
+    if (rec == null) {
+      MountHooks(
+          onRefresh = { handleRefresh(false) },
+      )
+      BackHandler(
+          onBack = onGoBack,
+      )
+      WatchlistDigScreen(
+          modifier = modifier,
+          state = state,
+          imageLoader = imageLoader,
+          onClose = onGoBack,
+          onChartScrub = { viewModel.handleChartDateScrubbed(it) },
+          onChartRangeSelected = { range ->
+            viewModel.handleChartRangeSelected(
+                scope = scope,
+                range = range,
+            )
+          },
+          onModifyWatchlist = { viewModel.handleModifyWatchlist(scope = scope) },
+          onRefresh = { handleRefresh(true) },
+          onTabUpdated = { section ->
+            viewModel.handleTabUpdated(
+                scope = scope,
+                section = section,
+            )
+          },
+          onRecClick = { viewModel.handleOpenRecommendation(it) },
+          onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
+          onOptionExpirationDateChanged = { date ->
+            viewModel.handleOptionsExpirationDateChanged(
+                scope = scope,
+                date = date,
+            )
+          },
+          onAddPriceAlert = {
+            // TODO add alert
+          },
+          onUpdatePriceAlert = { alert ->
+            // TODO update alert
+          },
+          onDeletePriceAlert = { alert ->
+            // TODO delete alert
+          },
+      )
+    } else {
+      val recParams =
+          remember(rec) {
+            WatchlistDigParams(
+                symbol = rec.symbol,
+                lookupSymbol = rec.symbol,
+                equityType = rec.quote?.type ?: EquityType.STOCK)
+          }
+      WatchlistDigEntry(
+          modifier = modifier,
+          params = recParams,
+          onGoBack = { viewModel.handleCloseRecommendation() },
+      )
+    }
   }
 }

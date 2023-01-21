@@ -28,8 +28,8 @@ android {
   defaultConfig {
     minSdkVersion rootProject.ext.minSdk
     targetSdkVersion rootProject.ext.targetSdk
+    resConfigs 'en'
 
-    resConfigs "en"
   }
 
   compileOptions {

@@ -33,8 +33,8 @@ android {
 
     // For vector drawables
     vectorDrawables.useSupportLibrary = true
+    resConfigs 'en'
 
-    resConfigs "en"
   }
 
   compileOptions {
@@ -88,13 +88,14 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion "$compose_compiler_version"
   }
+  packagingOptions {
+    resources {
+      pickFirsts += ['META-INF/core_release.kotlin_module', 'META-INF/ui_release.kotlin_module']
+    }
+  }
 
   // Fixes this error message
   // More than one file was found with OS independent path 'META-INF/core_release.kotlin_module'
-  packagingOptions {
-    pickFirst 'META-INF/core_release.kotlin_module'
-    pickFirst 'META-INF/ui_release.kotlin_module'
-  }
 }
 
 // Kapt flags

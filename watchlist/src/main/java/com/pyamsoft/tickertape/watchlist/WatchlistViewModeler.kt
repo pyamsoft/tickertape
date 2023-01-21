@@ -20,8 +20,6 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.pydroid.arch.UiSavedStateReader
-import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
@@ -146,27 +144,13 @@ internal constructor(
         .toList()
   }
 
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query.value = it }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    state.query.value.also { search ->
-      if (search.isBlank()) {
-        outState.remove(KEY_SEARCH)
-      } else {
-        outState.put(KEY_SEARCH, search.trim())
-      }
-    }
-  }
-
   override fun registerSaveState(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         val s = state
 
-        registry.registerProvider(KEY_SEARCH) { s.query }.also { add(it) }
+        registry.registerProvider(KEY_SEARCH) { s.query.value }.also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {

@@ -40,6 +40,7 @@ import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
 import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
+import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
@@ -48,9 +49,8 @@ import com.pyamsoft.tickertape.tape.TapeComponent
 import com.pyamsoft.tickertape.tape.TapeModule
 import com.pyamsoft.tickertape.tape.TapePreferences
 import com.pyamsoft.tickertape.tape.TapeService
-import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
-import com.pyamsoft.tickertape.watchlist.WatchlistRemoveDialog
+import com.pyamsoft.tickertape.watchlist.WatchlistRemoveInjector
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -93,7 +93,7 @@ internal interface TickerComponent {
 
   fun inject(application: TickerTape)
 
-  fun inject(watchlistRemoveDialog: WatchlistRemoveDialog)
+  fun inject(injector: WatchlistRemoveInjector)
 
   fun inject(portfolioRemoveDialog: PortfolioRemoveDialog)
 

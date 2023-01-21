@@ -18,6 +18,8 @@ package com.pyamsoft.tickertape.watchlist
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
@@ -108,18 +110,15 @@ fun WatchlistEntry(
 
   SaveStateDisposableEffect(viewModel)
 
+  val state = viewModel.state
+  val showDeleteTicker by state.deleteTicker.collectAsState()
+
   WatchlistScreen(
       modifier = modifier,
-      state = viewModel.state,
+      state = state,
       imageLoader = imageLoader,
       onRefresh = { handleRefresh(true) },
-      onDeleteTicker = { ticker ->
-        // TODO move away from dialog fragment
-        WatchlistRemoveDialog.show(
-            activity,
-            symbol = ticker.symbol,
-        )
-      },
+      onDeleteTicker = { viewModel.handleOpenDeleteTicker(it.symbol) },
       onSearchChanged = { viewModel.handleSearch(it) },
       onTabUpdated = { viewModel.handleSectionChanged(it) },
       onSelectTicker = { ticker ->
@@ -135,4 +134,11 @@ fun WatchlistEntry(
       },
       onRegenerateList = { viewModel.handleRegenerateList(this) },
   )
+
+  showDeleteTicker?.also { ticker ->
+    WatchlistRemoveDialog(
+        symbol = ticker,
+        onDismiss = { viewModel.handleCloseDeleteTicker() },
+    )
+  }
 }

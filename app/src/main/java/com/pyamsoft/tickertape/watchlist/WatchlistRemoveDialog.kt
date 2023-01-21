@@ -16,134 +16,52 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import android.content.res.Configuration
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.CheckResult
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
-import com.pyamsoft.pydroid.core.requireNotNull
-import com.pyamsoft.pydroid.ui.app.makeFullWidth
-import com.pyamsoft.pydroid.ui.theme.ThemeProvider
-import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.pydroid.ui.util.dispose
-import com.pyamsoft.pydroid.ui.util.recompose
-import com.pyamsoft.pydroid.ui.util.show
+import com.pyamsoft.pydroid.ui.inject.ComposableInjector
+import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
+import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.quote.DeleteTicker
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
-internal class WatchlistRemoveDialog : AppCompatDialogFragment() {
+class WatchlistRemoveInjector @Inject constructor() : ComposableInjector() {
 
   @JvmField @Inject internal var presenter: WatchlistDeletePresenter? = null
-  @JvmField @Inject internal var theming: Theming? = null
 
-  @CheckResult
-  private fun getSymbol(): StockSymbol {
-    return requireArguments()
-        .getString(KEY_SYMBOL)
-        .let { it.requireNotNull { "Must be created with $KEY_SYMBOL" } }
-        .asSymbol()
-  }
-
-  private fun onDelete(symbol: StockSymbol) {
-    presenter
-        .requireNotNull()
-        .handleRemove(
-            scope = requireActivity().lifecycleScope,
-            symbol = symbol,
-            onRemoved = { dismiss() },
-        )
-  }
-
-  override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?,
-  ): View {
-    val act = requireActivity()
-
-    ObjectGraph.ApplicationScope.retrieve(act).inject(this)
-
-    val symbol = getSymbol()
-
-    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
-    return ComposeView(act).apply {
-      id = R.id.dialog_watchlist_dig
-
-      setContent {
-        val handleDelete by rememberUpdatedState { onDelete(symbol) }
-
-        val handleDismiss by rememberUpdatedState { dismiss() }
-
-        act.TickerTapeTheme(themeProvider) {
-          DeleteTicker(
-              modifier = Modifier.fillMaxWidth(),
-              symbol = symbol,
-              onCancel = handleDismiss,
-              onConfirm = handleDelete,
-          )
-        }
-      }
-    }
-  }
-
-  override fun onViewCreated(
-      view: View,
-      savedInstanceState: Bundle?,
-  ) {
-    super.onViewCreated(view, savedInstanceState)
-    makeFullWidth()
-  }
-
-  override fun onConfigurationChanged(newConfig: Configuration) {
-    super.onConfigurationChanged(newConfig)
-    makeFullWidth()
-    recompose()
-  }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-    dispose()
-
+  override fun onDispose() {
     presenter = null
-    theming = null
   }
 
-  companion object {
-
-    private const val KEY_SYMBOL = "key_symbol"
-    private val TAG = WatchlistRemoveDialog::class.java.name
-
-    @JvmStatic
-    @CheckResult
-    private fun newInstance(
-        symbol: StockSymbol,
-    ): DialogFragment {
-      return WatchlistRemoveDialog().apply {
-        arguments = Bundle().apply { putString(KEY_SYMBOL, symbol.raw) }
-      }
-    }
-
-    @JvmStatic
-    fun show(
-        activity: FragmentActivity,
-        symbol: StockSymbol,
-    ) {
-      newInstance(symbol).show(activity, TAG)
-    }
+  override fun onInject(activity: FragmentActivity) {
+    ObjectGraph.ApplicationScope.retrieve(activity).inject(this)
   }
+}
+
+@Composable
+internal fun WatchlistRemoveDialog(
+    symbol: StockSymbol,
+    onDismiss: () -> Unit,
+) {
+  val component = rememberComposableInjector { WatchlistRemoveInjector() }
+  val presenter = rememberNotNull(component.presenter)
+
+  val scope = rememberCoroutineScope()
+
+  DeleteTicker(
+      modifier = Modifier.fillMaxWidth(),
+      symbol = symbol,
+      onCancel = onDismiss,
+      onConfirm = {
+        presenter.handleRemove(
+            scope = scope,
+            symbol = symbol,
+            onRemoved = onDismiss,
+        )
+      },
+  )
 }

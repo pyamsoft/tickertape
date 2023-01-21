@@ -215,6 +215,14 @@ internal constructor(
     s.regenerateTickers(scope) { internalAllTickers }
   }
 
+  fun handleOpenDeleteTicker(symbol: StockSymbol) {
+    state.deleteTicker.value = symbol
+  }
+
+  fun handleCloseDeleteTicker() {
+    state.deleteTicker.value = null
+  }
+
   companion object {
 
     private const val KEY_SEARCH = "search"

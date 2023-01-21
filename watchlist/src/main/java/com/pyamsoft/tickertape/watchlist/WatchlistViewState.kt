@@ -35,6 +35,7 @@ interface WatchlistViewState : UiViewState {
   val watchlist: StateFlow<List<Ticker>>
   val error: StateFlow<Throwable?>
   val deleteTicker: StateFlow<StockSymbol?>
+  val digTicker: StateFlow<Ticker?>
 
   @Stable
   @Immutable
@@ -54,4 +55,5 @@ class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewSt
   override val watchlist = MutableStateFlow(emptyList<Ticker>())
   override val error = MutableStateFlow<Throwable?>(null)
   override val deleteTicker = MutableStateFlow<StockSymbol?>(null)
+  override val digTicker = MutableStateFlow<Ticker?>(null)
 }

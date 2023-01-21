@@ -16,20 +16,23 @@
 
 package com.pyamsoft.tickertape.home
 
-import androidx.annotation.CheckResult
-import dagger.Subcomponent
+import androidx.fragment.app.FragmentActivity
+import coil.ImageLoader
+import com.pyamsoft.pydroid.ui.inject.ComposableInjector
+import com.pyamsoft.tickertape.ObjectGraph
+import javax.inject.Inject
 
-@Subcomponent
-internal interface HomeComponent {
+class HomeInjector @Inject internal constructor() : ComposableInjector() {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: HomeFragment)
+  @JvmField @Inject internal var viewModel: HomeViewModeler? = null
+  @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  fun inject(injector: HomeInjector)
+  override fun onDispose() {
+    viewModel = null
+    imageLoader = null
+  }
 
-  @Subcomponent.Factory
-  interface Factory {
-
-    @CheckResult fun create(): HomeComponent
+  override fun onInject(activity: FragmentActivity) {
+    ObjectGraph.ActivityScope.retrieve(activity).plusHome().create().inject(this)
   }
 }

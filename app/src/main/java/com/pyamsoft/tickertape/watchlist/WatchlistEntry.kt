@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -36,6 +38,8 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigEntry
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigParams
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -60,10 +64,13 @@ private fun MountHooks(
     onFabClicked: () -> Unit,
     onRefresh: () -> Unit,
 ) {
+  val handleFabClicked by rememberUpdatedState(onFabClicked)
+  val handleRefresh by rememberUpdatedState(onRefresh)
+
   LaunchedEffect(viewModel) {
     viewModel.bind(
         scope = this,
-        onMainSelectionEvent = { onFabClicked() },
+        onMainSelectionEvent = { handleFabClicked() },
     )
   }
 
@@ -71,7 +78,7 @@ private fun MountHooks(
     object : DefaultLifecycleObserver {
 
       override fun onStart(owner: LifecycleOwner) {
-        onRefresh()
+        handleRefresh()
       }
     }
   }
@@ -111,7 +118,8 @@ fun WatchlistEntry(
   SaveStateDisposableEffect(viewModel)
 
   val state = viewModel.state
-  val showDeleteTicker by state.deleteTicker.collectAsState()
+  val deleteTicker by state.deleteTicker.collectAsState()
+  val digTicker by state.digTicker.collectAsState()
 
   WatchlistScreen(
       modifier = modifier,
@@ -121,24 +129,35 @@ fun WatchlistEntry(
       onDeleteTicker = { viewModel.handleOpenDeleteTicker(it.symbol) },
       onSearchChanged = { viewModel.handleSearch(it) },
       onTabUpdated = { viewModel.handleSectionChanged(it) },
-      onSelectTicker = { ticker ->
-        val quote = ticker.quote
-        if (quote == null) {
-          Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}")
-          return@WatchlistScreen
-        }
-
-        val equityType = quote.type
-        val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol
-        // TODO open drilldown
-      },
+      onSelectTicker = { viewModel.handleOpenDig(it) },
       onRegenerateList = { viewModel.handleRegenerateList(this) },
   )
 
-  showDeleteTicker?.also { ticker ->
+  deleteTicker?.also { ticker ->
     WatchlistRemoveDialog(
         symbol = ticker,
         onDismiss = { viewModel.handleCloseDeleteTicker() },
+    )
+  }
+
+  digTicker?.also { ticker ->
+    val quote = ticker.quote
+    if (quote == null) {
+      LaunchedEffect(true) { Timber.w("Can't show dig dialog, missing quote: ${ticker.symbol}") }
+      return@also
+    }
+
+    val params =
+        remember(quote) {
+          WatchlistDigParams(
+              symbol = quote.symbol,
+              lookupSymbol =
+                  if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
+              equityType = quote.type)
+        }
+    WatchlistDigEntry(
+        params = params,
+        onGoBack = { viewModel.handleCloseDig() },
     )
   }
 }

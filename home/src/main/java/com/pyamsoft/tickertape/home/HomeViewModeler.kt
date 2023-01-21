@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
 import com.pyamsoft.tickertape.portfolio.PortfolioStockList
@@ -75,6 +76,24 @@ internal constructor(
       internalFullWatchlist = sorted
       watchlist.value = sorted.take(WATCHLIST_COUNT)
     }
+  }
+
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(KEY_SETTINGS) { s.isSettingsOpen.value }.also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry
+        .consumeRestored(KEY_SETTINGS)
+        ?.let { it as Boolean }
+        ?.also { s.isSettingsOpen.value = it }
   }
 
   fun handleFetchWatchlist(scope: CoroutineScope, force: Boolean) {
@@ -295,7 +314,17 @@ internal constructor(
     }
   }
 
+  fun handleOpenSettings() {
+    state.isSettingsOpen.value = true
+  }
+
+  fun handleCloseSettings() {
+    state.isSettingsOpen.value = false
+  }
+
   companion object {
+
+    private const val KEY_SETTINGS = "is_settings_open"
 
     private const val TRENDING_COUNT = 20
     private const val WATCHLIST_COUNT = 10

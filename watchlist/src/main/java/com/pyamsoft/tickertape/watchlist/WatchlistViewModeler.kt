@@ -223,6 +223,14 @@ internal constructor(
     state.deleteTicker.value = null
   }
 
+  fun handleOpenDig(ticker: Ticker) {
+    state.digTicker.value = ticker
+  }
+
+  fun handleCloseDig() {
+    state.digTicker.value = null
+  }
+
   companion object {
 
     private const val KEY_SEARCH = "search"

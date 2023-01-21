@@ -120,11 +120,15 @@ interface HomeViewState :
     HomeShortedViewState,
     HomeUndervaluedGrowthViewState,
     HomeGrowthTechViewState,
-    HomeMostActiveViewState
+    HomeMostActiveViewState {
+  val isSettingsOpen: StateFlow<Boolean>
+}
 
 @Stable
 @ActivityScope
 class MutableHomeViewState @Inject internal constructor() : HomeViewState {
+
+  override val isSettingsOpen = MutableStateFlow(false)
 
   override val isLoadingPortfolio = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
   override val portfolio = MutableStateFlow(PortfolioStockList.empty())

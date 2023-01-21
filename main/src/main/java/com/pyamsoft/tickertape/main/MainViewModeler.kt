@@ -19,8 +19,6 @@ package com.pyamsoft.tickertape.main
 import android.app.Activity
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.pydroid.arch.UiSavedStateReader
-import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
 import javax.inject.Inject
@@ -64,23 +62,6 @@ internal constructor(
         ?.let { it as String }
         ?.let { Theming.Mode.valueOf(it) }
         ?.also { s.theme.value = it }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    state.theme.value.also { theme ->
-      if (theme != Theming.Mode.SYSTEM) {
-        outState.put(KEY_THEME, theme.name)
-      } else {
-        outState.remove(KEY_THEME)
-      }
-    }
-  }
-
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_THEME)?.also { themeName ->
-      val theme = Theming.Mode.valueOf(themeName)
-      state.theme.value = theme
-    }
   }
 
   companion object {

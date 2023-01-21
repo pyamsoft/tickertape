@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -157,5 +158,13 @@ internal constructor(
   ) {
     state.section.value = section
     handleLoadTicker(scope, force = false)
+  }
+
+  fun handleOpenRecommendation(ticker: Ticker) {
+    state.digRecommendation.value = ticker
+  }
+
+  fun handleCloseRecommendation() {
+    state.digRecommendation.value = null
   }
 }

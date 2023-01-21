@@ -50,10 +50,6 @@ internal interface MainComponent {
 
   @CheckResult fun plusPortfolioDig(): PortfolioDigComponent.Factory
 
-  @CheckResult fun plusSettings(): SettingsComponent.Factory
-
-  @CheckResult fun plusAppSettings(): AppSettingsComponent.Factory
-
   @CheckResult fun plusAlerts(): NotificationComponent.Factory
 
   fun inject(activity: MainActivity)

@@ -29,6 +29,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.home.item.HomePortfolioSummaryItem
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -46,10 +47,13 @@ internal fun HomePortfolio(
     state: HomePortfolioViewState,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val isLoading = state.isLoadingPortfolio
-  val portfolio = state.portfolio
+  val loadingState by state.isLoadingPortfolio.collectAsState()
+  val portfolio by state.portfolio.collectAsState()
+  val portfolioError by state.portfolioError.collectAsState()
 
   val isEmptyPortfolio = remember(portfolio) { portfolio.list.isEmpty() }
+  val isLoading = remember(loadingState) { loadingState == HomeBaseViewState.LoadingState.LOADING }
+
   val isVisible =
       remember(
           isEmptyPortfolio,
@@ -68,7 +72,7 @@ internal fun HomePortfolio(
 
   Crossfade(
       modifier = modifier,
-      targetState = state.portfolioError,
+      targetState = portfolioError,
   ) { err ->
     if (err == null) {
       Column {
@@ -162,12 +166,7 @@ private fun Error(
 private fun PreviewPortfolio() {
   Surface {
     HomePortfolio(
-        state =
-            object : HomePortfolioViewState {
-              override val portfolio: PortfolioStockList = PortfolioStockList.empty()
-              override val portfolioError: Throwable? = null
-              override val isLoadingPortfolio: Boolean = false
-            },
+        state = MutableHomeViewState(),
         onRefresh = {},
     )
   }

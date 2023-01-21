@@ -31,6 +31,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,11 +40,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.home.item.HomeWatchlistItem
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -52,12 +52,20 @@ internal fun HomeWatchlist(
     onClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val isLoading = state.isLoadingWatchlist
-  val tickers = state.watchlist
-  val error = state.watchlistError
+  val loadingState by state.isLoadingWatchlist.collectAsState()
+  val error by state.watchlistError.collectAsState()
+  val tickers = state.watchlist.collectAsStateList()
+
+  val isLoading = remember(loadingState) { loadingState == HomeBaseViewState.LoadingState.LOADING }
 
   val isEmptyTickers = remember(tickers) { tickers.isEmpty() }
-  val isVisible = remember(isEmptyTickers, isLoading) { !isEmptyTickers || isLoading }
+  val isVisible =
+      remember(
+          isEmptyTickers,
+          isLoading,
+      ) {
+        !isEmptyTickers || isLoading
+      }
 
   FirstRenderEffect { onRefresh() }
 
@@ -185,22 +193,9 @@ private fun Error(
 @Preview
 @Composable
 private fun PreviewWatchlist() {
-  val symbol = "MSFT".asSymbol()
   Surface {
     HomeWatchlist(
-        state =
-            object : HomeWatchListViewState {
-              override val watchlist: List<Ticker> =
-                  listOf(
-                      Ticker(
-                          symbol = symbol,
-                          quote = newTestQuote(symbol),
-                          chart = newTestChart(symbol),
-                      ),
-                  )
-              override val watchlistError: Throwable? = null
-              override val isLoadingWatchlist: Boolean = false
-            },
+        state = MutableHomeViewState(),
         onClicked = {},
         onRefresh = {},
     )

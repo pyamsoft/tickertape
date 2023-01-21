@@ -39,20 +39,18 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
-import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import javax.inject.Inject
 
 class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
-  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var viewModel: HomeViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
@@ -78,7 +76,7 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   }
 
   private fun onOpenSettingsDialog() {
-    SettingsDialog.show(requireActivity())
+    // TODO
   }
 
   override fun onCreateView(
@@ -92,7 +90,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
     val appName = act.getString(R.string.app_name)
     val vm = viewModel.requireNotNull()
-    val mainVM = mainViewModel.requireNotNull()
     val loader = imageLoader.requireNotNull()
 
     val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
@@ -143,25 +140,24 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             }
 
         act.TickerTapeTheme(themeProvider) {
-            HomeScreen(
-                modifier = Modifier.fillMaxSize(),
-                state = vm.state,
-                appName = appName,
-                imageLoader = loader,
-                navBarBottomHeight = mainVM.state.bottomNavHeight,
-                onSettingsClicked = handleOpenSettings,
-                onChartClicked = handleChartClicked,
-                onRefreshWatchlist = handleRefreshWatchlist,
-                onRefreshUndervaluedGrowth = handleRefreshUndervaluedGrowth,
-                onRefreshTrending = handleRefreshTrending,
-                onRefreshPortfolio = handleRefreshPortfolio,
-                onRefreshMostShorted = handleRefreshMostShorted,
-                onRefreshLosers = handleRefreshLosers,
-                onRefreshIndexes = handleRefreshIndexes,
-                onRefreshGrowthTech = handleRefreshGrowthTech,
-                onRefreshGainers = handleRefreshGainers,
-                onRefreshMostActive = handleRefreshMostActive,
-            )
+          HomeScreen(
+              modifier = Modifier.fillMaxSize(),
+              state = vm.state,
+              appName = appName,
+              imageLoader = loader,
+              onSettingsClicked = handleOpenSettings,
+              onChartClicked = handleChartClicked,
+              onRefreshWatchlist = handleRefreshWatchlist,
+              onRefreshUndervaluedGrowth = handleRefreshUndervaluedGrowth,
+              onRefreshTrending = handleRefreshTrending,
+              onRefreshPortfolio = handleRefreshPortfolio,
+              onRefreshMostShorted = handleRefreshMostShorted,
+              onRefreshLosers = handleRefreshLosers,
+              onRefreshIndexes = handleRefreshIndexes,
+              onRefreshGrowthTech = handleRefreshGrowthTech,
+              onRefreshGainers = handleRefreshGainers,
+              onRefreshMostActive = handleRefreshMostActive,
+          )
         }
       }
     }
@@ -169,14 +165,12 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    mainViewModel.requireNotNull().restoreState(savedInstanceState)
     viewModel.requireNotNull().restoreState(savedInstanceState)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     viewModel?.saveState(outState)
-    mainViewModel?.saveState(outState)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -190,7 +184,6 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
     theming = null
     viewModel = null
-    mainViewModel = null
     imageLoader = null
     navigator = null
   }

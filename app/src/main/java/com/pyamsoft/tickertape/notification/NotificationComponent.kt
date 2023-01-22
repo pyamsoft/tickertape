@@ -22,8 +22,9 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface NotificationComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: NotificationFragment)
+  fun inject(fragment: NotificationFragment)
+
+  fun inject(injector: NotificationInjector)
 
   @Subcomponent.Factory
   interface Factory {

@@ -22,7 +22,7 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,8 +34,8 @@ interface WatchlistViewState : UiViewState {
   val loadingState: StateFlow<LoadingState>
   val watchlist: StateFlow<List<Ticker>>
   val error: StateFlow<Throwable?>
-  val deleteTicker: StateFlow<StockSymbol?>
-  val digTicker: StateFlow<Ticker?>
+  val deleteTicker: StateFlow<Ticker?>
+  val digParams: StateFlow<WatchlistDigParams?>
 
   @Stable
   @Immutable
@@ -54,6 +54,6 @@ class MutableWatchlistViewState @Inject internal constructor() : WatchlistViewSt
   override val loadingState = MutableStateFlow(WatchlistViewState.LoadingState.NONE)
   override val watchlist = MutableStateFlow(emptyList<Ticker>())
   override val error = MutableStateFlow<Throwable?>(null)
-  override val deleteTicker = MutableStateFlow<StockSymbol?>(null)
-  override val digTicker = MutableStateFlow<Ticker?>(null)
+  override val deleteTicker = MutableStateFlow<Ticker?>(null)
+  override val digParams = MutableStateFlow<WatchlistDigParams?>(null)
 }

@@ -38,11 +38,8 @@ import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
-import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigEntry
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigParams
 import javax.inject.Inject
-import timber.log.Timber
 
 class WatchlistInjector @Inject constructor() : ComposableInjector() {
 
@@ -93,45 +90,46 @@ fun WatchlistEntry(
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
 
-  val activity = rememberActivity()
   val scope = rememberCoroutineScope()
 
-  // Declare here since it is used in mount hook
-  val handleRefresh = { force: Boolean ->
-    viewModel.handleRefreshList(
-        scope = scope,
-        force = force,
-    )
-  }
-
-  MountHooks(
-      viewModel = viewModel,
-      onRefresh = { handleRefresh(false) },
-      onFabClicked = {
-        // TODO move away from sheet
-        NewTickerSheet.show(
-            activity,
-            TickerDestination.WATCHLIST,
-        )
-      },
-  )
-
-  SaveStateDisposableEffect(viewModel)
-
   val state = viewModel.state
-  val deleteTicker by state.deleteTicker.collectAsState()
-  val digTicker by state.digTicker.collectAsState()
+  val digTicker by state.digParams.collectAsState()
 
   Crossfade(
       targetState = digTicker,
   ) { dig ->
     if (dig == null) {
+      // Declare here since it is used in mount hook
+      val handleRefresh = { force: Boolean ->
+        viewModel.handleRefreshList(
+            scope = scope,
+            force = force,
+        )
+      }
+
+      val activity = rememberActivity()
+      MountHooks(
+          viewModel = viewModel,
+          onRefresh = { handleRefresh(false) },
+          onFabClicked = {
+            // TODO move away from sheet
+            NewTickerSheet.show(
+                activity,
+                TickerDestination.WATCHLIST,
+            )
+          },
+      )
+
+      SaveStateDisposableEffect(viewModel)
+
+      val deleteTicker by state.deleteTicker.collectAsState()
+
       WatchlistScreen(
           modifier = modifier,
           state = state,
           imageLoader = imageLoader,
           onRefresh = { handleRefresh(true) },
-          onDeleteTicker = { viewModel.handleOpenDeleteTicker(it.symbol) },
+          onDeleteTicker = { viewModel.handleOpenDeleteTicker(it) },
           onSearchChanged = { viewModel.handleSearch(it) },
           onTabUpdated = { viewModel.handleSectionChanged(it) },
           onSelectTicker = { viewModel.handleOpenDig(it) },
@@ -139,28 +137,20 @@ fun WatchlistEntry(
       )
 
       deleteTicker?.also { ticker ->
+        val params =
+            remember(ticker) {
+              WatchlistRemoveParams(
+                  symbol = ticker.symbol,
+              )
+            }
         WatchlistRemoveDialog(
-            symbol = ticker,
+            params = params,
             onDismiss = { viewModel.handleCloseDeleteTicker() },
         )
       }
     } else {
-      val quote = dig.quote
-      if (quote == null) {
-        LaunchedEffect(true) { Timber.w("Can't show dig dialog, missing quote: $dig") }
-        return@Crossfade
-      }
-
-      val params =
-          remember(quote) {
-            WatchlistDigParams(
-                symbol = quote.symbol,
-                lookupSymbol =
-                    if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
-                equityType = quote.type)
-          }
       WatchlistDigEntry(
-          params = params,
+          params = dig,
           onGoBack = { viewModel.handleCloseDig() },
       )
     }

@@ -25,8 +25,8 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 @Stable
 data class Ticker(
     val symbol: StockSymbol,
-    val quote: StockQuote?,
-    val chart: StockChart?,
+    val quote: StockQuote? = null,
+    val chart: StockChart? = null,
 ) {
 
   companion object {

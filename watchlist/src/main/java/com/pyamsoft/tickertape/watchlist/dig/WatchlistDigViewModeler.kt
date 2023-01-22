@@ -21,6 +21,7 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Named
@@ -161,7 +162,11 @@ internal constructor(
   }
 
   fun handleOpenRecommendation(ticker: Ticker) {
-    state.digRecommendation.value = ticker
+    state.digRecommendation.value =
+        WatchlistDigParams(
+            symbol = ticker.symbol,
+            lookupSymbol = ticker.symbol,
+            equityType = ticker.quote?.type ?: EquityType.STOCK)
   }
 
   fun handleCloseRecommendation() {

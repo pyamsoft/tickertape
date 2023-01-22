@@ -2,7 +2,6 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -17,7 +16,7 @@ interface WatchlistDigViewState : DigViewState {
   val watchlistStatus: StateFlow<WatchlistStatus>
   val isInWatchlistError: StateFlow<Throwable?>
 
-  val digRecommendation: StateFlow<Ticker?>
+  val digRecommendation: StateFlow<WatchlistDigParams?>
 
   @Stable
   @Immutable
@@ -41,5 +40,5 @@ internal constructor(
   override val watchlistStatus = MutableStateFlow(WatchlistDigViewState.WatchlistStatus.NONE)
   override val isInWatchlistError = MutableStateFlow<Throwable?>(null)
 
-  override val digRecommendation = MutableStateFlow<Ticker?>(null)
+  override val digRecommendation = MutableStateFlow<WatchlistDigParams?>(null)
 }

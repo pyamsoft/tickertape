@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
@@ -46,15 +47,22 @@ class WatchlistRemoveInjector @Inject constructor() : ComposableInjector() {
   }
 }
 
+@Stable
+internal data class WatchlistRemoveParams(
+    val symbol: StockSymbol,
+)
+
 @Composable
 internal fun WatchlistRemoveDialog(
-    symbol: StockSymbol,
+    params: WatchlistRemoveParams,
     onDismiss: () -> Unit,
 ) {
   val component = rememberComposableInjector { WatchlistRemoveInjector() }
   val presenter = rememberNotNull(component.presenter)
 
   val scope = rememberCoroutineScope()
+
+  val symbol = params.symbol
 
   Dialog(
       onDismissRequest = onDismiss,

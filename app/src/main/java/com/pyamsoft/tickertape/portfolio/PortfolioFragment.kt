@@ -72,10 +72,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
   }
 
   private fun onDeleteStock(stock: PortfolioStock) {
-    PortfolioRemoveDialog.show(
-        requireActivity(),
-        holding = stock.holding,
-    )
+    // TODO
   }
 
   private fun onRefresh(force: Boolean) {

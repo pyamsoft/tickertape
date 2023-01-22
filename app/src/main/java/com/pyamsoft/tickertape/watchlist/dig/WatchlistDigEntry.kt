@@ -19,10 +19,8 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -30,13 +28,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import coil.ImageLoader
+import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.LifecycleEffect
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 
 internal data class WatchlistDigInjector
@@ -80,13 +77,6 @@ private fun MountHooks(
   }
 }
 
-@Stable
-internal data class WatchlistDigParams(
-    val symbol: StockSymbol,
-    val lookupSymbol: StockSymbol,
-    val equityType: EquityType,
-)
-
 @Composable
 internal fun WatchlistDigEntry(
     modifier: Modifier = Modifier,
@@ -109,6 +99,9 @@ internal fun WatchlistDigEntry(
   val state = viewModel.state
 
   val recommendation by state.digRecommendation.collectAsState()
+
+  SaveStateDisposableEffect(viewModel)
+
   Crossfade(
       targetState = recommendation,
   ) { rec ->
@@ -158,16 +151,9 @@ internal fun WatchlistDigEntry(
           },
       )
     } else {
-      val recParams =
-          remember(rec) {
-            WatchlistDigParams(
-                symbol = rec.symbol,
-                lookupSymbol = rec.symbol,
-                equityType = rec.quote?.type ?: EquityType.STOCK)
-          }
       WatchlistDigEntry(
           modifier = modifier,
-          params = recParams,
+          params = rec,
           onGoBack = { viewModel.handleCloseRecommendation() },
       )
     }

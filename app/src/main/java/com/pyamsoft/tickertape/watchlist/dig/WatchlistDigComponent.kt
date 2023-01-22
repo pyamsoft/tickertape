@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import javax.inject.Named
@@ -26,10 +27,9 @@ import javax.inject.Named
 @Subcomponent
 internal interface WatchlistDigComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: WatchlistDigFragment)
-
   fun inject(injector: WatchlistDigInjector)
+
+  fun inject(fragment: WatchlistFragment)
 
   @Subcomponent.Factory
   interface Factory {

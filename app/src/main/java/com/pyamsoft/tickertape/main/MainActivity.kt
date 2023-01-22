@@ -20,11 +20,14 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.app.installPYDroid
@@ -43,7 +46,7 @@ import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
+import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigEntry
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -124,14 +127,12 @@ internal class MainActivity : AppCompatActivity() {
     Timber.d("Launch intent with symbol: $symbol")
     launcher.requireNotNull().cancelNotifications(symbol)
 
-    navigator
+    viewModel
         .requireNotNull()
-        .navigateTo(
-            WatchlistDigFragment.Screen(
-                symbol = symbol,
-                lookupSymbol = lookupSymbol,
-                equityType = equityType,
-            ),
+        .handleOpenDig(
+            symbol = symbol,
+            lookupSymbol = lookupSymbol,
+            equityType = equityType,
         )
   }
 
@@ -180,19 +181,32 @@ internal class MainActivity : AppCompatActivity() {
 
       val state = vm.state
       val theme by state.theme.collectAsState()
+      val watchlistDig by state.watchlistDigParams.collectAsState()
 
       TickerTapeTheme(theme) {
         SystemBars(theme, screen)
 
-        // Need to have box or snackbars push up bottom bar
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-          page?.also { p ->
-            MainScreen(
-                page = p,
-                onLoadPage = { navi.navigateTo(it) },
-                onActionSelected = { onMainActionSelected(it) },
+        Crossfade(
+            targetState = watchlistDig,
+        ) { dig ->
+          if (dig == null) {
+            // Need to have box or snackbars push up bottom bar
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+              page?.also { p ->
+                MainScreen(
+                    page = p,
+                    onLoadPage = { navi.navigateTo(it) },
+                    onActionSelected = { onMainActionSelected(it) },
+                )
+              }
+            }
+          } else {
+            WatchlistDigEntry(
+                modifier = Modifier.fillMaxSize(),
+                params = dig,
+                onGoBack = { vm.handleCloseDig() },
             )
           }
         }

@@ -31,7 +31,6 @@ import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.watchlist.WatchlistFragment
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 
 @ActivityScope
@@ -52,12 +51,6 @@ internal constructor(
         is TopLevelMainPage.Watchlist -> WatchlistFragment.newInstance()
         is TopLevelMainPage.Portfolio -> PortfolioFragment.newInstance()
         is TopLevelMainPage.Notifications -> NotificationFragment.newInstance()
-        is WatchlistDigFragment.Screen ->
-            WatchlistDigFragment.newInstance(
-                symbol = screen.symbol,
-                lookupSymbol = screen.lookupSymbol,
-                equityType = screen.equityType,
-            )
         is PortfolioDigFragment.Screen ->
             PortfolioDigFragment.newInstance(
                 symbol = screen.symbol,

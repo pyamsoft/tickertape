@@ -60,10 +60,9 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
@@ -84,15 +83,7 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
   private fun onRecommendationSelected(ticker: Ticker) {
     val quote = ticker.quote
 
-    navigator
-        .requireNotNull()
-        .navigateTo(
-            WatchlistDigFragment.Screen(
-                symbol = ticker.symbol,
-                lookupSymbol = ticker.symbol,
-                equityType = quote?.type ?: EquityType.STOCK,
-            ),
-        )
+    // TODO open watch dig entry
   }
 
   private fun onRangeSelected(range: StockChart.IntervalRange) {
@@ -319,28 +310,28 @@ internal class PortfolioDigFragment : Fragment(), FragmentNavigator.Screen<MainP
               onBack = handleGoBack,
           )
 
-            PortfolioDigScreen(
-                modifier = Modifier.fillMaxWidth(),
-                state = vm.state,
-                imageLoader = loader,
-                onClose = handleBack,
-                onChartScrub = handleChartScrubbed,
-                onChartRangeSelected = handleChartRangeSelected,
-                onTabUpdated = handleTabChanged,
-                onRefresh = handleRefresh,
-                onPositionAdd = handleAddPosition,
-                onPositionDelete = handleDeletePosition,
-                onPositionUpdate = handleUpdatePosition,
-                onSplitAdd = handleAddSplit,
-                onSplitDeleted = handleDeleteSplit,
-                onSplitUpdated = handleUpdateSplit,
-                onRecClick = handleRecommendSelected,
-                onOptionSectionChanged = handleOptionSectionChanged,
-                onOptionExpirationDateChanged = handleOptionsDateChanged,
-                onAddPriceAlert = handleAddPriceAlert,
-                onUpdatePriceAlert = handleUpdatePriceAlert,
-                onDeletePriceAlert = handleDeletePriceAlert,
-            )
+          PortfolioDigScreen(
+              modifier = Modifier.fillMaxWidth(),
+              state = vm.state,
+              imageLoader = loader,
+              onClose = handleBack,
+              onChartScrub = handleChartScrubbed,
+              onChartRangeSelected = handleChartRangeSelected,
+              onTabUpdated = handleTabChanged,
+              onRefresh = handleRefresh,
+              onPositionAdd = handleAddPosition,
+              onPositionDelete = handleDeletePosition,
+              onPositionUpdate = handleUpdatePosition,
+              onSplitAdd = handleAddSplit,
+              onSplitDeleted = handleDeleteSplit,
+              onSplitUpdated = handleUpdateSplit,
+              onRecClick = handleRecommendSelected,
+              onOptionSectionChanged = handleOptionSectionChanged,
+              onOptionExpirationDateChanged = handleOptionsDateChanged,
+              onAddPriceAlert = handleAddPriceAlert,
+              onUpdatePriceAlert = handleUpdatePriceAlert,
+              onDeletePriceAlert = handleDeletePriceAlert,
+          )
         }
       }
     }

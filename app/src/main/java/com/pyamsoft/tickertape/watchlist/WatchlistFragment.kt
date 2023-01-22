@@ -21,20 +21,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
+import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
+import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
+
+  @JvmField @Inject internal var theming: Theming? = null
+  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-  ): View? {
-    return null
+  ): View {
+    ObjectGraph.ActivityScope.retrieve(requireActivity()).plusWatchlist().create().inject(this)
+    return ComposeView(requireActivity()).apply {
+      setContent {
+        WatchlistEntry(
+            modifier = Modifier.fillMaxSize(),
+            onDigDown = { mainViewModel.requireNotNull().handleOpenDig(it) },
+        )
+      }
+    }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    theming = null
   }
 
   override fun getScreenId(): MainPage {

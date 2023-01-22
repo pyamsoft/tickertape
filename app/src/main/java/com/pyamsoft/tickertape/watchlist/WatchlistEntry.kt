@@ -91,8 +91,8 @@ fun WatchlistEntry(
   val imageLoader = rememberNotNull(component.imageLoader)
 
   val scope = rememberCoroutineScope()
+  val activity = rememberActivity()
 
-  // Declare here since it is used in mount hook
   val handleRefresh = { force: Boolean ->
     viewModel.handleRefreshList(
         scope = scope,
@@ -100,7 +100,7 @@ fun WatchlistEntry(
     )
   }
 
-  val activity = rememberActivity()
+  SaveStateDisposableEffect(viewModel)
   MountHooks(
       viewModel = viewModel,
       onRefresh = { handleRefresh(false) },
@@ -112,8 +112,6 @@ fun WatchlistEntry(
         )
       },
   )
-
-  SaveStateDisposableEffect(viewModel)
 
   val state = viewModel.state
   val deleteTicker by state.deleteTicker.collectAsState()

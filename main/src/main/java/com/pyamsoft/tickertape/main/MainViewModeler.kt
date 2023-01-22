@@ -24,7 +24,9 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
 import java.util.UUID
 import javax.inject.Inject
@@ -90,12 +92,24 @@ internal constructor(
       return
     }
 
+    handleOpenDig(
+        symbol = quote.symbol,
+        lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
+        equityType = quote.type,
+    )
+  }
+
+  fun handleOpenDig(
+      symbol: StockSymbol,
+      lookupSymbol: StockSymbol,
+      equityType: EquityType,
+  ) {
     state.watchlistDigParams.value =
         WatchlistDigParams(
             uniqueId = UUID.randomUUID().toString(),
-            symbol = quote.symbol,
-            lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
-            equityType = quote.type,
+            symbol = symbol,
+            lookupSymbol = lookupSymbol,
+            equityType = equityType,
         )
   }
 

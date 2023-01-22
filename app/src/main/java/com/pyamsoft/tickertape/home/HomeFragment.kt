@@ -43,7 +43,6 @@ import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigFragment
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
@@ -64,15 +63,7 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
     val equityType = quote.type
     val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol
-    navigator
-        .requireNotNull()
-        .navigateTo(
-            WatchlistDigFragment.Screen(
-                symbol = ticker.symbol,
-                lookupSymbol = lookupSymbol,
-                equityType = equityType,
-            ),
-        )
+    // TODO open WatchDigEntry
   }
 
   private fun onOpenSettingsDialog() {

@@ -64,21 +64,6 @@ internal constructor(
 }
 
 @Composable
-private fun MountHooks(
-    onRefresh: () -> Unit,
-) {
-  val handleRefresh by rememberUpdatedState(onRefresh)
-
-  LifecycleEffect {
-    object : DefaultLifecycleObserver {
-      override fun onStart(owner: LifecycleOwner) {
-        handleRefresh()
-      }
-    }
-  }
-}
-
-@Composable
 internal fun WatchlistDigEntry(
     modifier: Modifier = Modifier,
     params: WatchlistDigParams,
@@ -88,68 +73,19 @@ internal fun WatchlistDigEntry(
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
 
-  val scope = rememberCoroutineScope()
-
-  val handleRefresh = { force: Boolean ->
-    viewModel.handleLoadTicker(
-        scope = scope,
-        force = force,
-    )
-  }
-
   val state = viewModel.state
-
   val recommendation by state.digRecommendation.collectAsState()
-
   SaveStateDisposableEffect(viewModel)
 
   Crossfade(
       targetState = recommendation,
   ) { rec ->
     if (rec == null) {
-      MountHooks(
-          onRefresh = { handleRefresh(false) },
-      )
-      BackHandler(
-          onBack = onGoBack,
-      )
-      WatchlistDigScreen(
+      WatchScreen(
           modifier = modifier,
-          state = state,
+          viewModel = viewModel,
           imageLoader = imageLoader,
-          onClose = onGoBack,
-          onChartScrub = { viewModel.handleChartDateScrubbed(it) },
-          onChartRangeSelected = { range ->
-            viewModel.handleChartRangeSelected(
-                scope = scope,
-                range = range,
-            )
-          },
-          onModifyWatchlist = { viewModel.handleModifyWatchlist(scope = scope) },
-          onRefresh = { handleRefresh(true) },
-          onTabUpdated = { section ->
-            viewModel.handleTabUpdated(
-                scope = scope,
-                section = section,
-            )
-          },
-          onRecClick = { viewModel.handleOpenRecommendation(it) },
-          onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
-          onOptionExpirationDateChanged = { date ->
-            viewModel.handleOptionsExpirationDateChanged(
-                scope = scope,
-                date = date,
-            )
-          },
-          onAddPriceAlert = {
-            // TODO add alert
-          },
-          onUpdatePriceAlert = { alert ->
-            // TODO update alert
-          },
-          onDeletePriceAlert = { alert ->
-            // TODO delete alert
-          },
+          onGoBack = onGoBack,
       )
     } else {
       WatchlistDigEntry(
@@ -159,4 +95,73 @@ internal fun WatchlistDigEntry(
       )
     }
   }
+}
+
+@Composable
+private fun WatchScreen(
+    modifier: Modifier = Modifier,
+    viewModel: WatchlistDigViewModeler,
+    imageLoader: ImageLoader,
+    onGoBack: () -> Unit,
+) {
+  val scope = rememberCoroutineScope()
+
+  val handleRefresh by rememberUpdatedState { force: Boolean ->
+    viewModel.handleLoadTicker(
+        scope = scope,
+        force = force,
+    )
+
+    return@rememberUpdatedState
+  }
+
+  LifecycleEffect {
+    object : DefaultLifecycleObserver {
+      override fun onStart(owner: LifecycleOwner) {
+        handleRefresh(false)
+      }
+    }
+  }
+
+  BackHandler(
+      onBack = onGoBack,
+  )
+  WatchlistDigScreen(
+      modifier = modifier,
+      state = viewModel.state,
+      imageLoader = imageLoader,
+      onClose = onGoBack,
+      onChartScrub = { viewModel.handleChartDateScrubbed(it) },
+      onChartRangeSelected = { range ->
+        viewModel.handleChartRangeSelected(
+            scope = scope,
+            range = range,
+        )
+      },
+      onModifyWatchlist = { viewModel.handleModifyWatchlist(scope = scope) },
+      onRefresh = { handleRefresh(true) },
+      onTabUpdated = { section ->
+        viewModel.handleTabUpdated(
+            scope = scope,
+            section = section,
+        )
+      },
+      onRecClick = { viewModel.handleOpenRecommendation(it) },
+      onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
+      onOptionExpirationDateChanged = { date ->
+        viewModel.handleOptionsExpirationDateChanged(
+            scope = scope,
+            date = date,
+        )
+      },
+      onAddPriceAlert = {
+        // TODO add alert
+      },
+      onUpdatePriceAlert = { alert ->
+        // TODO update alert
+      },
+      onDeletePriceAlert = { alert ->
+        // TODO delete alert
+      },
+  )
 }

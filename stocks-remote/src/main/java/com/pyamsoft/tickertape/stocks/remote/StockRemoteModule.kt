@@ -133,7 +133,9 @@ abstract class StockRemoteModule {
     @JvmStatic
     @CheckResult
     @Named("moshi_converter")
-    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
+    internal fun provideMoshiConverterFactory(
+        @StockApi moshi: Moshi
+    ): Converter.Factory {
       return MoshiConverterFactory.create(moshi)
     }
 

@@ -39,6 +39,7 @@ internal interface WatchlistDigComponent {
         @BindsInstance symbol: StockSymbol,
         @BindsInstance @Named("lookup") lookupSymbol: StockSymbol,
         @BindsInstance equityType: EquityType,
+        @BindsInstance uniqueId: String,
     ): WatchlistDigComponent
   }
 }

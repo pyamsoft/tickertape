@@ -1,13 +1,14 @@
 package com.pyamsoft.tickertape.stocks.remote
 
 import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
 internal class MoshiJsonParser
 @Inject
 constructor(
-    private val moshi: Moshi,
+    @StockApi private val moshi: Moshi,
 ) : JsonParser {
 
   override fun <T : Any> toJson(data: T): String {

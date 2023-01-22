@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
@@ -28,7 +29,6 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,7 +106,7 @@ internal constructor(
   ) {
     state.watchlistDigParams.value =
         WatchlistDigParams(
-            uniqueId = UUID.randomUUID().toString(),
+            uniqueId = IdGenerator.generate(),
             symbol = symbol,
             lookupSymbol = lookupSymbol,
             equityType = equityType,

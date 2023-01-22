@@ -113,7 +113,6 @@ internal constructor(
             is HomeFragment ->
                 when (oldPage) {
                   null,
-                  is WatchlistDigFragment,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is WatchlistFragment,
@@ -124,7 +123,6 @@ internal constructor(
             is WatchlistFragment ->
                 when (oldPage) {
                   null,
-                  is WatchlistDigFragment,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
@@ -135,7 +133,6 @@ internal constructor(
             is PortfolioFragment ->
                 when (oldPage) {
                   null,
-                  is WatchlistDigFragment,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is WatchlistFragment,
@@ -146,7 +143,6 @@ internal constructor(
             is NotificationFragment ->
                 when (oldPage) {
                   null,
-                  is WatchlistDigFragment,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is WatchlistFragment,
@@ -154,7 +150,6 @@ internal constructor(
                   is PortfolioFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null
                 }
-            is WatchlistDigFragment,
             is PortfolioDigFragment -> R.anim.fragment_open_enter then R.anim.fragment_open_exit
             else -> null
           }

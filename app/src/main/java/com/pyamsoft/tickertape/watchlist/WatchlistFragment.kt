@@ -28,11 +28,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
+import com.pyamsoft.pydroid.ui.theme.ThemeProvider
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
+import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
@@ -46,12 +48,17 @@ class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
       savedInstanceState: Bundle?
   ): View {
     ObjectGraph.ActivityScope.retrieve(requireActivity()).plusWatchlist().create().inject(this)
+    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(requireActivity()) }
     return ComposeView(requireActivity()).apply {
       setContent {
-        WatchlistEntry(
-            modifier = Modifier.fillMaxSize(),
-            onDigDown = { mainViewModel.requireNotNull().handleOpenDig(it) },
-        )
+        requireActivity().TickerTapeTheme(
+            themeProvider = themeProvider,
+        ) {
+          WatchlistEntry(
+              modifier = Modifier.fillMaxSize(),
+              onDigDown = { mainViewModel.requireNotNull().handleOpenDig(it) },
+          )
+        }
       }
     }
   }

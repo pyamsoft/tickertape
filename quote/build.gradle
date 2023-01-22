@@ -75,7 +75,6 @@ dependencies {
   implementation "com.patrykandpatryk.vico:compose:$vico"
 
   // Moshi
-  implementation "com.squareup.moshi:moshi:$moshi"
   kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   implementation project(':alert')

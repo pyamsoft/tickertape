@@ -19,13 +19,13 @@ package com.pyamsoft.tickertape.watchlist.dig
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -192,7 +192,7 @@ internal constructor(
   fun handleOpenRecommendation(ticker: Ticker) {
     state.digRecommendation.value =
         WatchlistDigParams(
-            uniqueId = UUID.randomUUID().toString(),
+            uniqueId = IdGenerator.generate(),
             symbol = ticker.symbol,
             lookupSymbol = ticker.symbol,
             equityType = ticker.quote?.type ?: EquityType.STOCK,

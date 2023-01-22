@@ -58,6 +58,7 @@ internal constructor(
             params.symbol,
             params.lookupSymbol,
             params.equityType,
+            params.uniqueId,
         )
         .inject(this)
   }
@@ -71,7 +72,6 @@ internal fun WatchlistDigEntry(
 ) {
   val component = rememberComposableInjector { WatchlistDigInjector(params) }
   val viewModel = rememberNotNull(component.viewModel)
-  val imageLoader = rememberNotNull(component.imageLoader)
 
   val state = viewModel.state
   val recommendation by state.digRecommendation.collectAsState()
@@ -83,8 +83,7 @@ internal fun WatchlistDigEntry(
     if (rec == null) {
       WatchScreen(
           modifier = modifier,
-          viewModel = viewModel,
-          imageLoader = imageLoader,
+          component = component,
           onGoBack = onGoBack,
       )
     } else {
@@ -100,10 +99,11 @@ internal fun WatchlistDigEntry(
 @Composable
 private fun WatchScreen(
     modifier: Modifier = Modifier,
-    viewModel: WatchlistDigViewModeler,
-    imageLoader: ImageLoader,
+    component: WatchlistDigInjector,
     onGoBack: () -> Unit,
 ) {
+  val viewModel = rememberNotNull(component.viewModel)
+  val imageLoader = rememberNotNull(component.imageLoader)
   val scope = rememberCoroutineScope()
 
   val handleRefresh by rememberUpdatedState { force: Boolean ->

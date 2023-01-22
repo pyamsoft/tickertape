@@ -21,53 +21,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
-import com.pyamsoft.pydroid.ui.theme.ThemeProvider
-import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.ObjectGraph
-import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.TopLevelMainPage
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import javax.inject.Inject
 
 class WatchlistFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
-
-  @JvmField @Inject internal var theming: Theming? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-  ): View {
-    val act = requireActivity()
-
-    ObjectGraph.ActivityScope.retrieve(act).plusWatchlist().create().inject(this)
-
-    val themeProvider = ThemeProvider { theming.requireNotNull().isDarkTheme(act) }
-    return ComposeView(act).apply {
-      id = R.id.screen_watchlist
-
-      setContent {
-        act.TickerTapeTheme(themeProvider) {
-          WatchlistEntry(
-              modifier = Modifier.fillMaxSize(),
-          )
-        }
-      }
-    }
-  }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-
-    theming = null
+  ): View? {
+    return null
   }
 
   override fun getScreenId(): MainPage {

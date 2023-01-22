@@ -61,9 +61,7 @@ internal fun WatchlistRemoveDialog(
   val presenter = rememberNotNull(component.presenter)
 
   val scope = rememberCoroutineScope()
-
   val symbol = params.symbol
-
   Dialog(
       onDismissRequest = onDismiss,
   ) {

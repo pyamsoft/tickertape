@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,9 +35,9 @@ import com.pyamsoft.pydroid.ui.util.LifecycleEffect
 import com.pyamsoft.pydroid.ui.util.rememberActivity
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.add.NewTickerSheet
 import com.pyamsoft.tickertape.quote.add.TickerDestination
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigEntry
 import javax.inject.Inject
 
 class WatchlistInjector @Inject constructor() : ComposableInjector() {
@@ -85,6 +84,7 @@ private fun MountHooks(
 @Composable
 fun WatchlistEntry(
     modifier: Modifier = Modifier,
+    onDigDown: (Ticker) -> Unit,
 ) {
   val component = rememberComposableInjector { WatchlistInjector() }
   val viewModel = rememberNotNull(component.viewModel)
@@ -92,67 +92,54 @@ fun WatchlistEntry(
 
   val scope = rememberCoroutineScope()
 
+  // Declare here since it is used in mount hook
+  val handleRefresh = { force: Boolean ->
+    viewModel.handleRefreshList(
+        scope = scope,
+        force = force,
+    )
+  }
+
+  val activity = rememberActivity()
+  MountHooks(
+      viewModel = viewModel,
+      onRefresh = { handleRefresh(false) },
+      onFabClicked = {
+        // TODO move away from sheet
+        NewTickerSheet.show(
+            activity,
+            TickerDestination.WATCHLIST,
+        )
+      },
+  )
+
+  SaveStateDisposableEffect(viewModel)
+
   val state = viewModel.state
-  val digTicker by state.digParams.collectAsState()
+  val deleteTicker by state.deleteTicker.collectAsState()
 
-  Crossfade(
-      targetState = digTicker,
-  ) { dig ->
-    if (dig == null) {
-      // Declare here since it is used in mount hook
-      val handleRefresh = { force: Boolean ->
-        viewModel.handleRefreshList(
-            scope = scope,
-            force = force,
-        )
-      }
+  WatchlistScreen(
+      modifier = modifier,
+      state = state,
+      imageLoader = imageLoader,
+      onSelectTicker = onDigDown,
+      onRefresh = { handleRefresh(true) },
+      onDeleteTicker = { viewModel.handleOpenDeleteTicker(it) },
+      onSearchChanged = { viewModel.handleSearch(it) },
+      onTabUpdated = { viewModel.handleSectionChanged(it) },
+      onRegenerateList = { viewModel.handleRegenerateList(this) },
+  )
 
-      val activity = rememberActivity()
-      MountHooks(
-          viewModel = viewModel,
-          onRefresh = { handleRefresh(false) },
-          onFabClicked = {
-            // TODO move away from sheet
-            NewTickerSheet.show(
-                activity,
-                TickerDestination.WATCHLIST,
-            )
-          },
-      )
-
-      SaveStateDisposableEffect(viewModel)
-
-      val deleteTicker by state.deleteTicker.collectAsState()
-
-      WatchlistScreen(
-          modifier = modifier,
-          state = state,
-          imageLoader = imageLoader,
-          onRefresh = { handleRefresh(true) },
-          onDeleteTicker = { viewModel.handleOpenDeleteTicker(it) },
-          onSearchChanged = { viewModel.handleSearch(it) },
-          onTabUpdated = { viewModel.handleSectionChanged(it) },
-          onSelectTicker = { viewModel.handleOpenDig(it) },
-          onRegenerateList = { viewModel.handleRegenerateList(this) },
-      )
-
-      deleteTicker?.also { ticker ->
-        val params =
-            remember(ticker) {
-              WatchlistRemoveParams(
-                  symbol = ticker.symbol,
-              )
-            }
-        WatchlistRemoveDialog(
-            params = params,
-            onDismiss = { viewModel.handleCloseDeleteTicker() },
-        )
-      }
-    } else {
-      WatchlistDigEntry(
-          params = dig,
-          onGoBack = { viewModel.handleCloseDig() },
-      )
-    }
+  deleteTicker?.also { ticker ->
+    val params =
+        remember(ticker) {
+          WatchlistRemoveParams(
+              symbol = ticker.symbol,
+          )
+        }
+    WatchlistRemoveDialog(
+        params = params,
+        onDismiss = { viewModel.handleCloseDeleteTicker() },
+    )
   }
 }

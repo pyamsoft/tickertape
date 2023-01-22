@@ -37,6 +37,7 @@ import kotlin.reflect.KClass
 import okhttp3.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 
@@ -81,7 +82,7 @@ abstract class StockModule {
   @Module
   companion object {
 
-    /**
+      /**
      * If this is @Provides, you will need to change okhttp3 from implementation to api in Gradle
      */
     @Provides

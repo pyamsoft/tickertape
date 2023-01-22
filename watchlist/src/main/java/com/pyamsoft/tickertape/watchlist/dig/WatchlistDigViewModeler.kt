@@ -16,13 +16,16 @@
 
 package com.pyamsoft.tickertape.watchlist.dig
 
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
+import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +42,7 @@ internal constructor(
     override val state: MutableWatchlistDigViewState,
     private val interactor: WatchlistDigInteractor,
     private val interactorCache: WatchlistDigInteractor.Cache,
+    private val uniqueId: String,
     @Named("lookup") lookupSymbol: StockSymbol?,
 ) :
     DigViewModeler<MutableWatchlistDigViewState>(
@@ -93,6 +97,10 @@ internal constructor(
         )
       }
 
+  private fun saveStateKey(key: String): String {
+    return "${uniqueId}-$key"
+  }
+
   private suspend fun checkIsInWatchlist(force: Boolean) {
     val s = state
     if (force) {
@@ -135,6 +143,26 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry
+            .registerProvider(saveStateKey(KEY_REC_DIG)) { s.digRecommendation.value }
+            .also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry
+        .consumeRestored(saveStateKey(KEY_REC_DIG))
+        ?.let { it as WatchlistDigParams }
+        ?.also { s.digRecommendation.value = it }
+  }
+
   fun handleModifyWatchlist(scope: CoroutineScope) {
     scope.launch(context = Dispatchers.Main) {
       watchlistModifyRunner
@@ -164,12 +192,18 @@ internal constructor(
   fun handleOpenRecommendation(ticker: Ticker) {
     state.digRecommendation.value =
         WatchlistDigParams(
+            uniqueId = UUID.randomUUID().toString(),
             symbol = ticker.symbol,
             lookupSymbol = ticker.symbol,
-            equityType = ticker.quote?.type ?: EquityType.STOCK)
+            equityType = ticker.quote?.type ?: EquityType.STOCK,
+        )
   }
 
   fun handleCloseRecommendation() {
     state.digRecommendation.value = null
+  }
+
+  companion object {
+    private const val KEY_REC_DIG = "rec_dig"
   }
 }

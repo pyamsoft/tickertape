@@ -28,11 +28,9 @@ import com.pyamsoft.tickertape.main.MainSelectionEvent
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -155,7 +153,6 @@ internal constructor(
 
         registry.registerProvider(KEY_SEARCH) { s.query.value }.also { add(it) }
         registry.registerProvider(KEY_DELETE) { s.deleteTicker.value?.symbol?.raw }.also { add(it) }
-        registry.registerProvider(KEY_DIG) { s.digParams.value }.also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -168,11 +165,6 @@ internal constructor(
         ?.asSymbol()
         ?.let { Ticker(it) }
         .also { s.deleteTicker.value = it }
-
-    registry
-        .consumeRestored(KEY_DIG)
-        ?.let { it as WatchlistDigParams }
-        ?.also { s.digParams.value = it }
   }
 
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
@@ -239,29 +231,9 @@ internal constructor(
     state.deleteTicker.value = null
   }
 
-  fun handleOpenDig(ticker: Ticker) {
-    val quote = ticker.quote
-    if (quote == null) {
-      Timber.w("Can't show dig dialog, missing quote: $ticker")
-      return
-    }
-
-    state.digParams.value =
-        WatchlistDigParams(
-            symbol = quote.symbol,
-            lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
-            equityType = quote.type,
-        )
-  }
-
-  fun handleCloseDig() {
-    state.digParams.value = null
-  }
-
   companion object {
 
     private const val KEY_SEARCH = "search"
-    private const val KEY_DIG = "dig"
     private const val KEY_DELETE = "delete"
   }
 }

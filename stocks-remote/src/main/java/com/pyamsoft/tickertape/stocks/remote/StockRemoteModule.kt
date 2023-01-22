@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.remote
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
 import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
@@ -45,10 +46,12 @@ import com.pyamsoft.tickertape.stocks.sources.QuoteSource
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import com.pyamsoft.tickertape.stocks.sources.TopSource
+import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
+import javax.inject.Singleton
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -94,8 +97,20 @@ abstract class StockRemoteModule {
   @CheckResult
   internal abstract fun bindNewsSource(impl: NasdaqNewsSource): NewsSource
 
+  /** Expose globally */
+  @Binds @CheckResult internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser
+
   @Module
   companion object {
+
+    @Provides
+    @StockApi
+    @JvmStatic
+    @Singleton
+    @CheckResult
+    internal fun provideMoshi(): Moshi {
+      return Moshi.Builder().build()
+    }
 
     @Provides
     @JvmStatic
@@ -118,8 +133,8 @@ abstract class StockRemoteModule {
     @JvmStatic
     @CheckResult
     @Named("moshi_converter")
-    internal fun provideMoshiConverterFactory(): Converter.Factory {
-      return MoshiConverterFactory.create()
+    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
+      return MoshiConverterFactory.create(moshi)
     }
 
     @Provides

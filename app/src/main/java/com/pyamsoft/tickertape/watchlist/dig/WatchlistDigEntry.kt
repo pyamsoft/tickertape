@@ -34,6 +34,7 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.LifecycleEffect
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
+import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import javax.inject.Inject
 
 internal data class WatchlistDigInjector

@@ -2,6 +2,7 @@ package com.pyamsoft.tickertape.watchlist.dig
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.stocks.api.StockSymbol

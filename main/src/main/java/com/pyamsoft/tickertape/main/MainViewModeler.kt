@@ -21,10 +21,17 @@ import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
+import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.fromJson
+import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainViewModeler
 @Inject
@@ -32,6 +39,7 @@ internal constructor(
     override val state: MutableMainViewState,
     private val theming: Theming,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
+    private val jsonParser: JsonParser,
 ) : AbstractViewModeler<MainViewState>(state) {
 
   fun handleSyncDarkTheme(activity: Activity) {
@@ -52,6 +60,11 @@ internal constructor(
         val s = state
 
         registry.registerProvider(KEY_THEME) { s.theme.value.name }.also { add(it) }
+        registry
+            .registerProvider(KEY_WATCHLIST_DIG) {
+              s.watchlistDigParams.value?.let { jsonParser.toJson(it) }
+            }
+            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -62,10 +75,37 @@ internal constructor(
         ?.let { it as String }
         ?.let { Theming.Mode.valueOf(it) }
         ?.also { s.theme.value = it }
+
+    registry
+        .consumeRestored(KEY_WATCHLIST_DIG)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<WatchlistDigParams>(it) }
+        ?.also { s.watchlistDigParams.value = it }
+  }
+
+  fun handleOpenDig(ticker: Ticker) {
+    val quote = ticker.quote
+    if (quote == null) {
+      Timber.w("Can't show dig dialog, missing quote: $ticker")
+      return
+    }
+
+    state.watchlistDigParams.value =
+        WatchlistDigParams(
+            uniqueId = UUID.randomUUID().toString(),
+            symbol = quote.symbol,
+            lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
+            equityType = quote.type,
+        )
+  }
+
+  fun handleCloseDig() {
+    state.watchlistDigParams.value = null
   }
 
   companion object {
 
     private const val KEY_THEME = "theme"
+    private const val KEY_WATCHLIST_DIG = "watchlist_dig"
   }
 }

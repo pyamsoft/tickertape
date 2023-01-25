@@ -12,9 +12,7 @@ object AlertObjectGraph {
 
     private val trackingMap = mutableMapOf<Application, AlertWorkComponent>()
 
-    /**
-     * Called from Application
-     */
+    /** Called from Application */
     fun install(
         application: Application,
         component: AlertWorkComponent,

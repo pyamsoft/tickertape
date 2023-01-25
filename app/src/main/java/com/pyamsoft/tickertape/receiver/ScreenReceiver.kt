@@ -26,12 +26,12 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.alert.types.refresh.RefreshStandalone
 import com.pyamsoft.tickertape.receiver.ScreenReceiver.Registration
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 internal class ScreenReceiver internal constructor() : BroadcastReceiver() {
 

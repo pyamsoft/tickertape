@@ -180,14 +180,18 @@ abstract class RoomModule {
     @DbApi
     @Provides
     @JvmStatic
-    internal fun provideRoomPriceAlertInsertDao(@InternalApi db: RoomTickerDb): PriceAlertInsertDao {
+    internal fun provideRoomPriceAlertInsertDao(
+        @InternalApi db: RoomTickerDb
+    ): PriceAlertInsertDao {
       return db.roomPriceAlertInsertDao
     }
 
     @DbApi
     @Provides
     @JvmStatic
-    internal fun provideRoomPriceAlertDeleteDao(@InternalApi db: RoomTickerDb): PriceAlertDeleteDao {
+    internal fun provideRoomPriceAlertDeleteDao(
+        @InternalApi db: RoomTickerDb
+    ): PriceAlertDeleteDao {
       return db.roomPriceAlertDeleteDao
     }
   }

@@ -12,10 +12,10 @@ internal object DigDefaults {
   @CheckResult
   fun rememberChartHeight(): Dp {
     return rememberScreenHeightRatio(
-      // One fourth the screen in portrait
-      ratioPortrait = 0.25F,
-      // Slightly less than half screen in landscape
-      ratioLandscape = 0.45F,
+        // One fourth the screen in portrait
+        ratioPortrait = 0.25F,
+        // Slightly less than half screen in landscape
+        ratioLandscape = 0.45F,
     )
   }
 }

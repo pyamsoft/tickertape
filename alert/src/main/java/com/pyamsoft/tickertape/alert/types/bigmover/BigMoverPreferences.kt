@@ -28,6 +28,5 @@ interface BigMoverPreferences {
   companion object {
 
     const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
-
   }
 }

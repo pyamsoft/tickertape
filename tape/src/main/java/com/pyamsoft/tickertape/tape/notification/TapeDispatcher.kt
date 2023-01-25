@@ -39,11 +39,11 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.tape.R
 import com.pyamsoft.tickertape.tape.remote.TapeRemote
-import timber.log.Timber
+import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import com.pyamsoft.tickertape.ui.R as R2
+import timber.log.Timber
 
 @Singleton
 internal class TapeDispatcher

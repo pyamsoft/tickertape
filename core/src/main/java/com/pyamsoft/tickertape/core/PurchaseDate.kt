@@ -11,7 +11,7 @@ import java.time.LocalDate
  */
 @CheckResult
 private fun LocalDate.getDaysSincePurchase(now: LocalDate): Long {
-    return now.toEpochDay() - this.toEpochDay()
+  return now.toEpochDay() - this.toEpochDay()
 }
 
 @CheckResult
@@ -19,7 +19,7 @@ private fun LocalDate.getDaysSincePurchase(now: LocalDate): Long {
 fun LocalDate.isShortTermPurchase(
     now: LocalDate = LocalDate.now(),
 ): Boolean {
-    return this.getDaysSincePurchase(now) < 365
+  return this.getDaysSincePurchase(now) < 365
 }
 
 @CheckResult
@@ -27,5 +27,5 @@ fun LocalDate.isShortTermPurchase(
 fun LocalDate.isLongTermPurchase(
     now: LocalDate = LocalDate.now(),
 ): Boolean {
-    return this.getDaysSincePurchase(now) >= 365
+  return this.getDaysSincePurchase(now) >= 365
 }

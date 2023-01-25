@@ -38,7 +38,7 @@ internal constructor(
     PriceAlertDb,
     PriceAlertQueryDao.Cache,
     BaseDbImpl<
-            PriceAlertChangeEvent,
+        PriceAlertChangeEvent,
         PriceAlertRealtime,
         PriceAlertQueryDao,
         PriceAlertInsertDao,

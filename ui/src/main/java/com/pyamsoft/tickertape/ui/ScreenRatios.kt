@@ -31,9 +31,7 @@ private fun rememberScreenRatio(
   }
 }
 
-/**
- * Get a size relative to the current Screen width based on Orientation
- */
+/** Get a size relative to the current Screen width based on Orientation */
 @Composable
 @CheckResult
 fun rememberScreenWidthRatio(
@@ -51,9 +49,7 @@ fun rememberScreenWidthRatio(
   )
 }
 
-/**
- * Get a size relative to the current Screen height based on Orientation
- */
+/** Get a size relative to the current Screen height based on Orientation */
 @Composable
 @CheckResult
 fun rememberScreenHeightRatio(

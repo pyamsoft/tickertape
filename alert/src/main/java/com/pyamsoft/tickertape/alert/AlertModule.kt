@@ -55,8 +55,8 @@ abstract class AlertModule {
     @AlertInternalApi
     internal fun provideNotifier(
         // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
-      @AlertInternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
-      context: Context
+        @AlertInternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
+        context: Context
     ): Notifier {
       return Notifier.createDefault(context, dispatchers)
     }

@@ -21,8 +21,8 @@ import com.pyamsoft.tickertape.alert.base.PeriodicAlarm
 
 data class BigMoverAlarm
 internal constructor(
-  private val params: BigMoverWorkerParameters,
-  private val isEnabled: Boolean,
+    private val params: BigMoverWorkerParameters,
+    private val isEnabled: Boolean,
 ) : PeriodicAlarm() {
 
   override suspend fun tag(): String {

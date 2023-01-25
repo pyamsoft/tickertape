@@ -27,11 +27,11 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.initOnAppStart
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 internal class BootReceiver internal constructor() : BroadcastReceiver() {
 

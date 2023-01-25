@@ -38,7 +38,7 @@ internal constructor(
     BigMoverDb,
     BigMoverQueryDao.Cache,
     BaseDbImpl<
-            BigMoverChangeEvent,
+        BigMoverChangeEvent,
         BigMoverRealtime,
         BigMoverQueryDao,
         BigMoverInsertDao,

@@ -20,7 +20,6 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.BIG_MONEY_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockMarketCap
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode

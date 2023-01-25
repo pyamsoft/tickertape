@@ -15,8 +15,6 @@
  */
 
 apply plugin: "com.android.application"
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -90,7 +88,10 @@ android {
   }
   packagingOptions {
     resources {
-      pickFirsts += ['META-INF/core_release.kotlin_module', 'META-INF/ui_release.kotlin_module']
+      pickFirsts += [
+        'META-INF/core_release.kotlin_module',
+        'META-INF/ui_release.kotlin_module'
+      ]
     }
   }
 
@@ -98,21 +99,8 @@ android {
   // More than one file was found with OS independent path 'META-INF/core_release.kotlin_module'
 }
 
-// Kapt flags
-kapt {
-  correctErrorTypes = true
-  useBuildCache = true
-  mapDiagnosticLocations = true
-
-  javacOptions {
-    option("-Xlint:unchecked")
-    option("-Xlint:deprecation")
-    option("-Xmaxerrs", 10000)
-  }
-}
-
 dependencies {
-  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
 
   // Leak Canary
   debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
@@ -121,9 +109,6 @@ dependencies {
   debugImplementation "com.github.pyamsoft.pydroid:autopsy:$pydroid"
 
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist"
-
-  // Dagger
-  kapt "com.google.dagger:dagger-compiler:$dagger"
 
   implementation project(':alert')
   implementation project(':alert-workmanager')

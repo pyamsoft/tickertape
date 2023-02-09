@@ -28,7 +28,7 @@ buildscript {
     highlander = "0.2.0"
 
     // Jobs
-    workmanager = "2.7.1"
+    workmanager = "2.8.0"
 
     // Leak Canary
     leakCanary = "2.10"

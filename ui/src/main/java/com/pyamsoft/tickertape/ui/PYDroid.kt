@@ -41,10 +41,7 @@ fun LazyListScope.renderPYDroidExtras() {
 
   item {
     BillingUpsellWidget(
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = MaterialTheme.keylines.content)
-                .padding(top = MaterialTheme.keylines.content),
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
     )
   }
 }

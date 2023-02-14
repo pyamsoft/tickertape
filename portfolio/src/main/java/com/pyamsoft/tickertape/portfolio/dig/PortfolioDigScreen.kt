@@ -1,21 +1,11 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +78,10 @@ fun PortfolioDigScreen(
 
   // Watch for a swipe causing a page change and update accordingly
   val handleTabUpdated by rememberUpdatedState(onTabUpdated)
-  LaunchedEffect(pagerState, allTabs, handleTabUpdated) {
+  LaunchedEffect(
+      pagerState,
+      allTabs,
+  ) {
     snapshotFlow { pagerState.currentPage }
         .collectLatest { index ->
           val page = allTabs[index]

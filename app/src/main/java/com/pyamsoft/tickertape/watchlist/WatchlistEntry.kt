@@ -16,13 +16,7 @@
 
 package com.pyamsoft.tickertape.watchlist
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -32,7 +26,6 @@ import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.LifecycleEffect
-import com.pyamsoft.pydroid.ui.util.rememberActivity
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.Ticker
@@ -91,7 +84,6 @@ fun WatchlistEntry(
   val imageLoader = rememberNotNull(component.imageLoader)
 
   val scope = rememberCoroutineScope()
-  val activity = rememberActivity()
 
   val handleRefresh = { force: Boolean ->
     viewModel.handleRefreshList(
@@ -101,32 +93,31 @@ fun WatchlistEntry(
   }
 
   SaveStateDisposableEffect(viewModel)
-  MountHooks(
-      viewModel = viewModel,
-      onRefresh = { handleRefresh(false) },
-      onFabClicked = {
-        // TODO move away from sheet
-        NewTickerSheet.show(
-            activity,
-            TickerDestination.WATCHLIST,
-        )
-      },
-  )
 
   val state = viewModel.state
   val deleteTicker by state.deleteTicker.collectAsState()
 
-  WatchlistScreen(
-      modifier = modifier,
-      state = state,
-      imageLoader = imageLoader,
-      onSelectTicker = onDigDown,
-      onRefresh = { handleRefresh(true) },
-      onDeleteTicker = { viewModel.handleOpenDeleteTicker(it) },
-      onSearchChanged = { viewModel.handleSearch(it) },
-      onTabUpdated = { viewModel.handleSectionChanged(it) },
-      onRegenerateList = { viewModel.handleRegenerateList(this) },
-  )
+  NewTickerSheet(
+      destination = TickerDestination.WATCHLIST,
+  ) { controller ->
+    MountHooks(
+        viewModel = viewModel,
+        onRefresh = { handleRefresh(false) },
+        onFabClicked = { controller.show() },
+    )
+
+    WatchlistScreen(
+        modifier = modifier,
+        state = state,
+        imageLoader = imageLoader,
+        onSelectTicker = onDigDown,
+        onRefresh = { handleRefresh(true) },
+        onDeleteTicker = { viewModel.handleOpenDeleteTicker(it) },
+        onSearchChanged = { viewModel.handleSearch(it) },
+        onTabUpdated = { viewModel.handleSectionChanged(it) },
+        onRegenerateList = { viewModel.handleRegenerateList(this) },
+    )
+  }
 
   deleteTicker?.also { ticker ->
     val params =

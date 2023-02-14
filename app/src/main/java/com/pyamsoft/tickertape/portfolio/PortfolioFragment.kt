@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -84,13 +85,6 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
         )
   }
 
-  private fun handleFabClicked() {
-    NewTickerSheet.show(
-        requireActivity(),
-        TickerDestination.PORTFOLIO,
-    )
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -129,17 +123,29 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-          PortfolioScreen(
-              modifier = Modifier.fillMaxSize(),
-              state = vm.state,
-              imageLoader = loader,
-              onRefresh = handleRefresh,
-              onSelect = handleOpenManageDialog,
-              onDelete = handleDeleteStock,
-              onSearchChanged = handleSearchChanged,
-              onTabUpdated = handleTabChanged,
-              onRegenerateList = handleRegenerateList,
-          )
+          NewTickerSheet(
+              destination = TickerDestination.PORTFOLIO,
+          ) { controller ->
+            val onShowSheet by rememberUpdatedState { controller.show() }
+            LaunchedEffect(vm) {
+              vm.bind(
+                  scope = this,
+                  onMainSelectionEvent = { onShowSheet() },
+              )
+            }
+
+            PortfolioScreen(
+                modifier = Modifier.fillMaxSize(),
+                state = vm.state,
+                imageLoader = loader,
+                onRefresh = handleRefresh,
+                onSelect = handleOpenManageDialog,
+                onDelete = handleDeleteStock,
+                onSearchChanged = handleSearchChanged,
+                onTabUpdated = handleTabChanged,
+                onRegenerateList = handleRegenerateList,
+            )
+          }
         }
       }
     }
@@ -147,13 +153,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    viewModel.requireNotNull().also { vm ->
-      vm.restoreState(savedInstanceState)
-      vm.bind(
-          scope = viewLifecycleOwner.lifecycleScope,
-          onMainSelectionEvent = { handleFabClicked() },
-      )
-    }
+    viewModel.requireNotNull().also { vm -> vm.restoreState(savedInstanceState) }
   }
 
   override fun onStart() {

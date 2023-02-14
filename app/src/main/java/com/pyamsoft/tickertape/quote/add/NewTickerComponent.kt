@@ -23,8 +23,7 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface NewTickerComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: NewTickerSheet)
+  fun inject(injector: NewTickerInjector)
 
   @Subcomponent.Factory
   interface Factory {

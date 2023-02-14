@@ -17,19 +17,14 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.SearchResult
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -271,6 +266,21 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry.registerProvider(KEY_SYMBOL) { s.symbol.value }.also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    val s = state
+
+    registry.consumeRestored(KEY_SYMBOL)?.let { it as String }?.also { s.symbol.value = it }
+  }
+
   fun handleSearchResultsDismissed() {
     state.dismissSearchResultsPopup()
   }
@@ -337,10 +347,26 @@ internal constructor(
     state.optionType.value = type
   }
 
-  fun handleSubmit(
-      scope: CoroutineScope,
-      onSubmit: () -> Unit,
-  ) {
+  fun handleDismiss() {
+    handleClear()
+    handleClearEquityType()
+
+    val s = state
+
+    s.tradeSide.value = TradeSide.BUY
+    s.lookupResults.value = emptyList()
+    s.lookupError.value = null
+
+    s.optionType.value = StockOptions.Contract.Type.CALL
+    s.optionExpirationDate.value = null
+    s.optionStrikePrice.value = null
+
+    s.resolvedOption.value = null
+    s.resolvedTicker.value = null
+    s.validSymbol.value = null
+  }
+
+  fun handleSubmit(scope: CoroutineScope) {
     val s = state
     if (!s.canSubmit()) {
       return
@@ -373,7 +399,7 @@ internal constructor(
                     Timber.w("UPDATE happened but none was expected: ${result.data}")
               }
             }
-            .onSuccess { onSubmit() }
+            .onSuccess { handleClear() }
             .onFinally { s.isSubmitting.value = false }
       }
     }
@@ -381,5 +407,9 @@ internal constructor(
 
   fun handleTradeSideChanged(side: TradeSide) {
     state.tradeSide.value = side
+  }
+
+  companion object {
+    private const val KEY_SYMBOL = "key_symbol"
   }
 }

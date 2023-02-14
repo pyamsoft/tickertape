@@ -29,7 +29,7 @@ import com.pyamsoft.pydroid.ui.util.LifecycleEffect
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.add.NewTickerSheet
+import com.pyamsoft.tickertape.quote.add.NewTickerSheetScreen
 import com.pyamsoft.tickertape.quote.add.TickerDestination
 import javax.inject.Inject
 
@@ -97,7 +97,7 @@ fun WatchlistEntry(
   val state = viewModel.state
   val deleteTicker by state.deleteTicker.collectAsState()
 
-  NewTickerSheet(
+  NewTickerSheetScreen(
       destination = TickerDestination.WATCHLIST,
   ) { controller ->
     MountHooks(

@@ -36,7 +36,7 @@ internal constructor(
 }
 
 @Composable
-internal fun NewTickerSheet(
+internal fun NewTickerSheetScreen(
     destination: TickerDestination,
     content: @Composable (BottomSheetController) -> Unit,
 ) {

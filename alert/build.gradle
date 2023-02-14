@@ -55,5 +55,5 @@ dependencies {
   implementation project(':core')
   implementation project(':db')
   implementation project(':stocks')
-  implementation project(':tape')
+  implementation project(':ui')
 }

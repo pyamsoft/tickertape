@@ -20,13 +20,10 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.alert.base.Alarm
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertWorkerParameters
-import com.pyamsoft.tickertape.alert.types.refresh.RefreshWorkerParameters
 
 interface AlarmFactory {
 
   @CheckResult suspend fun priceAlertAlarm(params: PriceAlertWorkerParameters): Alarm
 
   @CheckResult suspend fun bigMoverAlarm(params: BigMoverWorkerParameters): Alarm
-
-  @CheckResult suspend fun refresherAlarm(params: RefreshWorkerParameters): Alarm
 }

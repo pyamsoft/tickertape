@@ -122,7 +122,6 @@ dependencies {
   implementation project(':quote')
   implementation project(':stocks')
   implementation project(':stocks-remote')
-  implementation project(':tape')
   implementation project(':ui')
   implementation project(':watchlist')
 }

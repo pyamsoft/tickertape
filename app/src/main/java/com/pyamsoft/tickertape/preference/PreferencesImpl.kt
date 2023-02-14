@@ -21,9 +21,7 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.util.booleanFlow
-import com.pyamsoft.pydroid.util.intFlow
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
-import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -35,41 +33,12 @@ internal class PreferencesImpl
 @Inject
 internal constructor(
     context: Context,
-) : TapePreferences, BigMoverPreferences {
+) : BigMoverPreferences {
 
   private val preferences by lazy {
+    Enforcer.assertOffMainThread()
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
   }
-
-  override suspend fun setTapeNotificationEnabled(enabled: Boolean) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        preferences.edit { putBoolean(Tape.KEY_NOTIFICATION_ENABLED, enabled) }
-      }
-
-  override suspend fun setTapePageSize(size: Int) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        preferences.edit { putInt(Tape.KEY_PAGE_SIZE, size) }
-      }
-
-  override suspend fun listenForTapePageSizeChanged(): Flow<Int> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext preferences.intFlow(
-            Tape.KEY_PAGE_SIZE,
-            TapePreferences.VALUE_DEFAULT_PAGE_SIZE,
-        )
-      }
-
-  override suspend fun listenForTapeNotificationChanged(): Flow<Boolean> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext preferences.booleanFlow(
-            Tape.KEY_NOTIFICATION_ENABLED,
-            TapePreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
-        )
-      }
 
   override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =
       withContext(context = Dispatchers.IO) {
@@ -89,12 +58,5 @@ internal constructor(
   private object BigMovers {
 
     const val KEY_NOTIFICATION_ENABLED = "key_big_mover_notification_v1"
-  }
-
-  private object Tape {
-
-    const val KEY_NOTIFICATION_ENABLED = "key_tape_notification_v1"
-
-    const val KEY_PAGE_SIZE = "key_tape_page_size_v1"
   }
 }

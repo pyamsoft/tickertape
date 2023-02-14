@@ -18,14 +18,10 @@ package com.pyamsoft.tickertape.notification
 
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.pydroid.arch.UiSavedStateReader
-import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.tickertape.alert.AlarmFactory
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
-import com.pyamsoft.tickertape.alert.types.refresh.RefreshStandalone
-import com.pyamsoft.tickertape.tape.TapePreferences
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,9 +33,7 @@ class NotificationViewModeler
 @Inject
 internal constructor(
     override val state: MutableNotificationViewState,
-    private val tapePreferences: TapePreferences,
     private val bigMoverPreferences: BigMoverPreferences,
-    private val refreshStandalone: RefreshStandalone,
     private val alerter: Alerter,
     private val alarmFactory: AlarmFactory,
 ) : AbstractViewModeler<NotificationViewState>(state) {
@@ -48,37 +42,10 @@ internal constructor(
     val s = state
 
     scope.launch(context = Dispatchers.Main) {
-      tapePreferences.listenForTapeNotificationChanged().collectLatest {
-        s.isTapeEnabled.value = it
-      }
-    }
-
-    scope.launch(context = Dispatchers.Main) {
-      tapePreferences.listenForTapePageSizeChanged().collectLatest { s.tapePageSize.value = it }
-    }
-
-    scope.launch(context = Dispatchers.Main) {
       bigMoverPreferences.listenForBigMoverNotificationChanged().collectLatest {
         s.isBigMoverEnabled.value = it
       }
     }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    val s = state
-
-    outState.put(TAPE_IS_ENABLED, s.isTapeEnabled)
-    outState.put(TAPE_PAGE_SIZE, s.tapePageSize)
-
-    outState.put(BIGMOVER_IS_ENABLED, s.isBigMoverEnabled)
-  }
-
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    val s = state
-
-    savedInstanceState.get<Boolean>(TAPE_IS_ENABLED)?.also { s.isTapeEnabled.value = it }
-    savedInstanceState.get<Int>(TAPE_PAGE_SIZE)?.also { s.tapePageSize.value = it }
-    savedInstanceState.get<Boolean>(BIGMOVER_IS_ENABLED)?.also { s.isBigMoverEnabled.value = it }
   }
 
   override fun registerSaveState(
@@ -87,8 +54,6 @@ internal constructor(
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         val s = state
 
-        registry.registerProvider(TAPE_IS_ENABLED) { s.isTapeEnabled.value }.also { add(it) }
-        registry.registerProvider(TAPE_PAGE_SIZE) { s.tapePageSize.value }.also { add(it) }
         registry
             .registerProvider(BIGMOVER_IS_ENABLED) { s.isBigMoverEnabled.value }
             .also { add(it) }
@@ -98,44 +63,9 @@ internal constructor(
     val s = state
 
     registry
-        .consumeRestored(TAPE_IS_ENABLED)
-        ?.let { it as Boolean }
-        ?.also { s.isTapeEnabled.value = it }
-    registry.consumeRestored(TAPE_PAGE_SIZE)?.let { it as Int }?.also { s.tapePageSize.value = it }
-    registry
         .consumeRestored(BIGMOVER_IS_ENABLED)
         ?.let { it as Boolean }
         ?.also { s.isBigMoverEnabled.value = it }
-  }
-
-  fun handleTapeNotificationToggled(scope: CoroutineScope) {
-    val s = state
-    val newEnabled = !s.isTapeEnabled.value
-
-    // Set state immediately for feedback
-    state.isTapeEnabled.value = newEnabled
-
-    // Fire pref change
-    scope.launch(context = Dispatchers.Main) {
-      tapePreferences.setTapeNotificationEnabled(newEnabled)
-
-      // Wait for completions
-      yield()
-
-      // Restart the launcher to update if the notification fires
-      refreshStandalone.refreshTape(false)
-    }
-  }
-
-  fun handleTapePageSizeChanged(
-      scope: CoroutineScope,
-      size: Int,
-  ) {
-    // Set state immediately for feedback
-    state.tapePageSize.value = size
-
-    // Fire pref change
-    scope.launch(context = Dispatchers.Main) { tapePreferences.setTapePageSize(size) }
   }
 
   fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
@@ -171,9 +101,6 @@ internal constructor(
   }
 
   companion object {
-    private const val TAPE_IS_ENABLED = "key_tape_is_enabled"
-    private const val TAPE_PAGE_SIZE = "key_tape_page_size"
-
     private const val BIGMOVER_IS_ENABLED = "key_bigmover_is_enabled"
   }
 }

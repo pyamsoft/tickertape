@@ -63,13 +63,6 @@ fun NotificationEntry(
   NotificationScreen(
       modifier = modifier,
       state = viewModel.state,
-      onTapeNotificationToggled = { viewModel.handleTapeNotificationToggled(scope = scope) },
-      onTapePageSizeChanged = { size ->
-        viewModel.handleTapePageSizeChanged(
-            scope = scope,
-            size = size,
-        )
-      },
       onBigMoverNotificationToggled = {
         viewModel.handleBigMoverNotificationToggled(scope = scope)
       },

@@ -59,6 +59,5 @@ dependencies {
   implementation project(':main')
   implementation project(':quote')
   implementation project(':stocks')
-  implementation project(':tape')
   api project(':ui')
 }

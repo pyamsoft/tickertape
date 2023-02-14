@@ -57,6 +57,5 @@ dependencies {
 
   implementation project(':alert')
   implementation project(':main')
-  implementation project(':tape')
   implementation project(':ui')
 }

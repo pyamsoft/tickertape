@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape
 
 import android.app.Activity
 import android.app.Application
-import android.app.Service
 import android.content.Context
 import androidx.annotation.CheckResult
 import coil.ImageLoader
@@ -42,20 +41,11 @@ import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
-import com.pyamsoft.tickertape.receiver.ScreenReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
-import com.pyamsoft.tickertape.tape.TapeComponent
-import com.pyamsoft.tickertape.tape.TapeModule
-import com.pyamsoft.tickertape.tape.TapePreferences
-import com.pyamsoft.tickertape.tape.TapeService
 import com.pyamsoft.tickertape.watchlist.WatchlistModule
 import com.pyamsoft.tickertape.watchlist.WatchlistRemoveInjector
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
+import dagger.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -67,7 +57,6 @@ import javax.inject.Singleton
             StockModule::class,
             DbModule::class,
             RoomModule::class,
-            TapeModule::class,
             AlertModule::class,
             WorkManagerModule::class,
             TickerModule::class,
@@ -89,8 +78,6 @@ internal interface TickerComponent {
 
   fun inject(receiver: BootReceiver)
 
-  fun inject(receiver: ScreenReceiver)
-
   fun inject(application: TickerTape)
 
   fun inject(injector: WatchlistRemoveInjector)
@@ -100,8 +87,6 @@ internal interface TickerComponent {
   @CheckResult fun plusPositionDateComponent(): PositionDateComponent.Factory
 
   @CheckResult fun plusSplitDateComponent(): SplitDateComponent.Factory
-
-  @CheckResult fun plusTapeComponent(): TapeComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
@@ -126,8 +111,6 @@ internal interface TickerComponent {
   @Module
   abstract class TickerProvider {
 
-    @Binds @CheckResult abstract fun bindTapePreferences(impl: PreferencesImpl): TapePreferences
-
     @Binds
     @CheckResult
     abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
@@ -139,12 +122,6 @@ internal interface TickerComponent {
       @JvmStatic
       internal fun provideActivityClass(): Class<out Activity> {
         return MainActivity::class.java
-      }
-
-      @Provides
-      @JvmStatic
-      internal fun provideServiceClass(): Class<out Service> {
-        return TapeService::class.java
       }
 
       @Provides

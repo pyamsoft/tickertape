@@ -16,11 +16,7 @@
 
 package com.pyamsoft.tickertape.notification
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -34,8 +30,6 @@ import com.pyamsoft.tickertape.ui.renderPYDroidExtras
 fun NotificationScreen(
     modifier: Modifier = Modifier,
     state: NotificationViewState,
-    onTapeNotificationToggled: () -> Unit,
-    onTapePageSizeChanged: (Int) -> Unit,
     onBigMoverNotificationToggled: () -> Unit,
 ) {
   Scaffold(
@@ -49,15 +43,6 @@ fun NotificationScreen(
       }
 
       renderPYDroidExtras()
-
-      item {
-        TapeNotifications(
-            modifier = Modifier.fillMaxWidth(),
-            state = state,
-            onTapeNotificationToggled = onTapeNotificationToggled,
-            onPageSizeChanged = onTapePageSizeChanged,
-        )
-      }
 
       item {
         BigMoverNotifications(
@@ -81,8 +66,6 @@ fun NotificationScreen(
 private fun PreviewNotificationScreen() {
   NotificationScreen(
       state = MutableNotificationViewState(),
-      onTapeNotificationToggled = {},
-      onTapePageSizeChanged = {},
       onBigMoverNotificationToggled = {},
   )
 }

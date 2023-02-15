@@ -11,8 +11,6 @@ sealed class TopLevelMainPage(val displayName: String) : MainPage {
 
   @Stable @Immutable object Home : TopLevelMainPage("Home")
 
-  @Stable @Immutable object Watchlist : TopLevelMainPage("Watchlist")
-
   @Stable @Immutable object Portfolio : TopLevelMainPage("Portfolio")
 
   @Stable @Immutable object Notifications : TopLevelMainPage("Notifications")

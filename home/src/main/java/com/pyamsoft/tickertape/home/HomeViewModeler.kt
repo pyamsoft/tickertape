@@ -26,7 +26,6 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.watchlist.WatchlistInteractor
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,13 +40,9 @@ internal constructor(
     private val homeInteractorCache: HomeInteractor.Cache,
     private val portfolioInteractor: PortfolioInteractor,
     private val portfolioInteractorCache: PortfolioInteractor.Cache,
-    private val watchlistInteractor: WatchlistInteractor,
-    private val watchlistInteractorCache: WatchlistInteractor.Cache,
     private val tickerInteractor: TickerInteractor,
     private val tickerInteractorCache: TickerInteractor.Cache,
 ) : AbstractViewModeler<HomeViewState>(state) {
-
-  private var internalFullWatchlist: List<Ticker> = emptyList()
 
   @CheckResult
   private suspend inline fun handleFetchScreener(
@@ -69,15 +64,6 @@ internal constructor(
         .onFinally { onLoading(HomeBaseViewState.LoadingState.DONE) }
   }
 
-  private fun handleGenerateWatchlist(list: List<Ticker>) {
-    val s = state
-    val sorted = list.sortedWith(Ticker.COMPARATOR)
-    s.apply {
-      internalFullWatchlist = sorted
-      watchlist.value = sorted.take(WATCHLIST_COUNT)
-    }
-  }
-
   override fun registerSaveState(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
@@ -94,32 +80,6 @@ internal constructor(
         .consumeRestored(KEY_SETTINGS)
         ?.let { it as Boolean }
         ?.also { s.isSettingsOpen.value = it }
-  }
-
-  fun handleFetchWatchlist(scope: CoroutineScope, force: Boolean) {
-    val s = state
-
-    s.isLoadingWatchlist.value = HomeBaseViewState.LoadingState.LOADING
-    scope.launch(context = Dispatchers.Main) {
-      if (force) {
-        watchlistInteractorCache.invalidateQuotes()
-      }
-      watchlistInteractor
-          .getQuotes()
-          .onSuccess { list ->
-            handleGenerateWatchlist(list)
-            s.watchlistError.value = null
-          }
-          .onFailure { Timber.e(it, "Failed to fetch watchlist") }
-          .onFailure {
-            s.apply {
-              internalFullWatchlist = emptyList()
-              watchlist.value = emptyList()
-              watchlistError.value = it
-            }
-          }
-          .onFinally { s.isLoadingWatchlist.value = HomeBaseViewState.LoadingState.DONE }
-    }
   }
 
   fun handleFetchPortfolio(scope: CoroutineScope, force: Boolean) {

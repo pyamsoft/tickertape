@@ -21,14 +21,11 @@ import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.quote.screen.WatchlistDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.fromJson
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,11 +59,6 @@ internal constructor(
         val s = state
 
         registry.registerProvider(KEY_THEME) { s.theme.value.name }.also { add(it) }
-        registry
-            .registerProvider(KEY_WATCHLIST_DIG) {
-              s.watchlistDigParams.value?.let { jsonParser.toJson(it) }
-            }
-            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -77,12 +69,6 @@ internal constructor(
         ?.let { it as String }
         ?.let { Theming.Mode.valueOf(it) }
         ?.also { s.theme.value = it }
-
-    registry
-        .consumeRestored(KEY_WATCHLIST_DIG)
-        ?.let { it as String }
-        ?.let { jsonParser.fromJson<WatchlistDigParams>(it) }
-        ?.also { s.watchlistDigParams.value = it }
   }
 
   fun handleOpenDig(ticker: Ticker) {
@@ -104,22 +90,24 @@ internal constructor(
       lookupSymbol: StockSymbol,
       equityType: EquityType,
   ) {
-    state.watchlistDigParams.value =
-        WatchlistDigParams(
-            uniqueId = IdGenerator.generate(),
-            symbol = symbol,
-            lookupSymbol = lookupSymbol,
-            equityType = equityType,
-        )
+    // TODO
+    //    state.watchlistDigParams.value =
+    //        WatchlistDigParams(
+    //            uniqueId = IdGenerator.generate(),
+    //            symbol = symbol,
+    //            lookupSymbol = lookupSymbol,
+    //            equityType = equityType,
+    //        )
   }
 
   fun handleCloseDig() {
-    state.watchlistDigParams.value = null
+    // TODO
+    //    state.watchlistDigParams.value = null
   }
 
   companion object {
 
     private const val KEY_THEME = "theme"
-    private const val KEY_WATCHLIST_DIG = "watchlist_dig"
+    //    private const val KEY_WATCHLIST_DIG = "watchlist_dig"
   }
 }

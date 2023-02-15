@@ -66,12 +66,6 @@ fun HomeEntry(
       imageLoader = imageLoader,
       onSettingsClicked = { viewModel.handleOpenSettings() },
       onChartClicked = { onOpenWatchlistDig(it) },
-      onRefreshWatchlist = {
-        viewModel.handleFetchWatchlist(
-            scope = this,
-            force = false,
-        )
-      },
       onRefreshUndervaluedGrowth = {
         viewModel.handleFetchUndervaluedGrowth(
             scope = this,

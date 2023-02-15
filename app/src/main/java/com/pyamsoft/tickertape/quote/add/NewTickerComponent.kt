@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
-import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
@@ -28,9 +27,6 @@ internal interface NewTickerComponent {
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-        @BindsInstance destination: TickerDestination,
-    ): NewTickerComponent
+    @CheckResult fun create(): NewTickerComponent
   }
 }

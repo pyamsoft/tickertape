@@ -20,25 +20,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -125,11 +108,6 @@ internal fun MainBottomNav(
               )
               Item(
                   current = page,
-                  target = TopLevelMainPage.Watchlist,
-                  onLoadPage = onLoadPage,
-              )
-              Item(
-                  current = page,
                   target = TopLevelMainPage.Portfolio,
                   onLoadPage = onLoadPage,
               )
@@ -172,8 +150,7 @@ private fun ActionButton(
     onActionSelected: (TopLevelMainPage) -> Unit,
 ) {
 
-  val isFabVisible =
-      remember(page) { page == TopLevelMainPage.Portfolio || page == TopLevelMainPage.Watchlist }
+  val isFabVisible = remember(page) { page == TopLevelMainPage.Portfolio }
 
   Box(
       modifier = modifier,
@@ -213,8 +190,7 @@ private fun RowScope.Item(
       remember(target) {
         when (target) {
           TopLevelMainPage.Home -> Icons.Filled.Home
-          TopLevelMainPage.Watchlist -> Icons.Filled.BarChart
-          TopLevelMainPage.Portfolio -> Icons.Filled.PieChart
+          TopLevelMainPage.Portfolio -> Icons.Filled.BarChart
           TopLevelMainPage.Notifications -> Icons.Filled.Notifications
         }
       }

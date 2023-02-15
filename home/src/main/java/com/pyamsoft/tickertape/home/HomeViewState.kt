@@ -46,13 +46,6 @@ interface HomePortfolioViewState : HomeBaseViewState {
 }
 
 @Stable
-interface HomeWatchListViewState : HomeBaseViewState {
-  val isLoadingWatchlist: StateFlow<HomeBaseViewState.LoadingState>
-  val watchlist: StateFlow<List<Ticker>>
-  val watchlistError: StateFlow<Throwable?>
-}
-
-@Stable
 interface HomeIndexesViewState : HomeBaseViewState {
   val isLoadingIndexes: StateFlow<HomeBaseViewState.LoadingState>
   val indexes: StateFlow<List<Ticker>>
@@ -112,7 +105,6 @@ interface HomeMostActiveViewState : HomeBaseViewState {
 interface HomeViewState :
     UiViewState,
     HomePortfolioViewState,
-    HomeWatchListViewState,
     HomeIndexesViewState,
     HomeGainersViewState,
     HomeLosersViewState,
@@ -133,10 +125,6 @@ class MutableHomeViewState @Inject internal constructor() : HomeViewState {
   override val isLoadingPortfolio = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
   override val portfolio = MutableStateFlow(PortfolioStockList.empty())
   override val portfolioError = MutableStateFlow<Throwable?>(null)
-
-  override val isLoadingWatchlist = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
-  override val watchlist = MutableStateFlow(emptyList<Ticker>())
-  override val watchlistError = MutableStateFlow<Throwable?>(null)
 
   override val isLoadingIndexes = MutableStateFlow(HomeBaseViewState.LoadingState.NONE)
   override val indexes = MutableStateFlow(emptyList<Ticker>())

@@ -61,5 +61,4 @@ dependencies {
   implementation project(':quote')
   implementation project(':stocks')
   implementation project(':ui')
-  implementation project(':watchlist')
 }

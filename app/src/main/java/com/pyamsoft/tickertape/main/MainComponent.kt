@@ -28,23 +28,13 @@ import com.pyamsoft.tickertape.notification.NotificationComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import com.pyamsoft.tickertape.watchlist.WatchlistComponent
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigComponent
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
-import dagger.Provides
-import dagger.Subcomponent
+import dagger.*
 
 @ActivityScope
 @Subcomponent(modules = [ThemeProviderModule::class, MainComponent.MainModule::class])
 internal interface MainComponent {
 
   @CheckResult fun plusHome(): HomeComponent.Factory
-
-  @CheckResult fun plusWatchlist(): WatchlistComponent.Factory
-
-  @CheckResult fun plusWatchlistDig(): WatchlistDigComponent.Factory
 
   @CheckResult fun plusPortfolio(): PortfolioComponent.Factory
 

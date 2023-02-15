@@ -36,9 +36,6 @@ import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.db.split.SplitDeleteDao
 import com.pyamsoft.tickertape.db.split.SplitInsertDao
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
-import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
-import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -63,27 +60,6 @@ abstract class RoomModule {
     internal fun provideRoom(context: Context): RoomTickerDb {
       val appContext = context.applicationContext
       return Room.databaseBuilder(appContext, RoomTickerDbImpl::class.java, DB_NAME).build()
-    }
-
-    @DbApi
-    @Provides
-    @JvmStatic
-    internal fun provideRoomSymbolQueryDao(@InternalApi db: RoomTickerDb): SymbolQueryDao {
-      return db.roomSymbolQueryDao
-    }
-
-    @DbApi
-    @Provides
-    @JvmStatic
-    internal fun provideRoomSymbolInsertDao(@InternalApi db: RoomTickerDb): SymbolInsertDao {
-      return db.roomSymbolInsertDao
-    }
-
-    @DbApi
-    @Provides
-    @JvmStatic
-    internal fun provideRoomSymbolDeleteDao(@InternalApi db: RoomTickerDb): SymbolDeleteDao {
-      return db.roomSymbolDeleteDao
     }
 
     @DbApi

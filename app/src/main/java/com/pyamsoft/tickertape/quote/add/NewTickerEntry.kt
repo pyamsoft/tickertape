@@ -15,19 +15,12 @@ import com.pyamsoft.tickertape.ui.WrapInBottomSheet
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 
-internal class NewTickerInjector
-@Inject
-internal constructor(
-    private val destination: TickerDestination,
-) : ComposableInjector() {
+internal class NewTickerInjector @Inject internal constructor() : ComposableInjector() {
 
   @JvmField @Inject internal var viewModel: NewTickerViewModeler? = null
 
   override fun onInject(activity: FragmentActivity) {
-    ObjectGraph.ApplicationScope.retrieve(activity)
-        .plusNewTickerComponent()
-        .create(destination)
-        .inject(this)
+    ObjectGraph.ApplicationScope.retrieve(activity).plusNewTickerComponent().create().inject(this)
   }
 
   override fun onDispose() {
@@ -37,14 +30,12 @@ internal constructor(
 
 @Composable
 internal fun NewTickerSheetScreen(
-    destination: TickerDestination,
     content: @Composable (BottomSheetController) -> Unit,
 ) {
   WrapInBottomSheet(
       sheetContent = { controller ->
         NewTickerEntry(
             controller = controller,
-            destination = destination,
             onClose = { controller.hide() },
         )
       },
@@ -74,11 +65,10 @@ private fun MountHooks(
 private fun NewTickerEntry(
     modifier: Modifier = Modifier,
     controller: BottomSheetController,
-    destination: TickerDestination,
     onClose: () -> Unit,
 ) {
   val scope = rememberCoroutineScope()
-  val component = rememberComposableInjector { NewTickerInjector(destination) }
+  val component = rememberComposableInjector { NewTickerInjector() }
   val viewModel = rememberNotNull(component.viewModel)
 
   val state = viewModel.state

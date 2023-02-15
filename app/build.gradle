@@ -123,7 +123,6 @@ dependencies {
   implementation project(':stocks')
   implementation project(':stocks-remote')
   implementation project(':ui')
-  implementation project(':watchlist')
 }
 
 // Leave at bottom

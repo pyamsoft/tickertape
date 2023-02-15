@@ -44,7 +44,6 @@ import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.NewTickerSheetScreen
-import com.pyamsoft.tickertape.quote.add.TickerDestination
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import javax.inject.Inject
@@ -123,9 +122,7 @@ class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
             rememberUpdatedState<CoroutineScope.() -> Unit> { vm.handleRegenerateList(this) }
 
         act.TickerTapeTheme(themeProvider) {
-          NewTickerSheetScreen(
-              destination = TickerDestination.PORTFOLIO,
-          ) { controller ->
+          NewTickerSheetScreen { controller ->
             val onShowSheet by rememberUpdatedState { controller.show() }
             LaunchedEffect(vm) {
               vm.bind(

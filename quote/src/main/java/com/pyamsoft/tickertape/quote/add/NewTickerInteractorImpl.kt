@@ -24,19 +24,11 @@ import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
-import com.pyamsoft.tickertape.db.symbol.JsonMappableDbSymbol
-import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.base.BaseTickerInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.SearchResult
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.stocks.api.*
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,8 +40,6 @@ import timber.log.Timber
 internal class NewTickerInteractorImpl
 @Inject
 internal constructor(
-    private val symbolQueryDao: SymbolQueryDao,
-    private val symbolInsertDao: SymbolInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingInsertDao: HoldingInsertDao,
     private val stockInteractor: StockInteractor,
@@ -130,24 +120,6 @@ internal constructor(
   }
 
   @CheckResult
-  private suspend fun handleInsertWatchlist(
-      symbol: StockSymbol,
-  ): DbInsert.InsertResult<StockSymbol> {
-    val existing = symbolQueryDao.query().firstOrNull { it.symbol == symbol }
-    return if (existing == null) {
-      val model = JsonMappableDbSymbol.create(symbol)
-      val result = symbolInsertDao.insert(model)
-      mapResultToSymbol(result) { it.symbol }
-    } else {
-      val error = IllegalArgumentException("${symbol.raw} already in watchlist")
-      DbInsert.InsertResult.Fail(
-          data = symbol,
-          error = error,
-      )
-    }
-  }
-
-  @CheckResult
   private suspend fun handleInsertPortfolio(
       symbol: StockSymbol,
       equityType: EquityType,
@@ -175,7 +147,6 @@ internal constructor(
 
   override suspend fun insertNewTicker(
       symbol: StockSymbol,
-      destination: TickerDestination,
       equityType: EquityType,
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>> =
@@ -183,15 +154,11 @@ internal constructor(
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val result =
-              when (destination) {
-                TickerDestination.WATCHLIST -> handleInsertWatchlist(symbol)
-                TickerDestination.PORTFOLIO -> handleInsertPortfolio(symbol, equityType, tradeSide)
-              }
+          val result = handleInsertPortfolio(symbol, equityType, tradeSide)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Failed to insert symbol into db: $symbol $destination")
+            Timber.e(e, "Failed to insert symbol into db: $symbol")
             ResultWrapper.failure(e)
           }
         }

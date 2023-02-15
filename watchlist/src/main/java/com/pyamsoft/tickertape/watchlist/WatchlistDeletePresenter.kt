@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.watchlist
+package com.pyamsoft.tickertape
 
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject

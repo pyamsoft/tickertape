@@ -38,7 +38,6 @@ internal constructor(
     override val state: MutableNewTickerViewState,
     interactor: NewTickerInteractor,
     interactorCache: NewTickerInteractor.Cache,
-    destination: TickerDestination,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
   private val tickerResolutionRunner =
@@ -80,7 +79,6 @@ internal constructor(
         val s = state
         interactor.insertNewTicker(
             symbol = symbol.asSymbol(),
-            destination = destination,
             equityType = s.equityType.value.requireNotNull(),
             tradeSide = s.tradeSide.value,
         )

@@ -46,7 +46,6 @@ interface NewTickerInteractor : BaseTickerInteractor {
   @CheckResult
   suspend fun insertNewTicker(
       symbol: StockSymbol,
-      destination: TickerDestination,
       equityType: EquityType,
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>>

@@ -46,7 +46,6 @@ import com.pyamsoft.tickertape.databinding.ActivityMainBinding
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import com.pyamsoft.tickertape.watchlist.dig.WatchlistDigEntry
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -181,7 +180,7 @@ internal class MainActivity : AppCompatActivity() {
 
       val state = vm.state
       val theme by state.theme.collectAsState()
-      val watchlistDig by state.watchlistDigParams.collectAsState()
+      val watchlistDig = null
 
       TickerTapeTheme(theme) {
         SystemBars(theme, screen)
@@ -203,11 +202,12 @@ internal class MainActivity : AppCompatActivity() {
               }
             }
           } else {
-            WatchlistDigEntry(
-                modifier = Modifier.fillMaxSize(),
-                params = dig,
-                onGoBack = { vm.handleCloseDig() },
-            )
+              // TODO
+//            WatchlistDigEntry(
+//                modifier = Modifier.fillMaxSize(),
+//                params = dig,
+//                onGoBack = { vm.handleCloseDig() },
+//            )
           }
         }
       }

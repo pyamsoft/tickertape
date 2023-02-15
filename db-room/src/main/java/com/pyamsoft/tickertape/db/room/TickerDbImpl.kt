@@ -26,8 +26,6 @@ import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.db.split.SplitDb
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,7 +34,6 @@ internal class TickerDbImpl
 @Inject
 internal constructor(
     // DB
-    override val symbols: SymbolDb,
     override val holdings: HoldingDb,
     override val positions: PositionDb,
     override val bigMovers: BigMoverDb,
@@ -44,7 +41,6 @@ internal constructor(
     override val priceAlerts: PriceAlertDb,
 
     // Caches
-    private val symbolCache: SymbolQueryDao.Cache,
     private val holdingCache: HoldingQueryDao.Cache,
     private val positionCache: PositionQueryDao.Cache,
     private val bigMoverCache: BigMoverQueryDao.Cache,
@@ -53,7 +49,6 @@ internal constructor(
 ) : TickerDb {
 
   override suspend fun invalidate() {
-    symbolCache.invalidate()
     holdingCache.invalidate()
     positionCache.invalidate()
     bigMoverCache.invalidate()

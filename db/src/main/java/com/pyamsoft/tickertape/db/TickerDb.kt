@@ -22,11 +22,8 @@ import com.pyamsoft.tickertape.db.mover.BigMoverDb
 import com.pyamsoft.tickertape.db.position.PositionDb
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
 import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
 
 interface TickerDb {
-
-  @get:CheckResult val symbols: SymbolDb
 
   @get:CheckResult val holdings: HoldingDb
 

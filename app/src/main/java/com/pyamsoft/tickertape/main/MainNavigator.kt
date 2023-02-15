@@ -30,7 +30,6 @@ import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
-import com.pyamsoft.tickertape.watchlist.WatchlistFragment
 import javax.inject.Inject
 
 @ActivityScope
@@ -48,7 +47,6 @@ internal constructor(
   override fun produceFragmentForScreen(screen: MainPage): Fragment =
       when (screen) {
         is TopLevelMainPage.Home -> HomeFragment.newInstance()
-        is TopLevelMainPage.Watchlist -> WatchlistFragment.newInstance()
         is TopLevelMainPage.Portfolio -> PortfolioFragment.newInstance()
         is TopLevelMainPage.Notifications -> NotificationFragment.newInstance()
         is PortfolioDigFragment.Screen ->
@@ -115,17 +113,6 @@ internal constructor(
                   null,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is WatchlistFragment,
-                  is PortfolioFragment,
-                  is NotificationFragment -> R.anim.slide_in_left then R.anim.slide_out_right
-                  else -> null
-                }
-            is WatchlistFragment ->
-                when (oldPage) {
-                  null,
-                  is PortfolioDigFragment ->
-                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   is PortfolioFragment,
                   is NotificationFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
@@ -135,7 +122,6 @@ internal constructor(
                   null,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is WatchlistFragment,
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   is NotificationFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
@@ -145,7 +131,6 @@ internal constructor(
                   null,
                   is PortfolioDigFragment ->
                       R.anim.fragment_open_enter then R.anim.fragment_open_exit
-                  is WatchlistFragment,
                   is HomeFragment,
                   is PortfolioFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null

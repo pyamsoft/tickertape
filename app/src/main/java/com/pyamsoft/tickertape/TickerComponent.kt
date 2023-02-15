@@ -43,8 +43,6 @@ import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
-import com.pyamsoft.tickertape.watchlist.WatchlistModule
-import com.pyamsoft.tickertape.watchlist.WatchlistRemoveInjector
 import dagger.*
 import javax.inject.Named
 import javax.inject.Singleton
@@ -61,7 +59,6 @@ import javax.inject.Singleton
             WorkManagerModule::class,
             TickerModule::class,
             HomeModule::class,
-            WatchlistModule::class,
             PortfolioModule::class,
             StockRemoteModule::class,
         ],
@@ -79,8 +76,6 @@ internal interface TickerComponent {
   fun inject(receiver: BootReceiver)
 
   fun inject(application: TickerTape)
-
-  fun inject(injector: WatchlistRemoveInjector)
 
   fun inject(injector: PortfolioRemoveInjector)
 

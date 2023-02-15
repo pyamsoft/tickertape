@@ -53,7 +53,6 @@ fun HomeScreen(
     onSettingsClicked: () -> Unit,
     onChartClicked: (Ticker) -> Unit,
     onRefreshIndexes: CoroutineScope.() -> Unit,
-    onRefreshWatchlist: CoroutineScope.() -> Unit,
     onRefreshPortfolio: CoroutineScope.() -> Unit,
     onRefreshGainers: CoroutineScope.() -> Unit,
     onRefreshLosers: CoroutineScope.() -> Unit,
@@ -103,14 +102,6 @@ fun HomeScreen(
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
             onRefresh = onRefreshIndexes,
-        )
-      }
-
-      item {
-        HomeWatchlist(
-            state = state,
-            onClicked = onChartClicked,
-            onRefresh = onRefreshWatchlist,
         )
       }
 
@@ -233,6 +224,5 @@ private fun PreviewHomeScreen() {
       onRefreshPortfolio = {},
       onRefreshTrending = {},
       onRefreshUndervaluedGrowth = {},
-      onRefreshWatchlist = {},
   )
 }

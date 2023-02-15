@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
@@ -57,8 +57,8 @@ interface TickerInteractor {
 }
 
 @CheckResult
-suspend fun TickerInteractor.getWatchListQuotes(
-    dao: SymbolQueryDao,
+suspend fun TickerInteractor.getHoldingQuotes(
+    dao: HoldingQueryDao,
     options: TickerInteractor.Options?,
 ): ResultWrapper<List<Ticker>> {
   val watchList = dao.query().map { it.symbol }

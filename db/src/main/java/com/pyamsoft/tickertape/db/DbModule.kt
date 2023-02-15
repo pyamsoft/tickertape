@@ -17,42 +17,11 @@
 package com.pyamsoft.tickertape.db
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.HoldingDb
-import com.pyamsoft.tickertape.db.holding.HoldingDbImpl
-import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
-import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
-import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
-import com.pyamsoft.tickertape.db.holding.HoldingRealtime
-import com.pyamsoft.tickertape.db.mover.BigMoverDb
-import com.pyamsoft.tickertape.db.mover.BigMoverDbImpl
-import com.pyamsoft.tickertape.db.mover.BigMoverDeleteDao
-import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
-import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
-import com.pyamsoft.tickertape.db.mover.BigMoverRealtime
-import com.pyamsoft.tickertape.db.position.PositionDb
-import com.pyamsoft.tickertape.db.position.PositionDbImpl
-import com.pyamsoft.tickertape.db.position.PositionDeleteDao
-import com.pyamsoft.tickertape.db.position.PositionInsertDao
-import com.pyamsoft.tickertape.db.position.PositionQueryDao
-import com.pyamsoft.tickertape.db.position.PositionRealtime
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertDb
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertDbImpl
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertDeleteDao
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
-import com.pyamsoft.tickertape.db.pricealert.PriceAlertRealtime
-import com.pyamsoft.tickertape.db.split.SplitDb
-import com.pyamsoft.tickertape.db.split.SplitDbImpl
-import com.pyamsoft.tickertape.db.split.SplitDeleteDao
-import com.pyamsoft.tickertape.db.split.SplitInsertDao
-import com.pyamsoft.tickertape.db.split.SplitQueryDao
-import com.pyamsoft.tickertape.db.split.SplitRealtime
-import com.pyamsoft.tickertape.db.symbol.SymbolDb
-import com.pyamsoft.tickertape.db.symbol.SymbolDbImpl
-import com.pyamsoft.tickertape.db.symbol.SymbolDeleteDao
-import com.pyamsoft.tickertape.db.symbol.SymbolInsertDao
-import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
-import com.pyamsoft.tickertape.db.symbol.SymbolRealtime
+import com.pyamsoft.tickertape.db.holding.*
+import com.pyamsoft.tickertape.db.mover.*
+import com.pyamsoft.tickertape.db.position.*
+import com.pyamsoft.tickertape.db.pricealert.*
+import com.pyamsoft.tickertape.db.split.*
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -64,9 +33,6 @@ import javax.inject.Qualifier
 abstract class DbModule {
 
   // DB
-
-  @Binds @CheckResult internal abstract fun provideSymbolDbImpl(impl: SymbolDbImpl): SymbolDb
-
   @Binds @CheckResult internal abstract fun provideHoldingDbImpl(impl: HoldingDbImpl): HoldingDb
 
   @Binds @CheckResult internal abstract fun providePositionDbImpl(impl: PositionDbImpl): PositionDb
@@ -80,11 +46,6 @@ abstract class DbModule {
   internal abstract fun providePriceAlertDbImpl(impl: PriceAlertDbImpl): PriceAlertDb
 
   // Caches
-
-  @Binds
-  @CheckResult
-  internal abstract fun provideSymbolCache(impl: SymbolDbImpl): SymbolQueryDao.Cache
-
   @Binds
   @CheckResult
   internal abstract fun provideHoldingCache(impl: HoldingDbImpl): HoldingQueryDao.Cache
@@ -107,42 +68,6 @@ abstract class DbModule {
 
   @Module
   companion object {
-
-    @JvmStatic
-    @Provides
-    @CheckResult
-    @InternalApi
-    internal fun provideSymbolDb(db: TickerDb): SymbolDb {
-      return db.symbols
-    }
-
-    @JvmStatic
-    @Provides
-    @CheckResult
-    internal fun provideSymbolRealtimeDao(@InternalApi db: SymbolDb): SymbolRealtime {
-      return db.realtime
-    }
-
-    @JvmStatic
-    @Provides
-    @CheckResult
-    internal fun provideSymbolQueryDao(@InternalApi db: SymbolDb): SymbolQueryDao {
-      return db.queryDao
-    }
-
-    @JvmStatic
-    @Provides
-    @CheckResult
-    internal fun provideSymbolInsertDao(@InternalApi db: SymbolDb): SymbolInsertDao {
-      return db.insertDao
-    }
-
-    @JvmStatic
-    @Provides
-    @CheckResult
-    internal fun provideSymbolDeleteDao(@InternalApi db: SymbolDb): SymbolDeleteDao {
-      return db.deleteDao
-    }
 
     @JvmStatic
     @Provides

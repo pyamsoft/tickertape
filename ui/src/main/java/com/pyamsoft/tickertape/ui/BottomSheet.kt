@@ -3,8 +3,19 @@ package com.pyamsoft.tickertape.ui
 import androidx.annotation.CheckResult
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +29,8 @@ interface BottomSheetController {
 
   fun hide()
 
+  val status: BottomSheetStatus
+
   @CheckResult fun statusFlow(): Flow<BottomSheetStatus>
 }
 
@@ -29,15 +42,17 @@ enum class BottomSheetStatus {
 
 @CheckResult
 @OptIn(ExperimentalMaterialApi::class)
+private fun ModalBottomSheetValue.toStatus(): BottomSheetStatus =
+    when (this) {
+      ModalBottomSheetValue.Hidden -> BottomSheetStatus.CLOSED
+      ModalBottomSheetValue.Expanded -> BottomSheetStatus.OPEN
+      ModalBottomSheetValue.HalfExpanded -> BottomSheetStatus.HALF
+    }
+
+@CheckResult
+@OptIn(ExperimentalMaterialApi::class)
 private fun ModalBottomSheetState.toStatusFlow(): Flow<BottomSheetStatus> {
-  return snapshotFlow { this.currentValue }
-      .map { value ->
-        when (value) {
-          ModalBottomSheetValue.Hidden -> BottomSheetStatus.CLOSED
-          ModalBottomSheetValue.Expanded -> BottomSheetStatus.OPEN
-          ModalBottomSheetValue.HalfExpanded -> BottomSheetStatus.HALF
-        }
-      }
+  return snapshotFlow { this.currentValue }.map { it.toStatus() }
 }
 
 @Composable
@@ -65,6 +80,9 @@ fun WrapInBottomSheet(
     object : BottomSheetController {
 
       private val statusFlow by lazy { sheetState.toStatusFlow() }
+
+      override val status
+        get() = sheetState.currentValue.toStatus()
 
       override fun show() {
         handleOpenSheet()

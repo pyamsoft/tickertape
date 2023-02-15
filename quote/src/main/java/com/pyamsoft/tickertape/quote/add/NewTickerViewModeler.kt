@@ -24,13 +24,19 @@ import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.quote.Ticker
-import com.pyamsoft.tickertape.stocks.api.*
-import java.time.LocalDate
-import javax.inject.Inject
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.SearchResult
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
+import com.pyamsoft.tickertape.stocks.api.StockOptions
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject

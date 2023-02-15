@@ -43,7 +43,11 @@ import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
-import dagger.*
+import dagger.Binds
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
 

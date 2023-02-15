@@ -18,7 +18,14 @@ package com.pyamsoft.tickertape.alert.workmanager
 
 import android.content.Context
 import androidx.annotation.CheckResult
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.Operation
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.Worker
 import com.google.common.util.concurrent.ListenableFuture
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.AlarmParameters
@@ -29,6 +36,10 @@ import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.PriceAlertWorker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
@@ -37,10 +48,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Singleton
 internal class WorkManagerAlerter

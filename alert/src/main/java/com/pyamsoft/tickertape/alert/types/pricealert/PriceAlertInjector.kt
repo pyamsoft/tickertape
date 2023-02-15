@@ -22,7 +22,7 @@ import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.alert.AlertObjectGraph
 import com.pyamsoft.tickertape.alert.WorkResult
 import com.pyamsoft.tickertape.alert.base.BaseInjector
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 
 class PriceAlertInjector

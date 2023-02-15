@@ -28,7 +28,11 @@ import com.pyamsoft.tickertape.notification.NotificationComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
 import com.pyamsoft.tickertape.ui.ThemeProviderModule
-import dagger.*
+import dagger.Binds
+import dagger.BindsInstance
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
 
 @ActivityScope
 @Subcomponent(modules = [ThemeProviderModule::class, MainComponent.MainModule::class])
@@ -49,8 +53,8 @@ internal interface MainComponent {
 
     @CheckResult
     fun create(
-        @BindsInstance activity: MainActivity,
-        @BindsInstance @IdRes fragmentContainerId: Int,
+      @BindsInstance activity: MainActivity,
+      @BindsInstance @IdRes fragmentContainerId: Int,
     ): MainComponent
   }
 

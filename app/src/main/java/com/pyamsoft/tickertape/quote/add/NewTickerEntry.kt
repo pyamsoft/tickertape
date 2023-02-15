@@ -1,7 +1,13 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
@@ -12,8 +18,8 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.ui.BottomSheetController
 import com.pyamsoft.tickertape.ui.BottomSheetStatus
 import com.pyamsoft.tickertape.ui.WrapInBottomSheet
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Inject
 
 internal class NewTickerInjector @Inject internal constructor() : ComposableInjector() {
 
@@ -85,6 +91,9 @@ private fun NewTickerEntry(
     }
   }
 
+  val sheetStatus = controller.status
+  val isOpen = remember(sheetStatus) { sheetStatus == BottomSheetStatus.OPEN }
+
   MountHooks(
       viewModel = viewModel,
       controller = controller,
@@ -93,6 +102,7 @@ private fun NewTickerEntry(
   SaveStateDisposableEffect(viewModel)
 
   BackHandler(
+      enabled = isOpen,
       onBack = { handleCloseClicked() },
   )
   NewTickerScreen(

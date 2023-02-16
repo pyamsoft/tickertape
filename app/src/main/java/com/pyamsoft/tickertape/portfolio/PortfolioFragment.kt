@@ -41,33 +41,33 @@ import com.pyamsoft.pydroid.ui.util.recompose
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.main.MainViewModeler
 import com.pyamsoft.tickertape.main.TopLevelMainPage
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import com.pyamsoft.tickertape.quote.add.NewTickerSheetScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
 class PortfolioFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
 
   @JvmField @Inject internal var navigator: Navigator<MainPage>? = null
+  @JvmField @Inject internal var mainViewModel: MainViewModeler? = null
   @JvmField @Inject internal var viewModel: PortfolioViewModeler? = null
   @JvmField @Inject internal var theming: Theming? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
   private fun onOpenManageDialog(stock: PortfolioStock) {
     val quote = stock.ticker?.quote
-    val session = quote?.currentSession
+    val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote?.symbol
 
-    navigator
+    mainViewModel
         .requireNotNull()
-        .navigateTo(
-            PortfolioDigFragment.Screen.create(
-                holding = stock.holding,
-                quote = quote,
-                currentPrice = session?.price,
-            ),
+        .handleOpenDig(
+            holding = stock.holding,
+            lookupSymbol = lookupSymbol,
+            currentPrice = quote?.currentSession?.price,
         )
   }
 

@@ -16,16 +16,15 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
-import com.pyamsoft.pydroid.ui.app.rememberDialogProperties
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberActivity
@@ -140,67 +139,66 @@ internal fun PortfolioDigDialog(
       viewModel = viewModel,
   )
 
-  Dialog(
-      properties = rememberDialogProperties(),
-      onDismissRequest = onDismiss,
-  ) {
-    PortfolioDigScreen(
-        modifier = modifier,
-        state = viewModel.state,
-        imageLoader = imageLoader,
-        onClose = onDismiss,
-        onChartScrub = { viewModel.handleChartDateScrubbed(it) },
-        onChartRangeSelected = {
-          viewModel.handleChartRangeSelected(
-              scope = scope,
-              range = it,
-          )
-        },
-        onTabUpdated = {
-          viewModel.handleTabUpdated(
-              scope = scope,
-              section = it,
-          )
-        },
-        onRefresh = {
-          viewModel.handleLoadTicker(
-              scope = scope,
-              force = true,
-          )
-        },
-        onPositionAdd = { handlePositionAdd() },
-        onPositionDelete = {
-          viewModel.handleDeletePosition(
-              scope = scope,
-              position = it,
-          )
-        },
-        onPositionUpdate = { handlePositionUpdate(it) },
-        onSplitAdd = { handleSplitAdd() },
-        onSplitDeleted = {
-          viewModel.handleDeleteSplit(
-              scope = scope,
-              split = it,
-          )
-        },
-        onSplitUpdated = { handleSplitUpdate(it) },
-        onRecClick = { handleRecommendationClicked(it) },
-        onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
-        onOptionExpirationDateChanged = {
-          viewModel.handleOptionsExpirationDateChanged(
-              scope = scope,
-              date = it,
-          )
-        },
-        onAddPriceAlert = {
-          // TODO
-        },
-        onUpdatePriceAlert = {
-          // TODO
-        },
-        onDeletePriceAlert = {
-          // TODO
-        },
-    )
-  }
+  BackHandler(
+      onBack = onDismiss,
+  )
+
+  PortfolioDigScreen(
+      modifier = modifier,
+      state = viewModel.state,
+      imageLoader = imageLoader,
+      onClose = onDismiss,
+      onChartScrub = { viewModel.handleChartDateScrubbed(it) },
+      onChartRangeSelected = {
+        viewModel.handleChartRangeSelected(
+            scope = scope,
+            range = it,
+        )
+      },
+      onTabUpdated = {
+        viewModel.handleTabUpdated(
+            scope = scope,
+            section = it,
+        )
+      },
+      onRefresh = {
+        viewModel.handleLoadTicker(
+            scope = scope,
+            force = true,
+        )
+      },
+      onPositionAdd = { handlePositionAdd() },
+      onPositionDelete = {
+        viewModel.handleDeletePosition(
+            scope = scope,
+            position = it,
+        )
+      },
+      onPositionUpdate = { handlePositionUpdate(it) },
+      onSplitAdd = { handleSplitAdd() },
+      onSplitDeleted = {
+        viewModel.handleDeleteSplit(
+            scope = scope,
+            split = it,
+        )
+      },
+      onSplitUpdated = { handleSplitUpdate(it) },
+      onRecClick = { handleRecommendationClicked(it) },
+      onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
+      onOptionExpirationDateChanged = {
+        viewModel.handleOptionsExpirationDateChanged(
+            scope = scope,
+            date = it,
+        )
+      },
+      onAddPriceAlert = {
+        // TODO
+      },
+      onUpdatePriceAlert = {
+        // TODO
+      },
+      onDeletePriceAlert = {
+        // TODO
+      },
+  )
 }

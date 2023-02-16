@@ -21,10 +21,12 @@ import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
@@ -112,13 +114,29 @@ internal constructor(
         scope = scope,
         symbol = quote.symbol,
         lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
+        currentPrice = quote.currentSession.price,
     )
+  }
+
+  fun handleOpenDig(
+      holding: DbHolding,
+      lookupSymbol: StockSymbol?,
+      currentPrice: StockMoneyValue? = null
+  ) {
+    state.portfolioDigParams.value =
+        PortfolioDigParams(
+            symbol = holding.symbol,
+            lookupSymbol = lookupSymbol,
+            holding = holding,
+            currentPrice = currentPrice,
+        )
   }
 
   fun handleOpenDig(
       scope: CoroutineScope,
       symbol: StockSymbol,
       lookupSymbol: StockSymbol?,
+      currentPrice: StockMoneyValue? = null
   ) {
     scope.launch(context = Dispatchers.Main) {
       val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
@@ -132,6 +150,7 @@ internal constructor(
               symbol = symbol,
               lookupSymbol = lookupSymbol,
               holding = holding,
+              currentPrice = currentPrice,
           )
     }
   }

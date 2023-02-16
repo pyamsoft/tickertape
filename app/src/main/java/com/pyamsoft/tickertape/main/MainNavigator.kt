@@ -29,7 +29,6 @@ import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeFragment
 import com.pyamsoft.tickertape.notification.NotificationFragment
 import com.pyamsoft.tickertape.portfolio.PortfolioFragment
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigFragment
 import javax.inject.Inject
 
 @ActivityScope
@@ -49,15 +48,6 @@ internal constructor(
         is TopLevelMainPage.Home -> HomeFragment.newInstance()
         is TopLevelMainPage.Portfolio -> PortfolioFragment.newInstance()
         is TopLevelMainPage.Notifications -> NotificationFragment.newInstance()
-        is PortfolioDigFragment.Screen ->
-            PortfolioDigFragment.newInstance(
-                symbol = screen.symbol,
-                lookupSymbol = screen.lookupSymbol,
-                holdingId = screen.holdingId,
-                holdingType = screen.holdingType,
-                holdingSide = screen.holdingSide,
-                currentPrice = screen.currentPrice,
-            )
         else -> throw IllegalArgumentException("Unhandled screen type: $screen")
       }
 
@@ -111,8 +101,6 @@ internal constructor(
             is HomeFragment ->
                 when (oldPage) {
                   null,
-                  is PortfolioDigFragment ->
-                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is PortfolioFragment,
                   is NotificationFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
@@ -120,8 +108,6 @@ internal constructor(
             is PortfolioFragment ->
                 when (oldPage) {
                   null,
-                  is PortfolioDigFragment ->
-                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is HomeFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   is NotificationFragment -> R.anim.slide_in_left then R.anim.slide_out_right
                   else -> null
@@ -129,13 +115,10 @@ internal constructor(
             is NotificationFragment ->
                 when (oldPage) {
                   null,
-                  is PortfolioDigFragment ->
-                      R.anim.fragment_open_enter then R.anim.fragment_open_exit
                   is HomeFragment,
                   is PortfolioFragment -> R.anim.slide_in_right then R.anim.slide_out_left
                   else -> null
                 }
-            is PortfolioDigFragment -> R.anim.fragment_open_enter then R.anim.fragment_open_exit
             else -> null
           }
 

@@ -49,8 +49,8 @@ import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
+import java.time.LocalDate
 
 @Composable
 @JvmOverloads
@@ -168,11 +168,13 @@ private fun LookupResults(
       expanded = isOpen,
       onDismissRequest = onResultsDismissed,
       properties =
-          PopupProperties(
-              focusable = false,
-              dismissOnBackPress = false,
-              dismissOnClickOutside = true,
-          ),
+          remember {
+            PopupProperties(
+                focusable = false,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = true,
+            )
+          },
   ) {
     for (result in results) {
       DropdownMenuItem(

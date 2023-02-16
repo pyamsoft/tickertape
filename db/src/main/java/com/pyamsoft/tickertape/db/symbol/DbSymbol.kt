@@ -20,12 +20,14 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.IdType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
+@Deprecated("Don't use")
 interface DbSymbol {
 
   @get:CheckResult val id: Id
 
   @get:CheckResult val symbol: StockSymbol
 
+  @Deprecated("Don't use")
   data class Id(override val raw: String) : IdType {
 
     override val isEmpty: Boolean = raw.isBlank()

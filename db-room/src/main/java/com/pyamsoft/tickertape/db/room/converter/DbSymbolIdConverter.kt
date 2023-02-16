@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
 import com.pyamsoft.tickertape.db.symbol.DbSymbol
 
+@Deprecated("Don't use")
 internal object DbSymbolIdConverter {
 
   @JvmStatic

@@ -18,4 +18,5 @@ package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.tickertape.db.DbInsert
 
+@Deprecated("Don't use")
 interface SymbolInsertDao : DbInsert<DbSymbol>

@@ -39,9 +39,9 @@ import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
 internal interface RoomTickerDb {
 
   // Symbols
-  @get:CheckResult val roomSymbolQueryDao: RoomSymbolQueryDao
-  @get:CheckResult val roomSymbolInsertDao: RoomSymbolInsertDao
-  @get:CheckResult val roomSymbolDeleteDao: RoomSymbolDeleteDao
+  @Deprecated("Don't use") @get:CheckResult val roomSymbolQueryDao: RoomSymbolQueryDao
+  @Deprecated("Don't use") @get:CheckResult val roomSymbolInsertDao: RoomSymbolInsertDao
+  @Deprecated("Don't use") @get:CheckResult val roomSymbolDeleteDao: RoomSymbolDeleteDao
 
   // Holdings
   @get:CheckResult val roomHoldingQueryDao: RoomHoldingQueryDao

@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Dao
+@Deprecated("Don't use")
 internal abstract class RoomSymbolQueryDao : SymbolQueryDao {
 
   override suspend fun query(): List<DbSymbol> =

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.tickertape.db.BaseDb
 
+@Deprecated("Don't use")
 interface SymbolDb :
     SymbolRealtime,
     SymbolQueryDao,

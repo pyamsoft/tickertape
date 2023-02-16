@@ -16,12 +16,14 @@
 
 package com.pyamsoft.tickertape.db.symbol
 
+@Deprecated("Don't use")
 sealed class SymbolChangeEvent {
 
-  data class Insert(val symbol: DbSymbol) : SymbolChangeEvent()
+  @Deprecated("Don't use") data class Insert(val symbol: DbSymbol) : SymbolChangeEvent()
 
-  data class Update(val symbol: DbSymbol) : SymbolChangeEvent()
+  @Deprecated("Don't use") data class Update(val symbol: DbSymbol) : SymbolChangeEvent()
 
+  @Deprecated("Don't use")
   data class Delete(
       val symbol: DbSymbol,
       val offerUndo: Boolean,

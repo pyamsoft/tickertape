@@ -21,16 +21,20 @@ import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
-import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
+import com.pyamsoft.tickertape.stocks.fromJson
+import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class MainViewModeler
 @Inject
@@ -39,6 +43,7 @@ internal constructor(
     private val theming: Theming,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
     private val jsonParser: JsonParser,
+    private val holdingQueryDao: HoldingQueryDao,
 ) : AbstractViewModeler<MainViewState>(state) {
 
   fun handleSyncDarkTheme(activity: Activity) {
@@ -59,6 +64,18 @@ internal constructor(
         val s = state
 
         registry.registerProvider(KEY_THEME) { s.theme.value.name }.also { add(it) }
+        registry
+            .registerProvider(KEY_PORTFOLIO_DIG) {
+              s.portfolioDigParams.value
+                  ?.let {
+                    DigSavedState(
+                        symbol = it.symbol,
+                        lookupSymbol = it.lookupSymbol,
+                    )
+                  }
+                  ?.let { jsonParser.toJson(it) }
+            }
+            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -69,9 +86,22 @@ internal constructor(
         ?.let { it as String }
         ?.let { Theming.Mode.valueOf(it) }
         ?.also { s.theme.value = it }
+
+    registry
+        .consumeRestored(KEY_PORTFOLIO_DIG)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<DigSavedState>(it) }
+        ?.also { saved ->
+          handleOpenDig(
+              // TODO: Can we avoid making a random CoroutineScope here?
+              scope = MainScope(),
+              symbol = saved.symbol,
+              lookupSymbol = saved.lookupSymbol,
+          )
+        }
   }
 
-  fun handleOpenDig(ticker: Ticker) {
+  fun handleOpenDig(scope: CoroutineScope, ticker: Ticker) {
     val quote = ticker.quote
     if (quote == null) {
       Timber.w("Can't show dig dialog, missing quote: $ticker")
@@ -79,35 +109,46 @@ internal constructor(
     }
 
     handleOpenDig(
+        scope = scope,
         symbol = quote.symbol,
         lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
-        equityType = quote.type,
     )
   }
 
   fun handleOpenDig(
+      scope: CoroutineScope,
       symbol: StockSymbol,
-      lookupSymbol: StockSymbol,
-      equityType: EquityType,
+      lookupSymbol: StockSymbol?,
   ) {
-    // TODO
-    //    state.watchlistDigParams.value =
-    //        WatchlistDigParams(
-    //            uniqueId = IdGenerator.generate(),
-    //            symbol = symbol,
-    //            lookupSymbol = lookupSymbol,
-    //            equityType = equityType,
-    //        )
+    scope.launch(context = Dispatchers.Main) {
+      val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
+      if (holding == null) {
+        Timber.w("Can't show dig dialog, missing holding: $symbol $lookupSymbol")
+        return@launch
+      }
+
+      state.portfolioDigParams.value =
+          PortfolioDigParams(
+              symbol = symbol,
+              lookupSymbol = lookupSymbol,
+              holding = holding,
+          )
+    }
   }
 
   fun handleCloseDig() {
-    // TODO
-    //    state.watchlistDigParams.value = null
+    state.portfolioDigParams.value = null
   }
 
   companion object {
 
     private const val KEY_THEME = "theme"
-    //    private const val KEY_WATCHLIST_DIG = "watchlist_dig"
+    private const val KEY_PORTFOLIO_DIG = "portfolio_dig"
   }
+
+  @JsonClass(generateAdapter = true)
+  private data class DigSavedState(
+      val symbol: StockSymbol,
+      val lookupSymbol: StockSymbol?,
+  )
 }

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.navigator.FragmentNavigator
 import com.pyamsoft.pydroid.ui.theme.ThemeProvider
@@ -62,7 +63,15 @@ class HomeFragment : Fragment(), FragmentNavigator.Screen<MainPage> {
           HomeEntry(
               modifier = Modifier.fillMaxSize(),
               appName = appName,
-              onOpenWatchlistDig = { mainViewModel.requireNotNull().handleOpenDig(it) })
+              onOpenWatchlistDig = {
+                mainViewModel
+                    .requireNotNull()
+                    .handleOpenDig(
+                        scope = viewLifecycleOwner.lifecycleScope,
+                        ticker = it,
+                    )
+              },
+          )
         }
       }
     }

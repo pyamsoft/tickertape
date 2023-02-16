@@ -43,11 +43,11 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
@@ -103,23 +103,14 @@ internal class MainActivity : AppCompatActivity() {
   private fun handleLaunchIntent() {
     val symbol = retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_SYMBOL) { it.asSymbol() }
     if (symbol == null) {
-      Timber.w("Cannot open Watchlist Dig Dialog without symbol")
-      return
-    }
-
-    val equityType =
-        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_EQUITY_TYPE) {
-          EquityType.valueOf(it)
-        }
-    if (equityType == null) {
-      Timber.w("Cannot open Watchlist Dig Dialog without equityType")
+      Timber.w("Cannot open Dig Dialog without symbol")
       return
     }
 
     val lookupSymbol =
         retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_LOOKUP_SYMBOL) { it.asSymbol() }
     if (lookupSymbol == null) {
-      Timber.w("Cannot open Watchlist Dig Dialog without lookupSymbol")
+      Timber.w("Cannot open Dig Dialog without lookupSymbol")
       return
     }
 
@@ -129,9 +120,9 @@ internal class MainActivity : AppCompatActivity() {
     viewModel
         .requireNotNull()
         .handleOpenDig(
+            scope = lifecycleScope,
             symbol = symbol,
             lookupSymbol = lookupSymbol,
-            equityType = equityType,
         )
   }
 
@@ -180,13 +171,13 @@ internal class MainActivity : AppCompatActivity() {
 
       val state = vm.state
       val theme by state.theme.collectAsState()
-      val watchlistDig = null
+      val portfolioDig by state.portfolioDigParams.collectAsState()
 
       TickerTapeTheme(theme) {
         SystemBars(theme, screen)
 
         Crossfade(
-            targetState = watchlistDig,
+            targetState = portfolioDig,
         ) { dig ->
           if (dig == null) {
             // Need to have box or snackbars push up bottom bar
@@ -202,12 +193,11 @@ internal class MainActivity : AppCompatActivity() {
               }
             }
           } else {
-              // TODO
-//            WatchlistDigEntry(
-//                modifier = Modifier.fillMaxSize(),
-//                params = dig,
-//                onGoBack = { vm.handleCloseDig() },
-//            )
+            PortfolioDigDialog(
+                modifier = Modifier.fillMaxSize(),
+                params = dig,
+                onDismiss = { vm.handleCloseDig() },
+            )
           }
         }
       }

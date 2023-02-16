@@ -210,11 +210,13 @@ private fun OptionsExpirationDropdown(
         expanded = isDropdownOpen,
         onDismissRequest = { setDropdownOpen(false) },
         properties =
-            PopupProperties(
-                focusable = false,
-                dismissOnBackPress = false,
-                dismissOnClickOutside = true,
-            ),
+            remember {
+              PopupProperties(
+                  focusable = false,
+                  dismissOnBackPress = false,
+                  dismissOnClickOutside = true,
+              )
+            },
     ) {
       for (choice in choices) {
         DropdownMenuItem(

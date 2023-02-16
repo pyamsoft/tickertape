@@ -213,11 +213,13 @@ private fun <T : Any> OptionsDropdown(
         expanded = isDropdownOpen,
         onDismissRequest = { setDropdownOpen(false) },
         properties =
-            PopupProperties(
-                focusable = false,
-                dismissOnBackPress = false,
-                dismissOnClickOutside = true,
-            ),
+            remember {
+              PopupProperties(
+                  focusable = false,
+                  dismissOnBackPress = false,
+                  dismissOnClickOutside = true,
+              )
+            },
     ) {
       if (displayChoices != null) {
         for (choice in displayChoices) {

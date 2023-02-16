@@ -21,6 +21,7 @@ import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.squareup.moshi.JsonClass
 
+@Deprecated("Don't use")
 @JsonClass(generateAdapter = true)
 data class JsonMappableDbSymbol
 internal constructor(

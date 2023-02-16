@@ -24,6 +24,7 @@ import androidx.room.PrimaryKey
 import com.pyamsoft.tickertape.db.symbol.DbSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
+@Deprecated("Don't use")
 @Entity(tableName = RoomDbSymbol.TABLE_NAME)
 internal data class RoomDbSymbol
 internal constructor(

@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Dao
+@Deprecated("Don't use")
 internal abstract class RoomSymbolDeleteDao : SymbolDeleteDao {
 
   override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =

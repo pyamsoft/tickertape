@@ -20,17 +20,20 @@ import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.core.ActivityScope
-import javax.inject.Inject
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Stable
 interface MainViewState : UiViewState {
   val theme: StateFlow<Theming.Mode>
+  val portfolioDigParams: StateFlow<PortfolioDigParams?>
 }
 
 @Stable
 @ActivityScope
 class MutableMainViewState @Inject internal constructor() : MainViewState {
   override val theme = MutableStateFlow(Theming.Mode.SYSTEM)
+  override val portfolioDigParams = MutableStateFlow<PortfolioDigParams?>(null)
 }

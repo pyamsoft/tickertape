@@ -32,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Dao
+@Deprecated("Don't use")
 internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
 
   override suspend fun insert(o: DbSymbol): DbInsert.InsertResult<DbSymbol> =

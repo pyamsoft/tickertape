@@ -82,7 +82,7 @@ private fun MountHooks(
 }
 
 @Composable
-internal fun PortfolioDigDialog(
+internal fun PortfolioDigEntry(
     modifier: Modifier = Modifier,
     params: PortfolioDigParams,
     onDismiss: () -> Unit,

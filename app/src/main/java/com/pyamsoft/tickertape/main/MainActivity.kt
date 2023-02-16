@@ -43,7 +43,7 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.databinding.ActivityMainBinding
-import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigDialog
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigEntry
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import timber.log.Timber
@@ -193,7 +193,7 @@ internal class MainActivity : AppCompatActivity() {
               }
             }
           } else {
-            PortfolioDigDialog(
+            PortfolioDigEntry(
                 modifier = Modifier.fillMaxSize(),
                 params = dig,
                 onDismiss = { vm.handleCloseDig() },

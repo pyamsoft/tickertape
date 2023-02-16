@@ -36,6 +36,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.isIndex
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -211,7 +212,11 @@ private fun PreviewPortfolioDigToolbar() {
   val symbol = "MSFT".asSymbol()
   val state =
       MutablePortfolioDigViewState(
-          symbol = symbol,
+          params =
+              PortfolioDigParams(
+                  symbol = symbol,
+                  lookupSymbol = null,
+              ),
       )
   val holding by state.holding.collectAsState()
 

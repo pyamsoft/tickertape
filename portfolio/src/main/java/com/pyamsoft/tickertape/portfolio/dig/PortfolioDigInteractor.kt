@@ -24,6 +24,7 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigInteractor
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 
 interface PortfolioDigInteractor : DigInteractor {
 
@@ -37,7 +38,7 @@ interface PortfolioDigInteractor : DigInteractor {
 
   @CheckResult suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>>
 
-  @CheckResult suspend fun getHolding(id: DbHolding.Id): ResultWrapper<DbHolding>
+  @CheckResult suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding>
 
   @CheckResult suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>>
 

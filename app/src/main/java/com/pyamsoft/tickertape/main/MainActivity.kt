@@ -103,7 +103,6 @@ internal class MainActivity : AppCompatActivity() {
     viewModel
         .requireNotNull()
         .handleOpenDig(
-            scope = lifecycleScope,
             symbol = symbol,
             lookupSymbol = lookupSymbol,
         )

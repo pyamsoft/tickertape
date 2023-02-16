@@ -28,6 +28,7 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -37,6 +38,7 @@ import com.pyamsoft.tickertape.portfolio.dig.splits.SplitScreen
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.chart.ChartData
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.news.DigNews
 import com.pyamsoft.tickertape.quote.dig.options.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.pricealert.DigPriceAlerts
@@ -62,13 +64,13 @@ fun PortfolioDigScreen(
     onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     // Positions
-    onPositionAdd: () -> Unit,
+    onPositionAdd: (DbHolding) -> Unit,
+    onPositionUpdate: (DbPosition, DbHolding) -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
-    onPositionUpdate: (DbPosition) -> Unit,
     // Splits
-    onSplitAdd: () -> Unit,
+    onSplitAdd: (DbHolding) -> Unit,
+    onSplitUpdated: (DbSplit, DbHolding) -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
-    onSplitUpdated: (DbSplit) -> Unit,
     // Recommendations
     onRecClick: (Ticker) -> Unit,
     // Options
@@ -170,13 +172,13 @@ private fun Content(
     onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
     // Positions
-    onPositionAdd: () -> Unit,
+    onPositionAdd: (DbHolding) -> Unit,
+    onPositionUpdate: (DbPosition, DbHolding) -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
-    onPositionUpdate: (DbPosition) -> Unit,
     // Splits
-    onSplitAdd: () -> Unit,
+    onSplitAdd: (DbHolding) -> Unit,
+    onSplitUpdated: (DbSplit, DbHolding) -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
-    onSplitUpdated: (DbSplit) -> Unit,
     // Recommendations
     onRecClick: (Ticker) -> Unit,
     // Options
@@ -294,7 +296,11 @@ private fun PreviewPortfolioDigScreen() {
   PortfolioDigScreen(
       state =
           MutablePortfolioDigViewState(
-              symbol = symbol,
+              params =
+                  PortfolioDigParams(
+                      symbol = symbol,
+                      lookupSymbol = null,
+                  ),
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},
@@ -304,10 +310,10 @@ private fun PreviewPortfolioDigScreen() {
       onRefresh = {},
       onPositionAdd = {},
       onPositionDelete = {},
-      onPositionUpdate = {},
+      onPositionUpdate = { _, _ -> },
       onSplitAdd = {},
       onSplitDeleted = {},
-      onSplitUpdated = {},
+      onSplitUpdated = { _, _ -> },
       onRecClick = {},
       onOptionExpirationDateChanged = {},
       onOptionSectionChanged = {},

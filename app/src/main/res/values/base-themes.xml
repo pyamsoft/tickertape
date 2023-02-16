@@ -18,6 +18,4 @@
 
     <style name="Base.Theme.TickerTape" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
 
-    <style name="Base.Theme.TickerTape.BottomSheet" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog" />
-
 </resources>

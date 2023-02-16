@@ -27,12 +27,7 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
-import javax.inject.Inject
-import javax.inject.Named
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -40,22 +35,19 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
 internal constructor(
     override val state: MutablePortfolioDigViewState,
-    private val equityType: EquityType,
-    private val tradeSide: TradeSide,
-    private val currentPrice: StockMoneyValue?,
+    private val params: PortfolioDigParams,
     private val interactor: PortfolioDigInteractor,
-    @Named("lookup") lookupSymbol: StockSymbol?,
     interactorCache: PortfolioDigInteractor.Cache,
-    holdingId: DbHolding.Id,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
-        lookupSymbol,
+        params.lookupSymbol,
         interactor,
         interactorCache,
     ) {
@@ -65,7 +57,13 @@ internal constructor(
         if (force) {
           interactorCache.invalidateSplits()
         }
-        return@highlander interactor.getSplits(holdingId)
+
+        val holding = state.holding.value
+        return@highlander if (holding == null) {
+          ResultWrapper.success(emptyList())
+        } else {
+          interactor.getSplits(holding.id)
+        }
       }
 
   private val holdingLoadRunner =
@@ -73,7 +71,13 @@ internal constructor(
         if (force) {
           interactorCache.invalidateHolding()
         }
-        return@highlander interactor.getHolding(holdingId)
+
+        val holding = params.holding
+        return@highlander if (holding != null) {
+          ResultWrapper.success(holding)
+        } else {
+          interactor.getHolding(params.symbol)
+        }
       }
 
   private val positionsLoadRunner =
@@ -82,8 +86,13 @@ internal constructor(
           interactorCache.invalidatePositions()
         }
 
-        return@highlander interactor.getPositions(holdingId).map { p ->
-          p.map { createPositionStock(it, splits) }.sortedBy { it.purchaseDate }
+        val holding = state.holding.value
+        return@highlander if (holding == null) {
+          ResultWrapper.success(emptyList())
+        } else {
+          interactor.getPositions(holding.id).map { p ->
+            p.map { createPositionStock(holding, it, splits) }.sortedBy { it.purchaseDate }
+          }
         }
       }
 
@@ -96,10 +105,14 @@ internal constructor(
   @Suppress("ControlFlowWithEmptyBody")
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
+
+        // Load the holding first, always
+        loadHolding(force)
+
         mutableListOf<Deferred<*>>()
             .apply {
 
-              // Always load the ticker
+              // Always load the ticker in parallel
               add(async { loadTicker(force) })
 
               @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
@@ -120,7 +133,6 @@ internal constructor(
                   add(async { loadSplits(force) })
                 }
                 PortfolioDigSections.POSITIONS -> {
-                  add(async { loadHolding(force) })
                   add(async { loadSplits(force) })
                   add(async { loadPositions(force) })
                 }
@@ -137,14 +149,15 @@ internal constructor(
 
   @CheckResult
   private fun createPositionStock(
+      holding: DbHolding,
       position: DbPosition,
       splits: List<DbSplit>,
   ): PositionStock {
     return PositionStock(
         position = position,
-        equityType = equityType,
-        tradeSide = tradeSide,
-        currentPrice = currentPrice,
+        equityType = holding.type,
+        tradeSide = holding.side,
+        currentPrice = params.currentPrice,
         splits = splits,
     )
   }
@@ -212,13 +225,14 @@ internal constructor(
     }
   }
 
-  private fun onPositionInsertOrUpdate(position: DbPosition) {
+  private fun onPositionInsertOrUpdate(position: DbPosition, holding: DbHolding) {
     val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         positions =
             insertOrUpdate(
                 s.positions.value,
                 createPositionStock(
+                    holding,
                     position,
                     s.stockSplits.value,
                 ),
@@ -229,11 +243,21 @@ internal constructor(
   }
 
   private fun onPositionUpdated(position: DbPosition) {
-    onPositionInsertOrUpdate(position)
+    val holding = state.holding.value
+    if (holding == null) {
+      Timber.w("Drop position update, missing holding")
+    } else {
+      onPositionInsertOrUpdate(position, holding)
+    }
   }
 
   private fun onPositionInserted(position: DbPosition) {
-    onPositionInsertOrUpdate(position)
+    val holding = state.holding.value
+    if (holding == null) {
+      Timber.w("Drop position insert, missing holding")
+    } else {
+      onPositionInsertOrUpdate(position, holding)
+    }
   }
 
   private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {

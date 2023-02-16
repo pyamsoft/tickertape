@@ -21,7 +21,6 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
@@ -29,10 +28,8 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,7 +41,6 @@ internal constructor(
     override val state: MutableMainViewState,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
     private val jsonParser: JsonParser,
-    private val holdingQueryDao: HoldingQueryDao,
 ) : AbstractViewModeler<MainViewState>(state) {
 
   fun handleMainActionSelected(scope: CoroutineScope, page: TopLevelMainPage) {
@@ -62,14 +58,7 @@ internal constructor(
 
         registry
             .registerProvider(KEY_PORTFOLIO_DIG) {
-              s.portfolioDigParams.value
-                  ?.let {
-                    DigSavedState(
-                        symbol = it.symbol,
-                        lookupSymbol = it.lookupSymbol,
-                    )
-                  }
-                  ?.let { jsonParser.toJson(it) }
+              s.portfolioDigParams.value?.let { jsonParser.toJson(it) }
             }
             .also { add(it) }
       }
@@ -78,18 +67,17 @@ internal constructor(
     registry
         .consumeRestored(KEY_PORTFOLIO_DIG)
         ?.let { it as String }
-        ?.let { jsonParser.fromJson<DigSavedState>(it) }
+        ?.let { jsonParser.fromJson<PortfolioDigParams>(it) }
         ?.also { saved ->
           handleOpenDig(
-              // TODO: Can we avoid making a random CoroutineScope here?
-              scope = MainScope(),
               symbol = saved.symbol,
               lookupSymbol = saved.lookupSymbol,
+              currentPrice = saved.currentPrice,
           )
         }
   }
 
-  fun handleOpenDig(scope: CoroutineScope, ticker: Ticker) {
+  fun handleOpenDig(ticker: Ticker) {
     val quote = ticker.quote
     if (quote == null) {
       Timber.w("Can't show dig dialog, missing quote: $ticker")
@@ -97,7 +85,6 @@ internal constructor(
     }
 
     handleOpenDig(
-        scope = scope,
         symbol = quote.symbol,
         lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
         currentPrice = quote.currentSession.price,
@@ -113,32 +100,21 @@ internal constructor(
         PortfolioDigParams(
             symbol = holding.symbol,
             lookupSymbol = lookupSymbol,
-            holding = holding,
             currentPrice = currentPrice,
         )
   }
 
   fun handleOpenDig(
-      scope: CoroutineScope,
       symbol: StockSymbol,
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
-    scope.launch(context = Dispatchers.Main) {
-      val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
-      if (holding == null) {
-        Timber.w("Can't show dig dialog, missing holding: $symbol $lookupSymbol")
-        return@launch
-      }
-
-      state.portfolioDigParams.value =
-          PortfolioDigParams(
-              symbol = symbol,
-              lookupSymbol = lookupSymbol,
-              holding = holding,
-              currentPrice = currentPrice,
-          )
-    }
+    state.portfolioDigParams.value =
+        PortfolioDigParams(
+            symbol = symbol,
+            lookupSymbol = lookupSymbol,
+            currentPrice = currentPrice,
+        )
   }
 
   fun handleCloseDig() {
@@ -149,10 +125,4 @@ internal constructor(
 
     private const val KEY_PORTFOLIO_DIG = "portfolio_dig"
   }
-
-  @JsonClass(generateAdapter = true)
-  private data class DigSavedState(
-      val symbol: StockSymbol,
-      val lookupSymbol: StockSymbol?,
-  )
 }

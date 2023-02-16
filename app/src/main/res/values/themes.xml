@@ -18,5 +18,4 @@
 
     <style name="Theme.TickerTape" parent="@style/Custom.Theme.TickerTape" />
 
-    <style name="Theme.TickerTape.BottomSheet" parent="@style/Custom.Theme.TickerTape.BottomSheet" />
 </resources>

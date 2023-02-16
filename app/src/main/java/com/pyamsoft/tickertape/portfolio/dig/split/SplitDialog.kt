@@ -46,12 +46,13 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateDialog
 import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddViewModeler
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class SplitDialog : AppCompatDialogFragment() {
 
@@ -207,15 +208,15 @@ internal class SplitDialog : AppCompatDialogFragment() {
     @JvmStatic
     @CheckResult
     private fun newInstance(
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
+        params: PortfolioDigParams,
+        holding: DbHolding,
         existingSplitId: DbSplit.Id,
     ): DialogFragment {
       return SplitDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.raw)
-              putString(KEY_HOLDING_ID, holdingId.raw)
+              putString(KEY_SYMBOL, params.symbol.raw)
+              putString(KEY_HOLDING_ID, holding.id.raw)
               putString(KEY_EXISTING_SPLIT_ID, existingSplitId.raw)
             }
       }
@@ -224,12 +225,12 @@ internal class SplitDialog : AppCompatDialogFragment() {
     @JvmStatic
     fun create(
         activity: FragmentActivity,
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
+        params: PortfolioDigParams,
+        holding: DbHolding,
     ) {
       newInstance(
-              symbol,
-              holdingId,
+              params,
+              holding,
               existingSplitId = DbSplit.Id.EMPTY,
           )
           .show(activity, TAG)
@@ -238,14 +239,14 @@ internal class SplitDialog : AppCompatDialogFragment() {
     @JvmStatic
     fun update(
         activity: FragmentActivity,
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
-        existingSplitId: DbSplit.Id,
+        params: PortfolioDigParams,
+        holding: DbHolding,
+        split: DbSplit,
     ) {
       newInstance(
-              symbol,
-              holdingId,
-              existingSplitId,
+              params,
+              holding,
+              existingSplitId = split.id,
           )
           .show(activity, TAG)
     }

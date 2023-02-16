@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape
 import android.app.Application
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.PYDroidLogger
+import com.pyamsoft.pydroid.ui.debug.InAppDebugLogger.Companion.createInAppDebugLogger
 import com.pyamsoft.pydroid.util.isDebugMode
 import timber.log.Timber
 
@@ -32,39 +33,46 @@ fun Application.installLogger() {
         },
     )
   }
+
+  Timber.plant(
+      object : Timber.Tree() {
+
+        private val logger by lazy { createInAppDebugLogger() }
+
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+          logger.log(priority, tag, message, t)
+        }
+      },
+  )
 }
 
 @CheckResult
-fun Application.createLogger(): PYDroidLogger? {
-  if (isDebugMode()) {
-    return null
-  } else {
-    return object : PYDroidLogger {
+fun createLogger(): PYDroidLogger {
+  return object : PYDroidLogger {
 
-      override fun d(
-          tag: String,
-          message: String,
-          vararg args: Any,
-      ) {
-        Timber.tag(tag).d(message, args)
-      }
+    override fun d(
+        tag: String,
+        message: String,
+        vararg args: Any,
+    ) {
+      Timber.tag(tag).d(message, args)
+    }
 
-      override fun w(
-          tag: String,
-          message: String,
-          vararg args: Any,
-      ) {
-        Timber.tag(tag).w(message, args)
-      }
+    override fun w(
+        tag: String,
+        message: String,
+        vararg args: Any,
+    ) {
+      Timber.tag(tag).w(message, args)
+    }
 
-      override fun e(
-          tag: String,
-          throwable: Throwable,
-          message: String,
-          vararg args: Any,
-      ) {
-        Timber.tag(tag).e(throwable, message, args)
-      }
+    override fun e(
+        tag: String,
+        throwable: Throwable,
+        message: String,
+        vararg args: Any,
+    ) {
+      Timber.tag(tag).e(throwable, message, args)
     }
   }
 }

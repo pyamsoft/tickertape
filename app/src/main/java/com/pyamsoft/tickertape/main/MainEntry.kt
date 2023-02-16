@@ -95,12 +95,7 @@ internal fun MainEntry(
             page = it,
         )
       },
-      onHomeDig = {
-        viewModel.handleOpenDig(
-            scope = scope,
-            ticker = it,
-        )
-      },
+      onHomeDig = { viewModel.handleOpenDig(it) },
       onPortfolioDig = { stock ->
         val quote = stock.ticker?.quote
         val lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote?.symbol

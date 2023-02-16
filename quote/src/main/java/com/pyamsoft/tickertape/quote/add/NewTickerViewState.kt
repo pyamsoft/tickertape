@@ -1,6 +1,5 @@
 package com.pyamsoft.tickertape.quote.add
 
-import androidx.annotation.CheckResult
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
@@ -11,10 +10,13 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 @Stable
 interface NewTickerViewState : UiViewState {
@@ -35,8 +37,7 @@ interface NewTickerViewState : UiViewState {
   val lookupError: StateFlow<Throwable?>
   val lookupResults: StateFlow<List<SearchResult>>
 
-  // TODO move into vm
-  @CheckResult fun canSubmit(): Boolean
+  val canSubmit: Flow<Boolean>
 }
 
 @Stable
@@ -59,15 +60,49 @@ class MutableNewTickerViewState @Inject internal constructor() : NewTickerViewSt
   override val lookupError = MutableStateFlow<Throwable?>(null)
   override val lookupResults = MutableStateFlow(emptyList<SearchResult>())
 
-  override fun canSubmit(): Boolean {
-    return if (isSubmitting.value || symbol.value.isBlank() || validSymbol.value == null) {
-      false
-    } else if (equityType.value != EquityType.OPTION) {
-      true
-    } else {
-      optionExpirationDate.value != null && optionStrikePrice.value != null
-    }
-  }
+  override val canSubmit =
+      combine(
+          symbol,
+          validSymbol,
+          equityType,
+          optionExpirationDate,
+          optionStrikePrice,
+      ) { args ->
+        val symbolValue = args[0] as String
+        val validSymbolValue = args[1] as StockSymbol?
+        val equityTypeValue = args[2] as EquityType?
+        val optionExpirationDateValue = args[3] as LocalDate?
+        val optionStrikePriceValue = args[4] as StockMoneyValue?
+
+        if (symbolValue.isBlank()) {
+          Timber.w("Cannot submit, blank symbol")
+          return@combine false
+        }
+
+        if (validSymbolValue == null) {
+          Timber.w("Cannot submit, invalid symbol")
+          return@combine false
+        }
+
+        if (equityTypeValue == null) {
+          Timber.w("Cannot submit, invalid type")
+          return@combine false
+        }
+
+        if (equityTypeValue == EquityType.OPTION) {
+          if (optionExpirationDateValue == null) {
+            Timber.w("Cannot submit, invalid Option Expiration")
+            return@combine false
+          }
+
+          if (optionStrikePriceValue == null) {
+            Timber.w("Cannot submit, invalid Option Strike")
+            return@combine false
+          }
+        }
+
+        return@combine true
+      }
 }
 
 @Stable

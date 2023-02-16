@@ -17,14 +17,9 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.TradeSide
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import dagger.BindsInstance
 import dagger.Subcomponent
-import javax.inject.Named
 
 @Subcomponent
 internal interface PortfolioDigComponent {
@@ -36,12 +31,7 @@ internal interface PortfolioDigComponent {
 
     @CheckResult
     fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance @Named("lookup") lookupSymbol: StockSymbol?,
-        @BindsInstance holdingId: DbHolding.Id,
-        @BindsInstance holdingType: EquityType,
-        @BindsInstance tradeSide: TradeSide,
-        @BindsInstance currentPrice: StockMoneyValue?,
+        @BindsInstance params: PortfolioDigParams,
     ): PortfolioDigComponent
   }
 }

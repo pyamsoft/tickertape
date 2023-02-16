@@ -1,18 +1,16 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Stable
 interface BasePortfolioDigViewState : BaseDigViewState {
@@ -43,8 +41,8 @@ interface PortfolioDigViewState :
 class MutablePortfolioDigViewState
 @Inject
 internal constructor(
-    symbol: StockSymbol,
-) : MutableDigViewState(symbol), PortfolioDigViewState {
+    params: PortfolioDigParams,
+) : MutableDigViewState(params.symbol), PortfolioDigViewState {
   override val section = MutableStateFlow(PortfolioDigSections.POSITIONS)
 
   override val stockSplitError = MutableStateFlow<Throwable?>(null)

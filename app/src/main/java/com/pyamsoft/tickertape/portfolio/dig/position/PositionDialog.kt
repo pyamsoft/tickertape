@@ -46,13 +46,14 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateDialog
+import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import timber.log.Timber
 
 internal class PositionDialog : AppCompatDialogFragment() {
 
@@ -218,17 +219,16 @@ internal class PositionDialog : AppCompatDialogFragment() {
     @JvmStatic
     @CheckResult
     private fun newInstance(
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
-        holdingType: EquityType,
+        params: PortfolioDigParams,
+        holding: DbHolding,
         existingPositionId: DbPosition.Id,
     ): DialogFragment {
       return PositionDialog().apply {
         arguments =
             Bundle().apply {
-              putString(KEY_SYMBOL, symbol.raw)
-              putString(KEY_HOLDING_ID, holdingId.raw)
-              putString(KEY_HOLDING_TYPE, holdingType.name)
+              putString(KEY_SYMBOL, params.symbol.raw)
+              putString(KEY_HOLDING_ID, holding.id.raw)
+              putString(KEY_HOLDING_TYPE, holding.type.name)
               putString(KEY_EXISTING_POSITION_ID, existingPositionId.raw)
             }
       }
@@ -237,14 +237,12 @@ internal class PositionDialog : AppCompatDialogFragment() {
     @JvmStatic
     fun create(
         activity: FragmentActivity,
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
-        holdingType: EquityType,
+        params: PortfolioDigParams,
+        holding: DbHolding,
     ) {
       newInstance(
-              symbol,
-              holdingId,
-              holdingType,
+              params,
+              holding,
               existingPositionId = DbPosition.Id.EMPTY,
           )
           .show(activity, TAG)
@@ -253,16 +251,14 @@ internal class PositionDialog : AppCompatDialogFragment() {
     @JvmStatic
     fun update(
         activity: FragmentActivity,
-        symbol: StockSymbol,
-        holdingId: DbHolding.Id,
-        holdingType: EquityType,
-        existingPositionId: DbPosition.Id,
+        params: PortfolioDigParams,
+        holding: DbHolding,
+        position: DbPosition,
     ) {
       newInstance(
-              symbol,
-              holdingId,
-              holdingType,
-              existingPositionId,
+              params,
+              holding,
+              existingPositionId = position.id,
           )
           .show(activity, TAG)
     }

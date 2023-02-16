@@ -35,6 +35,7 @@ import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -107,16 +108,17 @@ internal constructor(
         return@withContext positionRealtime.listenForChanges(onEvent)
       }
 
-  override suspend fun getHolding(id: DbHolding.Id): ResultWrapper<DbHolding> =
+  override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding> =
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
         return@withContext try {
-          val holding = holdingQueryDao.query().firstOrNull { it.id == id }
-          ResultWrapper.success(holding.requireNotNull { "Unable to find holding with id: $id" })
+          val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
+          ResultWrapper.success(
+              holding.requireNotNull { "Unable to find holding with symbol: $symbol" })
         } catch (e: Throwable) {
           e.ifNotCancellation {
-            Timber.e(e, "Failed to get db holding: $id")
+            Timber.e(e, "Failed to get db holding: $symbol")
             ResultWrapper.failure(e)
           }
         }

@@ -21,7 +21,6 @@
         <item name="android:datePickerDialogTheme">@style/ThemeOverlay.TickerTape.Dialog.DatePicker</item>
         <item name="dialogTheme">@style/ThemeOverlay.TickerTape.Dialog</item>
         <item name="alertDialogTheme">@style/ThemeOverlay.TickerTape.Dialog.Alert</item>
-        <item name="bottomSheetDialogTheme">@style/Theme.TickerTape.BottomSheet</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary</item>
@@ -33,26 +32,6 @@
 
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:navigationBarColor">@color/transparent</item>
-    </style>
-
-    <style name="Custom.Theme.TickerTape.BottomSheet" parent="@style/Base.Theme.TickerTape.BottomSheet">
-        <item name="bottomSheetStyle">@style/Widget.TickerTape.BottomSheet</item>
-
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary</item>
-        <item name="colorOnPrimary">@color/white</item>
-
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/secondary</item>
-        <item name="colorOnSecondary">@color/white</item>
-
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowBackground">@null</item>
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:navigationBarColor">@color/transparent</item>
-
-        <!-- Push all window content above the keyboard -->
-        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
 </resources>

@@ -30,6 +30,7 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberActivity
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
@@ -51,12 +52,7 @@ internal constructor(
     ObjectGraph.ActivityScope.retrieve(activity)
         .plusPortfolioDig()
         .create(
-            symbol = params.symbol,
-            lookupSymbol = params.lookupSymbol,
-            holdingId = params.holdingId,
-            holdingType = params.holdingType,
-            tradeSide = params.holdingSide,
-            currentPrice = params.currentPrice,
+            params = params,
         )
         .inject(this)
   }
@@ -95,39 +91,37 @@ internal fun PortfolioDigEntry(
   val scope = rememberCoroutineScope()
   val activity = rememberActivity()
 
-  val handlePositionAdd by rememberUpdatedState {
+  val handlePositionAdd by rememberUpdatedState { holding: DbHolding ->
     PositionDialog.create(
         activity = activity,
-        symbol = params.symbol,
-        holdingId = params.holdingId,
-        holdingType = params.holdingType,
+        params = params,
+        holding = holding,
     )
   }
 
-  val handlePositionUpdate by rememberUpdatedState { position: DbPosition ->
+  val handlePositionUpdate by rememberUpdatedState { position: DbPosition, holding: DbHolding ->
     PositionDialog.update(
         activity = activity,
-        symbol = params.symbol,
-        holdingId = params.holdingId,
-        holdingType = params.holdingType,
-        existingPositionId = position.id,
+        params = params,
+        holding = holding,
+        position = position,
     )
   }
 
-  val handleSplitAdd by rememberUpdatedState {
+  val handleSplitAdd by rememberUpdatedState { holding: DbHolding ->
     SplitDialog.create(
         activity = activity,
-        symbol = params.symbol,
-        holdingId = params.holdingId,
+        params = params,
+        holding = holding,
     )
   }
 
-  val handleSplitUpdate by rememberUpdatedState { split: DbSplit ->
+  val handleSplitUpdate by rememberUpdatedState { split: DbSplit, holding: DbHolding ->
     SplitDialog.update(
         activity = activity,
-        symbol = params.symbol,
-        holdingId = params.holdingId,
-        existingSplitId = split.id,
+        params = params,
+        holding = holding,
+        split = split,
     )
   }
 
@@ -167,22 +161,22 @@ internal fun PortfolioDigEntry(
             force = true,
         )
       },
-      onPositionAdd = { handlePositionAdd() },
+      onPositionAdd = { handlePositionAdd(it) },
+      onPositionUpdate = { p, h -> handlePositionUpdate(p, h) },
       onPositionDelete = {
         viewModel.handleDeletePosition(
             scope = scope,
             position = it,
         )
       },
-      onPositionUpdate = { handlePositionUpdate(it) },
-      onSplitAdd = { handleSplitAdd() },
+      onSplitAdd = { handleSplitAdd(it) },
+      onSplitUpdated = { s, h -> handleSplitUpdate(s, h) },
       onSplitDeleted = {
         viewModel.handleDeleteSplit(
             scope = scope,
             split = it,
         )
       },
-      onSplitUpdated = { handleSplitUpdate(it) },
       onRecClick = { handleRecommendationClicked(it) },
       onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
       onOptionExpirationDateChanged = {

@@ -108,7 +108,15 @@ private fun SubmissionSection(
     onClear: () -> Unit,
 ) {
   val isSubmitting by state.isSubmitting.collectAsState()
-  val canSubmit = state.canSubmit()
+  val canSubmit by state.canSubmit.collectAsState(false)
+
+  val isSubmitReady =
+      remember(
+          isSubmitting,
+          canSubmit,
+      ) {
+        canSubmit && !isSubmitting
+      }
 
   Column(
       modifier = modifier,
@@ -137,7 +145,7 @@ private fun SubmissionSection(
       )
 
       Button(
-          enabled = canSubmit,
+          enabled = isSubmitReady,
           modifier = Modifier.weight(1F),
           onClick = onSubmit,
       ) {

@@ -23,7 +23,7 @@ buildscript {
     compileSdk = 33
 
     // Us
-    pydroid = "26.2.0"
+    pydroid = "26.2.1-SNAPSHOT"
     cachify = "0.2.0"
     highlander = "0.2.0"
 

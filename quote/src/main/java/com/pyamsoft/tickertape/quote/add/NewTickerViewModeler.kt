@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -257,6 +258,7 @@ internal constructor(
   ) {
     val s = state
     s.apply {
+      Timber.d("Found new valid symbol: $symbol")
       validSymbol.value = symbol
       this.symbol.value = symbol.raw
 
@@ -327,10 +329,6 @@ internal constructor(
     )
   }
 
-  fun handleClear() {
-    state.clearInput()
-  }
-
   fun handleOptionExpirationDate(scope: CoroutineScope, date: LocalDate) {
     val s = state
 
@@ -352,33 +350,38 @@ internal constructor(
   }
 
   fun handleDismiss() {
-    handleClear()
     handleClearEquityType()
+    handleClear()
 
+    state.isSubmitting.value = false
+  }
+
+  fun handleClear() {
     val s = state
+    s.clearInput()
 
-    s.tradeSide.value = TradeSide.BUY
     s.lookupResults.value = emptyList()
     s.lookupError.value = null
 
-    s.optionType.value = StockOptions.Contract.Type.CALL
-    s.optionExpirationDate.value = null
-    s.optionStrikePrice.value = null
-
     s.resolvedOption.value = null
     s.resolvedTicker.value = null
-    s.validSymbol.value = null
   }
 
   fun handleSubmit(scope: CoroutineScope) {
     val s = state
-    if (!s.canSubmit()) {
+    if (s.isSubmitting.value) {
+      Timber.w("Already submitting, don't double up")
       return
     }
 
     s.apply {
       s.isSubmitting.value = true
       scope.launch(context = Dispatchers.Main) {
+        if (!s.canSubmit.first()) {
+          Timber.w("Cannot process submit")
+          return@launch
+        }
+
         val sym = resolveSubmission()
 
         // If blank, we can't do anything
@@ -403,8 +406,8 @@ internal constructor(
                     Timber.w("UPDATE happened but none was expected: ${result.data}")
               }
             }
-            .onSuccess { handleClear() }
             .onFinally { s.isSubmitting.value = false }
+            .onSuccess { handleClear() }
       }
     }
   }

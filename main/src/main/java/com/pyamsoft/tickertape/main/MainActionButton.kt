@@ -19,15 +19,15 @@ import androidx.compose.ui.graphics.Color
 fun MainActionButton(
     modifier: Modifier = Modifier,
     show: Boolean,
-    page: TopLevelMainPage,
-    onActionSelected: (TopLevelMainPage) -> Unit,
+    page: MainPage,
+    onActionSelected: (MainPage) -> Unit,
 ) {
   val isFabVisible =
       remember(
           page,
           show,
       ) {
-        show && page == TopLevelMainPage.Portfolio
+        show && page == MainPage.Portfolio
       }
 
   AnimatedVisibility(

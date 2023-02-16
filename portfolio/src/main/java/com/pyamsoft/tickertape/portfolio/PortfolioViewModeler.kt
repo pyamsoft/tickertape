@@ -30,7 +30,7 @@ import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.main.MainSelectionEvent
-import com.pyamsoft.tickertape.main.TopLevelMainPage
+import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
 import kotlinx.coroutines.CoroutineScope
@@ -244,7 +244,7 @@ internal constructor(
 
     scope.launch(context = Dispatchers.Main) {
       mainSelectionConsumer.onEvent { event ->
-        if (event.page == TopLevelMainPage.Portfolio) {
+        if (event.page == MainPage.Portfolio) {
           onMainSelectionEvent()
         }
       }

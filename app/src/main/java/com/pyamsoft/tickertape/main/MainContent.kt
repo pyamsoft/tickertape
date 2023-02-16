@@ -20,7 +20,7 @@ internal fun MainContent(
     modifier: Modifier = Modifier,
     appName: String,
     pagerState: PagerState,
-    allTabs: SnapshotStateList<TopLevelMainPage>,
+    allTabs: SnapshotStateList<MainPage>,
     onHomeDig: (Ticker) -> Unit,
     onPortfolioDig: (PortfolioStock) -> Unit,
 ) {
@@ -38,20 +38,20 @@ internal fun MainContent(
         }
 
     when (screen) {
-      is TopLevelMainPage.Home -> {
+      is MainPage.Home -> {
         HomeEntry(
             modifier = Modifier.fillMaxSize(),
             appName = appName,
             onDig = onHomeDig,
         )
       }
-      is TopLevelMainPage.Portfolio -> {
+      is MainPage.Portfolio -> {
         PortfolioEntry(
             modifier = Modifier.fillMaxSize(),
             onDig = onPortfolioDig,
         )
       }
-      is TopLevelMainPage.Notifications -> {
+      is MainPage.Notifications -> {
         NotificationEntry(
             modifier = Modifier.fillMaxSize(),
         )

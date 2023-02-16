@@ -49,12 +49,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 @CheckResult
-fun rememberAllTabs(): SnapshotStateList<TopLevelMainPage> {
+fun rememberAllTabs(): SnapshotStateList<MainPage> {
   return remember {
     mutableStateListOf(
-        TopLevelMainPage.Home,
-        TopLevelMainPage.Portfolio,
-        TopLevelMainPage.Notifications,
+        MainPage.Home,
+        MainPage.Portfolio,
+        MainPage.Notifications,
     )
   }
 }
@@ -64,12 +64,12 @@ fun rememberAllTabs(): SnapshotStateList<TopLevelMainPage> {
 fun MainBottomNav(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-    allTabs: SnapshotStateList<TopLevelMainPage>,
-    page: TopLevelMainPage,
+    allTabs: SnapshotStateList<MainPage>,
+    page: MainPage,
 ) {
   val scope = rememberCoroutineScope()
 
-  val handleNavigationClicked by rememberUpdatedState { p: TopLevelMainPage ->
+  val handleNavigationClicked by rememberUpdatedState { p: MainPage ->
     // Click fires the index to update
     // The index updating is caught by the snapshot flow
     // Which then triggers the page update function
@@ -92,17 +92,17 @@ fun MainBottomNav(
     ) {
       Item(
           current = page,
-          target = TopLevelMainPage.Home,
+          target = MainPage.Home,
           onLoadPage = { handleNavigationClicked(it) },
       )
       Item(
           current = page,
-          target = TopLevelMainPage.Portfolio,
+          target = MainPage.Portfolio,
           onLoadPage = { handleNavigationClicked(it) },
       )
       Item(
           current = page,
-          target = TopLevelMainPage.Notifications,
+          target = MainPage.Notifications,
           onLoadPage = { handleNavigationClicked(it) },
       )
     }
@@ -117,18 +117,18 @@ fun MainBottomNav(
 @Composable
 private fun RowScope.Item(
     modifier: Modifier = Modifier,
-    current: TopLevelMainPage,
-    target: TopLevelMainPage,
-    onLoadPage: (TopLevelMainPage) -> Unit,
+    current: MainPage,
+    target: MainPage,
+    onLoadPage: (MainPage) -> Unit,
 ) {
   val currentColor = LocalContentColor.current
 
   val icon =
       remember(target) {
         when (target) {
-          TopLevelMainPage.Home -> Icons.Filled.Home
-          TopLevelMainPage.Portfolio -> Icons.Filled.BarChart
-          TopLevelMainPage.Notifications -> Icons.Filled.Notifications
+          MainPage.Home -> Icons.Filled.Home
+          MainPage.Portfolio -> Icons.Filled.BarChart
+          MainPage.Notifications -> Icons.Filled.Notifications
         }
       }
 

@@ -37,7 +37,7 @@ internal class MainInjector @Inject internal constructor() : ComposableInjector(
 @OptIn(ExperimentalPagerApi::class)
 private fun WatchTabSwipe(
     pagerState: PagerState,
-    allTabs: SnapshotStateList<TopLevelMainPage>,
+    allTabs: SnapshotStateList<MainPage>,
 ) {
   // Watch for a swipe causing a page change and update accordingly
   LaunchedEffect(
@@ -56,7 +56,7 @@ private fun WatchTabSwipe(
 @OptIn(ExperimentalPagerApi::class)
 private fun MountHooks(
     pagerState: PagerState,
-    allTabs: SnapshotStateList<TopLevelMainPage>,
+    allTabs: SnapshotStateList<MainPage>,
 ) {
   WatchTabSwipe(
       pagerState = pagerState,

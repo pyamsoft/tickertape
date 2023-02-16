@@ -17,5 +17,5 @@
 package com.pyamsoft.tickertape.main
 
 data class MainSelectionEvent(
-    val page: TopLevelMainPage,
+    val page: MainPage,
 )

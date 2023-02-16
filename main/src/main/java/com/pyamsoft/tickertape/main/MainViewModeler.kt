@@ -43,7 +43,7 @@ internal constructor(
     private val jsonParser: JsonParser,
 ) : AbstractViewModeler<MainViewState>(state) {
 
-  fun handleMainActionSelected(scope: CoroutineScope, page: TopLevelMainPage) {
+  fun handleMainActionSelected(scope: CoroutineScope, page: MainPage) {
     scope.launch(context = Dispatchers.Main) {
       val event = MainSelectionEvent(page = page)
       mainActionSelectionBus.send(event)

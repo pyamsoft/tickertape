@@ -79,7 +79,9 @@ fun Quote(
         }
 
         Column(
-            modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+            modifier =
+                Modifier.padding(start = MaterialTheme.keylines.baseline)
+                    .padding(top = MaterialTheme.keylines.baseline),
             horizontalAlignment = Alignment.End,
         ) {
           if (isSpecialSession) {

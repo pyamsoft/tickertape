@@ -16,6 +16,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
+import com.pyamsoft.tickertape.quote.QuoteScope
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
@@ -31,11 +32,6 @@ internal fun PortfolioItem(
     onSelect: (PortfolioStock) -> Unit,
     onDelete: (PortfolioStock) -> Unit,
 ) {
-  val totalDirection = stock.totalDirection
-  val isOption = stock.isOption
-
-  val totalChangeTitle = remember(totalDirection) { totalDirection.asGainLoss() }
-
   Quote(
       modifier = modifier.fillMaxWidth(),
       symbol = stock.holding.symbol,
@@ -44,72 +40,76 @@ internal fun PortfolioItem(
       onLongClick = { onDelete(stock) },
   ) {
     Column {
-      Info(
-          name = if (isOption) "Contracts" else "Shares",
-          value = stock.totalShares.display,
-      )
-
-      Info(
-          name = "Value",
-          value = stock.current.display,
-      )
-
-      Info(
-          name = "Avg Cost Basis",
-          value = stock.overallCostBasis.display,
-      )
-
-      // These are only valid if we have current day quotes
-      if (stock.ticker != null) {
-        Info(
-            name = "$totalChangeTitle Amount",
-            value = stock.totalGainLossAmount,
-        )
-
-        Info(
-            name = "$totalChangeTitle Percent",
-            value = stock.totalGainLossPercent,
+      val shareCount = stock.totalShares
+      if (shareCount.isValid && !shareCount.isZero) {
+        PositionData(
+            stock = stock,
         )
       }
+    }
+  }
+}
 
-      if (stock.shortTermPositions > 0 || stock.longTermPositions > 0) {
-        Info(
-            modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
-            name = "Positions",
-            // No value here
-            value = "",
-        )
-      }
+@Composable
+private fun QuoteScope.PositionData(
+    stock: PortfolioStock,
+) {
+  val totalDirection = stock.totalDirection
+  val totalChangeTitle = remember(totalDirection) { totalDirection.asGainLoss() }
 
-      if (stock.shortTermPositions > 0) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          ShortTermPurchaseDateTag()
-          Info(
-              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-              value = "${stock.shortTermPositions}",
-          )
-        }
-      }
+  Info(
+      name = if (stock.isOption) "Contracts" else "Shares",
+      value = stock.totalShares.display,
+  )
 
-      if (stock.longTermPositions > 0) {
-        Row(
-            modifier =
-                Modifier.padding(
-                    top =
-                        if (stock.shortTermPositions > 0) MaterialTheme.keylines.baseline
-                        else ZeroSize,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          LongTermPurchaseDateTag()
-          Info(
-              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-              value = "${stock.longTermPositions}",
-          )
-        }
-      }
+  // These are only valid if we have current day quotes
+  if (stock.ticker != null) {
+    Info(
+        name = "$totalChangeTitle Percent",
+        value = stock.totalGainLossPercent,
+    )
+  } else {
+    Info(
+        name = "Value",
+        value = stock.current.display,
+    )
+  }
+
+  if (stock.shortTermPositions > 0 || stock.longTermPositions > 0) {
+    Info(
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+        name = "Positions",
+        // No value here
+        value = "",
+    )
+  }
+
+  if (stock.shortTermPositions > 0) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      ShortTermPurchaseDateTag()
+      Info(
+          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+          value = "${stock.shortTermPositions}",
+      )
+    }
+  }
+
+  if (stock.longTermPositions > 0) {
+    Row(
+        modifier =
+            Modifier.padding(
+                top =
+                    if (stock.shortTermPositions > 0) MaterialTheme.keylines.baseline else ZeroSize,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      LongTermPurchaseDateTag()
+      Info(
+          modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+          value = "${stock.longTermPositions}",
+      )
     }
   }
 }

@@ -50,7 +50,7 @@ class HomeInjector @Inject internal constructor() : ComposableInjector() {
 fun HomeEntry(
     modifier: Modifier = Modifier,
     appName: String,
-    onOpenWatchlistDig: (Ticker) -> Unit,
+    onDig: (Ticker) -> Unit,
 ) {
   val component = rememberComposableInjector { HomeInjector() }
   val viewModel = rememberNotNull(component.viewModel)
@@ -65,7 +65,7 @@ fun HomeEntry(
       appName = appName,
       imageLoader = imageLoader,
       onSettingsClicked = { viewModel.handleOpenSettings() },
-      onChartClicked = { onOpenWatchlistDig(it) },
+      onChartClicked = { onDig(it) },
       onRefreshUndervaluedGrowth = {
         viewModel.handleFetchUndervaluedGrowth(
             scope = this,

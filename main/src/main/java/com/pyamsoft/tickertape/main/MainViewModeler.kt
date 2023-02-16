@@ -16,11 +16,10 @@
 
 package com.pyamsoft.tickertape.main
 
-import android.app.Activity
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
-import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.quote.Ticker
@@ -38,24 +37,20 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@ActivityScope
 class MainViewModeler
 @Inject
 internal constructor(
     override val state: MutableMainViewState,
-    private val theming: Theming,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
     private val jsonParser: JsonParser,
     private val holdingQueryDao: HoldingQueryDao,
 ) : AbstractViewModeler<MainViewState>(state) {
 
-  fun handleSyncDarkTheme(activity: Activity) {
-    val isDark = theming.isDarkTheme(activity)
-    state.theme.value = if (isDark) Theming.Mode.DARK else Theming.Mode.LIGHT
-  }
-
   fun handleMainActionSelected(scope: CoroutineScope, page: TopLevelMainPage) {
     scope.launch(context = Dispatchers.Main) {
-      mainActionSelectionBus.send(MainSelectionEvent(page = page))
+      val event = MainSelectionEvent(page = page)
+      mainActionSelectionBus.send(event)
     }
   }
 
@@ -65,7 +60,6 @@ internal constructor(
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         val s = state
 
-        registry.registerProvider(KEY_THEME) { s.theme.value.name }.also { add(it) }
         registry
             .registerProvider(KEY_PORTFOLIO_DIG) {
               s.portfolioDigParams.value
@@ -81,14 +75,6 @@ internal constructor(
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
-    val s = state
-
-    registry
-        .consumeRestored(KEY_THEME)
-        ?.let { it as String }
-        ?.let { Theming.Mode.valueOf(it) }
-        ?.also { s.theme.value = it }
-
     registry
         .consumeRestored(KEY_PORTFOLIO_DIG)
         ?.let { it as String }
@@ -161,7 +147,6 @@ internal constructor(
 
   companion object {
 
-    private const val KEY_THEME = "theme"
     private const val KEY_PORTFOLIO_DIG = "portfolio_dig"
   }
 

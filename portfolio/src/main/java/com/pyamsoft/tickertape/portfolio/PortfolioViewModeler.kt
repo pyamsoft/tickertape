@@ -20,8 +20,6 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.pydroid.arch.UiSavedStateReader
-import com.pyamsoft.pydroid.arch.UiSavedStateWriter
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
@@ -35,11 +33,11 @@ import com.pyamsoft.tickertape.main.MainSelectionEvent
 import com.pyamsoft.tickertape.main.TopLevelMainPage
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -87,14 +85,19 @@ internal constructor(
     }
   }
 
+  @CheckResult
+  private fun doesPositionMatch(p1: DbPosition, p2: DbPosition): Boolean {
+    return p1.id == p2.id
+  }
+
   private fun CoroutineScope.handleUpdatePosition(position: DbPosition) {
-    val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
       internalFullPortfolio.map { stock ->
         return@map if (stock.holding.id != position.holdingId) stock
         else {
-          val newPositions = stock.positions.map { if (doesPositionMatch(it)) position else it }
+          val newPositions =
+              stock.positions.map { if (doesPositionMatch(it, position)) position else it }
           stock.copy(positions = newPositions)
         }
       }
@@ -112,16 +115,15 @@ internal constructor(
   }
 
   private fun CoroutineScope.handleDeletePosition(position: DbPosition, offerUndo: Boolean) {
-    val doesPositionMatch = { p: DbPosition -> p.id == position.id }
     val s = state
     s.regeneratePortfolio(this) {
       internalFullPortfolio.map { stock ->
         if (stock.holding.id != position.holdingId) {
           return@map stock
         } else {
-          return@map if (!stock.positions.contains(doesPositionMatch)) stock
+          return@map if (!stock.positions.contains { doesPositionMatch(it, position) }) stock
           else {
-            stock.copy(positions = stock.positions.filterNot(doesPositionMatch))
+            stock.copy(positions = stock.positions.filterNot { doesPositionMatch(it, position) })
           }
         }
       }
@@ -209,27 +211,13 @@ internal constructor(
     // On delete, we don't need to re-fetch quotes from the network
   }
 
-  override fun restoreState(savedInstanceState: UiSavedStateReader) {
-    savedInstanceState.get<String>(KEY_SEARCH)?.also { state.query.value = it }
-  }
-
-  override fun saveState(outState: UiSavedStateWriter) {
-    state.query.value.also { search ->
-      if (search.isBlank()) {
-        outState.remove(KEY_SEARCH)
-      } else {
-        outState.put(KEY_SEARCH, search.trim())
-      }
-    }
-  }
-
   override fun registerSaveState(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         val s = state
 
-        registry.registerProvider(KEY_SEARCH) { s.query }.also { add(it) }
+        registry.registerProvider(KEY_SEARCH) { s.query.value }.also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -309,6 +297,6 @@ internal constructor(
   ) : ListGenerateResult<PortfolioStock>
 
   companion object {
-    private const val KEY_SEARCH = "search"
+    private const val KEY_SEARCH = "portfolio_search"
   }
 }

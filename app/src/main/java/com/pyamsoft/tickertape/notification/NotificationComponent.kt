@@ -22,8 +22,6 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface NotificationComponent {
 
-  fun inject(fragment: NotificationFragment)
-
   fun inject(injector: NotificationInjector)
 
   @Subcomponent.Factory

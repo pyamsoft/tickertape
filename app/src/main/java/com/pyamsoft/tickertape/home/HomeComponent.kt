@@ -22,9 +22,6 @@ import dagger.Subcomponent
 @Subcomponent
 internal interface HomeComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: HomeFragment)
-
   fun inject(injector: HomeInjector)
 
   @Subcomponent.Factory

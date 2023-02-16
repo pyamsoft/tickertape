@@ -17,11 +17,8 @@
 package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
-import androidx.annotation.IdRes
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
-import com.pyamsoft.pydroid.ui.navigator.BackstackNavigator
-import com.pyamsoft.pydroid.ui.navigator.Navigator
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.notification.NotificationComponent
@@ -48,26 +45,16 @@ internal interface MainComponent {
 
   fun inject(activity: MainActivity)
 
+  fun inject(injector: MainInjector)
+
   @Subcomponent.Factory
   interface Factory {
 
-    @CheckResult
-    fun create(
-      @BindsInstance activity: MainActivity,
-      @BindsInstance @IdRes fragmentContainerId: Int,
-    ): MainComponent
+    @CheckResult fun create(@BindsInstance activity: MainActivity): MainComponent
   }
 
   @Module
   abstract class MainModule {
-
-    @Binds
-    @CheckResult
-    internal abstract fun bindNavigator(impl: MainNavigator): Navigator<MainPage>
-
-    @Binds
-    @CheckResult
-    internal abstract fun bindBackstackNavigator(impl: MainNavigator): BackstackNavigator<MainPage>
 
     @Binds
     @CheckResult

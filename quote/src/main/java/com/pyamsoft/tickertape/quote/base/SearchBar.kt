@@ -22,8 +22,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -118,12 +120,12 @@ private fun SearchInput(
   val (isSearchFocused, setSearchFocused) = remember { mutableStateOf(false) }
 
   val hasSearchQuery = remember(search) { search.isNotBlank() }
-  val handleClearSearch = { onSearchChanged("") }
+  val handleClearSearch by rememberUpdatedState { onSearchChanged("") }
 
   // If search bar is populated and focused, back gesture clears
   if (isSearchFocused && hasSearchQuery) {
     BackHandler(
-        onBack = handleClearSearch,
+        onBack = { handleClearSearch() },
     )
   }
 
@@ -148,7 +150,7 @@ private fun SearchInput(
             visible = search.isNotBlank(),
         ) {
           IconButton(
-              onClick = handleClearSearch,
+              onClick = { handleClearSearch() },
           ) {
             Icon(
                 imageVector = Icons.Filled.Close,

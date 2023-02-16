@@ -45,6 +45,56 @@ internal fun PortfolioItem(
         PositionData(
             stock = stock,
         )
+      } else {
+        QuoteData(
+            ticker = stock.ticker,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun QuoteScope.QuoteData(
+    ticker: Ticker?,
+) {
+  val quote = ticker?.quote
+
+  if (quote != null) {
+    Column {
+      quote.dayPreviousClose?.also { close ->
+        Info(
+            name = "Previous Close",
+            value = close.display,
+        )
+      }
+
+      quote.dayOpen?.also { open ->
+        Info(
+            name = "Open",
+            value = open.display,
+        )
+      }
+
+      quote.dayLow?.also { low ->
+        Info(
+            name = "Low",
+            value = low.display,
+        )
+      }
+
+      quote.dayHigh?.also { high ->
+        Info(
+            name = "High",
+            value = high.display,
+        )
+      }
+
+      quote.dayVolume?.also { volume ->
+        Info(
+            name = "Volume",
+            value = volume.display,
+        )
       }
     }
   }

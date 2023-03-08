@@ -18,8 +18,8 @@ data class PositionParams(
 ) {
 
   @CheckResult
-  fun raw(): Raw {
-    return Raw(
+  fun toJson(): Json {
+    return Json(
         symbol = symbol.raw,
         holdingId = holdingId.raw,
         holdingType = holdingType.name,
@@ -29,7 +29,7 @@ data class PositionParams(
 
   @Stable
   @JsonClass(generateAdapter = true)
-  data class Raw
+  data class Json
   internal constructor(
       val symbol: String,
       val holdingId: String,
@@ -38,7 +38,7 @@ data class PositionParams(
   ) {
 
     @CheckResult
-    fun hydrate(): PositionParams {
+    fun fromJson(): PositionParams {
       return PositionParams(
           symbol = symbol.asSymbol(),
           holdingId = DbHolding.Id(holdingId),

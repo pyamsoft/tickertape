@@ -7,7 +7,6 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @Stable
@@ -21,8 +20,8 @@ data class PortfolioDigParams(
 ) {
 
   @CheckResult
-  fun raw(): Raw {
-    return Raw(
+  fun toJson(): Json {
+    return Json(
         symbol = symbol.raw,
         lookupSymbol = lookupSymbol?.raw,
         currentPrice = currentPrice?.value,
@@ -31,7 +30,7 @@ data class PortfolioDigParams(
 
   @Stable
   @JsonClass(generateAdapter = true)
-  data class Raw
+  data class Json
   internal constructor(
       val symbol: String,
       val lookupSymbol: String?,
@@ -39,7 +38,7 @@ data class PortfolioDigParams(
   ) {
 
     @CheckResult
-    fun hydrate(): PortfolioDigParams {
+    fun fromJson(): PortfolioDigParams {
       return PortfolioDigParams(
           symbol = symbol.asSymbol(),
           lookupSymbol = lookupSymbol?.asSymbol(),

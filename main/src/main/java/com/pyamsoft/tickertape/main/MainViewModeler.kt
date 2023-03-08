@@ -58,7 +58,7 @@ internal constructor(
 
         registry
             .registerProvider(KEY_PORTFOLIO_DIG) {
-              s.portfolioDigParams.value?.let { jsonParser.toJson(it.raw()) }
+              s.portfolioDigParams.value?.let { jsonParser.toJson(it.toJson()) }
             }
             .also { add(it) }
       }
@@ -67,8 +67,8 @@ internal constructor(
     registry
         .consumeRestored(KEY_PORTFOLIO_DIG)
         ?.let { it as String }
-        ?.let { jsonParser.fromJson<PortfolioDigParams.Raw>(it) }
-        ?.hydrate()
+        ?.let { jsonParser.fromJson<PortfolioDigParams.Json>(it) }
+        ?.fromJson()
         ?.also { saved ->
           handleOpenDig(
               symbol = saved.symbol,

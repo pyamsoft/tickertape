@@ -16,8 +16,8 @@ data class SplitParams(
 ) {
 
   @CheckResult
-  fun raw(): Raw {
-    return Raw(
+  fun toJson(): Json {
+    return Json(
         symbol = symbol.raw,
         holdingId = holdingId.raw,
         existingSplitId = existingSplitId.raw,
@@ -26,7 +26,7 @@ data class SplitParams(
 
   @Stable
   @JsonClass(generateAdapter = true)
-  data class Raw
+  data class Json
   internal constructor(
       val symbol: String,
       val holdingId: String,
@@ -34,7 +34,7 @@ data class SplitParams(
   ) {
 
     @CheckResult
-    fun hydrate(): SplitParams {
+    fun fromJson(): SplitParams {
       return SplitParams(
           symbol = symbol.asSymbol(),
           holdingId = DbHolding.Id(holdingId),

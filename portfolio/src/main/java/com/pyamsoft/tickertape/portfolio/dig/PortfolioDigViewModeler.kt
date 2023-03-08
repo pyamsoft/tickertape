@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -28,6 +29,9 @@ import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
+import com.pyamsoft.tickertape.quote.dig.SplitParams
+import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.fromJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +47,7 @@ internal constructor(
     override val state: MutablePortfolioDigViewState,
     private val params: PortfolioDigParams,
     private val interactor: PortfolioDigInteractor,
+    private val jsonParser: JsonParser,
     interactorCache: PortfolioDigInteractor.Cache,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
@@ -72,6 +77,7 @@ internal constructor(
           interactorCache.invalidateHolding()
         }
 
+        // If thie holding is already provided, great, fast track!
         val holding = params.holding
         return@highlander if (holding != null) {
           ResultWrapper.success(holding)
@@ -299,6 +305,10 @@ internal constructor(
         splits = s.stockSplits.value.filterNot { it.id == split.id })
   }
 
+  private fun handleOpenSplit(params: SplitParams) {
+    state.splitDialog.value = params
+  }
+
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
       return
@@ -308,6 +318,27 @@ internal constructor(
     scope.launch(context = Dispatchers.Main) {
       loadRunner.call(force).also { state.loadingState.value = BaseDigViewState.LoadingState.DONE }
     }
+  }
+
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        val s = state
+
+        registry
+            .registerProvider(KEY_SPLIT_DIALOG) {
+              s.splitDialog.value?.let { jsonParser.toJson(it) }
+            }
+            .also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    registry
+        .consumeRestored(KEY_SPLIT_DIALOG)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<SplitParams>(it) }
+        ?.also { handleOpenSplit(it) }
   }
 
   fun bind(scope: CoroutineScope) {
@@ -359,7 +390,27 @@ internal constructor(
     handleLoadTicker(scope, force = false)
   }
 
+  fun handleOpenSplit(
+      params: PortfolioDigParams,
+      holding: DbHolding,
+      split: DbSplit? = null,
+  ) {
+    handleOpenSplit(
+        SplitParams(
+            symbol = params.symbol,
+            holdingId = holding.id,
+            existingSplitId = split?.id ?: DbSplit.Id.EMPTY,
+        ),
+    )
+  }
+
+  fun handleCloseSplit() {
+    state.splitDialog.value = null
+  }
+
   companion object {
+
+    private const val KEY_SPLIT_DIALOG = "key_split_dialog"
 
     @JvmStatic
     @CheckResult

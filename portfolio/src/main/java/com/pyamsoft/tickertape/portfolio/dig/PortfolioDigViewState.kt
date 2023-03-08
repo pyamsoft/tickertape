@@ -8,6 +8,7 @@ import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
+import com.pyamsoft.tickertape.quote.dig.SplitParams
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -34,7 +35,9 @@ interface SplitsPortfolioDigViewState : BasePortfolioDigViewState {
 
 @Stable
 interface PortfolioDigViewState :
-    DigViewState, PositionsPortfolioDigViewState, SplitsPortfolioDigViewState
+    DigViewState, PositionsPortfolioDigViewState, SplitsPortfolioDigViewState {
+  val splitDialog: StateFlow<SplitParams?>
+}
 
 // Public for PortfolioDigViewModeler constructor
 @Stable
@@ -45,6 +48,7 @@ internal constructor(
 ) : MutableDigViewState(params.symbol), PortfolioDigViewState {
   override val section = MutableStateFlow(PortfolioDigSections.POSITIONS)
 
+  override val splitDialog = MutableStateFlow<SplitParams?>(null)
   override val stockSplitError = MutableStateFlow<Throwable?>(null)
   override val stockSplits: StateFlow<List<DbSplit>>
 

@@ -62,20 +62,6 @@ private fun QuoteScope.QuoteData(
 
   if (quote != null) {
     Column {
-      quote.dayPreviousClose?.also { close ->
-        Info(
-            name = "Previous Close",
-            value = close.display,
-        )
-      }
-
-      quote.dayOpen?.also { open ->
-        Info(
-            name = "Open",
-            value = open.display,
-        )
-      }
-
       quote.dayLow?.also { low ->
         Info(
             name = "Low",

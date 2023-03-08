@@ -21,42 +21,42 @@ import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.JsonMappableDbSplit
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
+import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.api.asShares
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class SplitAddViewModeler
 @Inject
 internal constructor(
     override val state: MutableSplitAddViewState,
-    private val holdingId: DbHolding.Id,
     private val interactor: SplitAddInteractor,
-    private val existingSplitId: DbSplit.Id,
+    private val params: SplitParams,
     datePickerEventBus: EventConsumer<DateSelectedEvent<DbSplit.Id>>,
 ) :
     BaseAddViewModeler<SplitAddViewState, DbSplit.Id>(
         state = state,
         datePickerEventBus = datePickerEventBus,
-        existingId = existingSplitId,
+        existingId = params.existingSplitId,
     ) {
 
   private var existingSplit: DbSplit? = null
-  private var splitId = decideInitialSplitId(existingSplitId)
+  private var splitId = decideInitialSplitId(params.existingSplitId)
 
   private fun newSplit() {
-    if (existingSplitId.isEmpty) {
+    val existing = params.existingSplitId
+    if (existing.isEmpty) {
       splitId = generateNewSplitId()
     } else {
-      throw IllegalStateException("Do not use newPosition() with existing ID: $existingSplitId")
+      throw IllegalStateException("Do not use newPosition() with existing ID: $existing")
     }
   }
 
@@ -66,6 +66,8 @@ internal constructor(
     val preSplit = s.preSplitShareCount.value.toDouble()
     val postSplit = s.postSplitShareCount.value.toDouble()
     val date = s.splitDate.value.requireNotNull()
+
+    val holdingId = params.holdingId
 
     return if (existing == null) {
       Timber.d("No existing split, make new one for holding: $splitId $holdingId")

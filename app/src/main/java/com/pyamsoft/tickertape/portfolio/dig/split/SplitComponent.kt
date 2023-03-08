@@ -17,26 +17,21 @@
 package com.pyamsoft.tickertape.portfolio.dig.split
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.split.DbSplit
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.quote.dig.SplitParams
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
 internal interface SplitComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: SplitDialog)
+  fun inject(injector: SplitInjector)
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance holdingId: DbHolding.Id,
-        @BindsInstance existingSplitId: DbSplit.Id,
+        @BindsInstance params: SplitParams,
     ): SplitComponent
   }
 }

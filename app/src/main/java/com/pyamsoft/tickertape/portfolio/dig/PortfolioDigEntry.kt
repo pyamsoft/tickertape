@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,7 +35,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
-import com.pyamsoft.tickertape.portfolio.dig.split.SplitDialog
+import com.pyamsoft.tickertape.portfolio.dig.split.SplitEntry
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import javax.inject.Inject
@@ -109,25 +110,19 @@ internal fun PortfolioDigEntry(
   }
 
   val handleSplitAdd by rememberUpdatedState { holding: DbHolding ->
-    SplitDialog.create(
-        activity = activity,
-        params = params,
-        holding = holding,
-    )
+    viewModel.handleOpenSplit(params, holding)
   }
 
   val handleSplitUpdate by rememberUpdatedState { split: DbSplit, holding: DbHolding ->
-    SplitDialog.update(
-        activity = activity,
-        params = params,
-        holding = holding,
-        split = split,
-    )
+    viewModel.handleOpenSplit(params, holding, split)
   }
 
   val handleRecommendationClicked by rememberUpdatedState { ticker: Ticker ->
     // TODO
   }
+
+  val state = viewModel.state
+  val splitDialog by state.splitDialog.collectAsState()
 
   MountHooks(
       viewModel = viewModel,
@@ -139,7 +134,7 @@ internal fun PortfolioDigEntry(
 
   PortfolioDigScreen(
       modifier = modifier,
-      state = viewModel.state,
+      state = state,
       imageLoader = imageLoader,
       onClose = onDismiss,
       onChartScrub = { viewModel.handleChartDateScrubbed(it) },
@@ -195,4 +190,11 @@ internal fun PortfolioDigEntry(
         // TODO
       },
   )
+
+  splitDialog?.also { s ->
+    SplitEntry(
+        params = s,
+        onDismiss = { viewModel.handleCloseSplit() },
+    )
+  }
 }

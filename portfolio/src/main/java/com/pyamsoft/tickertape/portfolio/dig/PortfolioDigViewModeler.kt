@@ -333,13 +333,13 @@ internal constructor(
 
         registry
             .registerProvider(KEY_SPLIT_DIALOG) {
-              s.splitDialog.value?.let { jsonParser.toJson(it) }
+              s.splitDialog.value?.let { jsonParser.toJson(it.raw()) }
             }
             .also { add(it) }
 
         registry
             .registerProvider(KEY_POSITION_DIALOG) {
-              s.positionDialog.value?.let { jsonParser.toJson(it) }
+              s.positionDialog.value?.let { jsonParser.toJson(it.raw()) }
             }
             .also { add(it) }
       }
@@ -348,13 +348,15 @@ internal constructor(
     registry
         .consumeRestored(KEY_SPLIT_DIALOG)
         ?.let { it as String }
-        ?.let { jsonParser.fromJson<SplitParams>(it) }
+        ?.let { jsonParser.fromJson<SplitParams.Raw>(it) }
+        ?.hydrate()
         ?.also { handleOpenSplit(it) }
 
     registry
         .consumeRestored(KEY_POSITION_DIALOG)
         ?.let { it as String }
-        ?.let { jsonParser.fromJson<PositionParams>(it) }
+        ?.let { jsonParser.fromJson<PositionParams.Raw>(it) }
+        ?.hydrate()
         ?.also { handleOpenPosition(it) }
   }
 

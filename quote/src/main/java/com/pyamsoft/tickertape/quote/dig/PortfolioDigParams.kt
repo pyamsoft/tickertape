@@ -1,14 +1,16 @@
 package com.pyamsoft.tickertape.quote.dig
 
+import androidx.annotation.CheckResult
 import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.asMoney
+import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @Stable
-@JsonClass(generateAdapter = true)
 data class PortfolioDigParams(
     val symbol: StockSymbol,
     val lookupSymbol: StockSymbol?,
@@ -16,4 +18,33 @@ data class PortfolioDigParams(
 
     /** Don't JSON parse */
     @Json(ignore = true) val holding: DbHolding? = null,
-)
+) {
+
+  @CheckResult
+  fun raw(): Raw {
+    return Raw(
+        symbol = symbol.raw,
+        lookupSymbol = lookupSymbol?.raw,
+        currentPrice = currentPrice?.value,
+    )
+  }
+
+  @Stable
+  @JsonClass(generateAdapter = true)
+  data class Raw
+  internal constructor(
+      val symbol: String,
+      val lookupSymbol: String?,
+      val currentPrice: Double?,
+  ) {
+
+    @CheckResult
+    fun hydrate(): PortfolioDigParams {
+      return PortfolioDigParams(
+          symbol = symbol.asSymbol(),
+          lookupSymbol = lookupSymbol?.asSymbol(),
+          currentPrice = currentPrice?.asMoney(),
+      )
+    }
+  }
+}

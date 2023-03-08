@@ -14,9 +14,7 @@ data class PortfolioDigParams(
     val symbol: StockSymbol,
     val lookupSymbol: StockSymbol?,
     val currentPrice: StockMoneyValue? = null,
-
-    /** Don't JSON parse */
-    @Json(ignore = true) val holding: DbHolding? = null,
+    val holding: DbHolding? = null,
 ) {
 
   @CheckResult

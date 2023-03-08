@@ -17,14 +17,13 @@
 package com.pyamsoft.tickertape.portfolio.dig.splits.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.bus.EventConsumer
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.JsonMappableDbSplit
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
-import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.api.asShares
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class SplitAddViewModeler
@@ -40,11 +40,9 @@ internal constructor(
     override val state: MutableSplitAddViewState,
     private val interactor: SplitAddInteractor,
     private val params: SplitParams,
-    datePickerEventBus: EventConsumer<DateSelectedEvent<DbSplit.Id>>,
 ) :
     BaseAddViewModeler<SplitAddViewState, DbSplit.Id>(
         state = state,
-        datePickerEventBus = datePickerEventBus,
         existingId = params.existingSplitId,
     ) {
 
@@ -121,6 +119,25 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        registry
+            .registerProvider(KEY_DATE_PICKER) {
+              state.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
+            }
+            .also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    registry
+        .consumeRestored(KEY_DATE_PICKER)
+        ?.let { it as String }
+        ?.let { LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }
+        ?.also { handleOpenDateDialog(it) }
+  }
+
   override fun onDateChanged(date: LocalDate) {
     state.splitDate.value = date
   }
@@ -192,7 +209,7 @@ internal constructor(
   }
 
   fun bind(scope: CoroutineScope) {
-    onBind(scope) { existingId ->
+    onBind { existingId ->
       scope.launch(context = Dispatchers.Main) {
         interactor
             .loadExistingSplit(existingId)
@@ -211,11 +228,17 @@ internal constructor(
     handleNumberAsStringChange(postSplitCount) { state.postSplitShareCount.value = it }
   }
 
-  fun handleOpenDateDialog(block: (DbSplit.Id) -> Unit) {
-    block(splitId)
+  fun handleOpenDateDialog(date: LocalDate?) {
+    state.datePicker.value = date ?: LocalDate.now()
+  }
+
+  fun handleCloseDateDialog() {
+    state.datePicker.value = null
   }
 
   companion object {
+
+    private const val KEY_DATE_PICKER = "key_date_picker"
 
     @JvmStatic
     @CheckResult

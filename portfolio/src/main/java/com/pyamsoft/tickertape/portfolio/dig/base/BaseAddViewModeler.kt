@@ -19,39 +19,20 @@ package com.pyamsoft.tickertape.portfolio.dig.base
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.tickertape.db.IdType
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 abstract class BaseAddViewModeler<S : UiViewState, Id : IdType>
 protected constructor(
     override val state: S,
-    private val datePickerEventBus: EventConsumer<DateSelectedEvent<Id>>,
     private val existingId: Id,
 ) : AbstractViewModeler<S>(state) {
 
-  private fun handleDateChanged(date: LocalDate) {
-    onDateChanged(date)
-    checkSubmittable()
-  }
-
   protected fun onBind(
-      scope: CoroutineScope,
       onHasExistingId: (Id) -> Unit,
   ) {
-    scope.launch(context = Dispatchers.Main) {
-      datePickerEventBus.onEvent { e ->
-        if (isCurrentId(e.id)) {
-          val dateOfPurchase = LocalDate.of(e.year, e.month, e.dayOfMonth)
-          handleDateChanged(dateOfPurchase)
-        }
-      }
-    }
-
     existingId.also { eid ->
       if (!eid.isEmpty) {
         Timber.d("Existing ID, attempt load: $eid")
@@ -77,6 +58,11 @@ protected constructor(
       scope: CoroutineScope,
       onClose: () -> Unit,
   )
+
+  fun handleDateChanged(date: LocalDate) {
+    onDateChanged(date)
+    checkSubmittable()
+  }
 
   companion object {
 

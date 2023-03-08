@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 @Stable
 interface PositionAddViewState : UiViewState {
+  val datePicker: StateFlow<LocalDate?>
   val equityType: StateFlow<EquityType>
   val isSubmitting: StateFlow<Boolean>
   val isSubmittable: StateFlow<Boolean>
@@ -25,6 +26,7 @@ class MutablePositionAddViewState
 internal constructor(
     params: PositionParams,
 ) : PositionAddViewState {
+  override val datePicker = MutableStateFlow<LocalDate?>(null)
   override val equityType = MutableStateFlow(params.holdingType)
   override val isSubmitting = MutableStateFlow(false)
   override val isSubmittable = MutableStateFlow(false)

@@ -1,16 +1,15 @@
 package com.pyamsoft.tickertape.portfolio.dig.splits.add
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import javax.inject.Inject
 
 @Stable
 interface SplitAddViewState : UiViewState {
+  val datePicker: StateFlow<LocalDate?>
   val isSubmitting: StateFlow<Boolean>
   val isSubmittable: StateFlow<Boolean>
   val preSplitShareCount: StateFlow<String>
@@ -20,6 +19,7 @@ interface SplitAddViewState : UiViewState {
 
 @Stable
 class MutableSplitAddViewState @Inject internal constructor() : SplitAddViewState {
+  override val datePicker = MutableStateFlow<LocalDate?>(null)
   override val isSubmitting = MutableStateFlow(false)
   override val isSubmittable = MutableStateFlow(false)
   override val preSplitShareCount = MutableStateFlow("")

@@ -34,9 +34,7 @@ import com.pyamsoft.tickertape.main.MainComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioModule
 import com.pyamsoft.tickertape.portfolio.PortfolioRemoveInjector
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionComponent
-import com.pyamsoft.tickertape.portfolio.dig.position.date.PositionDateComponent
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
-import com.pyamsoft.tickertape.portfolio.dig.split.date.SplitDateComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
@@ -82,10 +80,6 @@ internal interface TickerComponent {
   fun inject(application: TickerTape)
 
   fun inject(injector: PortfolioRemoveInjector)
-
-  @CheckResult fun plusPositionDateComponent(): PositionDateComponent.Factory
-
-  @CheckResult fun plusSplitDateComponent(): SplitDateComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

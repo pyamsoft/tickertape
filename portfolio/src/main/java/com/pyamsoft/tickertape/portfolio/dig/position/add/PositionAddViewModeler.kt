@@ -17,14 +17,13 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.bus.EventConsumer
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.JsonMappableDbPosition
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
-import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
 import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
@@ -33,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class PositionAddViewModeler
@@ -41,11 +41,9 @@ internal constructor(
     override val state: MutablePositionAddViewState,
     private val interactor: PositionAddInteractor,
     private val params: PositionParams,
-    datePickerEventBus: EventConsumer<DateSelectedEvent<DbPosition.Id>>,
 ) :
     BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
         state = state,
-        datePickerEventBus = datePickerEventBus,
         existingId = params.existingPositionId,
     ) {
 
@@ -189,8 +187,27 @@ internal constructor(
     }
   }
 
+  override fun registerSaveState(
+      registry: SaveableStateRegistry
+  ): List<SaveableStateRegistry.Entry> =
+      mutableListOf<SaveableStateRegistry.Entry>().apply {
+        registry
+            .registerProvider(KEY_DATE_PICKER) {
+              state.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
+            }
+            .also { add(it) }
+      }
+
+  override fun consumeRestoredState(registry: SaveableStateRegistry) {
+    registry
+        .consumeRestored(KEY_DATE_PICKER)
+        ?.let { it as String }
+        ?.let { LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }
+        ?.also { handleOpenDateDialog(it) }
+  }
+
   fun bind(scope: CoroutineScope) {
-    onBind(scope) { existingId ->
+    onBind { existingId ->
       scope.launch(context = Dispatchers.Main) {
         interactor
             .loadExistingPosition(existingId)
@@ -209,11 +226,17 @@ internal constructor(
     handleNumberAsStringChange(numberOfShares) { state.numberOfShares.value = it }
   }
 
-  fun handleOpenDateDialog(block: (DbPosition.Id) -> Unit) {
-    block(positionId)
+  fun handleOpenDateDialog(date: LocalDate?) {
+    state.datePicker.value = date ?: LocalDate.now()
+  }
+
+  fun handleCloseDateDialog() {
+    state.datePicker.value = null
   }
 
   companion object {
+
+    private const val KEY_DATE_PICKER = "key_date_picker"
 
     @CheckResult
     private fun decideInitialPositionId(existingPositionId: DbPosition.Id): DbPosition.Id {

@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
+import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.app.rememberDialogProperties
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
@@ -19,6 +21,7 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
 import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
 import com.pyamsoft.tickertape.quote.dig.PositionParams
+import com.pyamsoft.tickertape.ui.DatePickerDialog
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -48,6 +51,8 @@ internal constructor(
 private fun MountHooks(
     viewModel: PositionAddViewModeler,
 ) {
+  SaveStateDisposableEffect(viewModel)
+
   LaunchedEffect(viewModel) { viewModel.bind(this) }
 }
 
@@ -69,10 +74,11 @@ internal fun PositionEntry(
   }
 
   val handleOpenDateDialog by rememberUpdatedState { date: LocalDate? ->
-    viewModel.handleOpenDateDialog { positionId ->
-      // TODO
-    }
+    viewModel.handleOpenDateDialog(date)
   }
+
+  val state = viewModel.state
+  val dateDialog by state.datePicker.collectAsState()
 
   MountHooks(
       viewModel = viewModel,
@@ -84,13 +90,21 @@ internal fun PositionEntry(
   ) {
     PositionAddScreen(
         modifier = modifier.padding(MaterialTheme.keylines.content),
-        state = viewModel.state,
+        state = state,
         symbol = params.symbol,
         onClose = { handleDismiss() },
         onPriceChanged = { viewModel.handlePriceChanged(it) },
         onNumberChanged = { viewModel.handleNumberChanged(it) },
         onSubmit = { handleSubmit() },
         onDateOfPurchaseClicked = { handleOpenDateDialog(it) },
+    )
+  }
+
+  dateDialog?.also { d ->
+    DatePickerDialog(
+        initialDate = d,
+        onDateSelected = { viewModel.handleDateChanged(it) },
+        onDismiss = { viewModel.handleCloseDateDialog() },
     )
   }
 }

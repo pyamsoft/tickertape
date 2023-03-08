@@ -17,28 +17,21 @@
 package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.stocks.api.EquityType
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import dagger.BindsInstance
 import dagger.Subcomponent
 
 @Subcomponent
 internal interface PositionComponent {
 
-  // Name arg0 because otherwise DaggerTickerComponent is bugged dagger-2.43
-  fun inject(arg0: PositionDialog)
+  fun inject(injector: PositionInjector)
 
   @Subcomponent.Factory
   interface Factory {
 
     @CheckResult
     fun create(
-        @BindsInstance symbol: StockSymbol,
-        @BindsInstance holdingId: DbHolding.Id,
-        @BindsInstance holdingType: EquityType,
-        @BindsInstance existingPositionId: DbPosition.Id,
+        @BindsInstance params: PositionParams,
     ): PositionComponent
   }
 }

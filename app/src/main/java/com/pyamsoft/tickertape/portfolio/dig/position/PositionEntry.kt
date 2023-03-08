@@ -1,4 +1,4 @@
-package com.pyamsoft.tickertape.portfolio.dig.split
+package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -16,23 +16,23 @@ import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
-import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddScreen
-import com.pyamsoft.tickertape.portfolio.dig.splits.add.SplitAddViewModeler
-import com.pyamsoft.tickertape.quote.dig.SplitParams
+import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddScreen
+import com.pyamsoft.tickertape.portfolio.dig.position.add.PositionAddViewModeler
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import java.time.LocalDate
 import javax.inject.Inject
 
-internal class SplitInjector
+internal class PositionInjector
 @Inject
 internal constructor(
-    private val params: SplitParams,
+    private val params: PositionParams,
 ) : ComposableInjector() {
 
-  @JvmField @Inject internal var viewModel: SplitAddViewModeler? = null
+  @JvmField @Inject internal var viewModel: PositionAddViewModeler? = null
 
   override fun onInject(activity: FragmentActivity) {
     ObjectGraph.ApplicationScope.retrieve(activity)
-        .plusSplitComponent()
+        .plusPositionComponent()
         .create(
             params = params,
         )
@@ -46,18 +46,18 @@ internal constructor(
 
 @Composable
 private fun MountHooks(
-    viewModel: SplitAddViewModeler,
+    viewModel: PositionAddViewModeler,
 ) {
   LaunchedEffect(viewModel) { viewModel.bind(this) }
 }
 
 @Composable
-internal fun SplitEntry(
+internal fun PositionEntry(
     modifier: Modifier = Modifier,
-    params: SplitParams,
+    params: PositionParams,
     onDismiss: () -> Unit,
 ) {
-  val component = rememberComposableInjector { SplitInjector(params) }
+  val component = rememberComposableInjector { PositionInjector(params) }
   val viewModel = rememberNotNull(component.viewModel)
 
   val scope = rememberCoroutineScope()
@@ -69,7 +69,7 @@ internal fun SplitEntry(
   }
 
   val handleOpenDateDialog by rememberUpdatedState { date: LocalDate? ->
-    viewModel.handleOpenDateDialog { splitId ->
+    viewModel.handleOpenDateDialog { positionId ->
       // TODO
     }
   }
@@ -82,15 +82,15 @@ internal fun SplitEntry(
       properties = rememberDialogProperties(),
       onDismissRequest = onDismiss,
   ) {
-    SplitAddScreen(
+    PositionAddScreen(
         modifier = modifier.padding(MaterialTheme.keylines.content),
         state = viewModel.state,
         symbol = params.symbol,
         onClose = { handleDismiss() },
-        onPreSplitCountChanged = { viewModel.handlePreSplitShareCountChanged(it) },
-        onPostSplitCountChanged = { viewModel.handlePostSplitShareCountChanged(it) },
+        onPriceChanged = { viewModel.handlePriceChanged(it) },
+        onNumberChanged = { viewModel.handleNumberChanged(it) },
         onSubmit = { handleSubmit() },
-        onSplitDateClicked = { handleOpenDateDialog(it) },
+        onDateOfPurchaseClicked = { handleOpenDateDialog(it) },
     )
   }
 }

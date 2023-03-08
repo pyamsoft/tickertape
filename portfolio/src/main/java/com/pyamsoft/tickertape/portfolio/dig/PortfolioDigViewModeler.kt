@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.fromJson
@@ -309,6 +310,10 @@ internal constructor(
     state.splitDialog.value = params
   }
 
+  private fun handleOpenPosition(params: PositionParams) {
+    state.positionDialog.value = params
+  }
+
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
       return
@@ -331,6 +336,12 @@ internal constructor(
               s.splitDialog.value?.let { jsonParser.toJson(it) }
             }
             .also { add(it) }
+
+        registry
+            .registerProvider(KEY_POSITION_DIALOG) {
+              s.positionDialog.value?.let { jsonParser.toJson(it) }
+            }
+            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -339,6 +350,12 @@ internal constructor(
         ?.let { it as String }
         ?.let { jsonParser.fromJson<SplitParams>(it) }
         ?.also { handleOpenSplit(it) }
+
+    registry
+        .consumeRestored(KEY_POSITION_DIALOG)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<PositionParams>(it) }
+        ?.also { handleOpenPosition(it) }
   }
 
   fun bind(scope: CoroutineScope) {
@@ -408,9 +425,29 @@ internal constructor(
     state.splitDialog.value = null
   }
 
+  fun handleOpenPosition(
+      params: PortfolioDigParams,
+      holding: DbHolding,
+      position: DbPosition? = null,
+  ) {
+    handleOpenPosition(
+        PositionParams(
+            symbol = params.symbol,
+            holdingId = holding.id,
+            holdingType = holding.type,
+            existingPositionId = position?.id ?: DbPosition.Id.EMPTY,
+        ),
+    )
+  }
+
+  fun handleClosePosition() {
+    state.positionDialog.value = null
+  }
+
   companion object {
 
     private const val KEY_SPLIT_DIALOG = "key_split_dialog"
+    private const val KEY_POSITION_DIALOG = "key_position_dialog"
 
     @JvmStatic
     @CheckResult

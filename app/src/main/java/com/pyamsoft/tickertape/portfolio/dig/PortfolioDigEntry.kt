@@ -26,15 +26,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
+import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
-import com.pyamsoft.pydroid.ui.util.rememberActivity
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
-import com.pyamsoft.tickertape.portfolio.dig.position.PositionDialog
+import com.pyamsoft.tickertape.portfolio.dig.position.PositionEntry
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitEntry
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -68,6 +68,8 @@ internal constructor(
 private fun MountHooks(
     viewModel: PortfolioDigViewModeler,
 ) {
+  SaveStateDisposableEffect(viewModel)
+
   LaunchedEffect(viewModel) { viewModel.bind(this) }
 
   LaunchedEffect(viewModel) {
@@ -90,31 +92,35 @@ internal fun PortfolioDigEntry(
   val imageLoader = rememberNotNull(component.imageLoader)
 
   val scope = rememberCoroutineScope()
-  val activity = rememberActivity()
 
   val handlePositionAdd by rememberUpdatedState { holding: DbHolding ->
-    PositionDialog.create(
-        activity = activity,
-        params = params,
-        holding = holding,
+    viewModel.handleOpenPosition(
+        params,
+        holding,
     )
   }
 
   val handlePositionUpdate by rememberUpdatedState { position: DbPosition, holding: DbHolding ->
-    PositionDialog.update(
-        activity = activity,
-        params = params,
-        holding = holding,
-        position = position,
+    viewModel.handleOpenPosition(
+        params,
+        holding,
+        position,
     )
   }
 
   val handleSplitAdd by rememberUpdatedState { holding: DbHolding ->
-    viewModel.handleOpenSplit(params, holding)
+    viewModel.handleOpenSplit(
+        params,
+        holding,
+    )
   }
 
   val handleSplitUpdate by rememberUpdatedState { split: DbSplit, holding: DbHolding ->
-    viewModel.handleOpenSplit(params, holding, split)
+    viewModel.handleOpenSplit(
+        params,
+        holding,
+        split,
+    )
   }
 
   val handleRecommendationClicked by rememberUpdatedState { ticker: Ticker ->
@@ -122,6 +128,7 @@ internal fun PortfolioDigEntry(
   }
 
   val state = viewModel.state
+  val positionDialog by state.positionDialog.collectAsState()
   val splitDialog by state.splitDialog.collectAsState()
 
   MountHooks(
@@ -195,6 +202,13 @@ internal fun PortfolioDigEntry(
     SplitEntry(
         params = s,
         onDismiss = { viewModel.handleCloseSplit() },
+    )
+  }
+
+  positionDialog?.also { p ->
+    PositionEntry(
+        params = p,
+        onDismiss = { viewModel.handleClosePosition() },
     )
   }
 }

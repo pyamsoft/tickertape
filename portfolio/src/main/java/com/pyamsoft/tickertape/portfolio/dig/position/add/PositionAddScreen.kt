@@ -7,7 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.ui.util.rememberStable
+import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionPopup
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
@@ -63,7 +66,13 @@ private fun PreviewPositionAddScreen() {
   PositionAddScreen(
       state =
           MutablePositionAddViewState(
-              equityType = EquityType.STOCK,
+              params =
+                  PositionParams(
+                      symbol = symbol,
+                      holdingId = DbHolding.Id.EMPTY,
+                      holdingType = EquityType.STOCK,
+                      existingPositionId = DbPosition.Id.EMPTY,
+                  ),
           ),
       symbol = symbol,
       onPriceChanged = {},

@@ -2,11 +2,12 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import javax.inject.Inject
 
 @Stable
 interface PositionAddViewState : UiViewState {
@@ -22,9 +23,9 @@ interface PositionAddViewState : UiViewState {
 class MutablePositionAddViewState
 @Inject
 internal constructor(
-    equityType: EquityType,
+    params: PositionParams,
 ) : PositionAddViewState {
-  override val equityType = MutableStateFlow(equityType)
+  override val equityType = MutableStateFlow(params.holdingType)
   override val isSubmitting = MutableStateFlow(false)
   override val isSubmittable = MutableStateFlow(false)
   override val pricePerShare = MutableStateFlow("")

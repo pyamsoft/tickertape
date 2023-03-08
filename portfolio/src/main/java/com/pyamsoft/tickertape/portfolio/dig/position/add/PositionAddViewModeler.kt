@@ -21,43 +21,43 @@ import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.core.IdGenerator
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.JsonMappableDbPosition
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.portfolio.dig.base.DateSelectedEvent
+import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class PositionAddViewModeler
 @Inject
 internal constructor(
     override val state: MutablePositionAddViewState,
-    private val holdingId: DbHolding.Id,
     private val interactor: PositionAddInteractor,
-    private val existingPositionId: DbPosition.Id,
+    private val params: PositionParams,
     datePickerEventBus: EventConsumer<DateSelectedEvent<DbPosition.Id>>,
 ) :
     BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
         state = state,
         datePickerEventBus = datePickerEventBus,
-        existingId = existingPositionId,
+        existingId = params.existingPositionId,
     ) {
 
   private var existingPosition: DbPosition? = null
-  private var positionId = decideInitialPositionId(existingPositionId)
+  private var positionId = decideInitialPositionId(params.existingPositionId)
 
   private fun newPosition() {
-    if (existingPositionId.isEmpty) {
+    val existing = params.existingPositionId
+    if (existing.isEmpty) {
       positionId = generateNewPositionId()
     } else {
-      throw IllegalStateException("Do not use newPosition() with existing ID: $existingPositionId")
+      throw IllegalStateException("Do not use newPosition() with existing ID: $existing")
     }
   }
 
@@ -67,6 +67,7 @@ internal constructor(
     val price = s.pricePerShare.value.toDouble()
     val shareCount = s.numberOfShares.value.toDouble()
     val date = s.dateOfPurchase.value.requireNotNull()
+    val holdingId = params.holdingId
 
     return if (existing == null) {
       Timber.d("No existing position, make new one for holding: $positionId $holdingId")

@@ -18,17 +18,16 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Stable
 interface PortfolioViewState : UiViewState {
+  val remove: StateFlow<PortfolioRemoveParams?>
   val query: StateFlow<String>
   val section: StateFlow<EquityType>
   val loadingState: StateFlow<LoadingState>
@@ -48,6 +47,7 @@ interface PortfolioViewState : UiViewState {
 @Stable
 @ActivityScope
 class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
+  override val remove = MutableStateFlow<PortfolioRemoveParams?>(null)
   override val query = MutableStateFlow("")
   override val section = MutableStateFlow(EquityType.STOCK)
   override val loadingState = MutableStateFlow(PortfolioViewState.LoadingState.NONE)

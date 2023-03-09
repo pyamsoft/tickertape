@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -57,6 +58,8 @@ private fun MountHooks(
     viewModel: PortfolioViewModeler,
     controller: BottomSheetController,
 ) {
+  SaveStateDisposableEffect(viewModel)
+
   val handleShowController by rememberUpdatedState { controller.show() }
   LaunchedEffect(viewModel) {
     viewModel.bind(
@@ -90,15 +93,17 @@ internal fun PortfolioEntry(
 
     val scope = rememberCoroutineScope()
 
+    val state = viewModel.state
+    val removeDialog by state.remove.collectAsState()
+
     MountHooks(
         viewModel = viewModel,
         controller = controller,
     )
-    SaveStateDisposableEffect(viewModel)
 
     PortfolioScreen(
         modifier = modifier,
-        state = viewModel.state,
+        state = state,
         imageLoader = imageLoader,
         onRefresh = {
           viewModel.handleRefreshList(
@@ -107,12 +112,17 @@ internal fun PortfolioEntry(
           )
         },
         onSelect = { onDig(it) },
-        onDelete = {
-          // TODO
-        },
+        onDelete = { viewModel.handleOpenDelete(it) },
         onSearchChanged = { viewModel.handleSearch(it) },
         onTabUpdated = { viewModel.handleSectionChanged(it) },
         onRegenerateList = { viewModel.handleRegenerateList(scope = scope) },
     )
+
+    removeDialog?.also { r ->
+      PortfolioRemoveDialog(
+          params = r,
+          onDismiss = { viewModel.handleCloseDelete() },
+      )
+    }
   }
 }

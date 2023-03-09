@@ -20,8 +20,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
@@ -47,11 +48,6 @@ class PortfolioRemoveInjector @Inject constructor() : ComposableInjector() {
   }
 }
 
-@Stable
-internal data class PortfolioRemoveParams(
-    val stock: PortfolioStock,
-)
-
 @Composable
 internal fun PortfolioRemoveDialog(
     params: PortfolioRemoveParams,
@@ -62,8 +58,13 @@ internal fun PortfolioRemoveDialog(
 
   val scope = rememberCoroutineScope()
 
-  val stock = params.stock
-  val holding = stock.holding
+  val handleConfirmDelete by rememberUpdatedState {
+    presenter.handleRemove(
+        scope = scope,
+        holding = params.holdingId,
+        onRemoved = onDismiss,
+    )
+  }
 
   Dialog(
       properties = rememberDialogProperties(),
@@ -71,15 +72,9 @@ internal fun PortfolioRemoveDialog(
   ) {
     DeleteTicker(
         modifier = Modifier.fillMaxWidth().padding(MaterialTheme.keylines.content),
-        symbol = holding.symbol,
+        symbol = params.symbol,
         onCancel = onDismiss,
-        onConfirm = {
-          presenter.handleRemove(
-              scope = scope,
-              holding = holding.id,
-              onRemoved = onDismiss,
-          )
-        },
+        onConfirm = { handleConfirmDelete() },
     )
   }
 }

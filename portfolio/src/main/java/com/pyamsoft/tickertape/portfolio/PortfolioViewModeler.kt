@@ -29,9 +29,11 @@ import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
-import com.pyamsoft.tickertape.main.MainSelectionEvent
 import com.pyamsoft.tickertape.main.MainPage
+import com.pyamsoft.tickertape.main.MainSelectionEvent
+import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.fromJson
 import com.pyamsoft.tickertape.ui.ListGenerateResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +48,7 @@ internal constructor(
     private val interactor: PortfolioInteractor,
     private val interactorCache: PortfolioInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
+    private val jsonParser: JsonParser,
 ) : AbstractViewModeler<PortfolioViewState>(state) {
 
   private var internalFullPortfolio: List<PortfolioStock> = emptyList()
@@ -211,6 +214,10 @@ internal constructor(
     // On delete, we don't need to re-fetch quotes from the network
   }
 
+  private fun handleOpenDelete(params: PortfolioRemoveParams) {
+    state.remove.value = params
+  }
+
   override fun registerSaveState(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
@@ -218,12 +225,23 @@ internal constructor(
         val s = state
 
         registry.registerProvider(KEY_SEARCH) { s.query.value }.also { add(it) }
+
+        registry
+            .registerProvider(KEY_REMOVE) { s.remove.value?.let { jsonParser.toJson(it.toJson()) } }
+            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
     val s = state
 
     registry.consumeRestored(KEY_SEARCH)?.let { it as String }?.also { s.query.value = it }
+
+    registry
+        .consumeRestored(KEY_REMOVE)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<PortfolioRemoveParams.Json>(it) }
+        ?.fromJson()
+        ?.also { handleOpenDelete(it) }
   }
 
   fun bind(
@@ -290,6 +308,19 @@ internal constructor(
     s.regeneratePortfolio(scope) { internalFullPortfolio }
   }
 
+  fun handleOpenDelete(stock: PortfolioStock) {
+    handleOpenDelete(
+        PortfolioRemoveParams(
+            symbol = stock.holding.symbol,
+            holdingId = stock.holding.id,
+        ),
+    )
+  }
+
+  fun handleCloseDelete() {
+    state.remove.value = null
+  }
+
   private data class PortfolioListGenerateResult(
       val portfolio: PortfolioStockList,
       override val all: List<PortfolioStock>,
@@ -297,6 +328,7 @@ internal constructor(
   ) : ListGenerateResult<PortfolioStock>
 
   companion object {
-    private const val KEY_SEARCH = "portfolio_search"
+    private const val KEY_SEARCH = "key_portfolio_search"
+    private const val KEY_REMOVE = "key_portfolio_remove_dialog"
   }
 }

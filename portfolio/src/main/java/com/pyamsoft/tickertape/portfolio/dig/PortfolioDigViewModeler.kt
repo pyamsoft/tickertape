@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
@@ -42,6 +43,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -266,10 +268,16 @@ internal constructor(
   }
 
   private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
-    // TODO handle offerUndo?
     val s = state
-    s.handlePositionListRegenOnSplitsUpdated(
-        positions = s.positions.value.filterNot { it.id == position.id })
+    if (offerUndo) {
+      Timber.d("Offer undo on position delete: $position")
+      s.recentlyDeletePosition.value = position
+    } else {
+      Timber.d("Mark position deleted: $position")
+      s.handlePositionListRegenOnSplitsUpdated(
+          positions = s.positions.value.filterNot { it.id == position.id },
+      )
+    }
   }
 
   private fun onSplitChangeEvent(event: SplitChangeEvent) {
@@ -484,6 +492,40 @@ internal constructor(
 
   fun handleCloseRec() {
     state.recommendedDig.value = null
+  }
+
+  fun handlePositionDeleteFinal() {
+    val deleted = state.recentlyDeletePosition.getAndUpdate { null }
+    if (deleted != null) {
+      onPostionDeleted(deleted, offerUndo = false)
+    }
+  }
+
+  fun handleRestoreDeletedPosition(scope: CoroutineScope) {
+    val deleted = state.recentlyDeletePosition.getAndUpdate { null }
+    if (deleted != null) {
+      scope.launch(context = Dispatchers.Main) {
+        interactor
+            .restorePosition(deleted)
+            .onFailure { Timber.e(it, "Error when restoring position: $deleted") }
+            .onSuccess { result ->
+              when (result) {
+                is DbInsert.InsertResult.Insert -> Timber.d("Position was restored: ${result.data}")
+                is DbInsert.InsertResult.Update ->
+                    Timber.d("Position was updated: ${result.data} from $deleted")
+                is DbInsert.InsertResult.Fail -> {
+                  Timber.e(result.error, "Failed to restore position: $deleted")
+                  // Caught by the onFailure below
+                  throw result.error
+                }
+              }
+            }
+            .onFailure {
+              Timber.e(it, "Failed to restore position")
+              // TODO handle position add error
+            }
+      }
+    }
   }
 
   companion object {

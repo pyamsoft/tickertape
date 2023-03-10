@@ -20,11 +20,13 @@ import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.ifNotCancellation
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionDeleteDao
+import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -36,11 +38,11 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioDigInteractorImpl
@@ -56,6 +58,7 @@ internal constructor(
     private val positionQueryDaoCache: PositionQueryDao.Cache,
     private val positionRealtime: PositionRealtime,
     private val positionDeleteDao: PositionDeleteDao,
+    private val positionInsertDao: PositionInsertDao,
     private val splitQueryDao: SplitQueryDao,
     private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val splitRealtime: SplitRealtime,
@@ -69,6 +72,21 @@ internal constructor(
         stockInteractor,
         stockInteractorCache,
     ) {
+
+  override suspend fun restorePosition(
+      position: DbPosition
+  ): ResultWrapper<DbInsert.InsertResult<DbPosition>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(positionInsertDao.insert(position))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to restore position: $position")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
 
   override suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {

@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
@@ -41,6 +42,11 @@ interface PortfolioDigInteractor : DigInteractor {
   @CheckResult suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding>
 
   @CheckResult suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>>
+
+  @CheckResult
+  suspend fun restorePosition(
+      position: DbPosition
+  ): ResultWrapper<DbInsert.InsertResult<DbPosition>>
 
   interface Cache : DigInteractor.Cache {
 

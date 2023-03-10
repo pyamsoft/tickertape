@@ -2,15 +2,22 @@ package com.pyamsoft.tickertape.portfolio.dig.position
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +29,7 @@ import com.pyamsoft.tickertape.portfolio.dig.PositionsPortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 @Composable
@@ -33,7 +41,10 @@ internal fun PositionScreen(
     onAddPosition: (DbHolding) -> Unit,
     onUpdatePosition: (DbPosition, DbHolding) -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
+    onPositionRestored: () -> Unit,
+    onPositionDeleteFinalized: () -> Unit,
 ) {
+
   val loadingState by state.loadingState.collectAsState()
   val positionError by state.positionsError.collectAsState()
   val holding by state.holding.collectAsState()
@@ -55,25 +66,73 @@ internal fun PositionScreen(
           modifier = Modifier.size(64.dp),
       )
     } else {
-      BaseDigListScreen(
+      Box(
           modifier = modifier,
-          label = "Add Position",
-          isAddVisible = isAddVisible,
-          items = positions,
-          isLoading = isLoading,
-          onRefresh = onRefresh,
-          onAddClicked = { onAddPosition(h) },
-          itemKey = { it.id.raw },
-      ) { position ->
-        PositionItem(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onUpdatePosition(position, h) },
-                        onLongClick = { onDeletePosition(position) },
-                    ),
-            position = position,
+          contentAlignment = Alignment.BottomCenter,
+      ) {
+        BaseDigListScreen(
+            label = "Add Position",
+            isAddVisible = isAddVisible,
+            items = positions,
+            isLoading = isLoading,
+            onRefresh = onRefresh,
+            onAddClicked = { onAddPosition(h) },
+            itemKey = { it.id.raw },
+        ) { position ->
+          PositionItem(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .combinedClickable(
+                          onClick = { onUpdatePosition(position, h) },
+                          onLongClick = { onDeletePosition(position) },
+                      ),
+              position = position,
+          )
+        }
+
+        PositionSnackbar(
+            state = state,
+            symbol = h.symbol,
+            onSnackbarDismissed = onPositionDeleteFinalized,
+            onSnackbarAction = onPositionRestored,
         )
+      }
+    }
+  }
+}
+
+@Composable
+private fun PositionSnackbar(
+    modifier: Modifier = Modifier,
+    state: PositionsPortfolioDigViewState,
+    symbol: StockSymbol,
+    onSnackbarDismissed: () -> Unit,
+    onSnackbarAction: () -> Unit,
+) {
+  val deleteUndoState = remember { SnackbarHostState() }
+  val undoable by state.recentlyDeletePosition.collectAsState()
+
+  SnackbarHost(
+      modifier = modifier,
+      hostState = deleteUndoState,
+  )
+
+  undoable?.also { u ->
+    LaunchedEffect(u) {
+      val snackbarResult =
+          deleteUndoState.showSnackbar(
+              message = "${symbol.raw} position removed",
+              duration = SnackbarDuration.Short,
+              actionLabel = "Undo",
+          )
+
+      when (snackbarResult) {
+        SnackbarResult.Dismissed -> {
+          onSnackbarDismissed()
+        }
+        SnackbarResult.ActionPerformed -> {
+          onSnackbarAction()
+        }
       }
     }
   }
@@ -98,6 +157,8 @@ private fun PreviewPositionScreen() {
         onRefresh = {},
         onDeletePosition = {},
         onUpdatePosition = { _, _ -> },
+        onPositionDeleteFinalized = {},
+        onPositionRestored = {},
     )
   }
 }

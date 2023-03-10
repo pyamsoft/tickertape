@@ -48,8 +48,8 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 @OptIn(ExperimentalPagerApi::class)
@@ -67,6 +67,8 @@ fun PortfolioDigScreen(
     onPositionAdd: (DbHolding) -> Unit,
     onPositionUpdate: (DbPosition, DbHolding) -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
+    onPositionDeleteFinalized: () -> Unit,
+    onPositionRestored: () -> Unit,
     // Splits
     onSplitAdd: (DbHolding) -> Unit,
     onSplitUpdated: (DbSplit, DbHolding) -> Unit,
@@ -141,6 +143,8 @@ fun PortfolioDigScreen(
                 onPositionAdd = onPositionAdd,
                 onPositionDelete = onPositionDelete,
                 onPositionUpdate = onPositionUpdate,
+                onPositionRestored = onPositionRestored,
+                onPositionDeleteFinalized = onPositionDeleteFinalized,
                 onSplitAdd = onSplitAdd,
                 onSplitDeleted = onSplitDeleted,
                 onSplitUpdated = onSplitUpdated,
@@ -175,6 +179,8 @@ private fun Content(
     onPositionAdd: (DbHolding) -> Unit,
     onPositionUpdate: (DbPosition, DbHolding) -> Unit,
     onPositionDelete: (DbPosition) -> Unit,
+    onPositionDeleteFinalized: () -> Unit,
+    onPositionRestored: () -> Unit,
     // Splits
     onSplitAdd: (DbHolding) -> Unit,
     onSplitUpdated: (DbSplit, DbHolding) -> Unit,
@@ -237,6 +243,8 @@ private fun Content(
             onAddPosition = onPositionAdd,
             onDeletePosition = onPositionDelete,
             onUpdatePosition = onPositionUpdate,
+            onPositionRestored = onPositionRestored,
+            onPositionDeleteFinalized = onPositionDeleteFinalized,
         )
       }
       PortfolioDigSections.STATISTICS -> {
@@ -311,6 +319,8 @@ private fun PreviewPortfolioDigScreen() {
       onPositionAdd = {},
       onPositionDelete = {},
       onPositionUpdate = { _, _ -> },
+      onPositionDeleteFinalized = {},
+      onPositionRestored = {},
       onSplitAdd = {},
       onSplitDeleted = {},
       onSplitUpdated = { _, _ -> },

@@ -2,6 +2,7 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.db.holding.DbHolding
+import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
@@ -24,6 +25,7 @@ interface BasePortfolioDigViewState : BaseDigViewState {
 
 @Stable
 interface PositionsPortfolioDigViewState : BasePortfolioDigViewState {
+  val recentlyDeletePosition: StateFlow<DbPosition?>
   val positions: StateFlow<List<PositionStock>>
   val positionsError: StateFlow<Throwable?>
 }
@@ -60,6 +62,7 @@ internal constructor(
 
   override val positionDialog = MutableStateFlow<PositionParams?>(null)
   override val positionsError = MutableStateFlow<Throwable?>(null)
+  override val recentlyDeletePosition = MutableStateFlow<DbPosition?>(null)
   override val positions: StateFlow<List<PositionStock>>
 
   private val realPositions = MutableStateFlow(emptyList<PositionStock>())

@@ -162,6 +162,8 @@ private fun PortfolioDigContent(
             position = it,
         )
       },
+      onPositionRestored = { viewModel.handleRestoreDeletedPosition(scope = scope) },
+      onPositionDeleteFinalized = { viewModel.handlePositionDeleteFinal() },
       onSplitAdd = { viewModel.handleOpenSplit(params, it) },
       onSplitUpdated = { s, h -> viewModel.handleOpenSplit(params, h, s) },
       onSplitDeleted = {

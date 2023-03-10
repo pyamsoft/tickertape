@@ -107,12 +107,6 @@ internal constructor(
         }
       }
 
-  private val positionDeleteRunner =
-      highlander<ResultWrapper<Boolean>, DbPosition> { interactor.deletePosition(it) }
-
-  private val splitDeleteRunner =
-      highlander<ResultWrapper<Boolean>, DbSplit> { interactor.deleteSplit(it) }
-
   @Suppress("ControlFlowWithEmptyBody")
   private val loadRunner =
       highlander<Unit, Boolean> { force ->
@@ -292,7 +286,8 @@ internal constructor(
         splits =
             insertOrUpdate(s.stockSplits.value, split) {
               it.holdingId == split.holdingId && it.id == split.id
-            })
+            },
+    )
   }
 
   private fun onSplitUpdated(split: DbSplit) {
@@ -394,8 +389,8 @@ internal constructor(
       split: DbSplit,
   ) {
     scope.launch(context = Dispatchers.Main) {
-      splitDeleteRunner
-          .call(split)
+      interactor
+          .deleteSplit(split)
           .onFailure { Timber.e(it, "Failed to delete split: $split") }
           .onSuccess { deleted ->
             if (deleted) {
@@ -412,8 +407,8 @@ internal constructor(
       position: DbPosition,
   ) {
     scope.launch(context = Dispatchers.Main) {
-      positionDeleteRunner
-          .call(position)
+      interactor
+          .deletePosition(position)
           .onFailure { Timber.e(it, "Failed to delete position: $position") }
           .onSuccess { deleted ->
             if (deleted) {

@@ -39,6 +39,7 @@ interface PortfolioDigViewState :
     DigViewState, PositionsPortfolioDigViewState, SplitsPortfolioDigViewState {
   val splitDialog: StateFlow<SplitParams?>
   val positionDialog: StateFlow<PositionParams?>
+  val recommendedDig: StateFlow<PortfolioDigParams?>
 }
 
 // Public for PortfolioDigViewModeler constructor
@@ -63,6 +64,8 @@ internal constructor(
 
   private val realPositions = MutableStateFlow(emptyList<PositionStock>())
   private val realSplit = MutableStateFlow(emptyList<DbSplit>())
+
+  override val recommendedDig = MutableStateFlow<PortfolioDigParams?>(null)
 
   init {
     positions = realPositions

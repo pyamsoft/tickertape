@@ -26,12 +26,16 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
+import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -314,6 +318,10 @@ internal constructor(
     state.positionDialog.value = params
   }
 
+  private fun handleOpenRec(params: PortfolioDigParams) {
+    state.recommendedDig.value = params
+  }
+
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
     if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
       return
@@ -342,6 +350,12 @@ internal constructor(
               s.positionDialog.value?.let { jsonParser.toJson(it.toJson()) }
             }
             .also { add(it) }
+
+        registry
+            .registerProvider(KEY_REC) {
+              s.recommendedDig.value?.let { jsonParser.toJson(it.toJson()) }
+            }
+            .also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
@@ -358,6 +372,13 @@ internal constructor(
         ?.let { jsonParser.fromJson<PositionParams.Json>(it) }
         ?.fromJson()
         ?.also { handleOpenPosition(it) }
+
+    registry
+        .consumeRestored(KEY_REC)
+        ?.let { it as String }
+        ?.let { jsonParser.fromJson<PortfolioDigParams.Json>(it) }
+        ?.fromJson()
+        ?.also { handleOpenRec(it) }
   }
 
   fun bind(scope: CoroutineScope) {
@@ -446,10 +467,35 @@ internal constructor(
     state.positionDialog.value = null
   }
 
+  fun handleRecClicked(ticker: Ticker) {
+    val quote = ticker.quote
+    var lookupSymbol: StockSymbol? = null
+    if (quote != null) {
+      if (quote.type == EquityType.OPTION) {
+        if (quote is StockOptionsQuote) {
+          lookupSymbol = quote.underlyingSymbol
+        }
+      }
+    }
+
+    handleOpenRec(
+        PortfolioDigParams(
+            symbol = ticker.symbol,
+            lookupSymbol = lookupSymbol,
+            currentPrice = quote?.currentSession?.price,
+        ),
+    )
+  }
+
+  fun handleCloseRec() {
+    state.recommendedDig.value = null
+  }
+
   companion object {
 
     private const val KEY_SPLIT_DIALOG = "key_split_dialog"
     private const val KEY_POSITION_DIALOG = "key_position_dialog"
+    private const val KEY_REC = "key_rec"
 
     @JvmStatic
     @CheckResult

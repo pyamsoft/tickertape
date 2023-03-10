@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
@@ -31,12 +30,8 @@ import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
-import com.pyamsoft.tickertape.db.holding.DbHolding
-import com.pyamsoft.tickertape.db.position.DbPosition
-import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionEntry
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitEntry
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import javax.inject.Inject
 
@@ -65,6 +60,37 @@ internal constructor(
 }
 
 @Composable
+internal fun PortfolioDigEntry(
+    modifier: Modifier = Modifier,
+    params: PortfolioDigParams,
+    onDismiss: () -> Unit,
+) {
+  val component = rememberComposableInjector { PortfolioDigInjector(params) }
+
+  val viewModel = rememberNotNull(component.viewModel)
+
+  val state = viewModel.state
+  val recDig by state.recommendedDig.collectAsState()
+
+  recDig.also { rec ->
+    if (rec == null) {
+      PortfolioDigContent(
+          modifier = modifier,
+          params = params,
+          component = component,
+          onDismiss = onDismiss,
+      )
+    } else {
+      PortfolioDigEntry(
+          modifier = modifier,
+          params = rec,
+          onDismiss = { viewModel.handleCloseRec() },
+      )
+    }
+  }
+}
+
+@Composable
 private fun MountHooks(
     viewModel: PortfolioDigViewModeler,
 ) {
@@ -81,62 +107,27 @@ private fun MountHooks(
 }
 
 @Composable
-internal fun PortfolioDigEntry(
+private fun PortfolioDigContent(
     modifier: Modifier = Modifier,
     params: PortfolioDigParams,
+    component: PortfolioDigInjector,
     onDismiss: () -> Unit,
 ) {
-  val component = rememberComposableInjector { PortfolioDigInjector(params) }
-
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
 
   val scope = rememberCoroutineScope()
 
-  val handlePositionAdd by rememberUpdatedState { holding: DbHolding ->
-    viewModel.handleOpenPosition(
-        params,
-        holding,
-    )
-  }
-
-  val handlePositionUpdate by rememberUpdatedState { position: DbPosition, holding: DbHolding ->
-    viewModel.handleOpenPosition(
-        params,
-        holding,
-        position,
-    )
-  }
-
-  val handleSplitAdd by rememberUpdatedState { holding: DbHolding ->
-    viewModel.handleOpenSplit(
-        params,
-        holding,
-    )
-  }
-
-  val handleSplitUpdate by rememberUpdatedState { split: DbSplit, holding: DbHolding ->
-    viewModel.handleOpenSplit(
-        params,
-        holding,
-        split,
-    )
-  }
-
-  val handleRecommendationClicked by rememberUpdatedState { ticker: Ticker ->
-    // TODO
-  }
-
   val state = viewModel.state
   val positionDialog by state.positionDialog.collectAsState()
   val splitDialog by state.splitDialog.collectAsState()
 
-  MountHooks(
-      viewModel = viewModel,
-  )
-
   BackHandler(
       onBack = onDismiss,
+  )
+
+  MountHooks(
+      viewModel = viewModel,
   )
 
   PortfolioDigScreen(
@@ -163,23 +154,23 @@ internal fun PortfolioDigEntry(
             force = true,
         )
       },
-      onPositionAdd = { handlePositionAdd(it) },
-      onPositionUpdate = { p, h -> handlePositionUpdate(p, h) },
+      onPositionAdd = { viewModel.handleOpenPosition(params, it) },
+      onPositionUpdate = { p, h -> viewModel.handleOpenPosition(params, h, p) },
       onPositionDelete = {
         viewModel.handleDeletePosition(
             scope = scope,
             position = it,
         )
       },
-      onSplitAdd = { handleSplitAdd(it) },
-      onSplitUpdated = { s, h -> handleSplitUpdate(s, h) },
+      onSplitAdd = { viewModel.handleOpenSplit(params, it) },
+      onSplitUpdated = { s, h -> viewModel.handleOpenSplit(params, h, s) },
       onSplitDeleted = {
         viewModel.handleDeleteSplit(
             scope = scope,
             split = it,
         )
       },
-      onRecClick = { handleRecommendationClicked(it) },
+      onRecClick = { viewModel.handleRecClicked(it) },
       onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
       onOptionExpirationDateChanged = {
         viewModel.handleOptionsExpirationDateChanged(

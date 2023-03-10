@@ -25,6 +25,7 @@ import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.HoldingRealtime
+import com.pyamsoft.tickertape.db.holding.queryById
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
@@ -34,14 +35,14 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioInteractorImpl
@@ -161,8 +162,7 @@ internal constructor(
           // First invalidate cache to be sure we are up to date
           holdingQueryDaoCache.invalidate()
 
-          // TODO move this query into the DAO layer
-          val holding = holdingQueryDao.query().firstOrNull { it.id == id }
+          val holding = holdingQueryDao.queryById(id)
           if (holding == null) {
             val err = IllegalStateException("Holding does not exist in DB: $id")
             Timber.e(err)

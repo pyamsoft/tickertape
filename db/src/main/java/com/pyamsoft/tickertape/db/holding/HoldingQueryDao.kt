@@ -16,9 +16,15 @@
 
 package com.pyamsoft.tickertape.db.holding
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.DbQuery
 
 interface HoldingQueryDao : DbQuery<DbHolding> {
 
   interface Cache : DbQuery.Cache
+}
+
+@CheckResult
+suspend fun HoldingQueryDao.queryById(id: DbHolding.Id): DbHolding? {
+  return this.query().firstOrNull { it.id == id }
 }

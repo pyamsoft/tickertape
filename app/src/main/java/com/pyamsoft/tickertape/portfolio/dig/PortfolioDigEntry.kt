@@ -173,6 +173,8 @@ private fun PortfolioDigContent(
             split = it,
         )
       },
+      onSplitRestored = { viewModel.handleRestoreDeletedSplit(scope = scope) },
+      onSplitDeleteFinalized = { viewModel.handleSplitDeleteFinal() },
       onRecClick = { viewModel.handleRecClicked(it) },
       onOptionSectionChanged = { viewModel.handleOptionsSectionChanged(it) },
       onOptionExpirationDateChanged = {

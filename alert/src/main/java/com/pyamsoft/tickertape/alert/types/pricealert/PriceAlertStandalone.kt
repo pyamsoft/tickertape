@@ -28,13 +28,13 @@ import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 class PriceAlertStandalone

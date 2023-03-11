@@ -45,9 +45,9 @@ import com.pyamsoft.pydroid.ui.util.stabilized
 import com.pyamsoft.tickertape.ui.icon.Paid
 import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
-import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import timber.log.Timber
 
 @Composable
 internal fun BasePositionPopup(

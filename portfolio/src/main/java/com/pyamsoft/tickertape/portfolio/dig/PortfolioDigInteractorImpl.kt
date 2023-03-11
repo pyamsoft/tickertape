@@ -39,11 +39,11 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioDigInteractorImpl

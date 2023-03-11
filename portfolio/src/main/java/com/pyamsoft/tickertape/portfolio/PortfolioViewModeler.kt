@@ -35,11 +35,11 @@ import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.fromJson
 import com.pyamsoft.tickertape.ui.ListGenerateResult
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject

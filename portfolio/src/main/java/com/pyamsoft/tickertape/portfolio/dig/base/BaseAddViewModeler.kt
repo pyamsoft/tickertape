@@ -20,9 +20,9 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.IdType
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import java.time.LocalDate
 
 abstract class BaseAddViewModeler<S : UiViewState, Id : IdType>
 protected constructor(

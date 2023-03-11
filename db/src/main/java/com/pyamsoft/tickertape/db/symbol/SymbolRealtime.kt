@@ -18,5 +18,4 @@ package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.tickertape.db.DbRealtime
 
-@Deprecated("Don't use")
-interface SymbolRealtime : DbRealtime<SymbolChangeEvent>
+@Deprecated("Don't use") interface SymbolRealtime : DbRealtime<SymbolChangeEvent>

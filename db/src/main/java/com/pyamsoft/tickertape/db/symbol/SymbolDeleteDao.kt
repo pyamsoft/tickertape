@@ -18,5 +18,4 @@ package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.tickertape.db.DbDelete
 
-@Deprecated("Don't use")
-interface SymbolDeleteDao : DbDelete<DbSymbol>
+@Deprecated("Don't use") interface SymbolDeleteDao : DbDelete<DbSymbol>

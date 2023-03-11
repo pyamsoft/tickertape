@@ -21,6 +21,5 @@ import com.pyamsoft.tickertape.db.DbQuery
 @Deprecated("Don't use")
 interface SymbolQueryDao : DbQuery<DbSymbol> {
 
-  @Deprecated("Don't use")
-  interface Cache : DbQuery.Cache
+  @Deprecated("Don't use") interface Cache : DbQuery.Cache
 }

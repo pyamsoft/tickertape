@@ -35,15 +35,15 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import java.time.Clock
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.Clock
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioInteractorImpl

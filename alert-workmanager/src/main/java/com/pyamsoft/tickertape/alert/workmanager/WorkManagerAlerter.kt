@@ -36,10 +36,6 @@ import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.PriceAlertWorker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
@@ -48,6 +44,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 internal class WorkManagerAlerter

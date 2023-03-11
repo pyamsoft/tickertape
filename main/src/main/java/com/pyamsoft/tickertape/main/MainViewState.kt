@@ -20,9 +20,9 @@ import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
 @Stable
 interface MainViewState : UiViewState {

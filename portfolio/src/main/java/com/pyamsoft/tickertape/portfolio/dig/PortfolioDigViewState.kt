@@ -11,10 +11,10 @@ import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.quote.dig.SplitParams
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.Clock
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface BasePortfolioDigViewState : BaseDigViewState {

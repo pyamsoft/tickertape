@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface PositionAddViewState : UiViewState {

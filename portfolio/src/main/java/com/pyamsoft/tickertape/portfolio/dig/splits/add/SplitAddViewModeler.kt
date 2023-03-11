@@ -26,14 +26,14 @@ import com.pyamsoft.tickertape.db.split.JsonMappableDbSplit
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.api.asShares
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SplitAddViewModeler
 @Inject

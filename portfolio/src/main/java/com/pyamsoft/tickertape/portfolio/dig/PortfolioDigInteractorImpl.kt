@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.db.position.PositionRealtime
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitDeleteDao
+import com.pyamsoft.tickertape.db.split.SplitInsertDao
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
@@ -63,6 +64,7 @@ internal constructor(
     private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val splitRealtime: SplitRealtime,
     private val splitDeleteDao: SplitDeleteDao,
+    private val splitInsertDao: SplitInsertDao,
 ) :
     PortfolioDigInteractor,
     PortfolioDigInteractor.Cache,
@@ -83,6 +85,19 @@ internal constructor(
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Failed to restore position: $position")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
+
+  override suspend fun restoreSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+        return@withContext try {
+          ResultWrapper.success(splitInsertDao.insert(split))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to restore split: $split")
             ResultWrapper.failure(e)
           }
         }

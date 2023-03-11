@@ -71,6 +71,7 @@ internal fun PositionScreen(
           contentAlignment = Alignment.BottomCenter,
       ) {
         BaseDigListScreen(
+            modifier = Modifier.matchParentSize(),
             label = "Add Position",
             isAddVisible = isAddVisible,
             items = positions,

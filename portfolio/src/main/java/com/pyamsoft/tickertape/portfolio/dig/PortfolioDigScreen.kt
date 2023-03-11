@@ -48,8 +48,8 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import java.time.LocalDate
 import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
 
 @Composable
 @OptIn(ExperimentalPagerApi::class)
@@ -73,6 +73,8 @@ fun PortfolioDigScreen(
     onSplitAdd: (DbHolding) -> Unit,
     onSplitUpdated: (DbSplit, DbHolding) -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
+    onSplitDeleteFinalized: () -> Unit,
+    onSplitRestored: () -> Unit,
     // Recommendations
     onRecClick: (Ticker) -> Unit,
     // Options
@@ -148,6 +150,8 @@ fun PortfolioDigScreen(
                 onSplitAdd = onSplitAdd,
                 onSplitDeleted = onSplitDeleted,
                 onSplitUpdated = onSplitUpdated,
+                onSplitRestored = onSplitRestored,
+                onSplitDeleteFinalized = onSplitDeleteFinalized,
                 onRecClick = onRecClick,
                 onOptionSectionChanged = onOptionSectionChanged,
                 onOptionExpirationDateChanged = onOptionExpirationDateChanged,
@@ -185,6 +189,8 @@ private fun Content(
     onSplitAdd: (DbHolding) -> Unit,
     onSplitUpdated: (DbSplit, DbHolding) -> Unit,
     onSplitDeleted: (DbSplit) -> Unit,
+    onSplitDeleteFinalized: () -> Unit,
+    onSplitRestored: () -> Unit,
     // Recommendations
     onRecClick: (Ticker) -> Unit,
     // Options
@@ -262,6 +268,8 @@ private fun Content(
             onAddSplit = onSplitAdd,
             onDeleteSplit = onSplitDeleted,
             onUpdateSplit = onSplitUpdated,
+            onSplitRestored = onSplitRestored,
+            onSplitDeleteFinalized = onSplitDeleteFinalized,
         )
       }
       PortfolioDigSections.RECOMMENDATIONS -> {
@@ -324,6 +332,8 @@ private fun PreviewPortfolioDigScreen() {
       onSplitAdd = {},
       onSplitDeleted = {},
       onSplitUpdated = { _, _ -> },
+      onSplitRestored = {},
+      onSplitDeleteFinalized = {},
       onRecClick = {},
       onOptionExpirationDateChanged = {},
       onOptionSectionChanged = {},

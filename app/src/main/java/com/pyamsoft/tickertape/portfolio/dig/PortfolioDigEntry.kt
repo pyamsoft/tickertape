@@ -72,6 +72,11 @@ internal fun PortfolioDigEntry(
   val state = viewModel.state
   val recDig by state.recommendedDig.collectAsState()
 
+  // Always run the mount hooks as this handles the VM save state
+  MountHooks(
+      viewModel = viewModel,
+  )
+
   recDig.also { rec ->
     if (rec == null) {
       PortfolioDigContent(
@@ -124,10 +129,6 @@ private fun PortfolioDigContent(
 
   BackHandler(
       onBack = onDismiss,
-  )
-
-  MountHooks(
-      viewModel = viewModel,
   )
 
   PortfolioDigScreen(

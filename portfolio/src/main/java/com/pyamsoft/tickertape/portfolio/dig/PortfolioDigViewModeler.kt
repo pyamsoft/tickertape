@@ -43,6 +43,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -226,7 +227,7 @@ internal constructor(
 
   private fun onPositionChangeEvent(event: PositionChangeEvent) {
     return when (event) {
-      is PositionChangeEvent.Delete -> onPostionDeleted(event.position, event.offerUndo)
+      is PositionChangeEvent.Delete -> onPositionDeleted(event.position, event.offerUndo)
       is PositionChangeEvent.Insert -> onPositionInserted(event.position)
       is PositionChangeEvent.Update -> onPositionUpdated(event.position)
     }
@@ -267,7 +268,7 @@ internal constructor(
     }
   }
 
-  private fun onPostionDeleted(position: DbPosition, offerUndo: Boolean) {
+  private fun onPositionDeleted(position: DbPosition, offerUndo: Boolean) {
     val s = state
     if (offerUndo) {
       Timber.d("Offer undo on position delete: $position")
@@ -307,10 +308,15 @@ internal constructor(
   }
 
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
-    // TODO handle offerUndo?
     val s = state
-    s.handlePositionListRegenOnSplitsUpdated(
-        splits = s.stockSplits.value.filterNot { it.id == split.id })
+    if (offerUndo) {
+      Timber.d("Offer undo on split delete: $split")
+      s.recentlyDeleteSplit.value = split
+    } else {
+      s.handlePositionListRegenOnSplitsUpdated(
+          splits = s.stockSplits.value.filterNot { it.id == split.id },
+      )
+    }
   }
 
   private fun handleOpenSplit(params: SplitParams) {
@@ -323,6 +329,45 @@ internal constructor(
 
   private fun handleOpenRec(params: PortfolioDigParams) {
     state.recommendedDig.value = params
+  }
+
+  private fun <T : Any> handleDeleteFinal(
+      recentlyDeleted: MutableStateFlow<T?>,
+      onDeleted: (T) -> Unit
+  ) {
+    val deleted = recentlyDeleted.getAndUpdate { null }
+    if (deleted != null) {
+      onDeleted(deleted)
+    }
+  }
+
+  private fun <T : Any> handleRestoreDeleted(
+      scope: CoroutineScope,
+      recentlyDeleted: MutableStateFlow<T?>,
+      restore: suspend (T) -> ResultWrapper<DbInsert.InsertResult<T>>
+  ) {
+    val deleted = recentlyDeleted.getAndUpdate { null }
+    if (deleted != null) {
+      scope.launch(context = Dispatchers.Main) {
+        restore(deleted)
+            .onFailure { Timber.e(it, "Error when restoring $deleted") }
+            .onSuccess { result ->
+              when (result) {
+                is DbInsert.InsertResult.Insert -> Timber.d("Restored: ${result.data}")
+                is DbInsert.InsertResult.Update -> Timber.d("Updated: ${result.data} from $deleted")
+                is DbInsert.InsertResult.Fail -> {
+                  Timber.e(result.error, "Failed to restore: $deleted")
+                  // Caught by the onFailure below
+                  throw result.error
+                }
+              }
+            }
+            .onFailure {
+              Timber.e(it, "Failed to restore")
+              // TODO handle restore error
+            }
+      }
+    }
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
@@ -340,6 +385,10 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
+
+        // We need the extra composeHash here so that each new PDE instance can keep its own data
+        // without overriding the others
+
         val s = state
 
         registry
@@ -362,6 +411,10 @@ internal constructor(
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
+
+    // We need the extra composeHash here so that each new PDE instance can keep its own data
+    // without overriding the others
+
     registry
         .consumeRestored(KEY_SPLIT_DIALOG)
         ?.let { it as String }
@@ -495,36 +548,28 @@ internal constructor(
   }
 
   fun handlePositionDeleteFinal() {
-    val deleted = state.recentlyDeletePosition.getAndUpdate { null }
-    if (deleted != null) {
-      onPostionDeleted(deleted, offerUndo = false)
-    }
+    handleDeleteFinal(state.recentlyDeletePosition) { onPositionDeleted(it, offerUndo = false) }
   }
 
   fun handleRestoreDeletedPosition(scope: CoroutineScope) {
-    val deleted = state.recentlyDeletePosition.getAndUpdate { null }
-    if (deleted != null) {
-      scope.launch(context = Dispatchers.Main) {
-        interactor
-            .restorePosition(deleted)
-            .onFailure { Timber.e(it, "Error when restoring position: $deleted") }
-            .onSuccess { result ->
-              when (result) {
-                is DbInsert.InsertResult.Insert -> Timber.d("Position was restored: ${result.data}")
-                is DbInsert.InsertResult.Update ->
-                    Timber.d("Position was updated: ${result.data} from $deleted")
-                is DbInsert.InsertResult.Fail -> {
-                  Timber.e(result.error, "Failed to restore position: $deleted")
-                  // Caught by the onFailure below
-                  throw result.error
-                }
-              }
-            }
-            .onFailure {
-              Timber.e(it, "Failed to restore position")
-              // TODO handle position add error
-            }
-      }
+    handleRestoreDeleted(
+        scope = scope,
+        recentlyDeleted = state.recentlyDeletePosition,
+    ) {
+      interactor.restorePosition(it)
+    }
+  }
+
+  fun handleSplitDeleteFinal() {
+    handleDeleteFinal(state.recentlyDeleteSplit) { onSplitDeleted(it, offerUndo = false) }
+  }
+
+  fun handleRestoreDeletedSplit(scope: CoroutineScope) {
+    handleRestoreDeleted(
+        scope = scope,
+        recentlyDeleted = state.recentlyDeleteSplit,
+    ) {
+      interactor.restoreSplit(it)
     }
   }
 

@@ -48,6 +48,9 @@ interface PortfolioDigInteractor : DigInteractor {
       position: DbPosition
   ): ResultWrapper<DbInsert.InsertResult<DbPosition>>
 
+  @CheckResult
+  suspend fun restoreSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>>
+
   interface Cache : DigInteractor.Cache {
 
     suspend fun invalidateSplits()

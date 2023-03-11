@@ -26,12 +26,15 @@ interface BasePortfolioDigViewState : BaseDigViewState {
 @Stable
 interface PositionsPortfolioDigViewState : BasePortfolioDigViewState {
   val recentlyDeletePosition: StateFlow<DbPosition?>
+
   val positions: StateFlow<List<PositionStock>>
   val positionsError: StateFlow<Throwable?>
 }
 
 @Stable
 interface SplitsPortfolioDigViewState : BasePortfolioDigViewState {
+  val recentlyDeleteSplit: StateFlow<DbSplit?>
+
   val stockSplits: StateFlow<List<DbSplit>>
   val stockSplitError: StateFlow<Throwable?>
 }
@@ -53,6 +56,7 @@ internal constructor(
 ) : MutableDigViewState(params.symbol), PortfolioDigViewState {
   override val section = MutableStateFlow(PortfolioDigSections.POSITIONS)
 
+  override val recentlyDeleteSplit = MutableStateFlow<DbSplit?>(null)
   override val splitDialog = MutableStateFlow<SplitParams?>(null)
   override val stockSplitError = MutableStateFlow<Throwable?>(null)
   override val stockSplits: StateFlow<List<DbSplit>>

@@ -270,14 +270,13 @@ internal constructor(
 
   private fun onPositionDeleted(position: DbPosition, offerUndo: Boolean) {
     val s = state
+    s.handlePositionListRegenOnSplitsUpdated(
+        positions = s.positions.value.filterNot { it.id == position.id },
+    )
+
     if (offerUndo) {
       Timber.d("Offer undo on position delete: $position")
       s.recentlyDeletePosition.value = position
-    } else {
-      Timber.d("Mark position deleted: $position")
-      s.handlePositionListRegenOnSplitsUpdated(
-          positions = s.positions.value.filterNot { it.id == position.id },
-      )
     }
   }
 
@@ -309,13 +308,13 @@ internal constructor(
 
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
     val s = state
+    s.handlePositionListRegenOnSplitsUpdated(
+        splits = s.stockSplits.value.filterNot { it.id == split.id },
+    )
+
     if (offerUndo) {
       Timber.d("Offer undo on split delete: $split")
       s.recentlyDeleteSplit.value = split
-    } else {
-      s.handlePositionListRegenOnSplitsUpdated(
-          splits = s.stockSplits.value.filterNot { it.id == split.id },
-      )
     }
   }
 

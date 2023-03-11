@@ -33,6 +33,7 @@ import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionEntry
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitEntry
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
+import java.time.Clock
 import javax.inject.Inject
 
 internal class PortfolioDigInjector
@@ -42,6 +43,7 @@ internal constructor(
 ) : ComposableInjector() {
 
   @JvmField @Inject internal var viewModel: PortfolioDigViewModeler? = null
+  @JvmField @Inject internal var clock: Clock? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
   override fun onInject(activity: FragmentActivity) {
@@ -56,6 +58,7 @@ internal constructor(
   override fun onDispose() {
     viewModel = null
     imageLoader = null
+    clock = null
   }
 }
 
@@ -120,6 +123,7 @@ private fun PortfolioDigContent(
 ) {
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
+  val clock = rememberNotNull(component.clock)
 
   val scope = rememberCoroutineScope()
 
@@ -133,6 +137,7 @@ private fun PortfolioDigContent(
 
   PortfolioDigScreen(
       modifier = modifier,
+      clock = clock,
       state = state,
       imageLoader = imageLoader,
       onClose = onDismiss,

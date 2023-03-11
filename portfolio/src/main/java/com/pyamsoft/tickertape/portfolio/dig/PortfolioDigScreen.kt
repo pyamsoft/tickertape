@@ -44,17 +44,20 @@ import com.pyamsoft.tickertape.quote.dig.options.DigOptionsChain
 import com.pyamsoft.tickertape.quote.dig.pricealert.DigPriceAlerts
 import com.pyamsoft.tickertape.quote.dig.recommend.DigRecommendations
 import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.flow.collectLatest
+import java.time.Clock
 import java.time.LocalDate
 
 @Composable
 @OptIn(ExperimentalPagerApi::class)
 fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
+    clock: Clock,
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
     onClose: () -> Unit,
@@ -135,6 +138,7 @@ fun PortfolioDigScreen(
           BaseDigViewState.LoadingState.DONE -> {
             Content(
                 modifier = Modifier.fillMaxSize(),
+                clock = clock,
                 state = state,
                 imageLoader = imageLoader,
                 pagerState = pagerState,
@@ -170,6 +174,7 @@ fun PortfolioDigScreen(
 @OptIn(ExperimentalPagerApi::class)
 private fun Content(
     modifier: Modifier = Modifier,
+    clock: Clock,
     state: PortfolioDigViewState,
     imageLoader: ImageLoader,
     pagerState: PagerState,
@@ -244,6 +249,7 @@ private fun Content(
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
             modifier = Modifier.fillMaxSize(),
+            clock = clock,
             state = state,
             onRefresh = onRefresh,
             onAddPosition = onPositionAdd,
@@ -308,8 +314,11 @@ private fun Loading(
 @Preview
 @Composable
 private fun PreviewPortfolioDigScreen() {
-  val symbol = "MSFT".asSymbol()
+  val symbol = TestSymbol
+  val clock = TestClock
+
   PortfolioDigScreen(
+      clock = clock,
       state =
           MutablePortfolioDigViewState(
               params =
@@ -317,6 +326,7 @@ private fun PreviewPortfolioDigScreen() {
                       symbol = symbol,
                       lookupSymbol = null,
                   ),
+              clock = clock,
           ),
       imageLoader = createNewTestImageLoader(),
       onClose = {},

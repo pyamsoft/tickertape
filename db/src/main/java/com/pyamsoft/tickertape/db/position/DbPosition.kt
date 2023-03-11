@@ -117,17 +117,11 @@ fun DbPosition.shareCountWithSplits(splits: List<DbSplit>): StockShareValue {
 }
 
 @CheckResult
-@JvmOverloads
-fun DbPosition.isShortTerm(
-    now: LocalDate = LocalDate.now(),
-): Boolean {
-  return this.purchaseDate.isShortTermPurchase(now)
+fun DbPosition.isShortTerm(time: LocalDate): Boolean {
+  return this.purchaseDate.isShortTermPurchase(time)
 }
 
 @CheckResult
-@JvmOverloads
-fun DbPosition.isLongTerm(
-    now: LocalDate = LocalDate.now(),
-): Boolean {
-  return this.purchaseDate.isLongTermPurchase(now)
+fun DbPosition.isLongTerm(time: LocalDate): Boolean {
+  return this.purchaseDate.isLongTermPurchase(time)
 }

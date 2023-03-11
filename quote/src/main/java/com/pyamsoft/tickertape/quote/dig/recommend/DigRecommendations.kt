@@ -32,8 +32,9 @@ import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigDefaults
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.RecommendationDigViewState
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 fun DigRecommendations(
@@ -158,11 +159,15 @@ private fun RecommendationItem(
 @Preview
 @Composable
 private fun PreviewDigRecommendations() {
+  val symbol = TestSymbol
+  val clock = TestClock
+
   DigRecommendations(
       state =
           object :
               MutableDigViewState(
-                  symbol = "MSFT".asSymbol(),
+                  symbol = symbol,
+                  clock = clock,
               ) {},
       onRefresh = {},
       onRecClick = {},

@@ -36,6 +36,7 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.stocks.api.asShares
+import java.time.Clock
 import java.time.LocalDate
 
 private const val NO_POSITION = 0.0
@@ -43,6 +44,7 @@ private const val NO_POSITION = 0.0
 @Stable
 data class PortfolioStock
 internal constructor(
+    private val clock: Clock,
     val holding: DbHolding,
     val positions: List<DbPosition>,
     val ticker: Ticker?,
@@ -145,7 +147,7 @@ internal constructor(
       shortTermPositions = 0
       longTermPositions = 0
     } else {
-      val today = LocalDate.now()
+      val today = LocalDate.now(clock)
       shortTermPositions = positions.count { it.isShortTerm(today) }
       longTermPositions = positions.count { it.isLongTerm(today) }
     }

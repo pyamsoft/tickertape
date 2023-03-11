@@ -41,6 +41,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -60,6 +61,7 @@ internal constructor(
     private val splitQueryDaoCache: SplitQueryDao.Cache,
     private val interactor: TickerInteractor,
     private val interactorCache: TickerInteractor.Cache,
+    private val clock: Clock,
 ) : PortfolioInteractor, PortfolioInteractor.Cache {
 
   override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
@@ -123,6 +125,7 @@ internal constructor(
                             positions = holdingPositions,
                             ticker = quote,
                             splits = holdingSplits,
+                            clock = clock,
                         )
                     result.add(stock)
                   }

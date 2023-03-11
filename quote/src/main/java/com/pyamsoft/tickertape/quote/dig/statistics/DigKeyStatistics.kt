@@ -17,7 +17,8 @@ import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.StatisticsDigViewState
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.quote.test.TestSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 fun DigKeyStatistics(
@@ -70,11 +71,15 @@ fun DigKeyStatistics(
 @Preview
 @Composable
 private fun PreviewDigKeyStatistics() {
+  val symbol = TestSymbol
+  val clock = TestClock
+
   DigKeyStatistics(
       state =
           object :
               MutableDigViewState(
-                  symbol = "MSFT".asSymbol(),
+                  symbol = symbol,
+                  clock = clock,
               ) {},
       onRefresh = {},
   )

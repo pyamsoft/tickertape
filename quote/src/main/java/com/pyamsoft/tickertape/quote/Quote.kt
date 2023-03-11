@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -16,11 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -105,21 +103,18 @@ fun Quote(
 @Preview
 @Composable
 private fun PreviewQuote() {
-  val symbol = "MSFT".asSymbol()
-  PreviewTickerTapeTheme {
-    Surface {
-      Quote(
-          modifier = Modifier.padding(16.dp),
-          symbol = symbol,
-          ticker =
-              Ticker(
-                  symbol = symbol,
-                  quote = newTestQuote(symbol),
-                  chart = null,
-              ),
-          onClick = {},
-          onLongClick = {},
-      )
-    }
-  }
+  val symbol = TestSymbol
+
+  Quote(
+      modifier = Modifier.padding(16.dp),
+      symbol = symbol,
+      ticker =
+          Ticker(
+              symbol = symbol,
+              quote = newTestQuote(symbol),
+              chart = null,
+          ),
+      onClick = {},
+      onLongClick = {},
+  )
 }

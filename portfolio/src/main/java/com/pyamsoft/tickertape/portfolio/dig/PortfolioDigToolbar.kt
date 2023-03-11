@@ -38,9 +38,10 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.isIndex
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -209,7 +210,9 @@ private fun PortfolioTab(
 @Composable
 @OptIn(ExperimentalPagerApi::class)
 private fun PreviewPortfolioDigToolbar() {
-  val symbol = "MSFT".asSymbol()
+  val symbol = TestSymbol
+  val clock = TestClock
+
   val state =
       MutablePortfolioDigViewState(
           params =
@@ -217,6 +220,7 @@ private fun PreviewPortfolioDigToolbar() {
                   symbol = symbol,
                   lookupSymbol = null,
               ),
+          clock = clock,
       )
   val holding by state.holding.collectAsState()
 

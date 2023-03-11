@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -18,11 +17,12 @@ import com.pyamsoft.tickertape.portfolio.test.newTestHolding
 import com.pyamsoft.tickertape.quote.Quote
 import com.pyamsoft.tickertape.quote.QuoteScope
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
 import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 @JvmOverloads
@@ -153,23 +153,24 @@ private fun QuoteScope.PositionData(
 @Preview
 @Composable
 private fun PreviewPortfolioItem() {
-  val symbol = "MSFT".asSymbol()
-  Surface {
-    PortfolioItem(
-        stock =
-            PortfolioStock(
-                holding = newTestHolding(symbol),
-                positions = emptyList(),
-                ticker =
-                    Ticker(
-                        symbol = symbol,
-                        quote = newTestQuote(symbol),
-                        chart = null,
-                    ),
-                splits = emptyList(),
-            ),
-        onSelect = {},
-        onDelete = {},
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  PortfolioItem(
+      stock =
+          PortfolioStock(
+              holding = newTestHolding(symbol),
+              positions = emptyList(),
+              ticker =
+                  Ticker(
+                      symbol = symbol,
+                      quote = newTestQuote(symbol),
+                      chart = null,
+                  ),
+              splits = emptyList(),
+              clock = clock,
+          ),
+      onSelect = {},
+      onDelete = {},
+  )
 }

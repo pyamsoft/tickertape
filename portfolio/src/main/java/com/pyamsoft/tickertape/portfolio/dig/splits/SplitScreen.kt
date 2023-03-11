@@ -11,7 +11,6 @@ import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,8 +28,9 @@ import com.pyamsoft.tickertape.portfolio.dig.SplitsPortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -141,24 +141,25 @@ private fun SplitSnackbar(
 @Preview
 @Composable
 private fun PreviewSplitScreen() {
-  val symbol = "MSFT".asSymbol()
-  Surface {
-    SplitScreen(
-        modifier = Modifier.fillMaxSize(),
-        state =
-            MutablePortfolioDigViewState(
-                params =
-                    PortfolioDigParams(
-                        symbol = symbol,
-                        lookupSymbol = null,
-                    ),
-            ),
-        onAddSplit = {},
-        onRefresh = {},
-        onDeleteSplit = {},
-        onUpdateSplit = { _, _ -> },
-        onSplitDeleteFinalized = {},
-        onSplitRestored = {},
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  SplitScreen(
+      modifier = Modifier.fillMaxSize(),
+      state =
+          MutablePortfolioDigViewState(
+              params =
+                  PortfolioDigParams(
+                      symbol = symbol,
+                      lookupSymbol = null,
+                  ),
+              clock = clock,
+          ),
+      onAddSplit = {},
+      onRefresh = {},
+      onDeleteSplit = {},
+      onUpdateSplit = { _, _ -> },
+      onSplitDeleteFinalized = {},
+      onSplitRestored = {},
+  )
 }

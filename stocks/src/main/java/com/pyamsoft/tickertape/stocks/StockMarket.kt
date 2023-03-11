@@ -1,6 +1,7 @@
 package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
+import java.time.Clock
 import java.time.DayOfWeek
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -26,9 +27,9 @@ object StockMarket {
 
   @JvmStatic
   @CheckResult
-  fun isOpen(): Boolean {
+  fun isOpen(clock: Clock): Boolean {
     // NYSE decides if the market is "open"
-    val marketTime = ZonedDateTime.now(ZoneId.of("America/New_York"))
+    val marketTime = ZonedDateTime.now(clock.withZone(ZoneId.of("America/New_York")))
 
     // Weekend, no market
     if (marketTime.dayOfWeek.isWeekend()) {

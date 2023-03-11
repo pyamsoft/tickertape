@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,16 +32,18 @@ import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
 import com.pyamsoft.tickertape.ui.PurchaseDateTag
+import com.pyamsoft.tickertape.ui.test.TestClock
+import java.time.Clock
+import java.time.LocalDate
 
 @Composable
 @JvmOverloads
 internal fun PositionItem(
     modifier: Modifier = Modifier,
     position: PositionStock,
+    clock: Clock,
 ) {
-
   BorderCard(
       modifier = modifier,
   ) {
@@ -62,6 +63,7 @@ internal fun PositionItem(
             PurchaseDate(
                 modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
                 position = position,
+                clock = clock,
             )
             NumberOfShares(
                 position = position,
@@ -134,6 +136,7 @@ private fun CurrentPosition(
 private fun QuoteScope.PurchaseDate(
     modifier: Modifier = Modifier,
     position: DbPosition,
+    clock: Clock,
 ) {
   val displayPurchaseDate =
       remember(position) { position.purchaseDate.format(DATE_FORMATTER.get().requireNotNull()) }
@@ -149,6 +152,7 @@ private fun QuoteScope.PurchaseDate(
     PurchaseDateTag(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
         purchaseDate = position.purchaseDate,
+        now = LocalDate.now(clock),
     )
   }
 }
@@ -264,19 +268,18 @@ private fun QuoteScope.NumberOfShares(
 @Preview
 @Composable
 private fun PreviewPositionItem() {
-  PreviewTickerTapeTheme {
-    Surface {
-      PositionItem(
-          modifier = Modifier.padding(16.dp),
-          position =
-              PositionStock(
-                  position = newTestPosition(),
-                  equityType = EquityType.STOCK,
-                  tradeSide = TradeSide.BUY,
-                  currentPrice = 25.0.asMoney(),
-                  splits = emptyList(),
-              ),
-      )
-    }
-  }
+  val clock = TestClock
+
+  PositionItem(
+      modifier = Modifier.padding(16.dp),
+      position =
+          PositionStock(
+              position = newTestPosition(clock),
+              equityType = EquityType.STOCK,
+              tradeSide = TradeSide.BUY,
+              currentPrice = 25.0.asMoney(),
+              splits = emptyList(),
+          ),
+      clock = clock,
+  )
 }

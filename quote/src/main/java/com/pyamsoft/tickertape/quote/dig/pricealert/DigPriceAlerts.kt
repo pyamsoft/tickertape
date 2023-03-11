@@ -15,7 +15,8 @@ import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.PriceAlertDigViewState
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.quote.test.TestSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -60,11 +61,15 @@ fun DigPriceAlerts(
 @Preview
 @Composable
 private fun PreviewDigPriceAlerts() {
+  val symbol = TestSymbol
+  val clock = TestClock
+
   DigPriceAlerts(
       state =
           object :
               MutableDigViewState(
-                  symbol = "MSFT".asSymbol(),
+                  symbol = symbol,
+                  clock = clock,
               ) {},
       onRefresh = {},
       onAddPriceAlert = {},

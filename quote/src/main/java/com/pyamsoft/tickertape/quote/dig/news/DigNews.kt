@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,11 +34,11 @@ import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.NewsDigViewState
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockNews
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 
 @Composable
@@ -191,18 +190,18 @@ private fun NewsItem(
 @Preview
 @Composable
 private fun PreviewDigNews() {
-  PreviewTickerTapeTheme {
-    Surface {
-      DigNews(
-          modifier = Modifier.padding(16.dp),
-          state =
-              object :
-                  MutableDigViewState(
-                      symbol = "MSFT".asSymbol(),
-                  ) {},
-          onRefresh = {},
-          imageLoader = createNewTestImageLoader(),
-      )
-    }
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  DigNews(
+      modifier = Modifier.padding(16.dp),
+      state =
+          object :
+              MutableDigViewState(
+                  symbol = symbol,
+                  clock = clock,
+              ) {},
+      onRefresh = {},
+      imageLoader = createNewTestImageLoader(),
+  )
 }

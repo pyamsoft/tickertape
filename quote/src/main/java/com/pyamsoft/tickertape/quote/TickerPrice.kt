@@ -16,10 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.MarketState
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 fun TickerPrice(
@@ -164,14 +165,16 @@ fun PriceSection(
 @Preview
 @Composable
 private fun PreviewTickerPrice() {
-  val symbol = "MSFT".asSymbol()
+  val clock = TestClock
+  val symbol = TestSymbol
+
   Surface {
     TickerPrice(
         ticker =
             Ticker(
                 symbol = symbol,
                 quote = newTestQuote(symbol),
-                chart = newTestChart(symbol),
+                chart = newTestChart(symbol, clock),
             ),
         size = TickerSize.QUOTE,
     )

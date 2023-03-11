@@ -13,6 +13,7 @@ import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Clock
 import javax.inject.Inject
 
 @Stable
@@ -53,7 +54,8 @@ class MutablePortfolioDigViewState
 @Inject
 internal constructor(
     params: PortfolioDigParams,
-) : MutableDigViewState(params.symbol), PortfolioDigViewState {
+    clock: Clock,
+) : MutableDigViewState(params.symbol, clock), PortfolioDigViewState {
   override val section = MutableStateFlow(PortfolioDigSections.POSITIONS)
 
   override val recentlyDeleteSplit = MutableStateFlow<DbSplit?>(null)

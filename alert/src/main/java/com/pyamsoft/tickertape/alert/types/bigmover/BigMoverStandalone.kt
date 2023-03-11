@@ -34,12 +34,13 @@ import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asPercent
-import java.time.LocalDateTime
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Clock
+import java.time.LocalDateTime
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class BigMoverStandalone
@@ -50,6 +51,7 @@ internal constructor(
     private val bigMoverQueryDao: BigMoverQueryDao,
     private val bigMoverInsertDao: BigMoverInsertDao,
     private val idMap: NotificationIdMap,
+    private val clock: Clock,
 ) {
 
   @CheckResult
@@ -66,7 +68,7 @@ internal constructor(
   private suspend fun postNotifications(bigMovers: List<StockQuote>) {
     Enforcer.assertOffMainThread()
 
-    val now = LocalDateTime.now()
+    val now = LocalDateTime.now(clock)
     val alreadySeenBigMovers = bigMoverQueryDao.query()
 
     bigMovers.forEach { quote ->
@@ -74,7 +76,7 @@ internal constructor(
       val insertRecord =
           if (moverRecord == null) {
             // If no mover record exists yet, make a new one
-            JsonMappableBigMoverReport.create(quote)
+            JsonMappableBigMoverReport.create(quote, clock)
           } else {
             val session = quote.currentSession
             if (moverRecord.lastState != session.state) {

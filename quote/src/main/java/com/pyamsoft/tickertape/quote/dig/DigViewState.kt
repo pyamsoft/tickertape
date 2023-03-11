@@ -2,8 +2,6 @@ package com.pyamsoft.tickertape.quote.dig
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.Ticker
@@ -13,10 +11,11 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
-import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Clock
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Stable
 interface BaseDigViewState : UiViewState {
@@ -85,6 +84,7 @@ interface DigViewState :
 abstract class MutableDigViewState
 protected constructor(
     symbol: StockSymbol,
+    clock: Clock,
 ) : DigViewState {
   final override val loadingState = MutableStateFlow(BaseDigViewState.LoadingState.NONE)
 
@@ -104,7 +104,7 @@ protected constructor(
 
   final override val chartError = MutableStateFlow<Throwable?>(null)
   final override val range = MutableStateFlow(StockChart.IntervalRange.ONE_DAY)
-  final override val currentDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
+  final override val currentDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now(clock))
   final override val currentPrice = MutableStateFlow<StockMoneyValue?>(null)
   final override val openingPrice = MutableStateFlow<StockMoneyValue?>(null)
 

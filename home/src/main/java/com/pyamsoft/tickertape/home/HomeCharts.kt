@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,10 +49,11 @@ import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.chart.ChartError
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.rememberInBackground
+import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -382,25 +382,25 @@ private fun ChartList(
 @Preview
 @Composable
 private fun PreviewHomeCharts() {
-  val symbol = "MSFT".asSymbol()
-  Surface {
-    HomeCharts(
-        tickers =
-            remember {
-              mutableStateListOf(
-                  Ticker(
-                      symbol = symbol,
-                      quote = newTestQuote(symbol),
-                      chart = newTestChart(symbol),
-                  ),
-              )
-            },
-        imageLoader = createNewTestImageLoader(),
-        isLoading = false,
-        name = "TEST STOCKS CHARTS",
-        error = null,
-        onChartClicked = {},
-        onRefresh = {},
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  HomeCharts(
+      tickers =
+          remember {
+            mutableStateListOf(
+                Ticker(
+                    symbol = symbol,
+                    quote = newTestQuote(symbol),
+                    chart = newTestChart(symbol, clock),
+                ),
+            )
+          },
+      imageLoader = createNewTestImageLoader(),
+      isLoading = false,
+      name = "TEST STOCKS CHARTS",
+      error = null,
+      onChartClicked = {},
+      onRefresh = {},
+  )
 }

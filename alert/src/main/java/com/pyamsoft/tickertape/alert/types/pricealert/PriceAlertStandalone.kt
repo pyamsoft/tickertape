@@ -28,12 +28,13 @@ import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import java.time.LocalDateTime
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Clock
+import java.time.LocalDateTime
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class PriceAlertStandalone
@@ -44,6 +45,7 @@ internal constructor(
     private val priceAlertQueryDao: PriceAlertQueryDao,
     private val priceAlertInsertDao: PriceAlertInsertDao,
     private val idMap: NotificationIdMap,
+    private val clock: Clock,
 ) {
 
   @CheckResult
@@ -80,7 +82,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         Enforcer.assertOffMainThread()
 
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(clock)
         // For each alert in price alerts
         // If the price of the stock quote has passed an alert direction
         // mark as alerted and trigger alert notification

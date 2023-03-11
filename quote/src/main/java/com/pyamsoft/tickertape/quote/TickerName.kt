@@ -11,10 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 fun TickerName(
@@ -81,7 +82,9 @@ fun TickerName(
 @Preview
 @Composable
 private fun PreviewTickerName() {
-  val symbol = "MSFT".asSymbol()
+  val clock = TestClock
+  val symbol = TestSymbol
+
   Surface {
     TickerName(
         symbol = symbol,
@@ -89,7 +92,7 @@ private fun PreviewTickerName() {
             Ticker(
                 symbol = symbol,
                 quote = newTestQuote(symbol),
-                chart = newTestChart(symbol),
+                chart = newTestChart(symbol, clock),
             ),
         size = TickerSize.QUOTE,
     )

@@ -21,8 +21,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 
 private val BOLD_STYLE =
     SpanStyle(
@@ -104,7 +104,8 @@ fun DeleteTicker(
 @Preview
 @Composable
 private fun PreviewDeleteTicker() {
-  val symbol = "MSFT".asSymbol()
+  val symbol = TestSymbol
+
   DeleteTicker(
       symbol = symbol,
       onConfirm = {},

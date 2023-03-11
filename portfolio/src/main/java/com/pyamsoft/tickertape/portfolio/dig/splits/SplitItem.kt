@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,7 +19,7 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.portfolio.test.newTestSplit
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.ui.BorderCard
-import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 @JvmOverloads
@@ -79,12 +78,10 @@ internal fun SplitItem(
 @Preview
 @Composable
 private fun PreviewSplitItem() {
-  PreviewTickerTapeTheme {
-    Surface {
-      SplitItem(
-          modifier = Modifier.padding(16.dp),
-          split = newTestSplit(),
-      )
-    }
-  }
+  val clock = TestClock
+
+  SplitItem(
+      modifier = Modifier.padding(16.dp),
+      split = newTestSplit(clock = clock),
+  )
 }

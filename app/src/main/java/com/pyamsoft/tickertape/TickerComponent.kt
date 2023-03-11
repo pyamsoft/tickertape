@@ -46,6 +46,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import java.time.Clock
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -128,6 +129,13 @@ internal interface TickerComponent {
       @Named("app_name")
       internal fun provideAppNameRes(): Int {
         return R.string.app_name
+      }
+
+      @Provides
+      @JvmStatic
+      @CheckResult
+      internal fun provideClock(): Clock {
+        return Clock.systemDefaultZone()
       }
     }
   }

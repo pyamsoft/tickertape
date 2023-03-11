@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
@@ -61,13 +60,14 @@ import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
 import com.pyamsoft.tickertape.core.isNegative
 import com.pyamsoft.tickertape.core.isPositive
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockDirection
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
+import com.pyamsoft.tickertape.ui.test.TestClock
 import kotlin.math.roundToInt
 
 @Stable
@@ -374,10 +374,11 @@ internal fun LineChart(
 @Preview
 @Composable
 private fun PreviewLineChart() {
-  Surface {
-    LineChart(
-        modifier = Modifier.width(320.dp).height(160.dp),
-        chart = newTestChart("MSFT".asSymbol()),
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  LineChart(
+      modifier = Modifier.width(320.dp).height(160.dp),
+      chart = newTestChart(symbol, clock),
+  )
 }

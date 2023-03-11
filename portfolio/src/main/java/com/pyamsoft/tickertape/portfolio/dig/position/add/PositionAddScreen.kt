@@ -11,9 +11,9 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionPopup
 import com.pyamsoft.tickertape.quote.dig.PositionParams
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import java.time.LocalDate
 
 @Composable
@@ -62,7 +62,8 @@ fun PositionAddScreen(
 @Preview
 @Composable
 private fun PreviewPositionAddScreen() {
-  val symbol = "MSFT".asSymbol()
+  val symbol = TestSymbol
+
   PositionAddScreen(
       state =
           MutablePositionAddViewState(

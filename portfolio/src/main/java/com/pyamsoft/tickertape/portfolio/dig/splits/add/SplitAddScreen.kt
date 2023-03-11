@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.ui.util.rememberStable
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionPopup
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
 import java.time.LocalDate
 
 @Composable
@@ -59,7 +59,8 @@ fun SplitAddScreen(
 @Preview
 @Composable
 private fun PreviewSplitAddScreen() {
-  val symbol = "MSFT".asSymbol()
+  val symbol = TestSymbol
+
   SplitAddScreen(
       state = MutableSplitAddViewState(),
       symbol = symbol,

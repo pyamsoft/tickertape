@@ -20,18 +20,22 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.Clock
 import java.time.LocalDateTime
 
 /** Should only be used in tests/preview */
 @CheckResult
-fun newTestChart(symbol: StockSymbol): StockChart {
+fun newTestChart(
+    symbol: StockSymbol,
+    clock: Clock,
+): StockChart {
   return object : StockChart {
     override val symbol: StockSymbol = symbol
     override val range: StockChart.IntervalRange = StockChart.IntervalRange.ONE_DAY
     override val interval: StockChart.IntervalTime = StockChart.IntervalTime.ONE_DAY
     override val startingPrice: StockMoneyValue = StockMoneyValue.NONE
     override val currentPrice: StockMoneyValue = StockMoneyValue.NONE
-    override val currentDate: LocalDateTime = LocalDateTime.now()
+    override val currentDate: LocalDateTime = LocalDateTime.now(clock)
     override val dates: List<LocalDateTime> = emptyList()
     override val close: List<StockMoneyValue> = emptyList()
   }

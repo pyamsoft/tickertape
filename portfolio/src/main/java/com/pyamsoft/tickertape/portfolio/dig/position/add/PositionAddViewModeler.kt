@@ -31,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -41,6 +42,7 @@ internal constructor(
     override val state: MutablePositionAddViewState,
     private val interactor: PositionAddInteractor,
     private val params: PositionParams,
+    private val clock: Clock,
 ) :
     BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
         state = state,
@@ -227,7 +229,7 @@ internal constructor(
   }
 
   fun handleOpenDateDialog(date: LocalDate?) {
-    state.datePicker.value = date ?: LocalDate.now()
+    state.datePicker.value = date ?: LocalDate.now(clock)
   }
 
   fun handleCloseDateDialog() {

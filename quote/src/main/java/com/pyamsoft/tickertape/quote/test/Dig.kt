@@ -12,19 +12,23 @@ import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
-import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.LocalDate
-import java.time.LocalDateTime
+import com.pyamsoft.tickertape.ui.test.TestClock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Clock
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 /** Should only be used in tests/preview */
 @CheckResult
-fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
+fun newTestDigViewState(
+    symbol: StockSymbol = TestSymbol,
+    clock: Clock = TestClock,
+): DigViewState {
   return object : DigViewState {
     override val range: StateFlow<StockChart.IntervalRange> =
         MutableStateFlow(StockChart.IntervalRange.ONE_DAY)
-    override val currentDate: StateFlow<LocalDateTime> = MutableStateFlow(LocalDateTime.now())
+    override val currentDate: StateFlow<LocalDateTime> = MutableStateFlow(LocalDateTime.now(clock))
     override val currentPrice: StateFlow<StockMoneyValue?> = MutableStateFlow(420.69.asMoney())
     override val openingPrice: StateFlow<StockMoneyValue?> = MutableStateFlow(69.420.asMoney())
     override val chartError: StateFlow<Throwable?> = MutableStateFlow(null)
@@ -35,7 +39,7 @@ fun newTestDigViewState(symbol: StockSymbol = "MSFT".asSymbol()): DigViewState {
             Ticker(
                 symbol = symbol,
                 quote = newTestQuote(symbol),
-                chart = newTestChart(symbol),
+                chart = newTestChart(symbol, clock),
             ))
     override val news: StateFlow<List<StockNews>> = MutableStateFlow(emptyList())
     override val newsError: StateFlow<Throwable?> = MutableStateFlow(null)

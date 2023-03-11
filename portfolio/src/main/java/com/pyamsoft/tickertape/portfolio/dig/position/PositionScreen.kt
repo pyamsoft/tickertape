@@ -11,7 +11,6 @@ import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,14 +28,17 @@ import com.pyamsoft.tickertape.portfolio.dig.PositionsPortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
+import java.time.Clock
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun PositionScreen(
     modifier: Modifier = Modifier,
     state: PositionsPortfolioDigViewState,
+    clock: Clock,
     onRefresh: () -> Unit,
     onAddPosition: (DbHolding) -> Unit,
     onUpdatePosition: (DbPosition, DbHolding) -> Unit,
@@ -88,6 +90,7 @@ internal fun PositionScreen(
                           onLongClick = { onDeletePosition(position) },
                       ),
               position = position,
+              clock = clock,
           )
         }
 
@@ -142,24 +145,26 @@ private fun PositionSnackbar(
 @Preview
 @Composable
 private fun PreviewPositionScreen() {
-  val symbol = "MSFT".asSymbol()
-  Surface {
-    PositionScreen(
-        modifier = Modifier.fillMaxSize(),
-        state =
-            MutablePortfolioDigViewState(
-                params =
-                    PortfolioDigParams(
-                        symbol = symbol,
-                        lookupSymbol = null,
-                    ),
-            ),
-        onAddPosition = {},
-        onRefresh = {},
-        onDeletePosition = {},
-        onUpdatePosition = { _, _ -> },
-        onPositionDeleteFinalized = {},
-        onPositionRestored = {},
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  PositionScreen(
+      modifier = Modifier.fillMaxSize(),
+      clock = clock,
+      state =
+          MutablePortfolioDigViewState(
+              params =
+                  PortfolioDigParams(
+                      symbol = symbol,
+                      lookupSymbol = null,
+                  ),
+              clock = clock,
+          ),
+      onAddPosition = {},
+      onRefresh = {},
+      onDeletePosition = {},
+      onUpdatePosition = { _, _ -> },
+      onPositionDeleteFinalized = {},
+      onPositionRestored = {},
+  )
 }

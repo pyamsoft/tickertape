@@ -19,16 +19,16 @@ package com.pyamsoft.tickertape.quote.chart
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 import java.time.LocalDateTime
 
 @Stable
@@ -67,10 +67,11 @@ fun Chart(
 @Preview
 @Composable
 private fun PreviewChart() {
-  Surface {
-    Chart(
-        modifier = Modifier.width(320.dp).height(160.dp),
-        chart = newTestChart("MSFT".asSymbol()),
-    )
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  Chart(
+      modifier = Modifier.width(320.dp).height(160.dp),
+      chart = newTestChart(symbol, clock),
+  )
 }

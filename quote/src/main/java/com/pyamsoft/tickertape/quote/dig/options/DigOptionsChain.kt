@@ -20,7 +20,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScrollableTabRow
-import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
@@ -48,10 +47,10 @@ import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.OptionsChainDigViewState
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.StockOptions
-import com.pyamsoft.tickertape.stocks.api.asSymbol
-import com.pyamsoft.tickertape.ui.PreviewTickerTapeTheme
+import com.pyamsoft.tickertape.ui.test.TestClock
 import java.time.LocalDate
 
 @Composable
@@ -398,19 +397,19 @@ private fun ContractItem(
 @Preview
 @Composable
 private fun PreviewDigOptionsChain() {
-  PreviewTickerTapeTheme {
-    Surface {
-      DigOptionsChain(
-          modifier = Modifier.padding(16.dp),
-          state =
-              object :
-                  MutableDigViewState(
-                      symbol = "MSFT".asSymbol(),
-                  ) {},
-          onRefresh = {},
-          onSectionChanged = {},
-          onExpirationDateChanged = {},
-      )
-    }
-  }
+  val symbol = TestSymbol
+  val clock = TestClock
+
+  DigOptionsChain(
+      modifier = Modifier.padding(16.dp),
+      state =
+          object :
+              MutableDigViewState(
+                  symbol = symbol,
+                  clock = clock,
+              ) {},
+      onRefresh = {},
+      onSectionChanged = {},
+      onExpirationDateChanged = {},
+  )
 }

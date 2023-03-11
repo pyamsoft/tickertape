@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.core.isShortTermPurchase
+import com.pyamsoft.tickertape.ui.test.TestClock
 import java.time.LocalDate
 
 @Composable
@@ -43,7 +44,7 @@ fun ShortTermPurchaseDateTag(
 fun PurchaseDateTag(
     modifier: Modifier = Modifier,
     purchaseDate: LocalDate,
-    now: LocalDate = LocalDate.now(),
+    now: LocalDate,
     style: TextStyle = MaterialTheme.typography.overline,
 ) {
   val isShortTerm =
@@ -93,15 +94,21 @@ private fun PurchaseDateTag(
 @Preview
 @Composable
 private fun PreviewPurchaseDateTagShort() {
+  val clock = TestClock
+
   PurchaseDateTag(
-      purchaseDate = LocalDate.now(),
+      purchaseDate = LocalDate.now(clock),
+      now = LocalDate.now(clock),
   )
 }
 
 @Preview
 @Composable
 private fun PreviewPurchaseDateTagLong() {
+  val clock = TestClock
+
   PurchaseDateTag(
-      purchaseDate = LocalDate.now().minusYears(1).minusDays(1),
+      purchaseDate = LocalDate.now(clock).minusYears(1).minusDays(1),
+      now = LocalDate.now(clock),
   )
 }

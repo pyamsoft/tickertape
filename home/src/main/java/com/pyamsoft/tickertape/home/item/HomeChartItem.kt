@@ -33,9 +33,10 @@ import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.quote.chart.Chart
+import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.ui.test.TestClock
 
 @Composable
 @JvmOverloads
@@ -73,14 +74,16 @@ internal fun HomeChartItem(
 @Preview
 @Composable
 private fun PreviewHomeChartItem() {
-  val symbol = "MSFT".asSymbol()
+  val clock = TestClock
+  val symbol = TestSymbol
+
   Surface {
     HomeChartItem(
         ticker =
             Ticker(
                 symbol = symbol,
                 quote = newTestQuote(symbol),
-                chart = newTestChart(symbol),
+                chart = newTestChart(symbol, clock),
             ),
         onClick = {},
     )

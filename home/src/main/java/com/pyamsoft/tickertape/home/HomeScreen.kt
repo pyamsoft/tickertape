@@ -83,7 +83,10 @@ fun HomeScreen(
 
       item {
         HomeHeader(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(bottom = MaterialTheme.keylines.content * 2)
+                    .padding(horizontal = MaterialTheme.keylines.content),
             appName = appName,
             onSettingsClicked = onSettingsClicked,
         )
@@ -91,6 +94,7 @@ fun HomeScreen(
 
       item {
         HomePortfolio(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             onRefresh = onRefreshPortfolio,
         )
@@ -98,6 +102,7 @@ fun HomeScreen(
 
       item {
         HomeIndexes(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -107,6 +112,7 @@ fun HomeScreen(
 
       item {
         HomeTrending(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -116,6 +122,7 @@ fun HomeScreen(
 
       item {
         HomeGainers(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -125,6 +132,7 @@ fun HomeScreen(
 
       item {
         HomeLosers(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -134,6 +142,7 @@ fun HomeScreen(
 
       item {
         HomeMostActive(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -143,6 +152,7 @@ fun HomeScreen(
 
       item {
         HomeUndervaluedGrowth(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -152,6 +162,7 @@ fun HomeScreen(
 
       item {
         HomeGrowthTech(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,
@@ -161,6 +172,7 @@ fun HomeScreen(
 
       item {
         HomeMostShorted(
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content * 2),
             state = state,
             imageLoader = imageLoader,
             onChartClicked = onChartClicked,

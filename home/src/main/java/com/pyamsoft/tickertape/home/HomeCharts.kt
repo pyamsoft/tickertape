@@ -279,11 +279,12 @@ private fun HomeCharts(
   FirstRenderEffect { onRefresh() }
 
   Crossfade(
-      modifier = modifier,
       targetState = error,
   ) { err ->
     if (err == null) {
-      Column {
+      Column(
+          modifier = modifier,
+      ) {
         Text(
             modifier =
                 Modifier.padding(
@@ -314,7 +315,7 @@ private fun HomeCharts(
       }
     } else {
       ChartError(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = modifier.fillMaxWidth(),
           error = err,
           imageLoader = imageLoader,
       )
@@ -353,7 +354,7 @@ private fun ChartList(
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
+      horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
     if (onlyChartTickers != null) {
       itemsIndexed(

@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 
 private const val FAB_OFFSET = 56 + 16
 
@@ -39,10 +38,10 @@ fun <T : Any> BaseDigListScreen(
     label: String,
     isAddVisible: Boolean,
     items: SnapshotStateList<T>,
-    isLoading: Boolean,
-    onRefresh: () -> Unit,
     onAddClicked: () -> Unit,
     itemKey: (T) -> String,
+    isLoading: Boolean,
+    onRefresh: () -> Unit,
     renderListItem: @Composable (T) -> Unit,
 ) {
   Box(
@@ -52,8 +51,6 @@ fun <T : Any> BaseDigListScreen(
     DigList(
         modifier = Modifier.matchParentSize(),
         items = items,
-        isLoading = isLoading,
-        onRefresh = onRefresh,
         itemKey = itemKey,
         listItem = renderListItem,
     )
@@ -70,32 +67,25 @@ fun <T : Any> BaseDigListScreen(
 private fun <T : Any> DigList(
     modifier: Modifier = Modifier,
     items: SnapshotStateList<T>,
-    isLoading: Boolean,
-    onRefresh: () -> Unit,
     itemKey: (T) -> String,
     listItem: @Composable (T) -> Unit,
 ) {
-  SwipeRefresh(
+  LazyColumn(
       modifier = modifier,
-      isRefreshing = isLoading,
-      onRefresh = onRefresh,
+      contentPadding = PaddingValues(MaterialTheme.keylines.content),
+      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
-    LazyColumn(
-        contentPadding = PaddingValues(MaterialTheme.keylines.content),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
+    items(
+        items = items,
+        key = { itemKey(it) },
     ) {
-      items(
-          items = items,
-          key = { itemKey(it) },
-      ) {
-        listItem(it)
-      }
+      listItem(it)
+    }
 
-      item {
-        Spacer(
-            modifier = Modifier.height(FAB_OFFSET.dp),
-        )
-      }
+    item {
+      Spacer(
+          modifier = Modifier.height(FAB_OFFSET.dp),
+      )
     }
   }
 }

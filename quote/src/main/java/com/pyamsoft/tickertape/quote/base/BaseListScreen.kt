@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.ErrorScreen
 import com.pyamsoft.tickertape.ui.FabDefaults
@@ -68,7 +67,6 @@ fun <T : Any> BaseListScreen(
         modifier = Modifier.fillMaxSize(),
         scaffoldPaddingValues = pv,
         imageLoader = imageLoader,
-        isLoading = isLoading,
         navBarBottomHeight = navBarBottomHeight,
         onRefresh = onRefresh,
         onSearchChanged = onSearchChanged,
@@ -95,7 +93,6 @@ private fun <T : Any> Content(
     list: List<T>,
     search: String,
     tab: EquityType,
-    isLoading: Boolean,
     navBarBottomHeight: Int,
     onSearchChanged: (String) -> Unit,
     onRefresh: () -> Unit,
@@ -120,29 +117,24 @@ private fun <T : Any> Content(
       modifier = modifier,
       contentAlignment = Alignment.BottomCenter,
   ) {
-    SwipeRefresh(
-        isRefreshing = isLoading,
+    ListSection(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldPaddingValues = scaffoldPaddingValues,
+        imageLoader = imageLoader,
+        navBarBottomHeight = bottomPaddingDp,
+        renderEmptyState = renderEmptyState,
+        onSearchChanged = onSearchChanged,
+        onTabUpdated = onTabUpdated,
         onRefresh = onRefresh,
-    ) {
-      ListSection(
-          modifier = Modifier.fillMaxSize(),
-          scaffoldPaddingValues = scaffoldPaddingValues,
-          imageLoader = imageLoader,
-          navBarBottomHeight = bottomPaddingDp,
-          renderEmptyState = renderEmptyState,
-          onSearchChanged = onSearchChanged,
-          onTabUpdated = onTabUpdated,
-          onRefresh = onRefresh,
-          onRegenerateList = onRegenerateList,
-          itemKey = itemKey,
-          renderHeader = renderHeader,
-          renderListItem = renderListItem,
-          pageError = pageError,
-          list = list,
-          search = search,
-          tab = tab,
-      )
-    }
+        onRegenerateList = onRegenerateList,
+        itemKey = itemKey,
+        renderHeader = renderHeader,
+        renderListItem = renderListItem,
+        pageError = pageError,
+        list = list,
+        search = search,
+        tab = tab,
+    )
   }
 }
 

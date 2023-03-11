@@ -22,13 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.quote.chart.Chart
-import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigDefaults
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.RecommendationDigViewState
@@ -44,45 +42,35 @@ fun DigRecommendations(
     onRecClick: (Ticker) -> Unit,
 ) {
   val error by state.recommendationError.collectAsState()
-  val loadingState by state.loadingState.collectAsState()
   val recommendations by state.recommendations.collectAsState()
 
-  val isRefreshing =
-      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
-
-  SwipeRefresh(
-      modifier = modifier.padding(MaterialTheme.keylines.content),
-      isRefreshing = isRefreshing,
-      onRefresh = onRefresh,
+  LazyColumn(
+      modifier = modifier.fillMaxSize().padding(MaterialTheme.keylines.content),
+      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-    ) {
-      if (error == null) {
-        items(
-            items = recommendations,
-            key = { it.symbol.raw },
-        ) { rec ->
-          RecommendationItem(
-              modifier = Modifier.fillMaxWidth(),
-              recommendation = rec,
-              onClick = onRecClick,
-          )
-        }
-      } else {
-        item {
-          val errorMessage =
-              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
+    if (error == null) {
+      items(
+          items = recommendations,
+          key = { it.symbol.raw },
+      ) { rec ->
+        RecommendationItem(
+            modifier = Modifier.fillMaxWidth(),
+            recommendation = rec,
+            onClick = onRecClick,
+        )
+      }
+    } else {
+      item {
+        val errorMessage =
+            remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
-          Text(
-              text = errorMessage,
-              style =
-                  MaterialTheme.typography.h6.copy(
-                      color = MaterialTheme.colors.error,
-                  ),
-          )
-        }
+        Text(
+            text = errorMessage,
+            style =
+                MaterialTheme.typography.h6.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
       }
     }
   }

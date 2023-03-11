@@ -43,8 +43,6 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.util.Stabilized
 import com.pyamsoft.pydroid.ui.util.rememberAsStateList
 import com.pyamsoft.pydroid.ui.util.rememberStable
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
-import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.OptionsChainDigViewState
 import com.pyamsoft.tickertape.quote.test.TestSymbol
@@ -69,10 +67,6 @@ fun DigOptionsChain(
   val error by state.optionsError.collectAsState()
   val options by state.optionsChain.collectAsState()
   val expirationDate by state.optionsExpirationDate.collectAsState()
-  val loadingState by state.loadingState.collectAsState()
-
-  val isRefreshing =
-      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   val selectedTabIndex = section.ordinal
 
@@ -109,62 +103,57 @@ fun DigOptionsChain(
       )
     }
 
-    SwipeRefresh(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
-    ) {
-      if (error == null) {
-        if (options != null) {
-          val contractList =
-              remember(
-                  options,
-                  section,
-                  // Whenever this date changes, refresh the list of options
-                  // TODO filter by date
-                  expirationDate,
-              ) {
-                val o = options.requireNotNull()
-                val contracts =
-                    when (section) {
-                      StockOptions.Contract.Type.CALL -> o.calls
-                      StockOptions.Contract.Type.PUT -> o.puts
-                    }
-                return@remember contracts.toMutableStateList()
-              }
-
-          LazyColumn(
-              modifier = Modifier.fillMaxSize(),
-              contentPadding = PaddingValues(MaterialTheme.keylines.content),
-              verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-          ) {
-            items(
-                items = contractList,
-                key = { it.strike.value },
-            ) { c ->
-              ContractItem(
-                  modifier = Modifier.fillMaxWidth(),
-                  contract = c,
-              )
+    if (error == null) {
+      if (options != null) {
+        val contractList =
+            remember(
+                options,
+                section,
+                // Whenever this date changes, refresh the list of options
+                // TODO filter by date
+                expirationDate,
+            ) {
+              val o = options.requireNotNull()
+              val contracts =
+                  when (section) {
+                    StockOptions.Contract.Type.CALL -> o.calls
+                    StockOptions.Contract.Type.PUT -> o.puts
+                  }
+              return@remember contracts.toMutableStateList()
             }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(MaterialTheme.keylines.content),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
+        ) {
+          items(
+              items = contractList,
+              key = { it.strike.value },
+          ) { c ->
+            ContractItem(
+                modifier = Modifier.fillMaxWidth(),
+                contract = c,
+            )
           }
         }
-      } else {
-        val scrollState = rememberScrollState()
+      }
+    } else {
+      val scrollState = rememberScrollState()
 
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
-        ) {
-          val errorMessage =
-              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
+      Column(
+          modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
+      ) {
+        val errorMessage =
+            remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
-          Text(
-              text = errorMessage,
-              style =
-                  MaterialTheme.typography.h6.copy(
-                      color = MaterialTheme.colors.error,
-                  ),
-          )
-        }
+        Text(
+            text = errorMessage,
+            style =
+                MaterialTheme.typography.h6.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
       }
     }
   }

@@ -30,8 +30,6 @@ import coil.compose.AsyncImage
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.util.collectAsStateList
-import com.pyamsoft.pydroid.ui.widget.SwipeRefresh
-import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.NewsDigViewState
 import com.pyamsoft.tickertape.quote.test.TestSymbol
@@ -49,46 +47,36 @@ fun DigNews(
     onRefresh: () -> Unit,
 ) {
   val error by state.newsError.collectAsState()
-  val loadingState by state.loadingState.collectAsState()
   val news = state.news.collectAsStateList()
 
-  val isRefreshing =
-      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
-
-  SwipeRefresh(
-      modifier = modifier,
-      isRefreshing = isRefreshing,
-      onRefresh = onRefresh,
+  LazyColumn(
+      modifier = modifier.fillMaxSize(),
+      contentPadding = PaddingValues(MaterialTheme.keylines.content),
+      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(MaterialTheme.keylines.content),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-    ) {
-      if (error == null) {
-        items(
-            items = news,
-            key = { it.id },
-        ) { n ->
-          NewsItem(
-              modifier = Modifier.fillMaxWidth(),
-              imageLoader = imageLoader,
-              news = n,
-          )
-        }
-      } else {
-        item {
-          val errorMessage =
-              remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
+    if (error == null) {
+      items(
+          items = news,
+          key = { it.id },
+      ) { n ->
+        NewsItem(
+            modifier = Modifier.fillMaxWidth(),
+            imageLoader = imageLoader,
+            news = n,
+        )
+      }
+    } else {
+      item {
+        val errorMessage =
+            remember(error) { error.requireNotNull().message ?: "An unexpected error occurred" }
 
-          Text(
-              text = errorMessage,
-              style =
-                  MaterialTheme.typography.h6.copy(
-                      color = MaterialTheme.colors.error,
-                  ),
-          )
-        }
+        Text(
+            text = errorMessage,
+            style =
+                MaterialTheme.typography.h6.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
       }
     }
   }

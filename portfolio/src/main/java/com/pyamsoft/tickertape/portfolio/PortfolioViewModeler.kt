@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.portfolio
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
@@ -31,15 +30,16 @@ import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.main.MainPage
 import com.pyamsoft.tickertape.main.MainSelectionEvent
+import com.pyamsoft.tickertape.quote.DeleteRestoreViewModeler
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.fromJson
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -49,7 +49,7 @@ internal constructor(
     private val interactorCache: PortfolioInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
     private val jsonParser: JsonParser,
-) : AbstractViewModeler<PortfolioViewState>(state) {
+) : DeleteRestoreViewModeler<PortfolioViewState>(state) {
 
   private var internalFullPortfolio: List<PortfolioStock> = emptyList()
 
@@ -76,13 +76,13 @@ internal constructor(
       }
 
   private fun CoroutineScope.handleSplitRealtimeEvent(event: SplitChangeEvent) {
-    Timber.d("A split change has happened, re-process the entire list")
+    Timber.d("A split change has happened, re-process the entire list: $event")
     handleRefreshList(this, false)
   }
 
   private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
     return when (event) {
-      is PositionChangeEvent.Delete -> handleDeletePosition(event.position, event.offerUndo)
+      is PositionChangeEvent.Delete -> handleDeletePosition(event.position)
       is PositionChangeEvent.Insert -> handleInsertPosition(event.position)
       is PositionChangeEvent.Update -> handleUpdatePosition(event.position)
     }
@@ -117,7 +117,9 @@ internal constructor(
     }
   }
 
-  private fun CoroutineScope.handleDeletePosition(position: DbPosition, offerUndo: Boolean) {
+  private fun CoroutineScope.handleDeletePosition(position: DbPosition) {
+    // On delete, we don't need to re-fetch quotes from the network
+
     val s = state
     s.regeneratePortfolio(this) {
       internalFullPortfolio.map { stock ->
@@ -131,9 +133,6 @@ internal constructor(
         }
       }
     }
-    // TODO offer up undo ability
-
-    // On delete, we don't need to re-fetch quotes from the network
   }
 
   private fun CoroutineScope.handleHoldingRealtimeEvent(event: HoldingChangeEvent) {
@@ -195,23 +194,31 @@ internal constructor(
   }
 
   private fun CoroutineScope.handleUpdateHolding(holding: DbHolding) {
+    Timber.d("Holding updated: $holding")
+
     // Don't actually insert anything to the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
     handleRefreshList(scope = this, force = true)
   }
 
   private fun CoroutineScope.handleInsertHolding(holding: DbHolding) {
+    Timber.d("Holding inserted: $holding")
+
     // Don't actually insert anything to the list here, but call a full refresh
     // This will re-fetch the DB and the network and give us back quotes
     handleRefreshList(scope = this, force = true)
   }
 
   private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
-    val s = state
-    s.regeneratePortfolio(this) { internalFullPortfolio.filterNot { it.holding.id == holding.id } }
-    // TODO offer up undo ability
-
     // On delete, we don't need to re-fetch quotes from the network
+    val s = state
+
+    s.regeneratePortfolio(this) { internalFullPortfolio.filterNot { it.holding.id == holding.id } }
+
+    if (offerUndo) {
+      Timber.d("Offer undo on holding delete: $holding")
+      s.recentlyDeleteHolding.value = holding
+    }
   }
 
   private fun handleOpenDelete(params: PortfolioRemoveParams) {
@@ -319,6 +326,21 @@ internal constructor(
 
   fun handleCloseDelete() {
     state.remove.value = null
+  }
+
+  fun handleHoldingDeleteFinal(scope: CoroutineScope) {
+    handleDeleteFinal(state.recentlyDeleteHolding) {
+      scope.handleDeleteHolding(it, offerUndo = false)
+    }
+  }
+
+  fun handleRestoreDeletedHolding(scope: CoroutineScope) {
+    handleRestoreDeleted(
+        scope = scope,
+        recentlyDeleted = state.recentlyDeleteHolding,
+    ) {
+      interactor.restoreHolding(it)
+    }
   }
 
   private data class PortfolioListGenerateResult(

@@ -20,17 +20,21 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Stable
 interface PortfolioViewState : UiViewState {
   val remove: StateFlow<PortfolioRemoveParams?>
+  val recentlyDeleteHolding: StateFlow<DbHolding?>
+
   val query: StateFlow<String>
   val section: StateFlow<EquityType>
   val loadingState: StateFlow<LoadingState>
+
   val portfolio: StateFlow<PortfolioStockList>
   val stocks: StateFlow<List<PortfolioStock>>
   val error: StateFlow<Throwable?>
@@ -48,9 +52,12 @@ interface PortfolioViewState : UiViewState {
 @ActivityScope
 class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewState {
   override val remove = MutableStateFlow<PortfolioRemoveParams?>(null)
+  override val recentlyDeleteHolding = MutableStateFlow<DbHolding?>(null)
+
   override val query = MutableStateFlow("")
   override val section = MutableStateFlow(EquityType.STOCK)
   override val loadingState = MutableStateFlow(PortfolioViewState.LoadingState.NONE)
+
   override val portfolio = MutableStateFlow(PortfolioStockList.empty())
   override val stocks = MutableStateFlow(emptyList<PortfolioStock>())
   override val error = MutableStateFlow<Throwable?>(null)

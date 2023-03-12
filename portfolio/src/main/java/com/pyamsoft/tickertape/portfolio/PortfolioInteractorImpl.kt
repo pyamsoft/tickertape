@@ -20,9 +20,11 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
+import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.HoldingRealtime
 import com.pyamsoft.tickertape.db.holding.queryById
@@ -35,21 +37,22 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
-import java.time.Clock
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Clock
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioInteractorImpl
 @Inject
 internal constructor(
     private val holdingRealtime: HoldingRealtime,
+    private val holdingInsertDao: HoldingInsertDao,
     private val holdingQueryDao: HoldingQueryDao,
     private val holdingQueryDaoCache: HoldingQueryDao.Cache,
     private val holdingDeleteDao: HoldingDeleteDao,
@@ -63,6 +66,22 @@ internal constructor(
     private val interactorCache: TickerInteractor.Cache,
     private val clock: Clock,
 ) : PortfolioInteractor, PortfolioInteractor.Cache {
+
+  override suspend fun restoreHolding(
+      holding: DbHolding
+  ): ResultWrapper<DbInsert.InsertResult<DbHolding>> =
+      withContext(context = Dispatchers.IO) {
+        Enforcer.assertOffMainThread()
+
+        return@withContext try {
+          ResultWrapper.success(holdingInsertDao.insert(holding))
+        } catch (e: Throwable) {
+          e.ifNotCancellation {
+            Timber.e(e, "Failed to restore holding: $holding")
+            ResultWrapper.failure(e)
+          }
+        }
+      }
 
   override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) {

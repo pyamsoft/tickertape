@@ -116,6 +116,8 @@ internal fun PortfolioEntry(
         onSearchChanged = { viewModel.handleSearch(it) },
         onTabUpdated = { viewModel.handleSectionChanged(it) },
         onRegenerateList = { viewModel.handleRegenerateList(scope = scope) },
+        onHoldingDeleteFinalized = { viewModel.handleHoldingDeleteFinal(scope = scope) },
+        onHoldingRestored = { viewModel.handleRestoreDeletedHolding(scope = scope) },
     )
 
     removeDialog?.also { r ->

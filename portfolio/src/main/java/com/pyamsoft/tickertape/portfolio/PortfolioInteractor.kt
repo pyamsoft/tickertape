@@ -18,6 +18,7 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
@@ -34,6 +35,9 @@ interface PortfolioInteractor {
   @CheckResult suspend fun getPortfolio(): ResultWrapper<List<PortfolioStock>>
 
   @CheckResult suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean>
+
+  @CheckResult
+  suspend fun restoreHolding(holding: DbHolding): ResultWrapper<DbInsert.InsertResult<DbHolding>>
 
   interface Cache {
 

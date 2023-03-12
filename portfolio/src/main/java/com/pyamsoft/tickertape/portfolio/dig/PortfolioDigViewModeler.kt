@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
@@ -38,16 +37,14 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
@@ -85,7 +82,7 @@ internal constructor(
           interactorCache.invalidateHolding()
         }
 
-        // If thie holding is already provided, great, fast track!
+        // If this holding is already provided, great, fast track!
         val holding = params.holding
         return@highlander if (holding != null) {
           ResultWrapper.success(holding)
@@ -328,45 +325,6 @@ internal constructor(
 
   private fun handleOpenRec(params: PortfolioDigParams) {
     state.recommendedDig.value = params
-  }
-
-  private fun <T : Any> handleDeleteFinal(
-      recentlyDeleted: MutableStateFlow<T?>,
-      onDeleted: (T) -> Unit
-  ) {
-    val deleted = recentlyDeleted.getAndUpdate { null }
-    if (deleted != null) {
-      onDeleted(deleted)
-    }
-  }
-
-  private fun <T : Any> handleRestoreDeleted(
-      scope: CoroutineScope,
-      recentlyDeleted: MutableStateFlow<T?>,
-      restore: suspend (T) -> ResultWrapper<DbInsert.InsertResult<T>>
-  ) {
-    val deleted = recentlyDeleted.getAndUpdate { null }
-    if (deleted != null) {
-      scope.launch(context = Dispatchers.Main) {
-        restore(deleted)
-            .onFailure { Timber.e(it, "Error when restoring $deleted") }
-            .onSuccess { result ->
-              when (result) {
-                is DbInsert.InsertResult.Insert -> Timber.d("Restored: ${result.data}")
-                is DbInsert.InsertResult.Update -> Timber.d("Updated: ${result.data} from $deleted")
-                is DbInsert.InsertResult.Fail -> {
-                  Timber.e(result.error, "Failed to restore: $deleted")
-                  // Caught by the onFailure below
-                  throw result.error
-                }
-              }
-            }
-            .onFailure {
-              Timber.e(it, "Failed to restore")
-              // TODO handle restore error
-            }
-      }
-    }
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {

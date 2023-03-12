@@ -3,6 +3,7 @@ package com.pyamsoft.tickertape.home
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.pyamsoft.tickertape.ui.rememberScreenHeightRatio
 import com.pyamsoft.tickertape.ui.rememberScreenWidthRatio
 
@@ -31,4 +32,6 @@ internal object HomeScreenDefaults {
         ratioLandscape = 0.45F,
     )
   }
+
+  val PORTFOLIO_HEIGHT = 264.dp
 }

@@ -18,10 +18,13 @@ package com.pyamsoft.tickertape.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -93,17 +96,18 @@ internal fun HomePortfolio(
           )
         }
 
-        Box {
+        Box(
+            modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT),
+        ) {
           HomePortfolioSummaryItem(
-              // Don't use matchParentSize here
               modifier =
-                  Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.keylines.content),
+                  Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
               portfolio = portfolio,
           )
 
           Loading(
-              isLoading = isLoading,
               modifier = Modifier.matchParentSize(),
+              isLoading = isLoading,
           )
         }
       }
@@ -122,7 +126,10 @@ private fun Loading(
     modifier: Modifier = Modifier,
 ) {
   AnimatedVisibility(
+      modifier = modifier,
       visible = isLoading,
+      enter = fadeIn(),
+      exit = fadeOut(),
   ) {
     Box(
         modifier = modifier.padding(MaterialTheme.keylines.content),

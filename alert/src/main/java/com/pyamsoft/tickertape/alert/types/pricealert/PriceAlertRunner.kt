@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.alert.types.pricealert
 
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.alert.base.BaseRunner
 import com.pyamsoft.tickertape.db.getQuotesForHoldings
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
@@ -49,7 +50,9 @@ internal constructor(
       val quotes = stockInteractor.getQuotesForHoldings(holdingQueryDao)
       standalone.notifyPriceAlerts(quotes)
     } catch (e: Throwable) {
-      Timber.e(e, "Error getting watchlist quotes for price alerts")
+        e.ifNotCancellation {
+            Timber.e(e, "Error getting watchlist quotes for price alerts")
+        }
     }
   }
 }

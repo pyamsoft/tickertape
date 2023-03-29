@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
@@ -190,8 +191,10 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
         try {
           KeyStatistics.Financials.Recommendation.valueOf(this.uppercase())
         } catch (e: Throwable) {
-          Timber.w(e, "Unknown recommendation string: $this, fallback to UNKNOWN")
-          KeyStatistics.Financials.Recommendation.UNKNOWN
+          e.ifNotCancellation {
+            Timber.w(e, "Unknown recommendation string: $this, fallback to UNKNOWN")
+            KeyStatistics.Financials.Recommendation.UNKNOWN
+          }
         }
       }
     }

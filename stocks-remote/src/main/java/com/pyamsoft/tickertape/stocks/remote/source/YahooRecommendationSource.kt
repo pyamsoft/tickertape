@@ -16,17 +16,18 @@
 
 package com.pyamsoft.tickertape.stocks.remote.source
 
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.RecommendationService
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooRecommendationSource
@@ -49,11 +50,13 @@ internal constructor(@YahooApi private val service: RecommendationService) : Rec
                       .toList(),
           )
         } catch (e: Throwable) {
-          Timber.e(e, "Unable to get recommendations for symbol: ${symbol.raw}")
-          return@withContext StockRecommendations.create(
-              symbol,
-              emptyList(),
-          )
+          e.ifNotCancellation {
+            Timber.e(e, "Unable to get recommendations for symbol: ${symbol.raw}")
+            return@withContext StockRecommendations.create(
+                symbol,
+                emptyList(),
+            )
+          }
         }
       }
 }

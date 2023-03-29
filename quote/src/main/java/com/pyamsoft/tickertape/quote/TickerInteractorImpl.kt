@@ -109,7 +109,7 @@ internal constructor(
 
             ResultWrapper.success(tickers)
           }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error getting tickers: $symbols $range $options")
             ResultWrapper.failure(e)

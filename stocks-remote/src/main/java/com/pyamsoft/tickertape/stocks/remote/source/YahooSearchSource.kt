@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.stocks.remote.source
 
+import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -23,11 +24,11 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooSearchSource
@@ -58,16 +59,18 @@ internal constructor(
               }
               .toList()
         } catch (e: Throwable) {
-          if (e is HttpException) {
-            // If YF delivers us a 404, then it just could not find any search results.
-            // Empty list
-            if (e.code() == 404) {
-              return@withContext emptyList<SearchResult>()
+          e.ifNotCancellation {
+            if (e is HttpException) {
+              // If YF delivers us a 404, then it just could not find any search results.
+              // Empty list
+              if (e.code() == 404) {
+                return@withContext emptyList<SearchResult>()
+              }
             }
-          }
 
-          // Otherwise rethrow the exception,
-          throw e
+            // Otherwise rethrow the exception,
+            throw e
+          }
         }
       }
 }

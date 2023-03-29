@@ -53,10 +53,10 @@ interface PortfolioDigInteractor : DigInteractor {
 
   interface Cache : DigInteractor.Cache {
 
-    suspend fun invalidateSplits()
+    suspend fun invalidateSplits(id: DbHolding.Id)
 
-    suspend fun invalidateHolding()
+    suspend fun invalidateHolding(id: DbHolding.Id)
 
-    suspend fun invalidatePositions()
+    suspend fun invalidatePositions(id: DbHolding.Id)
   }
 }

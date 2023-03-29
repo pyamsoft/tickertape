@@ -19,13 +19,30 @@ package com.pyamsoft.tickertape.db.holding
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.DbQuery
 import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
 interface HoldingQueryDao : DbQuery<DbHolding> {
 
   @CheckResult suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding>
 
+  @CheckResult suspend fun queryBySymbol(symbol: StockSymbol): Maybe<out DbHolding>
+
+  @CheckResult
+  suspend fun queryByTradeSide(
+      symbol: StockSymbol,
+      side: TradeSide,
+  ): Maybe<out DbHolding>
+
   interface Cache : DbQuery.Cache {
 
-    suspend fun invalidateById(id: DbHolding.Id)
+    suspend fun invalidateByHoldingId(id: DbHolding.Id)
+
+    suspend fun invalidateBySymbol(symbol: StockSymbol)
+
+    suspend fun invalidateByTradeSide(
+        symbol: StockSymbol,
+        side: TradeSide,
+    )
   }
 }

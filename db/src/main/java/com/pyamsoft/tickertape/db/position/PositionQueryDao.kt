@@ -16,9 +16,21 @@
 
 package com.pyamsoft.tickertape.db.position
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.DbQuery
+import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.db.holding.DbHolding
 
 interface PositionQueryDao : DbQuery<DbPosition> {
 
-  interface Cache : DbQuery.Cache
+  @CheckResult suspend fun queryById(id: DbPosition.Id): Maybe<out DbPosition>
+
+  @CheckResult suspend fun queryByHoldingId(id: DbHolding.Id): List<DbPosition>
+
+  interface Cache : DbQuery.Cache {
+
+    suspend fun invalidateById(id: DbPosition.Id)
+
+    suspend fun invalidateByHoldingId(id: DbHolding.Id)
+  }
 }

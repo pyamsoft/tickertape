@@ -19,14 +19,15 @@ package com.pyamsoft.tickertape.portfolio.dig.position.add
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionInsertDao
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PositionAddInteractorImpl
@@ -54,8 +55,11 @@ internal constructor(
   override suspend fun loadExistingPosition(id: DbPosition.Id): ResultWrapper<DbPosition> =
       withContext(context = Dispatchers.IO) {
         try {
-          val result = positionQueryDao.query().first { it.id == id }
-          ResultWrapper.success(result)
+          when (val result = positionQueryDao.queryById(id)) {
+            is Maybe.Data -> ResultWrapper.success(result.data)
+            is Maybe.None ->
+                ResultWrapper.failure(RuntimeException("No position for id: ${id.raw}"))
+          }
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error querying for position with ID: $id")

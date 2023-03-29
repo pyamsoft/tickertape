@@ -19,14 +19,15 @@ package com.pyamsoft.tickertape.portfolio.dig.splits.add
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitInsertDao
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class SplitAddInteractorImpl
@@ -52,8 +53,10 @@ internal constructor(
   override suspend fun loadExistingSplit(id: DbSplit.Id): ResultWrapper<DbSplit> =
       withContext(context = Dispatchers.IO) {
         try {
-          val result = splitQueryDao.query().first { it.id == id }
-          ResultWrapper.success(result)
+          when (val result = splitQueryDao.queryById(id)) {
+            is Maybe.Data -> ResultWrapper.success(result.data)
+            is Maybe.None -> ResultWrapper.failure(RuntimeException("No split for id: ${id.raw}"))
+          }
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error querying for split with ID: $id")

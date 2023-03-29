@@ -17,9 +17,9 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import com.pyamsoft.pydroid.core.ResultWrapper
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -38,11 +38,11 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioDigInteractorImpl
@@ -133,9 +133,12 @@ internal constructor(
   override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding> =
       withContext(context = Dispatchers.IO) {
         try {
-          val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
-          ResultWrapper.success(
-              holding.requireNotNull { "Unable to find holding with symbol: $symbol" })
+          when (val holding = holdingQueryDao.queryBySymbol(symbol)) {
+            is Maybe.Data -> ResultWrapper.success(holding.data)
+            is Maybe.None -> {
+              ResultWrapper.failure(RuntimeException("Missing holding: ${symbol.raw}"))
+            }
+          }
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Failed to get db holding: $symbol")
@@ -144,13 +147,13 @@ internal constructor(
         }
       }
 
-  override suspend fun invalidateHolding() =
-      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidate() }
+  override suspend fun invalidateHolding(id: DbHolding.Id) =
+      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidateByHoldingId(id) }
 
   override suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>> =
       withContext(context = Dispatchers.IO) {
         try {
-          val positions = positionQueryDao.query().filter { it.holdingId == id }
+          val positions = positionQueryDao.queryByHoldingId(id)
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -160,14 +163,14 @@ internal constructor(
         }
       }
 
-  override suspend fun invalidatePositions() =
-      withContext(context = Dispatchers.IO) { positionQueryDaoCache.invalidate() }
+  override suspend fun invalidatePositions(id: DbHolding.Id) =
+      withContext(context = Dispatchers.IO) { positionQueryDaoCache.invalidateByHoldingId(id) }
 
   override suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>> =
       withContext(context = Dispatchers.IO) {
         try {
-          val positions = splitQueryDao.query().filter { it.holdingId == id }
-          ResultWrapper.success(positions)
+          val splits = splitQueryDao.queryByHoldingId(id)
+          ResultWrapper.success(splits)
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Failed to get db splits: $id")
@@ -176,6 +179,6 @@ internal constructor(
         }
       }
 
-  override suspend fun invalidateSplits() =
-      withContext(context = Dispatchers.IO) { splitQueryDaoCache.invalidate() }
+  override suspend fun invalidateSplits(id: DbHolding.Id) =
+      withContext(context = Dispatchers.IO) { splitQueryDaoCache.invalidateByHoldingId(id) }
 }

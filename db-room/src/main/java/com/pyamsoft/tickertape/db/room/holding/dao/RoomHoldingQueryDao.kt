@@ -24,6 +24,8 @@ import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.room.holding.entity.RoomDbHolding
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -54,4 +56,45 @@ internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
       LIMIT 1
       """)
   internal abstract suspend fun daoQueryById(id: DbHolding.Id): RoomDbHolding?
+
+  final override suspend fun queryBySymbol(symbol: StockSymbol): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        when (val res = daoQueryBySymbol(symbol)) {
+          null -> Maybe.None
+          else -> Maybe.Data(res)
+        }
+      }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbHolding.TABLE_NAME}
+      WHERE ${RoomDbHolding.COLUMN_SYMBOL} = :symbol
+      LIMIT 1
+      """)
+  internal abstract suspend fun daoQueryBySymbol(symbol: StockSymbol): RoomDbHolding?
+
+  final override suspend fun queryByTradeSide(
+      symbol: StockSymbol,
+      side: TradeSide
+  ): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        when (val res = daoQueryByTradeSide(symbol, side)) {
+          null -> Maybe.None
+          else -> Maybe.Data(res)
+        }
+      }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbHolding.TABLE_NAME}
+      WHERE ${RoomDbHolding.COLUMN_SYMBOL} = :symbol
+      AND ${RoomDbHolding.COLUMN_HOLDING_SIDE} = :side
+      LIMIT 1
+      """)
+  internal abstract suspend fun daoQueryByTradeSide(
+      symbol: StockSymbol,
+      side: TradeSide
+  ): RoomDbHolding?
 }

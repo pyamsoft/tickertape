@@ -164,7 +164,7 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         try {
           // First invalidate cache to be sure we are up to date
-          holdingQueryDaoCache.invalidateById(id)
+          holdingQueryDaoCache.invalidateByHoldingId(id)
 
           when (val holding = holdingQueryDao.queryById(id)) {
             is Maybe.Data -> {

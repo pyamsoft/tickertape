@@ -17,15 +17,18 @@
 package com.pyamsoft.tickertape.db.split
 
 import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class SplitDbImpl
@@ -52,6 +55,18 @@ internal constructor(
         return@cachify realQueryDao.query()
       }
 
+  private val queryByIdCache =
+      multiCachify<QueryByIdKey, Maybe<out DbSplit>, DbSplit.Id> { id ->
+        enforcer.assertOffMainThread()
+        return@multiCachify realQueryDao.queryById(id)
+      }
+
+  private val queryByHoldingIdCache =
+      multiCachify<QueryByHoldingIdKey, List<DbSplit>, DbHolding.Id> { id ->
+        enforcer.assertOffMainThread()
+        return@multiCachify realQueryDao.queryByHoldingId(id)
+      }
+
   override val deleteDao: SplitDeleteDao = this
 
   override val insertDao: SplitInsertDao = this
@@ -60,13 +75,54 @@ internal constructor(
 
   override val realtime: SplitRealtime = this
 
-  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
+  override suspend fun invalidate() =
+      withContext(context = Dispatchers.IO) {
+        queryCache.clear()
+        queryByIdCache.clear()
+        queryByHoldingIdCache.clear()
+      }
+
+  override suspend fun invalidateById(id: DbSplit.Id) =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByIdKey(
+                id = id,
+            )
+        return@withContext queryByIdCache.key(key).clear()
+      }
+
+  override suspend fun invalidateByHoldingId(id: DbHolding.Id) =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByHoldingIdKey(
+                id = id,
+            )
+        return@withContext queryByHoldingIdCache.key(key).clear()
+      }
 
   override suspend fun listenForChanges(onChange: (event: SplitChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<DbSplit> =
       withContext(context = Dispatchers.IO) { queryCache.call() }
+
+  override suspend fun queryById(id: DbSplit.Id): Maybe<out DbSplit> =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByIdKey(
+                id = id,
+            )
+        return@withContext queryByIdCache.key(key).call(id)
+      }
+
+  override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbSplit> =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByHoldingIdKey(
+                id = id,
+            )
+        return@withContext queryByHoldingIdCache.key(key).call(id)
+      }
 
   override suspend fun insert(o: DbSplit): DbInsert.InsertResult<DbSplit> =
       withContext(context = Dispatchers.IO) {
@@ -95,4 +151,12 @@ internal constructor(
           }
         }
       }
+
+  private data class QueryByIdKey(
+      val id: DbSplit.Id,
+  )
+
+  private data class QueryByHoldingIdKey(
+      val id: DbHolding.Id,
+  )
 }

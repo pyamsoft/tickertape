@@ -141,9 +141,6 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
           )
         }
 
-    val specSegments = mutableStateListOf<LineChart.LineSpec>()
-    val lineSegments = mutableStateListOf<List<ChartDataEntry>>()
-
     // Only one segment, color the chart based on the final price compared to the baseline
     val lineColor =
         dataPoints.lastOrNull().let { lastData ->
@@ -159,34 +156,34 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
           }
         }
 
-    lineSegments.add(
-        dataPoints.mapIndexed { i, d ->
-          ChartDataEntry(
-              data = d,
-              x = i.toFloat(),
-              y = d.price.value.toFloat(),
-          )
-        },
-    )
-    specSegments.add(
-        LineChart.LineSpec(
-            lineColor = lineColor,
-            lineBackgroundShader =
-                verticalGradient(
-                    colors =
-                        Color(lineColor).let { c ->
-                          arrayOf(
-                              c.copy(alpha = 0.7F),
-                              c.copy(alpha = 0.3F),
-                          )
-                        },
-                ),
-        ),
-    )
-
     return@rememberInBackground ChartLines(
-        models = ChartEntryModelProducer(lineSegments).getModel(),
-        specs = specSegments,
+        models =
+            ChartEntryModelProducer(
+                    dataPoints.mapIndexed { i, d ->
+                      ChartDataEntry(
+                          data = d,
+                          x = i.toFloat(),
+                          y = d.price.value.toFloat(),
+                      )
+                    },
+                )
+                .getModel(),
+        specs =
+            mutableStateListOf(
+                LineChart.LineSpec(
+                    lineColor = lineColor,
+                    lineBackgroundShader =
+                        verticalGradient(
+                            colors =
+                                Color(lineColor).let { c ->
+                                  arrayOf(
+                                      c.copy(alpha = 0.7F),
+                                      c.copy(alpha = 0.3F),
+                                  )
+                                },
+                        ),
+                ),
+            ),
     )
   }
 }

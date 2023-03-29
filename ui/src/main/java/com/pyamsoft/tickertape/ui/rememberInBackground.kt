@@ -42,7 +42,7 @@ fun <T : Any> rememberInBackground(
     val scope = this
 
     // Default for computation intensive task
-    scope.launch(context = Dispatchers.Default) {
+    scope.launch(context = Dispatchers.IO) {
       val result = handleCalculation()
       setValue(result)
     }

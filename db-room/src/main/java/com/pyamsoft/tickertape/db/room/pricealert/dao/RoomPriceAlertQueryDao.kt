@@ -36,4 +36,21 @@ internal abstract class RoomPriceAlertQueryDao : PriceAlertQueryDao {
   @Transaction
   @Query("""SELECT * FROM ${RoomPriceAlert.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomPriceAlert>
+
+  final override suspend fun queryActive(): List<PriceAlert> =
+      withContext(context = Dispatchers.IO) { daoQueryActive() }
+
+  @CheckResult
+  @Transaction
+  @Query(
+      """
+      SELECT * FROM ${RoomPriceAlert.TABLE_NAME}
+      WHERE ${RoomPriceAlert.COLUMN_ENABLED} = TRUE
+      AND 
+        (
+          ${RoomPriceAlert.COLUMN_TRIGGER_PRICE_BELOW} IS NOT NULL
+          OR ${RoomPriceAlert.COLUMN_TRIGGER_PRICE_ABOVE} IS NOT NULL
+        )
+      """)
+  internal abstract suspend fun daoQueryActive(): List<RoomPriceAlert>
 }

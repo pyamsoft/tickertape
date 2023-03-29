@@ -20,6 +20,8 @@ import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.room.split.entity.RoomDbSplit
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
@@ -36,4 +38,32 @@ internal abstract class RoomSplitQueryDao : SplitQueryDao {
   @Transaction
   @Query("""SELECT * FROM ${RoomDbSplit.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbSplit>
+
+  final override suspend fun queryById(id: DbSplit.Id): Maybe<out DbSplit> =
+      withContext(context = Dispatchers.IO) {
+        when (val res = daoQueryById(id)) {
+          null -> Maybe.None
+          else -> Maybe.Data(res)
+        }
+      }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbSplit.TABLE_NAME}
+      WHERE ${RoomDbSplit.COLUMN_ID} = :id
+      LIMIT 1
+      """)
+  internal abstract suspend fun daoQueryById(id: DbSplit.Id): RoomDbSplit?
+
+  final override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbSplit> =
+      withContext(context = Dispatchers.IO) { daoQueryByHoldingId(id) }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbSplit.TABLE_NAME}
+      WHERE ${RoomDbSplit.COLUMN_HOLDING_ID} = :id
+      """)
+  internal abstract suspend fun daoQueryByHoldingId(id: DbHolding.Id): List<RoomDbSplit>
 }

@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.JsonMappableDbHolding
@@ -33,12 +34,12 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -120,23 +121,24 @@ internal constructor(
       equityType: EquityType,
       tradeSide: TradeSide,
   ): DbInsert.InsertResult<StockSymbol> {
-    val existing =
-        holdingQueryDao.query().firstOrNull { it.symbol == symbol && it.side == tradeSide }
-    return if (existing == null) {
-      val model =
-          JsonMappableDbHolding.create(
-              symbol,
-              equityType,
-              tradeSide,
-          )
-      val result = holdingInsertDao.insert(model)
-      mapResultToSymbol(result) { it.symbol }
-    } else {
-      val error = IllegalArgumentException("${symbol.raw} already in portfolio: $tradeSide")
-      DbInsert.InsertResult.Fail(
-          data = symbol,
-          error = error,
-      )
+    when (holdingQueryDao.queryByTradeSide(symbol, tradeSide)) {
+      is Maybe.Data -> {
+        val error = IllegalArgumentException("${symbol.raw} already in portfolio: $tradeSide")
+        return DbInsert.InsertResult.Fail(
+            data = symbol,
+            error = error,
+        )
+      }
+      is Maybe.None -> {
+        val model =
+            JsonMappableDbHolding.create(
+                symbol,
+                equityType,
+                tradeSide,
+            )
+        val result = holdingInsertDao.insert(model)
+        return mapResultToSymbol(result) { it.symbol }
+      }
     }
   }
 

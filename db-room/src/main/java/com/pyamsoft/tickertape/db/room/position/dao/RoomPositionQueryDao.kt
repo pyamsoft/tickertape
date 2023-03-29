@@ -20,6 +20,8 @@ import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.room.position.entity.RoomDbPosition
@@ -36,4 +38,32 @@ internal abstract class RoomPositionQueryDao : PositionQueryDao {
   @Transaction
   @Query("""SELECT * FROM ${RoomDbPosition.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbPosition>
+
+  final override suspend fun queryById(id: DbPosition.Id): Maybe<out DbPosition> =
+      withContext(context = Dispatchers.IO) {
+        when (val res = daoQueryById(id)) {
+          null -> Maybe.None
+          else -> Maybe.Data(res)
+        }
+      }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbPosition.TABLE_NAME}
+      WHERE ${RoomDbPosition.COLUMN_ID} = :id
+      LIMIT 1
+      """)
+  internal abstract suspend fun daoQueryById(id: DbPosition.Id): RoomDbPosition?
+
+  final override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbPosition> =
+      withContext(context = Dispatchers.IO) { daoQueryByHoldingId(id) }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbPosition.TABLE_NAME}
+      WHERE ${RoomDbPosition.COLUMN_HOLDING_ID} = :id
+      """)
+  internal abstract suspend fun daoQueryByHoldingId(id: DbHolding.Id): List<RoomDbPosition>
 }

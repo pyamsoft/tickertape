@@ -29,13 +29,13 @@ import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.worker.notification.NotificationIdMap
 import com.pyamsoft.tickertape.worker.notification.NotificationType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Singleton
 class PriceAlertStandalone
@@ -87,12 +87,13 @@ internal constructor(
         // For each alert in price alerts
         // If the price of the stock quote has passed an alert direction
         // mark as alerted and trigger alert notification
-        val alerts =
-            priceAlertQueryDao.query().filter {
-              // Alert must be enabled
-              // Alert must have a trigger price set in some direction
-              it.enabled && (it.triggerPriceAbove != null || it.triggerPriceBelow != null)
-            }
+        val alerts = priceAlertQueryDao.queryActive()
+
+        //            priceAlertQueryDao.query().filter {
+        //              // Alert must be enabled
+        //              // Alert must have a trigger price set in some direction
+        //              it.enabled && (it.triggerPriceAbove != null || it.triggerPriceBelow != null)
+        //            }
         Timber.d("FUTURE: PROCESS PRICE ALERTS: $quotes $alerts")
       }
 

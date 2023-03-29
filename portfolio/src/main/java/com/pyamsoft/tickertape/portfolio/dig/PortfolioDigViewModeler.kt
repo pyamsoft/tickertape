@@ -37,7 +37,6 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +44,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
@@ -64,43 +64,44 @@ internal constructor(
 
   private val splitLoadRunner =
       highlander<ResultWrapper<List<DbSplit>>, Boolean> { force ->
-        if (force) {
-          interactorCache.invalidateSplits()
-        }
-
         val holding = state.holding.value
-        return@highlander if (holding == null) {
-          ResultWrapper.success(emptyList())
+        if (holding == null) {
+          return@highlander ResultWrapper.success(emptyList())
         } else {
-          interactor.getSplits(holding.id)
+          if (force) {
+            interactorCache.invalidateSplits(holding.id)
+          }
+
+          return@highlander interactor.getSplits(holding.id)
         }
       }
 
   private val holdingLoadRunner =
       highlander<ResultWrapper<DbHolding>, Boolean> { force ->
-        if (force) {
-          interactorCache.invalidateHolding()
-        }
 
         // If this holding is already provided, great, fast track!
         val holding = params.holding
-        return@highlander if (holding != null) {
-          ResultWrapper.success(holding)
+        if (holding == null) {
+          return@highlander interactor.getHolding(params.symbol)
         } else {
-          interactor.getHolding(params.symbol)
+          if (force) {
+            interactorCache.invalidateHolding(holding.id)
+          }
+
+          return@highlander ResultWrapper.success(holding)
         }
       }
 
   private val positionsLoadRunner =
       highlander<ResultWrapper<List<PositionStock>>, Boolean, List<DbSplit>> { force, splits ->
-        if (force) {
-          interactorCache.invalidatePositions()
-        }
-
         val holding = state.holding.value
-        return@highlander if (holding == null) {
-          ResultWrapper.success(emptyList())
+        if (holding == null) {
+          return@highlander ResultWrapper.success(emptyList())
         } else {
+          if (force) {
+            interactorCache.invalidatePositions(holding.id)
+          }
+
           interactor.getPositions(holding.id).map { p ->
             p.map { createPositionStock(holding, it, splits) }.sortedBy { it.purchaseDate }
           }

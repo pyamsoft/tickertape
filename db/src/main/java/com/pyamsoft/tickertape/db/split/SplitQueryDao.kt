@@ -16,9 +16,21 @@
 
 package com.pyamsoft.tickertape.db.split
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.DbQuery
+import com.pyamsoft.tickertape.db.Maybe
+import com.pyamsoft.tickertape.db.holding.DbHolding
 
 interface SplitQueryDao : DbQuery<DbSplit> {
 
-  interface Cache : DbQuery.Cache
+  @CheckResult suspend fun queryById(id: DbSplit.Id): Maybe<out DbSplit>
+
+  @CheckResult suspend fun queryByHoldingId(id: DbHolding.Id): List<DbSplit>
+
+  interface Cache : DbQuery.Cache {
+
+    suspend fun invalidateById(id: DbSplit.Id)
+
+    suspend fun invalidateByHoldingId(id: DbHolding.Id)
+  }
 }

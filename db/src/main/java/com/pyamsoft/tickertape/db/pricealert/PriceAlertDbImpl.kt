@@ -21,11 +21,11 @@ import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PriceAlertDbImpl
@@ -52,6 +52,12 @@ internal constructor(
         return@cachify realQueryDao.query()
       }
 
+  private val queryActiveCache =
+      cachify<List<PriceAlert>> {
+        enforcer.assertOffMainThread()
+        return@cachify realQueryDao.queryActive()
+      }
+
   override val deleteDao: PriceAlertDeleteDao = this
 
   override val insertDao: PriceAlertInsertDao = this
@@ -60,13 +66,23 @@ internal constructor(
 
   override val realtime: PriceAlertRealtime = this
 
-  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
+  override suspend fun invalidate() =
+      withContext(context = Dispatchers.IO) {
+        queryCache.clear()
+        queryActiveCache.clear()
+      }
+
+  override suspend fun invalidateActive() =
+      withContext(context = Dispatchers.IO) { queryActiveCache.clear() }
 
   override suspend fun listenForChanges(onChange: (event: PriceAlertChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<PriceAlert> =
       withContext(context = Dispatchers.IO) { queryCache.call() }
+
+  override suspend fun queryActive(): List<PriceAlert> =
+      withContext(context = Dispatchers.IO) { queryActiveCache.call() }
 
   override suspend fun insert(o: PriceAlert): DbInsert.InsertResult<PriceAlert> =
       withContext(context = Dispatchers.IO) {

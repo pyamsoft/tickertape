@@ -16,9 +16,17 @@
 
 package com.pyamsoft.tickertape.db.pricealert
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.DbQuery
 
 interface PriceAlertQueryDao : DbQuery<PriceAlert> {
 
-  interface Cache : DbQuery.Cache
+  @CheckResult suspend fun queryActive(): List<PriceAlert>
+
+  interface Cache : DbQuery.Cache {
+
+    @CheckResult suspend fun invalidateActive()
+
+  }
+
 }

@@ -23,11 +23,13 @@ import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.Maybe
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class HoldingDbImpl
@@ -60,6 +62,19 @@ internal constructor(
         return@multiCachify realQueryDao.queryById(id)
       }
 
+  private val queryBySymbolCache =
+      multiCachify<QueryBySymbolKey, Maybe<out DbHolding>, StockSymbol> { symbol ->
+        enforcer.assertOffMainThread()
+        return@multiCachify realQueryDao.queryBySymbol(symbol)
+      }
+
+  private val queryByTradeSideCache =
+      multiCachify<QueryByTradeSideKey, Maybe<out DbHolding>, StockSymbol, TradeSide> { symbol, side
+        ->
+        enforcer.assertOffMainThread()
+        return@multiCachify realQueryDao.queryByTradeSide(symbol, side)
+      }
+
   override val deleteDao: HoldingDeleteDao = this
 
   override val insertDao: HoldingInsertDao = this
@@ -72,15 +87,36 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         queryCache.clear()
         queryByIdCache.clear()
+        queryBySymbolCache.clear()
+        queryByTradeSideCache.clear()
       }
 
-  override suspend fun invalidateById(id: DbHolding.Id) =
+  override suspend fun invalidateByHoldingId(id: DbHolding.Id) =
       withContext(context = Dispatchers.IO) {
         val key =
             QueryByIdKey(
                 id = id,
             )
         queryByIdCache.key(key).clear()
+      }
+
+  override suspend fun invalidateBySymbol(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryBySymbolKey(
+                symbol = symbol,
+            )
+        queryBySymbolCache.key(key).clear()
+      }
+
+  override suspend fun invalidateByTradeSide(symbol: StockSymbol, side: TradeSide) =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByTradeSideKey(
+                symbol = symbol,
+                side = side,
+            )
+        queryByTradeSideCache.key(key).clear()
       }
 
   override suspend fun listenForChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
@@ -96,6 +132,28 @@ internal constructor(
                 id = id,
             )
         return@withContext queryByIdCache.key(key).call(id)
+      }
+
+  override suspend fun queryBySymbol(symbol: StockSymbol): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryBySymbolKey(
+                symbol = symbol,
+            )
+        return@withContext queryBySymbolCache.key(key).call(symbol)
+      }
+
+  override suspend fun queryByTradeSide(
+      symbol: StockSymbol,
+      side: TradeSide
+  ): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByTradeSideKey(
+                symbol = symbol,
+                side = side,
+            )
+        return@withContext queryByTradeSideCache.key(key).call(symbol, side)
       }
 
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
@@ -128,5 +186,14 @@ internal constructor(
 
   private data class QueryByIdKey(
       val id: DbHolding.Id,
+  )
+
+  private data class QueryBySymbolKey(
+      val symbol: StockSymbol,
+  )
+
+  private data class QueryByTradeSideKey(
+      val symbol: StockSymbol,
+      val side: TradeSide,
   )
 }

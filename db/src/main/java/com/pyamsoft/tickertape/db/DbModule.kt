@@ -58,38 +58,34 @@ import javax.inject.Qualifier
 abstract class DbModule {
 
   // DB
-  @Binds @CheckResult internal abstract fun provideHoldingDbImpl(impl: HoldingDbImpl): HoldingDb
+  @Binds @CheckResult internal abstract fun bindHoldingDb(impl: HoldingDbImpl): HoldingDb
 
-  @Binds @CheckResult internal abstract fun providePositionDbImpl(impl: PositionDbImpl): PositionDb
+  @Binds @CheckResult internal abstract fun bindPositionDb(impl: PositionDbImpl): PositionDb
 
-  @Binds @CheckResult internal abstract fun provideBigMoverDbImpl(impl: BigMoverDbImpl): BigMoverDb
+  @Binds @CheckResult internal abstract fun bindBigMoverDb(impl: BigMoverDbImpl): BigMoverDb
 
-  @Binds @CheckResult internal abstract fun provideSplitDbImpl(impl: SplitDbImpl): SplitDb
+  @Binds @CheckResult internal abstract fun bindSplitDb(impl: SplitDbImpl): SplitDb
 
-  @Binds
-  @CheckResult
-  internal abstract fun providePriceAlertDbImpl(impl: PriceAlertDbImpl): PriceAlertDb
+  @Binds @CheckResult internal abstract fun bindPriceAlertDb(impl: PriceAlertDbImpl): PriceAlertDb
 
   // Caches
   @Binds
   @CheckResult
-  internal abstract fun provideHoldingCache(impl: HoldingDbImpl): HoldingQueryDao.Cache
+  internal abstract fun bindHoldingCache(impl: HoldingDbImpl): HoldingQueryDao.Cache
 
   @Binds
   @CheckResult
-  internal abstract fun providePositionCache(impl: PositionDbImpl): PositionQueryDao.Cache
+  internal abstract fun bindPositionCache(impl: PositionDbImpl): PositionQueryDao.Cache
 
   @Binds
   @CheckResult
-  internal abstract fun provideBigMoverCache(impl: BigMoverDbImpl): BigMoverQueryDao.Cache
+  internal abstract fun bindBigMoverCache(impl: BigMoverDbImpl): BigMoverQueryDao.Cache
+
+  @Binds @CheckResult internal abstract fun bindSplitCache(impl: SplitDbImpl): SplitQueryDao.Cache
 
   @Binds
   @CheckResult
-  internal abstract fun provideSplitCache(impl: SplitDbImpl): SplitQueryDao.Cache
-
-  @Binds
-  @CheckResult
-  internal abstract fun providePriceAlertCache(impl: PriceAlertDbImpl): PriceAlertQueryDao.Cache
+  internal abstract fun bindPriceAlertCache(impl: PriceAlertDbImpl): PriceAlertQueryDao.Cache
 
   @Module
   companion object {

@@ -16,14 +16,14 @@
 
 package com.pyamsoft.tickertape.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import com.pyamsoft.tickertape.home.HomeEntry
 import com.pyamsoft.tickertape.notification.NotificationEntry
 import com.pyamsoft.tickertape.portfolio.PortfolioEntry
@@ -31,7 +31,7 @@ import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.quote.Ticker
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 internal fun MainContent(
     modifier: Modifier = Modifier,
     appName: String,
@@ -42,7 +42,7 @@ internal fun MainContent(
 ) {
   HorizontalPager(
       modifier = modifier,
-      count = allTabs.size,
+      pageCount = allTabs.size,
       state = pagerState,
   ) { page ->
     val screen =

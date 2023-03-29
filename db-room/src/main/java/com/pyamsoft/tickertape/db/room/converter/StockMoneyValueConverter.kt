@@ -24,16 +24,24 @@ import com.pyamsoft.tickertape.stocks.api.asMoney
 internal object StockMoneyValueConverter {
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun toMoney(money: Double): StockMoneyValue {
+  @TypeConverter
+  fun toMoney(money: Double?): StockMoneyValue? {
+    if (money == null) {
+      return null
+    }
+
     return money.asMoney()
   }
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun fromMoney(money: StockMoneyValue): Double {
+  @TypeConverter
+  fun fromMoney(money: StockMoneyValue?): Double? {
+    if (money == null) {
+      return null
+    }
+
     return money.value
   }
 }

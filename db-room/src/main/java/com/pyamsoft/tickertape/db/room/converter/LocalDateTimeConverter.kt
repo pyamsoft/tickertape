@@ -18,23 +18,30 @@ package com.pyamsoft.tickertape.db.room.converter
 
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 internal object LocalDateTimeConverter {
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun toLocalDateTime(date: Long): LocalDateTime {
-    return LocalDateTime.ofInstant(Instant.ofEpochSecond(date), ZoneOffset.UTC)
+  @TypeConverter
+  fun toLocalDateTime(date: String?): LocalDateTime? {
+    if (date == null) {
+      return null
+    }
+
+    return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
   }
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun fromLocalDateTime(date: LocalDateTime): Long {
-    return date.toEpochSecond(ZoneOffset.UTC)
+  @TypeConverter
+  fun fromLocalDateTime(date: LocalDateTime?): String? {
+    if (date == null) {
+      return null
+    }
+
+    return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(date)
   }
 }

@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.converter
+package com.pyamsoft.tickertape.db.room.split.converter
 
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.db.split.DbSplit
 
-internal object StockSymbolConverter {
+internal object DbSplitIdConverter {
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun toSymbol(symbol: String?): StockSymbol? {
-    if (symbol == null) {
+  fun toId(id: String?): DbSplit.Id? {
+    if (id == null) {
       return null
     }
 
-    return symbol.asSymbol()
+    return DbSplit.Id(id)
   }
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun fromSymbol(symbol: StockSymbol?): String? {
-    if (symbol == null) {
+  fun fromId(id: DbSplit.Id?): String? {
+    if (id == null) {
       return null
     }
 
-    return symbol.raw
+    return id.raw
   }
 }

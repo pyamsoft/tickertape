@@ -24,16 +24,24 @@ import com.pyamsoft.tickertape.stocks.api.asShares
 internal object StockShareValueConverter {
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun toShares(shares: Double): StockShareValue {
+  @TypeConverter
+  fun toShares(shares: Double?): StockShareValue? {
+    if (shares == null) {
+      return null
+    }
+
     return shares.asShares()
   }
 
   @JvmStatic
-  @TypeConverter
   @CheckResult
-  fun fromShares(shares: StockShareValue): Double {
+  @TypeConverter
+  fun fromShares(shares: StockShareValue?): Double? {
+    if (shares == null) {
+      return null
+    }
+
     return shares.value
   }
 }

@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.converter
+package com.pyamsoft.tickertape.db.room.pricealert.converter
 
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 
-internal object StockSymbolConverter {
+internal object PriceAlertIdConverter {
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun toSymbol(symbol: String?): StockSymbol? {
-    if (symbol == null) {
+  fun toId(id: String?): PriceAlert.Id? {
+    if (id == null) {
       return null
     }
 
-    return symbol.asSymbol()
+    return PriceAlert.Id(id)
   }
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun fromSymbol(symbol: StockSymbol?): String? {
-    if (symbol == null) {
+  fun fromId(id: PriceAlert.Id?): String? {
+    if (id == null) {
       return null
     }
 
-    return symbol.raw
+    return id.raw
   }
 }

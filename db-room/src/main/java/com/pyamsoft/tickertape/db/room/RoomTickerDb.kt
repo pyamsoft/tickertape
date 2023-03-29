@@ -17,31 +17,23 @@
 package com.pyamsoft.tickertape.db.room
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingInsertDao
-import com.pyamsoft.tickertape.db.room.dao.holding.RoomHoldingQueryDao
-import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverInsertDao
-import com.pyamsoft.tickertape.db.room.dao.mover.RoomBigMoverQueryDao
-import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionInsertDao
-import com.pyamsoft.tickertape.db.room.dao.position.RoomPositionQueryDao
-import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertInsertDao
-import com.pyamsoft.tickertape.db.room.dao.pricealert.RoomPriceAlertQueryDao
-import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitInsertDao
-import com.pyamsoft.tickertape.db.room.dao.split.RoomSplitQueryDao
-import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolDeleteDao
-import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolInsertDao
-import com.pyamsoft.tickertape.db.room.dao.symbol.RoomSymbolQueryDao
+import com.pyamsoft.tickertape.db.room.holding.dao.RoomHoldingDeleteDao
+import com.pyamsoft.tickertape.db.room.holding.dao.RoomHoldingInsertDao
+import com.pyamsoft.tickertape.db.room.holding.dao.RoomHoldingQueryDao
+import com.pyamsoft.tickertape.db.room.mover.dao.RoomBigMoverDeleteDao
+import com.pyamsoft.tickertape.db.room.mover.dao.RoomBigMoverInsertDao
+import com.pyamsoft.tickertape.db.room.mover.dao.RoomBigMoverQueryDao
+import com.pyamsoft.tickertape.db.room.position.dao.RoomPositionDeleteDao
+import com.pyamsoft.tickertape.db.room.position.dao.RoomPositionInsertDao
+import com.pyamsoft.tickertape.db.room.position.dao.RoomPositionQueryDao
+import com.pyamsoft.tickertape.db.room.pricealert.dao.RoomPriceAlertDeleteDao
+import com.pyamsoft.tickertape.db.room.pricealert.dao.RoomPriceAlertInsertDao
+import com.pyamsoft.tickertape.db.room.pricealert.dao.RoomPriceAlertQueryDao
+import com.pyamsoft.tickertape.db.room.split.dao.RoomSplitDeleteDao
+import com.pyamsoft.tickertape.db.room.split.dao.RoomSplitInsertDao
+import com.pyamsoft.tickertape.db.room.split.dao.RoomSplitQueryDao
 
 internal interface RoomTickerDb {
-
-  // Symbols
-  @Deprecated("Don't use") @get:CheckResult val roomSymbolQueryDao: RoomSymbolQueryDao
-  @Deprecated("Don't use") @get:CheckResult val roomSymbolInsertDao: RoomSymbolInsertDao
-  @Deprecated("Don't use") @get:CheckResult val roomSymbolDeleteDao: RoomSymbolDeleteDao
 
   // Holdings
   @get:CheckResult val roomHoldingQueryDao: RoomHoldingQueryDao

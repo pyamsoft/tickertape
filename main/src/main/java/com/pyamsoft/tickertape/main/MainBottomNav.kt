@@ -17,9 +17,11 @@
 package com.pyamsoft.tickertape.main
 
 import androidx.annotation.CheckResult
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -40,8 +42,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
 import com.pyamsoft.tickertape.ui.icon.BarChart
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +60,7 @@ fun rememberAllTabs(): SnapshotStateList<MainPage> {
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 fun MainBottomNav(
     modifier: Modifier = Modifier,
     pagerState: PagerState,

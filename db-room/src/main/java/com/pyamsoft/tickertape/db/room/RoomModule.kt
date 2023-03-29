@@ -46,7 +46,7 @@ import javax.inject.Qualifier
 @Module
 abstract class RoomModule {
 
-  @Binds @CheckResult internal abstract fun provideDb(impl: TickerDbImpl): TickerDb
+  @Binds @CheckResult internal abstract fun bindDb(impl: TickerDbImpl): TickerDb
 
   @Module
   companion object {

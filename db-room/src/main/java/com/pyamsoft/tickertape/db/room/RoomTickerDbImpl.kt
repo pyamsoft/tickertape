@@ -16,63 +16,46 @@
 
 package com.pyamsoft.tickertape.db.room
 
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.pyamsoft.tickertape.db.room.converter.BigMoverReportIdConverter
-import com.pyamsoft.tickertape.db.room.converter.DbHoldingIdConverter
-import com.pyamsoft.tickertape.db.room.converter.DbPositionIdConverter
-import com.pyamsoft.tickertape.db.room.converter.DbSplitIdConverter
-import com.pyamsoft.tickertape.db.room.converter.DbSymbolIdConverter
-import com.pyamsoft.tickertape.db.room.converter.EquityTypeConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateConverter
 import com.pyamsoft.tickertape.db.room.converter.LocalDateTimeConverter
-import com.pyamsoft.tickertape.db.room.converter.MarketStateConverter
-import com.pyamsoft.tickertape.db.room.converter.PriceAlertIdConverter
 import com.pyamsoft.tickertape.db.room.converter.StockMoneyValueConverter
-import com.pyamsoft.tickertape.db.room.converter.StockPercentConverter
 import com.pyamsoft.tickertape.db.room.converter.StockShareValueConverter
 import com.pyamsoft.tickertape.db.room.converter.StockSymbolConverter
-import com.pyamsoft.tickertape.db.room.converter.TradeSideConverter
-import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
-import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
-import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
-import com.pyamsoft.tickertape.db.room.entity.RoomDbSplit
-import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
-import com.pyamsoft.tickertape.db.room.entity.RoomPriceAlert
+import com.pyamsoft.tickertape.db.room.holding.converter.DbHoldingIdConverter
+import com.pyamsoft.tickertape.db.room.holding.converter.EquityTypeConverter
+import com.pyamsoft.tickertape.db.room.holding.converter.TradeSideConverter
+import com.pyamsoft.tickertape.db.room.holding.entity.RoomDbHolding
+import com.pyamsoft.tickertape.db.room.mover.converter.BigMoverReportIdConverter
+import com.pyamsoft.tickertape.db.room.mover.converter.MarketStateConverter
+import com.pyamsoft.tickertape.db.room.mover.converter.StockPercentConverter
+import com.pyamsoft.tickertape.db.room.mover.entity.RoomBigMoverReport
+import com.pyamsoft.tickertape.db.room.position.converter.DbPositionIdConverter
+import com.pyamsoft.tickertape.db.room.position.entity.RoomDbPosition
+import com.pyamsoft.tickertape.db.room.pricealert.converter.PriceAlertIdConverter
+import com.pyamsoft.tickertape.db.room.pricealert.entity.RoomPriceAlert
+import com.pyamsoft.tickertape.db.room.split.converter.DbSplitIdConverter
+import com.pyamsoft.tickertape.db.room.split.entity.RoomDbSplit
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 1,
     entities =
         [
             // Version 1
-            RoomDbSymbol::class,
             RoomDbHolding::class,
             RoomDbPosition::class,
             RoomBigMoverReport::class,
-
-            // Version 2
             RoomDbSplit::class,
-
-            // Version 3
             RoomPriceAlert::class,
-        ],
-    autoMigrations =
-        [
-            // Adds DbSplit table
-            AutoMigration(from = 1, to = 2),
-
-            // Adds PriceAlert table
-            AutoMigration(from = 2, to = 3),
         ],
 )
 @TypeConverters(
     // Version 1
-    DbSymbolIdConverter::class,
     DbHoldingIdConverter::class,
-    DbPositionIdConverter::class,
+    DbSplitIdConverter::class,
     BigMoverReportIdConverter::class,
     StockSymbolConverter::class,
     StockShareValueConverter::class,
@@ -83,11 +66,7 @@ import com.pyamsoft.tickertape.db.room.entity.RoomPriceAlert
     StockPercentConverter::class,
     TradeSideConverter::class,
     LocalDateConverter::class,
-
-    // Version 2
-    DbSplitIdConverter::class,
-
-    // Version 3
+    DbPositionIdConverter::class,
     PriceAlertIdConverter::class,
 )
 internal abstract class RoomTickerDbImpl internal constructor() : RoomDatabase(), RoomTickerDb

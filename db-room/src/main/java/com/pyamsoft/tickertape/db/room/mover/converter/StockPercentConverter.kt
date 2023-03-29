@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.converter
+package com.pyamsoft.tickertape.db.room.mover.converter
 
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.StockPercent
+import com.pyamsoft.tickertape.stocks.api.asPercent
 
-internal object StockSymbolConverter {
+internal object StockPercentConverter {
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun toSymbol(symbol: String?): StockSymbol? {
-    if (symbol == null) {
+  fun toPercent(percent: Double?): StockPercent? {
+    if (percent == null) {
       return null
     }
 
-    return symbol.asSymbol()
+    return percent.asPercent()
   }
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun fromSymbol(symbol: StockSymbol?): String? {
-    if (symbol == null) {
+  fun fromPercent(percent: StockPercent?): Double? {
+    if (percent == null) {
       return null
     }
 
-    return symbol.raw
+    return percent.value
   }
 }

@@ -16,6 +16,9 @@
 
 package com.pyamsoft.tickertape.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,18 +26,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainInjector @Inject internal constructor() : ComposableInjector() {
 
@@ -50,7 +50,7 @@ internal class MainInjector @Inject internal constructor() : ComposableInjector(
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun WatchTabSwipe(
     pagerState: PagerState,
     allTabs: SnapshotStateList<MainPage>,
@@ -69,7 +69,7 @@ private fun WatchTabSwipe(
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun MountHooks(
     pagerState: PagerState,
     allTabs: SnapshotStateList<MainPage>,
@@ -81,7 +81,7 @@ private fun MountHooks(
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 internal fun MainEntry(
     modifier: Modifier = Modifier,
     appName: String,

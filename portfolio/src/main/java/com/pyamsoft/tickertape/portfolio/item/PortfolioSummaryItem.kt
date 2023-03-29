@@ -184,16 +184,6 @@ private fun DisplayPortfolioData(
         )
       }
 
-  val positions =
-      remember(data?.positions) {
-        val positions = data?.positions
-        if (positions == null) {
-          return@remember ""
-        } else {
-          return@remember "Short Term: ${positions.shortTerm} Long Term: ${positions.longTerm}"
-        }
-      }
-
   Column(
       modifier = modifier.fillMaxWidth(),
   ) {

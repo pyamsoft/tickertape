@@ -17,11 +17,15 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -38,10 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import coil.ImageLoader
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -65,12 +65,12 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
+import kotlinx.coroutines.flow.collectLatest
 import java.time.Clock
 import java.time.LocalDate
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 fun PortfolioDigScreen(
     modifier: Modifier = Modifier,
     clock: Clock,
@@ -187,7 +187,7 @@ fun PortfolioDigScreen(
 }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun Content(
     modifier: Modifier = Modifier,
     clock: Clock,
@@ -224,7 +224,7 @@ private fun Content(
 ) {
   HorizontalPager(
       modifier = modifier,
-      count = allTabs.size,
+      pageCount = allTabs.size,
       state = pagerState,
   ) { page ->
     val section =

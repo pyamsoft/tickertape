@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.db.room.converter
+package com.pyamsoft.tickertape.db.room.holding.converter
 
 import androidx.annotation.CheckResult
 import androidx.room.TypeConverter
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 
-internal object StockSymbolConverter {
+internal object TradeSideConverter {
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun toSymbol(symbol: String?): StockSymbol? {
-    if (symbol == null) {
+  fun toSide(side: String?): TradeSide? {
+    if (side == null) {
       return null
     }
 
-    return symbol.asSymbol()
+    return TradeSide.valueOf(side)
   }
 
   @JvmStatic
   @CheckResult
   @TypeConverter
-  fun fromSymbol(symbol: StockSymbol?): String? {
-    if (symbol == null) {
+  fun fromSide(side: TradeSide?): String? {
+    if (side == null) {
       return null
     }
 
-    return symbol.raw
+    return side.name
   }
 }

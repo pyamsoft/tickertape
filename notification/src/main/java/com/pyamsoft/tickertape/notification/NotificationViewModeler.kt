@@ -18,24 +18,22 @@ package com.pyamsoft.tickertape.notification
 
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.tickertape.alert.AlarmFactory
-import com.pyamsoft.tickertape.alert.Alerter
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
-import javax.inject.Inject
+import com.pyamsoft.tickertape.worker.WorkJobType
+import com.pyamsoft.tickertape.worker.WorkerQueue
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import javax.inject.Inject
 
 class NotificationViewModeler
 @Inject
 internal constructor(
     override val state: MutableNotificationViewState,
     private val bigMoverPreferences: BigMoverPreferences,
-    private val alerter: Alerter,
-    private val alarmFactory: AlarmFactory,
+    private val workerQueue: WorkerQueue,
 ) : AbstractViewModeler<NotificationViewState>(state) {
 
   fun bind(scope: CoroutineScope) {
@@ -82,20 +80,12 @@ internal constructor(
       // Wait for completions
       yield()
 
-      // Fire all big mover alarms in case this is going from disabled -> enabled
-      val alarm =
-          alarmFactory.bigMoverAlarm(
-              BigMoverWorkerParameters(
-                  forceRefresh = false,
-              ),
-          )
-
       // Cancel existing alarms
-      alerter.cancelAlarm(alarm)
+      workerQueue.cancel(WorkJobType.REPEAT_BIG_MOVERS)
 
       // If we are enabled, fire
       if (newEnabled) {
-        alerter.scheduleAlarm(alarm)
+        workerQueue.enqueue(WorkJobType.REPEAT_BIG_MOVERS)
       }
     }
   }

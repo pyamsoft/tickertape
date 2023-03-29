@@ -17,24 +17,19 @@
 package com.pyamsoft.tickertape
 
 import android.app.Application
-import android.content.ComponentName
-import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.libraries.OssLibraries
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.ui.installPYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
-import com.pyamsoft.tickertape.alert.AlarmFactory
-import com.pyamsoft.tickertape.alert.AlertObjectGraph
-import com.pyamsoft.tickertape.alert.Alerter
-import com.pyamsoft.tickertape.alert.initOnAppStart
+import com.pyamsoft.tickertape.worker.WorkerQueue
+import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
-import com.pyamsoft.tickertape.receiver.BootReceiver
+import com.pyamsoft.tickertape.work.enqueueAppWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -42,9 +37,7 @@ import javax.inject.Inject
 
 class TickerTape : Application() {
 
-  @Inject @JvmField internal var alerter: Alerter? = null
-
-  @Inject @JvmField internal var alarmFactory: AlarmFactory? = null
+  @Inject @JvmField internal var workerQueue: WorkerQueue? = null
 
   @CheckResult
   private fun installPYDroid(): ModuleProvider {
@@ -63,6 +56,11 @@ class TickerTape : Application() {
     )
   }
 
+  private fun installWorkerComponent(component: TickerComponent) {
+    val wc = component.plusWorkerComponent().create()
+    WorkerObjectGraph.install(this, wc)
+  }
+
   private fun installComponent(moduleProvider: ModuleProvider) {
     val mods = moduleProvider.get()
     val component =
@@ -75,28 +73,17 @@ class TickerTape : Application() {
                 enforcer = mods.enforcer(),
             )
     component.inject(this)
+
     ObjectGraph.ApplicationScope.install(this, component)
-    AlertObjectGraph.WorkerScope.install(this, component.plusAlertWorkComponent())
+    installWorkerComponent(component)
   }
 
   private fun beginWork() {
     // Coroutine start up is slow. What we can do instead is create a handler, which is cheap, and
     // post to the main thread to defer this work until after start up is done
     Handler(Looper.getMainLooper()).post {
-      MainScope().launch(context = Dispatchers.Default) {
-        alerter.requireNotNull().initOnAppStart(alarmFactory.requireNotNull())
-      }
+      MainScope().launch(context = Dispatchers.Default) { workerQueue?.enqueueAppWork() }
     }
-  }
-
-  /** Ensure the BootReceiver is set to state enabled */
-  private fun ensureBootReceiverEnabled() {
-    val componentName = ComponentName(this, BootReceiver::class.java)
-    packageManager.setComponentEnabledSetting(
-        componentName,
-        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-        PackageManager.DONT_KILL_APP,
-    )
   }
 
   override fun onCreate() {
@@ -107,7 +94,6 @@ class TickerTape : Application() {
     installComponent(modules)
 
     addLibraries()
-    ensureBootReceiverEnabled()
     beginWork()
   }
 

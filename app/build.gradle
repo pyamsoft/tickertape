@@ -110,8 +110,6 @@ dependencies {
 
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist"
 
-  implementation project(':alert')
-  implementation project(':alert-workmanager')
   implementation project(':core')
   implementation project(':db')
   implementation project(':db-room')
@@ -123,6 +121,8 @@ dependencies {
   implementation project(':stocks')
   implementation project(':stocks-remote')
   implementation project(':ui')
+  implementation project(':worker')
+  implementation project(':worker-workmanager')
 }
 
 // Leave at bottom

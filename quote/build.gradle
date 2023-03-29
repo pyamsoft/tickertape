@@ -60,8 +60,8 @@ dependencies {
   // Moshi
   kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
-  implementation project(':alert')
   implementation project(':db')
   implementation project(':stocks')
   api project(':ui')
+  implementation project(':worker')
 }

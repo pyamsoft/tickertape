@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Peter Kenji Yamanaka
+ * Copyright 2023 pyamsoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    google()
-    mavenCentral()
+package com.pyamsoft.tickertape.worker.work.bigmover
+
+import androidx.annotation.CheckResult
+import kotlinx.coroutines.flow.Flow
+
+interface BigMoverPreferences {
+
+  suspend fun setBigMoverNotificationEnabled(enabled: Boolean)
+
+  @CheckResult suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean>
+
+  companion object {
+
+    const val VALUE_DEFAULT_NOTIFICATION_ENABLED = true
   }
 }
-
-rootProject.name = "TickerTape"
-include ':app'
-include ':core'
-include ':db'
-include ':db-room'
-include ':home'
-include ':main'
-include ':notification'
-include ':portfolio'
-include ':quote'
-include ':stocks'
-include ':stocks-remote'
-include ':ui'
-include ':worker'
-include ':worker-workmanager'

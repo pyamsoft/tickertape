@@ -23,10 +23,6 @@ import androidx.annotation.CheckResult
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.ui.theme.Theming
-import com.pyamsoft.tickertape.alert.AlertModule
-import com.pyamsoft.tickertape.alert.AlertWorkComponent
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
-import com.pyamsoft.tickertape.alert.workmanager.WorkManagerModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.home.HomeModule
@@ -39,9 +35,12 @@ import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
 import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
-import com.pyamsoft.tickertape.receiver.BootReceiver
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
+import com.pyamsoft.tickertape.worker.WorkerAppModule
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
+import com.pyamsoft.tickertape.worker.workmanager.WorkManagerAppModule
+import com.pyamsoft.tickertape.worker.workmanager.WorkerComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -56,32 +55,32 @@ import javax.inject.Singleton
     modules =
         [
             TickerComponent.TickerProvider::class,
+
+            // Stock network
             StockModule::class,
-            DbModule::class,
-            RoomModule::class,
-            AlertModule::class,
-            WorkManagerModule::class,
             TickerModule::class,
+            StockRemoteModule::class,
+
+            // Screens
             HomeModule::class,
             PortfolioModule::class,
-            StockRemoteModule::class,
+
+            // Database
+            DbModule::class,
+            RoomModule::class,
+
+            // Workers
+            WorkerAppModule::class,
+            WorkManagerAppModule::class,
         ],
 )
 internal interface TickerComponent {
 
-  // ===============================================
-  // HACKY INJECTORS
-
-  /* FROM inside BigMoverInjector, RefresherInjector: See TickerTape Injector */
-  @CheckResult fun plusAlertWorkComponent(): AlertWorkComponent
-
-  // ===============================================
-
-  fun inject(receiver: BootReceiver)
-
   fun inject(application: TickerTape)
 
   fun inject(injector: PortfolioRemoveInjector)
+
+  @CheckResult fun plusWorkerComponent(): WorkerComponent.Factory
 
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 

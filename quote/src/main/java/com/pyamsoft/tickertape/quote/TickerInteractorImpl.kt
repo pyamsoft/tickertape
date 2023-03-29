@@ -19,13 +19,11 @@ package com.pyamsoft.tickertape.quote
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverStandalone
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverStandalone
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +33,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class TickerInteractorImpl
@@ -128,7 +128,7 @@ internal constructor(
     if (options.notifyBigMovers) {
       launch(context = Dispatchers.IO) {
         wrapped("Error during big-mover refresh") {
-          bigMoverStandalone.notifyForBigMovers(
+          bigMoverStandalone.notifyBigMovers(
               quotes = tickers.mapNotNull { it.quote },
           )
         }

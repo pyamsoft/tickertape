@@ -21,7 +21,7 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.util.booleanFlow
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

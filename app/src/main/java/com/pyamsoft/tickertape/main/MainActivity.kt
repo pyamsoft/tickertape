@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.app.installPYDroid
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
@@ -36,16 +35,15 @@ import com.pyamsoft.pydroid.util.doOnCreate
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverNotificationData
 import timber.log.Timber
 import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
-  @JvmField @Inject internal var launcher: MainAlarmLauncher? = null
   @JvmField @Inject internal var themeViewModel: ThemeViewModeler? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
 
@@ -98,8 +96,6 @@ internal class MainActivity : AppCompatActivity() {
     }
 
     Timber.d("Launch intent with symbol: $symbol")
-    launcher.requireNotNull().cancelNotifications(symbol)
-
     viewModel
         .requireNotNull()
         .handleOpenDig(
@@ -146,13 +142,6 @@ internal class MainActivity : AppCompatActivity() {
         )
       }
     }
-
-    launcher
-        .requireNotNull()
-        .bind(
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-        )
   }
 
   override fun onResume() {
@@ -177,7 +166,6 @@ internal class MainActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
 
-    launcher = null
     viewModel = null
     themeViewModel = null
   }

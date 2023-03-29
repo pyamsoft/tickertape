@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.notification
 
 import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
-import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
+import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

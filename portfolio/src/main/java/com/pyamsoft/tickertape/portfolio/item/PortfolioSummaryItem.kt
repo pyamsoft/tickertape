@@ -47,6 +47,7 @@ import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
 import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
 import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
+import com.pyamsoft.tickertape.ui.rememberInBackground
 
 @Composable
 fun PorfolioSummaryItem(
@@ -56,7 +57,7 @@ fun PorfolioSummaryItem(
 ) {
   // Short circuit
   val data =
-      remember(
+      rememberInBackground(
           portfolio,
           equityType,
       ) {

@@ -110,6 +110,7 @@ dependencies {
 
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist"
 
+  implementation project(':alert')
   implementation project(':core')
   implementation project(':db')
   implementation project(':db-room')

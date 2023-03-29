@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Peter Kenji Yamanaka
+ * Copyright 2023 pyamsoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    google()
-    mavenCentral()
-  }
-}
+package com.pyamsoft.tickertape.worker
 
-rootProject.name = "TickerTape"
-include ':alert'
-include ':app'
-include ':core'
-include ':db'
-include ':db-room'
-include ':home'
-include ':main'
-include ':notification'
-include ':portfolio'
-include ':quote'
-include ':stocks'
-include ':stocks-remote'
-include ':ui'
-include ':worker'
-include ':worker-workmanager'
+internal suspend fun WorkerQueue.enqueueAppWork() {
+  // Queue up the periodic Repeat job for processing once-a-day
+  this.cancel(WorkJobType.REPEAT_PRICE_ALERTS)
+  this.enqueue(WorkJobType.REPEAT_PRICE_ALERTS)
+
+  this.cancel(WorkJobType.REPEAT_BIG_MOVERS)
+  this.enqueue(WorkJobType.REPEAT_BIG_MOVERS)
+}

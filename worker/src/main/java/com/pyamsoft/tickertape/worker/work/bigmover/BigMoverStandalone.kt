@@ -21,9 +21,6 @@ import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
-import com.pyamsoft.tickertape.worker.InternalApi
-import com.pyamsoft.tickertape.worker.notification.NotificationIdMap
-import com.pyamsoft.tickertape.worker.notification.NotificationType
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.getQuotesForHoldings
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
@@ -37,6 +34,8 @@ import com.pyamsoft.tickertape.stocks.api.StockMarketSession
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.asPercent
+import com.pyamsoft.tickertape.worker.notification.NotificationIdMap
+import com.pyamsoft.tickertape.worker.notification.NotificationType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,7 +48,7 @@ import javax.inject.Singleton
 class BigMoverStandalone
 @Inject
 internal constructor(
-    @InternalApi private val notifier: Notifier,
+    private val notifier: Notifier,
     private val holdingQueryDao: HoldingQueryDao,
     private val stockInteractor: StockInteractor,
     private val enforcer: ThreadEnforcer,

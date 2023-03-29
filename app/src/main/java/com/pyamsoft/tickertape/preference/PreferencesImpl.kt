@@ -22,11 +22,11 @@ import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.util.booleanFlow
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class PreferencesImpl

@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.worker.notification
+package com.pyamsoft.tickertape.alert.notification.bigmover
 
-import com.pyamsoft.pydroid.notify.Notifier
-import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.pyamsoft.pydroid.notify.NotifyData
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-@Singleton
-class NotificationCanceller
-@Inject
+data class BigMoverNotificationData
 internal constructor(
-    private val notifier: Notifier,
-    private val idMap: NotificationIdMap,
-) {
+    val quote: StockQuote,
+) : NotifyData {
 
-  fun cancelBigMoverNotification(symbol: StockSymbol) {
-    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { symbol }
-    Timber.d("Cancel big mover notification: $symbol $id")
-    notifier.cancel(id)
+  companion object {
+
+    const val INTENT_KEY_SYMBOL = "intent_key_symbol"
+    const val INTENT_KEY_LOOKUP_SYMBOL = "intent_key_lookup_symbol"
   }
 }

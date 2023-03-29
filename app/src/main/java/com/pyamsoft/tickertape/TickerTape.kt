@@ -25,15 +25,15 @@ import com.pyamsoft.pydroid.ui.ModuleProvider
 import com.pyamsoft.pydroid.ui.PYDroid
 import com.pyamsoft.pydroid.ui.installPYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
-import com.pyamsoft.tickertape.worker.WorkerQueue
-import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
-import com.pyamsoft.tickertape.work.enqueueAppWork
+import com.pyamsoft.tickertape.worker.enqueueAppWork
+import com.pyamsoft.tickertape.worker.WorkerQueue
+import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class TickerTape : Application() {
 

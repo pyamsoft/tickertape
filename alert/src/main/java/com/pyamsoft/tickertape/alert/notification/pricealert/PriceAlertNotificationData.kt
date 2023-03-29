@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.work
+package com.pyamsoft.tickertape.alert.notification.pricealert
 
-import com.pyamsoft.tickertape.worker.WorkJobType
-import com.pyamsoft.tickertape.worker.WorkerQueue
+import com.pyamsoft.pydroid.notify.NotifyData
+import com.pyamsoft.tickertape.db.pricealert.PriceAlert
+import com.pyamsoft.tickertape.stocks.api.StockQuote
 
-internal suspend fun WorkerQueue.enqueueAppWork() {
-  // Queue up the periodic Repeat job for processing once-a-day
-  this.cancel(WorkJobType.REPEAT_PRICE_ALERTS)
-  this.enqueue(WorkJobType.REPEAT_PRICE_ALERTS)
-
-  this.cancel(WorkJobType.REPEAT_BIG_MOVERS)
-  this.enqueue(WorkJobType.REPEAT_BIG_MOVERS)
-}
+data class PriceAlertNotificationData
+internal constructor(
+    val quote: StockQuote,
+    val alert: PriceAlert,
+) : NotifyData

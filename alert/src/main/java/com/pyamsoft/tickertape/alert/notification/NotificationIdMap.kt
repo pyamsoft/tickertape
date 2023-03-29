@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.worker.notification
+package com.pyamsoft.tickertape.alert.notification
 
-import com.pyamsoft.pydroid.notify.Notifier
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.notify.NotifyId
+import com.pyamsoft.pydroid.notify.toNotifyId
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NotificationCanceller
-@Inject
-internal constructor(
-    private val notifier: Notifier,
-    private val idMap: NotificationIdMap,
-) {
+internal class NotificationIdMap @Inject internal constructor() {
 
-  fun cancelBigMoverNotification(symbol: StockSymbol) {
-    val id = idMap.getNotificationId(NotificationType.BIG_MOVER) { symbol }
-    Timber.d("Cancel big mover notification: $symbol $id")
-    notifier.cancel(id)
+  private val map by lazy { mutableMapOf<NotificationType, IdMap>() }
+
+  @CheckResult
+  private fun getNotifications(type: NotificationType): IdMap {
+    return map.getOrPut(type) { mutableMapOf() }
+  }
+
+  @CheckResult
+  inline fun getNotificationId(type: NotificationType, key: () -> StockSymbol): NotifyId {
+    val k = key()
+    return getNotifications(type).getOrPut(k) { (k.hashCode() + type.ordinal).toNotifyId() }
   }
 }
+
+typealias IdMap = MutableMap<StockSymbol, NotifyId>

@@ -35,10 +35,10 @@ import com.pyamsoft.pydroid.util.doOnCreate
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverNotificationData
 import timber.log.Timber
 import javax.inject.Inject
 

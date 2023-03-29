@@ -23,6 +23,7 @@ import androidx.annotation.CheckResult
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.ui.theme.Theming
+import com.pyamsoft.tickertape.alert.AlertAppModule
 import com.pyamsoft.tickertape.db.DbModule
 import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.home.HomeModule
@@ -37,7 +38,6 @@ import com.pyamsoft.tickertape.quote.TickerModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
-import com.pyamsoft.tickertape.worker.WorkerAppModule
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.worker.workmanager.WorkManagerAppModule
 import com.pyamsoft.tickertape.worker.workmanager.WorkerComponent
@@ -70,8 +70,10 @@ import javax.inject.Singleton
             RoomModule::class,
 
             // Workers
-            WorkerAppModule::class,
             WorkManagerAppModule::class,
+
+            // Alerts
+            AlertAppModule::class,
         ],
 )
 internal interface TickerComponent {

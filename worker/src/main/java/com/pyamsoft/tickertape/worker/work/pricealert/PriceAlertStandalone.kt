@@ -20,9 +20,6 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
-import com.pyamsoft.tickertape.worker.InternalApi
-import com.pyamsoft.tickertape.worker.notification.NotificationIdMap
-import com.pyamsoft.tickertape.worker.notification.NotificationType
 import com.pyamsoft.tickertape.db.getQuotesForHoldings
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
@@ -30,6 +27,8 @@ import com.pyamsoft.tickertape.db.pricealert.PriceAlertInsertDao
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockQuote
+import com.pyamsoft.tickertape.worker.notification.NotificationIdMap
+import com.pyamsoft.tickertape.worker.notification.NotificationType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -42,7 +41,7 @@ import javax.inject.Singleton
 class PriceAlertStandalone
 @Inject
 internal constructor(
-    @InternalApi private val notifier: Notifier,
+    private val notifier: Notifier,
     private val stockInteractor: StockInteractor,
     private val holdingQueryDao: HoldingQueryDao,
     private val guard: NotifyGuard,

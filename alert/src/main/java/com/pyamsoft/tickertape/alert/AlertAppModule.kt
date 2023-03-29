@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.worker
+package com.pyamsoft.tickertape.alert
 
 import android.content.Context
 import androidx.annotation.CheckResult
@@ -23,7 +23,7 @@ import com.pyamsoft.pydroid.notify.NotifyDispatcher
 import com.pyamsoft.pydroid.notify.NotifyGuard
 import com.pyamsoft.pydroid.notify.NotifyPermission
 import com.pyamsoft.pydroid.util.PermissionRequester
-import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverNotificationDispatcher
+import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationDispatcher
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -31,10 +31,10 @@ import dagger.multibindings.IntoSet
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-@Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class InternalApi
+@Qualifier @Retention(AnnotationRetention.BINARY) private annotation class InternalApi
 
 @Module
-abstract class WorkerAppModule {
+abstract class AlertAppModule {
 
   @Binds
   @IntoSet
@@ -50,11 +50,10 @@ abstract class WorkerAppModule {
     @JvmStatic
     @Singleton
     @CheckResult
-    @InternalApi
     internal fun provideNotifier(
         // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
-      @InternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
-      context: Context
+        @InternalApi dispatchers: MutableSet<NotifyDispatcher<*>>,
+        context: Context
     ): Notifier {
       return Notifier.createDefault(context, dispatchers)
     }

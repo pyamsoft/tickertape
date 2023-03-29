@@ -52,18 +52,14 @@ import com.patrykandpatryk.vico.core.entry.ChartEntry
 import com.patrykandpatryk.vico.core.entry.ChartEntryModel
 import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatryk.vico.core.entry.FloatEntry
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
 import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
-import com.pyamsoft.tickertape.core.isNegative
-import com.pyamsoft.tickertape.core.isPositive
 import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.periodHigh
 import com.pyamsoft.tickertape.stocks.api.periodLow
 import com.pyamsoft.tickertape.ui.rememberInBackground
@@ -75,11 +71,6 @@ private data class ChartLines(
     val models: ChartEntryModel,
     val specs: SnapshotStateList<LineChart.LineSpec>,
 )
-
-@CheckResult
-private fun ChartData.priceValueAdjustedToBaseline(): Double {
-  return this.price.value - this.baseline.value
-}
 
 /** Can't be data class */
 @Stable
@@ -96,11 +87,6 @@ private class ChartDataEntry(
   @CheckResult
   fun isDataPoint(): Boolean {
     return data != null
-  }
-
-  @CheckResult
-  fun getData(): ChartData {
-    return data.requireNotNull { "Cannot get ChartData from empty data point" }
   }
 
   override fun equals(other: Any?): Boolean {
@@ -131,38 +117,6 @@ private class ChartDataEntry(
   }
 }
 
-@CheckResult
-private fun ChartData.resolvePriceDirection(): StockDirection {
-  val adjusted = this.priceValueAdjustedToBaseline()
-  // Decide, based on the baseline value, where the direction is going
-  return when {
-    adjusted.isPositive() -> StockDirection.UP
-    adjusted.isNegative() -> StockDirection.DOWN
-    else -> StockDirection.NONE
-  }
-}
-
-private fun finishSegments(
-    lineSegments: MutableList<List<ChartDataEntry>>,
-    specSegments: MutableList<LineChart.LineSpec>,
-    currentSegment: List<ChartDataEntry>,
-    currentDirection: StockDirection,
-) {
-  // We are done with this segment, add it to the list of segments
-  lineSegments.add(currentSegment)
-  // Derive a color for the segment
-  specSegments.add(
-      LineChart.LineSpec(
-          lineColor =
-              when {
-                currentDirection.isUp -> DEFAULT_STOCK_UP_COLOR
-                currentDirection.isDown -> DEFAULT_STOCK_DOWN_COLOR
-                else -> DEFAULT_STOCK_COLOR
-              },
-      ),
-  )
-}
-
 @Composable
 @CheckResult
 private fun rememberChartLines(chart: StockChart): ChartLines? {
@@ -190,56 +144,42 @@ private fun rememberChartLines(chart: StockChart): ChartLines? {
     val specSegments = mutableStateListOf<LineChart.LineSpec>()
     val lineSegments = mutableStateListOf<List<ChartDataEntry>>()
 
-    var index = 0
-    var lastData: ChartData? = null
-    val currentSegment = mutableStateListOf<ChartDataEntry>()
-
-    while (true) {
-      // If we have no more points, we are done
-      val data = dataPoints.getOrNull(index) ?: break
-
-      val x = index.toFloat()
-
-      // Grab a data point and chart it
-      currentSegment.add(
-          ChartDataEntry(
-              data = data,
-              x = x,
-              y = data.price.value.toFloat(),
-          ),
-      )
-
-      // Bump the index
-      lastData = data
-      ++index
-    }
-
+    // Only one segment, color the chart based on the final price compared to the baseline
     val lineColor =
-        if (lastData == null) DEFAULT_STOCK_COLOR
-        else {
-          val price = lastData.price.value
-          val base = lastData.baseline.value
-          when {
-            price < base -> DEFAULT_STOCK_DOWN_COLOR
-            price > base -> DEFAULT_STOCK_UP_COLOR
-            else -> DEFAULT_STOCK_COLOR
+        dataPoints.lastOrNull().let { lastData ->
+          if (lastData == null) DEFAULT_STOCK_COLOR
+          else {
+            val price = lastData.price.value
+            val base = lastData.baseline.value
+            when {
+              price < base -> DEFAULT_STOCK_DOWN_COLOR
+              price > base -> DEFAULT_STOCK_UP_COLOR
+              else -> DEFAULT_STOCK_COLOR
+            }
           }
         }
 
-    val fillColor = Color(lineColor)
-
-    // Only one segment, color the chart based on the final price compared to the baseline
-    lineSegments.add(currentSegment)
+    lineSegments.add(
+        dataPoints.mapIndexed { i, d ->
+          ChartDataEntry(
+              data = d,
+              x = i.toFloat(),
+              y = d.price.value.toFloat(),
+          )
+        },
+    )
     specSegments.add(
         LineChart.LineSpec(
             lineColor = lineColor,
             lineBackgroundShader =
                 verticalGradient(
                     colors =
-                        arrayOf(
-                            fillColor.copy(alpha = 0.7F),
-                            fillColor.copy(alpha = 0.3F),
-                        ),
+                        Color(lineColor).let { c ->
+                          arrayOf(
+                              c.copy(alpha = 0.7F),
+                              c.copy(alpha = 0.3F),
+                          )
+                        },
                 ),
         ),
     )

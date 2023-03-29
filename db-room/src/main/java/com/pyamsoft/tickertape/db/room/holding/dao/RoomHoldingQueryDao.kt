@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.room.holding.entity.RoomDbHolding
@@ -36,4 +37,21 @@ internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
   @Transaction
   @Query("""SELECT * FROM ${RoomDbHolding.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbHolding>
+
+  final override suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        when (val res = daoQueryById(id)) {
+          null -> Maybe.None
+          else -> Maybe.Data(res)
+        }
+      }
+
+  @CheckResult
+  @Query(
+      """
+      SELECT * FROM ${RoomDbHolding.TABLE_NAME}
+      WHERE ${RoomDbHolding.COLUMN_ID} = :id
+      LIMIT 1
+      """)
+  internal abstract suspend fun daoQueryById(id: DbHolding.Id): RoomDbHolding?
 }

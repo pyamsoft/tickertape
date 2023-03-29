@@ -20,13 +20,13 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.holding.HoldingDeleteDao
 import com.pyamsoft.tickertape.db.holding.HoldingInsertDao
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.holding.HoldingRealtime
-import com.pyamsoft.tickertape.db.holding.queryById
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
@@ -36,15 +36,15 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
-import java.time.Clock
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Clock
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioInteractorImpl
@@ -164,16 +164,18 @@ internal constructor(
       withContext(context = Dispatchers.IO) {
         try {
           // First invalidate cache to be sure we are up to date
-          holdingQueryDaoCache.invalidate()
+          holdingQueryDaoCache.invalidateById(id)
 
-          val holding = holdingQueryDao.queryById(id)
-          if (holding == null) {
-            val err = IllegalStateException("Holding does not exist in DB: $id")
-            Timber.e(err)
-            return@withContext ResultWrapper.failure(err)
+          when (val holding = holdingQueryDao.queryById(id)) {
+            is Maybe.Data -> {
+              ResultWrapper.success(holdingDeleteDao.delete(holding.data, offerUndo = true))
+            }
+            is Maybe.None -> {
+              val err = IllegalStateException("Holding does not exist in DB: $id")
+              Timber.e(err)
+              return@withContext ResultWrapper.failure(err)
+            }
           }
-
-          ResultWrapper.success(holdingDeleteDao.delete(holding, offerUndo = true))
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Error removing holding $id")

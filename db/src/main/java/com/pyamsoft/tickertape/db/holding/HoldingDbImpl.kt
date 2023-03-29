@@ -17,10 +17,12 @@
 package com.pyamsoft.tickertape.db.holding
 
 import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
+import com.pyamsoft.tickertape.db.Maybe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -52,6 +54,12 @@ internal constructor(
         return@cachify realQueryDao.query()
       }
 
+  private val queryByIdCache =
+      multiCachify<QueryByIdKey, Maybe<out DbHolding>, DbHolding.Id> { id ->
+        enforcer.assertOffMainThread()
+        return@multiCachify realQueryDao.queryById(id)
+      }
+
   override val deleteDao: HoldingDeleteDao = this
 
   override val insertDao: HoldingInsertDao = this
@@ -60,13 +68,35 @@ internal constructor(
 
   override val realtime: HoldingRealtime = this
 
-  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
+  override suspend fun invalidate() =
+      withContext(context = Dispatchers.IO) {
+        queryCache.clear()
+        queryByIdCache.clear()
+      }
+
+  override suspend fun invalidateById(id: DbHolding.Id) =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByIdKey(
+                id = id,
+            )
+        queryByIdCache.key(key).clear()
+      }
 
   override suspend fun listenForChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<DbHolding> =
       withContext(context = Dispatchers.IO) { queryCache.call() }
+
+  override suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding> =
+      withContext(context = Dispatchers.IO) {
+        val key =
+            QueryByIdKey(
+                id = id,
+            )
+        return@withContext queryByIdCache.key(key).call(id)
+      }
 
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
       withContext(context = Dispatchers.IO) {
@@ -95,4 +125,8 @@ internal constructor(
           }
         }
       }
+
+  private data class QueryByIdKey(
+      val id: DbHolding.Id,
+  )
 }

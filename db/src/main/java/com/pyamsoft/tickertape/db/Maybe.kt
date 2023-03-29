@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.pyamsoft.tickertape.db
 
-package com.pyamsoft.tickertape.db.holding
-
-import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.db.DbQuery
-import com.pyamsoft.tickertape.db.Maybe
-
-interface HoldingQueryDao : DbQuery<DbHolding> {
-
-  @CheckResult
-  suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding>
-
-  interface Cache : DbQuery.Cache {
-
-    suspend fun invalidateById(id: DbHolding.Id)
-
-  }
+/**
+ * Easy optional data type for use with Cachify amonst other things
+ *
+ * Cachify expects non-null data returned, so we use this to signal "empty" results
+ */
+sealed class Maybe<T> {
+  data class Data<T>(val data: T) : Maybe<T>()
+  object None : Maybe<Nothing>()
 }
-

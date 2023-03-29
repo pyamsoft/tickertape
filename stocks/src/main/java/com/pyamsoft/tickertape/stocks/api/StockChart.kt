@@ -20,7 +20,6 @@ import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.data.StockChartImpl
 import java.time.LocalDateTime
@@ -104,15 +103,11 @@ interface StockChart {
 @CheckResult
 @WorkerThread
 fun StockChart.periodHigh(): StockMoneyValue {
-  Enforcer.assertOffMainThread()
-
   return close.maxByOrNull { it.value }.requireNotNull()
 }
 
 @CheckResult
 @WorkerThread
 fun StockChart.periodLow(): StockMoneyValue {
-  Enforcer.assertOffMainThread()
-
   return close.minByOrNull { it.value }.requireNotNull()
 }

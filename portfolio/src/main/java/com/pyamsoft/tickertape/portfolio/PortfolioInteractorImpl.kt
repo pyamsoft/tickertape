@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
@@ -37,15 +36,15 @@ import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
 import com.pyamsoft.tickertape.db.split.SplitRealtime
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import java.time.Clock
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.Clock
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioInteractorImpl
@@ -71,9 +70,7 @@ internal constructor(
       holding: DbHolding
   ): ResultWrapper<DbInsert.InsertResult<DbHolding>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           ResultWrapper.success(holdingInsertDao.insert(holding))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -84,28 +81,17 @@ internal constructor(
       }
 
   override suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        holdingRealtime.listenForChanges(onChange)
-      }
+      withContext(context = Dispatchers.Default) { holdingRealtime.listenForChanges(onChange) }
 
   override suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        positionRealtime.listenForChanges(onChange)
-      }
+      withContext(context = Dispatchers.Default) { positionRealtime.listenForChanges(onChange) }
 
   override suspend fun listenForSplitChanges(onChange: (event: SplitChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        splitRealtime.listenForChanges(onChange)
-      }
+      withContext(context = Dispatchers.Default) { splitRealtime.listenForChanges(onChange) }
 
   override suspend fun getPortfolio(): ResultWrapper<List<PortfolioStock>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           coroutineScope {
             // Run both queries in parallel
             val jobResult =
@@ -162,8 +148,6 @@ internal constructor(
 
   override suspend fun invalidatePortfolio() =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         // Clear all DB
         awaitAll(
             async { holdingQueryDaoCache.invalidate() },
@@ -178,9 +162,7 @@ internal constructor(
   @CheckResult
   override suspend fun removeHolding(id: DbHolding.Id): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           // First invalidate cache to be sure we are up to date
           holdingQueryDaoCache.invalidate()
 

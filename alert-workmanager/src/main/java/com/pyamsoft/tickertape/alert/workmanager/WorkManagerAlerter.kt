@@ -21,13 +21,12 @@ import androidx.annotation.CheckResult
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
-import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.Worker
-import com.google.common.util.concurrent.ListenableFuture
-import com.pyamsoft.pydroid.core.Enforcer
+import androidx.work.await
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.alert.AlarmParameters
 import com.pyamsoft.tickertape.alert.Alerter
 import com.pyamsoft.tickertape.alert.base.Alarm
@@ -36,16 +35,10 @@ import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
 import com.pyamsoft.tickertape.alert.workmanager.worker.BigMoverWorker
 import com.pyamsoft.tickertape.alert.workmanager.worker.PriceAlertWorker
-import java.util.concurrent.CancellationException
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -53,12 +46,13 @@ import timber.log.Timber
 internal class WorkManagerAlerter
 @Inject
 internal constructor(
+    private val enforcer: ThreadEnforcer,
     private val context: Context,
 ) : Alerter {
 
   @CheckResult
   private fun workManager(): WorkManager {
-    Enforcer.assertOffMainThread()
+    enforcer.assertOffMainThread()
     return WorkManager.getInstance(context)
   }
 
@@ -77,7 +71,7 @@ internal constructor(
   }
 
   private suspend fun queueAlarm(alarm: Alarm) {
-    Enforcer.assertOffMainThread()
+    enforcer.assertOffMainThread()
 
     cancelAlarm(alarm)
 
@@ -101,63 +95,55 @@ internal constructor(
     Timber.d("Queue work [$tag]: ${request.id}")
   }
 
+  @CheckResult
+  private fun generateConstraints(): Constraints {
+    enforcer.assertOffMainThread()
+    return Constraints.Builder().setRequiresBatteryNotLow(true).build()
+  }
+
+  @CheckResult
+  private fun createWork(
+      work: Class<out Worker>,
+      tag: String,
+      period: Long,
+      periodUnit: TimeUnit,
+      isPeriodicWork: Boolean,
+      inputData: Data
+  ): WorkRequest {
+    enforcer.assertOffMainThread()
+
+    return if (isPeriodicWork) {
+      PeriodicWorkRequest.Builder(work, period, periodUnit)
+          .addTag(tag)
+          .setConstraints(generateConstraints())
+          .setInputData(inputData)
+          .build()
+    } else {
+      OneTimeWorkRequest.Builder(work)
+          .setInitialDelay(period, periodUnit)
+          .addTag(tag)
+          .setConstraints(generateConstraints())
+          .setInputData(inputData)
+          .build()
+    }
+  }
+
   override suspend fun scheduleAlarm(alarm: Alarm) =
       withContext(context = Dispatchers.Default) { queueAlarm(alarm) }
 
   override suspend fun cancelAlarm(alarm: Alarm) =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
         workManager().cancelAllWorkByTag(alarm.tag()).await()
+        return@withContext
       }
 
   override suspend fun cancel() =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
         workManager().cancelAllWork().await()
+        return@withContext
       }
 
   companion object {
-
-    private val alerterExecutor = Executor { it.run() }
-
-    private suspend fun Operation.await() {
-      Enforcer.assertOffMainThread()
-      this.result.await()
-    }
-
-    // Copied out of androidx.work.ListenableFuture
-    // since this extension is library private otherwise...
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun <R> ListenableFuture<R>.await(): R {
-      Enforcer.assertOffMainThread()
-
-      // Fast path
-      if (this.isDone) {
-        try {
-          return this.get()
-        } catch (e: ExecutionException) {
-          throw e.cause ?: e
-        }
-      }
-
-      return suspendCancellableCoroutine { continuation ->
-        Enforcer.assertOffMainThread()
-        this.addListener(
-            {
-              Enforcer.assertOffMainThread()
-              try {
-                continuation.resume(this.get())
-              } catch (throwable: Throwable) {
-                val cause = throwable.cause ?: throwable
-                when (throwable) {
-                  is CancellationException -> continuation.cancel(cause)
-                  else -> continuation.resumeWithException(cause)
-                }
-              }
-            },
-            alerterExecutor)
-      }
-    }
 
     @JvmStatic
     @CheckResult
@@ -168,41 +154,6 @@ internal constructor(
         builder = builder.putBoolean(entry.key, entry.value)
       }
       return builder.build()
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun generateConstraints(): Constraints {
-      Enforcer.assertOffMainThread()
-      return Constraints.Builder().setRequiresBatteryNotLow(true).build()
-    }
-
-    @JvmStatic
-    @CheckResult
-    private fun createWork(
-        work: Class<out Worker>,
-        tag: String,
-        period: Long,
-        periodUnit: TimeUnit,
-        isPeriodicWork: Boolean,
-        inputData: Data
-    ): WorkRequest {
-      Enforcer.assertOffMainThread()
-
-      return if (isPeriodicWork) {
-        PeriodicWorkRequest.Builder(work, period, periodUnit)
-            .addTag(tag)
-            .setConstraints(generateConstraints())
-            .setInputData(inputData)
-            .build()
-      } else {
-        OneTimeWorkRequest.Builder(work)
-            .setInitialDelay(period, periodUnit)
-            .addTag(tag)
-            .setConstraints(generateConstraints())
-            .setInputData(inputData)
-            .build()
-      }
     }
   }
 }

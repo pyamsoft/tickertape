@@ -35,10 +35,10 @@ import com.pyamsoft.tickertape.alert.initOnAppStart
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.receiver.BootReceiver
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -72,6 +72,7 @@ class TickerTape : Application() {
                 debug = isDebugMode(),
                 imageLoader = mods.imageLoader(),
                 theming = mods.theming(),
+                enforcer = mods.enforcer(),
             )
     component.inject(this)
     ObjectGraph.ApplicationScope.install(this, component)

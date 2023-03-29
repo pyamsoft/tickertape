@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
@@ -41,8 +40,7 @@ internal constructor(
       position: DbPosition
   ): ResultWrapper<DbInsert.InsertResult<DbPosition>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           val result = positionInsertDao.insert(position)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
@@ -55,8 +53,7 @@ internal constructor(
 
   override suspend fun loadExistingPosition(id: DbPosition.Id): ResultWrapper<DbPosition> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           val result = positionQueryDao.query().first { it.id == id }
           ResultWrapper.success(result)
         } catch (e: Throwable) {

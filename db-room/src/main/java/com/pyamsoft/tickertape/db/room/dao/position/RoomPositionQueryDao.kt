@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.position
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionQueryDao
 import com.pyamsoft.tickertape.db.room.entity.RoomDbPosition
@@ -28,10 +29,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomPositionQueryDao : PositionQueryDao {
 
-  override suspend fun query(): List<DbPosition> =
+  final override suspend fun query(): List<DbPosition> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomDbPosition.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbPosition>
 }

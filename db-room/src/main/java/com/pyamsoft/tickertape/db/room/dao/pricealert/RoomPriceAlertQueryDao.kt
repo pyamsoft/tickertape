@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.pricealert
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.db.pricealert.PriceAlertQueryDao
 import com.pyamsoft.tickertape.db.room.entity.RoomPriceAlert
@@ -28,10 +29,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomPriceAlertQueryDao : PriceAlertQueryDao {
 
-  override suspend fun query(): List<PriceAlert> =
+  final override suspend fun query(): List<PriceAlert> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomPriceAlert.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomPriceAlert>
 }

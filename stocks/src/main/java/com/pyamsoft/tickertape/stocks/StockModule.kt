@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.stocks.cache.KeyStatisticsCache
 import com.pyamsoft.tickertape.stocks.cache.NewsCache
 import com.pyamsoft.tickertape.stocks.cache.OptionsCache
@@ -31,12 +32,12 @@ import com.pyamsoft.tickertape.stocks.scope.StockApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
-import javax.inject.Qualifier
-import kotlin.reflect.KClass
 import okhttp3.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
+import javax.inject.Named
+import javax.inject.Qualifier
+import kotlin.reflect.KClass
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 
@@ -88,8 +89,11 @@ abstract class StockModule {
     @JvmStatic
     @CheckResult
     @StockApi
-    internal fun createCallFactory(@Named("debug") debug: Boolean): Call.Factory {
-      return OkHttpClientLazyCallFactory(debug)
+    internal fun createCallFactory(
+        enforcer: ThreadEnforcer,
+        @Named("debug") debug: Boolean
+    ): Call.Factory {
+      return OkHttpClientLazyCallFactory(debug, enforcer)
     }
 
     /**

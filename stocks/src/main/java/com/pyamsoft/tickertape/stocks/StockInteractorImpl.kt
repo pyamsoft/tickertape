@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.stocks
 import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockChart
@@ -89,18 +88,12 @@ internal constructor(
   @CheckResult
   private suspend fun getJustKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         // Key statistics but without a Quote pairing
-        return@withContext statisticsCache.getStatistics(symbols) {
-          interactor.getKeyStatistics(it)
-        }
+        statisticsCache.getStatistics(symbols) { interactor.getKeyStatistics(it) }
       }
 
   override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         // Fetch stats and quote at the same time
         val jobs =
             mutableListOf<Deferred<*>>().apply {
@@ -131,56 +124,36 @@ internal constructor(
 
   override suspend fun invalidateStatistics(symbols: List<StockSymbol>) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         symbols.forEach { statisticsCache.removeStatistics(it) }
       }
 
   override suspend fun search(query: String): List<SearchResult> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext searchCache.key(query).call(query)
-      }
+      withContext(context = Dispatchers.IO) { searchCache.key(query).call(query) }
 
   override suspend fun invalidateSearch(query: String) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         // Remove the cache from the search map and clear it if it exists
         searchCache.key(query).clear()
       }
 
   override suspend fun getTrending(count: Int): StockTrends =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext trendingCache.call(count)
-      }
+      withContext(context = Dispatchers.IO) { trendingCache.call(count) }
 
   override suspend fun invalidateTrending() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        trendingCache.clear()
-      }
+      withContext(context = Dispatchers.IO) { trendingCache.clear() }
 
   override suspend fun getScreener(screener: StockScreener, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext topCaches.key(screener).call(screener, count)
-      }
+      withContext(context = Dispatchers.IO) { topCaches.key(screener).call(screener, count) }
 
   override suspend fun invalidateScreener(screener: StockScreener) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        topCaches.key(screener).clear()
-      }
+      withContext(context = Dispatchers.IO) { topCaches.key(screener).clear() }
 
   override suspend fun getOptions(
       symbols: List<StockSymbol>,
       expirationDate: LocalDate?,
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext optionsCache.getOptions(symbols, expirationDate) { s, e ->
-          interactor.getOptions(s, e)
-        }
+        optionsCache.getOptions(symbols, expirationDate) { s, e -> interactor.getOptions(s, e) }
       }
 
   override suspend fun invalidateOptions(
@@ -188,7 +161,6 @@ internal constructor(
       expirationDate: LocalDate?,
   ) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         symbols.forEach { optionsCache.removeOption(it, expirationDate) }
       }
 
@@ -199,9 +171,7 @@ internal constructor(
       contractType: StockOptions.Contract.Type
   ): String =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext interactor.resolveOptionLookupIdentifier(
+        interactor.resolveOptionLookupIdentifier(
             symbol = symbol,
             expirationDate = expirationDate,
             strikePrice = strikePrice,
@@ -211,33 +181,22 @@ internal constructor(
 
   override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext stockCache.getQuotes(symbols) { interactor.getQuotes(it) }
+        stockCache.getQuotes(symbols) { interactor.getQuotes(it) }
       }
 
   override suspend fun invalidateQuotes(symbols: List<StockSymbol>) {
-    withContext(context = Dispatchers.IO) {
-      Enforcer.assertOffMainThread()
-      symbols.forEach { stockCache.removeQuote(it) }
-    }
+    withContext(context = Dispatchers.IO) { symbols.forEach { stockCache.removeQuote(it) } }
   }
 
   override suspend fun invalidateAllQuotes() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        stockCache.removeAllQuotes()
-      }
+      withContext(context = Dispatchers.IO) { stockCache.removeAllQuotes() }
 
   override suspend fun getCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext stockCache.getCharts(symbols, range) { s, r ->
-          interactor.getCharts(s, r)
-        }
+        stockCache.getCharts(symbols, range) { s, r -> interactor.getCharts(s, r) }
       }
 
   override suspend fun invalidateCharts(
@@ -245,37 +204,23 @@ internal constructor(
       range: StockChart.IntervalRange
   ) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         symbols.forEach { stockCache.removeChart(it, range) }
       }
 
   override suspend fun invalidateAllCharts() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        stockCache.removeAllCharts()
-      }
+      withContext(context = Dispatchers.IO) { stockCache.removeAllCharts() }
 
   override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext newsCache.getNews(symbols) { interactor.getNews(it) }
+        newsCache.getNews(symbols) { interactor.getNews(it) }
       }
 
   override suspend fun invalidateNews(symbols: List<StockSymbol>) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        symbols.forEach { newsCache.removeNews(it) }
-      }
+      withContext(context = Dispatchers.IO) { symbols.forEach { newsCache.removeNews(it) } }
 
   override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext recommendationCache.key(symbol).call(symbol)
-      }
+      withContext(context = Dispatchers.IO) { recommendationCache.key(symbol).call(symbol) }
 
   override suspend fun invalidateRecommendations(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        recommendationCache.key(symbol).clear()
-      }
+      withContext(context = Dispatchers.IO) { recommendationCache.key(symbol).clear() }
 }

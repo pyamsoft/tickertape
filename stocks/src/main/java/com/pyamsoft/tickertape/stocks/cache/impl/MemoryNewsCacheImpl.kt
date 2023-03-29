@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.cache.impl
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.NewsCache
@@ -30,21 +29,12 @@ internal class MemoryNewsCacheImpl @Inject internal constructor() :
     BaseMemoryCacheImpl<StockSymbol, StockNewsList>(), NewsCache {
 
   override suspend fun removeNews(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext remove(symbol)
-      }
+      withContext(context = Dispatchers.IO) { remove(symbol) }
 
   override suspend fun getNews(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<StockNewsList>
-  ): List<StockNewsList> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext get(symbols, resolve)
-      }
+  ): List<StockNewsList> = withContext(context = Dispatchers.IO) { get(symbols, resolve) }
 
   override fun getKeyFromValue(value: StockNewsList): StockSymbol {
     return value.symbol

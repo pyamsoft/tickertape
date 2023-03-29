@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.util.ifNotCancellation
@@ -39,11 +38,11 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioDigInteractorImpl
@@ -79,9 +78,7 @@ internal constructor(
       position: DbPosition
   ): ResultWrapper<DbInsert.InsertResult<DbPosition>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           ResultWrapper.success(positionInsertDao.insert(position))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -93,8 +90,7 @@ internal constructor(
 
   override suspend fun restoreSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(splitInsertDao.insert(split))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -106,8 +102,7 @@ internal constructor(
 
   override suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(positionDeleteDao.delete(position, offerUndo = true))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -119,8 +114,7 @@ internal constructor(
 
   override suspend fun deleteSplit(split: DbSplit): ResultWrapper<Boolean> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(splitDeleteDao.delete(split, offerUndo = true))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -131,22 +125,14 @@ internal constructor(
       }
 
   override suspend fun watchSplits(onEvent: (SplitChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        return@withContext splitRealtime.listenForChanges(onEvent)
-      }
+      withContext(context = Dispatchers.Default) { splitRealtime.listenForChanges(onEvent) }
 
   override suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        return@withContext positionRealtime.listenForChanges(onEvent)
-      }
+      withContext(context = Dispatchers.Default) { positionRealtime.listenForChanges(onEvent) }
 
   override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val holding = holdingQueryDao.query().firstOrNull { it.symbol == symbol }
           ResultWrapper.success(
               holding.requireNotNull { "Unable to find holding with symbol: $symbol" })
@@ -159,16 +145,11 @@ internal constructor(
       }
 
   override suspend fun invalidateHolding() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        holdingQueryDaoCache.invalidate()
-      }
+      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidate() }
 
   override suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val positions = positionQueryDao.query().filter { it.holdingId == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
@@ -180,16 +161,11 @@ internal constructor(
       }
 
   override suspend fun invalidatePositions() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        positionQueryDaoCache.invalidate()
-      }
+      withContext(context = Dispatchers.IO) { positionQueryDaoCache.invalidate() }
 
   override suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val positions = splitQueryDao.query().filter { it.holdingId == id }
           ResultWrapper.success(positions)
         } catch (e: Throwable) {
@@ -201,8 +177,5 @@ internal constructor(
       }
 
   override suspend fun invalidateSplits() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        splitQueryDaoCache.invalidate()
-      }
+      withContext(context = Dispatchers.IO) { splitQueryDaoCache.invalidate() }
 }

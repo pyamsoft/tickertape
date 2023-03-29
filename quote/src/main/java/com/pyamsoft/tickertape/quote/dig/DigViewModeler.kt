@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.quote.dig
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.quote.DeleteRestoreViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
@@ -84,8 +83,7 @@ protected constructor(
             .map { news ->
               // Run Off main thread
               return@map withContext(context = Dispatchers.IO) {
-                Enforcer.assertOffMainThread()
-                return@withContext news.sortedByDescending { it.publishedAt }
+                news.sortedByDescending { it.publishedAt }
               }
             }
       }

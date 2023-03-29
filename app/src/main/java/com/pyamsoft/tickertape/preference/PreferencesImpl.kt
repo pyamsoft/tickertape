@@ -19,37 +19,36 @@ package com.pyamsoft.tickertape.preference
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.util.booleanFlow
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PreferencesImpl
 @Inject
 internal constructor(
+    enforcer: ThreadEnforcer,
     context: Context,
 ) : BigMoverPreferences {
 
   private val preferences by lazy {
-    Enforcer.assertOffMainThread()
+    enforcer.assertOffMainThread()
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
   }
 
   override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         preferences.edit { putBoolean(BigMovers.KEY_NOTIFICATION_ENABLED, enabled) }
       }
 
   override suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext preferences.booleanFlow(
+        preferences.booleanFlow(
             BigMovers.KEY_NOTIFICATION_ENABLED,
             BigMoverPreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
         )

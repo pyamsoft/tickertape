@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.splits.add
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
@@ -39,8 +38,7 @@ internal constructor(
 
   override suspend fun submitSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           val result = splitInsertDao.insert(split)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
@@ -53,8 +51,7 @@ internal constructor(
 
   override suspend fun loadExistingSplit(id: DbSplit.Id): ResultWrapper<DbSplit> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           val result = splitQueryDao.query().first { it.id == id }
           ResultWrapper.success(result)
         } catch (e: Throwable) {

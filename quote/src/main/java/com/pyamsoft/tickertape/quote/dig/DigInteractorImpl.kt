@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote.dig
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.Ticker
@@ -50,8 +49,7 @@ protected constructor(
       symbol: StockSymbol
   ): ResultWrapper<StockRecommendations> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(stockInteractor.getRecommendations(symbol))
         } catch (e: Throwable) {
           e.ifNotCancellation {
@@ -63,14 +61,12 @@ protected constructor(
 
   final override suspend fun invalidateRecommendations(symbol: StockSymbol) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         stockInteractorCache.invalidateRecommendations(symbol)
       }
 
   final override suspend fun getStatistics(symbol: StockSymbol): ResultWrapper<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(
                   stockInteractor.getKeyStatistics(listOf(symbol)),
               )
@@ -86,7 +82,6 @@ protected constructor(
 
   final override suspend fun invalidateStatistics(symbol: StockSymbol) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         stockInteractorCache.invalidateStatistics(listOf(symbol))
       }
 
@@ -94,8 +89,7 @@ protected constructor(
       symbol: StockSymbol,
   ): ResultWrapper<StockNewsList> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           ResultWrapper.success(
               stockInteractor
                   .getNews(listOf(symbol))
@@ -111,19 +105,14 @@ protected constructor(
       }
 
   final override suspend fun invalidateNews(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        stockInteractorCache.invalidateNews(listOf(symbol))
-      }
+      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateNews(listOf(symbol)) }
 
   final override suspend fun getChart(
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
   ): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext getCharts(
+        getCharts(
                 symbols = listOf(symbol),
                 range = range,
             )
@@ -136,9 +125,7 @@ protected constructor(
       range: StockChart.IntervalRange
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           interactor.getCharts(
               symbols = symbols,
               range = range,
@@ -155,18 +142,10 @@ protected constructor(
   final override suspend fun invalidateChart(
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
-  ) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        invalidateCharts(listOf(symbol), range)
-      }
+  ) = withContext(context = Dispatchers.IO) { invalidateCharts(listOf(symbol), range) }
 
   final override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-  ) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        interactorCache.invalidateCharts(symbols, range)
-      }
+  ) = withContext(context = Dispatchers.IO) { interactorCache.invalidateCharts(symbols, range) }
 }

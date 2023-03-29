@@ -56,9 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.util.Stabilized
 import com.pyamsoft.pydroid.ui.util.rememberAsStateList
-import com.pyamsoft.pydroid.ui.util.rememberStable
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.OptionsChainDigViewState
 import com.pyamsoft.tickertape.quote.test.TestSymbol
@@ -113,7 +111,7 @@ fun DigOptionsChain(
     options?.let { o ->
       OptionsExpirationDropdown(
           modifier = Modifier.padding(vertical = MaterialTheme.keylines.baseline),
-          value = expirationDate.rememberStable(),
+          value = expirationDate,
           choices = o.expirationDates.rememberAsStateList(),
           onSelect = onExpirationDateChanged,
       )
@@ -178,14 +176,13 @@ fun DigOptionsChain(
 @Composable
 private fun OptionsExpirationDropdown(
     modifier: Modifier = Modifier,
-    value: Stabilized<LocalDate?>,
+    value: LocalDate?,
     choices: SnapshotStateList<LocalDate>,
     onSelect: (LocalDate) -> Unit,
 ) {
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
-  val data = value.data
   val displayValue =
-      remember(data, dateFormatter) { if (data == null) "" else data.format(dateFormatter) }
+      remember(value, dateFormatter) { if (value == null) "" else value.format(dateFormatter) }
 
   val (isDropdownOpen, setDropdownOpen) = remember { mutableStateOf(false) }
 

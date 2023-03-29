@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -45,7 +44,6 @@ internal constructor(@YahooApi private val service: ChartService) : ChartSource 
       range: StockChart.IntervalRange,
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         val interval = getIntervalForRange(range)
         val result =
             service.getCharts(

@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.quote.base
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.stocks.StockInteractor
@@ -38,9 +37,7 @@ protected constructor(
       expirationDate: LocalDate?,
   ): ResultWrapper<StockOptions> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val options =
               stockInteractor.getOptions(
                   symbols = listOf(symbol),
@@ -59,7 +56,6 @@ protected constructor(
 
   final override suspend fun invalidateOptionsChain(symbol: StockSymbol) =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
         stockInteractorCache.invalidateQuotes(listOf(symbol))
       }
 }

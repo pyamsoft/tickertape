@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.api.DATE_FORMATTER
 import com.pyamsoft.tickertape.stocks.api.EquityType
@@ -38,12 +37,12 @@ import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class YahooQuoteSource
@@ -52,8 +51,6 @@ internal constructor(@YahooApi private val service: QuoteService) : QuoteSource 
 
   override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val result =
             service.getQuotes(
                 fields = YF_QUOTE_FIELDS,

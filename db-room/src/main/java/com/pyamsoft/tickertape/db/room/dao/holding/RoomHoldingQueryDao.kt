@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.holding
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingQueryDao
 import com.pyamsoft.tickertape.db.room.entity.RoomDbHolding
@@ -28,10 +29,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
 
-  override suspend fun query(): List<DbHolding> =
+  final override suspend fun query(): List<DbHolding> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomDbHolding.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbHolding>
 }

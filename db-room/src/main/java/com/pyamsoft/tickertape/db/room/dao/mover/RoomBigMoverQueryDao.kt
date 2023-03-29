@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.mover
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.mover.BigMoverQueryDao
 import com.pyamsoft.tickertape.db.mover.BigMoverReport
 import com.pyamsoft.tickertape.db.room.entity.RoomBigMoverReport
@@ -28,10 +29,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomBigMoverQueryDao : BigMoverQueryDao {
 
-  override suspend fun query(): List<BigMoverReport> =
+  final override suspend fun query(): List<BigMoverReport> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomBigMoverReport.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomBigMoverReport>
 }

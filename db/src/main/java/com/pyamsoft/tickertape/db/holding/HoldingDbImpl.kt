@@ -17,20 +17,21 @@
 package com.pyamsoft.tickertape.db.holding
 
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class HoldingDbImpl
 @Inject
 internal constructor(
+    enforcer: ThreadEnforcer,
     @DbApi realQueryDao: HoldingQueryDao,
     @DbApi private val realInsertDao: HoldingInsertDao,
     @DbApi private val realDeleteDao: HoldingDeleteDao,
@@ -47,7 +48,7 @@ internal constructor(
 
   private val queryCache =
       cachify<List<DbHolding>> {
-        Enforcer.assertOffMainThread()
+        enforcer.assertOffMainThread()
         return@cachify realQueryDao.query()
       }
 
@@ -59,29 +60,17 @@ internal constructor(
 
   override val realtime: HoldingRealtime = this
 
-  override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        queryCache.clear()
-      }
+  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
 
   override suspend fun listenForChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        onEvent(onChange)
-      }
+      withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<DbHolding> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext queryCache.call()
-      }
+      withContext(context = Dispatchers.IO) { queryCache.call() }
 
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext realInsertDao.insert(o).also { result ->
+        realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
               invalidate()
@@ -99,8 +88,7 @@ internal constructor(
 
   override suspend fun delete(o: DbHolding, offerUndo: Boolean): Boolean =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
+        realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()
             publish(HoldingChangeEvent.Delete(o, offerUndo))

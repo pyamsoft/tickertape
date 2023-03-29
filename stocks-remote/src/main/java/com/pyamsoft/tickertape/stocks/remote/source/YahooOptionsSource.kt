@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -137,8 +136,6 @@ internal constructor(
       expirationDate: LocalDate?
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val jobs =
             mutableListOf<Deferred<StockOptions>>().apply {
               for (symbol in symbols) {
@@ -155,7 +152,6 @@ internal constructor(
       contractType: StockOptions.Contract.Type
   ): String =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
         // MSFT220114P00305000
         // MSFT 22-01-14 P $00305.000
 

@@ -18,14 +18,14 @@ package com.pyamsoft.tickertape.stocks.remote.network
 
 import androidx.annotation.CheckResult
 import androidx.core.text.HtmlCompat
-import java.net.URL
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.Path
 import org.simpleframework.xml.Root
+import java.net.URL
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Can't be a data class because SimpleXML is weird yo
@@ -54,24 +54,28 @@ internal constructor() {
   internal constructor() {
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "guid") @set:Element(name = "guid") internal var articleGuid: String? = null
+    @get:Element(name = "guid", required = false)
+    @set:Element(name = "guid", required = false)
+    internal var articleGuid: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "link") @set:Element(name = "link") internal var articleUrl: String? = null
+    @get:Element(name = "link", required = false)
+    @set:Element(name = "link", required = false)
+    internal var articleUrl: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "title")
-    @set:Element(name = "title")
+    @get:Element(name = "title", required = false)
+    @set:Element(name = "title", required = false)
     internal var articleTitle: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "description")
-    @set:Element(name = "description")
+    @get:Element(name = "description", required = false)
+    @set:Element(name = "description", required = false)
     internal var articleDescription: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "pubDate")
-    @set:Element(name = "pubDate")
+    @get:Element(name = "pubDate", required = false)
+    @set:Element(name = "pubDate", required = false)
     internal var articlePublishedAt: String? = null
 
     /** This needs to be a var because SimpleXML is weird yo */

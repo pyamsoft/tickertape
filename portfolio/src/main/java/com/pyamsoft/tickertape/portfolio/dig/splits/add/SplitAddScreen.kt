@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.pydroid.ui.util.rememberStable
 import com.pyamsoft.tickertape.portfolio.dig.base.BasePositionPopup
 import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -65,7 +64,7 @@ fun SplitAddScreen(
       bottomFieldValue = postSplitShareCount,
       onBottomFieldChanged = onPostSplitCountChanged,
       dateLabel = "Date of Purchase",
-      dateField = splitDate.rememberStable(),
+      date = splitDate,
       onDateClicked = onSplitDateClicked,
       onSubmit = onSubmit,
       onClose = onClose,

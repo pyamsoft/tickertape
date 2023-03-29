@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.home
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.quote.Ticker
@@ -51,19 +50,14 @@ internal constructor(
   }
 
   override suspend fun invalidateScreener(screener: StockScreener) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        stockInteractorCache.invalidateScreener(screener)
-      }
+      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateScreener(screener) }
 
   override suspend fun getScreener(
       screener: StockScreener,
       count: Int
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val top = stockInteractor.getScreener(screener, count)
           lookupCharts(top.quotes.map { it.symbol })
         } catch (e: Throwable) {
@@ -79,9 +73,7 @@ internal constructor(
       count: Int,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val trend = stockInteractor.getTrending(count)
           lookupCharts(trend.symbols)
         } catch (e: Throwable) {
@@ -93,10 +85,7 @@ internal constructor(
       }
 
   override suspend fun invalidateTrending() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        stockInteractorCache.invalidateTrending()
-      }
+      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateTrending() }
 
   companion object {
 

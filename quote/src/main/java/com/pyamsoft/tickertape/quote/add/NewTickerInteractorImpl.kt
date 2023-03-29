@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.DbInsert
@@ -34,12 +33,12 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -61,8 +60,7 @@ internal constructor(
 
   override suspend fun resolveTicker(symbol: StockSymbol): ResultWrapper<Ticker> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext try {
+        try {
           tickerInteractor
               .getQuotes(
                   listOf(symbol),
@@ -80,16 +78,13 @@ internal constructor(
 
   override suspend fun invalidateTicker(symbol: StockSymbol) {
     withContext(context = Dispatchers.IO) {
-      Enforcer.assertOffMainThread()
       tickerInteractorCache.invalidateQuotes(listOf(symbol))
     }
   }
 
   override suspend fun search(query: String): ResultWrapper<List<SearchResult>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val results = stockInteractor.search(query)
           ResultWrapper.success(results)
         } catch (e: Throwable) {
@@ -102,7 +97,6 @@ internal constructor(
 
   override suspend fun invalidateSearch(query: String) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         stockInteractorCache.invalidateSearch(query)
       }
 
@@ -156,9 +150,7 @@ internal constructor(
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext try {
+        try {
           val result = handleInsertPortfolio(symbol, equityType, tradeSide)
           ResultWrapper.success(result)
         } catch (e: Throwable) {
@@ -176,8 +168,7 @@ internal constructor(
       contractType: StockOptions.Contract.Type
   ): String =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
-        return@withContext stockInteractor.resolveOptionLookupIdentifier(
+        stockInteractor.resolveOptionLookupIdentifier(
             symbol = symbol,
             expirationDate = expirationDate,
             strikePrice = strikePrice,

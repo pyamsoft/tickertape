@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.stocks.cache.impl
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.storage.CacheStorage
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import kotlinx.coroutines.Dispatchers
@@ -40,19 +39,13 @@ internal abstract class BaseMemoryCacheImpl<K : Any, V : Any> protected construc
 
   suspend fun remove(key: K) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         mutex.withLock { cache[key]?.clear() }
-
         return@withContext
       }
 
   suspend fun clear() =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         mutex.withLock { cache.clear() }
-
         return@withContext
       }
 
@@ -62,9 +55,7 @@ internal abstract class BaseMemoryCacheImpl<K : Any, V : Any> protected construc
       crossinline resolve: suspend (List<StockSymbol>) -> List<V>,
   ): List<V> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext mutex.withLock {
+        mutex.withLock {
           val result = mutableListOf<V>()
           val stillNeeded = mutableListOf<StockSymbol>()
           for (key in keys) {

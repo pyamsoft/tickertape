@@ -16,18 +16,17 @@
 
 package com.pyamsoft.tickertape.alert
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.base.Alarm
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverAlarm
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverWorkerParameters
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertAlarm
 import com.pyamsoft.tickertape.alert.types.pricealert.PriceAlertWorkerParameters
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class AlarmFactoryImpl
@@ -37,15 +36,10 @@ internal constructor(
 ) : AlarmFactory {
 
   override suspend fun priceAlertAlarm(params: PriceAlertWorkerParameters): Alarm =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext PriceAlertAlarm(params)
-      }
+      withContext(context = Dispatchers.IO) { PriceAlertAlarm(params) }
 
   override suspend fun bigMoverAlarm(params: BigMoverWorkerParameters): Alarm =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val isEnabled = bigMoverPreferences.listenForBigMoverNotificationChanged().first()
 
         return@withContext BigMoverAlarm(

@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
@@ -250,8 +249,6 @@ private fun calculateDifferences(
     current: StockMoneyValue,
     openingPrice: StockMoneyValue
 ): ScrubDifferences {
-  Enforcer.assertOffMainThread()
-
   val comparison = current.compareTo(openingPrice)
   if (comparison == 0) {
     return ScrubDifferences.ZERO

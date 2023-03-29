@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.mover.BigMoverInsertDao
@@ -34,6 +35,7 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomBigMoverInsertDao : BigMoverInsertDao {
 
+  @Transaction
   override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
       withContext(context = Dispatchers.IO) {
         val roomBigMover = RoomBigMoverReport.create(o)

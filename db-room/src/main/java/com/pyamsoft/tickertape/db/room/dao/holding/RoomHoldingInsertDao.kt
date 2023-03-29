@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -34,6 +35,7 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomHoldingInsertDao : HoldingInsertDao {
 
+  @Transaction
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
       withContext(context = Dispatchers.IO) {
         val roomHolding = RoomDbHolding.create(o)

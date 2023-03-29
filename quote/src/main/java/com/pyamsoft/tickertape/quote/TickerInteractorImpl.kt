@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.quote
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.alert.types.bigmover.BigMoverStandalone
@@ -53,8 +52,6 @@ internal constructor(
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         // If we have no symbols, don't even make the trip
         if (symbols.isEmpty()) {
           return@withContext ResultWrapper.success(emptyList())
@@ -144,9 +141,7 @@ internal constructor(
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext getTickers(
+        getTickers(
             symbols = symbols,
             range = null,
             options = options,
@@ -154,16 +149,10 @@ internal constructor(
       }
 
   override suspend fun invalidateQuotes(symbols: List<StockSymbol>) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        interactorCache.invalidateQuotes(symbols)
-      }
+      withContext(context = Dispatchers.IO) { interactorCache.invalidateQuotes(symbols) }
 
   override suspend fun invalidateAllQuotes() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        interactorCache.invalidateAllQuotes()
-      }
+      withContext(context = Dispatchers.IO) { interactorCache.invalidateAllQuotes() }
 
   @CheckResult
   override suspend fun getCharts(
@@ -172,9 +161,7 @@ internal constructor(
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext getTickers(
+        getTickers(
             symbols = symbols,
             range = range,
             options = options,
@@ -184,17 +171,10 @@ internal constructor(
   override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange
-  ) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        interactorCache.invalidateCharts(symbols, range)
-      }
+  ) = withContext(context = Dispatchers.IO) { interactorCache.invalidateCharts(symbols, range) }
 
   override suspend fun invalidateAllCharts() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        interactorCache.invalidateAllCharts()
-      }
+      withContext(context = Dispatchers.IO) { interactorCache.invalidateAllCharts() }
 
   companion object {
 

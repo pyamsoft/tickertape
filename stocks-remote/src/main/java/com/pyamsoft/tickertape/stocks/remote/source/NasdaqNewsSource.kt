@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -51,8 +50,6 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
 
   override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
         for (s in symbols) {
           val resp =

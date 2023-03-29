@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.alert.types.pricealert
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
@@ -80,8 +79,6 @@ internal constructor(
 
   suspend fun notifyPriceAlerts(quotes: List<StockQuote>) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val now = LocalDateTime.now(clock)
         // For each alert in price alerts
         // If the price of the stock quote has passed an alert direction

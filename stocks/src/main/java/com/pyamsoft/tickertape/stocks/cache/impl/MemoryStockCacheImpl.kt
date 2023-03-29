@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.cache.impl
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
@@ -33,33 +32,17 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
   private val charts by lazy { Charts() }
 
   override suspend fun removeQuote(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
+      withContext(context = Dispatchers.IO) { quotes.remove(symbol) }
 
-        return@withContext quotes.remove(symbol)
-      }
-
-  override suspend fun removeAllQuotes() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        quotes.clear()
-      }
+  override suspend fun removeAllQuotes() = withContext(context = Dispatchers.IO) { quotes.clear() }
 
   override suspend fun getQuotes(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<StockQuote>
-  ): List<StockQuote> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        return@withContext quotes.get(symbols, resolve)
-      }
+  ): List<StockQuote> = withContext(context = Dispatchers.IO) { quotes.get(symbols, resolve) }
 
   override suspend fun removeChart(symbol: StockSymbol, range: StockChart.IntervalRange) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         val key =
             ChartKey(
                 symbol = symbol,
@@ -68,12 +51,7 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
         return@withContext charts.remove(key)
       }
 
-  override suspend fun removeAllCharts() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
-        charts.clear()
-      }
+  override suspend fun removeAllCharts() = withContext(context = Dispatchers.IO) { charts.clear() }
 
   override suspend fun getCharts(
       symbols: List<StockSymbol>,
@@ -81,7 +59,6 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
       resolve: suspend (List<StockSymbol>, StockChart.IntervalRange) -> List<StockChart>
   ): List<StockChart> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         val keys =
             symbols.map {
               ChartKey(

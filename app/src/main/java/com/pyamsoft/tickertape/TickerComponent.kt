@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import androidx.annotation.CheckResult
 import coil.ImageLoader
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.alert.AlertModule
 import com.pyamsoft.tickertape.alert.AlertWorkComponent
@@ -95,10 +96,11 @@ internal interface TickerComponent {
 
     @CheckResult
     fun create(
-        @BindsInstance application: Application,
         @Named("debug") @BindsInstance debug: Boolean,
+        @BindsInstance application: Application,
         @BindsInstance imageLoader: ImageLoader,
         @BindsInstance theming: Theming,
+        @BindsInstance enforcer: ThreadEnforcer,
     ): TickerComponent
   }
 

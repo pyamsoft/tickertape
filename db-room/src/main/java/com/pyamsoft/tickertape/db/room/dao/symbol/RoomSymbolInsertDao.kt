@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.room.ROOM_ROW_COUNT_UPDATE_INVALID
@@ -35,6 +36,7 @@ import kotlinx.coroutines.withContext
 @Deprecated("Don't use")
 internal abstract class RoomSymbolInsertDao : SymbolInsertDao {
 
+  @Transaction
   override suspend fun insert(o: DbSymbol): DbInsert.InsertResult<DbSymbol> =
       withContext(context = Dispatchers.IO) {
         val roomSymbol = RoomDbSymbol.create(o)

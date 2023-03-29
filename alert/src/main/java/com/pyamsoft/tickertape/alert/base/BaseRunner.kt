@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.alert.base
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.alert.WorkResult
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
@@ -35,7 +34,6 @@ internal abstract class BaseRunner<P : BaseWorkerParameters> protected construct
       params: P,
   ): WorkResult =
       withContext(context = Dispatchers.Default) {
-        Enforcer.assertOffMainThread()
         val identifier = identifier(id, tags)
         try {
           performWork(params)

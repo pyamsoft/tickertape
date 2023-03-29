@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.symbol
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSymbol
 import com.pyamsoft.tickertape.db.symbol.DbSymbol
 import com.pyamsoft.tickertape.db.symbol.SymbolQueryDao
@@ -29,10 +30,11 @@ import kotlinx.coroutines.withContext
 @Deprecated("Don't use")
 internal abstract class RoomSymbolQueryDao : SymbolQueryDao {
 
-  override suspend fun query(): List<DbSymbol> =
+  final override suspend fun query(): List<DbSymbol> =
       withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomDbSymbol.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbSymbol>
 }

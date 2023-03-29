@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.db
 
 import com.pyamsoft.pydroid.bus.EventBus
-import com.pyamsoft.pydroid.core.Enforcer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -33,13 +32,9 @@ internal abstract class BaseDbImpl<
 
   protected suspend fun onEvent(onEvent: (event: ChangeEvent) -> Unit) =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         return@withContext bus.onEvent { onEvent(it) }
       }
 
   protected suspend fun publish(event: ChangeEvent) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        bus.send(event)
-      }
+      withContext(context = Dispatchers.IO) { bus.send(event) }
 }

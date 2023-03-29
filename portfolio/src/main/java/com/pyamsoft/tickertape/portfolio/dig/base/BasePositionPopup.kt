@@ -56,14 +56,12 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.defaults.DialogDefaults
 import com.pyamsoft.pydroid.ui.defaults.ImageDefaults
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
-import com.pyamsoft.pydroid.ui.util.Stabilized
-import com.pyamsoft.pydroid.ui.util.stabilized
 import com.pyamsoft.tickertape.ui.icon.Paid
 import com.pyamsoft.tickertape.ui.icon.Tag
 import com.pyamsoft.tickertape.ui.icon.Today
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import timber.log.Timber
 
 @Composable
 internal fun BasePositionPopup(
@@ -74,7 +72,7 @@ internal fun BasePositionPopup(
     topFieldLabel: String,
     topFieldValue: String,
     dateLabel: String,
-    dateField: Stabilized<LocalDate?>,
+    date: LocalDate?,
     onTopFieldChanged: (String) -> Unit,
     bottomFieldLabel: String,
     bottomFieldValue: String,
@@ -88,8 +86,6 @@ internal fun BasePositionPopup(
 
   // Request focus to top field on launch
   LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
-
-  val date = dateField.data
 
   Surface(
       modifier = modifier,
@@ -347,7 +343,7 @@ private fun PreviewBasePositionPopup() {
       bottomFieldLabel = "Bottom",
       bottomFieldValue = "Bottom",
       onBottomFieldChanged = {},
-      dateField = stabilized(null),
+      date = null,
       dateLabel = "Date",
       onDateClicked = {},
       onSubmit = {},

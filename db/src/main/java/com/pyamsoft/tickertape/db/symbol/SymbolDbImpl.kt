@@ -17,21 +17,22 @@
 package com.pyamsoft.tickertape.db.symbol
 
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 @Deprecated("Don't use")
 internal class SymbolDbImpl
 @Inject
 internal constructor(
+    enforcer: ThreadEnforcer,
     @DbApi realQueryDao: SymbolQueryDao,
     @DbApi private val realInsertDao: SymbolInsertDao,
     @DbApi private val realDeleteDao: SymbolDeleteDao,
@@ -48,7 +49,7 @@ internal constructor(
 
   private val queryCache =
       cachify<List<DbSymbol>> {
-        Enforcer.assertOffMainThread()
+        enforcer.assertOffMainThread()
         return@cachify realQueryDao.query()
       }
 
@@ -60,28 +61,17 @@ internal constructor(
 
   override val realtime: SymbolRealtime = this
 
-  override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        queryCache.clear()
-      }
+  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
 
   override suspend fun listenForChanges(onChange: (event: SymbolChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        onEvent(onChange)
-      }
+      withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<DbSymbol> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext queryCache.call()
-      }
+      withContext(context = Dispatchers.IO) { queryCache.call() }
 
   override suspend fun insert(o: DbSymbol): DbInsert.InsertResult<DbSymbol> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext realInsertDao.insert(o).also { result ->
+        realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
               invalidate()
@@ -99,8 +89,7 @@ internal constructor(
 
   override suspend fun delete(o: DbSymbol, offerUndo: Boolean): Boolean =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
+        realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()
             publish(SymbolChangeEvent.Delete(o, offerUndo))

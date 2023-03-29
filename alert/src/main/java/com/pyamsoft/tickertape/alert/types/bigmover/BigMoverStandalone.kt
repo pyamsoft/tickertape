@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.alert.types.bigmover
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.pydroid.notify.NotifyChannelInfo
 import com.pyamsoft.pydroid.notify.NotifyGuard
@@ -46,6 +46,7 @@ import timber.log.Timber
 class BigMoverStandalone
 @Inject
 internal constructor(
+    private val enforcer: ThreadEnforcer,
     @AlertInternalApi private val notifier: Notifier,
     private val guard: NotifyGuard,
     private val bigMoverQueryDao: BigMoverQueryDao,
@@ -66,7 +67,7 @@ internal constructor(
   }
 
   private suspend fun postNotifications(bigMovers: List<StockQuote>) {
-    Enforcer.assertOffMainThread()
+    enforcer.assertOffMainThread()
 
     val now = LocalDateTime.now(clock)
     val alreadySeenBigMovers = bigMoverQueryDao.query()

@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.source
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
@@ -54,8 +53,6 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
 
   override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         if (symbols.isEmpty()) {
           return@withContext emptyList()
         }

@@ -16,18 +16,17 @@
 
 package com.pyamsoft.tickertape.stocks.remote.source
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.RecommendationService
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooRecommendationSource
@@ -36,8 +35,6 @@ internal constructor(@YahooApi private val service: RecommendationService) : Rec
 
   override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         try {
           val resp = service.getRecommendations(symbol = symbol.raw)
           val rec = resp.finance.result.first()

@@ -18,21 +18,24 @@ package com.pyamsoft.tickertape.stocks.okhttp
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
-import com.pyamsoft.pydroid.core.Enforcer
-import javax.net.SocketFactory
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
+import javax.net.SocketFactory
 
 class OkHttpClientLazyCallFactory(
     debug: Boolean,
+    private val enforcer: ThreadEnforcer,
 ) : Call.Factory {
 
-  private val client by lazy { createOkHttpClient(debug, DelegatingSocketFactory.create()) }
+  private val client by lazy {
+    createOkHttpClient(enforcer, debug, DelegatingSocketFactory.create())
+  }
 
   override fun newCall(request: Request): Call {
-    Enforcer.assertOffMainThread()
+    enforcer.assertOffMainThread()
     return client.newCall(request)
   }
 
@@ -41,10 +44,11 @@ class OkHttpClientLazyCallFactory(
     @JvmStatic
     @CheckResult
     internal fun createOkHttpClient(
+        enforcer: ThreadEnforcer,
         debug: Boolean,
         socketFactory: SocketFactory,
     ): OkHttpClient {
-      Enforcer.assertOffMainThread()
+      enforcer.assertOffMainThread()
 
       return OkHttpClient.Builder()
           .socketFactory(socketFactory)

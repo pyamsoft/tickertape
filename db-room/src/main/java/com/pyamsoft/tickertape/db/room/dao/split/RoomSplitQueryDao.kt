@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.db.room.dao.split
 import androidx.annotation.CheckResult
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.pyamsoft.tickertape.db.room.entity.RoomDbSplit
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
@@ -28,9 +29,11 @@ import kotlinx.coroutines.withContext
 @Dao
 internal abstract class RoomSplitQueryDao : SplitQueryDao {
 
-  override suspend fun query(): List<DbSplit> = withContext(context = Dispatchers.IO) { daoQuery() }
+  final override suspend fun query(): List<DbSplit> =
+      withContext(context = Dispatchers.IO) { daoQuery() }
 
   @CheckResult
+  @Transaction
   @Query("""SELECT * FROM ${RoomDbSplit.TABLE_NAME}""")
   internal abstract suspend fun daoQuery(): List<RoomDbSplit>
 }

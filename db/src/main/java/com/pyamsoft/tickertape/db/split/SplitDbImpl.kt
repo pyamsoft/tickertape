@@ -17,20 +17,21 @@
 package com.pyamsoft.tickertape.db.split
 
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.pydroid.core.Enforcer
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class SplitDbImpl
 @Inject
 internal constructor(
+    enforcer: ThreadEnforcer,
     @DbApi realQueryDao: SplitQueryDao,
     @DbApi private val realInsertDao: SplitInsertDao,
     @DbApi private val realDeleteDao: SplitDeleteDao,
@@ -47,7 +48,7 @@ internal constructor(
 
   private val queryCache =
       cachify<List<DbSplit>> {
-        Enforcer.assertOffMainThread()
+        enforcer.assertOffMainThread()
         return@cachify realQueryDao.query()
       }
 
@@ -59,28 +60,17 @@ internal constructor(
 
   override val realtime: SplitRealtime = this
 
-  override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        queryCache.clear()
-      }
+  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
 
   override suspend fun listenForChanges(onChange: (event: SplitChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        onEvent(onChange)
-      }
+      withContext(context = Dispatchers.IO) { onEvent(onChange) }
 
   override suspend fun query(): List<DbSplit> =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext queryCache.call()
-      }
+      withContext(context = Dispatchers.IO) { queryCache.call() }
 
   override suspend fun insert(o: DbSplit): DbInsert.InsertResult<DbSplit> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext realInsertDao.insert(o).also { result ->
+        realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
               invalidate()
@@ -98,8 +88,7 @@ internal constructor(
 
   override suspend fun delete(o: DbSplit, offerUndo: Boolean): Boolean =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext realDeleteDao.delete(o, offerUndo).also { deleted ->
+        realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()
             publish(SplitChangeEvent.Delete(o, offerUndo))

@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.remote.source
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.asCompany
@@ -24,11 +23,11 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooSearchSource
@@ -39,8 +38,6 @@ internal constructor(
 
   override suspend fun search(query: String): List<SearchResult> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-
         if (query.isBlank()) {
           return@withContext emptyList()
         }

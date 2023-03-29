@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.stocks.cache.impl
 
-import com.pyamsoft.pydroid.core.Enforcer
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.cache.OptionsCache
@@ -38,11 +37,7 @@ internal class MemoryOptionsCacheImpl @Inject internal constructor() :
   override suspend fun removeOption(
       symbol: StockSymbol,
       expirationDate: LocalDate?,
-  ) =
-      withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
-        return@withContext remove(OptionsKey(symbol, expirationDate))
-      }
+  ) = withContext(context = Dispatchers.IO) { remove(OptionsKey(symbol, expirationDate)) }
 
   override suspend fun getOptions(
       symbols: List<StockSymbol>,
@@ -50,7 +45,6 @@ internal class MemoryOptionsCacheImpl @Inject internal constructor() :
       resolve: suspend (List<StockSymbol>, LocalDate?) -> List<StockOptions>
   ): List<StockOptions> =
       withContext(context = Dispatchers.IO) {
-        Enforcer.assertOffMainThread()
         val keys =
             symbols.map { s ->
               OptionsKey(

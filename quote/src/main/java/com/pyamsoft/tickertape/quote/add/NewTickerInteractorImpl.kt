@@ -33,12 +33,12 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 internal class NewTickerInteractorImpl
@@ -77,9 +77,7 @@ internal constructor(
       }
 
   override suspend fun invalidateTicker(symbol: StockSymbol) {
-    withContext(context = Dispatchers.IO) {
-      tickerInteractorCache.invalidateQuotes(listOf(symbol))
-    }
+    withContext(context = Dispatchers.IO) { tickerInteractorCache.invalidateQuotes(listOf(symbol)) }
   }
 
   override suspend fun search(query: String): ResultWrapper<List<SearchResult>> =
@@ -96,9 +94,7 @@ internal constructor(
       }
 
   override suspend fun invalidateSearch(query: String) =
-      withContext(context = Dispatchers.IO) {
-        stockInteractorCache.invalidateSearch(query)
-      }
+      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateSearch(query) }
 
   @CheckResult
   private inline fun <T : Any> mapResultToSymbol(

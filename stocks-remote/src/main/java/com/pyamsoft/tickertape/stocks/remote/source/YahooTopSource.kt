@@ -33,10 +33,10 @@ import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 internal class YahooTopSource

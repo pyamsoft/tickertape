@@ -32,12 +32,12 @@ import com.pyamsoft.tickertape.stocks.scope.StockApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import okhttp3.Call
-import retrofit2.Converter
-import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.reflect.KClass
+import okhttp3.Call
+import retrofit2.Converter
+import retrofit2.Retrofit
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
 

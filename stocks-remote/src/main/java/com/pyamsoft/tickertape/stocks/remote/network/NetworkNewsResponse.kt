@@ -18,14 +18,14 @@ package com.pyamsoft.tickertape.stocks.remote.network
 
 import androidx.annotation.CheckResult
 import androidx.core.text.HtmlCompat
+import java.net.URL
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.Path
 import org.simpleframework.xml.Root
-import java.net.URL
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Can't be a data class because SimpleXML is weird yo

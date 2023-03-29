@@ -17,18 +17,18 @@
 package com.pyamsoft.tickertape.worker.work.pricealert
 
 import com.pyamsoft.tickertape.worker.work.BgWorker
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class PriceAlertWork
 @Inject
 internal constructor(
-  private val standalone: PriceAlertStandalone,
+    private val standalone: PriceAlertStandalone,
 ) : BgWorker {
 
   override suspend fun work(): BgWorker.WorkResult =

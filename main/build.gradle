@@ -27,7 +27,6 @@ android {
     minSdkVersion rootProject.ext.minSdk
     targetSdkVersion rootProject.ext.targetSdk
     resConfigs 'en'
-
   }
 
   compileOptions {

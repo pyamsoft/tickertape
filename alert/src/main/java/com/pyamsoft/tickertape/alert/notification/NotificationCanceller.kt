@@ -18,9 +18,9 @@ package com.pyamsoft.tickertape.alert.notification
 
 import com.pyamsoft.pydroid.notify.Notifier
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 class NotificationCanceller

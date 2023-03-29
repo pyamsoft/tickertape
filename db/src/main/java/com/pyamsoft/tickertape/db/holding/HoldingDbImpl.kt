@@ -23,11 +23,11 @@ import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.Maybe
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class HoldingDbImpl

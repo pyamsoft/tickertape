@@ -25,12 +25,12 @@ import com.pyamsoft.tickertape.worker.WorkJobType
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.workmanager.workers.BigMoverWorker
 import com.pyamsoft.tickertape.worker.workmanager.workers.PriceAlertWorker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 internal class WorkerQueueImpl

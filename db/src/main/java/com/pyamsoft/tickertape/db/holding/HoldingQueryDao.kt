@@ -22,13 +22,10 @@ import com.pyamsoft.tickertape.db.Maybe
 
 interface HoldingQueryDao : DbQuery<DbHolding> {
 
-  @CheckResult
-  suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding>
+  @CheckResult suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding>
 
   interface Cache : DbQuery.Cache {
 
     suspend fun invalidateById(id: DbHolding.Id)
-
   }
 }
-

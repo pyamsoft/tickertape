@@ -39,8 +39,8 @@ import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationD
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class MainActivity : AppCompatActivity() {
 

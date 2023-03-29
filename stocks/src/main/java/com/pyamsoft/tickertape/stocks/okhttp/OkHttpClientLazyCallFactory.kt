@@ -19,11 +19,11 @@ package com.pyamsoft.tickertape.stocks.okhttp
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.ThreadEnforcer
+import javax.net.SocketFactory
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
-import javax.net.SocketFactory
 
 class OkHttpClientLazyCallFactory(
     debug: Boolean,

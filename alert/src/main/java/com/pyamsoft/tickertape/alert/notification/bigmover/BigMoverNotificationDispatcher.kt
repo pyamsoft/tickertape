@@ -39,10 +39,10 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import timber.log.Timber
+import com.pyamsoft.tickertape.ui.R as R2
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.pyamsoft.tickertape.ui.R as R2
+import timber.log.Timber
 
 @Singleton
 internal class BigMoverNotificationDispatcher

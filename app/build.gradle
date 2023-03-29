@@ -32,7 +32,6 @@ android {
     // For vector drawables
     vectorDrawables.useSupportLibrary = true
     resConfigs 'en'
-
   }
 
   compileOptions {

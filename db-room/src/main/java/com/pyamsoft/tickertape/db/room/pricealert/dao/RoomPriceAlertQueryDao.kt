@@ -46,7 +46,7 @@ internal abstract class RoomPriceAlertQueryDao : PriceAlertQueryDao {
       """
       SELECT * FROM ${RoomPriceAlert.TABLE_NAME}
       WHERE ${RoomPriceAlert.COLUMN_ENABLED} = TRUE
-      AND 
+      AND
         (
           ${RoomPriceAlert.COLUMN_TRIGGER_PRICE_BELOW} IS NOT NULL
           OR ${RoomPriceAlert.COLUMN_TRIGGER_PRICE_ABOVE} IS NOT NULL

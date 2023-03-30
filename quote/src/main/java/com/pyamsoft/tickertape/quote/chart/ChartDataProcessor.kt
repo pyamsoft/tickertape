@@ -21,6 +21,5 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 
 interface ChartDataProcessor {
 
-    @CheckResult
-    suspend fun processChartEntries(chart: StockChart): ChartDataPainter
+  @CheckResult suspend fun processChartEntries(chart: StockChart): ChartDataPainter
 }

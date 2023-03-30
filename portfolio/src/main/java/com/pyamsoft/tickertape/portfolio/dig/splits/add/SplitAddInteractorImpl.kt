@@ -23,11 +23,11 @@ import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitInsertDao
 import com.pyamsoft.tickertape.db.split.SplitQueryDao
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class SplitAddInteractorImpl

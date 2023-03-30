@@ -26,7 +26,5 @@ interface PriceAlertQueryDao : DbQuery<PriceAlert> {
   interface Cache : DbQuery.Cache {
 
     @CheckResult suspend fun invalidateActive()
-
   }
-
 }

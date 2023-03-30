@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.compose.runtime.Stable
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.split.DbSplit
@@ -36,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface BasePortfolioDigViewState : BaseDigViewState {
   val section: StateFlow<PortfolioDigSections>
 
-  val holding: StateFlow<DbHolding?>
+  val holding: StateFlow<Maybe<out DbHolding>?>
   val holdingError: StateFlow<Throwable?>
 }
 
@@ -79,7 +80,7 @@ internal constructor(
   override val stockSplitError = MutableStateFlow<Throwable?>(null)
   override val stockSplits: StateFlow<List<DbSplit>>
 
-  override val holding = MutableStateFlow<DbHolding?>(null)
+  override val holding = MutableStateFlow<Maybe<out DbHolding>?>(null)
   override val holdingError = MutableStateFlow<Throwable?>(null)
 
   override val positionDialog = MutableStateFlow<PositionParams?>(null)

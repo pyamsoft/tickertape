@@ -27,6 +27,7 @@ import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
@@ -84,38 +86,53 @@ internal fun PositionScreen(
           modifier = Modifier.size(64.dp),
       )
     } else {
-      Box(
-          modifier = modifier,
-          contentAlignment = Alignment.BottomCenter,
-      ) {
-        BaseDigListScreen(
-            modifier = Modifier.matchParentSize(),
-            label = "Add Position",
-            isAddVisible = isAddVisible,
-            items = positions,
-            isLoading = isLoading,
-            onRefresh = onRefresh,
-            onAddClicked = { onAddPosition(h) },
-            itemKey = { it.id.raw },
-        ) { position ->
-          PositionItem(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .combinedClickable(
-                          onClick = { onUpdatePosition(position, h) },
-                          onLongClick = { onDeletePosition(position) },
-                      ),
-              position = position,
-              clock = clock,
-          )
-        }
+      when (h) {
+        is Maybe.Data -> {
+          val data = h.data
+          Box(
+              modifier = modifier,
+              contentAlignment = Alignment.BottomCenter,
+          ) {
+            BaseDigListScreen(
+                modifier = Modifier.matchParentSize(),
+                label = "Add Position",
+                isAddVisible = isAddVisible,
+                items = positions,
+                isLoading = isLoading,
+                onRefresh = onRefresh,
+                onAddClicked = { onAddPosition(data) },
+                itemKey = { it.id.raw },
+            ) { position ->
+              PositionItem(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .combinedClickable(
+                              onClick = { onUpdatePosition(position, data) },
+                              onLongClick = { onDeletePosition(position) },
+                          ),
+                  position = position,
+                  clock = clock,
+              )
+            }
 
-        PositionSnackbar(
-            state = state,
-            symbol = h.symbol,
-            onSnackbarDismissed = onPositionDeleteFinalized,
-            onSnackbarAction = onPositionRestored,
-        )
+            PositionSnackbar(
+                state = state,
+                symbol = data.symbol,
+                onSnackbarDismissed = onPositionDeleteFinalized,
+                onSnackbarAction = onPositionRestored,
+            )
+          }
+        }
+        is Maybe.None -> {
+          Box(
+              modifier = modifier,
+              contentAlignment = Alignment.Center,
+          ) {
+            Text(
+                text = "Not in the DB",
+            )
+          }
+        }
       }
     }
   }

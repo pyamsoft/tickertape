@@ -38,11 +38,11 @@ import com.pyamsoft.tickertape.quote.TickerInteractor
 import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PortfolioDigInteractorImpl
@@ -130,15 +130,10 @@ internal constructor(
   override suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit) =
       withContext(context = Dispatchers.Default) { positionRealtime.listenForChanges(onEvent) }
 
-  override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<DbHolding> =
+  override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<Maybe<out DbHolding>> =
       withContext(context = Dispatchers.IO) {
         try {
-          when (val holding = holdingQueryDao.queryBySymbol(symbol)) {
-            is Maybe.Data -> ResultWrapper.success(holding.data)
-            is Maybe.None -> {
-              ResultWrapper.failure(RuntimeException("Missing holding: ${symbol.raw}"))
-            }
-          }
+          return@withContext ResultWrapper.success(holdingQueryDao.queryBySymbol(symbol))
         } catch (e: Throwable) {
           e.ifNotCancellation {
             Timber.e(e, "Failed to get db holding: $symbol")

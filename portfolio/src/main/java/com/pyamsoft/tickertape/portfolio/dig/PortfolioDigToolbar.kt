@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -49,8 +50,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.ZeroElevation
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.YFJumpLink
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -66,6 +69,12 @@ private val HIDE_TABS_FOR_INDEXES =
     arrayOf(
         PortfolioDigSections.OPTIONS_CHAIN,
         PortfolioDigSections.STATISTICS,
+        PortfolioDigSections.SPLITS,
+    )
+
+private val HIDE_TABS_FOR_NO_DB =
+    arrayOf(
+        PortfolioDigSections.POSITIONS,
         PortfolioDigSections.SPLITS,
     )
 
@@ -85,32 +94,39 @@ private val HIDE_TABS_FOR_CRYPTO =
 @CheckResult
 internal fun rememberTabs(
     symbol: StockSymbol,
-    holding: DbHolding?
+    holding: Maybe<out DbHolding>?
 ): SnapshotStateList<PortfolioDigSections> {
   // Hide tabs in options
-  val equityType = holding?.type
   return remember(
-      equityType,
+      holding,
       symbol,
   ) {
-    PortfolioDigSections.values()
-        .filter { v ->
-          if (equityType == null) {
-            // Just provide something so that we have a visual placeholder
-            return@filter !HIDE_TABS_FOR_OPTIONS.contains(v)
-          } else {
-            return@filter if (symbol.isIndex()) {
-              !HIDE_TABS_FOR_INDEXES.contains(v)
-            } else {
-              when (equityType) {
-                EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
-                EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
-                else -> true
+    if (holding == null) {
+      return@remember mutableStateListOf()
+    } else {
+      return@remember PortfolioDigSections.values()
+          .filter { v ->
+            // Kotlin is weird sometimes
+            when (val h: Maybe<out DbHolding> = holding.requireNotNull()) {
+              is Maybe.Data -> {
+                val equityType = h.data.type
+                return@filter if (symbol.isIndex()) {
+                  !HIDE_TABS_FOR_INDEXES.contains(v)
+                } else {
+                  when (equityType) {
+                    EquityType.OPTION -> !HIDE_TABS_FOR_OPTIONS.contains(v)
+                    EquityType.CRYPTOCURRENCY -> !HIDE_TABS_FOR_CRYPTO.contains(v)
+                    else -> true
+                  }
+                }
+              }
+              is Maybe.None -> {
+                return@filter !HIDE_TABS_FOR_NO_DB.contains(v)
               }
             }
           }
-        }
-        .toMutableStateList()
+          .toMutableStateList()
+    }
   }
 }
 

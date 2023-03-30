@@ -20,6 +20,7 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
@@ -54,7 +55,7 @@ internal constructor(
     private val params: PortfolioDigParams,
     private val interactor: PortfolioDigInteractor,
     private val jsonParser: JsonParser,
-    private val processor: ChartDataProcessor,
+    processor: ChartDataProcessor,
     interactorCache: PortfolioDigInteractor.Cache,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
@@ -67,20 +68,24 @@ internal constructor(
 
   private val splitLoadRunner =
       highlander<ResultWrapper<List<DbSplit>>, Boolean> { force ->
-        val holding = state.holding.value
-        if (holding == null) {
-          return@highlander ResultWrapper.success(emptyList())
-        } else {
-          if (force) {
-            interactorCache.invalidateSplits(holding.id)
-          }
+        when (val holding = state.holding.value) {
+          is Maybe.Data -> {
+            val data = holding.data
+            if (force) {
+              interactorCache.invalidateSplits(data.id)
+            }
 
-          return@highlander interactor.getSplits(holding.id)
+            return@highlander interactor.getSplits(data.id)
+          }
+          null,
+          is Maybe.None -> {
+            return@highlander ResultWrapper.success(emptyList())
+          }
         }
       }
 
   private val holdingLoadRunner =
-      highlander<ResultWrapper<DbHolding>, Boolean> { force ->
+      highlander<ResultWrapper<Maybe<out DbHolding>>, Boolean> { force ->
 
         // If this holding is already provided, great, fast track!
         val holding = params.holding
@@ -91,22 +96,26 @@ internal constructor(
             interactorCache.invalidateHolding(holding.id)
           }
 
-          return@highlander ResultWrapper.success(holding)
+          return@highlander ResultWrapper.success(Maybe.Data(holding))
         }
       }
 
   private val positionsLoadRunner =
       highlander<ResultWrapper<List<PositionStock>>, Boolean, List<DbSplit>> { force, splits ->
-        val holding = state.holding.value
-        if (holding == null) {
-          return@highlander ResultWrapper.success(emptyList())
-        } else {
-          if (force) {
-            interactorCache.invalidatePositions(holding.id)
-          }
+        when (val holding = state.holding.value) {
+          is Maybe.Data -> {
+            val data = holding.data
+            if (force) {
+              interactorCache.invalidatePositions(data.id)
+            }
 
-          interactor.getPositions(holding.id).map { p ->
-            p.map { createPositionStock(holding, it, splits) }.sortedBy { it.purchaseDate }
+            interactor.getPositions(data.id).map { p ->
+              p.map { createPositionStock(data, it, splits) }.sortedBy { it.purchaseDate }
+            }
+          }
+          null,
+          is Maybe.None -> {
+            return@highlander ResultWrapper.success(emptyList())
           }
         }
       }
@@ -252,20 +261,26 @@ internal constructor(
   }
 
   private fun onPositionUpdated(position: DbPosition) {
-    val holding = state.holding.value
-    if (holding == null) {
-      Timber.w("Drop position update, missing holding")
-    } else {
-      onPositionInsertOrUpdate(position, holding)
+    when (val holding = state.holding.value) {
+      is Maybe.Data -> {
+        onPositionInsertOrUpdate(position, holding.data)
+      }
+      null,
+      is Maybe.None -> {
+        Timber.w("Drop position update, missing holding")
+      }
     }
   }
 
   private fun onPositionInserted(position: DbPosition) {
-    val holding = state.holding.value
-    if (holding == null) {
-      Timber.w("Drop position insert, missing holding")
-    } else {
-      onPositionInsertOrUpdate(position, holding)
+    when (val holding = state.holding.value) {
+      is Maybe.Data -> {
+        onPositionInsertOrUpdate(position, holding.data)
+      }
+      null,
+      is Maybe.None -> {
+        Timber.w("Drop position insert, missing holding")
+      }
     }
   }
 

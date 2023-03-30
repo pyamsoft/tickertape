@@ -57,7 +57,6 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import com.pyamsoft.tickertape.ui.rememberInBackground
 import java.time.LocalDate
 
 @Composable
@@ -197,7 +196,7 @@ private fun <T : Any> OptionsDropdown(
   val formatToDisplayChoice by rememberUpdatedState(onDisplayChoice)
 
   val displayChoices =
-      rememberInBackground(choices) {
+      remember(choices) {
         choices.map { c ->
           OptionsDropdownItem(
               display = formatToDisplayChoice(c),
@@ -237,16 +236,14 @@ private fun <T : Any> OptionsDropdown(
               )
             },
     ) {
-      if (displayChoices != null) {
-        for (choice in displayChoices) {
-          DropdownMenuItem(
-              onClick = { onSelect(choice.value) },
-          ) {
-            Text(
-                modifier = Modifier.padding(MaterialTheme.keylines.baseline),
-                text = choice.display,
-            )
-          }
+      for (choice in displayChoices) {
+        DropdownMenuItem(
+            onClick = { onSelect(choice.value) },
+        ) {
+          Text(
+              modifier = Modifier.padding(MaterialTheme.keylines.baseline),
+              text = choice.display,
+          )
         }
       }
     }

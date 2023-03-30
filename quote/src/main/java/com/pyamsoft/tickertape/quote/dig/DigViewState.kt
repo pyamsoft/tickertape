@@ -21,17 +21,19 @@ import androidx.compose.runtime.Stable
 import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartDataPainter
+import com.pyamsoft.tickertape.quote.dig.recommend.StockRec
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockNews
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface BaseDigViewState : UiViewState {
@@ -49,6 +51,7 @@ interface BaseDigViewState : UiViewState {
 
 @Stable
 interface ChartDigViewState : BaseDigViewState {
+  val chart: StateFlow<ChartDataPainter?>
   val range: StateFlow<StockChart.IntervalRange>
   val currentDate: StateFlow<LocalDateTime>
   val currentPrice: StateFlow<StockMoneyValue?>
@@ -70,7 +73,7 @@ interface StatisticsDigViewState : BaseDigViewState {
 
 @Stable
 interface RecommendationDigViewState : BaseDigViewState {
-  val recommendations: StateFlow<List<Ticker>>
+  val recommendations: StateFlow<List<StockRec>>
   val recommendationError: StateFlow<Throwable?>
 }
 
@@ -112,12 +115,13 @@ protected constructor(
   final override val statistics = MutableStateFlow<KeyStatistics?>(null)
   final override val statisticsError = MutableStateFlow<Throwable?>(null)
 
-  final override val recommendations = MutableStateFlow(emptyList<Ticker>())
+  final override val recommendations = MutableStateFlow(emptyList<StockRec>())
   final override val recommendationError = MutableStateFlow<Throwable?>(null)
 
   final override val news = MutableStateFlow(emptyList<StockNews>())
   final override val newsError = MutableStateFlow<Throwable?>(null)
 
+  final override val chart = MutableStateFlow<ChartDataPainter?>(null)
   final override val chartError = MutableStateFlow<Throwable?>(null)
   final override val range = MutableStateFlow(StockChart.IntervalRange.ONE_DAY)
   final override val currentDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now(clock))

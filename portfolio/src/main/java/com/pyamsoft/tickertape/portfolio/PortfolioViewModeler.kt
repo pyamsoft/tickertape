@@ -35,11 +35,11 @@ import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.fromJson
 import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -49,6 +49,7 @@ internal constructor(
     private val interactorCache: PortfolioInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
     private val jsonParser: JsonParser,
+    private val processor: PortfolioProcessor,
 ) : DeleteRestoreViewModeler<PortfolioViewState>(state) {
 
   private var internalFullPortfolio: List<PortfolioStock> = emptyList()
@@ -66,12 +67,10 @@ internal constructor(
           state,
           tickers ->
         val full = tickers.sortedWith(PortfolioStock.COMPARATOR)
-        val portfolio = PortfolioStockList.of(full)
-        val stocks = state.asVisible(full)
         return@highlander PortfolioListGenerateResult(
             all = full,
-            portfolio = portfolio,
-            visible = stocks,
+            portfolio = processor.process(full),
+            visible = state.asVisible(full),
         )
       }
 
@@ -163,7 +162,7 @@ internal constructor(
 
           // Clear data on bad processing
           internalFullPortfolio = emptyList()
-          self.portfolio.value = PortfolioStockList.empty()
+          self.portfolio.value = null
           self.stocks.value = emptyList()
         }
       }
@@ -344,7 +343,7 @@ internal constructor(
   }
 
   private data class PortfolioListGenerateResult(
-      val portfolio: PortfolioStockList,
+      val portfolio: PortfolioData,
       override val all: List<PortfolioStock>,
       override val visible: List<PortfolioStock>,
   ) : ListGenerateResult<PortfolioStock>

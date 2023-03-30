@@ -26,13 +26,13 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerName
 import com.pyamsoft.tickertape.quote.TickerPrice
 import com.pyamsoft.tickertape.quote.TickerSize
 import com.pyamsoft.tickertape.quote.chart.Chart
+import com.pyamsoft.tickertape.quote.chart.ChartDataPainter
 import com.pyamsoft.tickertape.quote.test.TestSymbol
 import com.pyamsoft.tickertape.quote.test.newTestChart
 import com.pyamsoft.tickertape.quote.test.newTestQuote
@@ -43,6 +43,7 @@ import com.pyamsoft.tickertape.ui.test.TestClock
 internal fun HomeChartItem(
     modifier: Modifier = Modifier,
     ticker: Ticker,
+    painter: ChartDataPainter,
     onClick: (Ticker) -> Unit,
 ) {
   // We can assume here the chart is not null
@@ -66,7 +67,7 @@ internal fun HomeChartItem(
     }
     Chart(
         modifier = Modifier.weight(1F).fillMaxWidth(),
-        chart = ticker.chart.requireNotNull(),
+        painter = painter,
     )
   }
 }
@@ -85,6 +86,7 @@ private fun PreviewHomeChartItem() {
                 quote = newTestQuote(symbol),
                 chart = newTestChart(symbol, clock),
             ),
+        painter = ChartDataPainter.EMPTY,
         onClick = {},
     )
   }

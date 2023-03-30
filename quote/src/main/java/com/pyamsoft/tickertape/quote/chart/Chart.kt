@@ -20,32 +20,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.tickertape.quote.test.TestSymbol
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
-import com.pyamsoft.tickertape.ui.test.TestClock
-import java.time.LocalDateTime
-
-@Stable
-data class ChartData
-internal constructor(
-    val high: StockMoneyValue,
-    val low: StockMoneyValue,
-    val baseline: StockMoneyValue,
-    val date: LocalDateTime,
-    val price: StockMoneyValue,
-    val range: StockChart.IntervalRange,
-)
 
 @Composable
 fun Chart(
     modifier: Modifier = Modifier,
-    chart: StockChart,
+    painter: ChartDataPainter,
     onScrub: ((ChartData) -> Unit)? = null,
 ) {
   Box(
@@ -53,13 +35,13 @@ fun Chart(
   ) {
     LineChart(
         modifier = Modifier.matchParentSize(),
-        chart = chart,
+        painter = painter,
         onScrub = onScrub,
     )
 
     ChartBounds(
         modifier = Modifier.matchParentSize(),
-        chart = chart,
+        painter = painter,
     )
   }
 }
@@ -67,11 +49,8 @@ fun Chart(
 @Preview
 @Composable
 private fun PreviewChart() {
-  val symbol = TestSymbol
-  val clock = TestClock
-
   Chart(
       modifier = Modifier.width(320.dp).height(160.dp),
-      chart = newTestChart(symbol, clock),
+      painter = ChartDataPainter.EMPTY,
   )
 }

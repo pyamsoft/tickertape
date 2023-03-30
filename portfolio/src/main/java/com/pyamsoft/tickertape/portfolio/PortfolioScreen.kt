@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @Composable
 @JvmOverloads
@@ -181,15 +183,32 @@ private fun PortfolioSummary(
   val portfolio by state.portfolio.collectAsState()
   val section by state.section.collectAsState()
 
-  PorfolioSummaryItem(
-      modifier =
-          modifier
-              .statusBarsPadding()
-              .padding(horizontal = MaterialTheme.keylines.content)
-              .padding(top = MaterialTheme.keylines.baseline),
-      portfolio = portfolio,
-      equityType = section,
-  )
+  val data =
+      remember(section, portfolio) {
+        when (section) {
+          EquityType.STOCK -> portfolio?.stocks
+          EquityType.OPTION -> {
+            Timber.d("Don't show a summary for options")
+            null
+          }
+          EquityType.CRYPTOCURRENCY -> portfolio?.crypto
+        }
+      }
+
+  AnimatedVisibility(
+      visible = data != null,
+  ) {
+    data?.also { d ->
+      PorfolioSummaryItem(
+          modifier =
+              modifier
+                  .statusBarsPadding()
+                  .padding(horizontal = MaterialTheme.keylines.content)
+                  .padding(top = MaterialTheme.keylines.baseline),
+          data = d,
+      )
+    }
+  }
 }
 
 @Preview

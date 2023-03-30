@@ -22,9 +22,9 @@ import com.pyamsoft.pydroid.arch.UiViewState
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 @Stable
 interface PortfolioViewState : UiViewState {
@@ -35,7 +35,7 @@ interface PortfolioViewState : UiViewState {
   val section: StateFlow<EquityType>
   val loadingState: StateFlow<LoadingState>
 
-  val portfolio: StateFlow<PortfolioStockList>
+  val portfolio: StateFlow<PortfolioData?>
   val stocks: StateFlow<List<PortfolioStock>>
   val error: StateFlow<Throwable?>
 
@@ -58,7 +58,7 @@ class MutablePortfolioViewState @Inject internal constructor() : PortfolioViewSt
   override val section = MutableStateFlow(EquityType.STOCK)
   override val loadingState = MutableStateFlow(PortfolioViewState.LoadingState.NONE)
 
-  override val portfolio = MutableStateFlow(PortfolioStockList.empty())
+  override val portfolio = MutableStateFlow<PortfolioData?>(null)
   override val stocks = MutableStateFlow(emptyList<PortfolioStock>())
   override val error = MutableStateFlow<Throwable?>(null)
 }

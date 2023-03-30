@@ -19,11 +19,17 @@ package com.pyamsoft.tickertape.quote
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.quote.add.NewTickerInteractor
 import com.pyamsoft.tickertape.quote.add.NewTickerInteractorImpl
+import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
+import com.pyamsoft.tickertape.quote.chart.ChartDataProcessorImpl
 import dagger.Binds
 import dagger.Module
 
 @Module
-abstract class TickerModule {
+abstract class UiAppModule {
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindChartDataProcessor(impl: ChartDataProcessorImpl): ChartDataProcessor
 
   @Binds
   @CheckResult

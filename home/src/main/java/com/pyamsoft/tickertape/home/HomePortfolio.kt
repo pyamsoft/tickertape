@@ -54,7 +54,8 @@ internal fun HomePortfolio(
   val portfolio by state.portfolio.collectAsState()
   val portfolioError by state.portfolioError.collectAsState()
 
-  val isEmptyPortfolio = remember(portfolio) { portfolio.list.isEmpty() }
+  val isEmptyPortfolio =
+      remember(portfolio) { portfolio.let { it == null || it.stocks.positions.isEmpty() } }
   val isLoading = remember(loadingState) { loadingState == HomeBaseViewState.LoadingState.LOADING }
 
   val isVisible =
@@ -99,11 +100,13 @@ internal fun HomePortfolio(
         Box(
             modifier = Modifier.fillMaxWidth().height(HomeScreenDefaults.PORTFOLIO_HEIGHT),
         ) {
-          HomePortfolioSummaryItem(
-              modifier =
-                  Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
-              portfolio = portfolio,
-          )
+          portfolio?.also { p ->
+            HomePortfolioSummaryItem(
+                modifier =
+                    Modifier.matchParentSize().padding(horizontal = MaterialTheme.keylines.content),
+                portfolio = p,
+            )
+          }
 
           Loading(
               modifier = Modifier.matchParentSize(),

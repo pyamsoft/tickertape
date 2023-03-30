@@ -17,11 +17,6 @@
 package com.pyamsoft.tickertape.portfolio.item
 
 import androidx.annotation.CheckResult
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,39 +36,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
-import com.pyamsoft.tickertape.stocks.api.EquityType
+import com.pyamsoft.tickertape.portfolio.PortfolioData
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.asGainLoss
 import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
 import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
-import com.pyamsoft.tickertape.ui.rememberInBackground
 
 @Composable
 fun PorfolioSummaryItem(
     modifier: Modifier = Modifier,
-    portfolio: PortfolioStockList,
-    equityType: EquityType,
+    data: PortfolioData.Data,
 ) {
-  // Short circuit
-  val data =
-      rememberInBackground(
-          portfolio,
-          equityType,
-      ) {
-        portfolio.generateData(equityType)
-      }
-
-  AnimatedVisibility(
-      visible = data != null,
-      enter = fadeIn() + slideInVertically(),
-      exit = slideOutVertically() + fadeOut(),
-  ) {
-    DisplayPortfolioData(
-        modifier = modifier,
-        data = data,
-    )
-  }
+  DisplayPortfolioData(
+      modifier = modifier,
+      data = data,
+  )
 }
 
 @CheckResult
@@ -92,88 +69,56 @@ private fun resolveDirectionColor(
 @Composable
 private fun DisplayPortfolioData(
     modifier: Modifier = Modifier,
-    data: PortfolioStockList.Data?,
+    data: PortfolioData.Data,
 ) {
   val colors = MaterialTheme.colors
   val mediumAlpha = ContentAlpha.medium
 
   val totalComposeColor =
       remember(
-          data?.total?.direction,
+          data,
           colors,
           mediumAlpha,
       ) {
-        val d = data?.total?.direction
-        if (d == null) Color.Unspecified
-        else {
-          resolveDirectionColor(
-              d,
-              colors,
-              mediumAlpha,
-          )
-        }
+        resolveDirectionColor(
+            data.total.direction,
+            colors,
+            mediumAlpha,
+        )
       }
 
   val totalGainLoss =
-      remember(data?.total) {
-        val total = data?.total
-        if (total == null) {
-          return@remember ""
-        } else {
-          val amount = "${total.direction.sign}${total.change.display}"
-          val pct = "${total.direction.sign}${total.changePercent.display}"
-          return@remember "$amount ($pct)"
-        }
+      remember(data) {
+        val total = data.total
+        val amount = "${total.direction.sign}${total.change.display}"
+        val pct = "${total.direction.sign}${total.changePercent.display}"
+        return@remember "$amount ($pct)"
       }
 
-  val totalGainLossLabel =
-      remember(data?.total) {
-        val total = data?.total
-        if (total == null) {
-          return@remember ""
-        } else {
-          return@remember total.direction.asGainLoss().uppercase()
-        }
-      }
+  val totalGainLossLabel = remember(data) { data.total.direction.asGainLoss().uppercase() }
 
   val todayComposeColor =
       remember(
-          data?.today?.direction,
+          data,
           colors,
           mediumAlpha,
       ) {
-        val d = data?.today?.direction
-        if (d == null) Color.Unspecified
-        else {
-          resolveDirectionColor(
-              d,
-              colors,
-              mediumAlpha,
-          )
-        }
+        resolveDirectionColor(
+            data.today.direction,
+            colors,
+            mediumAlpha,
+        )
       }
 
   val todayGainLoss =
-      remember(data?.today) {
-        val today = data?.today
-        if (today == null) {
-          return@remember ""
-        } else {
-          val amount = "${today.direction.sign}${today.change.display}"
-          val pct = "${today.direction.sign}${today.changePercent.display}"
-          return@remember "$amount ($pct)"
-        }
+      remember(data) {
+        val today = data.today
+        val amount = "${today.direction.sign}${today.change.display}"
+        val pct = "${today.direction.sign}${today.changePercent.display}"
+        return@remember "$amount ($pct)"
       }
 
-  val todayGainLossLabel =
-      remember(data?.today) {
-        val today = data?.today
-        if (today == null) {
-          return@remember ""
-        } else {
-          return@remember today.direction.asGainLoss().uppercase()
-        }
-      }
+  val todayGainLossLabel = remember(data) { data.today.direction.asGainLoss().uppercase() }
 
   val labelColor =
       remember(
@@ -198,7 +143,7 @@ private fun DisplayPortfolioData(
     )
     Text(
         modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = data?.current?.display.orEmpty(),
+        text = data.current.display,
         style =
             MaterialTheme.typography.h3.copy(
                 fontWeight = FontWeight.W700,
@@ -241,59 +186,57 @@ private fun DisplayPortfolioData(
             ),
     )
 
-    val pos = data?.positions
-    if (pos != null) {
-      Column(
-          modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+    val pos = data.positions
+    Column(
+        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+    ) {
+      if (pos.shortTerm > 0 || pos.longTerm > 0) {
+        Text(
+            modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
+            text = "POSITIONS",
+            style =
+                MaterialTheme.typography.caption.copy(
+                    fontWeight = FontWeight.W400,
+                    color = labelColor,
+                ),
+        )
+      }
+
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
       ) {
-        if (pos.shortTerm > 0 || pos.longTerm > 0) {
+        if (pos.shortTerm > 0) {
+          ShortTermPurchaseDateTag(
+              style = MaterialTheme.typography.body2,
+          )
           Text(
-              modifier = Modifier.padding(bottom = MaterialTheme.keylines.typography),
-              text = "POSITIONS",
+              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+              text = "${pos.shortTerm}",
               style =
-                  MaterialTheme.typography.caption.copy(
+                  MaterialTheme.typography.body1.copy(
                       fontWeight = FontWeight.W400,
-                      color = labelColor,
                   ),
           )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          if (pos.shortTerm > 0) {
-            ShortTermPurchaseDateTag(
-                style = MaterialTheme.typography.body2,
-            )
-            Text(
-                modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-                text = "${pos.shortTerm}",
-                style =
-                    MaterialTheme.typography.body1.copy(
-                        fontWeight = FontWeight.W400,
-                    ),
-            )
-          }
+        if (pos.shortTerm > 0 && pos.longTerm > 0) {
+          Spacer(
+              modifier = Modifier.width(MaterialTheme.keylines.content),
+          )
+        }
 
-          if (pos.shortTerm > 0 && pos.longTerm > 0) {
-            Spacer(
-                modifier = Modifier.width(MaterialTheme.keylines.content),
-            )
-          }
-
-          if (pos.longTerm > 0) {
-            LongTermPurchaseDateTag(
-                style = MaterialTheme.typography.body2,
-            )
-            Text(
-                modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
-                text = "${pos.longTerm}",
-                style =
-                    MaterialTheme.typography.body1.copy(
-                        fontWeight = FontWeight.W400,
-                    ),
-            )
-          }
+        if (pos.longTerm > 0) {
+          LongTermPurchaseDateTag(
+              style = MaterialTheme.typography.body2,
+          )
+          Text(
+              modifier = Modifier.padding(start = MaterialTheme.keylines.baseline),
+              text = "${pos.longTerm}",
+              style =
+                  MaterialTheme.typography.body1.copy(
+                      fontWeight = FontWeight.W400,
+                  ),
+          )
         }
       }
     }
@@ -305,8 +248,7 @@ private fun DisplayPortfolioData(
 private fun PreviewPortfolioSummaryItem() {
   Surface {
     PorfolioSummaryItem(
-        portfolio = PortfolioStockList.empty(),
-        equityType = EquityType.STOCK,
+        data = PortfolioData.EMPTY.stocks,
     )
   }
 }

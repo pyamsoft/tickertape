@@ -27,7 +27,13 @@ import dagger.Binds
 import dagger.Module
 
 @Module
-abstract class PortfolioModule {
+abstract class PortfolioAppModule {
+
+  @Binds
+  @CheckResult
+  internal abstract fun bindPortfolioProcessor(
+      impl: PortfolioProcessorImpl,
+  ): PortfolioProcessor
 
   @Binds
   @CheckResult

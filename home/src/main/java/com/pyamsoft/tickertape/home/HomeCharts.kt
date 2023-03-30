@@ -44,16 +44,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.chart.ChartError
-import com.pyamsoft.tickertape.quote.test.TestSymbol
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.quote.test.newTestQuote
-import com.pyamsoft.tickertape.ui.rememberInBackground
-import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlinx.coroutines.CoroutineScope
 
@@ -270,7 +266,7 @@ private fun HomeCharts(
     modifier: Modifier = Modifier,
     name: String,
     isLoading: Boolean,
-    tickers: SnapshotStateList<Ticker>,
+    tickers: SnapshotStateList<HomeStock>,
     error: Throwable?,
     imageLoader: ImageLoader,
     onChartClicked: (Ticker) -> Unit,
@@ -346,35 +342,35 @@ private fun Loading(
 @Composable
 private fun ChartList(
     modifier: Modifier = Modifier,
-    tickers: List<Ticker>,
+    tickers: SnapshotStateList<HomeStock>,
     onClick: (Ticker) -> Unit,
 ) {
-  val onlyChartTickers = rememberInBackground(tickers) { tickers.filter { it.chart != null } }
+  val onlyChartTickers = remember(tickers) { tickers.filter { it.chart != null } }
 
   LazyRow(
       modifier = modifier,
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
   ) {
-    if (onlyChartTickers != null) {
-      itemsIndexed(
-          items = onlyChartTickers,
-          key = { index, item -> "${item.symbol.raw}-${index}" },
-      ) { index, item ->
-        // We can assume here the chart is not null
-        HomeChartItem(
-            modifier =
-                Modifier.fillMaxHeight().width(HomeScreenDefaults.rememberItemWidth()).run {
-                  when (index) {
-                    0 -> padding(start = MaterialTheme.keylines.content)
-                    onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
-                    else -> this
-                  }
-                },
-            ticker = item,
-            onClick = onClick,
-        )
-      }
+    itemsIndexed(
+        items = onlyChartTickers,
+        key = { index, item -> "${item.ticker.symbol.raw}-${index}" },
+    ) { index, item ->
+      // We can assume here the chart is not null
+      HomeChartItem(
+          modifier =
+              Modifier.fillMaxHeight().width(HomeScreenDefaults.rememberItemWidth()).run {
+                when (index) {
+                  0 -> padding(start = MaterialTheme.keylines.content)
+                  onlyChartTickers.lastIndex -> padding(end = MaterialTheme.keylines.content)
+                  else -> this
+                }
+              },
+          onClick = onClick,
+          ticker = item.ticker,
+          // Safe to assume
+          painter = item.chart.requireNotNull(),
+      )
     }
   }
 }
@@ -382,20 +378,8 @@ private fun ChartList(
 @Preview
 @Composable
 private fun PreviewHomeCharts() {
-  val symbol = TestSymbol
-  val clock = TestClock
-
   HomeCharts(
-      tickers =
-          remember {
-            mutableStateListOf(
-                Ticker(
-                    symbol = symbol,
-                    quote = newTestQuote(symbol),
-                    chart = newTestChart(symbol, clock),
-                ),
-            )
-          },
+      tickers = remember { mutableStateListOf() },
       imageLoader = createNewTestImageLoader(),
       isLoading = false,
       name = "TEST STOCKS CHARTS",

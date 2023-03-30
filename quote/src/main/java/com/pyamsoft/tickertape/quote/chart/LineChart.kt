@@ -17,9 +17,6 @@
 package com.pyamsoft.tickertape.quote.chart
 
 import androidx.annotation.CheckResult
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,7 +42,7 @@ import com.patrykandpatryk.vico.compose.component.textComponent
 import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
 import com.patrykandpatryk.vico.core.chart.decoration.Decoration
 import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
-import com.patrykandpatryk.vico.core.chart.line.LineChart
+import com.patrykandpatryk.vico.core.chart.line.LineChart as VicoLineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatryk.vico.core.dimensions.MutableDimensions
 import com.patrykandpatryk.vico.core.entry.ChartEntry
@@ -54,39 +51,27 @@ import com.patrykandpatryk.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatryk.vico.core.entry.FloatEntry
 import com.pyamsoft.pydroid.theme.HairlineSize
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_COLOR
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_DOWN_COLOR
-import com.pyamsoft.tickertape.core.DEFAULT_STOCK_UP_COLOR
-import com.pyamsoft.tickertape.quote.test.TestSymbol
-import com.pyamsoft.tickertape.quote.test.newTestChart
-import com.pyamsoft.tickertape.stocks.api.StockChart
-import com.pyamsoft.tickertape.stocks.api.periodHigh
-import com.pyamsoft.tickertape.stocks.api.periodLow
-import com.pyamsoft.tickertape.ui.rememberInBackground
-import com.pyamsoft.tickertape.ui.test.TestClock
+import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import kotlin.math.roundToInt
 
 @Stable
 private data class ChartLines(
     val models: ChartEntryModel,
-    val specs: SnapshotStateList<LineChart.LineSpec>,
+    val specs: SnapshotStateList<VicoLineChart.LineSpec>,
 )
 
 /** Can't be data class */
 @Stable
 private class ChartDataEntry(
-    private val data: ChartData?,
-    x: Float,
-    y: Float,
+    private val data: ChartDataCoordinates,
 ) :
     ChartEntry by FloatEntry(
-        x = x,
-        y = y,
+        x = data.x,
+        y = data.y,
     ) {
 
-  @CheckResult
-  fun isDataPoint(): Boolean {
-    return data != null
+  override fun toString(): String {
+    return "ChartDataEntry(x=$x, y=$y)"
   }
 
   override fun equals(other: Any?): Boolean {
@@ -96,101 +81,20 @@ private class ChartDataEntry(
     other as ChartDataEntry
 
     if (data != other.data) return false
-    if (x != other.x) return false
-    if (y != other.y) return false
+
     return true
   }
 
-  override fun toString(): String {
-    return if (isDataPoint()) {
-      "ChartDataEntry(x=$x, y=$y)"
-    } else {
-      "ChartDataEntry(Fake)"
-    }
-  }
-
   override fun hashCode(): Int {
-    var result = data?.hashCode() ?: 0
-    result = 31 * result + x.hashCode()
-    result = 31 * result + y.hashCode()
-    return result
+    return data.hashCode()
   }
 }
 
 @Composable
 @CheckResult
-private fun rememberChartLines(chart: StockChart): ChartLines? {
-  return rememberInBackground(chart) {
-    val high = chart.periodHigh()
-    val low = chart.periodLow()
-    val range = chart.range
-
-    val closes = chart.close
-    val baseline = chart.startingPrice
-
-    val dataPoints =
-        chart.dates.mapIndexed { i, date ->
-          val close = closes[i]
-          ChartData(
-              high = high,
-              low = low,
-              baseline = baseline,
-              range = range,
-              date = date,
-              price = close,
-          )
-        }
-
-    // Only one segment, color the chart based on the final price compared to the baseline
-    val lineColor =
-        dataPoints.lastOrNull().let { lastData ->
-          if (lastData == null) DEFAULT_STOCK_COLOR
-          else {
-            val price = lastData.price.value
-            val base = lastData.baseline.value
-            when {
-              price < base -> DEFAULT_STOCK_DOWN_COLOR
-              price > base -> DEFAULT_STOCK_UP_COLOR
-              else -> DEFAULT_STOCK_COLOR
-            }
-          }
-        }
-
-    return@rememberInBackground ChartLines(
-        models =
-            ChartEntryModelProducer(
-                    dataPoints.mapIndexed { i, d ->
-                      ChartDataEntry(
-                          data = d,
-                          x = i.toFloat(),
-                          y = d.price.value.toFloat(),
-                      )
-                    },
-                )
-                .getModel(),
-        specs =
-            mutableStateListOf(
-                LineChart.LineSpec(
-                    lineColor = lineColor,
-                    lineBackgroundShader =
-                        verticalGradient(
-                            colors =
-                                Color(lineColor).let { c ->
-                                  arrayOf(
-                                      c.copy(alpha = 0.7F),
-                                      c.copy(alpha = 0.3F),
-                                  )
-                                },
-                        ),
-                ),
-            ),
-    )
-  }
-}
-
-@Composable
-@CheckResult
-private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
+private fun rememberLineDecorations(
+    startingPrice: StockMoneyValue,
+): List<Decoration> {
   val lineShape =
       shapeComponent(
           color = MaterialTheme.colors.secondary,
@@ -220,12 +124,12 @@ private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
 
   val baselineDecoration =
       remember(
-          chart.startingPrice,
+          startingPrice,
           lineShape,
           lineText,
       ) {
         ThresholdLine(
-            thresholdValue = chart.startingPrice.value.toFloat(),
+            thresholdValue = if (startingPrice.isValid) startingPrice.value.toFloat() else 0F,
             lineComponent = lineShape,
             labelComponent = lineText,
         )
@@ -234,88 +138,111 @@ private fun rememberLineDecorations(chart: StockChart): List<Decoration> {
   return remember(baselineDecoration) { listOf(baselineDecoration) }
 }
 
+@CheckResult
+@Composable
+private fun rememberChartLines(
+    painter: ChartDataPainter,
+): ChartLines {
+  return remember(painter) {
+    val producer =
+        ChartEntryModelProducer(
+            painter.coordinates.map { ChartDataEntry(it) },
+        )
+
+    val spec =
+        VicoLineChart.LineSpec(
+            lineColor = painter.color,
+            lineBackgroundShader =
+                verticalGradient(
+                    colors =
+                        Color(painter.color).let { c ->
+                          arrayOf(
+                              c.copy(alpha = 0.7F),
+                              c.copy(alpha = 0.3F),
+                          )
+                        },
+                ),
+        )
+
+    return@remember ChartLines(
+        models = producer.getModel(),
+        specs = mutableStateListOf(spec),
+    )
+  }
+}
+
 @Composable
 internal fun LineChart(
     modifier: Modifier = Modifier,
-    chart: StockChart,
+    painter: ChartDataPainter,
     onScrub: ((ChartData) -> Unit)? = null,
 ) {
-  val lines = rememberChartLines(chart)
+  val startingMoney = painter.startingMoney
+  val lines = rememberChartLines(painter)
+  val decorations = rememberLineDecorations(startingMoney)
 
-  val decorations = rememberLineDecorations(chart)
+  val axisValuesOverrider =
+      remember(
+          lines.models,
+          startingMoney,
+      ) {
+        // Adjust the Y axis to include the baseline starting price if needed
+        val baseline = if (startingMoney.isValid) startingMoney.value.toFloat() else 0F
+        val models = lines.models
+        val adjustedMinY = if (baseline < models.minY) baseline else models.minY
+        val adjustedMaxY = if (baseline > models.maxY) baseline else models.maxY
+        return@remember AxisValuesOverrider.fixed(
+            minX = lines.models.minX,
+            maxX = lines.models.maxX,
+            minY = adjustedMinY,
+            maxY = adjustedMaxY,
+        )
+      }
 
-  AnimatedVisibility(
-      modifier = modifier,
-      visible = lines != null,
-      enter = fadeIn(),
-      exit = fadeOut(),
-  ) {
-    if (lines != null) {
-      val axisValuesOverrider =
-          remember(
-              lines.models,
-              chart.startingPrice,
-          ) {
-            // Adjust the Y axis to include the baseline starting price if needed
-            val baseline = chart.startingPrice.value.toFloat()
-            val models = lines.models
-            val adjustedMinY = if (baseline < models.minY) baseline else models.minY
-            val adjustedMaxY = if (baseline > models.maxY) baseline else models.maxY
-            return@remember AxisValuesOverrider.fixed(
-                minX = lines.models.minX,
-                maxX = lines.models.maxX,
-                minY = adjustedMinY,
-                maxY = adjustedMaxY,
-            )
-          }
-
-      Chart(
-          modifier = Modifier.fillMaxSize().padding(start = MaterialTheme.keylines.baseline),
-          isZoomEnabled = false,
-          chart =
-              lineChart(
-                  lines = lines.specs,
-                  axisValuesOverrider = axisValuesOverrider,
-                  decorations = decorations,
-              ),
-          model = lines.models,
-          startAxis =
-              startAxis(
-                  // No ticks
-                  tick = null,
-                  // No labels on start axis
-                  valueFormatter = { _, _ -> "" },
-              ),
-          bottomAxis =
-              bottomAxis(
-                  // No ticks
-                  tick = null,
-                  // No labels on bottom axis
-                  valueFormatter = { _, _ -> "" },
-                  tickPosition =
-                      HorizontalAxis.TickPosition.Center(
-                          // Spacing so large there will not be any ticks
-                          // Offset by 1 to avoid a crash where Offset cannot be less than 1
-                          spacing = lines.models.maxX.roundToInt() * 2 + 1,
-                      ),
-              ),
-          chartScrollSpec =
-              rememberChartScrollSpec(
-                  isScrollEnabled = false,
-              ),
+  val scrollSpec =
+      rememberChartScrollSpec<ChartEntryModel>(
+          isScrollEnabled = false,
       )
-    }
-  }
+
+  Chart(
+      modifier = modifier.fillMaxSize().padding(start = MaterialTheme.keylines.baseline),
+      isZoomEnabled = false,
+      chart =
+          lineChart(
+              lines = lines.specs,
+              axisValuesOverrider = axisValuesOverrider,
+              decorations = decorations,
+          ),
+      model = lines.models,
+      startAxis =
+          startAxis(
+              // No ticks
+              tick = null,
+              // No labels on start axis
+              valueFormatter = { _, _ -> "" },
+          ),
+      bottomAxis =
+          bottomAxis(
+              // No ticks
+              tick = null,
+              // No labels on bottom axis
+              valueFormatter = { _, _ -> "" },
+              tickPosition =
+                  HorizontalAxis.TickPosition.Center(
+                      // Spacing so large there will not be any ticks
+                      // Offset by 1 to avoid a crash where Offset cannot be less than 1
+                      spacing = lines.models.maxX.roundToInt() * 2 + 1,
+                  ),
+          ),
+      chartScrollSpec = scrollSpec,
+  )
 }
 
 @Preview
 @Composable
 private fun PreviewLineChart() {
-  val symbol = TestSymbol
-  val clock = TestClock
-
   LineChart(
       modifier = Modifier.width(320.dp).height(160.dp),
-      chart = newTestChart(symbol, clock),
+      painter = ChartDataPainter.EMPTY,
   )
 }

@@ -20,22 +20,18 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.portfolio.PortfolioData
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
-import com.pyamsoft.tickertape.stocks.api.EquityType
 
 @Composable
 @JvmOverloads
 fun HomePortfolioSummaryItem(
     modifier: Modifier = Modifier,
-    portfolio: PortfolioStockList,
+    portfolio: PortfolioData,
 ) {
   PorfolioSummaryItem(
       modifier = modifier,
-      portfolio = portfolio,
-
-      // Hardcode to Stock
-      equityType = EquityType.STOCK,
+      data = portfolio.stocks,
   )
 }
 
@@ -44,7 +40,7 @@ fun HomePortfolioSummaryItem(
 private fun PreviewHomePortfolioSummaryItem() {
   Surface {
     HomePortfolioSummaryItem(
-        portfolio = PortfolioStockList.empty(),
+        portfolio = PortfolioData.EMPTY,
     )
   }
 }

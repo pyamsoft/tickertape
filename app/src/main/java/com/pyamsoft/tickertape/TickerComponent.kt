@@ -29,12 +29,12 @@ import com.pyamsoft.tickertape.db.room.RoomModule
 import com.pyamsoft.tickertape.home.HomeModule
 import com.pyamsoft.tickertape.main.MainActivity
 import com.pyamsoft.tickertape.main.MainComponent
-import com.pyamsoft.tickertape.portfolio.PortfolioModule
+import com.pyamsoft.tickertape.portfolio.PortfolioAppModule
 import com.pyamsoft.tickertape.portfolio.PortfolioRemoveInjector
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionComponent
 import com.pyamsoft.tickertape.portfolio.dig.split.SplitComponent
 import com.pyamsoft.tickertape.preference.PreferencesImpl
-import com.pyamsoft.tickertape.quote.TickerModule
+import com.pyamsoft.tickertape.quote.UiAppModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
@@ -58,12 +58,12 @@ import javax.inject.Singleton
 
             // Stock network
             StockModule::class,
-            TickerModule::class,
+            UiAppModule::class,
             StockRemoteModule::class,
 
             // Screens
             HomeModule::class,
-            PortfolioModule::class,
+            PortfolioAppModule::class,
 
             // Database
             DbModule::class,

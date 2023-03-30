@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -53,11 +54,13 @@ internal constructor(
     private val params: PortfolioDigParams,
     private val interactor: PortfolioDigInteractor,
     private val jsonParser: JsonParser,
+    private val processor: ChartDataProcessor,
     interactorCache: PortfolioDigInteractor.Cache,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
         params.lookupSymbol,
+        processor,
         interactor,
         interactorCache,
     ) {

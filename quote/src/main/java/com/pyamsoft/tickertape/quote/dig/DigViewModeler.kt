@@ -19,27 +19,31 @@ package com.pyamsoft.tickertape.quote.dig
 import androidx.annotation.CheckResult
 import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
+import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.quote.DeleteRestoreViewModeler
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.chart.ChartData
+import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
+import com.pyamsoft.tickertape.quote.dig.recommend.StockRec
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(
     override val state: S,
     private val lookupSymbol: StockSymbol?,
+    private val processor: ChartDataProcessor,
     interactor: DigInteractor,
     interactorCache: DigInteractor.Cache,
 ) : DeleteRestoreViewModeler<S>(state) {
@@ -159,12 +163,6 @@ protected constructor(
     val symbol = getLookupSymbol()
     recommendationRunner
         .call(force, symbol)
-        .onSuccess { r ->
-          s.apply {
-            recommendations.value = r.recommendations.map { it.asTicker() }
-            recommendationError.value = null
-          }
-        }
         .onFailure { Timber.e(it, "Failed to load recommendations for $symbol") }
         .onFailure { e ->
           s.apply {
@@ -182,7 +180,14 @@ protected constructor(
               .call(recommendations)
               .onSuccess { rec ->
                 Timber.d("Loaded full recs for symbols: $rec")
-                state.recommendations.value = rec
+                state.recommendations.value =
+                    rec.filter { it.chart != null }
+                        .map { t ->
+                          StockRec(
+                              ticker = t,
+                              chart = processor.processChartEntries(t.chart.requireNotNull()),
+                          )
+                        }
               }
               .onFailure { e ->
                 Timber.e(e, "Failed to load full ticker quote for recs: $recommendations")
@@ -252,6 +257,9 @@ protected constructor(
 
               // Clear the error on load success
               chartError.value = null
+
+              // Process chart values for drawing
+              chart.value = processor.processChartEntries(c)
             }
           }
         }

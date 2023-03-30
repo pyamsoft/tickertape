@@ -20,17 +20,18 @@ import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.portfolio.PortfolioInteractor
-import com.pyamsoft.tickertape.portfolio.PortfolioStockList
+import com.pyamsoft.tickertape.portfolio.PortfolioProcessor
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.TickerInteractor
+import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class HomeViewModeler
 @Inject
@@ -42,7 +43,20 @@ internal constructor(
     private val portfolioInteractorCache: PortfolioInteractor.Cache,
     private val tickerInteractor: TickerInteractor,
     private val tickerInteractorCache: TickerInteractor.Cache,
+    private val portfolioProcessor: PortfolioProcessor,
+    private val chartDataProcessor: ChartDataProcessor,
 ) : AbstractViewModeler<HomeViewState>(state) {
+
+  @CheckResult
+  private suspend fun List<Ticker>.asHomeStocks(): List<HomeStock> {
+    return this.map { t ->
+      val chart = t.chart
+      return@map HomeStock(
+          ticker = t,
+          chart = if (chart == null) null else chartDataProcessor.processChartEntries(chart),
+      )
+    }
+  }
 
   @CheckResult
   private suspend inline fun handleFetchScreener(
@@ -93,16 +107,16 @@ internal constructor(
 
       portfolioInteractor
           .getPortfolio()
-          .onSuccess {
+          .onSuccess { stocks ->
             s.apply {
-              portfolio.value = PortfolioStockList.of(it)
+              portfolio.value = portfolioProcessor.process(stocks)
               portfolioError.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to fetch portfolio") }
           .onFailure {
             s.apply {
-              portfolio.value = PortfolioStockList.empty()
+              portfolio.value = null
               portfolioError.value = it
             }
           }
@@ -128,9 +142,9 @@ internal constructor(
               range = StockChart.IntervalRange.ONE_DAY,
               options = null,
           )
-          .onSuccess {
+          .onSuccess { list ->
             s.apply {
-              indexes.value = it
+              indexes.value = list.asHomeStocks()
               indexesError.value = null
             }
           }
@@ -154,7 +168,7 @@ internal constructor(
           onLoading = { s.isLoadingGainers.value = it },
           onFetched = { list, error ->
             s.apply {
-              gainers.value = list
+              gainers.value = list.asHomeStocks()
               gainersError.value = error
             }
           },
@@ -171,7 +185,7 @@ internal constructor(
           onLoading = { s.isLoadingGrowthTech.value = it },
           onFetched = { list, error ->
             s.apply {
-              growthTech.value = list
+              growthTech.value = list.asHomeStocks()
               growthTechError.value = error
             }
           },
@@ -188,7 +202,7 @@ internal constructor(
           onLoading = { s.isLoadingUndervaluedGrowth.value = it },
           onFetched = { list, error ->
             s.apply {
-              undervaluedGrowth.value = list
+              undervaluedGrowth.value = list.asHomeStocks()
               undervaluedGrowthError.value = error
             }
           },
@@ -205,7 +219,7 @@ internal constructor(
           onLoading = { s.isLoadingMostActive.value = it },
           onFetched = { list, error ->
             s.apply {
-              mostActive.value = list
+              mostActive.value = list.asHomeStocks()
               mostActiveError.value = error
             }
           },
@@ -222,7 +236,7 @@ internal constructor(
           onLoading = { s.isLoadingLosers.value = it },
           onFetched = { list, error ->
             s.apply {
-              losers.value = list
+              losers.value = list.asHomeStocks()
               losersError.value = error
             }
           },
@@ -239,7 +253,7 @@ internal constructor(
           onLoading = { s.isLoadingMostShorted.value = it },
           onFetched = { list, error ->
             s.apply {
-              mostShorted.value = list
+              mostShorted.value = list.asHomeStocks()
               mostShortedError.value = error
             }
           },
@@ -257,9 +271,9 @@ internal constructor(
 
       homeInteractor
           .getTrending(TRENDING_COUNT)
-          .onSuccess {
+          .onSuccess { list ->
             s.apply {
-              trending.value = it
+              trending.value = list.asHomeStocks()
               trendingError.value = null
             }
           }

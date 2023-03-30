@@ -17,8 +17,8 @@
 package com.pyamsoft.tickertape.quote.dig.chart
 
 import androidx.annotation.CheckResult
-import androidx.annotation.WorkerThread
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,64 +65,65 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
 import com.pyamsoft.tickertape.ui.KarinaTsoyScreen
-import com.pyamsoft.tickertape.ui.rememberInBackground
-import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
 import kotlin.math.abs
 
 @Composable
 fun DigChart(
     modifier: Modifier = Modifier,
     state: ChartDigViewState,
-    imageLoader: ImageLoader,
     onScrub: (ChartData) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
   val ticker by state.ticker.collectAsState()
   val range by state.range.collectAsState()
+  val chart by state.chart.collectAsState()
   val chartError by state.chartError.collectAsState()
 
-  val chart = ticker.chart
   val isOptions = remember(ticker) { ticker.quote?.type == EquityType.OPTION }
 
   Column(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
-    if (chartError == null) {
-      if (chart != null) {
-        Ranges(
-            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
-            range = range,
-            isOptions = isOptions,
-            onRangeSelected = onRangeSelected,
-        )
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-          Chart(
-              modifier = Modifier.fillMaxWidth().height(QuoteDefaults.rememberChartHeight()),
-              chart = chart,
-              onScrub = onScrub,
+    Crossfade(
+        targetState = chartError,
+    ) { ce ->
+      if (ce == null) {
+        chart?.also { c ->
+          Ranges(
+              modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
+              range = range,
+              isOptions = isOptions,
+              onRangeSelected = onRangeSelected,
           )
-          CurrentScrub(
+
+          Column(
               modifier = Modifier.fillMaxWidth(),
-              state = state,
-          )
-        }
-      }
-    } else {
-      val errorMessage =
-          remember(chartError) {
-            chartError.requireNotNull().message ?: "An unexpected error occurred"
+          ) {
+            Chart(
+                modifier = Modifier.fillMaxWidth().height(QuoteDefaults.rememberChartHeight()),
+                painter = c,
+                onScrub = onScrub,
+            )
+            CurrentScrub(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+            )
           }
+        }
+      } else {
+        val errorMessage =
+            remember(chartError) {
+              chartError.requireNotNull().message ?: "An unexpected error occurred"
+            }
 
-      Text(
-          text = errorMessage,
-          style =
-              MaterialTheme.typography.h6.copy(
-                  color = MaterialTheme.colors.error,
-              ),
-      )
+        Text(
+            text = errorMessage,
+            style =
+                MaterialTheme.typography.h6.copy(
+                    color = MaterialTheme.colors.error,
+                ),
+        )
+      }
     }
   }
 }
@@ -206,7 +207,7 @@ private fun CurrentPriceDisplay(
     openingPrice: StockMoneyValue?,
 ) {
   val diff =
-      rememberInBackground(
+      remember(
           price,
           openingPrice,
       ) {
@@ -244,7 +245,6 @@ private fun CurrentPriceDisplay(
 }
 
 @CheckResult
-@WorkerThread
 private fun calculateDifferences(
     current: StockMoneyValue,
     openingPrice: StockMoneyValue
@@ -300,7 +300,7 @@ private fun Ranges(
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
   val allRanges =
-      rememberInBackground(isOptions) {
+      remember(isOptions) {
         StockChart.IntervalRange.values().filter { range ->
           return@filter if (!isOptions) true
           else {
@@ -315,27 +315,25 @@ private fun Ranges(
       modifier = modifier,
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.baseline),
   ) {
-    if (allRanges != null) {
-      items(
-          items = allRanges,
-          key = { it.name },
-      ) { item ->
-        if (item == range) {
-          Button(
-              onClick = { onRangeSelected(item) },
-          ) {
-            Text(
-                text = item.display,
-            )
-          }
-        } else {
-          TextButton(
-              onClick = { onRangeSelected(item) },
-          ) {
-            Text(
-                text = item.display,
-            )
-          }
+    items(
+        items = allRanges,
+        key = { it.name },
+    ) { item ->
+      if (item == range) {
+        Button(
+            onClick = { onRangeSelected(item) },
+        ) {
+          Text(
+              text = item.display,
+          )
+        }
+      } else {
+        TextButton(
+            onClick = { onRangeSelected(item) },
+        ) {
+          Text(
+              text = item.display,
+          )
         }
       }
     }
@@ -372,7 +370,6 @@ private fun PreviewDigChart() {
   Surface {
     DigChart(
         state = newTestDigViewState(),
-        imageLoader = createNewTestImageLoader(),
         onScrub = {},
         onRangeSelected = {},
     )

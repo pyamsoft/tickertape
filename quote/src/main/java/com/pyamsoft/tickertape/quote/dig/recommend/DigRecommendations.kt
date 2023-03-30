@@ -67,7 +67,7 @@ fun DigRecommendations(
     if (error == null) {
       items(
           items = recommendations,
-          key = { it.symbol.raw },
+          key = { it.ticker.symbol.raw },
       ) { rec ->
         RecommendationItem(
             modifier = Modifier.fillMaxWidth(),
@@ -95,14 +95,15 @@ fun DigRecommendations(
 @Composable
 private fun RecommendationItem(
     modifier: Modifier = Modifier,
-    recommendation: Ticker,
+    recommendation: StockRec,
     onClick: (Ticker) -> Unit,
 ) {
+  val ticker = recommendation.ticker
   val chart = recommendation.chart
 
   val isRecommendationSpecialSession =
-      remember(recommendation) {
-        val quote = recommendation.quote
+      remember(ticker) {
+        val quote = ticker.quote
         if (quote == null) {
           return@remember false
         } else {
@@ -114,25 +115,22 @@ private fun RecommendationItem(
       modifier = modifier,
   ) {
     Column(
-        modifier =
-            Modifier.clickable { onClick(recommendation) }.padding(MaterialTheme.keylines.baseline),
+        modifier = Modifier.clickable { onClick(ticker) }.padding(MaterialTheme.keylines.baseline),
     ) {
       TickerName(
           modifier = Modifier.fillMaxWidth(),
-          symbol = recommendation.symbol,
-          ticker = recommendation,
+          symbol = ticker.symbol,
+          ticker = ticker,
           size = TickerSize.QUOTE,
       )
-      if (chart != null) {
-        Chart(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(top = MaterialTheme.keylines.content)
-                    .padding(bottom = MaterialTheme.keylines.baseline)
-                    .height(DigDefaults.rememberChartHeight()),
-            chart = chart,
-        )
-      }
+      Chart(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .padding(top = MaterialTheme.keylines.content)
+                  .padding(bottom = MaterialTheme.keylines.baseline)
+                  .height(DigDefaults.rememberChartHeight()),
+          painter = chart,
+      )
       Box(
           modifier = Modifier.fillMaxWidth(),
           contentAlignment = Alignment.BottomEnd,
@@ -145,13 +143,13 @@ private fun RecommendationItem(
           if (isRecommendationSpecialSession) {
             TickerPrice(
                 modifier = Modifier.padding(end = MaterialTheme.keylines.content),
-                ticker = recommendation,
+                ticker = ticker,
                 size = TickerSize.RECOMMEND_QUOTE_EXTRA,
             )
           }
 
           TickerPrice(
-              ticker = recommendation,
+              ticker = ticker,
               size = TickerSize.RECOMMEND_QUOTE,
           )
         }

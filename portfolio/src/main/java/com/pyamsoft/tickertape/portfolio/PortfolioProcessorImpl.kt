@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
-import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.core.isZero
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockDirection
@@ -26,20 +25,17 @@ import com.pyamsoft.tickertape.stocks.api.StockPercent
 import com.pyamsoft.tickertape.stocks.api.asDirection
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asPercent
-import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-@Stable
-class PortfolioStockList
-private constructor(
-    val list: List<PortfolioStock>,
-) {
+@Singleton
+internal class PortfolioProcessorImpl @Inject internal constructor() : PortfolioProcessor {
 
   @CheckResult
-  fun generateData(equityType: EquityType): Data? {
-    if (equityType == EquityType.OPTION) {
-      Timber.w("Not generating any Data for Options type")
-      return null
-    }
+  private fun Sequence<PortfolioStock>.processEquities(): PortfolioData.Data {
+    val list = this
 
     val totalShortTermPositions: Int
     val totalLongTermPositions: Int
@@ -52,8 +48,7 @@ private constructor(
     val todayChangePercent: StockPercent
     val todayDirection: StockDirection
 
-    val matchingStocks = list.asSequence().filter { it.holding.type == equityType }
-    val totalValues = matchingStocks.map { it.todayNumber }
+    val totalValues = list.map { it.todayNumber }
     val isTotalInvalid = totalValues.any { it == null }
 
     // If we are missing some days, we cannot correctly calculate, so show none
@@ -74,7 +69,7 @@ private constructor(
 
       // If there are no entries, then sum is zero. We cannot divide without getting NaN
       // so we cannot calculate
-      val totalCost = matchingStocks.map { it.costNumber }.sum()
+      val totalCost = list.sumOf { it.costNumber }
       if (totalCost.isZero()) {
         totalChange = StockMoneyValue.NONE
         totalChangePercent = StockPercent.NONE
@@ -88,7 +83,7 @@ private constructor(
         totalChangePercent = (rawTotalChange / totalCost * 100).asPercent()
         totalDirection = rawTotalChange.asDirection()
 
-        val todayValues = matchingStocks.map { it.todayChangeNumber }
+        val todayValues = list.map { it.todayChangeNumber }
         val isTodayInvalid = todayValues.any { it == null }
         if (isTodayInvalid) {
           todayChange = StockMoneyValue.NONE
@@ -102,65 +97,39 @@ private constructor(
         }
       }
 
-      totalShortTermPositions = matchingStocks.sumOf { it.shortTermPositions }
-      totalLongTermPositions = matchingStocks.sumOf { it.longTermPositions }
+      totalShortTermPositions = list.sumOf { it.shortTermPositions }
+      totalLongTermPositions = list.sumOf { it.longTermPositions }
     }
 
-    return Data(
+    return PortfolioData.Data(
         current = current,
         total =
-            Data.Summary(
+            PortfolioData.Data.Summary(
                 change = totalChange,
                 changePercent = totalChangePercent,
                 direction = totalDirection,
             ),
         today =
-            Data.Summary(
+            PortfolioData.Data.Summary(
                 change = todayChange,
                 changePercent = todayChangePercent,
                 direction = todayDirection,
             ),
         positions =
-            Data.Positions(
+            PortfolioData.Data.Positions(
                 shortTerm = totalShortTermPositions,
                 longTerm = totalLongTermPositions,
             ),
     )
   }
 
-  data class Data(
-      val current: StockMoneyValue,
-      val total: Summary,
-      val today: Summary,
-      val positions: Positions,
-  ) {
-
-    data class Summary(
-        val change: StockMoneyValue,
-        val changePercent: StockPercent,
-        val direction: StockDirection,
-    )
-
-    data class Positions(
-        val shortTerm: Int,
-        val longTerm: Int,
-    )
-  }
-
-  companion object {
-
-    private val EMPTY = PortfolioStockList(emptyList())
-
-    @JvmStatic
-    @CheckResult
-    fun empty(): PortfolioStockList {
-      return EMPTY
-    }
-
-    @JvmStatic
-    @CheckResult
-    fun of(list: List<PortfolioStock>): PortfolioStockList {
-      return if (list.isEmpty()) EMPTY else PortfolioStockList(list)
-    }
-  }
+  override suspend fun process(portfolio: List<PortfolioStock>): PortfolioData =
+      withContext(context = Dispatchers.IO) {
+        val list = portfolio.asSequence()
+        return@withContext PortfolioData(
+            stocks = list.filter { it.holding.type == EquityType.STOCK }.processEquities(),
+            options = list.filter { it.holding.type == EquityType.OPTION }.processEquities(),
+            crypto = list.filter { it.holding.type == EquityType.CRYPTOCURRENCY }.processEquities(),
+        )
+      }
 }

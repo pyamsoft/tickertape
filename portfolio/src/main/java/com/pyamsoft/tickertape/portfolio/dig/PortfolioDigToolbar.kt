@@ -181,37 +181,39 @@ internal fun PortfolioDigToolbar(
           },
       )
 
-      val currentPage = pagerState.currentPage
-      ScrollableTabRow(
-          backgroundColor = Color.Transparent,
-          selectedTabIndex = currentPage,
-          indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-            )
-          },
-      ) {
-        val scope = rememberCoroutineScope()
-        for (index in allTabs.indices) {
-          val tab = allTabs[index]
-          val isSelected =
-              remember(
-                  index,
-                  currentPage,
-              ) {
-                index == currentPage
-              }
+      if (allTabs.isNotEmpty()) {
+        val currentPage = pagerState.currentPage
+        ScrollableTabRow(
+            backgroundColor = Color.Transparent,
+            selectedTabIndex = currentPage,
+            indicator = { tabPositions ->
+              TabRowDefaults.Indicator(
+                  modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+              )
+            },
+        ) {
+          val scope = rememberCoroutineScope()
+          for (index in allTabs.indices) {
+            val tab = allTabs[index]
+            val isSelected =
+                remember(
+                    index,
+                    currentPage,
+                ) {
+                  index == currentPage
+                }
 
-          PortfolioTab(
-              tab = tab,
-              isSelected = isSelected,
-              onSelected = {
-                // Click fires the index to update
-                // The index updating is caught by the snapshot flow
-                // Which then triggers the page update function
-                scope.launch(context = Dispatchers.Main) { pagerState.animateScrollToPage(index) }
-              },
-          )
+            PortfolioTab(
+                tab = tab,
+                isSelected = isSelected,
+                onSelected = {
+                  // Click fires the index to update
+                  // The index updating is caught by the snapshot flow
+                  // Which then triggers the page update function
+                  scope.launch(context = Dispatchers.Main) { pagerState.animateScrollToPage(index) }
+                },
+            )
+          }
         }
       }
     }

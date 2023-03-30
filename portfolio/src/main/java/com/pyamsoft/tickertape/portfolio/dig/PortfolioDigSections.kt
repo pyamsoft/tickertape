@@ -22,12 +22,12 @@ import androidx.compose.runtime.Stable
 @Stable
 @Immutable
 enum class PortfolioDigSections(val display: String) {
+  CHART("Chart"),
+  PRICE_ALERTS("Price Alerts"),
   POSITIONS("Positions"),
   SPLITS("Stock Splits"),
-  CHART("Chart"),
   STATISTICS("Details"),
-  PRICE_ALERTS("Price Alerts"),
+  OPTIONS_CHAIN("Options Chain"),
   NEWS("News"),
   RECOMMENDATIONS("Recommendations"),
-  OPTIONS_CHAIN("Options Chain"),
 }

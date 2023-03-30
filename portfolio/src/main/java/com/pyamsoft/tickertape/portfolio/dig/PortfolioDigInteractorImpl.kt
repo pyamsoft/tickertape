@@ -142,8 +142,8 @@ internal constructor(
         }
       }
 
-  override suspend fun invalidateHolding(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidateByHoldingId(id) }
+  override suspend fun invalidateHolding(symbol: StockSymbol) =
+      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidateBySymbol(symbol) }
 
   override suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>> =
       withContext(context = Dispatchers.IO) {

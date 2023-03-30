@@ -39,10 +39,10 @@ import com.pyamsoft.pydroid.notify.NotifyId
 import com.pyamsoft.tickertape.stocks.api.MarketState
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockQuote
-import com.pyamsoft.tickertape.ui.R as R2
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
+import com.pyamsoft.tickertape.ui.R as R2
 
 @Singleton
 internal class BigMoverNotificationDispatcher
@@ -87,6 +87,7 @@ internal constructor(
         Intent(appContext, activityClass).apply {
           flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
           putExtra(BigMoverNotificationData.INTENT_KEY_SYMBOL, quote.symbol.raw)
+          putExtra(BigMoverNotificationData.INTENT_KEY_EQUITY, quote.type.name)
 
           val lookupSymbol =
               if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol

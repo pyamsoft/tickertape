@@ -61,6 +61,7 @@ import com.pyamsoft.tickertape.quote.dig.pricealert.DigPriceAlerts
 import com.pyamsoft.tickertape.quote.dig.recommend.DigRecommendations
 import com.pyamsoft.tickertape.quote.dig.statistics.DigKeyStatistics
 import com.pyamsoft.tickertape.quote.test.TestSymbol
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.ui.test.TestClock
@@ -79,6 +80,7 @@ fun PortfolioDigScreen(
     onClose: () -> Unit,
     onRefresh: () -> Unit,
     onTabUpdated: (PortfolioDigSections) -> Unit,
+    onAddNewHolding: () -> Unit,
     // Chart
     onChartScrub: (ChartData) -> Unit,
     onChartRangeSelected: (StockChart.IntervalRange) -> Unit,
@@ -180,6 +182,7 @@ fun PortfolioDigScreen(
                 onAddPriceAlert = onAddPriceAlert,
                 onUpdatePriceAlert = onUpdatePriceAlert,
                 onDeletePriceAlert = onDeletePriceAlert,
+                onAddNewHolding = onAddNewHolding,
             )
           }
         }
@@ -198,6 +201,7 @@ private fun Content(
     pagerState: PagerState,
     allTabs: SnapshotStateList<PortfolioDigSections>,
     onRefresh: () -> Unit,
+    onAddNewHolding: () -> Unit,
 
     // Chart
     onChartScrub: (ChartData) -> Unit,
@@ -274,6 +278,7 @@ private fun Content(
             onUpdatePosition = onPositionUpdate,
             onPositionRestored = onPositionRestored,
             onPositionDeleteFinalized = onPositionDeleteFinalized,
+            onAddNewHolding = onAddNewHolding,
         )
       }
       PortfolioDigSections.STATISTICS -> {
@@ -293,6 +298,7 @@ private fun Content(
             onUpdateSplit = onSplitUpdated,
             onSplitRestored = onSplitRestored,
             onSplitDeleteFinalized = onSplitDeleteFinalized,
+            onAddNewHolding = onAddNewHolding,
         )
       }
       PortfolioDigSections.RECOMMENDATIONS -> {
@@ -341,6 +347,7 @@ private fun PreviewPortfolioDigScreen() {
               params =
                   PortfolioDigParams(
                       symbol = symbol,
+                      equityType = EquityType.STOCK,
                       lookupSymbol = null,
                   ),
               clock = clock,
@@ -367,5 +374,6 @@ private fun PreviewPortfolioDigScreen() {
       onAddPriceAlert = {},
       onUpdatePriceAlert = {},
       onDeletePriceAlert = {},
+      onAddNewHolding = {},
   )
 }

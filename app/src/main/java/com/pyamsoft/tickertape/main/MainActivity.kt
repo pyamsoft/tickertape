@@ -36,11 +36,12 @@ import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationData
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
@@ -95,11 +96,19 @@ internal class MainActivity : AppCompatActivity() {
       return
     }
 
-    Timber.d("Launch intent with symbol: $symbol")
+    val equityType =
+        retrieveFromIntent(BigMoverNotificationData.INTENT_KEY_EQUITY) { EquityType.valueOf(it) }
+    if (equityType == null) {
+      Timber.w("Cannot open Dig Dialog without equityType")
+      return
+    }
+
+    Timber.d("Launch intent: $symbol $equityType")
     viewModel
         .requireNotNull()
         .handleOpenDig(
             symbol = symbol,
+            equityType = equityType,
             lookupSymbol = lookupSymbol,
         )
   }

@@ -56,7 +56,7 @@ interface PortfolioDigInteractor : DigInteractor {
 
     suspend fun invalidateSplits(id: DbHolding.Id)
 
-    suspend fun invalidateHolding(id: DbHolding.Id)
+    suspend fun invalidateHolding(symbol: StockSymbol)
 
     suspend fun invalidatePositions(id: DbHolding.Id)
   }

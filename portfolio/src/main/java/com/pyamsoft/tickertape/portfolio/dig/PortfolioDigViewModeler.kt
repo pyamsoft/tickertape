@@ -28,6 +28,7 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.portfolio.dig.position.PositionStock
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.add.NewTickerInteractor
 import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewModeler
@@ -38,8 +39,8 @@ import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -47,12 +48,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
 internal constructor(
     override val state: MutablePortfolioDigViewState,
     private val params: PortfolioDigParams,
+    private val newInteractor: NewTickerInteractor,
     private val interactor: PortfolioDigInteractor,
     private val jsonParser: JsonParser,
     processor: ChartDataProcessor,
@@ -89,14 +92,14 @@ internal constructor(
 
         // If this holding is already provided, great, fast track!
         val holding = params.holding
-        if (holding == null) {
-          return@highlander interactor.getHolding(params.symbol)
+        if (holding != null) {
+          return@highlander ResultWrapper.success(Maybe.Data(holding))
         } else {
           if (force) {
-            interactorCache.invalidateHolding(holding.id)
+            interactorCache.invalidateHolding(params.symbol)
           }
 
-          return@highlander ResultWrapper.success(Maybe.Data(holding))
+          return@highlander interactor.getHolding(params.symbol)
         }
       }
 
@@ -500,21 +503,21 @@ internal constructor(
   }
 
   fun handleRecClicked(ticker: Ticker) {
-    val quote = ticker.quote
+    val quote = ticker.quote ?: return
+
     var lookupSymbol: StockSymbol? = null
-    if (quote != null) {
-      if (quote.type == EquityType.OPTION) {
-        if (quote is StockOptionsQuote) {
-          lookupSymbol = quote.underlyingSymbol
-        }
+    if (quote.type == EquityType.OPTION) {
+      if (quote is StockOptionsQuote) {
+        lookupSymbol = quote.underlyingSymbol
       }
     }
 
     handleOpenRec(
         PortfolioDigParams(
             symbol = ticker.symbol,
+            equityType = quote.type,
             lookupSymbol = lookupSymbol,
-            currentPrice = quote?.currentSession?.price,
+            currentPrice = quote.currentSession.price,
         ),
     )
   }
@@ -546,6 +549,34 @@ internal constructor(
         recentlyDeleted = state.recentlyDeleteSplit,
     ) {
       interactor.restoreSplit(it)
+    }
+  }
+
+  fun handleAddTicker(scope: CoroutineScope) {
+    val h = state.holding.value ?: return
+
+    scope.launch(context = Dispatchers.Main) {
+      when (h) {
+        is Maybe.Data -> {
+          Timber.w("Cannot delete existing holding: ${h.data.id} ${h.data.symbol}")
+        }
+        is Maybe.None -> {
+          newInteractor
+              .insertNewTicker(
+                  symbol = params.symbol,
+                  equityType = params.equityType,
+                  tradeSide = TradeSide.BUY,
+              )
+              .onSuccess {
+                // Refresh screen
+                handleLoadTicker(
+                    scope = this,
+                    force = true,
+                )
+              }
+              .onFailure { Timber.e(it, "Failed adding new quote: ${params.symbol}") }
+        }
+      }
     }
   }
 

@@ -24,15 +24,16 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.stocks.JsonParser
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @ActivityScope
 class MainViewModeler
@@ -72,6 +73,7 @@ internal constructor(
         ?.also { saved ->
           handleOpenDig(
               symbol = saved.symbol,
+              equityType = saved.equityType,
               lookupSymbol = saved.lookupSymbol,
               currentPrice = saved.currentPrice,
           )
@@ -87,6 +89,7 @@ internal constructor(
 
     handleOpenDig(
         symbol = quote.symbol,
+        equityType = quote.type,
         lookupSymbol = if (quote is StockOptionsQuote) quote.underlyingSymbol else quote.symbol,
         currentPrice = quote.currentSession.price,
     )
@@ -100,6 +103,7 @@ internal constructor(
     state.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = holding.symbol,
+            equityType = holding.type,
             lookupSymbol = lookupSymbol,
             currentPrice = currentPrice,
         )
@@ -107,12 +111,14 @@ internal constructor(
 
   fun handleOpenDig(
       symbol: StockSymbol,
+      equityType: EquityType,
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
     state.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = symbol,
+            equityType = equityType,
             lookupSymbol = lookupSymbol,
             currentPrice = currentPrice,
         )

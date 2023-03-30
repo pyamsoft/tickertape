@@ -72,12 +72,6 @@ private val HIDE_TABS_FOR_INDEXES =
         PortfolioDigSections.SPLITS,
     )
 
-private val HIDE_TABS_FOR_NO_DB =
-    arrayOf(
-        PortfolioDigSections.POSITIONS,
-        PortfolioDigSections.SPLITS,
-    )
-
 private val HIDE_TABS_FOR_OPTIONS =
     arrayOf(
         PortfolioDigSections.OPTIONS_CHAIN,
@@ -121,7 +115,9 @@ internal fun rememberTabs(
                 }
               }
               is Maybe.None -> {
-                return@filter !HIDE_TABS_FOR_NO_DB.contains(v)
+                return@filter !HIDE_TABS_FOR_INDEXES.contains(v) &&
+                    !HIDE_TABS_FOR_CRYPTO.contains(v) &&
+                    !HIDE_TABS_FOR_OPTIONS.contains(v)
               }
             }
           }
@@ -253,6 +249,7 @@ private fun PreviewPortfolioDigToolbar() {
           params =
               PortfolioDigParams(
                   symbol = symbol,
+                  equityType = EquityType.STOCK,
                   lookupSymbol = null,
               ),
           clock = clock,

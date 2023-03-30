@@ -197,6 +197,7 @@ private fun PortfolioDigContent(
       onDeletePriceAlert = {
         // TODO
       },
+      onAddNewHolding = {viewModel.handleAddTicker(scope = scope)},
   )
 
   splitDialog?.also { s ->

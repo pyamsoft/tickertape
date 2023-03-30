@@ -19,9 +19,11 @@ package com.pyamsoft.tickertape.portfolio.dig.position
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
@@ -47,6 +49,7 @@ import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.quote.test.TestSymbol
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.test.TestClock
 import java.time.Clock
@@ -63,6 +66,7 @@ internal fun PositionScreen(
     onDeletePosition: (DbPosition) -> Unit,
     onPositionRestored: () -> Unit,
     onPositionDeleteFinalized: () -> Unit,
+    onAddNewHolding: () -> Unit,
 ) {
 
   val loadingState by state.loadingState.collectAsState()
@@ -124,13 +128,20 @@ internal fun PositionScreen(
           }
         }
         is Maybe.None -> {
-          Box(
+          Column(
               modifier = modifier,
-              contentAlignment = Alignment.Center,
+              horizontalAlignment = Alignment.CenterHorizontally,
           ) {
             Text(
                 text = "Not in the DB",
             )
+            Button(
+                onClick = onAddNewHolding,
+            ) {
+              Text(
+                  text = "Add to DB",
+              )
+            }
           }
         }
       }
@@ -189,6 +200,7 @@ private fun PreviewPositionScreen() {
               params =
                   PortfolioDigParams(
                       symbol = symbol,
+                      equityType = EquityType.STOCK,
                       lookupSymbol = null,
                   ),
               clock = clock,
@@ -199,5 +211,6 @@ private fun PreviewPositionScreen() {
       onUpdatePosition = { _, _ -> },
       onPositionDeleteFinalized = {},
       onPositionRestored = {},
+      onAddNewHolding = {},
   )
 }

@@ -89,25 +89,27 @@ fun DigChart(
     ) { ce ->
       if (ce == null) {
         chart?.also { c ->
-          Ranges(
-              modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
-              range = range,
-              isOptions = isOptions,
-              onRangeSelected = onRangeSelected,
-          )
+          Column {
+            Ranges(
+                modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.keylines.content),
+                range = range,
+                isOptions = isOptions,
+                onRangeSelected = onRangeSelected,
+            )
 
-          Column(
-              modifier = Modifier.fillMaxWidth(),
-          ) {
-            Chart(
-                modifier = Modifier.fillMaxWidth().height(QuoteDefaults.rememberChartHeight()),
-                painter = c,
-                onScrub = onScrub,
-            )
-            CurrentScrub(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                state = state,
-            )
+            ) {
+              Chart(
+                  modifier = Modifier.fillMaxWidth().height(QuoteDefaults.rememberChartHeight()),
+                  painter = c,
+                  onScrub = onScrub,
+              )
+              CurrentScrub(
+                  modifier = Modifier.fillMaxWidth(),
+                  state = state,
+              )
+            }
           }
         }
       } else {

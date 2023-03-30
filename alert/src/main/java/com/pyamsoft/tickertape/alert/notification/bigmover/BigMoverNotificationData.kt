@@ -27,6 +27,7 @@ internal constructor(
   companion object {
 
     const val INTENT_KEY_SYMBOL = "intent_key_symbol"
+    const val INTENT_KEY_EQUITY = "intent_key_equity"
     const val INTENT_KEY_LOOKUP_SYMBOL = "intent_key_lookup_symbol"
   }
 }

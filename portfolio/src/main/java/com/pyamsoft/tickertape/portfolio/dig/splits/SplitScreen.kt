@@ -19,9 +19,11 @@ package com.pyamsoft.tickertape.portfolio.dig.splits
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
@@ -47,6 +49,7 @@ import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
 import com.pyamsoft.tickertape.quote.dig.base.BaseDigListScreen
 import com.pyamsoft.tickertape.quote.test.TestSymbol
+import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.ui.test.TestClock
 
@@ -61,6 +64,7 @@ internal fun SplitScreen(
     onDeleteSplit: (DbSplit) -> Unit,
     onSplitDeleteFinalized: () -> Unit,
     onSplitRestored: () -> Unit,
+    onAddNewHolding: () -> Unit,
 ) {
   val loadingState by state.loadingState.collectAsState()
   val splitError by state.stockSplitError.collectAsState()
@@ -120,14 +124,21 @@ internal fun SplitScreen(
           }
         }
         is Maybe.None -> {
-          Box(
-              modifier = modifier,
-              contentAlignment = Alignment.Center,
-          ) {
-            Text(
-                text = "Not in the DB",
-            )
-          }
+            Column(
+                modifier = modifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "Not in the DB",
+                )
+                Button(
+                    onClick = onAddNewHolding,
+                ) {
+                    Text(
+                        text = "Add to DB",
+                    )
+                }
+            }
         }
       }
     }
@@ -184,6 +195,7 @@ private fun PreviewSplitScreen() {
               params =
                   PortfolioDigParams(
                       symbol = symbol,
+                      equityType = EquityType.STOCK,
                       lookupSymbol = null,
                   ),
               clock = clock,
@@ -194,5 +206,6 @@ private fun PreviewSplitScreen() {
       onUpdateSplit = { _, _ -> },
       onSplitDeleteFinalized = {},
       onSplitRestored = {},
+      onAddNewHolding = {},
   )
 }

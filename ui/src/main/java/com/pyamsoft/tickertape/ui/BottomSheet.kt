@@ -35,7 +35,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -122,7 +121,7 @@ fun WrapInBottomSheet(
 
   // Watch for a swipe causing a sheet change and update accordingly
   val handleSheetUpdated by rememberUpdatedState(onSwipe)
-  LaunchedEffect(sheetState) { sheetState.toStatusFlow().collectLatest { handleSheetUpdated(it) } }
+  LaunchedEffect(sheetState) { sheetState.toStatusFlow().collect { handleSheetUpdated(it) } }
 
   ModalBottomSheetLayout(
       scrimColor = scrimColor,

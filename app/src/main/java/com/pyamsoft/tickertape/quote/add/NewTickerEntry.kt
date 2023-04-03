@@ -35,7 +35,6 @@ import com.pyamsoft.tickertape.ui.BottomSheetController
 import com.pyamsoft.tickertape.ui.BottomSheetStatus
 import com.pyamsoft.tickertape.ui.WrapInBottomSheet
 import javax.inject.Inject
-import kotlinx.coroutines.flow.collectLatest
 
 internal class NewTickerInjector @Inject internal constructor() : ComposableInjector() {
 
@@ -75,7 +74,7 @@ private fun MountHooks(
       viewModel,
       controller,
   ) {
-    controller.statusFlow().collectLatest { status ->
+    controller.statusFlow().collect { status ->
       if (status == BottomSheetStatus.CLOSED) {
         viewModel.handleDismiss()
       }

@@ -23,8 +23,8 @@ import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import javax.inject.Inject
 
 class NotificationViewModeler
@@ -66,18 +66,11 @@ internal constructor(
   }
 
   fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
-    val s = state
-    val newEnabled = !s.isBigMoverEnabled.value
-
-    // Set state immediately for feedback
-    state.isBigMoverEnabled.value = newEnabled
+    val newEnabled = state.isBigMoverEnabled.updateAndGet { !it }
 
     // Fire pref change
     scope.launch(context = Dispatchers.Main) {
       bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
-
-      // Wait for completions
-      yield()
 
       // Cancel existing alarms
       workerQueue.cancel(WorkJobType.REPEAT_BIG_MOVERS)

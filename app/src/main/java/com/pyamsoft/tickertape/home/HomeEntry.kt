@@ -16,7 +16,6 @@
 
 package com.pyamsoft.tickertape.home
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +24,7 @@ import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
+import com.pyamsoft.pydroid.ui.util.fullScreenDialog
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.Ticker
@@ -124,7 +124,7 @@ fun HomeEntry(
 
   if (isSettingsOpen) {
     SettingsDialog(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fullScreenDialog(),
         onDismiss = { viewModel.handleCloseSettings() },
     )
   }

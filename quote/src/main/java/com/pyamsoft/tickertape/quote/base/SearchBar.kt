@@ -18,6 +18,9 @@ package com.pyamsoft.tickertape.quote.base
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,7 +40,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.tickertape.stocks.api.EquityType
-import kotlinx.coroutines.CoroutineScope
+import com.pyamsoft.tickertape.ui.debouncedOnTextChange
 
 @Composable
 internal fun SearchBar(
@@ -58,21 +60,10 @@ internal fun SearchBar(
     currentTab: EquityType,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onRegenerateList: CoroutineScope.() -> Unit,
 ) {
   val contentColor = LocalContentColor.current
   val allTypes = remember { EquityType.values().toList().toMutableStateList() }
   val selectedTabIndex = currentTab.ordinal
-
-  LaunchedEffect(
-      search,
-      currentTab,
-  ) {
-    val scope = this
-
-    // Fire the processing effect after the search or tab changes
-    scope.onRegenerateList()
-  }
 
   Column(
       modifier = modifier.fillMaxWidth(),
@@ -128,15 +119,17 @@ private fun TickerTab(
 }
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 private fun SearchInput(
     modifier: Modifier = Modifier,
     search: String,
     onSearchChanged: (String) -> Unit,
 ) {
+  val (query, onChange) = debouncedOnTextChange(search, onSearchChanged)
   val (isSearchFocused, setSearchFocused) = remember { mutableStateOf(false) }
 
-  val hasSearchQuery = remember(search) { search.isNotBlank() }
-  val handleClearSearch by rememberUpdatedState { onSearchChanged("") }
+  val hasSearchQuery = remember(query) { query.isNotBlank() }
+  val handleClearSearch by rememberUpdatedState { onChange("") }
 
   // If search bar is populated and focused, back gesture clears
   if (isSearchFocused && hasSearchQuery) {
@@ -150,9 +143,9 @@ private fun SearchInput(
           modifier
               .padding(horizontal = MaterialTheme.keylines.content)
               .padding(bottom = MaterialTheme.keylines.baseline)
-              .onFocusChanged { focus -> setSearchFocused(focus.isFocused) },
-      value = search,
-      onValueChange = onSearchChanged,
+              .onFocusChanged { setSearchFocused(it.isFocused) },
+      value = query,
+      onValueChange = onChange,
       singleLine = true,
       shape = RoundedCornerShape(percent = 50),
       label = {
@@ -163,7 +156,9 @@ private fun SearchInput(
       },
       trailingIcon = {
         AnimatedVisibility(
-            visible = search.isNotBlank(),
+            visible = hasSearchQuery,
+            enter = scaleIn(),
+            exit = scaleOut(),
         ) {
           IconButton(
               onClick = { handleClearSearch() },
@@ -187,7 +182,6 @@ private fun PreviewSearchBar() {
         onSearchChanged = {},
         currentTab = EquityType.STOCK,
         onTabUpdated = {},
-        onRegenerateList = {},
     )
   }
 }

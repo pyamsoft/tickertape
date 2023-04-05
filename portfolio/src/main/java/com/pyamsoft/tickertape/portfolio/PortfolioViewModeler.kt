@@ -22,7 +22,6 @@ import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
-import com.pyamsoft.pydroid.util.ifNotCancellation
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -34,12 +33,14 @@ import com.pyamsoft.tickertape.quote.DeleteRestoreViewModeler
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.fromJson
-import com.pyamsoft.tickertape.ui.ListGenerateResult
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
@@ -52,7 +53,7 @@ internal constructor(
     private val processor: PortfolioProcessor,
 ) : DeleteRestoreViewModeler<PortfolioViewState>(state) {
 
-  private var internalFullPortfolio: List<PortfolioStock> = emptyList()
+  private var fullPortfolio = MutableStateFlow(emptyList<PortfolioStock>())
 
   private val portfolioFetcher =
       highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { force ->
@@ -62,24 +63,12 @@ internal constructor(
         return@highlander interactor.getPortfolio()
       }
 
-  private val portfolioGenerator =
-      highlander<PortfolioListGenerateResult, PortfolioViewState, List<PortfolioStock>> {
-          state,
-          tickers ->
-        val full = tickers.sortedWith(PortfolioStock.COMPARATOR)
-        return@highlander PortfolioListGenerateResult(
-            all = full,
-            portfolio = processor.process(full),
-            visible = state.asVisible(full),
-        )
-      }
-
   private fun CoroutineScope.handleSplitRealtimeEvent(event: SplitChangeEvent) {
     Timber.d("A split change has happened, re-process the entire list: $event")
     handleRefreshList(this, false)
   }
 
-  private fun CoroutineScope.handlePositionRealtimeEvent(event: PositionChangeEvent) {
+  private fun handlePositionRealtimeEvent(event: PositionChangeEvent) {
     return when (event) {
       is PositionChangeEvent.Delete -> handleDeletePosition(event.position)
       is PositionChangeEvent.Insert -> handleInsertPosition(event.position)
@@ -92,10 +81,9 @@ internal constructor(
     return p1.id == p2.id
   }
 
-  private fun CoroutineScope.handleUpdatePosition(position: DbPosition) {
-    val s = state
-    s.regeneratePortfolio(this) {
-      internalFullPortfolio.map { stock ->
+  private fun handleUpdatePosition(position: DbPosition) {
+    fullPortfolio.update { p ->
+      p.map { stock ->
         return@map if (stock.holding.id != position.holdingId) stock
         else {
           val newPositions =
@@ -106,28 +94,27 @@ internal constructor(
     }
   }
 
-  private fun CoroutineScope.handleInsertPosition(position: DbPosition) {
-    val s = state
-    s.regeneratePortfolio(this) {
-      internalFullPortfolio.map { stock ->
+  private fun handleInsertPosition(position: DbPosition) {
+    fullPortfolio.update { p ->
+      p.map { stock ->
         return@map if (stock.holding.id != position.holdingId) stock
         else stock.copy(positions = stock.positions + position)
       }
     }
   }
 
-  private fun CoroutineScope.handleDeletePosition(position: DbPosition) {
+  private fun handleDeletePosition(position: DbPosition) {
     // On delete, we don't need to re-fetch quotes from the network
-
-    val s = state
-    s.regeneratePortfolio(this) {
-      internalFullPortfolio.map { stock ->
+    fullPortfolio.update { p ->
+      p.map { stock ->
         if (stock.holding.id != position.holdingId) {
           return@map stock
         } else {
           return@map if (!stock.positions.contains { doesPositionMatch(it, position) }) stock
           else {
-            stock.copy(positions = stock.positions.filterNot { doesPositionMatch(it, position) })
+            stock.copy(
+                positions = stock.positions.filterNot { doesPositionMatch(it, position) },
+            )
           }
         }
       }
@@ -140,56 +127,6 @@ internal constructor(
       is HoldingChangeEvent.Insert -> handleInsertHolding(event.holding)
       is HoldingChangeEvent.Update -> handleUpdateHolding(event.holding)
     }
-  }
-
-  private inline fun MutablePortfolioViewState.regeneratePortfolio(
-      scope: CoroutineScope,
-      crossinline stocks: () -> List<PortfolioStock>
-  ) {
-    val self = this
-
-    // Default dispatcher for performance
-    scope.launch(context = Dispatchers.Default) {
-      // Cancel any old processing
-      try {
-        val result = portfolioGenerator.call(state, stocks())
-        internalFullPortfolio = result.all
-        self.portfolio.value = result.portfolio
-        self.stocks.value = result.visible
-      } catch (e: Throwable) {
-        e.ifNotCancellation {
-          Timber.e(e, "Error occurred while regenerating list")
-
-          // Clear data on bad processing
-          internalFullPortfolio = emptyList()
-          self.portfolio.value = null
-          self.stocks.value = emptyList()
-        }
-      }
-    }
-  }
-
-  @CheckResult
-  private fun PortfolioViewState.asVisible(tickers: List<PortfolioStock>): List<PortfolioStock> {
-    val search = this.query.value
-    val section = this.section.value
-    return tickers
-        .asSequence()
-        .filter { ps ->
-          val symbol = ps.holding.symbol.raw
-          val name = ps.ticker?.quote?.company?.company
-          return@filter if (symbol.contains(search, ignoreCase = true)) true
-          else name?.contains(search, ignoreCase = true) ?: false
-        }
-        .filter { ps ->
-          val type = ps.holding.type
-          return@filter when (section) {
-            EquityType.STOCK -> type == EquityType.STOCK
-            EquityType.OPTION -> type == EquityType.OPTION
-            EquityType.CRYPTOCURRENCY -> type == EquityType.CRYPTOCURRENCY
-          }
-        }
-        .toList()
   }
 
   private fun CoroutineScope.handleUpdateHolding(holding: DbHolding) {
@@ -208,11 +145,11 @@ internal constructor(
     handleRefreshList(scope = this, force = true)
   }
 
-  private fun CoroutineScope.handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
+  private fun handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
     // On delete, we don't need to re-fetch quotes from the network
     val s = state
 
-    s.regeneratePortfolio(this) { internalFullPortfolio.filterNot { it.holding.id == holding.id } }
+    fullPortfolio.update { p -> p.filterNot { it.holding.id == holding.id } }
 
     if (offerUndo) {
       Timber.d("Offer undo on holding delete: $holding")
@@ -222,6 +159,57 @@ internal constructor(
 
   private fun handleOpenDelete(params: PortfolioRemoveParams) {
     state.remove.value = params
+  }
+
+  private fun generateList(
+      scope: CoroutineScope,
+  ) {
+    // Create a source that generates data based on the latest from all sources
+    val combined =
+        combineTransform(
+            fullPortfolio,
+            state.query,
+            state.section,
+        ) { all, search, section ->
+          emit(
+              ItemPayload(
+                  stocks = all,
+                  search = search,
+                  section = section,
+              ),
+          )
+        }
+
+    scope.launch(context = Dispatchers.Default) {
+      combined.collect { (stocks, search, section) ->
+        state.portfolio.value = processor.process(stocks)
+        state.stocks.value =
+            stocks
+                .asSequence()
+                .run {
+                  if (search.isBlank()) {
+                    this
+                  } else {
+                    filter { ps ->
+                      val symbol = ps.holding.symbol.raw
+                      val name = ps.ticker?.quote?.company?.company
+                      return@filter if (symbol.contains(search, ignoreCase = true)) true
+                      else name?.contains(search, ignoreCase = true) ?: false
+                    }
+                  }
+                }
+                .filter { ps ->
+                  val type = ps.holding.type
+                  return@filter when (section) {
+                    EquityType.STOCK -> type == EquityType.STOCK
+                    EquityType.OPTION -> type == EquityType.OPTION
+                    EquityType.CRYPTOCURRENCY -> type == EquityType.CRYPTOCURRENCY
+                  }
+                }
+                .sortedWith(PortfolioStock.COMPARATOR)
+                .toList()
+      }
+    }
   }
 
   override fun registerSaveState(
@@ -273,6 +261,8 @@ internal constructor(
         }
       }
     }
+
+    generateList(scope = scope)
   }
 
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
@@ -286,14 +276,14 @@ internal constructor(
           .call(force)
           .onSuccess { list ->
             state.apply {
-              regeneratePortfolio(scope) { list }
+              fullPortfolio.value = list
               error.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to refresh entry list") }
           .onFailure {
             state.apply {
-              regeneratePortfolio(scope) { emptyList() }
+              fullPortfolio.value = emptyList()
               error.value = it
             }
           }
@@ -309,11 +299,6 @@ internal constructor(
     state.section.value = tab
   }
 
-  fun handleRegenerateList(scope: CoroutineScope) {
-    val s = state
-    s.regeneratePortfolio(scope) { internalFullPortfolio }
-  }
-
   fun handleOpenDelete(stock: PortfolioStock) {
     handleOpenDelete(
         PortfolioRemoveParams(
@@ -327,10 +312,8 @@ internal constructor(
     state.remove.value = null
   }
 
-  fun handleHoldingDeleteFinal(scope: CoroutineScope) {
-    handleDeleteFinal(state.recentlyDeleteHolding) {
-      scope.handleDeleteHolding(it, offerUndo = false)
-    }
+  fun handleHoldingDeleteFinal() {
+    handleDeleteFinal(state.recentlyDeleteHolding) { handleDeleteHolding(it, offerUndo = false) }
   }
 
   fun handleRestoreDeletedHolding(scope: CoroutineScope) {
@@ -342,11 +325,11 @@ internal constructor(
     }
   }
 
-  private data class PortfolioListGenerateResult(
-      val portfolio: PortfolioData,
-      override val all: List<PortfolioStock>,
-      override val visible: List<PortfolioStock>,
-  ) : ListGenerateResult<PortfolioStock>
+  private data class ItemPayload(
+      val stocks: List<PortfolioStock>,
+      val search: String,
+      val section: EquityType,
+  )
 
   companion object {
     private const val KEY_SEARCH = "key_portfolio_search"

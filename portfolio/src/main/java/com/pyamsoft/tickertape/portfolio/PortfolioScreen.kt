@@ -59,7 +59,6 @@ fun PortfolioScreen(
     onDelete: (PortfolioStock) -> Unit,
     onSearchChanged: (String) -> Unit,
     onTabUpdated: (EquityType) -> Unit,
-    onRegenerateList: CoroutineScope.() -> Unit,
     onHoldingDeleteFinalized: () -> Unit,
     onHoldingRestored: () -> Unit,
 ) {
@@ -86,7 +85,6 @@ fun PortfolioScreen(
         onRefresh = onRefresh,
         onSearchChanged = onSearchChanged,
         onTabUpdated = onTabUpdated,
-        onRegenerateList = onRegenerateList,
         itemKey = { _, stock -> stock.holding.symbol.raw },
         renderHeader = {
           PortfolioSummary(
@@ -222,7 +220,6 @@ private fun PreviewPortfolioScreen() {
       onSelect = {},
       onSearchChanged = {},
       onTabUpdated = {},
-      onRegenerateList = {},
       onHoldingDeleteFinalized = {},
       onHoldingRestored = {},
   )

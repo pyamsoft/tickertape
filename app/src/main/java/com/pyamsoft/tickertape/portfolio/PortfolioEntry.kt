@@ -115,8 +115,7 @@ internal fun PortfolioEntry(
         onDelete = { viewModel.handleOpenDelete(it) },
         onSearchChanged = { viewModel.handleSearch(it) },
         onTabUpdated = { viewModel.handleSectionChanged(it) },
-        onRegenerateList = { viewModel.handleRegenerateList(scope = scope) },
-        onHoldingDeleteFinalized = { viewModel.handleHoldingDeleteFinal(scope = scope) },
+        onHoldingDeleteFinalized = { viewModel.handleHoldingDeleteFinal() },
         onHoldingRestored = { viewModel.handleRestoreDeletedHolding(scope = scope) },
     )
 

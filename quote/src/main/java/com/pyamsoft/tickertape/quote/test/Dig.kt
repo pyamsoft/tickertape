@@ -19,8 +19,10 @@ package com.pyamsoft.tickertape.quote.test
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.Ticker
+import com.pyamsoft.tickertape.quote.chart.ChartDataPainter
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.DigViewState
+import com.pyamsoft.tickertape.quote.dig.recommend.StockRec
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -29,11 +31,11 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.ui.test.TestClock
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 /** Should only be used in tests/preview */
 @CheckResult
@@ -61,7 +63,7 @@ fun newTestDigViewState(
     override val newsError: StateFlow<Throwable?> = MutableStateFlow(null)
     override val statistics: StateFlow<KeyStatistics?> = MutableStateFlow(null)
     override val statisticsError: StateFlow<Throwable?> = MutableStateFlow(null)
-    override val recommendations: StateFlow<List<Ticker>> = MutableStateFlow(emptyList())
+    override val recommendations: StateFlow<List<StockRec>> = MutableStateFlow(emptyList())
     override val recommendationError: StateFlow<Throwable?> = MutableStateFlow(null)
     override val optionsChain: StateFlow<StockOptions?> = MutableStateFlow(null)
     override val optionsError: StateFlow<Throwable?> = MutableStateFlow(null)
@@ -69,5 +71,6 @@ fun newTestDigViewState(
         MutableStateFlow(StockOptions.Contract.Type.CALL)
     override val optionsExpirationDate: StateFlow<LocalDate?> = MutableStateFlow(null)
     override val priceAlerts: StateFlow<List<PriceAlert>> = MutableStateFlow(emptyList())
+    override val chart: StateFlow<ChartDataPainter?> = MutableStateFlow(null)
   }
 }

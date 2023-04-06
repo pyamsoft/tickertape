@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
-import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
@@ -46,6 +45,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,8 +58,8 @@ internal constructor(
     private val newInteractor: NewTickerInteractor,
     private val interactor: PortfolioDigInteractor,
     private val jsonParser: JsonParser,
+    private val interactorCache: PortfolioDigInteractor.Cache,
     processor: ChartDataProcessor,
-    interactorCache: PortfolioDigInteractor.Cache,
 ) :
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
@@ -69,104 +69,100 @@ internal constructor(
         interactorCache,
     ) {
 
-  private val splitLoadRunner =
-      highlander<ResultWrapper<List<DbSplit>>, Boolean> { force ->
-        when (val holding = state.holding.value) {
-          is Maybe.Data -> {
-            val data = holding.data
-            if (force) {
-              interactorCache.invalidateSplits(data.id)
-            }
-
-            return@highlander interactor.getSplits(data.id)
-          }
-          null,
-          is Maybe.None -> {
-            return@highlander ResultWrapper.success(emptyList())
-          }
-        }
-      }
-
-  private val holdingLoadRunner =
-      highlander<ResultWrapper<Maybe<out DbHolding>>, Boolean> { force ->
-
-        // If this holding is already provided, great, fast track!
-        val holding = params.holding
-        if (holding != null) {
-          return@highlander ResultWrapper.success(Maybe.Data(holding))
-        } else {
+  @CheckResult
+  private suspend fun handleLoadSplits(force: Boolean): ResultWrapper<List<DbSplit>> =
+      when (val holding = state.holding.value) {
+        is Maybe.Data -> {
+          val data = holding.data
           if (force) {
-            interactorCache.invalidateHolding(params.symbol)
+            interactorCache.invalidateSplits(data.id)
           }
 
-          return@highlander interactor.getHolding(params.symbol)
+          interactor.getSplits(data.id)
+        }
+        null,
+        is Maybe.None -> {
+          ResultWrapper.success(emptyList())
         }
       }
 
-  private val positionsLoadRunner =
-      highlander<ResultWrapper<List<PositionStock>>, Boolean, List<DbSplit>> { force, splits ->
-        when (val holding = state.holding.value) {
-          is Maybe.Data -> {
-            val data = holding.data
-            if (force) {
-              interactorCache.invalidatePositions(data.id)
-            }
+  @CheckResult
+  private suspend fun handleLoadHolding(force: Boolean): ResultWrapper<Maybe<out DbHolding>> {
 
-            interactor.getPositions(data.id).map { p ->
-              p.map { createPositionStock(data, it, splits) }.sortedBy { it.purchaseDate }
-            }
+    // If this holding is already provided, great, fast track!
+    val holding = params.holding
+    return if (holding != null) {
+      ResultWrapper.success(Maybe.Data(holding))
+    } else {
+      if (force) {
+        interactorCache.invalidateHolding(params.symbol)
+      }
+
+      interactor.getHolding(params.symbol)
+    }
+  }
+
+  @CheckResult
+  private suspend fun handleLoadPositions(
+      force: Boolean,
+      splits: List<DbSplit>
+  ): ResultWrapper<List<PositionStock>> =
+      when (val holding = state.holding.value) {
+        is Maybe.Data -> {
+          val data = holding.data
+          if (force) {
+            interactorCache.invalidatePositions(data.id)
           }
-          null,
-          is Maybe.None -> {
-            return@highlander ResultWrapper.success(emptyList())
+
+          interactor.getPositions(data.id).map { p ->
+            p.map { createPositionStock(data, it, splits) }.sortedBy { it.purchaseDate }
           }
         }
+        null,
+        is Maybe.None -> ResultWrapper.success(emptyList())
       }
 
-  @Suppress("ControlFlowWithEmptyBody")
-  private val loadRunner =
-      highlander<Unit, Boolean> { force ->
+  private suspend fun handleLoadAll(force: Boolean) = coroutineScope {
+    // Load the holding first, always
+    loadHolding(force)
 
-        // Load the holding first, always
-        loadHolding(force)
+    mutableListOf<Deferred<*>>()
+        .apply {
 
-        mutableListOf<Deferred<*>>()
-            .apply {
+          // Always load the ticker in parallel
+          add(async { loadTicker(force) })
 
-              // Always load the ticker in parallel
-              add(async { loadTicker(force) })
-
-              @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
-              when (state.section.value) {
-                PortfolioDigSections.PRICE_ALERTS -> {
-                  // TODO add price alerts work
-                }
-                PortfolioDigSections.CHART -> {
-                  // Chart doesn't need anything specific
-                }
-                PortfolioDigSections.NEWS -> {
-                  add(async { loadNews(force) })
-                }
-                PortfolioDigSections.STATISTICS -> {
-                  add(async { loadStatistics(force) })
-                }
-                PortfolioDigSections.SPLITS -> {
-                  add(async { loadSplits(force) })
-                }
-                PortfolioDigSections.POSITIONS -> {
-                  add(async { loadSplits(force) })
-                  add(async { loadPositions(force) })
-                }
-                PortfolioDigSections.RECOMMENDATIONS -> {
-                  add(async { loadRecommendations(force) })
-                }
-                PortfolioDigSections.OPTIONS_CHAIN -> {
-                  add(async { loadOptionsChain(force) })
-                }
-              }
+          @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
+          when (state.section.value) {
+            PortfolioDigSections.PRICE_ALERTS -> {
+              // TODO add price alerts work
             }
-            .awaitAll()
-      }
+            PortfolioDigSections.CHART -> {
+              // Chart doesn't need anything specific
+            }
+            PortfolioDigSections.NEWS -> {
+              add(async { loadNews(force) })
+            }
+            PortfolioDigSections.STATISTICS -> {
+              add(async { loadStatistics(force) })
+            }
+            PortfolioDigSections.SPLITS -> {
+              add(async { loadSplits(force) })
+            }
+            PortfolioDigSections.POSITIONS -> {
+              add(async { loadSplits(force) })
+              add(async { loadPositions(force) })
+            }
+            PortfolioDigSections.RECOMMENDATIONS -> {
+              add(async { loadRecommendations(force) })
+            }
+            PortfolioDigSections.OPTIONS_CHAIN -> {
+              add(async { loadOptionsChain(force) })
+            }
+          }
+        }
+        .awaitAll()
+  }
 
   @CheckResult
   private fun createPositionStock(
@@ -185,8 +181,7 @@ internal constructor(
 
   private suspend fun loadSplits(force: Boolean) {
     val s = state
-    splitLoadRunner
-        .call(force)
+    handleLoadSplits(force)
         .onSuccess { sp ->
           s.apply {
             stockSplitError.value = null
@@ -202,8 +197,7 @@ internal constructor(
   }
 
   private suspend fun loadHolding(force: Boolean) {
-    holdingLoadRunner
-        .call(force)
+    handleLoadHolding(force)
         .onSuccess { h ->
           state.apply {
             holding.value = h
@@ -222,8 +216,7 @@ internal constructor(
     val s = state
     val splits = s.stockSplits.value
 
-    positionsLoadRunner
-        .call(force, splits)
+    handleLoadPositions(force, splits)
         .onSuccess { p ->
           s.apply {
             positionsError.value = null
@@ -354,13 +347,18 @@ internal constructor(
       return
     }
 
-    Timber.d("Start loading everything")
-    state.loadingState.value = BaseDigViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
-      loadRunner.call(force).also {
-        Timber.d("Done loading everything")
-        state.loadingState.value = BaseDigViewState.LoadingState.DONE
+      if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
+        return@launch
       }
+
+      Timber.d("Start loading everything")
+      state.loadingState.value = BaseDigViewState.LoadingState.LOADING
+
+      handleLoadAll(force)
+
+      Timber.d("Done loading everything")
+      state.loadingState.value = BaseDigViewState.LoadingState.DONE
     }
   }
 

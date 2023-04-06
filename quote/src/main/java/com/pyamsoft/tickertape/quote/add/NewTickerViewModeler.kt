@@ -31,19 +31,19 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject
 internal constructor(
     override val state: MutableNewTickerViewState,
-    interactor: NewTickerInteractor,
+    private val interactor: NewTickerInteractor,
     interactorCache: NewTickerInteractor.Cache,
 ) : AbstractViewModeler<NewTickerViewState>(state) {
 
@@ -65,30 +65,6 @@ internal constructor(
           interactorCache.invalidateOptionsChain(symbol)
         }
         return@highlander interactor.getOptionsChain(symbol, expirationDate)
-      }
-
-  private val optionResolverRunner =
-      highlander<String, StockSymbol, LocalDate, StockMoneyValue, StockOptions.Contract.Type> {
-          symbol,
-          expirationDate,
-          strikePrice,
-          contractType ->
-        interactor.resolveOptionsIdentifier(
-            symbol = symbol,
-            expirationDate = expirationDate,
-            strikePrice = strikePrice,
-            contractType = contractType,
-        )
-      }
-
-  private val insertRunner =
-      highlander<ResultWrapper<DbInsert.InsertResult<StockSymbol>>, String> { symbol ->
-        val s = state
-        interactor.insertNewTicker(
-            symbol = symbol.asSymbol(),
-            equityType = s.equityType.value.requireNotNull(),
-            tradeSide = s.tradeSide.value,
-        )
       }
 
   private val symbolLookupRunner =
@@ -214,7 +190,7 @@ internal constructor(
     return if (equityType.value != EquityType.OPTION) {
       symbol.value
     } else {
-      optionResolverRunner.call(
+      interactor.resolveOptionsIdentifier(
           validSymbol.value.requireNotNull(),
           optionExpirationDate.value.requireNotNull(),
           optionStrikePrice.value.requireNotNull(),
@@ -375,13 +351,18 @@ internal constructor(
     }
 
     s.apply {
-      s.isSubmitting.value = true
       scope.launch(context = Dispatchers.Main) {
         if (!s.canSubmit.first()) {
           Timber.w("Cannot process submit")
           return@launch
         }
 
+        if (s.isSubmitting.value) {
+          Timber.w("Already submitting, don't double up")
+          return@launch
+        }
+
+        s.isSubmitting.value = true
         val sym = resolveSubmission()
 
         // If blank, we can't do anything
@@ -392,8 +373,12 @@ internal constructor(
           throw InvalidLookupException
         }
 
-        insertRunner
-            .call(sym)
+        interactor
+            .insertNewTicker(
+                symbol = sym.asSymbol(),
+                equityType = s.equityType.value.requireNotNull(),
+                tradeSide = s.tradeSide.value,
+            )
             .onFailure { Timber.e(it, "Failed to insert new symbol: $sym") }
             .onSuccess { result ->
               when (result) {

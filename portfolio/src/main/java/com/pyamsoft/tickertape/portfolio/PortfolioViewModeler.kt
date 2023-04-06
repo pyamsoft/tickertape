@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
-import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.bus.EventConsumer
 import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.util.contains
@@ -55,13 +54,13 @@ internal constructor(
 
   private var fullPortfolio = MutableStateFlow(emptyList<PortfolioStock>())
 
-  private val portfolioFetcher =
-      highlander<ResultWrapper<List<PortfolioStock>>, Boolean> { force ->
-        if (force) {
-          interactorCache.invalidatePortfolio()
-        }
-        return@highlander interactor.getPortfolio()
-      }
+  @CheckResult
+  private suspend fun fetchPortfolio(force: Boolean): ResultWrapper<List<PortfolioStock>> {
+    if (force) {
+      interactorCache.invalidatePortfolio()
+    }
+    return interactor.getPortfolio()
+  }
 
   private fun CoroutineScope.handleSplitRealtimeEvent(event: SplitChangeEvent) {
     Timber.d("A split change has happened, re-process the entire list: $event")
@@ -270,10 +269,13 @@ internal constructor(
       return
     }
 
-    state.loadingState.value = PortfolioViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
-      portfolioFetcher
-          .call(force)
+      if (state.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
+        return@launch
+      }
+
+      state.loadingState.value = PortfolioViewState.LoadingState.LOADING
+      fetchPortfolio(force)
           .onSuccess { list ->
             state.apply {
               fullPortfolio.value = list

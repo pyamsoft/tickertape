@@ -67,7 +67,7 @@ private fun ModalBottomSheetValue.toStatus(): BottomSheetStatus =
 @CheckResult
 @OptIn(ExperimentalMaterialApi::class)
 private fun ModalBottomSheetState.toStatusFlow(): Flow<BottomSheetStatus> {
-  return snapshotFlow { this.currentValue }.map { it.toStatus() }
+  return snapshotFlow { this.targetValue }.map { it.toStatus() }
 }
 
 @Composable

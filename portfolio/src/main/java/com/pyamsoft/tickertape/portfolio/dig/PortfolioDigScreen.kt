@@ -118,13 +118,13 @@ fun PortfolioDigScreen(
       pagerState,
       allTabs,
   ) {
-    snapshotFlow { pagerState.currentPage }
-        .collect { index ->
-          if (allTabs.isNotEmpty()) {
+    if (allTabs.isNotEmpty()) {
+      snapshotFlow { pagerState.targetPage }
+          .collect { index ->
             val page = allTabs[index]
             handleTabUpdated(page)
           }
-        }
+    }
   }
 
   Surface(

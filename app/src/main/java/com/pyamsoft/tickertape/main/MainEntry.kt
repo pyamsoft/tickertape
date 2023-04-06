@@ -32,8 +32,8 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainInjector @Inject internal constructor() : ComposableInjector() {
 
@@ -59,7 +59,7 @@ private fun WatchTabSwipe(
       pagerState,
       allTabs,
   ) {
-    snapshotFlow { pagerState.currentPage }
+    snapshotFlow { pagerState.targetPage }
         .collect { index ->
           val page = allTabs[index]
           Timber.d("Page swiped: $page")

@@ -354,9 +354,13 @@ internal constructor(
       return
     }
 
+    Timber.d("Start loading everything")
     state.loadingState.value = BaseDigViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Main) {
-      loadRunner.call(force).also { state.loadingState.value = BaseDigViewState.LoadingState.DONE }
+      loadRunner.call(force).also {
+        Timber.d("Done loading everything")
+        state.loadingState.value = BaseDigViewState.LoadingState.DONE
+      }
     }
   }
 

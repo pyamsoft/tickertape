@@ -124,6 +124,11 @@ class TickerTape : Application() {
             "An HTTP+HTTP/2 client for Android and Java applications.",
         )
         add(
+            "Highlander",
+            "https://github.com/pyamsoft/highlander",
+            "There can be only one.",
+        )
+        add(
             "Room",
             "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",
             "The AndroidX Jetpack Room library. Fluent SQLite database access.",

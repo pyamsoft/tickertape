@@ -32,6 +32,8 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -60,10 +62,9 @@ private fun WatchTabSwipe(
       allTabs,
   ) {
     snapshotFlow { pagerState.targetPage }
-        .collect { index ->
-          val page = allTabs[index]
-          Timber.d("Page swiped: $page")
-        }
+        .distinctUntilChanged()
+        .mapNotNull { allTabs.getOrNull(it) }
+        .collect { page -> Timber.d("Page swiped: $page") }
   }
 }
 

@@ -35,6 +35,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -67,7 +68,7 @@ private fun ModalBottomSheetValue.toStatus(): BottomSheetStatus =
 @CheckResult
 @OptIn(ExperimentalMaterialApi::class)
 private fun ModalBottomSheetState.toStatusFlow(): Flow<BottomSheetStatus> {
-  return snapshotFlow { this.targetValue }.map { it.toStatus() }
+  return snapshotFlow { this.targetValue }.distinctUntilChanged().map { it.toStatus() }
 }
 
 @Composable

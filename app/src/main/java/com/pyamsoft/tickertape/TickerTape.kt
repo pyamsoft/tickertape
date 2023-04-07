@@ -30,10 +30,10 @@ import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.enqueueAppWork
 import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -123,6 +123,12 @@ class TickerTape : Application() {
             "https://github.com/square/okhttp",
             "An HTTP+HTTP/2 client for Android and Java applications.",
         )
+        add(
+            "Cachify",
+            "https://github.com/pyamsoft/cachify",
+            "Simple in-memory caching of all the things",
+        )
+
         add(
             "Highlander",
             "https://github.com/pyamsoft/highlander",

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,21 +45,6 @@ fun Quote(
     onLongClick: () -> Unit,
     content: @Composable QuoteScope.() -> Unit = {},
 ) {
-
-  val isSpecialSession =
-      remember(ticker) {
-        if (ticker == null) {
-          return@remember false
-        } else {
-          val quote = ticker.quote
-          if (quote == null) {
-            return@remember false
-          } else {
-            return@remember quote.afterHours != null || quote.preMarket != null
-          }
-        }
-      }
-
   BorderCard(
       modifier = modifier,
   ) {
@@ -98,14 +82,6 @@ fun Quote(
                     .padding(top = MaterialTheme.keylines.baseline),
             horizontalAlignment = Alignment.End,
         ) {
-          if (isSpecialSession) {
-            TickerPrice(
-                modifier = Modifier.padding(bottom = MaterialTheme.keylines.content),
-                ticker = ticker,
-                size = TickerSize.QUOTE_EXTRA,
-            )
-          }
-
           TickerPrice(
               ticker = ticker,
               size = TickerSize.QUOTE,

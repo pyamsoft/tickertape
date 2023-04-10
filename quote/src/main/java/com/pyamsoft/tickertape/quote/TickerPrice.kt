@@ -76,13 +76,6 @@ fun TickerPrice(
                     highAlpha,
                     mediumAlpha,
                 )
-            TickerSize.QUOTE_EXTRA ->
-                TickerSizes.priceExtra(
-                    typography,
-                    contentColor,
-                    mediumAlpha,
-                    disabledAlpha,
-                )
             TickerSize.RECOMMEND_QUOTE ->
                 TickerSizes.recPrice(
                     typography,
@@ -90,18 +83,11 @@ fun TickerPrice(
                     highAlpha,
                     mediumAlpha,
                 )
-            TickerSize.RECOMMEND_QUOTE_EXTRA ->
-                TickerSizes.recPriceExtra(
-                    typography,
-                    contentColor,
-                    mediumAlpha,
-                    disabledAlpha,
-                )
           }
         }
 
     // If we are a special quote, display the regular market info
-    val session = if (size.isSpecial) quote.regular else quote.currentSession
+    val session = quote.currentSession
 
     val direction = session.direction
     val directionSign = session.direction.sign

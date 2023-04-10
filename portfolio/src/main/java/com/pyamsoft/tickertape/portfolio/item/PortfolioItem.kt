@@ -78,18 +78,23 @@ private fun QuoteScope.QuoteData(
 
   if (quote != null) {
     Column {
-      quote.dayLow?.also { low ->
-        Info(
-            name = "Low",
-            value = low.display,
-        )
-      }
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        quote.dayLow?.also { low ->
+          Info(
+              modifier = Modifier.padding(end = MaterialTheme.keylines.content),
+              name = "Low",
+              value = low.display,
+          )
+        }
 
-      quote.dayHigh?.also { high ->
-        Info(
-            name = "High",
-            value = high.display,
-        )
+        quote.dayHigh?.also { high ->
+          Info(
+              name = "High",
+              value = high.display,
+          )
+        }
       }
 
       quote.dayVolume?.also { volume ->
@@ -109,22 +114,27 @@ private fun QuoteScope.PositionData(
   val totalDirection = stock.totalDirection
   val totalChangeTitle = remember(totalDirection) { totalDirection.asGainLoss() }
 
-  Info(
-      name = if (stock.isOption) "Contracts" else "Shares",
-      value = stock.totalShares.display,
-  )
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Info(
+        modifier = Modifier.padding(end = MaterialTheme.keylines.content),
+        name = if (stock.isOption) "Contracts" else "Shares",
+        value = stock.totalShares.display,
+    )
 
-  // These are only valid if we have current day quotes
-  if (stock.ticker != null) {
-    Info(
-        name = "$totalChangeTitle Percent",
-        value = stock.totalGainLossPercent,
-    )
-  } else {
-    Info(
-        name = "Value",
-        value = stock.current.display,
-    )
+    // These are only valid if we have current day quotes
+    if (stock.ticker != null) {
+      Info(
+          name = "$totalChangeTitle Percent",
+          value = stock.totalGainLossPercent,
+      )
+    } else {
+      Info(
+          name = "Value",
+          value = stock.current.display,
+      )
+    }
   }
 
   if (stock.shortTermPositions > 0 || stock.longTermPositions > 0) {

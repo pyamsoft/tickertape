@@ -55,23 +55,12 @@ fun TickerName(
           highAlpha,
           mediumAlpha,
       ) {
-        when (size) {
-          TickerSize.CHART ->
-              TickerSizes.chart(
-                  typography,
-                  contentColor,
-                  highAlpha,
-                  mediumAlpha,
-              )
-          TickerSize.QUOTE ->
-              TickerSizes.quote(
-                  typography,
-                  contentColor,
-                  highAlpha,
-                  mediumAlpha,
-              )
-          else -> throw IllegalStateException("Can't use TickerName with size: $size")
-        }
+        TickerSizes.chart(
+            typography,
+            contentColor,
+            highAlpha,
+            mediumAlpha,
+        )
       }
 
   Column(

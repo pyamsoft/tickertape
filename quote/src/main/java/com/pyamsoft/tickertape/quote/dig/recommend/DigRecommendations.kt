@@ -140,14 +140,6 @@ private fun RecommendationItem(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.End,
         ) {
-          if (isRecommendationSpecialSession) {
-            TickerPrice(
-                modifier = Modifier.padding(end = MaterialTheme.keylines.content),
-                ticker = ticker,
-                size = TickerSize.RECOMMEND_QUOTE_EXTRA,
-            )
-          }
-
           TickerPrice(
               ticker = ticker,
               size = TickerSize.RECOMMEND_QUOTE,

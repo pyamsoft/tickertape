@@ -26,16 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Stable
 @Immutable
-enum class TickerSize(val isSpecial: Boolean) {
-  CHART(isSpecial = false),
-
-  // Quotes
-  QUOTE(isSpecial = false),
-  QUOTE_EXTRA(isSpecial = true),
-
-  // Recommendations
-  RECOMMEND_QUOTE(isSpecial = false),
-  RECOMMEND_QUOTE_EXTRA(isSpecial = true)
+enum class TickerSize {
+  CHART,
+  QUOTE,
+  RECOMMEND_QUOTE,
 }
 
 @Stable
@@ -50,32 +44,6 @@ internal constructor(
     @JvmStatic
     @CheckResult
     fun chart(
-        typography: Typography,
-        color: Color,
-        alphaHigh: Float,
-        alphaMedium: Float,
-    ) =
-        TickerSizes(
-            title =
-                typography.h6.copy(
-                    color = color.copy(alpha = alphaHigh),
-                    fontWeight = FontWeight.W700,
-                ),
-            description =
-                typography.body2.copy(
-                    color = color.copy(alpha = alphaMedium),
-                    fontWeight = FontWeight.W400,
-                ),
-            label =
-                typography.caption.copy(
-                    color = color.copy(alpha = alphaMedium),
-                    fontWeight = FontWeight.W400,
-                ),
-        )
-
-    @JvmStatic
-    @CheckResult
-    fun quote(
         typography: Typography,
         color: Color,
         alphaHigh: Float,
@@ -106,15 +74,6 @@ internal constructor(
         color: Color,
         alphaHigh: Float,
         alphaMedium: Float,
-    ) = quote(typography, color, alphaHigh, alphaMedium)
-
-    @JvmStatic
-    @CheckResult
-    fun priceExtra(
-        typography: Typography,
-        color: Color,
-        alphaHigh: Float,
-        alphaMedium: Float,
     ) = chart(typography, color, alphaHigh, alphaMedium)
 
     @JvmStatic
@@ -124,7 +83,7 @@ internal constructor(
         color: Color,
         alphaHigh: Float,
         alphaMedium: Float,
-    ) = priceExtra(typography, color, alphaHigh, alphaMedium)
+    ) = chart(typography, color, alphaHigh, alphaMedium)
 
     @JvmStatic
     @CheckResult

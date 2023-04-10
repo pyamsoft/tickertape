@@ -99,6 +99,10 @@ internal fun rememberTabs(
       return@remember mutableStateListOf()
     } else {
       return@remember PortfolioDigSections.values()
+          .asSequence()
+          .filterNot {  PortfolioDigSections.NEWS == it }
+          .filterNot {  PortfolioDigSections.PRICE_ALERTS == it }
+          .filterNot {  PortfolioDigSections.OPTIONS_CHAIN == it }
           .filter { v ->
             // Kotlin is weird sometimes
             when (val h: Maybe<out DbHolding> = holding.requireNotNull()) {
@@ -121,6 +125,7 @@ internal fun rememberTabs(
               }
             }
           }
+          .toList()
           .toMutableStateList()
     }
   }

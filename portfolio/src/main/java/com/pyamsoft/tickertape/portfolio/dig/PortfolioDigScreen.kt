@@ -249,24 +249,6 @@ private fun Content(
             onRangeSelected = onChartRangeSelected,
         )
       }
-      PortfolioDigSections.NEWS -> {
-        DigNews(
-            modifier = Modifier.fillMaxSize(),
-            state = state,
-            imageLoader = imageLoader,
-            onRefresh = onRefresh,
-        )
-      }
-      PortfolioDigSections.PRICE_ALERTS -> {
-        DigPriceAlerts(
-            modifier = Modifier.fillMaxSize(),
-            state = state,
-            onRefresh = onRefresh,
-            onAddPriceAlert = onAddPriceAlert,
-            onUpdatePriceAlert = onUpdatePriceAlert,
-            onDeletePriceAlert = onDeletePriceAlert,
-        )
-      }
       PortfolioDigSections.POSITIONS -> {
         PositionScreen(
             modifier = Modifier.fillMaxSize(),
@@ -307,6 +289,24 @@ private fun Content(
             state = state,
             onRefresh = onRefresh,
             onRecClick = onRecClick,
+        )
+      }
+      PortfolioDigSections.NEWS -> {
+        DigNews(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            imageLoader = imageLoader,
+            onRefresh = onRefresh,
+        )
+      }
+      PortfolioDigSections.PRICE_ALERTS -> {
+        DigPriceAlerts(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = onRefresh,
+            onAddPriceAlert = onAddPriceAlert,
+            onUpdatePriceAlert = onUpdatePriceAlert,
+            onDeletePriceAlert = onDeletePriceAlert,
         )
       }
       PortfolioDigSections.OPTIONS_CHAIN -> {

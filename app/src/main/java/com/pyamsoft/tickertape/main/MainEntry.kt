@@ -71,9 +71,12 @@ private fun WatchTabSwipe(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun MountHooks(
+    viewModel: MainViewModeler,
     pagerState: PagerState,
     allTabs: SnapshotStateList<MainPage>,
 ) {
+  SaveStateDisposableEffect(viewModel)
+
   WatchTabSwipe(
       pagerState = pagerState,
       allTabs = allTabs,
@@ -94,10 +97,10 @@ internal fun MainEntry(
   val scope = rememberCoroutineScope()
 
   MountHooks(
+      viewModel = viewModel,
       pagerState = pagerState,
       allTabs = allTabs,
   )
-  SaveStateDisposableEffect(viewModel)
 
   MainScreen(
       modifier = modifier,

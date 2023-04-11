@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.quote.dig.base
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -56,8 +57,7 @@ fun <T : Any> BaseDigListScreen(
     items: SnapshotStateList<T>,
     onAddClicked: () -> Unit,
     itemKey: (T) -> String,
-    isLoading: Boolean,
-    onRefresh: () -> Unit,
+    emptyState: @Composable () -> Unit = {},
     renderListItem: @Composable (T) -> Unit,
 ) {
   Box(
@@ -68,7 +68,8 @@ fun <T : Any> BaseDigListScreen(
         modifier = Modifier.matchParentSize(),
         items = items,
         itemKey = itemKey,
-        listItem = renderListItem,
+        emptyState = emptyState,
+        renderListItem = renderListItem,
     )
 
     DigAdd(
@@ -84,24 +85,37 @@ private fun <T : Any> DigList(
     modifier: Modifier = Modifier,
     items: SnapshotStateList<T>,
     itemKey: (T) -> String,
-    listItem: @Composable (T) -> Unit,
+    emptyState: @Composable () -> Unit,
+    renderListItem: @Composable (T) -> Unit,
 ) {
-  LazyColumn(
-      modifier = modifier,
-      contentPadding = PaddingValues(MaterialTheme.keylines.content),
-      verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
-  ) {
-    items(
-        items = items,
-        key = { itemKey(it) },
-    ) {
-      listItem(it)
-    }
+  Crossfade(
+      targetState = items,
+  ) { stuff ->
+    if (stuff.isEmpty()) {
+      Box(
+          modifier = modifier,
+      ) {
+        emptyState()
+      }
+    } else {
+      LazyColumn(
+          modifier = modifier,
+          contentPadding = PaddingValues(MaterialTheme.keylines.content),
+          verticalArrangement = Arrangement.spacedBy(MaterialTheme.keylines.content),
+      ) {
+        items(
+            items = items,
+            key = { itemKey(it) },
+        ) {
+          renderListItem(it)
+        }
 
-    item {
-      Spacer(
-          modifier = Modifier.height(FAB_OFFSET.dp),
-      )
+        item {
+          Spacer(
+              modifier = Modifier.height(FAB_OFFSET.dp),
+          )
+        }
+      }
     }
   }
 }
@@ -146,11 +160,9 @@ private fun PreviewBaseDigListScreen() {
         modifier = Modifier.fillMaxSize(),
         label = "Test",
         isAddVisible = true,
-        isLoading = false,
         items = remember { mutableStateListOf<String>() },
         itemKey = { "" },
         onAddClicked = {},
-        onRefresh = {},
     ) {}
   }
 }

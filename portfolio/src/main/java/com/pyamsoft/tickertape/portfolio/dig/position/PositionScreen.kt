@@ -19,17 +19,14 @@ package com.pyamsoft.tickertape.portfolio.dig.position
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +40,10 @@ import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
+import com.pyamsoft.tickertape.portfolio.dig.EmptyList
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
+import com.pyamsoft.tickertape.portfolio.dig.NoHolding
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigSections
 import com.pyamsoft.tickertape.portfolio.dig.PositionsPortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -60,7 +60,6 @@ internal fun PositionScreen(
     modifier: Modifier = Modifier,
     state: PositionsPortfolioDigViewState,
     clock: Clock,
-    onRefresh: () -> Unit,
     onAddPosition: (DbHolding) -> Unit,
     onUpdatePosition: (DbPosition, DbHolding) -> Unit,
     onDeletePosition: (DbPosition) -> Unit,
@@ -82,8 +81,6 @@ internal fun PositionScreen(
             holdingError == null
       }
 
-  val isLoading = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
-
   holding.also { h ->
     if (h == null) {
       CircularProgressIndicator(
@@ -102,10 +99,14 @@ internal fun PositionScreen(
                 label = "Add Position",
                 isAddVisible = isAddVisible,
                 items = positions,
-                isLoading = isLoading,
-                onRefresh = onRefresh,
                 onAddClicked = { onAddPosition(data) },
                 itemKey = { it.id.raw },
+                emptyState = {
+                  EmptyList(
+                      sections = PortfolioDigSections.POSITIONS,
+                      onAddItem = { onAddPosition(data) },
+                  )
+                },
             ) { position ->
               PositionItem(
                   modifier =
@@ -128,21 +129,10 @@ internal fun PositionScreen(
           }
         }
         is Maybe.None -> {
-          Column(
+          NoHolding(
               modifier = modifier,
-              horizontalAlignment = Alignment.CenterHorizontally,
-          ) {
-            Text(
-                text = "Not in the DB",
-            )
-            Button(
-                onClick = onAddNewHolding,
-            ) {
-              Text(
-                  text = "Add to DB",
-              )
-            }
-          }
+              onAddNewHolding = onAddNewHolding,
+          )
         }
       }
     }
@@ -206,7 +196,6 @@ private fun PreviewPositionScreen() {
               clock = clock,
           ),
       onAddPosition = {},
-      onRefresh = {},
       onDeletePosition = {},
       onUpdatePosition = { _, _ -> },
       onPositionDeleteFinalized = {},

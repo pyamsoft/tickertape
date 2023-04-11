@@ -19,17 +19,14 @@ package com.pyamsoft.tickertape.portfolio.dig.splits
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +40,10 @@ import com.pyamsoft.pydroid.ui.util.collectAsStateList
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.split.DbSplit
+import com.pyamsoft.tickertape.portfolio.dig.EmptyList
 import com.pyamsoft.tickertape.portfolio.dig.MutablePortfolioDigViewState
+import com.pyamsoft.tickertape.portfolio.dig.NoHolding
+import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigSections
 import com.pyamsoft.tickertape.portfolio.dig.SplitsPortfolioDigViewState
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -58,7 +58,6 @@ import com.pyamsoft.tickertape.ui.test.TestClock
 internal fun SplitScreen(
     modifier: Modifier = Modifier,
     state: SplitsPortfolioDigViewState,
-    onRefresh: () -> Unit,
     onAddSplit: (DbHolding) -> Unit,
     onUpdateSplit: (DbSplit, DbHolding) -> Unit,
     onDeleteSplit: (DbSplit) -> Unit,
@@ -79,8 +78,6 @@ internal fun SplitScreen(
             holdingError == null
       }
 
-  val isLoading = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
-
   holding.also { h ->
     if (h == null) {
       CircularProgressIndicator(
@@ -99,10 +96,14 @@ internal fun SplitScreen(
                 label = "Add Stock Split",
                 isAddVisible = isAddVisible,
                 items = splits,
-                isLoading = isLoading,
-                onRefresh = onRefresh,
                 onAddClicked = { onAddSplit(data) },
                 itemKey = { it.id.raw },
+                emptyState = {
+                  EmptyList(
+                      sections = PortfolioDigSections.SPLITS,
+                      onAddItem = { onAddSplit(data) },
+                  )
+                },
             ) { split ->
               SplitItem(
                   modifier =
@@ -124,21 +125,10 @@ internal fun SplitScreen(
           }
         }
         is Maybe.None -> {
-            Column(
-                modifier = modifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "Not in the DB",
-                )
-                Button(
-                    onClick = onAddNewHolding,
-                ) {
-                    Text(
-                        text = "Add to DB",
-                    )
-                }
-            }
+          NoHolding(
+              modifier = modifier,
+              onAddNewHolding = onAddNewHolding,
+          )
         }
       }
     }
@@ -201,7 +191,6 @@ private fun PreviewSplitScreen() {
               clock = clock,
           ),
       onAddSplit = {},
-      onRefresh = {},
       onDeleteSplit = {},
       onUpdateSplit = { _, _ -> },
       onSplitDeleteFinalized = {},

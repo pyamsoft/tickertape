@@ -39,16 +39,12 @@ import com.pyamsoft.tickertape.ui.test.TestClock
 fun DigPriceAlerts(
     modifier: Modifier = Modifier,
     state: PriceAlertDigViewState,
-    onRefresh: () -> Unit,
     onAddPriceAlert: () -> Unit,
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
   val loadingState by state.loadingState.collectAsState()
   val priceAlerts = state.priceAlerts.collectAsStateList()
-
-  val isRefreshing =
-      remember(loadingState) { loadingState == BaseDigViewState.LoadingState.LOADING }
 
   val isAddVisible = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.DONE }
 
@@ -57,8 +53,6 @@ fun DigPriceAlerts(
       label = "Add Position",
       isAddVisible = isAddVisible,
       items = priceAlerts,
-      isLoading = isRefreshing,
-      onRefresh = onRefresh,
       onAddClicked = onAddPriceAlert,
       itemKey = { it.id.raw },
   ) { priceAlert ->
@@ -87,7 +81,6 @@ private fun PreviewDigPriceAlerts() {
                   symbol = symbol,
                   clock = clock,
               ) {},
-      onRefresh = {},
       onAddPriceAlert = {},
       onDeletePriceAlert = {},
       onUpdatePriceAlert = {},

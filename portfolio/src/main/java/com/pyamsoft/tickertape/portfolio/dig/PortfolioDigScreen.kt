@@ -254,7 +254,6 @@ private fun Content(
             modifier = Modifier.fillMaxSize(),
             clock = clock,
             state = state,
-            onRefresh = onRefresh,
             onAddPosition = onPositionAdd,
             onDeletePosition = onPositionDelete,
             onUpdatePosition = onPositionUpdate,
@@ -274,7 +273,6 @@ private fun Content(
         SplitScreen(
             modifier = Modifier.fillMaxSize(),
             state = state,
-            onRefresh = onRefresh,
             onAddSplit = onSplitAdd,
             onDeleteSplit = onSplitDeleted,
             onUpdateSplit = onSplitUpdated,
@@ -303,7 +301,6 @@ private fun Content(
         DigPriceAlerts(
             modifier = Modifier.fillMaxSize(),
             state = state,
-            onRefresh = onRefresh,
             onAddPriceAlert = onAddPriceAlert,
             onUpdatePriceAlert = onUpdatePriceAlert,
             onDeletePriceAlert = onDeletePriceAlert,

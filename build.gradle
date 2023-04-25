@@ -44,7 +44,7 @@ buildscript {
 
     moshi = "1.14.0"
     retrofit = "2.9.0"
-    okhttp = "4.10.0"
+    okhttp = "4.11.0"
 
     // Compose
     compose_version = "1.4.2"

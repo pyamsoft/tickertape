@@ -60,7 +60,7 @@ buildscript {
     appCompat = "1.6.1"
 
     // Material Design
-    materialDesign = "1.8.0"
+    materialDesign = "1.9.0"
 
     // Vico charts
     vico = "1.6.5"

@@ -63,7 +63,7 @@ buildscript {
     materialDesign = "1.9.0"
 
     // Vico charts
-    vico = "1.6.5"
+    vico = "1.6.6"
   }
 }
 

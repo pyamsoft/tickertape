@@ -56,7 +56,7 @@ android {
 
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  ksp "com.google.dagger:dagger-compiler:$dagger"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
   ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   implementation "com.patrykandpatryk.vico:compose:1.6.6"

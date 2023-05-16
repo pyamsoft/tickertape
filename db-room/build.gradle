@@ -55,7 +55,7 @@ room {
 
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  ksp "com.google.dagger:dagger-compiler:$dagger"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
   ksp "androidx.room:room-compiler:${rootProject.ext.room}"
 
   // Room

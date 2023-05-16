@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.cachify.cachify
 import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.tickertape.stocks.api.KeyStatistics
 import com.pyamsoft.tickertape.stocks.api.SearchResult
@@ -37,14 +36,14 @@ import com.pyamsoft.tickertape.stocks.cache.OptionsCache
 import com.pyamsoft.tickertape.stocks.cache.StockCache
 import com.pyamsoft.tickertape.stocks.cache.createNewMemoryCacheStorage
 import com.pyamsoft.tickertape.stocks.scope.InternalStockApi
-import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class StockInteractorImpl
@@ -58,10 +57,10 @@ internal constructor(
 ) : StockInteractor, StockInteractor.Cache {
 
   private val trendingCache =
-      cachify<StockTrends, Int>(
+      multiCachify<Int, StockTrends, Int>(
           storage = { listOf(createNewMemoryCacheStorage()) },
-      ) {
-        interactor.getTrending(it)
+      ) { count ->
+        interactor.getTrending(count)
       }
 
   private val topCaches =
@@ -137,7 +136,7 @@ internal constructor(
       }
 
   override suspend fun getTrending(count: Int): StockTrends =
-      withContext(context = Dispatchers.IO) { trendingCache.call(count) }
+      withContext(context = Dispatchers.IO) { trendingCache.key(count).call(count) }
 
   override suspend fun invalidateTrending() =
       withContext(context = Dispatchers.IO) { trendingCache.clear() }

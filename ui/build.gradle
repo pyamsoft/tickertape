@@ -16,7 +16,6 @@
 
 plugins {
   id("com.android.library")
-  id("com.google.devtools.ksp")
 }
 
 //noinspection GroovyMissingReturnStatement
@@ -56,7 +55,6 @@ android {
 
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  ksp "com.google.dagger:dagger-compiler:$dagger"
 
   // AndroidX
   api "androidx.fragment:fragment-ktx:1.5.7"

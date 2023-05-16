@@ -51,7 +51,7 @@ android {
 
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  ksp "com.google.dagger:dagger-compiler:$dagger"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
 
   api "androidx.work:work-runtime:$workmanager"
   api "androidx.work:work-runtime-ktx:$workmanager"

@@ -81,8 +81,8 @@ android {
   }
 
   buildFeatures {
-    viewBinding true
     compose true
+    buildConfig true
   }
 
   composeOptions {
@@ -103,7 +103,7 @@ android {
 
 dependencies {
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  ksp "com.google.dagger:dagger-compiler:$dagger"
+  kapt "com.google.dagger:dagger-compiler:$dagger"
 
   // Leak Canary
   debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"

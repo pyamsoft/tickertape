@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.library"
+plugins {
+  id("com.android.library")
+  id("com.google.devtools.ksp")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -30,15 +33,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   buildFeatures {
@@ -47,17 +50,16 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion "$compose_compiler_version"
+    kotlinCompilerExtensionVersion "$composeCompiler"
   }
 }
 
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  ksp "com.google.dagger:dagger-compiler:$dagger"
+  ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
-  implementation "com.patrykandpatryk.vico:compose:$vico"
-
-  // Moshi
-  kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+  implementation "com.patrykandpatryk.vico:compose:1.6.6"
 
   implementation project(':db')
   implementation project(':stocks')

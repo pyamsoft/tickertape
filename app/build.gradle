@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.application"
+plugins {
+  id("com.android.application")
+  id("com.google.devtools.ksp")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -35,15 +38,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   signingConfigs {
@@ -83,7 +86,7 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion "$compose_compiler_version"
+    kotlinCompilerExtensionVersion "$composeCompiler"
   }
   packagingOptions {
     resources {
@@ -99,7 +102,8 @@ android {
 }
 
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  ksp "com.google.dagger:dagger-compiler:$dagger"
 
   // Leak Canary
   debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
@@ -124,6 +128,3 @@ dependencies {
   implementation project(':worker')
   implementation project(':worker-workmanager')
 }
-
-// Leave at bottom
-// apply plugin: 'com.google.gms.google-services'

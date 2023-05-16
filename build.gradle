@@ -24,8 +24,6 @@ buildscript {
 
     // Us
     pydroid = "26.4.1"
-    cachify = "0.3.0"
-    highlander = "0.2.1"
 
     // Jobs
     workmanager = "2.8.1"
@@ -33,37 +31,23 @@ buildscript {
     // Leak Canary
     leakCanary = "2.10"
 
-    // Logging
-    timber = "5.0.1"
-
     // Room
-    room = "2.5.0"
+    room = "2.5.1"
 
     // Dagger
     dagger = "2.46.1"
 
     moshi = "1.15.0"
     retrofit = "2.9.0"
-    okhttp = "4.11.0"
 
     // Compose
-    compose_version = "1.4.3"
-    compose_compiler_version = "1.4.7"
+    compose = "1.4.3"
+    composeCompiler = "1.4.7"
     composeActivity = "1.7.1"
     composeMaterial = "1.4.3"
     accompanist = "0.30.1"
-    coil = "2.3.0"
 
-    // AndroidX
-    core = "1.10.1"
-    fragment = "1.5.7"
-    appCompat = "1.6.1"
-
-    // Material Design
-    materialDesign = "1.9.0"
-
-    // Vico charts
-    vico = "1.6.6"
+    desugar = "2.0.3"
   }
 }
 
@@ -88,6 +72,10 @@ plugins {
   // Spotless
   // https://github.com/diffplug/spotless
   id "com.diffplug.spotless" version "6.18.0" apply false
+
+  // KSP
+  // https://github.com/google/ksp
+  id "com.google.devtools.ksp" version "1.8.21-1.0.11" apply false
 }
 
 subprojects {
@@ -95,42 +83,17 @@ subprojects {
   plugins.withType(com.android.build.gradle.api.AndroidBasePlugin) {
     // Apply Cache Fix
     project.apply plugin: "org.gradle.android.cache-fix"
-
-    // Apply Kotlin and Kapt
     project.apply plugin: 'kotlin-android'
-    project.apply plugin: 'kotlin-kapt'
-
-    // Kapt flags
-    kapt {
-      correctErrorTypes = true
-      useBuildCache = true
-      mapDiagnosticLocations = true
-
-      javacOptions {
-        option("-Xlint:unchecked")
-        option("-Xlint:deprecation")
-        option("-Xmaxerrs", 10000)
-      }
-    }
 
     // Configure matching toolchains
     // https://kotlinlang.org/docs/gradle-configure-project.html#2c42d1dc
     kotlin {
-      jvmToolchain(11)
+      jvmToolchain(17)
     }
     java {
       toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(17))
       }
-    }
-
-    dependencies {
-      // Apply core library desugaring at the most recent version
-      coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.3"
-
-      // Can't kapt dagger-compiler here, must do so in every module gradle
-      // or else Kotlin-Android through an error about the :app module. Odd I know.
-      // kapt "com.google.dagger:dagger-compiler:$dagger"
     }
   }
 }

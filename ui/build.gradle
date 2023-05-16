@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.library"
+plugins {
+  id("com.android.library")
+  id("com.google.devtools.ksp")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -30,15 +33,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   buildFeatures {
@@ -47,33 +50,34 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion "$compose_compiler_version"
+    kotlinCompilerExtensionVersion "$composeCompiler"
   }
 }
 
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  ksp "com.google.dagger:dagger-compiler:$dagger"
 
   // AndroidX
-  api "androidx.fragment:fragment-ktx:$fragment"
-  api "androidx.appcompat:appcompat:$appCompat"
+  api "androidx.fragment:fragment-ktx:1.5.7"
+  api "androidx.appcompat:appcompat:1.6.1"
 
   // Compose
-  api "androidx.compose.compiler:compiler:$compose_compiler_version"
+  api "androidx.compose.compiler:compiler:$composeCompiler"
   api "androidx.activity:activity-compose:$composeActivity"
-  api "androidx.compose.ui:ui:$compose_version"
+  api "androidx.compose.ui:ui:$compose"
   api "androidx.compose.material:material:$composeMaterial"
-  api "androidx.compose.animation:animation:$compose_version"
-  api "androidx.compose.ui:ui-tooling-preview:$compose_version"
-  debugApi "androidx.compose.ui:ui-tooling:$compose_version"
+  api "androidx.compose.animation:animation:$compose"
+  api "androidx.compose.ui:ui-tooling-preview:$compose"
+  debugApi "androidx.compose.ui:ui-tooling:$compose"
 
   // Uncomment for extended icons, then copy out to avoid entire dep
   // api "androidx.compose.material:material-icons-extended:$composeMaterial"
 
-  api "io.coil-kt:coil-compose-base:$coil"
+  api "io.coil-kt:coil-compose-base:2.3.0"
 
   // Material Design
-  api "com.google.android.material:material:$materialDesign"
+  api "com.google.android.material:material:1.9.0"
 
   // PYDroid
   api "com.github.pyamsoft.pydroid:ui:$pydroid"

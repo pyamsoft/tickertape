@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.library"
+plugins {
+  id("com.android.library")
+  id("com.google.devtools.ksp")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -30,15 +33,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   buildFeatures {
@@ -51,13 +54,14 @@ room {
 }
 
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  ksp "com.google.dagger:dagger-compiler:$dagger"
+  ksp "androidx.room:room-compiler:${rootProject.ext.room}"
 
   // Room
   // Need this format for variable resolution for AGP cache plugin fix
   implementation "androidx.room:room-runtime:${rootProject.ext.room}"
   implementation "androidx.room:room-ktx:${rootProject.ext.room}"
-  kapt "androidx.room:room-compiler:${rootProject.ext.room}"
 
   implementation project(':core')
   implementation project(':db')

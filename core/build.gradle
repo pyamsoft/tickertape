@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.library"
+plugins {
+  id("com.android.library")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -30,15 +32,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   buildFeatures {
@@ -47,27 +49,27 @@ android {
 }
 
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
 
   // Timber logging
-  api "com.jakewharton.timber:timber:$timber"
+  api "com.jakewharton.timber:timber:5.0.1"
 
   // PYDroid
   api "com.github.pyamsoft.pydroid:arch:$pydroid"
   api "com.github.pyamsoft.pydroid:util:$pydroid"
 
   // Cachify
-  api "com.github.pyamsoft:cachify:$cachify"
+  api "com.github.pyamsoft:cachify:0.3.0"
 
   // Highlander
-  api "com.github.pyamsoft:highlander:$highlander"
+  api "com.github.pyamsoft:highlander:0.2.1"
 
   // Android support library.
-  api "androidx.core:core-ktx:$core"
+  api "androidx.core:core-ktx:1.10.1"
 
   // Dagger
   api "com.google.dagger:dagger:$dagger"
 
   // Annotations
-  api "androidx.compose.runtime:runtime:$compose_version"
+  api "androidx.compose.runtime:runtime:$compose"
 }

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: "com.android.library"
+plugins {
+  id("com.android.library")
+  id("com.google.devtools.ksp")
+}
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -30,15 +33,15 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
   }
 
   buildFeatures {
@@ -46,28 +49,16 @@ android {
   }
 }
 
-// Kapt flags
-kapt {
-  correctErrorTypes = true
-  useBuildCache = true
-  mapDiagnosticLocations = true
-
-  javacOptions {
-    option("-Xlint:unchecked")
-    option("-Xlint:deprecation")
-    option("-Xmaxerrs", 10000)
-  }
-}
-
 dependencies {
-  kapt "com.google.dagger:dagger-compiler:$dagger"
+  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+  ksp "com.google.dagger:dagger-compiler:$dagger"
+  ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   // API for Dagger
   api "com.squareup.retrofit2:retrofit:$retrofit"
 
   // Moshi
   api "com.squareup.moshi:moshi:$moshi"
-  kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
   // Retrofit
   implementation "com.squareup.retrofit2:converter-moshi:$retrofit"

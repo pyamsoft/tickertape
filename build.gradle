@@ -29,7 +29,7 @@ buildscript {
     workmanager = "2.8.1"
 
     // Leak Canary
-    leakCanary = "2.10"
+    leakCanary = "2.11"
 
     // Room
     room = "2.5.1"

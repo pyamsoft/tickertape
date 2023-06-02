@@ -38,7 +38,7 @@ internal constructor(
 ) : SplitAddInteractor {
 
   override suspend fun submitSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val result = splitInsertDao.insert(split)
           ResultWrapper.success(result)
@@ -51,7 +51,7 @@ internal constructor(
       }
 
   override suspend fun loadExistingSplit(id: DbSplit.Id): ResultWrapper<DbSplit> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           when (val result = splitQueryDao.queryById(id)) {
             is Maybe.Data -> ResultWrapper.success(result.data)

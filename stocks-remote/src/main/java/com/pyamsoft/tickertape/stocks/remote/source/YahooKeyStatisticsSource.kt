@@ -53,7 +53,7 @@ internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyS
   }
 
   override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         if (symbols.isEmpty()) {
           return@withContext emptyList()
         }

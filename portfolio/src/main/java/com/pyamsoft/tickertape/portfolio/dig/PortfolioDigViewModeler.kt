@@ -347,7 +347,7 @@ internal constructor(
       return
     }
 
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
         return@launch
       }
@@ -419,18 +419,20 @@ internal constructor(
   }
 
   fun bind(scope: CoroutineScope) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor.watchPositions { onPositionChangeEvent(it) }
+    interactor.watchPositions().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { onPositionChangeEvent(it) } }
     }
 
-    scope.launch(context = Dispatchers.Main) { interactor.watchSplits { onSplitChangeEvent(it) } }
+    interactor.watchSplits().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { onSplitChangeEvent(it) } }
+    }
   }
 
   fun handleDeleteSplit(
       scope: CoroutineScope,
       split: DbSplit,
   ) {
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       interactor
           .deleteSplit(split)
           .onFailure { Timber.e(it, "Failed to delete split: $split") }
@@ -448,7 +450,7 @@ internal constructor(
       scope: CoroutineScope,
       position: DbPosition,
   ) {
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       interactor
           .deletePosition(position)
           .onFailure { Timber.e(it, "Failed to delete position: $position") }
@@ -557,7 +559,7 @@ internal constructor(
   fun handleAddTicker(scope: CoroutineScope) {
     val h = state.holding.value ?: return
 
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       when (h) {
         is Maybe.Data -> {
           Timber.w("Cannot delete existing holding: ${h.data.id} ${h.data.symbol}")

@@ -32,17 +32,17 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
   private val charts by lazy { Charts() }
 
   override suspend fun removeQuote(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) { quotes.remove(symbol) }
+      withContext(context = Dispatchers.Default) { quotes.remove(symbol) }
 
-  override suspend fun removeAllQuotes() = withContext(context = Dispatchers.IO) { quotes.clear() }
+  override suspend fun removeAllQuotes() = withContext(context = Dispatchers.Default) { quotes.clear() }
 
   override suspend fun getQuotes(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<StockQuote>
-  ): List<StockQuote> = withContext(context = Dispatchers.IO) { quotes.get(symbols, resolve) }
+  ): List<StockQuote> = withContext(context = Dispatchers.Default) { quotes.get(symbols, resolve) }
 
   override suspend fun removeChart(symbol: StockSymbol, range: StockChart.IntervalRange) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             ChartKey(
                 symbol = symbol,
@@ -51,14 +51,14 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
         return@withContext charts.remove(key)
       }
 
-  override suspend fun removeAllCharts() = withContext(context = Dispatchers.IO) { charts.clear() }
+  override suspend fun removeAllCharts() = withContext(context = Dispatchers.Default) { charts.clear() }
 
   override suspend fun getCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
       resolve: suspend (List<StockSymbol>, StockChart.IntervalRange) -> List<StockChart>
   ): List<StockChart> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val keys =
             symbols.map {
               ChartKey(

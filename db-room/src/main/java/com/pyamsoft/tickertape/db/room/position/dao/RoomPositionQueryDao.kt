@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomPositionQueryDao : PositionQueryDao {
 
   final override suspend fun query(): List<DbPosition> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+      withContext(context = Dispatchers.Default) { daoQuery() }
 
   @CheckResult
   @Transaction
@@ -40,7 +40,7 @@ internal abstract class RoomPositionQueryDao : PositionQueryDao {
   internal abstract suspend fun daoQuery(): List<RoomDbPosition>
 
   final override suspend fun queryById(id: DbPosition.Id): Maybe<out DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         when (val res = daoQueryById(id)) {
           null -> Maybe.None
           else -> Maybe.Data(res)
@@ -57,7 +57,7 @@ internal abstract class RoomPositionQueryDao : PositionQueryDao {
   internal abstract suspend fun daoQueryById(id: DbPosition.Id): RoomDbPosition?
 
   final override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbPosition> =
-      withContext(context = Dispatchers.IO) { daoQueryByHoldingId(id) }
+      withContext(context = Dispatchers.Default) { daoQueryByHoldingId(id) }
 
   @CheckResult
   @Query(

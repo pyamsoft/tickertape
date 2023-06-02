@@ -86,7 +86,7 @@ protected constructor(
             // Sort news articles by published date
             .map { news ->
               // Run Off main thread
-              return@map withContext(context = Dispatchers.IO) {
+              return@map withContext(context = Dispatchers.Default) {
                 news.sortedByDescending { it.publishedAt }
               }
             }
@@ -175,7 +175,7 @@ protected constructor(
 
   private suspend fun loadQuotesForRecommendations(recommendations: StockRecommendations) =
       coroutineScope {
-        launch(context = Dispatchers.Main) {
+        launch(context = Dispatchers.Default) {
           recommendationLookupRunner
               .call(recommendations)
               .onSuccess { rec ->
@@ -290,7 +290,7 @@ protected constructor(
     state.optionsExpirationDate.value = date
 
     // Reload options
-    scope.launch(context = Dispatchers.Main) { loadOptionsChain(false) }
+    scope.launch(context = Dispatchers.Default) { loadOptionsChain(false) }
   }
 
   fun handleChartRangeSelected(

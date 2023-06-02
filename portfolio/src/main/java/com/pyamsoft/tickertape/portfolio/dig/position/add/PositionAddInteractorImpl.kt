@@ -40,7 +40,7 @@ internal constructor(
   override suspend fun submitPosition(
       position: DbPosition
   ): ResultWrapper<DbInsert.InsertResult<DbPosition>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val result = positionInsertDao.insert(position)
           ResultWrapper.success(result)
@@ -53,7 +53,7 @@ internal constructor(
       }
 
   override suspend fun loadExistingPosition(id: DbPosition.Id): ResultWrapper<DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           when (val result = positionQueryDao.queryById(id)) {
             is Maybe.Data -> ResultWrapper.success(result.data)

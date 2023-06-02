@@ -49,7 +49,7 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
   }
 
   override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
         for (s in symbols) {
           val resp =

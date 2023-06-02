@@ -37,7 +37,7 @@ internal abstract class RoomPositionInsertDao : PositionInsertDao {
 
   @Transaction
   override suspend fun insert(o: DbPosition): DbInsert.InsertResult<DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomPosition = RoomDbPosition.create(o)
         return@withContext if (daoQuery(roomPosition.id) == null) {
           if (daoInsert(roomPosition) != ROOM_ROW_ID_INSERT_INVALID) {

@@ -25,11 +25,12 @@ import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class HoldingDbImpl
@@ -84,7 +85,7 @@ internal constructor(
   override val realtime: HoldingRealtime = this
 
   override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         queryCache.clear()
         queryByIdCache.clear()
         queryBySymbolCache.clear()
@@ -92,7 +93,7 @@ internal constructor(
       }
 
   override suspend fun invalidateByHoldingId(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -101,7 +102,7 @@ internal constructor(
       }
 
   override suspend fun invalidateBySymbol(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryBySymbolKey(
                 symbol = symbol,
@@ -110,7 +111,7 @@ internal constructor(
       }
 
   override suspend fun invalidateByTradeSide(symbol: StockSymbol, side: TradeSide) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByTradeSideKey(
                 symbol = symbol,
@@ -119,14 +120,15 @@ internal constructor(
         queryByTradeSideCache.key(key).clear()
       }
 
-  override suspend fun listenForChanges(onChange: (event: HoldingChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) { onEvent(onChange) }
+  override fun listenForChanges(): Flow<HoldingChangeEvent> {
+    return subscribe()
+  }
 
   override suspend fun query(): List<DbHolding> =
-      withContext(context = Dispatchers.IO) { queryCache.call() }
+      withContext(context = Dispatchers.Default) { queryCache.call() }
 
   override suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -135,7 +137,7 @@ internal constructor(
       }
 
   override suspend fun queryBySymbol(symbol: StockSymbol): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryBySymbolKey(
                 symbol = symbol,
@@ -147,7 +149,7 @@ internal constructor(
       symbol: StockSymbol,
       side: TradeSide
   ): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByTradeSideKey(
                 symbol = symbol,
@@ -157,7 +159,7 @@ internal constructor(
       }
 
   override suspend fun insert(o: DbHolding): DbInsert.InsertResult<DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
@@ -175,7 +177,7 @@ internal constructor(
       }
 
   override suspend fun delete(o: DbHolding, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()

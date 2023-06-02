@@ -16,7 +16,10 @@
 
 package com.pyamsoft.tickertape.db
 
+import androidx.annotation.CheckResult
+import kotlinx.coroutines.flow.Flow
+
 interface DbRealtime<T : Any> {
 
-  suspend fun listenForChanges(onChange: (event: T) -> Unit)
+  @CheckResult fun listenForChanges(): Flow<T>
 }

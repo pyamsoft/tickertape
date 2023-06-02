@@ -16,9 +16,9 @@
 
 package com.pyamsoft.tickertape.db
 
-import com.pyamsoft.pydroid.bus.EventBus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.bus.internal.DefaultEventBus
+import kotlinx.coroutines.flow.Flow
 
 internal abstract class BaseDbImpl<
     ChangeEvent : Any,
@@ -28,13 +28,11 @@ internal abstract class BaseDbImpl<
     D : DbDelete<*>,
 > protected constructor() : BaseDb<R, Q, I, D> {
 
-  private val bus = EventBus.create<ChangeEvent>()
+  private val bus = DefaultEventBus<ChangeEvent>()
 
-  protected suspend fun onEvent(onEvent: (event: ChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) {
-        return@withContext bus.onEvent { onEvent(it) }
-      }
+  @CheckResult protected fun subscribe(): Flow<ChangeEvent> = bus
 
-  protected suspend fun publish(event: ChangeEvent) =
-      withContext(context = Dispatchers.IO) { bus.send(event) }
+  protected suspend fun publish(event: ChangeEvent) {
+    bus.emit(event)
+  }
 }

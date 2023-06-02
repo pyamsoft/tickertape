@@ -170,7 +170,7 @@ internal constructor(
     }
 
     s.isSubmitting.value = true
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       val split = resolveSplit(existingSplit)
       interactor
           .submitSplit(split)
@@ -212,7 +212,7 @@ internal constructor(
 
   fun bind(scope: CoroutineScope) {
     onBind { existingId ->
-      scope.launch(context = Dispatchers.Main) {
+      scope.launch(context = Dispatchers.Default) {
         interactor
             .loadExistingSplit(existingId)
             .onFailure { Timber.e(it, "Failed to load existing split") }

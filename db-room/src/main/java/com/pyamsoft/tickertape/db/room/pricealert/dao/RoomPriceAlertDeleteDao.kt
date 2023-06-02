@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomPriceAlertDeleteDao : PriceAlertDeleteDao {
 
   override suspend fun delete(o: PriceAlert, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomPriceAlert = RoomPriceAlert.create(o)
         return@withContext daoDelete(roomPriceAlert) > 0
       }

@@ -124,17 +124,17 @@ abstract class StockRemoteModule {
     @Provides
     @JvmStatic
     @CheckResult
-    @NasdaqApi
-    internal fun provideNews(@Named("xml") serviceCreator: NetworkServiceCreator): NewsService {
-      return serviceCreator.create(NewsService::class)
+    @Named("moshi_converter")
+    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
+      return MoshiConverterFactory.create(moshi)
     }
 
     @Provides
     @JvmStatic
     @CheckResult
-    @Named("moshi_converter")
-    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
-      return MoshiConverterFactory.create(moshi)
+    @NasdaqApi
+    internal fun provideNews(@Named("xml") serviceCreator: NetworkServiceCreator): NewsService {
+      return serviceCreator.create(NewsService::class)
     }
 
     @Provides

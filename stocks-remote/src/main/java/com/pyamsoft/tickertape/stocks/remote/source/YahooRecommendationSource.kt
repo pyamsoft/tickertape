@@ -35,7 +35,7 @@ internal class YahooRecommendationSource
 internal constructor(@YahooApi private val service: RecommendationService) : RecommendationSource {
 
   override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val resp = service.getRecommendations(symbol = symbol.raw)
           val rec = resp.finance.result.first()

@@ -23,14 +23,15 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.holding.HoldingChangeEvent
 import com.pyamsoft.tickertape.db.position.PositionChangeEvent
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
+import kotlinx.coroutines.flow.Flow
 
 interface PortfolioInteractor {
 
-  suspend fun listenForHoldingChanges(onChange: (event: HoldingChangeEvent) -> Unit)
+  @CheckResult fun listenForHoldingChanges(): Flow<HoldingChangeEvent>
 
-  suspend fun listenForPositionChanges(onChange: (event: PositionChangeEvent) -> Unit)
+  @CheckResult fun listenForPositionChanges(): Flow<PositionChangeEvent>
 
-  suspend fun listenForSplitChanges(onChange: (event: SplitChangeEvent) -> Unit)
+  @CheckResult fun listenForSplitChanges(): Flow<SplitChangeEvent>
 
   @CheckResult suspend fun getPortfolio(): ResultWrapper<List<PortfolioStock>>
 

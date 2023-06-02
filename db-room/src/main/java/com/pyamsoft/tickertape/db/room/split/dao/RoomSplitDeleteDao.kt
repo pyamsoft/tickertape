@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomSplitDeleteDao : SplitDeleteDao {
 
   override suspend fun delete(o: DbSplit, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomSplit = RoomDbSplit.create(o)
         return@withContext daoDelete(roomSplit) > 0
       }

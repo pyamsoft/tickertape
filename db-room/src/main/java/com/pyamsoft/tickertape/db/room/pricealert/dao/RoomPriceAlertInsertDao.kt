@@ -37,7 +37,7 @@ internal abstract class RoomPriceAlertInsertDao : PriceAlertInsertDao {
 
   @Transaction
   override suspend fun insert(o: PriceAlert): DbInsert.InsertResult<PriceAlert> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomPriceAlert = RoomPriceAlert.create(o)
         return@withContext if (daoQuery(roomPriceAlert.id) == null) {
           if (daoInsert(roomPriceAlert) != ROOM_ROW_ID_INSERT_INVALID) {

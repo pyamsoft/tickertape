@@ -241,20 +241,20 @@ internal constructor(
       scope: CoroutineScope,
       onMainSelectionEvent: () -> Unit,
   ) {
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForHoldingChanges { handleHoldingRealtimeEvent(it) }
+    interactor.listenForHoldingChanges().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { handleHoldingRealtimeEvent(it) } }
     }
 
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForPositionChanges { handlePositionRealtimeEvent(it) }
+    interactor.listenForPositionChanges().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { handlePositionRealtimeEvent(it) } }
     }
 
-    scope.launch(context = Dispatchers.Main) {
-      interactor.listenForSplitChanges { handleSplitRealtimeEvent(it) }
+    interactor.listenForSplitChanges().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { handleSplitRealtimeEvent(it) } }
     }
 
-    scope.launch(context = Dispatchers.Main) {
-      mainSelectionConsumer.onEvent { event ->
+    scope.launch(context = Dispatchers.Default) {
+      mainSelectionConsumer.collect { event ->
         if (event.page == MainPage.Portfolio) {
           onMainSelectionEvent()
         }
@@ -269,7 +269,7 @@ internal constructor(
       return
     }
 
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       if (state.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
         return@launch
       }

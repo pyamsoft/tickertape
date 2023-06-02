@@ -38,7 +38,7 @@ internal constructor(
 ) : SearchSource {
 
   override suspend fun search(query: String): List<SearchResult> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         if (query.isBlank()) {
           return@withContext emptyList()
         }

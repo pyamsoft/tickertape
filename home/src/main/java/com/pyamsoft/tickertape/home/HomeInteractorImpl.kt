@@ -50,13 +50,13 @@ internal constructor(
   }
 
   override suspend fun invalidateScreener(screener: StockScreener) =
-      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateScreener(screener) }
+      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateScreener(screener) }
 
   override suspend fun getScreener(
       screener: StockScreener,
       count: Int
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val top = stockInteractor.getScreener(screener, count)
           lookupCharts(top.quotes.map { it.symbol })
@@ -72,7 +72,7 @@ internal constructor(
   override suspend fun getTrending(
       count: Int,
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val trend = stockInteractor.getTrending(count)
           lookupCharts(trend.symbols)
@@ -85,7 +85,7 @@ internal constructor(
       }
 
   override suspend fun invalidateTrending() =
-      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateTrending() }
+      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateTrending() }
 
   companion object {
 

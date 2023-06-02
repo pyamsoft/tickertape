@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomPriceAlertQueryDao : PriceAlertQueryDao {
 
   final override suspend fun query(): List<PriceAlert> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+      withContext(context = Dispatchers.Default) { daoQuery() }
 
   @CheckResult
   @Transaction
@@ -38,7 +38,7 @@ internal abstract class RoomPriceAlertQueryDao : PriceAlertQueryDao {
   internal abstract suspend fun daoQuery(): List<RoomPriceAlert>
 
   final override suspend fun queryActive(): List<PriceAlert> =
-      withContext(context = Dispatchers.IO) { daoQueryActive() }
+      withContext(context = Dispatchers.Default) { daoQueryActive() }
 
   @CheckResult
   @Transaction

@@ -38,13 +38,13 @@ internal abstract class BaseMemoryCacheImpl<K : Any, V : Any> protected construc
   @CheckResult protected abstract fun getSymbolFromKey(key: K): StockSymbol
 
   suspend fun remove(key: K) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         mutex.withLock { cache[key]?.clear() }
         return@withContext
       }
 
   suspend fun clear() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         mutex.withLock { cache.clear() }
         return@withContext
       }
@@ -54,7 +54,7 @@ internal abstract class BaseMemoryCacheImpl<K : Any, V : Any> protected construc
       keys: List<K>,
       crossinline resolve: suspend (List<StockSymbol>) -> List<V>,
   ): List<V> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         mutex.withLock {
           val result = mutableListOf<V>()
           val stillNeeded = mutableListOf<StockSymbol>()

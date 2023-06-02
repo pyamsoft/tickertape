@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomHoldingDeleteDao : HoldingDeleteDao {
 
   override suspend fun delete(o: DbHolding, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomHolding = RoomDbHolding.create(o)
         return@withContext daoDelete(roomHolding) > 0
       }

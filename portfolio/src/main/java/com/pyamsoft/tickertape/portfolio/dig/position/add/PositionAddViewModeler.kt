@@ -149,7 +149,7 @@ internal constructor(
     }
 
     s.isSubmitting.value = true
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       val position = resolvePosition(existingPosition)
       interactor
           .submitPosition(position)
@@ -210,7 +210,7 @@ internal constructor(
 
   fun bind(scope: CoroutineScope) {
     onBind { existingId ->
-      scope.launch(context = Dispatchers.Main) {
+      scope.launch(context = Dispatchers.Default) {
         interactor
             .loadExistingPosition(existingId)
             .onFailure { Timber.e(it, "Failed to load existing position") }

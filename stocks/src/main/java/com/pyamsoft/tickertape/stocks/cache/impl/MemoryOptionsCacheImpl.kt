@@ -37,14 +37,14 @@ internal class MemoryOptionsCacheImpl @Inject internal constructor() :
   override suspend fun removeOption(
       symbol: StockSymbol,
       expirationDate: LocalDate?,
-  ) = withContext(context = Dispatchers.IO) { remove(OptionsKey(symbol, expirationDate)) }
+  ) = withContext(context = Dispatchers.Default) { remove(OptionsKey(symbol, expirationDate)) }
 
   override suspend fun getOptions(
       symbols: List<StockSymbol>,
       expirationDate: LocalDate?,
       resolve: suspend (List<StockSymbol>, LocalDate?) -> List<StockOptions>
   ): List<StockOptions> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val keys =
             symbols.map { s ->
               OptionsKey(

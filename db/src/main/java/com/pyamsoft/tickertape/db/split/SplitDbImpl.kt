@@ -24,11 +24,12 @@ import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class SplitDbImpl
@@ -76,14 +77,14 @@ internal constructor(
   override val realtime: SplitRealtime = this
 
   override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         queryCache.clear()
         queryByIdCache.clear()
         queryByHoldingIdCache.clear()
       }
 
   override suspend fun invalidateById(id: DbSplit.Id) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -92,7 +93,7 @@ internal constructor(
       }
 
   override suspend fun invalidateByHoldingId(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByHoldingIdKey(
                 id = id,
@@ -100,14 +101,15 @@ internal constructor(
         return@withContext queryByHoldingIdCache.key(key).clear()
       }
 
-  override suspend fun listenForChanges(onChange: (event: SplitChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) { onEvent(onChange) }
+  override fun listenForChanges(): Flow<SplitChangeEvent> {
+    return subscribe()
+  }
 
   override suspend fun query(): List<DbSplit> =
-      withContext(context = Dispatchers.IO) { queryCache.call() }
+      withContext(context = Dispatchers.Default) { queryCache.call() }
 
   override suspend fun queryById(id: DbSplit.Id): Maybe<out DbSplit> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -116,7 +118,7 @@ internal constructor(
       }
 
   override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbSplit> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByHoldingIdKey(
                 id = id,
@@ -125,7 +127,7 @@ internal constructor(
       }
 
   override suspend fun insert(o: DbSplit): DbInsert.InsertResult<DbSplit> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
@@ -143,7 +145,7 @@ internal constructor(
       }
 
   override suspend fun delete(o: DbSplit, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()

@@ -40,7 +40,7 @@ internal constructor(
 ) : WorkerQueue {
 
   override suspend fun enqueue(type: WorkJobType) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val builder: WorkRequest.Builder<*, *> =
             when (type) {
               WorkJobType.REPEAT_BIG_MOVERS ->
@@ -72,7 +72,7 @@ internal constructor(
       }
 
   override suspend fun cancel(type: WorkJobType) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
 
         // Resolve the WorkManager instance
         Timber.d("Cancel work by tag: $type")

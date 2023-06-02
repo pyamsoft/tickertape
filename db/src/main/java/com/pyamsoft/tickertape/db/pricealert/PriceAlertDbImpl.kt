@@ -21,11 +21,12 @@ import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class PriceAlertDbImpl
@@ -67,25 +68,26 @@ internal constructor(
   override val realtime: PriceAlertRealtime = this
 
   override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         queryCache.clear()
         queryActiveCache.clear()
       }
 
   override suspend fun invalidateActive() =
-      withContext(context = Dispatchers.IO) { queryActiveCache.clear() }
+      withContext(context = Dispatchers.Default) { queryActiveCache.clear() }
 
-  override suspend fun listenForChanges(onChange: (event: PriceAlertChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) { onEvent(onChange) }
+  override fun listenForChanges(): Flow<PriceAlertChangeEvent> {
+    return subscribe()
+  }
 
   override suspend fun query(): List<PriceAlert> =
-      withContext(context = Dispatchers.IO) { queryCache.call() }
+      withContext(context = Dispatchers.Default) { queryCache.call() }
 
   override suspend fun queryActive(): List<PriceAlert> =
-      withContext(context = Dispatchers.IO) { queryActiveCache.call() }
+      withContext(context = Dispatchers.Default) { queryActiveCache.call() }
 
   override suspend fun insert(o: PriceAlert): DbInsert.InsertResult<PriceAlert> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
@@ -103,7 +105,7 @@ internal constructor(
       }
 
   override suspend fun delete(o: PriceAlert, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()

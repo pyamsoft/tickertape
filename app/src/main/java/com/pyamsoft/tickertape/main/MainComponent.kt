@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.main
 import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bus.EventBus
 import com.pyamsoft.pydroid.bus.EventConsumer
+import com.pyamsoft.pydroid.bus.internal.DefaultEventBus
 import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.notification.NotificationComponent
@@ -70,7 +71,7 @@ internal interface MainComponent {
       @CheckResult
       @ActivityScope
       internal fun provideMainSelectionEventBus(): EventBus<MainSelectionEvent> {
-        return EventBus.create()
+        return DefaultEventBus()
       }
     }
   }

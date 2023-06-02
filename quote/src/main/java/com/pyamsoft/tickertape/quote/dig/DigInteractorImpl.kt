@@ -48,7 +48,7 @@ protected constructor(
   final override suspend fun getRecommendations(
       symbol: StockSymbol
   ): ResultWrapper<StockRecommendations> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(stockInteractor.getRecommendations(symbol))
         } catch (e: Throwable) {
@@ -60,12 +60,12 @@ protected constructor(
       }
 
   final override suspend fun invalidateRecommendations(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         stockInteractorCache.invalidateRecommendations(symbol)
       }
 
   final override suspend fun getStatistics(symbol: StockSymbol): ResultWrapper<KeyStatistics> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(
                   stockInteractor.getKeyStatistics(listOf(symbol)),
@@ -81,14 +81,14 @@ protected constructor(
       }
 
   final override suspend fun invalidateStatistics(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         stockInteractorCache.invalidateStatistics(listOf(symbol))
       }
 
   final override suspend fun getNews(
       symbol: StockSymbol,
   ): ResultWrapper<StockNewsList> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(
               stockInteractor
@@ -105,13 +105,13 @@ protected constructor(
       }
 
   final override suspend fun invalidateNews(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateNews(listOf(symbol)) }
+      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateNews(listOf(symbol)) }
 
   final override suspend fun getChart(
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
   ): ResultWrapper<Ticker> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         getCharts(
                 symbols = listOf(symbol),
                 range = range,
@@ -124,7 +124,7 @@ protected constructor(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           interactor.getCharts(
               symbols = symbols,
@@ -142,10 +142,10 @@ protected constructor(
   final override suspend fun invalidateChart(
       symbol: StockSymbol,
       range: StockChart.IntervalRange,
-  ) = withContext(context = Dispatchers.IO) { invalidateCharts(listOf(symbol), range) }
+  ) = withContext(context = Dispatchers.Default) { invalidateCharts(listOf(symbol), range) }
 
   final override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-  ) = withContext(context = Dispatchers.IO) { interactorCache.invalidateCharts(symbols, range) }
+  ) = withContext(context = Dispatchers.Default) { interactorCache.invalidateCharts(symbols, range) }
 }

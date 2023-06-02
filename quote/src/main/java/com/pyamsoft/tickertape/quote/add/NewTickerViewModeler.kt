@@ -89,7 +89,7 @@ internal constructor(
     }
 
     val sym = symbol.uppercase()
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       tickerResolutionRunner
           .call(false, sym)
           .onSuccess { Timber.d("Resolved ticker for $sym $it") }
@@ -124,7 +124,7 @@ internal constructor(
       return
     }
 
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       symbolLookupRunner
           .call(false, symbol)
           .onFailure { Timber.e(it, "Error looking up results for $symbol") }
@@ -201,7 +201,7 @@ internal constructor(
 
   private fun performLookupOptionData(scope: CoroutineScope, symbol: StockSymbol) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       optionLookupRunner
           .call(false, symbol, s.optionExpirationDate.value)
           .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
@@ -351,7 +351,7 @@ internal constructor(
     }
 
     s.apply {
-      scope.launch(context = Dispatchers.Main) {
+      scope.launch(context = Dispatchers.Default) {
         if (!s.canSubmit.first()) {
           Timber.w("Cannot process submit")
           return@launch

@@ -53,7 +53,7 @@ protected constructor(
     ) {
       val deleted = recentlyDeleted.getAndUpdate { null }
       if (deleted != null) {
-        scope.launch(context = Dispatchers.Main) {
+        scope.launch(context = Dispatchers.Default) {
           restore(deleted)
               .onFailure { Timber.e(it, "Error when restoring $deleted") }
               .onSuccess { result ->

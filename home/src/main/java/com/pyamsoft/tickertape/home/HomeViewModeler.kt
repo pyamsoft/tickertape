@@ -98,7 +98,7 @@ internal constructor(
 
   fun handleFetchPortfolio(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       s.isLoadingPortfolio.value = HomeBaseViewState.LoadingState.LOADING
 
       if (force) {
@@ -126,7 +126,7 @@ internal constructor(
 
   fun handleFetchIndexes(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       s.isLoadingIndexes.value = HomeBaseViewState.LoadingState.LOADING
 
       if (force) {
@@ -161,7 +161,7 @@ internal constructor(
 
   fun handleFetchGainers(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.DAY_GAINERS,
@@ -178,7 +178,7 @@ internal constructor(
 
   fun handleFetchGrowthTech(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.GROWTH_TECHNOLOGY_STOCKS,
@@ -195,7 +195,7 @@ internal constructor(
 
   fun handleFetchUndervaluedGrowth(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.UNDERVALUED_GROWTH_STOCKS,
@@ -212,7 +212,7 @@ internal constructor(
 
   fun handleFetchMostActive(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.MOST_ACTIVES,
@@ -229,7 +229,7 @@ internal constructor(
 
   fun handleFetchLosers(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.DAY_LOSERS,
@@ -246,7 +246,7 @@ internal constructor(
 
   fun handleFetchMostShorted(scope: CoroutineScope, force: Boolean) {
     val s = state
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
           StockScreener.MOST_SHORTED_STOCKS,
@@ -264,7 +264,7 @@ internal constructor(
   fun handleFetchTrending(scope: CoroutineScope, force: Boolean) {
     val s = state
     s.isLoadingTrending.value = HomeBaseViewState.LoadingState.LOADING
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       if (force) {
         homeInteractorCache.invalidateTrending()
       }

@@ -38,10 +38,8 @@ internal constructor(
   fun bind(scope: CoroutineScope) {
     val s = state
 
-    scope.launch(context = Dispatchers.Main) {
-      bigMoverPreferences.listenForBigMoverNotificationChanged().collect {
-        s.isBigMoverEnabled.value = it
-      }
+    bigMoverPreferences.listenForBigMoverNotificationChanged().also { f ->
+      scope.launch(context = Dispatchers.Default) { f.collect { s.isBigMoverEnabled.value = it } }
     }
   }
 
@@ -67,10 +65,10 @@ internal constructor(
 
   fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
     val newEnabled = state.isBigMoverEnabled.updateAndGet { !it }
+    bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
 
     // Fire pref change
-    scope.launch(context = Dispatchers.Main) {
-      bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
+    scope.launch(context = Dispatchers.Default) {
 
       // Cancel existing alarms
       workerQueue.cancel(WorkJobType.REPEAT_BIG_MOVERS)

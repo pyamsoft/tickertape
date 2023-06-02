@@ -39,6 +39,7 @@ import com.pyamsoft.tickertape.quote.dig.DigInteractorImpl
 import com.pyamsoft.tickertape.stocks.StockInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -77,7 +78,7 @@ internal constructor(
   override suspend fun restorePosition(
       position: DbPosition
   ): ResultWrapper<DbInsert.InsertResult<DbPosition>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(positionInsertDao.insert(position))
         } catch (e: Throwable) {
@@ -89,7 +90,7 @@ internal constructor(
       }
 
   override suspend fun restoreSplit(split: DbSplit): ResultWrapper<DbInsert.InsertResult<DbSplit>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(splitInsertDao.insert(split))
         } catch (e: Throwable) {
@@ -101,7 +102,7 @@ internal constructor(
       }
 
   override suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(positionDeleteDao.delete(position, offerUndo = true))
         } catch (e: Throwable) {
@@ -113,7 +114,7 @@ internal constructor(
       }
 
   override suspend fun deleteSplit(split: DbSplit): ResultWrapper<Boolean> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           ResultWrapper.success(splitDeleteDao.delete(split, offerUndo = true))
         } catch (e: Throwable) {
@@ -124,14 +125,16 @@ internal constructor(
         }
       }
 
-  override suspend fun watchSplits(onEvent: (SplitChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) { splitRealtime.listenForChanges(onEvent) }
+  override fun watchPositions(): Flow<PositionChangeEvent> {
+    return positionRealtime.listenForChanges()
+  }
 
-  override suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.Default) { positionRealtime.listenForChanges(onEvent) }
+  override fun watchSplits(): Flow<SplitChangeEvent> {
+    return splitRealtime.listenForChanges()
+  }
 
   override suspend fun getHolding(symbol: StockSymbol): ResultWrapper<Maybe<out DbHolding>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           return@withContext ResultWrapper.success(holdingQueryDao.queryBySymbol(symbol))
         } catch (e: Throwable) {
@@ -143,10 +146,10 @@ internal constructor(
       }
 
   override suspend fun invalidateHolding(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) { holdingQueryDaoCache.invalidateBySymbol(symbol) }
+      withContext(context = Dispatchers.Default) { holdingQueryDaoCache.invalidateBySymbol(symbol) }
 
   override suspend fun getPositions(id: DbHolding.Id): ResultWrapper<List<DbPosition>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val positions = positionQueryDao.queryByHoldingId(id)
           ResultWrapper.success(positions)
@@ -159,10 +162,10 @@ internal constructor(
       }
 
   override suspend fun invalidatePositions(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) { positionQueryDaoCache.invalidateByHoldingId(id) }
+      withContext(context = Dispatchers.Default) { positionQueryDaoCache.invalidateByHoldingId(id) }
 
   override suspend fun getSplits(id: DbHolding.Id): ResultWrapper<List<DbSplit>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val splits = splitQueryDao.queryByHoldingId(id)
           ResultWrapper.success(splits)
@@ -175,5 +178,5 @@ internal constructor(
       }
 
   override suspend fun invalidateSplits(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) { splitQueryDaoCache.invalidateByHoldingId(id) }
+      withContext(context = Dispatchers.Default) { splitQueryDaoCache.invalidateByHoldingId(id) }
 }

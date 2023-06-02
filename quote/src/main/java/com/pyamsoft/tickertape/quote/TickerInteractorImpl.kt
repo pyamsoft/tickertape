@@ -51,7 +51,7 @@ internal constructor(
       range: StockChart.IntervalRange?,
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         // If we have no symbols, don't even make the trip
         if (symbols.isEmpty()) {
           return@withContext ResultWrapper.success(emptyList())
@@ -126,7 +126,7 @@ internal constructor(
     }
 
     if (options.notifyBigMovers) {
-      launch(context = Dispatchers.IO) {
+      launch(context = Dispatchers.Default) {
         wrapped("Error during big-mover refresh") {
           bigMoverStandalone.notifyBigMovers(
               quotes = tickers.mapNotNull { it.quote },
@@ -140,7 +140,7 @@ internal constructor(
       symbols: List<StockSymbol>,
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         getTickers(
             symbols = symbols,
             range = null,
@@ -149,10 +149,10 @@ internal constructor(
       }
 
   override suspend fun invalidateQuotes(symbols: List<StockSymbol>) =
-      withContext(context = Dispatchers.IO) { interactorCache.invalidateQuotes(symbols) }
+      withContext(context = Dispatchers.Default) { interactorCache.invalidateQuotes(symbols) }
 
   override suspend fun invalidateAllQuotes() =
-      withContext(context = Dispatchers.IO) { interactorCache.invalidateAllQuotes() }
+      withContext(context = Dispatchers.Default) { interactorCache.invalidateAllQuotes() }
 
   @CheckResult
   override suspend fun getCharts(
@@ -160,7 +160,7 @@ internal constructor(
       range: StockChart.IntervalRange,
       options: TickerInteractor.Options?,
   ): ResultWrapper<List<Ticker>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         getTickers(
             symbols = symbols,
             range = range,
@@ -171,10 +171,10 @@ internal constructor(
   override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange
-  ) = withContext(context = Dispatchers.IO) { interactorCache.invalidateCharts(symbols, range) }
+  ) = withContext(context = Dispatchers.Default) { interactorCache.invalidateCharts(symbols, range) }
 
   override suspend fun invalidateAllCharts() =
-      withContext(context = Dispatchers.IO) { interactorCache.invalidateAllCharts() }
+      withContext(context = Dispatchers.Default) { interactorCache.invalidateAllCharts() }
 
   companion object {
 

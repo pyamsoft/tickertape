@@ -135,7 +135,7 @@ internal constructor(
       symbols: List<StockSymbol>,
       expirationDate: LocalDate?
   ): List<StockOptions> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val jobs =
             mutableListOf<Deferred<StockOptions>>().apply {
               for (symbol in symbols) {

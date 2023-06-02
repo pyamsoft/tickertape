@@ -50,7 +50,7 @@ internal class YahooQuoteSource
 internal constructor(@YahooApi private val service: QuoteService) : QuoteSource {
 
   override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val result =
             service.getQuotes(
                 fields = YF_QUOTE_FIELDS,

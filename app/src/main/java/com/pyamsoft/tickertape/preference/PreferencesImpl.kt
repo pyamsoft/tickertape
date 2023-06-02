@@ -20,13 +20,16 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.ThreadEnforcer
-import com.pyamsoft.pydroid.util.booleanFlow
+import com.pyamsoft.pydroid.util.preferenceBooleanFlow
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class PreferencesImpl
@@ -41,17 +44,22 @@ internal constructor(
     PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
   }
 
-  override suspend fun setBigMoverNotificationEnabled(enabled: Boolean) =
-      withContext(context = Dispatchers.IO) {
-        preferences.edit { putBoolean(BigMovers.KEY_NOTIFICATION_ENABLED, enabled) }
-      }
+  private val scope by lazy {
+    CoroutineScope(
+        context = SupervisorJob() + Dispatchers.IO + CoroutineName(this::class.java.name),
+    )
+  }
 
-  override suspend fun listenForBigMoverNotificationChanged(): Flow<Boolean> =
-      withContext(context = Dispatchers.IO) {
-        preferences.booleanFlow(
-            BigMovers.KEY_NOTIFICATION_ENABLED,
-            BigMoverPreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
-        )
+  override fun setBigMoverNotificationEnabled(enabled: Boolean) {
+    scope.launch { preferences.edit { putBoolean(BigMovers.KEY_NOTIFICATION_ENABLED, enabled) } }
+  }
+
+  override fun listenForBigMoverNotificationChanged(): Flow<Boolean> =
+      preferenceBooleanFlow(
+          BigMovers.KEY_NOTIFICATION_ENABLED,
+          BigMoverPreferences.VALUE_DEFAULT_NOTIFICATION_ENABLED,
+      ) {
+        preferences
       }
 
   private object BigMovers {

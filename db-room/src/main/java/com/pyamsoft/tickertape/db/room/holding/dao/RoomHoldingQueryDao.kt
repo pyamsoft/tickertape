@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
 
   final override suspend fun query(): List<DbHolding> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+      withContext(context = Dispatchers.Default) { daoQuery() }
 
   @CheckResult
   @Transaction
@@ -41,7 +41,7 @@ internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
   internal abstract suspend fun daoQuery(): List<RoomDbHolding>
 
   final override suspend fun queryById(id: DbHolding.Id): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         when (val res = daoQueryById(id)) {
           null -> Maybe.None
           else -> Maybe.Data(res)
@@ -58,7 +58,7 @@ internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
   internal abstract suspend fun daoQueryById(id: DbHolding.Id): RoomDbHolding?
 
   final override suspend fun queryBySymbol(symbol: StockSymbol): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         when (val res = daoQueryBySymbol(symbol)) {
           null -> Maybe.None
           else -> Maybe.Data(res)
@@ -78,7 +78,7 @@ internal abstract class RoomHoldingQueryDao : HoldingQueryDao {
       symbol: StockSymbol,
       side: TradeSide
   ): Maybe<out DbHolding> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         when (val res = daoQueryByTradeSide(symbol, side)) {
           null -> Maybe.None
           else -> Maybe.Data(res)

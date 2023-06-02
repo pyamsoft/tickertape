@@ -27,12 +27,13 @@ import com.pyamsoft.tickertape.db.split.DbSplit
 import com.pyamsoft.tickertape.db.split.SplitChangeEvent
 import com.pyamsoft.tickertape.quote.dig.DigInteractor
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import kotlinx.coroutines.flow.Flow
 
 interface PortfolioDigInteractor : DigInteractor {
 
-  @CheckResult suspend fun watchPositions(onEvent: (PositionChangeEvent) -> Unit)
+  @CheckResult fun watchPositions(): Flow<PositionChangeEvent>
 
-  @CheckResult suspend fun watchSplits(onEvent: (SplitChangeEvent) -> Unit)
+  @CheckResult fun watchSplits(): Flow<SplitChangeEvent>
 
   @CheckResult suspend fun deletePosition(position: DbPosition): ResultWrapper<Boolean>
 

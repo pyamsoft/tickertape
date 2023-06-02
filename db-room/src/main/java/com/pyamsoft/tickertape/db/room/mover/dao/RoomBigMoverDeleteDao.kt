@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomBigMoverDeleteDao : BigMoverDeleteDao {
 
   override suspend fun delete(o: BigMoverReport, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomBigMover = RoomBigMoverReport.create(o)
         return@withContext daoDelete(roomBigMover) > 0
       }

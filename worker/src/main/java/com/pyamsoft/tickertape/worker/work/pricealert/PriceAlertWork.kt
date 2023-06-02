@@ -32,7 +32,7 @@ internal constructor(
 ) : BgWorker {
 
   override suspend fun work(): BgWorker.WorkResult =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           standalone.notifyPriceAlerts()
           return@withContext BgWorker.WorkResult.Success

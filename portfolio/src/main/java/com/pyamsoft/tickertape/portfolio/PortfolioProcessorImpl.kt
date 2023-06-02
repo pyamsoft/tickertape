@@ -124,7 +124,7 @@ internal class PortfolioProcessorImpl @Inject internal constructor() : Portfolio
   }
 
   override suspend fun process(portfolio: List<PortfolioStock>): PortfolioData =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val list = portfolio.asSequence()
         return@withContext PortfolioData(
             stocks = list.filter { it.holding.type == EquityType.STOCK }.processEquities(),

@@ -33,10 +33,10 @@ import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooTopSource
@@ -46,7 +46,7 @@ internal constructor(
 ) : TopSource {
 
   override suspend fun getTrending(count: Int): StockTrends =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val result = service.getTrending(count)
         return@withContext result.finance.result
             .asSequence()
@@ -71,7 +71,7 @@ internal constructor(
       screener: StockScreener,
       count: Int,
   ): StockTops =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         service
             .getScreener(count, screener.name.lowercase())
             .finance

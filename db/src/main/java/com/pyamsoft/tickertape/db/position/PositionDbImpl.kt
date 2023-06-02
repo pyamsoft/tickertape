@@ -27,6 +27,7 @@ import com.pyamsoft.tickertape.db.holding.DbHolding
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -76,14 +77,14 @@ internal constructor(
   override val realtime: PositionRealtime = this
 
   override suspend fun invalidate() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         queryCache.clear()
         queryByIdCache.clear()
         queryByHoldingIdCache.clear()
       }
 
   override suspend fun invalidateById(id: DbPosition.Id) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -92,7 +93,7 @@ internal constructor(
       }
 
   override suspend fun invalidateByHoldingId(id: DbHolding.Id) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByHoldingIdKey(
                 id = id,
@@ -100,14 +101,15 @@ internal constructor(
         return@withContext queryByHoldingIdCache.key(key).clear()
       }
 
-  override suspend fun listenForChanges(onChange: (event: PositionChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) { onEvent(onChange) }
+  override fun listenForChanges(): Flow<PositionChangeEvent> {
+    return subscribe()
+  }
 
   override suspend fun query(): List<DbPosition> =
-      withContext(context = Dispatchers.IO) { queryCache.call() }
+      withContext(context = Dispatchers.Default) { queryCache.call() }
 
   override suspend fun queryById(id: DbPosition.Id): Maybe<out DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByIdKey(
                 id = id,
@@ -116,7 +118,7 @@ internal constructor(
       }
 
   override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val key =
             QueryByHoldingIdKey(
                 id = id,
@@ -125,7 +127,7 @@ internal constructor(
       }
 
   override suspend fun insert(o: DbPosition): DbInsert.InsertResult<DbPosition> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
@@ -143,7 +145,7 @@ internal constructor(
       }
 
   override suspend fun delete(o: DbPosition, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()

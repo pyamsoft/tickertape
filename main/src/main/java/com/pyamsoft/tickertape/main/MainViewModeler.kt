@@ -45,10 +45,8 @@ internal constructor(
 ) : AbstractViewModeler<MainViewState>(state) {
 
   fun handleMainActionSelected(scope: CoroutineScope, page: MainPage) {
-    scope.launch(context = Dispatchers.Main) {
-      val event = MainSelectionEvent(page = page)
-      mainActionSelectionBus.send(event)
-    }
+    val event = MainSelectionEvent(page = page)
+    scope.launch(context = Dispatchers.Default) { mainActionSelectionBus.emit(event) }
   }
 
   override fun registerSaveState(

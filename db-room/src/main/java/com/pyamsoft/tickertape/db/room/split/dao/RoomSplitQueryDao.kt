@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomSplitQueryDao : SplitQueryDao {
 
   final override suspend fun query(): List<DbSplit> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+      withContext(context = Dispatchers.Default) { daoQuery() }
 
   @CheckResult
   @Transaction
@@ -40,7 +40,7 @@ internal abstract class RoomSplitQueryDao : SplitQueryDao {
   internal abstract suspend fun daoQuery(): List<RoomDbSplit>
 
   final override suspend fun queryById(id: DbSplit.Id): Maybe<out DbSplit> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         when (val res = daoQueryById(id)) {
           null -> Maybe.None
           else -> Maybe.Data(res)
@@ -57,7 +57,7 @@ internal abstract class RoomSplitQueryDao : SplitQueryDao {
   internal abstract suspend fun daoQueryById(id: DbSplit.Id): RoomDbSplit?
 
   final override suspend fun queryByHoldingId(id: DbHolding.Id): List<DbSplit> =
-      withContext(context = Dispatchers.IO) { daoQueryByHoldingId(id) }
+      withContext(context = Dispatchers.Default) { daoQueryByHoldingId(id) }
 
   @CheckResult
   @Query(

@@ -82,7 +82,7 @@ internal constructor(
   }
 
   suspend fun notifyPriceAlerts(quotes: List<StockQuote>) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val now = LocalDateTime.now(clock)
         // For each alert in price alerts
         // If the price of the stock quote has passed an alert direction
@@ -98,7 +98,7 @@ internal constructor(
       }
 
   suspend fun notifyPriceAlerts() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val quotes = stockInteractor.getQuotesForHoldings(holdingQueryDao)
         notifyPriceAlerts(quotes)
       }

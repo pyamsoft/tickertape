@@ -60,7 +60,7 @@ internal constructor(
     ) {
 
   override suspend fun resolveTicker(symbol: StockSymbol): ResultWrapper<Ticker> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           tickerInteractor
               .getQuotes(
@@ -78,11 +78,11 @@ internal constructor(
       }
 
   override suspend fun invalidateTicker(symbol: StockSymbol) {
-    withContext(context = Dispatchers.IO) { tickerInteractorCache.invalidateQuotes(listOf(symbol)) }
+    withContext(context = Dispatchers.Default) { tickerInteractorCache.invalidateQuotes(listOf(symbol)) }
   }
 
   override suspend fun search(query: String): ResultWrapper<List<SearchResult>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val results = stockInteractor.search(query)
           ResultWrapper.success(results)
@@ -95,7 +95,7 @@ internal constructor(
       }
 
   override suspend fun invalidateSearch(query: String) =
-      withContext(context = Dispatchers.IO) { stockInteractorCache.invalidateSearch(query) }
+      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateSearch(query) }
 
   @CheckResult
   private inline fun <T : Any> mapResultToSymbol(
@@ -147,7 +147,7 @@ internal constructor(
       equityType: EquityType,
       tradeSide: TradeSide,
   ): ResultWrapper<DbInsert.InsertResult<StockSymbol>> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val result = handleInsertPortfolio(symbol, equityType, tradeSide)
           ResultWrapper.success(result)

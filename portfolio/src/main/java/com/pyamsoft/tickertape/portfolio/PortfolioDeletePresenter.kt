@@ -34,7 +34,7 @@ internal constructor(
       holding: DbHolding.Id,
       onRemoved: () -> Unit,
   ) {
-    scope.launch(context = Dispatchers.Main) {
+    scope.launch(context = Dispatchers.Default) {
       interactor
           .removeHolding(holding)
           .onSuccess { Timber.d("Removed holding $holding") }

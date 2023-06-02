@@ -16,10 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.okhttp
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.bootstrap.network.DelegatingSocketFactory
 import com.pyamsoft.pydroid.core.ThreadEnforcer
-import javax.net.SocketFactory
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -31,34 +29,25 @@ class OkHttpClientLazyCallFactory(
 ) : Call.Factory {
 
   private val client by lazy {
-    createOkHttpClient(enforcer, debug, DelegatingSocketFactory.create())
+    enforcer.assertOffMainThread()
+
+    return@lazy OkHttpClient.Builder()
+        .socketFactory(DelegatingSocketFactory.create())
+        .run {
+          var self = this
+
+          if (debug) {
+            val logger = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            self = self.addInterceptor(logger)
+          }
+
+          return@run self
+        }
+        .build()
   }
 
   override fun newCall(request: Request): Call {
     enforcer.assertOffMainThread()
     return client.newCall(request)
-  }
-
-  companion object {
-
-    @JvmStatic
-    @CheckResult
-    internal fun createOkHttpClient(
-        enforcer: ThreadEnforcer,
-        debug: Boolean,
-        socketFactory: SocketFactory,
-    ): OkHttpClient {
-      enforcer.assertOffMainThread()
-
-      return OkHttpClient.Builder()
-          .socketFactory(socketFactory)
-          .apply {
-            if (debug) {
-              addInterceptor(
-                  HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) })
-            }
-          }
-          .build()
-    }
   }
 }

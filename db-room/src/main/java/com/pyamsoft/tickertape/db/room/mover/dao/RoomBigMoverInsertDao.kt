@@ -37,7 +37,7 @@ internal abstract class RoomBigMoverInsertDao : BigMoverInsertDao {
 
   @Transaction
   override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val roomBigMover = RoomBigMoverReport.create(o)
         return@withContext if (daoQuery(roomBigMover.id) == null) {
           if (daoInsert(roomBigMover) != ROOM_ROW_ID_INSERT_INVALID) {

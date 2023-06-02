@@ -21,11 +21,12 @@ import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.db.BaseDbImpl
 import com.pyamsoft.tickertape.db.DbApi
 import com.pyamsoft.tickertape.db.DbInsert
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class BigMoverDbImpl
@@ -46,11 +47,10 @@ internal constructor(
         BigMoverDeleteDao,
     >() {
 
-  private val queryCache =
-      cachify<List<BigMoverReport>> {
-        enforcer.assertOffMainThread()
-        return@cachify realQueryDao.query()
-      }
+  private val queryCache = cachify {
+    enforcer.assertOffMainThread()
+    return@cachify realQueryDao.query()
+  }
 
   override val deleteDao: BigMoverDeleteDao = this
 
@@ -60,16 +60,18 @@ internal constructor(
 
   override val realtime: BigMoverRealtime = this
 
-  override suspend fun invalidate() = withContext(context = Dispatchers.IO) { queryCache.clear() }
+  override suspend fun invalidate() =
+      withContext(context = Dispatchers.Default) { queryCache.clear() }
 
-  override suspend fun listenForChanges(onChange: (event: BigMoverChangeEvent) -> Unit) =
-      withContext(context = Dispatchers.IO) { onEvent(onChange) }
+  override fun listenForChanges(): Flow<BigMoverChangeEvent> {
+    return subscribe()
+  }
 
   override suspend fun query(): List<BigMoverReport> =
-      withContext(context = Dispatchers.IO) { queryCache.call() }
+      withContext(context = Dispatchers.Default) { queryCache.call() }
 
   override suspend fun insert(o: BigMoverReport): DbInsert.InsertResult<BigMoverReport> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realInsertDao.insert(o).also { result ->
           return@also when (result) {
             is DbInsert.InsertResult.Insert -> {
@@ -87,7 +89,7 @@ internal constructor(
       }
 
   override suspend fun delete(o: BigMoverReport, offerUndo: Boolean): Boolean =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         realDeleteDao.delete(o, offerUndo).also { deleted ->
           if (deleted) {
             invalidate()

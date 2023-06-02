@@ -36,7 +36,7 @@ protected constructor(
       symbol: StockSymbol,
       expirationDate: LocalDate?,
   ): ResultWrapper<StockOptions> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         try {
           val options =
               stockInteractor.getOptions(

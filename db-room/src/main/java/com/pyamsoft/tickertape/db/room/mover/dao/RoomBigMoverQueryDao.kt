@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 internal abstract class RoomBigMoverQueryDao : BigMoverQueryDao {
 
   final override suspend fun query(): List<BigMoverReport> =
-      withContext(context = Dispatchers.IO) { daoQuery() }
+      withContext(context = Dispatchers.Default) { daoQuery() }
 
   @CheckResult
   @Transaction

@@ -162,13 +162,13 @@ internal constructor(
   }
 
   suspend fun notifyBigMovers(quotes: List<StockQuote>) =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val bigMovers = quotes.filterBigMovers()
         postNotifications(bigMovers)
       }
 
   suspend fun notifyBigMovers() =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         val quotes = stockInteractor.getQuotesForHoldings(holdingQueryDao)
         notifyBigMovers(quotes)
       }

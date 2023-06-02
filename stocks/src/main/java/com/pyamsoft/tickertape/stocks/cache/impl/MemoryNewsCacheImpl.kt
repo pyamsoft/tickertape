@@ -29,12 +29,12 @@ internal class MemoryNewsCacheImpl @Inject internal constructor() :
     BaseMemoryCacheImpl<StockSymbol, StockNewsList>(), NewsCache {
 
   override suspend fun removeNews(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) { remove(symbol) }
+      withContext(context = Dispatchers.Default) { remove(symbol) }
 
   override suspend fun getNews(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<StockNewsList>
-  ): List<StockNewsList> = withContext(context = Dispatchers.IO) { get(symbols, resolve) }
+  ): List<StockNewsList> = withContext(context = Dispatchers.Default) { get(symbols, resolve) }
 
   override fun getKeyFromValue(value: StockNewsList): StockSymbol {
     return value.symbol

@@ -29,12 +29,12 @@ internal class MemoryKeyStatisticsCacheImpl @Inject internal constructor() :
     BaseMemoryCacheImpl<StockSymbol, KeyStatistics>(), KeyStatisticsCache {
 
   override suspend fun removeStatistics(symbol: StockSymbol) =
-      withContext(context = Dispatchers.IO) { remove(symbol) }
+      withContext(context = Dispatchers.Default) { remove(symbol) }
 
   override suspend fun getStatistics(
       symbols: List<StockSymbol>,
       resolve: suspend (List<StockSymbol>) -> List<KeyStatistics>
-  ): List<KeyStatistics> = withContext(context = Dispatchers.IO) { get(symbols, resolve) }
+  ): List<KeyStatistics> = withContext(context = Dispatchers.Default) { get(symbols, resolve) }
 
   override fun getKeyFromValue(value: KeyStatistics): StockSymbol {
     return value.symbol

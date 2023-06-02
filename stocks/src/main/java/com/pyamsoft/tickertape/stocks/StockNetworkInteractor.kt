@@ -59,13 +59,13 @@ internal constructor(
 ) : StockInteractor {
 
   override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =
-      withContext(context = Dispatchers.IO) { recommendationSource.getRecommendations(symbol) }
+      withContext(context = Dispatchers.Default) { recommendationSource.getRecommendations(symbol) }
 
   override suspend fun getKeyStatistics(symbols: List<StockSymbol>): List<KeyStatistics> =
-      withContext(context = Dispatchers.IO) { keyStatisticSource.getKeyStatistics(symbols) }
+      withContext(context = Dispatchers.Default) { keyStatisticSource.getKeyStatistics(symbols) }
 
   override suspend fun search(query: String): List<SearchResult> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         // When hitting the network upstream, we wait for a couple milliseconds to allow the UI
         // to debounce repeated requests
         // TODO Add variable? Do we ever need to search immediately?
@@ -78,22 +78,22 @@ internal constructor(
       symbols: List<StockSymbol>,
       expirationDate: LocalDate?,
   ): List<StockOptions> =
-      withContext(context = Dispatchers.IO) { optionsSource.getOptions(symbols, expirationDate) }
+      withContext(context = Dispatchers.Default) { optionsSource.getOptions(symbols, expirationDate) }
 
   override suspend fun getTrending(count: Int): StockTrends =
-      withContext(context = Dispatchers.IO) { topSource.getTrending(count) }
+      withContext(context = Dispatchers.Default) { topSource.getTrending(count) }
 
   override suspend fun getScreener(screener: StockScreener, count: Int): StockTops =
-      withContext(context = Dispatchers.IO) { topSource.getScreener(screener, count) }
+      withContext(context = Dispatchers.Default) { topSource.getScreener(screener, count) }
 
   override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =
-      withContext(context = Dispatchers.IO) { quoteSource.getQuotes(symbols) }
+      withContext(context = Dispatchers.Default) { quoteSource.getQuotes(symbols) }
 
   override suspend fun getCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
   ): List<StockChart> =
-      withContext(context = Dispatchers.IO) {
+      withContext(context = Dispatchers.Default) {
         chartSource
             .getCharts(symbols, range)
             // Remove any duplicated symbols, we expect only one
@@ -116,5 +116,5 @@ internal constructor(
       }
 
   override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
-      withContext(context = Dispatchers.IO) { newsSource.getNews(symbols) }
+      withContext(context = Dispatchers.Default) { newsSource.getNews(symbols) }
 }

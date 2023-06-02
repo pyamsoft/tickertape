@@ -38,6 +38,7 @@ import com.pyamsoft.tickertape.R
 import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieHost
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
 import com.pyamsoft.tickertape.ui.TickerTapeTheme
 import timber.log.Timber
@@ -149,6 +150,8 @@ internal class MainActivity : AppCompatActivity() {
             modifier = Modifier.fillMaxSize(),
             appName = appName,
         )
+
+        YahooCookieHost()
       }
     }
   }

@@ -32,6 +32,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.sources.TopSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -43,11 +44,19 @@ internal class YahooTopSource
 @Inject
 internal constructor(
     @YahooApi private val service: TopService,
+    @YahooApi private val cookie: YahooCrumbProvider,
 ) : TopSource {
 
   override suspend fun getTrending(count: Int): StockTrends =
       withContext(context = Dispatchers.Default) {
-        val result = service.getTrending(count)
+        val result =
+            cookie.withAuth { auth ->
+              service.getTrending(
+                  cookie = auth.cookie,
+                  crumb = auth.crumb,
+                  count = count,
+              )
+            }
         return@withContext result.finance.result
             .asSequence()
             .filterOnlyValidTrending()
@@ -72,10 +81,17 @@ internal constructor(
       count: Int,
   ): StockTops =
       withContext(context = Dispatchers.Default) {
-        service
-            .getScreener(count, screener.name.lowercase())
-            .finance
-            .result
+        val resp =
+            cookie.withAuth { auth ->
+              service.getScreener(
+                  cookie = auth.cookie,
+                  crumb = auth.crumb,
+                  count = count,
+                  screener = screener.name.lowercase(),
+              )
+            }
+
+        return@withContext resp.finance.result
             .asSequence()
             .filterOnlyValidTops()
             .map { top ->

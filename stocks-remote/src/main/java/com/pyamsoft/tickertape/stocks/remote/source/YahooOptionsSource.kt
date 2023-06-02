@@ -28,25 +28,27 @@ import com.pyamsoft.tickertape.stocks.parseUTCTime
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkOptionResponse
 import com.pyamsoft.tickertape.stocks.remote.service.OptionsService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.sources.OptionsSource
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooOptionsSource
 @Inject
 internal constructor(
     @YahooApi private val service: OptionsService,
+    @YahooApi private val cookie: YahooCrumbProvider,
 ) : OptionsSource {
 
   companion object {
@@ -123,11 +125,15 @@ internal constructor(
       expirationDate: LocalDate?,
   ): StockOptions {
     val resp =
-        service.getOptions(
-            symbol = symbol.raw,
-            // If the expiration date is passed, YF gives us options info for that date
-            expirationDate = expirationDate?.atTime(0, 0)?.toEpochSecond(ZoneOffset.UTC),
-        )
+        cookie.withAuth { auth ->
+          service.getOptions(
+              cookie = auth.cookie,
+              crumb = auth.crumb,
+              symbol = symbol.raw,
+              // If the expiration date is passed, YF gives us options info for that date
+              expirationDate = expirationDate?.atTime(0, 0)?.toEpochSecond(ZoneOffset.UTC),
+          )
+        }
     return parseOptionsResponse(resp)
   }
 

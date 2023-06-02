@@ -26,6 +26,7 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.parseMarketTime
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.ChartService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,6 +40,7 @@ internal class YahooChartSource
 @Inject
 internal constructor(
     @YahooApi private val service: ChartService,
+    @YahooApi private val cookie: YahooCrumbProvider,
 ) : ChartSource {
 
   override suspend fun getCharts(
@@ -47,12 +49,15 @@ internal constructor(
   ): List<StockChart> =
       withContext(context = Dispatchers.Default) {
         val interval = getIntervalForRange(range)
-        val result =
+        val result = cookie.withAuth { auth ->
             service.getCharts(
+                cookie = auth.cookie,
+                crumb = auth.crumb,
                 symbols = symbols.joinToString(",") { it.raw },
                 range = range.apiValue,
                 interval = interval.apiValue,
             )
+        }
 
         val localId = ZoneId.systemDefault()
         return@withContext result.spark.result

@@ -20,17 +20,24 @@ import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkTopResponse
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkTrendingResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 internal interface TopService {
 
   @CheckResult
   @GET("https://query1.finance.yahoo.com/v1/finance/trending/US")
-  suspend fun getTrending(@Query("count") count: Int): NetworkTrendingResponse
+  suspend fun getTrending(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
+      @Query("count") count: Int
+  ): NetworkTrendingResponse
 
   @CheckResult
   @GET("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?$DEFAULT_OPTIONS")
   suspend fun getScreener(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("count") count: Int,
       @Query("scrIds") screener: String,
   ): NetworkTopResponse

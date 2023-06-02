@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.remote.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 internal interface QuoteService {
@@ -26,6 +27,8 @@ internal interface QuoteService {
   @CheckResult
   @GET("https://query1.finance.yahoo.com/v7/finance/quote?$DEFAULT_QUOTE_OPTIONS")
   suspend fun getQuotes(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("fields", encoded = true) fields: String,
       @Query("symbols", encoded = true) symbols: String
   ): NetworkQuoteResponse

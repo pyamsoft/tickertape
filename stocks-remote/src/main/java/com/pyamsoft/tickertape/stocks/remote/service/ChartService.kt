@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.remote.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkChartResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 internal interface ChartService {
@@ -26,6 +27,8 @@ internal interface ChartService {
   @CheckResult
   @GET("https://query1.finance.yahoo.com/v7/finance/spark?$DEFAULT_CHART_OPTIONS")
   suspend fun getCharts(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("symbols", encoded = true) symbols: String,
       @Query("range") range: String,
       @Query("interval") interval: String,

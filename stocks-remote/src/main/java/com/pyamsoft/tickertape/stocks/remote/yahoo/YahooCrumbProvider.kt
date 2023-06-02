@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.service
+package com.pyamsoft.tickertape.stocks.remote.yahoo
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.remote.network.NetworkKeyStatisticsResponse
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
-import retrofit2.http.Query
 
-internal interface KeyStatisticsService {
+internal interface YahooCrumbProvider {
 
-  @CheckResult
-  @GET("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}")
-  suspend fun getStatistics(
-      @Header("Cookie") cookie: String,
-      @Query("crumb", encoded = true) crumb: String,
-      @Path("symbol") symbol: String,
-      @Query("modules") modules: String
-  ): NetworkKeyStatisticsResponse
+  @CheckResult suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T
 }

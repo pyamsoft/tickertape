@@ -19,6 +19,7 @@ package com.pyamsoft.tickertape.stocks.remote.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkSearchResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 internal interface SearchService {
@@ -26,6 +27,8 @@ internal interface SearchService {
   @CheckResult
   @GET("https://query2.finance.yahoo.com/v1/finance/search?$DEFAULT_SEARCH_OPTIONS")
   suspend fun performSearch(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("q") query: String,
       @Query("quotesCount") count: Int
   ): NetworkSearchResponse

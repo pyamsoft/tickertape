@@ -38,6 +38,8 @@ import com.pyamsoft.tickertape.quote.UiAppModule
 import com.pyamsoft.tickertape.quote.add.NewTickerComponent
 import com.pyamsoft.tickertape.stocks.StockModule
 import com.pyamsoft.tickertape.stocks.remote.StockRemoteModule
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooComponent
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookiePreferences
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import com.pyamsoft.tickertape.worker.workmanager.WorkManagerAppModule
 import com.pyamsoft.tickertape.worker.workmanager.WorkerComponent
@@ -84,6 +86,8 @@ internal interface TickerComponent {
 
   @CheckResult fun plusWorkerComponent(): WorkerComponent.Factory
 
+  @CheckResult fun plusYahooComponent(): YahooComponent.Factory
+
   @CheckResult fun plusMainComponent(): MainComponent.Factory
 
   @CheckResult fun plusPositionComponent(): PositionComponent.Factory
@@ -111,6 +115,10 @@ internal interface TickerComponent {
     @Binds
     @CheckResult
     abstract fun bindBigMoverPreferences(impl: PreferencesImpl): BigMoverPreferences
+
+    @Binds
+    @CheckResult
+    abstract fun bindYahooPreferences(impl: PreferencesImpl): YahooCookiePreferences
 
     @Module
     companion object {

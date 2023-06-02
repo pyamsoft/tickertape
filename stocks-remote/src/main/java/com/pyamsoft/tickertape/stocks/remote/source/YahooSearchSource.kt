@@ -23,18 +23,20 @@ import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooSearchSource
 @Inject
 internal constructor(
     @YahooApi private val service: SearchService,
+    @YahooApi private val cookie: YahooCrumbProvider,
 ) : SearchSource {
 
   override suspend fun search(query: String): List<SearchResult> =
@@ -44,7 +46,16 @@ internal constructor(
         }
 
         try {
-          val result = service.performSearch(query, count = 20)
+          val result =
+              cookie.withAuth { auth ->
+                service.performSearch(
+                    cookie = auth.cookie,
+                    crumb = auth.crumb,
+                    query = query,
+                    count = 20,
+                )
+              }
+
           return@withContext result.quotes
               .asSequence()
               // Remove duplicate listings

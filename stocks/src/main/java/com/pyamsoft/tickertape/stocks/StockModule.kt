@@ -141,6 +141,26 @@ abstract class StockModule {
     @Provides
     @JvmStatic
     @CheckResult
+    @Named("yahoo")
+    internal fun provideYahooNetworkCreator(
+        @StockApi callFactory: Call.Factory,
+        @Named("yahoo_converter") converter: Converter.Factory,
+    ): NetworkServiceCreator {
+      val retrofit =
+          createRetrofit(
+              callFactory = callFactory,
+              converterFactories = listOf(converter),
+          )
+      return object : NetworkServiceCreator {
+        override fun <T : Any> create(target: KClass<T>): T {
+          return retrofit.create(target.java)
+        }
+      }
+    }
+
+    @Provides
+    @JvmStatic
+    @CheckResult
     @Named("xml")
     internal fun provideXmlNetworkCreator(
         @StockApi callFactory: Call.Factory,

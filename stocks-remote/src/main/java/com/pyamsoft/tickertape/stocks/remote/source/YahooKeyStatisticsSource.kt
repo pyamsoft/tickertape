@@ -23,9 +23,8 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkKeyStatisticsResponse
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,19 +32,28 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooKeyStatisticsSource
 @Inject
-internal constructor(@YahooApi private val service: KeyStatisticsService) : KeyStatisticSource {
+internal constructor(
+    @YahooApi private val service: KeyStatisticsService,
+    @YahooApi private val cookie: YahooCrumbProvider,
+) : KeyStatisticSource {
 
   @CheckResult
   private suspend fun fetchKeyStatistics(symbol: StockSymbol): PairedResponse {
     val response =
-        service.getStatistics(
-            symbol = symbol.raw,
-            modules = ALL_MODULES_STRING,
-        )
+        cookie.withAuth { auth ->
+          service.getStatistics(
+              cookie = auth.cookie,
+              crumb = auth.crumb,
+              symbol = symbol.raw,
+              modules = ALL_MODULES_STRING,
+          )
+        }
     return PairedResponse(
         symbol = symbol,
         response = response,

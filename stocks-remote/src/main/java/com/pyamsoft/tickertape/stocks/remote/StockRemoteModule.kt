@@ -37,6 +37,11 @@ import com.pyamsoft.tickertape.stocks.remote.source.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooRecommendationSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooSearchSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooTopSource
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieConverterFactory
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieManager
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieService
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieStorage
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
@@ -50,10 +55,10 @@ import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
-import javax.inject.Singleton
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 abstract class StockRemoteModule {
@@ -100,6 +105,16 @@ abstract class StockRemoteModule {
   /** Expose globally */
   @Binds @CheckResult internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser
 
+  @Binds
+  @YahooApi
+  @CheckResult
+  internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): YahooCrumbProvider
+
+  @Binds
+  @YahooApi
+  @CheckResult
+  internal abstract fun bindYahooCrumbManager(impl: YahooCookieStorage): YahooCookieManager
+
   @Module
   companion object {
 
@@ -127,6 +142,14 @@ abstract class StockRemoteModule {
     @Named("moshi_converter")
     internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
       return MoshiConverterFactory.create(moshi)
+    }
+
+    @Provides
+    @JvmStatic
+    @CheckResult
+    @Named("yahoo_converter")
+    internal fun provideYahooConverterFactory(): Converter.Factory {
+      return YahooCookieConverterFactory()
     }
 
     @Provides
@@ -199,6 +222,16 @@ abstract class StockRemoteModule {
         @Named("json") serviceCreator: NetworkServiceCreator
     ): RecommendationService {
       return serviceCreator.create(RecommendationService::class)
+    }
+
+    @Provides
+    @YahooApi
+    @JvmStatic
+    @CheckResult
+    internal fun provideYahoo(
+        @Named("yahoo") serviceCreator: NetworkServiceCreator
+    ): YahooCookieService {
+      return serviceCreator.create(YahooCookieService::class)
     }
   }
 }

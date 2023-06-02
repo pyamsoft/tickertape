@@ -19,11 +19,17 @@ package com.pyamsoft.tickertape.stocks.remote.service
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkRecommendationResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface RecommendationService {
 
   @CheckResult
   @GET("https://query2.finance.yahoo.com/v6/finance/recommendationsbysymbol/{symbol}")
-  suspend fun getRecommendations(@Path("symbol") symbol: String): NetworkRecommendationResponse
+  suspend fun getRecommendations(
+      @Header("Cookie") cookie: String,
+      @Query("crumb", encoded = true) crumb: String,
+      @Path("symbol") symbol: String
+  ): NetworkRecommendationResponse
 }

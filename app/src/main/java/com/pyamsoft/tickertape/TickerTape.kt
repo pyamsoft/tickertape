@@ -27,14 +27,13 @@ import com.pyamsoft.pydroid.ui.installPYDroid
 import com.pyamsoft.pydroid.util.isDebugMode
 import com.pyamsoft.tickertape.core.PRIVACY_POLICY_URL
 import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooObjectGraph
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.enqueueAppWork
 import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -59,8 +58,6 @@ class TickerTape : Application() {
 
   private fun installExtraComponents(component: TickerComponent) {
     WorkerObjectGraph.install(this, component.plusWorkerComponent().create())
-
-    YahooObjectGraph.install(this, component.plusYahooComponent().create())
   }
 
   private fun installComponent(moduleProvider: ModuleProvider) {

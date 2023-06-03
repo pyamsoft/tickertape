@@ -37,8 +37,6 @@ import com.pyamsoft.tickertape.stocks.remote.source.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooRecommendationSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooSearchSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooTopSource
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieConverterFactory
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieManager
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieService
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieStorage
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
@@ -57,6 +55,7 @@ import dagger.Module
 import dagger.Provides
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -110,11 +109,6 @@ abstract class StockRemoteModule {
   @CheckResult
   internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): YahooCrumbProvider
 
-  @Binds
-  @YahooApi
-  @CheckResult
-  internal abstract fun bindYahooCrumbManager(impl: YahooCookieStorage): YahooCookieManager
-
   @Module
   companion object {
 
@@ -149,7 +143,7 @@ abstract class StockRemoteModule {
     @CheckResult
     @Named("yahoo_converter")
     internal fun provideYahooConverterFactory(): Converter.Factory {
-      return YahooCookieConverterFactory()
+      return ScalarsConverterFactory.create()
     }
 
     @Provides

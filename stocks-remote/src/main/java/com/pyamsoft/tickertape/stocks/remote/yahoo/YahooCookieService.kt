@@ -17,12 +17,17 @@
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
 import androidx.annotation.CheckResult
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 
 internal interface YahooCookieService {
 
   @CheckResult
+  @GET("https://finance.yahoo.com")
+  suspend fun getCookie(@Header("Accept") accept: String): Response<String>
+
+  @CheckResult
   @GET("https://query1.finance.yahoo.com/v1/test/getcrumb")
-  suspend fun getCrumb(@Header("Cookie") cookie: String): YahooCrumbResponse
+  suspend fun getCrumb(@Header("Cookie") cookie: String): String
 }

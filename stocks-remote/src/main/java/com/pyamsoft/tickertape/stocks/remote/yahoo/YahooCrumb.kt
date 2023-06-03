@@ -16,6 +16,8 @@
 
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
-internal data class YahooCrumb(val crumb: String, val cookie: String)
-
-internal data class YahooCrumbResponse(val crumb: String)
+internal data class YahooCrumb
+internal constructor(
+    val crumb: String,
+    val cookie: String,
+)

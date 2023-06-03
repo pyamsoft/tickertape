@@ -21,8 +21,6 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.util.preferenceBooleanFlow
-import com.pyamsoft.pydroid.util.preferenceStringFlow
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookiePreferences
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +37,7 @@ internal class PreferencesImpl
 internal constructor(
     enforcer: ThreadEnforcer,
     context: Context,
-) : BigMoverPreferences, YahooCookiePreferences {
+) : BigMoverPreferences {
 
   private val preferences by lazy {
     enforcer.assertOffMainThread()
@@ -64,28 +62,8 @@ internal constructor(
         preferences
       }
 
-  override fun listenForYahooCookie(): Flow<String> =
-      preferenceStringFlow(
-          YahooCookies.KEY_YAHOO_COOKIE,
-          YahooCookiePreferences.VALUE_DEFAULT_COOKIE,
-      ) {
-        preferences
-      }
-
-  override fun removeYahooCookie() {
-    scope.launch { preferences.edit { remove(YahooCookies.KEY_YAHOO_COOKIE) } }
-  }
-
-  override fun saveYahooCookie(cookie: String) {
-    scope.launch { preferences.edit { putString(YahooCookies.KEY_YAHOO_COOKIE, cookie) } }
-  }
-
   private object BigMovers {
 
     const val KEY_NOTIFICATION_ENABLED = "key_big_mover_notification_v1"
-  }
-
-  private object YahooCookies {
-    const val KEY_YAHOO_COOKIE = "key_yahoo_cookie_v1"
   }
 }

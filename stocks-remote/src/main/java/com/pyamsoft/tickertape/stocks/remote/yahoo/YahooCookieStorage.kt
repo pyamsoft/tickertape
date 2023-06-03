@@ -17,18 +17,12 @@
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.timeout
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -36,17 +30,18 @@ import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 internal class YahooCookieStorage
 @Inject
 internal constructor(
-    private val preferences: YahooCookiePreferences,
+    private val enforcer: ThreadEnforcer,
     @YahooApi private val service: YahooCookieService,
-) : YahooCrumbProvider, YahooCookieManager {
+) : YahooCrumbProvider {
 
   private val mutex = Mutex()
+
+  private var storedCookie = ""
   private var storedCrumb: YahooCrumb? = null
 
   private val scope by lazy {
@@ -55,63 +50,77 @@ internal constructor(
     )
   }
 
-  @OptIn(FlowPreview::class)
-  private val cookieFromStorage =
-      preferences
-          .listenForYahooCookie()
-          // If after 1 second we haven't gotten a cookie, we throw an error, and then
-          // immediately catch the error and emit an empty string
-          .timeout(1.seconds)
-          .catch {
-            // If the error is from a timeout, catch it and emit empty string, else its
-            // an error
-            if (it is TimeoutCancellationException) emit("") else throw it
-          }
-          // Every time we get a new cookie, clear the crumb
-          .onEach { clearStoredCrumb() }
+  @CheckResult
+  private suspend fun getCookie(): String {
+    enforcer.assertOffMainThread()
+
+    val s = storedCookie
+    if (s.isNotBlank()) {
+      return s
+    }
+
+    return mutex.withLock {
+      if (storedCookie.isBlank()) {
+        storedCookie =
+            try {
+              val page = service.getCookie(accept = YF_ACCEPT_STRING)
+              val cookies = page.headers().values("Set-Cookie")
+              cookies.joinToString(";")
+            } catch (e: Throwable) {
+              Timber.e(e, "Error getting YF cookie")
+              ""
+            }
+      }
+
+      return@withLock storedCookie
+    }
+  }
 
   @CheckResult
-  private suspend fun getCrumb(): YahooCrumb? =
-      withContext(context = Dispatchers.Default) {
-        // Fast path
-        val s = storedCrumb
-        if (s != null) {
-          return@withContext s
-        }
+  private suspend fun getCrumb(): YahooCrumb? {
+    enforcer.assertOffMainThread()
+    // Fast path
+    val s = storedCrumb
+    if (s != null) {
+      return s
+    }
 
-        // Get cookie from storage
-        val c = cookieFromStorage.first()
-        if (c.isBlank()) {
-          return@withContext null
-        }
+    // Get cookie from storage
+    val c = getCookie()
+    Timber.d("Got cookie from YF: $c")
+    if (c.isBlank()) {
+      return null
+    }
 
-        return@withContext mutex.withLock {
-          if (storedCrumb == null) {
-            storedCrumb =
-                try {
-                  val newCrumb = service.getCrumb(cookie = c)
-                  YahooCrumb(
-                      cookie = c,
-                      crumb = newCrumb.crumb,
-                  )
-                } catch (e: Throwable) {
-                  Timber.e(e, "Error getting YF crumb")
-                  null
-                }
-          }
-
-          return@withLock storedCrumb
-        }
+    return mutex.withLock {
+      if (storedCrumb == null) {
+        storedCrumb =
+            try {
+              val newCrumb = service.getCrumb(cookie = c)
+              YahooCrumb(
+                  cookie = c,
+                  crumb = newCrumb,
+              )
+            } catch (e: Throwable) {
+              Timber.e(e, "Error getting YF crumb")
+              null
+            }
       }
+
+      return@withLock storedCrumb
+    }
+  }
 
   @CheckResult
   private suspend fun resolveCrumb(): YahooCrumb? {
+    enforcer.assertOffMainThread()
+
     var crumb = getCrumb()
     var count = 0
 
     // Attempt to do this a few times just in case
     while (crumb == null && count < 2) {
-      reset()
+      clearStored()
       crumb = getCrumb()
       ++count
     }
@@ -121,9 +130,19 @@ internal constructor(
 
   @CheckResult
   private suspend inline fun <T : Any> attemptAuthedRequest(block: (YahooCrumb) -> T): T {
+    enforcer.assertOffMainThread()
+
     val crumb = resolveCrumb() ?: throw MISSING_COOKIE_EXCEPTION
     return block(crumb)
   }
+
+  private suspend fun clearStored() =
+      mutex.withLock {
+        enforcer.assertOffMainThread()
+
+        storedCrumb = null
+        storedCookie = ""
+      }
 
   override suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T =
       withContext(context = Dispatchers.Default) {
@@ -135,8 +154,7 @@ internal constructor(
               Timber.w("YF returned a 401. We have a bad cookie or crumb.")
 
               // Clear the cookie and crumb and try again
-              preferences.removeYahooCookie()
-              clearStoredCrumb()
+              clearStored()
 
               // Try one more time
               Timber.w("Try again after cookie/crumb reset")
@@ -148,24 +166,13 @@ internal constructor(
         }
       }
 
-  private suspend fun clearStoredCrumb() = mutex.withLock { storedCrumb = null }
-
-  private fun clearCrumb() {
-    scope.launch { clearStoredCrumb() }
-  }
-
-  override fun save(cookie: String) {
-    preferences.saveYahooCookie(cookie)
-  }
-
-  override fun reset() {
-    preferences.removeYahooCookie()
-    clearCrumb()
-  }
-
   companion object {
     private val MISSING_COOKIE_EXCEPTION =
         RuntimeException(
             "Unable to authorize your device for stock data. Please open the app, which will attempt to refresh the session.")
+
+    // Need to pass this Accept header or YF does not return set-cookies
+    private const val YF_ACCEPT_STRING =
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
   }
 }

@@ -44,13 +44,8 @@ android {
         jvmTarget = "17"
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion "$composeCompiler"
-    }
-
     buildFeatures {
         buildConfig = false
-        compose = true
     }
 }
 
@@ -66,13 +61,11 @@ dependencies {
     api "com.squareup.moshi:moshi:$moshi"
 
     // Retrofit
-    // API for classpath reflection to not break
-    api "com.squareup.retrofit2:converter-moshi:$retrofit"
-    api "com.squareup.retrofit2:converter-scalars:$retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit"
 
     // Retrofit for Google News
-    // API for classpath reflection to not break
-    api("com.squareup.retrofit2:converter-simplexml:$retrofit") {
+    implementation("com.squareup.retrofit2:converter-simplexml:$retrofit") {
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'

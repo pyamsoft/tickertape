@@ -15,71 +15,73 @@
  */
 
 plugins {
-  id("com.android.library")
-  id("com.google.devtools.ksp")
+    id("com.android.library")
+    id("com.google.devtools.ksp")
 }
 
 //noinspection GroovyMissingReturnStatement
 android {
-  namespace "com.pyamsoft.tickertape.stocks.remote"
+    namespace "com.pyamsoft.tickertape.stocks.remote"
 
-  compileSdkVersion rootProject.ext.compileSdk
+    compileSdkVersion rootProject.ext.compileSdk
 
-  //noinspection GroovyMissingReturnStatement
-  defaultConfig {
-    minSdkVersion rootProject.ext.minSdk
-    targetSdkVersion rootProject.ext.targetSdk
-    resConfigs 'en'
-  }
+    //noinspection GroovyMissingReturnStatement
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
+        resConfigs 'en'
+    }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
 
-    // Flag to enable support for the new language APIs
-    coreLibraryDesugaringEnabled true
-  }
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+    }
 
-  kotlinOptions {
-    jvmTarget = "17"
-  }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
-  composeOptions {
-    kotlinCompilerExtensionVersion "$composeCompiler"
-  }
+    composeOptions {
+        kotlinCompilerExtensionVersion "$composeCompiler"
+    }
 
-  buildFeatures {
-    buildConfig = false
-    compose = true
-  }
+    buildFeatures {
+        buildConfig = false
+        compose = true
+    }
 }
 
 dependencies {
-  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  kapt "com.google.dagger:dagger-compiler:$dagger"
-  ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
 
-  // API for Dagger
-  api "com.squareup.retrofit2:retrofit:$retrofit"
+    // API for Dagger
+    api "com.squareup.retrofit2:retrofit:$retrofit"
 
-  // Moshi
-  api "com.squareup.moshi:moshi:$moshi"
+    // Moshi
+    api "com.squareup.moshi:moshi:$moshi"
 
-  // Retrofit
-  implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
-  implementation "com.squareup.retrofit2:converter-scalars:$retrofit"
+    // Retrofit
+    // API for classpath reflection to not break
+    api "com.squareup.retrofit2:converter-moshi:$retrofit"
+    api "com.squareup.retrofit2:converter-scalars:$retrofit"
 
-  // Retrofit for Google News
-  implementation("com.squareup.retrofit2:converter-simplexml:$retrofit") {
-    exclude group: 'xpp3', module: 'xpp3'
-    exclude group: 'stax', module: 'stax-api'
-    exclude group: 'stax', module: 'stax'
-  }
+    // Retrofit for Google News
+    // API for classpath reflection to not break
+    api("com.squareup.retrofit2:converter-simplexml:$retrofit") {
+        exclude group: 'xpp3', module: 'xpp3'
+        exclude group: 'stax', module: 'stax-api'
+        exclude group: 'stax', module: 'stax'
+    }
 
-  // PYDroid
-  implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"
+    // PYDroid
+    implementation "com.github.pyamsoft.pydroid:bootstrap:$pydroid"
 
-  api project(':core')
-  api project(':stocks')
-  api project(':ui')
+    api project(':core')
+    api project(':stocks')
+    api project(':ui')
 }

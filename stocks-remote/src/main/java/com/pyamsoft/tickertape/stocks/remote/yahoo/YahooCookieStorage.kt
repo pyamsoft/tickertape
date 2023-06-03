@@ -17,12 +17,11 @@
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.cachify.cachify
+import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -36,7 +35,7 @@ internal class YahooCookieStorage
 @Inject
 internal constructor(
     private val enforcer: ThreadEnforcer,
-    @YahooApi private val service: YahooCookieService,
+    @YahooApi service: YahooCookieService,
 ) : YahooCrumbProvider {
 
   private val mutex = Mutex()
@@ -44,11 +43,9 @@ internal constructor(
   private var storedCookie = ""
   private var storedCrumb: YahooCrumb? = null
 
-  private val scope by lazy {
-    CoroutineScope(
-        context = SupervisorJob() + Dispatchers.Default + CoroutineName(this::class.java.name),
-    )
-  }
+  // Internally use a cachify so that we have do not make multiple upstream calls at the same time
+  private val cookieCache = cachify { service.getCookie(accept = YF_ACCEPT_STRING) }
+  private val crumbCache = multiCachify<String, String, String> { service.getCrumb(cookie = it) }
 
   @CheckResult
   private suspend fun getCookie(): String {
@@ -63,7 +60,7 @@ internal constructor(
       if (storedCookie.isBlank()) {
         storedCookie =
             try {
-              val page = service.getCookie(accept = YF_ACCEPT_STRING)
+              val page = cookieCache.call()
               val cookies = page.headers().values("Set-Cookie")
               cookies.joinToString(";")
             } catch (e: Throwable) {
@@ -96,7 +93,7 @@ internal constructor(
       if (storedCrumb == null) {
         storedCrumb =
             try {
-              val newCrumb = service.getCrumb(cookie = c)
+              val newCrumb = crumbCache.key(c).call(c)
               YahooCrumb(
                   cookie = c,
                   crumb = newCrumb,
@@ -142,6 +139,9 @@ internal constructor(
 
         storedCrumb = null
         storedCookie = ""
+
+        cookieCache.clear()
+        crumbCache.clear()
       }
 
   override suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T =
@@ -168,8 +168,7 @@ internal constructor(
 
   companion object {
     private val MISSING_COOKIE_EXCEPTION =
-        RuntimeException(
-            "Unable to authorize your device for stock data. Please open the app, which will attempt to refresh the session.")
+        RuntimeException("Unable to authorize device for stock data, please try again")
 
     // Need to pass this Accept header or YF does not return set-cookies
     private const val YF_ACCEPT_STRING =

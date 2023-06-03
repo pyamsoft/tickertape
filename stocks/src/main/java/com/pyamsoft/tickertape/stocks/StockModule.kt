@@ -37,6 +37,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Qualifier
+import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 @Qualifier @Retention(AnnotationRetention.BINARY) private annotation class PrivateApi
@@ -82,95 +83,34 @@ abstract class StockModule {
   @Module
   companion object {
 
-    /**
-     * If this is @Provides, you will need to change okhttp3 from implementation to api in Gradle
-     */
     @Provides
-    @JvmStatic
-    @CheckResult
     @StockApi
-    internal fun createCallFactory(
+    @JvmStatic
+    internal fun provideCallFactory(
         enforcer: ThreadEnforcer,
         @Named("debug") debug: Boolean
     ): Call.Factory {
       return OkHttpClientLazyCallFactory(debug, enforcer)
     }
 
-    /**
-     * If this is @Provides, you will need to change retrofit from implementation to api in Gradle
-     */
+    @Provides
+    @StockApi
     @JvmStatic
-    @CheckResult
-    private fun createRetrofit(
-        callFactory: Call.Factory,
-        converterFactories: List<Converter.Factory> = emptyList(),
+    internal fun provideRetrofit(
+        @StockApi callFactory: Call.Factory,
+        @StockApi converter: Converter.Factory,
     ): Retrofit {
       return Retrofit.Builder()
           .baseUrl("https://your-service-should-be-replacing-this-url")
           .callFactory(callFactory)
-          .run {
-            var self = this
-            for (factory in converterFactories) {
-              self = self.addConverterFactory(factory)
-            }
-            return@run self
-          }
+          .addConverterFactory(converter)
           .build()
     }
 
     @Provides
     @JvmStatic
-    @CheckResult
-    @Named("json")
-    internal fun provideJsonNetworkCreator(
-        @StockApi callFactory: Call.Factory,
-        @Named("moshi_converter") converter: Converter.Factory,
-    ): NetworkServiceCreator {
-      val retrofit =
-          createRetrofit(
-              callFactory = callFactory,
-              converterFactories = listOf(converter),
-          )
-      return object : NetworkServiceCreator {
-        override fun <T : Any> create(target: KClass<T>): T {
-          return retrofit.create(target.java)
-        }
-      }
-    }
-
-    @Provides
-    @JvmStatic
-    @CheckResult
-    @Named("yahoo")
-    internal fun provideYahooNetworkCreator(
-        @StockApi callFactory: Call.Factory,
-        @Named("yahoo_converter") converter: Converter.Factory,
-    ): NetworkServiceCreator {
-      val retrofit =
-          createRetrofit(
-              callFactory = callFactory,
-              converterFactories = listOf(converter),
-          )
-      return object : NetworkServiceCreator {
-        override fun <T : Any> create(target: KClass<T>): T {
-          return retrofit.create(target.java)
-        }
-      }
-    }
-
-    @Provides
-    @JvmStatic
-    @CheckResult
-    @Named("xml")
-    internal fun provideXmlNetworkCreator(
-        @StockApi callFactory: Call.Factory,
-        @Named("xml_converter") converter: Converter.Factory,
-    ): NetworkServiceCreator {
-      val retrofit =
-          createRetrofit(
-              callFactory = callFactory,
-              converterFactories = listOf(converter),
-          )
+    @Singleton
+    internal fun provideJsonNetworkCreator(@StockApi retrofit: Retrofit): NetworkServiceCreator {
       return object : NetworkServiceCreator {
         override fun <T : Any> create(target: KClass<T>): T {
           return retrofit.create(target.java)

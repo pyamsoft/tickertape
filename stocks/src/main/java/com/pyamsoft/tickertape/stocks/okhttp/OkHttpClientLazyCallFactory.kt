@@ -37,7 +37,7 @@ class OkHttpClientLazyCallFactory(
           var self = this
 
           if (debug) {
-            val logger = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            val logger = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
             self = self.addInterceptor(logger)
           }
 

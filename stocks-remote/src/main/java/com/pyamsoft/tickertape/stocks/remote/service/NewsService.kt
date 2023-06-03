@@ -17,6 +17,7 @@
 package com.pyamsoft.tickertape.stocks.remote.service
 
 import androidx.annotation.CheckResult
+import com.pyamsoft.tickertape.stocks.remote.converter.XmlResponse
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkNewsResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -24,6 +25,7 @@ import retrofit2.http.Query
 
 internal interface NewsService {
 
+  @XmlResponse
   @CheckResult
   @GET("https://www.nasdaq.com/feed/rssoutbound")
   suspend fun getNews(

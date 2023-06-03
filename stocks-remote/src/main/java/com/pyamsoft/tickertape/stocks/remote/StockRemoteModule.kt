@@ -16,11 +16,11 @@
 
 package com.pyamsoft.tickertape.stocks.remote
 
-import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
 import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
+import com.pyamsoft.tickertape.stocks.remote.converter.QualifiedTypeConverterFactory
 import com.pyamsoft.tickertape.stocks.remote.service.ChartService
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.remote.service.NewsService
@@ -53,6 +53,7 @@ import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -62,52 +63,34 @@ import javax.inject.Singleton
 @Module
 abstract class StockRemoteModule {
 
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindQuoteSource(impl: YahooQuoteSource): QuoteSource
+  @Binds @StockApi internal abstract fun bindQuoteSource(impl: YahooQuoteSource): QuoteSource
+
+  @Binds @StockApi internal abstract fun bindOptionsSource(impl: YahooOptionsSource): OptionsSource
+
+  @Binds @StockApi internal abstract fun bindChartSource(impl: YahooChartSource): ChartSource
 
   @Binds
   @StockApi
-  @CheckResult
-  internal abstract fun bindOptionsSource(impl: YahooOptionsSource): OptionsSource
-
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindChartSource(impl: YahooChartSource): ChartSource
-
-  @Binds @StockApi @CheckResult internal abstract fun bindTopSource(impl: YahooTopSource): TopSource
-
-  @Binds
-  @StockApi
-  @CheckResult
   internal abstract fun bindKeyStatisticsSource(impl: YahooKeyStatisticsSource): KeyStatisticSource
 
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindSearchSource(impl: YahooSearchSource): SearchSource
+  @Binds @StockApi internal abstract fun bindSearchSource(impl: YahooSearchSource): SearchSource
+
+  @Binds @StockApi internal abstract fun bindTopSource(impl: YahooTopSource): TopSource
 
   @Binds
   @StockApi
-  @CheckResult
   internal abstract fun bindRecommendationsSource(
       impl: YahooRecommendationSource
   ): RecommendationSource
 
-  @Binds
-  @StockApi
-  @CheckResult
-  internal abstract fun bindNewsSource(impl: NasdaqNewsSource): NewsSource
-
-  /** Expose globally */
-  @Binds @CheckResult internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser
+  @Binds @StockApi internal abstract fun bindNewsSource(impl: NasdaqNewsSource): NewsSource
 
   @Binds
   @YahooApi
-  @CheckResult
   internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): YahooCrumbProvider
+
+  /** Expose globally */
+  @Binds internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser
 
   @Module
   companion object {
@@ -116,15 +99,29 @@ abstract class StockRemoteModule {
     @StockApi
     @JvmStatic
     @Singleton
-    @CheckResult
     internal fun provideMoshi(): Moshi {
       return Moshi.Builder().build()
     }
 
+    @StockApi
     @Provides
     @JvmStatic
-    @CheckResult
-    @Named("xml_converter")
+    internal fun provideQualifiedConverterFactory(
+        @Named("xml") xmlConverter: Converter.Factory,
+        @Named("scalar") scalarConverter: Converter.Factory,
+        // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
+        @StockApi converters: MutableSet<Converter.Factory>,
+    ): Converter.Factory {
+      return QualifiedTypeConverterFactory(
+          xml = xmlConverter,
+          scalar = scalarConverter,
+          converters = converters,
+      )
+    }
+
+    @Provides
+    @JvmStatic
+    @Named("xml")
     internal fun provideXmlConverterFactory(): Converter.Factory {
       @Suppress("DEPRECATION")
       return retrofit2.converter.simplexml.SimpleXmlConverterFactory.createNonStrict()
@@ -132,88 +129,73 @@ abstract class StockRemoteModule {
 
     @Provides
     @JvmStatic
-    @CheckResult
-    @Named("moshi_converter")
-    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
-      return MoshiConverterFactory.create(moshi)
-    }
-
-    @Provides
-    @JvmStatic
-    @CheckResult
-    @Named("yahoo_converter")
+    @Named("scalar")
     internal fun provideYahooConverterFactory(): Converter.Factory {
       return ScalarsConverterFactory.create()
     }
 
     @Provides
     @JvmStatic
-    @CheckResult
+    @IntoSet
+    @StockApi
+    internal fun provideMoshiConverterFactory(@StockApi moshi: Moshi): Converter.Factory {
+      return MoshiConverterFactory.create(moshi)
+    }
+
+    @Provides
+    @JvmStatic
     @NasdaqApi
-    internal fun provideNews(@Named("xml") serviceCreator: NetworkServiceCreator): NewsService {
+    internal fun provideNews(serviceCreator: NetworkServiceCreator): NewsService {
       return serviceCreator.create(NewsService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideQuotes(@Named("json") serviceCreator: NetworkServiceCreator): QuoteService {
+    internal fun provideQuotes(serviceCreator: NetworkServiceCreator): QuoteService {
       return serviceCreator.create(QuoteService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideCharts(@Named("json") serviceCreator: NetworkServiceCreator): ChartService {
+    internal fun provideCharts(serviceCreator: NetworkServiceCreator): ChartService {
       return serviceCreator.create(ChartService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideTops(@Named("json") serviceCreator: NetworkServiceCreator): TopService {
+    internal fun provideTops(serviceCreator: NetworkServiceCreator): TopService {
       return serviceCreator.create(TopService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideSearch(
-        @Named("json") serviceCreator: NetworkServiceCreator
-    ): SearchService {
+    internal fun provideSearch(serviceCreator: NetworkServiceCreator): SearchService {
       return serviceCreator.create(SearchService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideOptions(
-        @Named("json") serviceCreator: NetworkServiceCreator
-    ): OptionsService {
+    internal fun provideOptions(serviceCreator: NetworkServiceCreator): OptionsService {
       return serviceCreator.create(OptionsService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideKeyStatistics(
-        @Named("json") serviceCreator: NetworkServiceCreator
-    ): KeyStatisticsService {
+    internal fun provideKeyStatistics(serviceCreator: NetworkServiceCreator): KeyStatisticsService {
       return serviceCreator.create(KeyStatisticsService::class)
     }
 
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
     internal fun provideRecommendations(
-        @Named("json") serviceCreator: NetworkServiceCreator
+        serviceCreator: NetworkServiceCreator
     ): RecommendationService {
       return serviceCreator.create(RecommendationService::class)
     }
@@ -221,10 +203,7 @@ abstract class StockRemoteModule {
     @Provides
     @YahooApi
     @JvmStatic
-    @CheckResult
-    internal fun provideYahoo(
-        @Named("yahoo") serviceCreator: NetworkServiceCreator
-    ): YahooCookieService {
+    internal fun provideYahooCookies(serviceCreator: NetworkServiceCreator): YahooCookieService {
       return serviceCreator.create(YahooCookieService::class)
     }
   }

@@ -16,16 +16,16 @@
 
 package com.pyamsoft.tickertape.stocks.remote.converter
 
+import androidx.annotation.CheckResult
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
-import javax.inject.Inject
 
+// https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/JsonAndXmlConverters.java
 internal class QualifiedTypeConverterFactory
-@Inject
-internal constructor(
+private constructor(
     private val xml: Converter.Factory,
     private val scalar: Converter.Factory,
     private val converters: Set<Converter.Factory>,
@@ -81,5 +81,22 @@ internal constructor(
     }
 
     return super.requestBodyConverter(type, parameterAnnotations, methodAnnotations, retrofit)
+  }
+
+  companion object {
+
+    @JvmStatic
+    @CheckResult
+    fun create(
+        xml: Converter.Factory,
+        scalar: Converter.Factory,
+        converters: Set<Converter.Factory>,
+    ): Converter.Factory {
+      return QualifiedTypeConverterFactory(
+          xml = xml,
+          scalar = scalar,
+          converters = converters,
+      )
+    }
   }
 }

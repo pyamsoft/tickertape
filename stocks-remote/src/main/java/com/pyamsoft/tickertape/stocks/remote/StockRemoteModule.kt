@@ -112,7 +112,7 @@ abstract class StockRemoteModule {
         // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
         @StockApi converters: MutableSet<Converter.Factory>,
     ): Converter.Factory {
-      return QualifiedTypeConverterFactory(
+      return QualifiedTypeConverterFactory.create(
           xml = xmlConverter,
           scalar = scalarConverter,
           converters = converters,

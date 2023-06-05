@@ -171,7 +171,10 @@ internal constructor(
   override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange
-  ) = withContext(context = Dispatchers.Default) { interactorCache.invalidateCharts(symbols, range) }
+  ) =
+      withContext(context = Dispatchers.Default) {
+        interactorCache.invalidateCharts(symbols, range)
+      }
 
   override suspend fun invalidateAllCharts() =
       withContext(context = Dispatchers.Default) { interactorCache.invalidateAllCharts() }

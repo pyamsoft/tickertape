@@ -21,42 +21,42 @@ plugins {
 
 //noinspection GroovyMissingReturnStatement
 android {
-  namespace "com.pyamsoft.tickertape.db"
+  namespace = "com.pyamsoft.tickertape.main"
 
-  compileSdkVersion rootProject.ext.compileSdk
+  compileSdk = rootProject.extra["compileSdk"] as Int
 
-  //noinspection GroovyMissingReturnStatement
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdk
-    targetSdkVersion rootProject.ext.targetSdk
-    resConfigs 'en'
+    minSdk = rootProject.extra["minSdk"] as Int
+
+    resourceConfigurations += setOf("en")
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     // Flag to enable support for the new language APIs
-    coreLibraryDesugaringEnabled true
+    isCoreLibraryDesugaringEnabled = true
   }
 
-  kotlinOptions {
-    jvmTarget = "17"
-  }
+  kotlinOptions { jvmTarget = "17" }
 
   buildFeatures {
-    buildConfig false
+    buildConfig = false
+    compose = true
   }
+
+  composeOptions { kotlinCompilerExtensionVersion = "${rootProject.extra["composeCompiler"]}" }
 }
 
 dependencies {
-  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar"
-  kapt "com.google.dagger:dagger-compiler:$dagger"
-  ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:${rootProject.extra["desugar"]}")
 
-  // Moshi
-  api "com.squareup.moshi:moshi:$moshi"
+  kapt("com.google.dagger:dagger-compiler:${rootProject.extra["dagger"]}")
 
-  api project(':core')
-  api project(':stocks')
+  implementation(project(":core"))
+  implementation(project(":db"))
+  implementation(project(":quote"))
+  implementation(project(":stocks"))
+  implementation(project(":ui"))
 }

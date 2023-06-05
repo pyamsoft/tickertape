@@ -23,18 +23,33 @@ pluginManagement {
 }
 
 rootProject.name = "TickerTape"
-include ':alert'
-include ':app'
-include ':core'
-include ':db'
-include ':db-room'
-include ':home'
-include ':main'
-include ':notification'
-include ':portfolio'
-include ':quote'
-include ':stocks'
-include ':stocks-remote'
-include ':ui'
-include ':worker'
-include ':worker-workmanager'
+
+include(":alert")
+
+include(":app")
+
+include(":core")
+
+include(":db")
+
+include(":db-room")
+
+include(":home")
+
+include(":main")
+
+include(":notification")
+
+include(":portfolio")
+
+include(":quote")
+
+include(":stocks")
+
+include(":stocks-remote")
+
+include(":ui")
+
+include(":worker")
+
+include(":worker-workmanager")

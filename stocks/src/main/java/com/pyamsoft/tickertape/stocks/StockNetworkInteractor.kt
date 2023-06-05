@@ -78,7 +78,9 @@ internal constructor(
       symbols: List<StockSymbol>,
       expirationDate: LocalDate?,
   ): List<StockOptions> =
-      withContext(context = Dispatchers.Default) { optionsSource.getOptions(symbols, expirationDate) }
+      withContext(context = Dispatchers.Default) {
+        optionsSource.getOptions(symbols, expirationDate)
+      }
 
   override suspend fun getTrending(count: Int): StockTrends =
       withContext(context = Dispatchers.Default) { topSource.getTrending(count) }

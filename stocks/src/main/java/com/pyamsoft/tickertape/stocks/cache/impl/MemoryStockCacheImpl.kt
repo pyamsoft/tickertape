@@ -34,7 +34,8 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
   override suspend fun removeQuote(symbol: StockSymbol) =
       withContext(context = Dispatchers.Default) { quotes.remove(symbol) }
 
-  override suspend fun removeAllQuotes() = withContext(context = Dispatchers.Default) { quotes.clear() }
+  override suspend fun removeAllQuotes() =
+      withContext(context = Dispatchers.Default) { quotes.clear() }
 
   override suspend fun getQuotes(
       symbols: List<StockSymbol>,
@@ -51,7 +52,8 @@ internal class MemoryStockCacheImpl @Inject internal constructor() : StockCache 
         return@withContext charts.remove(key)
       }
 
-  override suspend fun removeAllCharts() = withContext(context = Dispatchers.Default) { charts.clear() }
+  override suspend fun removeAllCharts() =
+      withContext(context = Dispatchers.Default) { charts.clear() }
 
   override suspend fun getCharts(
       symbols: List<StockSymbol>,

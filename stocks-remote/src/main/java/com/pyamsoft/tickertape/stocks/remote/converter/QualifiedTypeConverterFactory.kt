@@ -17,11 +17,11 @@
 package com.pyamsoft.tickertape.stocks.remote.converter
 
 import androidx.annotation.CheckResult
+import java.lang.reflect.Type
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
-import java.lang.reflect.Type
 
 // https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/JsonAndXmlConverters.java
 internal class QualifiedTypeConverterFactory

@@ -66,10 +66,10 @@ import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.ui.test.TestClock
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapNotNull
 import java.time.Clock
 import java.time.LocalDate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)

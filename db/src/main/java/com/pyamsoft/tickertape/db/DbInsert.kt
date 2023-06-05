@@ -24,7 +24,9 @@ interface DbInsert<T : Any> {
 
   sealed class InsertResult<T : Any> {
     data class Insert<T : Any>(val data: T) : InsertResult<T>()
+
     data class Update<T : Any>(val data: T) : InsertResult<T>()
+
     data class Fail<T : Any>(val data: T, val error: Throwable) : InsertResult<T>()
   }
 }

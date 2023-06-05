@@ -78,7 +78,9 @@ internal constructor(
       }
 
   override suspend fun invalidateTicker(symbol: StockSymbol) {
-    withContext(context = Dispatchers.Default) { tickerInteractorCache.invalidateQuotes(listOf(symbol)) }
+    withContext(context = Dispatchers.Default) {
+      tickerInteractorCache.invalidateQuotes(listOf(symbol))
+    }
   }
 
   override suspend fun search(query: String): ResultWrapper<List<SearchResult>> =

@@ -22,5 +22,6 @@ package com.pyamsoft.tickertape.db
  */
 sealed class Maybe<T> {
   data class Data<T>(val data: T) : Maybe<T>()
+
   object None : Maybe<Nothing>()
 }

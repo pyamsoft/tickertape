@@ -24,6 +24,7 @@ buildscript {
 
     // Us
     pydroid = "26.5.0"
+    cachify = "0.3.0"
 
     // Jobs
     workmanager = "2.8.1"
@@ -55,19 +56,19 @@ buildscript {
 plugins {
   // Android AGP
   // https://developer.android.com/studio/build#top-level
-  id 'com.android.library' version '8.0.2' apply false
+  id("com.android.library") version "8.0.2" apply false
 
   // Fix Android build cache
   // https://github.com/gradle/android-cache-fix-gradle-plugin
-  id "org.gradle.android.cache-fix" version "2.7.1" apply false
+  id("org.gradle.android.cache-fix") version "2.7.1" apply false
 
   // Kotlin
   // https://developer.android.com/studio/build#top-level
-  id 'org.jetbrains.kotlin.android' version "1.8.21" apply false
+  id("org.jetbrains.kotlin.android") version "1.8.21" apply false
 
   // Gradle version checker
   // https://github.com/ben-manes/gradle-versions-plugin
-  id 'com.github.ben-manes.versions' version '0.46.0' apply false
+  id("com.github.ben-manes.versions") version "0.46.0" apply false
 
   // Version Filter Plugin
   // https://github.com/janderssonse/gradle-versions-filter-plugin
@@ -75,11 +76,11 @@ plugins {
 
   // Spotless
   // https://github.com/diffplug/spotless
-  id "com.diffplug.spotless" version "6.19.0" apply false
+  id("com.diffplug.spotless") version "6.19.0" apply false
 
   // KSP
   // https://github.com/google/ksp
-  id "com.google.devtools.ksp" version "1.8.21-1.0.11" apply false
+  id("com.google.devtools.ksp") version "1.8.21-1.0.11" apply false
 
   // Gradle Doctor
   // https://runningcode.github.io/gradle-doctor/
@@ -91,7 +92,7 @@ subprojects {
   plugins.withType(com.android.build.gradle.api.AndroidBasePlugin) {
     // Apply Cache Fix
     project.apply plugin: "org.gradle.android.cache-fix"
-    project.apply plugin: 'kotlin-android'
+    project.apply plugin: "kotlin-android"
     project.apply plugin: "kotlin-kapt"
 
     // Configure matching toolchains
@@ -107,9 +108,10 @@ subprojects {
   }
 }
 
+
 allprojects {
   apply plugin: "com.diffplug.spotless"
-  apply plugin: 'com.github.ben-manes.versions'
+  apply plugin: "com.github.ben-manes.versions"
   apply plugin: "se.ascp.gradle.gradle-versions-filter"
 
   repositories {
@@ -120,7 +122,7 @@ allprojects {
 
     // Jitpack
     maven {
-      url 'https://jitpack.io'
+      setUrl("https://jitpack.io")
       content {
         includeGroup("com.github.pyamsoft.pydroid")
         includeGroup("com.github.pyamsoft")
@@ -130,26 +132,17 @@ allprojects {
 
   // Java compile show
   tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+    options.compilerArgs += [
+      "-Xlint:unchecked",
+      "-Xlint:deprecation"
+    ]
     options.deprecation = true
-  }
-
-  // Version Plugin ignore non-stable releases
-  def isNonStable = { version ->
-    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { version.toUpperCase().contains(it) }
-    def regex = /^[0-9,.v-]+(-r)?$/
-    return !stableKeyword && !(version ==~ regex)
-  }
-  tasks.named("dependencyUpdates").configure {
-    rejectVersionIf {
-      isNonStable(it.candidate.version)
-    }
   }
 
   // Spotless plugin
   spotless {
     java {
-      target "src/**/*.java"
+      target("src/**/*.java")
 
       removeUnusedImports()
       trimTrailingWhitespace()
@@ -157,7 +150,7 @@ allprojects {
       indentWithSpaces(2)
     }
     kotlin {
-      target "src/**/*.kt"
+      target("src/**/*.kt", "*.kts")
       ktfmt()
 
       trimTrailingWhitespace()
@@ -165,7 +158,7 @@ allprojects {
       indentWithSpaces(2)
     }
     groovyGradle {
-      target "*.gradle"
+      target("*.gradle")
       greclipse()
 
       trimTrailingWhitespace()

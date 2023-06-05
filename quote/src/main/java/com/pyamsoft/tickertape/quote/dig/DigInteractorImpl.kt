@@ -105,7 +105,9 @@ protected constructor(
       }
 
   final override suspend fun invalidateNews(symbol: StockSymbol) =
-      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateNews(listOf(symbol)) }
+      withContext(context = Dispatchers.Default) {
+        stockInteractorCache.invalidateNews(listOf(symbol))
+      }
 
   final override suspend fun getChart(
       symbol: StockSymbol,
@@ -147,5 +149,8 @@ protected constructor(
   final override suspend fun invalidateCharts(
       symbols: List<StockSymbol>,
       range: StockChart.IntervalRange,
-  ) = withContext(context = Dispatchers.Default) { interactorCache.invalidateCharts(symbols, range) }
+  ) =
+      withContext(context = Dispatchers.Default) {
+        interactorCache.invalidateCharts(symbols, range)
+      }
 }

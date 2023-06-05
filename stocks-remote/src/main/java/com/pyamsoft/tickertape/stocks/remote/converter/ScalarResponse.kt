@@ -16,8 +16,5 @@
 
 package com.pyamsoft.tickertape.stocks.remote.converter
 
-/**
- * Annotate a Service call with this to note it is a Scalar call
- */
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ScalarResponse
+/** Annotate a Service call with this to note it is a Scalar call */
+@Retention(AnnotationRetention.RUNTIME) annotation class ScalarResponse

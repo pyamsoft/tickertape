@@ -50,7 +50,9 @@ internal constructor(
   }
 
   override suspend fun invalidateScreener(screener: StockScreener) =
-      withContext(context = Dispatchers.Default) { stockInteractorCache.invalidateScreener(screener) }
+      withContext(context = Dispatchers.Default) {
+        stockInteractorCache.invalidateScreener(screener)
+      }
 
   override suspend fun getScreener(
       screener: StockScreener,

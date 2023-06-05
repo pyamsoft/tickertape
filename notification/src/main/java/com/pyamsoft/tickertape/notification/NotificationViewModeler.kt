@@ -21,11 +21,11 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.worker.WorkJobType
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class NotificationViewModeler
 @Inject

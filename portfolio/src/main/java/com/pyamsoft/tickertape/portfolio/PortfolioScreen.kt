@@ -45,7 +45,6 @@ import com.pyamsoft.tickertape.quote.base.BaseListScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
 import com.pyamsoft.tickertape.ui.test.createNewTestImageLoader
-import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 @Composable

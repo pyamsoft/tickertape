@@ -24,7 +24,9 @@ interface BgWorker {
 
   sealed class WorkResult {
     object Success : WorkResult()
+
     object Cancelled : WorkResult()
+
     data class Failed(val throwable: Throwable) : WorkResult()
   }
 }

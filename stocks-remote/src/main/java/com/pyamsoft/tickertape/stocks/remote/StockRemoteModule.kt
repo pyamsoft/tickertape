@@ -54,11 +54,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import javax.inject.Named
+import javax.inject.Singleton
 import retrofit2.Converter
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 abstract class StockRemoteModule {

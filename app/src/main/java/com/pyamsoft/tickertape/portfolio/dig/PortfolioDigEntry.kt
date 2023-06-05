@@ -17,15 +17,20 @@
 package com.pyamsoft.tickertape.portfolio.dig
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
+import com.pyamsoft.pydroid.theme.keylines
+import com.pyamsoft.pydroid.ui.app.rememberDialogProperties
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
@@ -80,21 +85,24 @@ internal fun PortfolioDigEntry(
       viewModel = viewModel,
   )
 
-  recDig.also { rec ->
-    if (rec == null) {
-      PortfolioDigContent(
-          modifier = modifier,
-          params = params,
-          component = component,
-          onDismiss = onDismiss,
-      )
-    } else {
-      PortfolioDigEntry(
-          modifier = modifier,
-          params = rec,
-          onDismiss = { viewModel.handleCloseRec() },
-      )
-    }
+  Dialog(
+      onDismissRequest = onDismiss,
+      properties = rememberDialogProperties(),
+  ) {
+    PortfolioDigContent(
+        modifier = modifier,
+        params = params,
+        component = component,
+        onDismiss = onDismiss,
+    )
+  }
+
+  recDig?.also { rec ->
+    PortfolioDigEntry(
+        modifier = modifier,
+        params = rec,
+        onDismiss = { viewModel.handleCloseRec() },
+    )
   }
 }
 
@@ -136,7 +144,7 @@ private fun PortfolioDigContent(
   )
 
   PortfolioDigScreen(
-      modifier = modifier,
+      modifier = modifier.padding(MaterialTheme.keylines.content),
       clock = clock,
       state = state,
       imageLoader = imageLoader,
@@ -197,7 +205,7 @@ private fun PortfolioDigContent(
       onDeletePriceAlert = {
         // TODO
       },
-      onAddNewHolding = {viewModel.handleAddTicker(scope = scope)},
+      onAddNewHolding = { viewModel.handleAddTicker(scope = scope) },
   )
 
   splitDialog?.also { s ->

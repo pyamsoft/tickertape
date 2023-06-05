@@ -29,8 +29,8 @@ internal interface OptionsService {
   @GET("https://query1.finance.yahoo.com/v7/finance/options/{symbol}")
   suspend fun getOptions(
       @Header("Cookie") cookie: String,
-      @Query("crumb", encoded = true) crumb: String,
       @Path("symbol") symbol: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("date") expirationDate: Long?,
   ): NetworkOptionResponse
 }

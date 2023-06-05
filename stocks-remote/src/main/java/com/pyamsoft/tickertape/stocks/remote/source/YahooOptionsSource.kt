@@ -128,8 +128,8 @@ internal constructor(
         cookie.withAuth { auth ->
           service.getOptions(
               cookie = auth.cookie,
-              crumb = auth.crumb,
               symbol = symbol.raw,
+              crumb = auth.crumb,
               // If the expiration date is passed, YF gives us options info for that date
               expirationDate = expirationDate?.atTime(0, 0)?.toEpochSecond(ZoneOffset.UTC),
           )

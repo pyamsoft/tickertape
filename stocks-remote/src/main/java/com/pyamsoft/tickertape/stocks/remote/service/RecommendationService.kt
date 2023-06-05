@@ -29,7 +29,7 @@ internal interface RecommendationService {
   @GET("https://query2.finance.yahoo.com/v6/finance/recommendationsbysymbol/{symbol}")
   suspend fun getRecommendations(
       @Header("Cookie") cookie: String,
+      @Path("symbol") symbol: String,
       @Query("crumb", encoded = true) crumb: String,
-      @Path("symbol") symbol: String
   ): NetworkRecommendationResponse
 }

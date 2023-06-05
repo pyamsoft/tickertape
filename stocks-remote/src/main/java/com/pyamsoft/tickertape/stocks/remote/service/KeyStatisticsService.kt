@@ -29,8 +29,8 @@ internal interface KeyStatisticsService {
   @GET("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}")
   suspend fun getStatistics(
       @Header("Cookie") cookie: String,
-      @Query("crumb", encoded = true) crumb: String,
       @Path("symbol") symbol: String,
+      @Query("crumb", encoded = true) crumb: String,
       @Query("modules") modules: String
   ): NetworkKeyStatisticsResponse
 }

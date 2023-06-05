@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.main
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -33,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import com.pyamsoft.pydroid.ui.util.fullScreenDialog
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigEntry
 import com.pyamsoft.tickertape.quote.Ticker
@@ -89,26 +89,21 @@ internal fun MainScreen(
         }
       },
   ) { pv ->
-    Crossfade(
-        modifier = Modifier.fillMaxSize(),
-        targetState = portfolioDig,
-    ) { dig ->
-      if (dig == null) {
-        MainContent(
-            modifier = Modifier.fillMaxSize().padding(pv),
-            appName = appName,
-            pagerState = pagerState,
-            allTabs = allTabs,
-            onHomeDig = onHomeDig,
-            onPortfolioDig = onPortfolioDig,
-        )
-      } else {
-        PortfolioDigEntry(
-            modifier = Modifier.fillMaxSize().padding(pv),
-            params = dig,
-            onDismiss = onCloseDig,
-        )
-      }
+    MainContent(
+        modifier = Modifier.fillMaxSize().padding(pv),
+        appName = appName,
+        pagerState = pagerState,
+        allTabs = allTabs,
+        onHomeDig = onHomeDig,
+        onPortfolioDig = onPortfolioDig,
+    )
+
+    portfolioDig?.also { p ->
+      PortfolioDigEntry(
+          modifier = Modifier.fullScreenDialog(),
+          params = p,
+          onDismiss = onCloseDig,
+      )
     }
   }
 }

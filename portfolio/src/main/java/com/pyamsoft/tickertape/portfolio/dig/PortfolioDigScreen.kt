@@ -131,6 +131,7 @@ fun PortfolioDigScreen(
   Surface(
       modifier = modifier,
       elevation = DialogDefaults.Elevation,
+      shape = MaterialTheme.shapes.medium,
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

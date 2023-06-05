@@ -49,8 +49,8 @@ internal constructor(
         cookie.withAuth { auth ->
           service.getStatistics(
               cookie = auth.cookie,
-              crumb = auth.crumb,
               symbol = symbol.raw,
+              crumb = auth.crumb,
               modules = ALL_MODULES_STRING,
           )
         }

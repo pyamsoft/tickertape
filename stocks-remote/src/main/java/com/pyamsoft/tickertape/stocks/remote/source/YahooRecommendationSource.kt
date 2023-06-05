@@ -45,8 +45,8 @@ internal constructor(
               cookie.withAuth { auth ->
                 service.getRecommendations(
                     cookie = auth.cookie,
-                    crumb = auth.crumb,
                     symbol = symbol.raw,
+                    crumb = auth.crumb,
                 )
               }
 

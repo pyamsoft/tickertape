@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -45,7 +46,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -100,9 +100,9 @@ internal fun rememberTabs(
     } else {
       return@remember PortfolioDigSections.values()
           .asSequence()
-          .filterNot {  PortfolioDigSections.NEWS == it }
-          .filterNot {  PortfolioDigSections.PRICE_ALERTS == it }
-          .filterNot {  PortfolioDigSections.OPTIONS_CHAIN == it }
+          .filterNot { PortfolioDigSections.NEWS == it }
+          .filterNot { PortfolioDigSections.PRICE_ALERTS == it }
+          .filterNot { PortfolioDigSections.OPTIONS_CHAIN == it }
           .filter { v ->
             // Kotlin is weird sometimes
             when (val h: Maybe<out DbHolding> = holding.requireNotNull()) {
@@ -149,7 +149,11 @@ internal fun PortfolioDigToolbar(
       elevation = ZeroElevation,
       contentColor = Color.White,
       color = MaterialTheme.colors.primary,
-      shape = RectangleShape,
+      shape =
+          MaterialTheme.shapes.medium.copy(
+              bottomEnd = ZeroCornerSize,
+              bottomStart = ZeroCornerSize,
+          ),
   ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

@@ -63,9 +63,6 @@ dependencies {
 
   api("io.coil-kt:coil-compose-base:2.4.0")
 
-  // Material Design
-  implementation("com.google.android.material:material:1.9.0")
-
   // PYDroid
   api("com.github.pyamsoft.pydroid:ui:${rootProject.extra["pydroid"]}")
 

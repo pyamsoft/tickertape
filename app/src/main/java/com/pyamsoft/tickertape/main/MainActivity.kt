@@ -35,13 +35,13 @@ import com.pyamsoft.pydroid.util.doOnCreate
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
+import com.pyamsoft.tickertape.TickerTapeTheme
 import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationData
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
-import com.pyamsoft.tickertape.ui.TickerTapeTheme
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
@@ -169,7 +169,7 @@ internal class MainActivity : AppCompatActivity() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    themeViewModel?.handleSyncDarkTheme(this)
+    themeViewModel?.handleSyncDarkTheme(newConfig)
   }
 
   override fun onDestroy() {

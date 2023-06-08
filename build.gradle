@@ -23,7 +23,7 @@ buildscript {
     compileSdk = 33
 
     // Us
-    pydroid = "26.5.0"
+    pydroid = "26.5.2"
     cachify = "0.3.0"
 
     // Jobs

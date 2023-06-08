@@ -25,7 +25,6 @@ import com.pyamsoft.tickertape.home.HomeComponent
 import com.pyamsoft.tickertape.notification.NotificationComponent
 import com.pyamsoft.tickertape.portfolio.PortfolioComponent
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigComponent
-import com.pyamsoft.tickertape.ui.ThemeProviderModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -33,7 +32,7 @@ import dagger.Provides
 import dagger.Subcomponent
 
 @ActivityScope
-@Subcomponent(modules = [ThemeProviderModule::class, MainComponent.MainModule::class])
+@Subcomponent(modules = [MainComponent.MainModule::class])
 internal interface MainComponent {
 
   @CheckResult fun plusHome(): HomeComponent.Factory

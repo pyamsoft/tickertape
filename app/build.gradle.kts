@@ -131,9 +131,6 @@ dependencies {
   implementation(
       "com.google.accompanist:accompanist-systemuicontroller:${rootProject.extra["accompanist"]}")
 
-  // Material Design
-  implementation("com.google.android.material:material:1.9.0")
-
   implementation(project(":alert"))
   implementation(project(":core"))
   implementation(project(":db"))

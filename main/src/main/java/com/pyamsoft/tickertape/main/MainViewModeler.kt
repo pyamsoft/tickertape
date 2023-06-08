@@ -19,7 +19,6 @@ package com.pyamsoft.tickertape.main
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.pydroid.bus.EventBus
-import com.pyamsoft.tickertape.core.ActivityScope
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.PortfolioDigParams
@@ -35,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ActivityScope
 class MainViewModeler
 @Inject
 internal constructor(

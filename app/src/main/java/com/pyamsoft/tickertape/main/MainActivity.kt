@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.ui.app.installPYDroid
@@ -124,24 +123,17 @@ internal class MainActivity : AppCompatActivity() {
     handleLaunchIntent()
 
     val tvm = themeViewModel.requireNotNull()
-    val vm = viewModel.requireNotNull()
     val appName = getString(R.string.app_name)
 
     setContent {
       val themeState = tvm.state
       val theme by themeState.theme.collectAsState()
 
-      val state = vm.state
-      val portfolioDig by state.portfolioDigParams.collectAsState()
-
-      val isDigging = remember(portfolioDig) { portfolioDig != null }
-
       TickerTapeTheme(
           theme = theme,
       ) {
         SystemBars(
             theme = theme,
-            isDigging = isDigging,
         )
         InstallPYDroidExtras()
 

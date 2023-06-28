@@ -32,7 +32,6 @@ import com.pyamsoft.tickertape.quote.DeleteRestoreViewModeler
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +39,12 @@ import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioViewModeler
 @Inject
 internal constructor(
-    override val state: MutablePortfolioViewState,
+    state: MutablePortfolioViewState,
     private val interactor: PortfolioInteractor,
     private val interactorCache: PortfolioInteractor.Cache,
     private val mainSelectionConsumer: EventConsumer<MainSelectionEvent>,
@@ -52,6 +52,7 @@ internal constructor(
     private val processor: PortfolioProcessor,
 ) : DeleteRestoreViewModeler<PortfolioViewState>(state) {
 
+  private val vmState = state
   private var fullPortfolio = MutableStateFlow(emptyList<PortfolioStock>())
 
   @CheckResult
@@ -146,7 +147,7 @@ internal constructor(
 
   private fun handleDeleteHolding(holding: DbHolding, offerUndo: Boolean) {
     // On delete, we don't need to re-fetch quotes from the network
-    val s = state
+    val s = vmState
 
     fullPortfolio.update { p -> p.filterNot { it.holding.id == holding.id } }
 
@@ -157,7 +158,7 @@ internal constructor(
   }
 
   private fun handleOpenDelete(params: PortfolioRemoveParams) {
-    state.remove.value = params
+    vmState.remove.value = params
   }
 
   private fun generateList(
@@ -167,8 +168,8 @@ internal constructor(
     val combined =
         combineTransform(
             fullPortfolio,
-            state.query,
-            state.section,
+            vmState.query,
+            vmState.section,
         ) { all, search, section ->
           emit(
               ItemPayload(
@@ -181,8 +182,8 @@ internal constructor(
 
     scope.launch(context = Dispatchers.Default) {
       combined.collect { (stocks, search, section) ->
-        state.portfolio.value = processor.process(stocks)
-        state.stocks.value =
+        vmState.portfolio.value = processor.process(stocks)
+        vmState.stocks.value =
             stocks
                 .asSequence()
                 .run {
@@ -215,7 +216,7 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = state
+        val s = vmState
 
         registry.registerProvider(KEY_SEARCH) { s.query.value }.also { add(it) }
 
@@ -225,7 +226,7 @@ internal constructor(
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
-    val s = state
+    val s = vmState
 
     registry.consumeRestored(KEY_SEARCH)?.let { it as String }?.also { s.query.value = it }
 
@@ -265,40 +266,40 @@ internal constructor(
   }
 
   fun handleRefreshList(scope: CoroutineScope, force: Boolean) {
-    if (state.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
+    if (vmState.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
       return
     }
 
     scope.launch(context = Dispatchers.Default) {
-      if (state.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
+      if (vmState.loadingState.value == PortfolioViewState.LoadingState.LOADING) {
         return@launch
       }
 
-      state.loadingState.value = PortfolioViewState.LoadingState.LOADING
+      vmState.loadingState.value = PortfolioViewState.LoadingState.LOADING
       fetchPortfolio(force)
           .onSuccess { list ->
-            state.apply {
+            vmState.apply {
               fullPortfolio.value = list
               error.value = null
             }
           }
           .onFailure { Timber.e(it, "Failed to refresh entry list") }
           .onFailure {
-            state.apply {
+            vmState.apply {
               fullPortfolio.value = emptyList()
               error.value = it
             }
           }
-          .onFinally { state.loadingState.value = PortfolioViewState.LoadingState.DONE }
+          .onFinally { vmState.loadingState.value = PortfolioViewState.LoadingState.DONE }
     }
   }
 
   fun handleSearch(query: String) {
-    state.query.value = query
+    vmState.query.value = query
   }
 
   fun handleSectionChanged(tab: EquityType) {
-    state.section.value = tab
+    vmState.section.value = tab
   }
 
   fun handleOpenDelete(stock: PortfolioStock) {
@@ -311,17 +312,17 @@ internal constructor(
   }
 
   fun handleCloseDelete() {
-    state.remove.value = null
+    vmState.remove.value = null
   }
 
   fun handleHoldingDeleteFinal() {
-    handleDeleteFinal(state.recentlyDeleteHolding) { handleDeleteHolding(it, offerUndo = false) }
+    handleDeleteFinal(vmState.recentlyDeleteHolding) { handleDeleteHolding(it, offerUndo = false) }
   }
 
   fun handleRestoreDeletedHolding(scope: CoroutineScope) {
     handleRestoreDeleted(
         scope = scope,
-        recentlyDeleted = state.recentlyDeleteHolding,
+        recentlyDeleted = vmState.recentlyDeleteHolding,
     ) {
       interactor.restoreHolding(it)
     }

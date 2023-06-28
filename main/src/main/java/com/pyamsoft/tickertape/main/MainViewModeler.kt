@@ -28,19 +28,21 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class MainViewModeler
 @Inject
 internal constructor(
-    override val state: MutableMainViewState,
+    state: MutableMainViewState,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
     private val jsonParser: JsonParser,
 ) : AbstractViewModeler<MainViewState>(state) {
+
+  private val vmState = state
 
   fun handleMainActionSelected(scope: CoroutineScope, page: MainPage) {
     val event = MainSelectionEvent(page = page)
@@ -51,7 +53,7 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = state
+        val s = vmState
 
         registry
             .registerProvider(KEY_PORTFOLIO_DIG) {
@@ -96,7 +98,7 @@ internal constructor(
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
-    state.portfolioDigParams.value =
+    vmState.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = holding.symbol,
             equityType = holding.type,
@@ -111,7 +113,7 @@ internal constructor(
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
-    state.portfolioDigParams.value =
+    vmState.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = symbol,
             equityType = equityType,
@@ -121,7 +123,7 @@ internal constructor(
   }
 
   fun handleCloseDig() {
-    state.portfolioDigParams.value = null
+    vmState.portfolioDigParams.value = null
   }
 
   companion object {

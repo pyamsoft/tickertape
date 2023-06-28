@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.dig.position
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,7 +27,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
-import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.app.rememberDialogProperties
@@ -49,7 +49,7 @@ internal constructor(
 
   @JvmField @Inject internal var viewModel: PositionAddViewModeler? = null
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ApplicationScope.retrieve(activity)
         .plusPositionComponent()
         .create(
@@ -93,8 +93,7 @@ internal fun PositionEntry(
     viewModel.handleOpenDateDialog(date)
   }
 
-  val state = viewModel.state
-  val dateDialog by state.datePicker.collectAsState()
+  val dateDialog by viewModel.datePicker.collectAsState()
 
   MountHooks(
       viewModel = viewModel,
@@ -106,7 +105,7 @@ internal fun PositionEntry(
   ) {
     PositionAddScreen(
         modifier = modifier.padding(MaterialTheme.keylines.content),
-        state = state,
+        state = viewModel,
         symbol = params.symbol,
         onClose = { handleDismiss() },
         onPriceChanged = { viewModel.handlePriceChanged(it) },

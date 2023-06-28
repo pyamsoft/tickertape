@@ -28,21 +28,19 @@ import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.fromJson
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class MainViewModeler
 @Inject
 internal constructor(
-    state: MutableMainViewState,
+    override val state: MutableMainViewState,
     private val mainActionSelectionBus: EventBus<MainSelectionEvent>,
     private val jsonParser: JsonParser,
-) : AbstractViewModeler<MainViewState>(state) {
-
-  private val vmState = state
+) : MainViewState by state, AbstractViewModeler<MainViewState>(state) {
 
   fun handleMainActionSelected(scope: CoroutineScope, page: MainPage) {
     val event = MainSelectionEvent(page = page)
@@ -53,7 +51,7 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = vmState
+        val s = state
 
         registry
             .registerProvider(KEY_PORTFOLIO_DIG) {
@@ -98,7 +96,7 @@ internal constructor(
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
-    vmState.portfolioDigParams.value =
+    state.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = holding.symbol,
             equityType = holding.type,
@@ -113,7 +111,7 @@ internal constructor(
       lookupSymbol: StockSymbol?,
       currentPrice: StockMoneyValue? = null
   ) {
-    vmState.portfolioDigParams.value =
+    state.portfolioDigParams.value =
         PortfolioDigParams(
             symbol = symbol,
             equityType = equityType,
@@ -123,7 +121,7 @@ internal constructor(
   }
 
   fun handleCloseDig() {
-    vmState.portfolioDigParams.value = null
+    state.portfolioDigParams.value = null
   }
 
   companion object {

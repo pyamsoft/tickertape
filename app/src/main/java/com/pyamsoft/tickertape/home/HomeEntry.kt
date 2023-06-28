@@ -16,11 +16,11 @@
 
 package com.pyamsoft.tickertape.home
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
@@ -41,7 +41,7 @@ class HomeInjector @Inject internal constructor() : ComposableInjector() {
     imageLoader = null
   }
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ActivityScope.retrieve(activity).plusHome().create().inject(this)
   }
 }
@@ -56,12 +56,11 @@ fun HomeEntry(
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
 
-  val state = viewModel.state
-  val isSettingsOpen by state.isSettingsOpen.collectAsState()
+  val isSettingsOpen by viewModel.isSettingsOpen.collectAsState()
 
   HomeScreen(
       modifier = modifier,
-      state = state,
+      state = viewModel,
       appName = appName,
       imageLoader = imageLoader,
       onSettingsClicked = { viewModel.handleOpenSettings() },

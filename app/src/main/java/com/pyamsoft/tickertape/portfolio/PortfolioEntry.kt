@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -48,7 +48,7 @@ internal class PortfolioInjector @Inject internal constructor() : ComposableInje
     imageLoader = null
   }
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ActivityScope.retrieve(activity).plusPortfolio().create().inject(this)
   }
 }
@@ -93,8 +93,7 @@ internal fun PortfolioEntry(
 
     val scope = rememberCoroutineScope()
 
-    val state = viewModel.state
-    val removeDialog by state.remove.collectAsState()
+    val removeDialog by viewModel.remove.collectAsState()
 
     MountHooks(
         viewModel = viewModel,
@@ -103,7 +102,7 @@ internal fun PortfolioEntry(
 
     PortfolioScreen(
         modifier = modifier,
-        state = state,
+        state = viewModel,
         imageLoader = imageLoader,
         onRefresh = {
           viewModel.handleRefreshList(

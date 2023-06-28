@@ -27,16 +27,16 @@ import com.pyamsoft.tickertape.quote.chart.ChartDataProcessor
 import com.pyamsoft.tickertape.stocks.api.StockChart
 import com.pyamsoft.tickertape.stocks.api.StockScreener
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class HomeViewModeler
 @Inject
 internal constructor(
-    state: MutableHomeViewState,
+    override val state: MutableHomeViewState,
     private val homeInteractor: HomeInteractor,
     private val homeInteractorCache: HomeInteractor.Cache,
     private val portfolioInteractor: PortfolioInteractor,
@@ -45,9 +45,7 @@ internal constructor(
     private val tickerInteractorCache: TickerInteractor.Cache,
     private val portfolioProcessor: PortfolioProcessor,
     private val chartDataProcessor: ChartDataProcessor,
-) : AbstractViewModeler<HomeViewState>(state) {
-
-  private val vmState = state
+) : HomeViewState by state, AbstractViewModeler<HomeViewState>(state) {
 
   @CheckResult
   private suspend fun List<Ticker>.asHomeStocks(): List<HomeStock> {
@@ -84,13 +82,13 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = vmState
+        val s = state
 
         registry.registerProvider(KEY_SETTINGS) { s.isSettingsOpen.value }.also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
-    val s = vmState
+    val s = state
 
     registry
         .consumeRestored(KEY_SETTINGS)
@@ -99,7 +97,7 @@ internal constructor(
   }
 
   fun handleFetchPortfolio(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       s.isLoadingPortfolio.value = HomeBaseViewState.LoadingState.LOADING
 
@@ -127,7 +125,7 @@ internal constructor(
   }
 
   fun handleFetchIndexes(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       s.isLoadingIndexes.value = HomeBaseViewState.LoadingState.LOADING
 
@@ -162,7 +160,7 @@ internal constructor(
   }
 
   fun handleFetchGainers(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -179,7 +177,7 @@ internal constructor(
   }
 
   fun handleFetchGrowthTech(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -196,7 +194,7 @@ internal constructor(
   }
 
   fun handleFetchUndervaluedGrowth(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -213,7 +211,7 @@ internal constructor(
   }
 
   fun handleFetchMostActive(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -230,7 +228,7 @@ internal constructor(
   }
 
   fun handleFetchLosers(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -247,7 +245,7 @@ internal constructor(
   }
 
   fun handleFetchMostShorted(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       handleFetchScreener(
           force,
@@ -264,7 +262,7 @@ internal constructor(
   }
 
   fun handleFetchTrending(scope: CoroutineScope, force: Boolean) {
-    val s = vmState
+    val s = state
     s.isLoadingTrending.value = HomeBaseViewState.LoadingState.LOADING
     scope.launch(context = Dispatchers.Default) {
       if (force) {
@@ -291,11 +289,11 @@ internal constructor(
   }
 
   fun handleOpenSettings() {
-    vmState.isSettingsOpen.value = true
+    state.isSettingsOpen.value = true
   }
 
   fun handleCloseSettings() {
-    vmState.isSettingsOpen.value = false
+    state.isSettingsOpen.value = false
   }
 
   companion object {

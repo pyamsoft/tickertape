@@ -39,8 +39,8 @@ import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationD
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class MainActivity : AppCompatActivity() {
 
@@ -122,12 +122,11 @@ internal class MainActivity : AppCompatActivity() {
 
     handleLaunchIntent()
 
-    val tvm = themeViewModel.requireNotNull()
+    val vm = themeViewModel.requireNotNull()
     val appName = getString(R.string.app_name)
 
     setContent {
-      val themeState = tvm.state
-      val theme by themeState.theme.collectAsState()
+      val theme by vm.theme.collectAsState()
 
       TickerTapeTheme(
           theme = theme,

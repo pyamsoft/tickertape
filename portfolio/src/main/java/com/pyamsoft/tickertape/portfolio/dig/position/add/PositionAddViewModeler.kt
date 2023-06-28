@@ -27,29 +27,28 @@ import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.quote.dig.PositionParams
 import com.pyamsoft.tickertape.stocks.api.asMoney
 import com.pyamsoft.tickertape.stocks.api.asShares
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PositionAddViewModeler
 @Inject
 internal constructor(
-    state: MutablePositionAddViewState,
+    override val state: MutablePositionAddViewState,
     private val interactor: PositionAddInteractor,
     private val params: PositionParams,
     private val clock: Clock,
 ) :
+    PositionAddViewState by state,
     BaseAddViewModeler<PositionAddViewState, DbPosition.Id>(
         state = state,
         existingId = params.existingPositionId,
     ) {
-
-  private val vmState = state
 
   private var existingPosition: DbPosition? = null
   private var positionId = decideInitialPositionId(params.existingPositionId)
@@ -65,7 +64,7 @@ internal constructor(
 
   @CheckResult
   private fun resolvePosition(existing: DbPosition?): DbPosition {
-    val s = vmState
+    val s = state
     val price = s.pricePerShare.value.toDouble()
     val shareCount = s.numberOfShares.value.toDouble()
     val date = s.dateOfPurchase.value.requireNotNull()
@@ -91,7 +90,7 @@ internal constructor(
 
   private fun loadExistingPositionData(existing: DbPosition) {
     Timber.d("Load existing position data from position: $existing")
-    vmState.apply {
+    state.apply {
       // Save this full position for later
       existingPosition = existing
 
@@ -122,7 +121,7 @@ internal constructor(
   }
 
   override fun checkSubmittable() {
-    vmState.apply {
+    state.apply {
       val isAllValuesDefined =
           pricePerShare.value.toDoubleOrNull() != null &&
               numberOfShares.value.toDoubleOrNull() != null &&
@@ -132,7 +131,7 @@ internal constructor(
   }
 
   override fun onDateChanged(date: LocalDate) {
-    vmState.dateOfPurchase.value = date
+    state.dateOfPurchase.value = date
   }
 
   override fun isCurrentId(id: DbPosition.Id): Boolean {
@@ -143,7 +142,7 @@ internal constructor(
       scope: CoroutineScope,
       onClose: () -> Unit,
   ) {
-    val s = vmState
+    val s = state
     s.apply {
       if (isSubmitting.value || !isSubmittable.value) {
         return
@@ -197,7 +196,7 @@ internal constructor(
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         registry
             .registerProvider(KEY_DATE_PICKER) {
-              vmState.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
+              state.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
             }
             .also { add(it) }
       }
@@ -223,19 +222,19 @@ internal constructor(
   }
 
   fun handlePriceChanged(pricePerShare: String) {
-    handleNumberAsStringChange(pricePerShare) { vmState.pricePerShare.value = it }
+    handleNumberAsStringChange(pricePerShare) { state.pricePerShare.value = it }
   }
 
   fun handleNumberChanged(numberOfShares: String) {
-    handleNumberAsStringChange(numberOfShares) { vmState.numberOfShares.value = it }
+    handleNumberAsStringChange(numberOfShares) { state.numberOfShares.value = it }
   }
 
   fun handleOpenDateDialog(date: LocalDate?) {
-    vmState.datePicker.value = date ?: LocalDate.now(clock)
+    state.datePicker.value = date ?: LocalDate.now(clock)
   }
 
   fun handleCloseDateDialog() {
-    vmState.datePicker.value = null
+    state.datePicker.value = null
   }
 
   companion object {

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.portfolio.dig
 
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -26,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
-import androidx.fragment.app.FragmentActivity
 import coil.ImageLoader
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.theme.keylines
@@ -51,7 +51,7 @@ internal constructor(
   @JvmField @Inject internal var clock: Clock? = null
   @JvmField @Inject internal var imageLoader: ImageLoader? = null
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ActivityScope.retrieve(activity)
         .plusPortfolioDig()
         .create(
@@ -77,8 +77,7 @@ internal fun PortfolioDigEntry(
 
   val viewModel = rememberNotNull(component.viewModel)
 
-  val state = viewModel.state
-  val recDig by state.recommendedDig.collectAsState()
+  val recDig by viewModel.recommendedDig.collectAsState()
 
   // Always run the mount hooks as this handles the VM save state
   MountHooks(
@@ -135,9 +134,8 @@ private fun PortfolioDigContent(
 
   val scope = rememberCoroutineScope()
 
-  val state = viewModel.state
-  val positionDialog by state.positionDialog.collectAsState()
-  val splitDialog by state.splitDialog.collectAsState()
+  val positionDialog by viewModel.positionDialog.collectAsState()
+  val splitDialog by viewModel.splitDialog.collectAsState()
 
   BackHandler(
       onBack = onDismiss,
@@ -146,7 +144,7 @@ private fun PortfolioDigContent(
   PortfolioDigScreen(
       modifier = modifier.padding(MaterialTheme.keylines.content),
       clock = clock,
-      state = state,
+      state = viewModel,
       imageLoader = imageLoader,
       onClose = onDismiss,
       onChartScrub = { viewModel.handleChartDateScrubbed(it) },

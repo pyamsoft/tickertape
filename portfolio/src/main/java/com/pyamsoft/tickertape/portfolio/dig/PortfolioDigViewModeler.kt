@@ -40,6 +40,7 @@ import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.fromJson
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -48,12 +49,11 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
 internal constructor(
-    state: MutablePortfolioDigViewState,
+    override val state: MutablePortfolioDigViewState,
     private val params: PortfolioDigParams,
     private val newInteractor: NewTickerInteractor,
     private val interactor: PortfolioDigInteractor,
@@ -61,6 +61,7 @@ internal constructor(
     private val interactorCache: PortfolioDigInteractor.Cache,
     processor: ChartDataProcessor,
 ) :
+    PortfolioDigViewState by state,
     DigViewModeler<MutablePortfolioDigViewState>(
         state,
         params.lookupSymbol,
@@ -69,11 +70,9 @@ internal constructor(
         interactorCache,
     ) {
 
-  private val vmState = state
-
   @CheckResult
   private suspend fun handleLoadSplits(force: Boolean): ResultWrapper<List<DbSplit>> =
-      when (val holding = vmState.holding.value) {
+      when (val holding = state.holding.value) {
         is Maybe.Data -> {
           val data = holding.data
           if (force) {
@@ -109,7 +108,7 @@ internal constructor(
       force: Boolean,
       splits: List<DbSplit>
   ): ResultWrapper<List<PositionStock>> =
-      when (val holding = vmState.holding.value) {
+      when (val holding = state.holding.value) {
         is Maybe.Data -> {
           val data = holding.data
           if (force) {
@@ -135,7 +134,7 @@ internal constructor(
           add(async { loadTicker(force) })
 
           @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
-          when (vmState.section.value) {
+          when (state.section.value) {
             PortfolioDigSections.PRICE_ALERTS -> {
               // TODO add price alerts work
             }
@@ -182,7 +181,7 @@ internal constructor(
   }
 
   private suspend fun loadSplits(force: Boolean) {
-    val s = vmState
+    val s = state
     handleLoadSplits(force)
         .onSuccess { sp ->
           s.apply {
@@ -201,13 +200,13 @@ internal constructor(
   private suspend fun loadHolding(force: Boolean) {
     handleLoadHolding(force)
         .onSuccess { h ->
-          vmState.apply {
+          state.apply {
             holding.value = h
             holdingError.value = null
           }
         }
         .onFailure { e ->
-          vmState.apply {
+          state.apply {
             holding.value = null
             holdingError.value = e
           }
@@ -215,7 +214,7 @@ internal constructor(
   }
 
   private suspend fun loadPositions(force: Boolean) {
-    val s = vmState
+    val s = state
     val splits = s.stockSplits.value
 
     handleLoadPositions(force, splits)
@@ -242,7 +241,7 @@ internal constructor(
   }
 
   private fun onPositionInsertOrUpdate(position: DbPosition, holding: DbHolding) {
-    val s = vmState
+    val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         positions =
             insertOrUpdate(
@@ -259,7 +258,7 @@ internal constructor(
   }
 
   private fun onPositionUpdated(position: DbPosition) {
-    when (val holding = vmState.holding.value) {
+    when (val holding = state.holding.value) {
       is Maybe.Data -> {
         onPositionInsertOrUpdate(position, holding.data)
       }
@@ -271,7 +270,7 @@ internal constructor(
   }
 
   private fun onPositionInserted(position: DbPosition) {
-    when (val holding = vmState.holding.value) {
+    when (val holding = state.holding.value) {
       is Maybe.Data -> {
         onPositionInsertOrUpdate(position, holding.data)
       }
@@ -283,7 +282,7 @@ internal constructor(
   }
 
   private fun onPositionDeleted(position: DbPosition, offerUndo: Boolean) {
-    val s = vmState
+    val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         positions = s.positions.value.filterNot { it.id == position.id },
     )
@@ -303,7 +302,7 @@ internal constructor(
   }
 
   private fun onSplitInsertOrUpdate(split: DbSplit) {
-    val s = vmState
+    val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         splits =
             insertOrUpdate(s.stockSplits.value, split) {
@@ -321,7 +320,7 @@ internal constructor(
   }
 
   private fun onSplitDeleted(split: DbSplit, offerUndo: Boolean) {
-    val s = vmState
+    val s = state
     s.handlePositionListRegenOnSplitsUpdated(
         splits = s.stockSplits.value.filterNot { it.id == split.id },
     )
@@ -333,34 +332,34 @@ internal constructor(
   }
 
   private fun handleOpenSplit(params: SplitParams) {
-    vmState.splitDialog.value = params
+    state.splitDialog.value = params
   }
 
   private fun handleOpenPosition(params: PositionParams) {
-    vmState.positionDialog.value = params
+    state.positionDialog.value = params
   }
 
   private fun handleOpenRec(params: PortfolioDigParams) {
-    vmState.recommendedDig.value = params
+    state.recommendedDig.value = params
   }
 
   override fun handleLoadTicker(scope: CoroutineScope, force: Boolean) {
-    if (vmState.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
+    if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
       return
     }
 
     scope.launch(context = Dispatchers.Default) {
-      if (vmState.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
+      if (state.loadingState.value == BaseDigViewState.LoadingState.LOADING) {
         return@launch
       }
 
       Timber.d("Start loading everything")
-      vmState.loadingState.value = BaseDigViewState.LoadingState.LOADING
+      state.loadingState.value = BaseDigViewState.LoadingState.LOADING
 
       handleLoadAll(force)
 
       Timber.d("Done loading everything")
-      vmState.loadingState.value = BaseDigViewState.LoadingState.DONE
+      state.loadingState.value = BaseDigViewState.LoadingState.DONE
     }
   }
 
@@ -372,7 +371,7 @@ internal constructor(
         // We need the extra composeHash here so that each new PDE instance can keep its own data
         // without overriding the others
 
-        val s = vmState
+        val s = state
 
         registry
             .registerProvider(KEY_SPLIT_DIALOG) {
@@ -467,7 +466,7 @@ internal constructor(
   }
 
   fun handleTabUpdated(scope: CoroutineScope, section: PortfolioDigSections) {
-    vmState.section.value = section
+    state.section.value = section
     handleLoadTicker(scope, force = false)
   }
 
@@ -486,7 +485,7 @@ internal constructor(
   }
 
   fun handleCloseSplit() {
-    vmState.splitDialog.value = null
+    state.splitDialog.value = null
   }
 
   fun handleOpenPosition(
@@ -505,7 +504,7 @@ internal constructor(
   }
 
   fun handleClosePosition() {
-    vmState.positionDialog.value = null
+    state.positionDialog.value = null
   }
 
   fun handleRecClicked(ticker: Ticker) {
@@ -529,37 +528,37 @@ internal constructor(
   }
 
   fun handleCloseRec() {
-    vmState.recommendedDig.value = null
+    state.recommendedDig.value = null
   }
 
   fun handlePositionDeleteFinal() {
-    handleDeleteFinal(vmState.recentlyDeletePosition) { onPositionDeleted(it, offerUndo = false) }
+    handleDeleteFinal(state.recentlyDeletePosition) { onPositionDeleted(it, offerUndo = false) }
   }
 
   fun handleRestoreDeletedPosition(scope: CoroutineScope) {
     handleRestoreDeleted(
         scope = scope,
-        recentlyDeleted = vmState.recentlyDeletePosition,
+        recentlyDeleted = state.recentlyDeletePosition,
     ) {
       interactor.restorePosition(it)
     }
   }
 
   fun handleSplitDeleteFinal() {
-    handleDeleteFinal(vmState.recentlyDeleteSplit) { onSplitDeleted(it, offerUndo = false) }
+    handleDeleteFinal(state.recentlyDeleteSplit) { onSplitDeleted(it, offerUndo = false) }
   }
 
   fun handleRestoreDeletedSplit(scope: CoroutineScope) {
     handleRestoreDeleted(
         scope = scope,
-        recentlyDeleted = vmState.recentlyDeleteSplit,
+        recentlyDeleted = state.recentlyDeleteSplit,
     ) {
       interactor.restoreSplit(it)
     }
   }
 
   fun handleAddTicker(scope: CoroutineScope) {
-    val h = vmState.holding.value ?: return
+    val h = state.holding.value ?: return
 
     scope.launch(context = Dispatchers.Default) {
       when (h) {

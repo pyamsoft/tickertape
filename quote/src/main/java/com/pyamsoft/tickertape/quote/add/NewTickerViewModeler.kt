@@ -31,23 +31,21 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import java.time.LocalDate
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
-import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject
 internal constructor(
-    state: MutableNewTickerViewState,
+    override val state: MutableNewTickerViewState,
     private val interactor: NewTickerInteractor,
     interactorCache: NewTickerInteractor.Cache,
-) : AbstractViewModeler<NewTickerViewState>(state) {
-
-  private val vmState = state
+) : NewTickerViewState by state, AbstractViewModeler<NewTickerViewState>(state) {
 
   private val tickerResolutionRunner =
       highlander<ResultWrapper<Ticker>, Boolean, String> { force, query ->
@@ -82,7 +80,7 @@ internal constructor(
       scope: CoroutineScope,
       symbol: String,
   ) {
-    val s = vmState
+    val s = state
     s.resolvedTicker.value = null
 
     if (symbol.isBlank()) {
@@ -115,7 +113,7 @@ internal constructor(
       scope: CoroutineScope,
       symbol: String,
   ) {
-    val s = vmState
+    val s = state
 
     if (symbol.isBlank()) {
       Timber.w("Cannot lookup for empty symbol")
@@ -160,7 +158,7 @@ internal constructor(
 
   @CheckResult
   private fun processLookupResults(results: List<SearchResult>): List<SearchResult> {
-    val equityType = vmState.equityType.value
+    val equityType = state.equityType.value
     return if (equityType == null) {
       emptyList()
     } else {
@@ -202,7 +200,7 @@ internal constructor(
   }
 
   private fun performLookupOptionData(scope: CoroutineScope, symbol: StockSymbol) {
-    val s = vmState
+    val s = state
     scope.launch(context = Dispatchers.Default) {
       optionLookupRunner
           .call(false, symbol, s.optionExpirationDate.value)
@@ -234,7 +232,7 @@ internal constructor(
       symbol: StockSymbol,
       dismiss: Boolean,
   ) {
-    val s = vmState
+    val s = state
     s.apply {
       Timber.d("Found new valid symbol: $symbol")
       validSymbol.value = symbol
@@ -254,19 +252,19 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = vmState
+        val s = state
 
         registry.registerProvider(KEY_SYMBOL) { s.symbol.value }.also { add(it) }
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
-    val s = vmState
+    val s = state
 
     registry.consumeRestored(KEY_SYMBOL)?.let { it as String }?.also { s.symbol.value = it }
   }
 
   fun handleSearchResultsDismissed() {
-    vmState.dismissSearchResultsPopup()
+    state.dismissSearchResultsPopup()
   }
 
   fun handleAfterSymbolChanged(scope: CoroutineScope, symbol: String) {
@@ -275,21 +273,21 @@ internal constructor(
   }
 
   fun handleSymbolChanged(symbol: String) {
-    vmState.apply {
+    state.apply {
       this.symbol.value = symbol
       validSymbol.value = null
     }
   }
 
   fun handleEquityTypeSelected(type: EquityType) {
-    vmState.apply {
+    state.apply {
       equityType.value = type
       clearInput()
     }
   }
 
   fun handleClearEquityType() {
-    vmState.apply {
+    state.apply {
       equityType.value = null
       clearInput()
     }
@@ -308,7 +306,7 @@ internal constructor(
   }
 
   fun handleOptionExpirationDate(scope: CoroutineScope, date: LocalDate) {
-    val s = vmState
+    val s = state
 
     s.optionExpirationDate.value = date
 
@@ -320,22 +318,22 @@ internal constructor(
   }
 
   fun handleOptionStrikePrice(price: StockMoneyValue) {
-    vmState.optionStrikePrice.value = price
+    state.optionStrikePrice.value = price
   }
 
   fun handleOptionType(type: StockOptions.Contract.Type) {
-    vmState.optionType.value = type
+    state.optionType.value = type
   }
 
   fun handleDismiss() {
     handleClearEquityType()
     handleClear()
 
-    vmState.isSubmitting.value = false
+    state.isSubmitting.value = false
   }
 
   fun handleClear() {
-    val s = vmState
+    val s = state
     s.clearInput()
 
     s.lookupResults.value = emptyList()
@@ -346,7 +344,7 @@ internal constructor(
   }
 
   fun handleSubmit(scope: CoroutineScope) {
-    val s = vmState
+    val s = state
     if (s.isSubmitting.value) {
       Timber.w("Already submitting, don't double up")
       return
@@ -400,7 +398,7 @@ internal constructor(
   }
 
   fun handleTradeSideChanged(side: TradeSide) {
-    vmState.tradeSide.value = side
+    state.tradeSide.value = side
   }
 
   companion object {

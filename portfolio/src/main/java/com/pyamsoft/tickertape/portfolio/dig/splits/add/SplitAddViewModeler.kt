@@ -26,29 +26,28 @@ import com.pyamsoft.tickertape.db.split.JsonMappableDbSplit
 import com.pyamsoft.tickertape.portfolio.dig.base.BaseAddViewModeler
 import com.pyamsoft.tickertape.quote.dig.SplitParams
 import com.pyamsoft.tickertape.stocks.api.asShares
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SplitAddViewModeler
 @Inject
 internal constructor(
-    state: MutableSplitAddViewState,
+    override val state: MutableSplitAddViewState,
     private val interactor: SplitAddInteractor,
     private val params: SplitParams,
     private val clock: Clock,
 ) :
+    SplitAddViewState by state,
     BaseAddViewModeler<SplitAddViewState, DbSplit.Id>(
         state = state,
         existingId = params.existingSplitId,
     ) {
-
-  private val vmState = state
 
   private var existingSplit: DbSplit? = null
   private var splitId = decideInitialSplitId(params.existingSplitId)
@@ -64,7 +63,7 @@ internal constructor(
 
   @CheckResult
   private fun resolveSplit(existing: DbSplit?): DbSplit {
-    val s = vmState
+    val s = state
     val preSplit = s.preSplitShareCount.value.toDouble()
     val postSplit = s.postSplitShareCount.value.toDouble()
     val date = s.splitDate.value.requireNotNull()
@@ -93,7 +92,7 @@ internal constructor(
 
   private fun loadExistingSplitData(existing: DbSplit) {
     Timber.d("Load existing split data from split: $existing")
-    vmState.apply {
+    state.apply {
       // Save this full position for later
       existingSplit = existing
 
@@ -129,7 +128,7 @@ internal constructor(
       mutableListOf<SaveableStateRegistry.Entry>().apply {
         registry
             .registerProvider(KEY_DATE_PICKER) {
-              vmState.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
+              state.datePicker.value?.format(DateTimeFormatter.ISO_DATE)
             }
             .also { add(it) }
       }
@@ -143,11 +142,11 @@ internal constructor(
   }
 
   override fun onDateChanged(date: LocalDate) {
-    vmState.splitDate.value = date
+    state.splitDate.value = date
   }
 
   override fun checkSubmittable() {
-    vmState.apply {
+    state.apply {
       val isAllValuesDefined =
           preSplitShareCount.value.toDoubleOrNull() != null &&
               postSplitShareCount.value.toDoubleOrNull() != null &&
@@ -164,7 +163,7 @@ internal constructor(
       scope: CoroutineScope,
       onClose: () -> Unit,
   ) {
-    val s = vmState
+    val s = state
     s.apply {
       if (isSubmitting.value || !isSubmittable.value) {
         return
@@ -225,19 +224,19 @@ internal constructor(
   }
 
   fun handlePreSplitShareCountChanged(preSplitCount: String) {
-    handleNumberAsStringChange(preSplitCount) { vmState.preSplitShareCount.value = it }
+    handleNumberAsStringChange(preSplitCount) { state.preSplitShareCount.value = it }
   }
 
   fun handlePostSplitShareCountChanged(postSplitCount: String) {
-    handleNumberAsStringChange(postSplitCount) { vmState.postSplitShareCount.value = it }
+    handleNumberAsStringChange(postSplitCount) { state.postSplitShareCount.value = it }
   }
 
   fun handleOpenDateDialog(date: LocalDate?) {
-    vmState.datePicker.value = date ?: LocalDate.now(clock)
+    state.datePicker.value = date ?: LocalDate.now(clock)
   }
 
   fun handleCloseDateDialog() {
-    vmState.datePicker.value = null
+    state.datePicker.value = null
   }
 
   companion object {

@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.quote.add
 
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
@@ -40,7 +40,7 @@ internal class NewTickerInjector @Inject internal constructor() : ComposableInje
 
   @JvmField @Inject internal var viewModel: NewTickerViewModeler? = null
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ApplicationScope.retrieve(activity).plusNewTickerComponent().create().inject(this)
   }
 
@@ -92,9 +92,7 @@ private fun NewTickerEntry(
   val component = rememberComposableInjector { NewTickerInjector() }
   val viewModel = rememberNotNull(component.viewModel)
 
-  val state = viewModel.state
-
-  val equityType by state.equityType.collectAsState()
+  val equityType by viewModel.equityType.collectAsState()
 
   val handleClose by rememberUpdatedState(onClose)
 
@@ -122,7 +120,7 @@ private fun NewTickerEntry(
   )
   NewTickerScreen(
       modifier = modifier,
-      state = state,
+      state = viewModel,
       onClose = { handleCloseClicked() },
       onTypeSelected = { viewModel.handleEquityTypeSelected(it) },
       onSymbolChanged = { viewModel.handleSymbolChanged(it) },

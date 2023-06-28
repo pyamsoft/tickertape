@@ -21,24 +21,22 @@ import com.pyamsoft.pydroid.arch.AbstractViewModeler
 import com.pyamsoft.tickertape.worker.WorkJobType
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.work.bigmover.BigMoverPreferences
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class NotificationViewModeler
 @Inject
 internal constructor(
-    state: MutableNotificationViewState,
+    override val state: MutableNotificationViewState,
     private val bigMoverPreferences: BigMoverPreferences,
     private val workerQueue: WorkerQueue,
-) : AbstractViewModeler<NotificationViewState>(state) {
-
-  private val vmState = state
+) : NotificationViewState by state, AbstractViewModeler<NotificationViewState>(state) {
 
   fun bind(scope: CoroutineScope) {
-    val s = vmState
+    val s = state
 
     bigMoverPreferences.listenForBigMoverNotificationChanged().also { f ->
       scope.launch(context = Dispatchers.Default) { f.collect { s.isBigMoverEnabled.value = it } }
@@ -49,7 +47,7 @@ internal constructor(
       registry: SaveableStateRegistry
   ): List<SaveableStateRegistry.Entry> =
       mutableListOf<SaveableStateRegistry.Entry>().apply {
-        val s = vmState
+        val s = state
 
         registry
             .registerProvider(BIGMOVER_IS_ENABLED) { s.isBigMoverEnabled.value }
@@ -57,7 +55,7 @@ internal constructor(
       }
 
   override fun consumeRestoredState(registry: SaveableStateRegistry) {
-    val s = vmState
+    val s = state
 
     registry
         .consumeRestored(BIGMOVER_IS_ENABLED)
@@ -66,7 +64,7 @@ internal constructor(
   }
 
   fun handleBigMoverNotificationToggled(scope: CoroutineScope) {
-    val newEnabled = vmState.isBigMoverEnabled.updateAndGet { !it }
+    val newEnabled = state.isBigMoverEnabled.updateAndGet { !it }
     bigMoverPreferences.setBigMoverNotificationEnabled(newEnabled)
 
     // Fire pref change

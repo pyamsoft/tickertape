@@ -16,6 +16,7 @@
 
 package com.pyamsoft.tickertape.main
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentActivity
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
@@ -41,7 +41,7 @@ internal class MainInjector @Inject internal constructor() : ComposableInjector(
 
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
 
-  override fun onInject(activity: FragmentActivity) {
+  override fun onInject(activity: ComponentActivity) {
     ObjectGraph.ActivityScope.retrieve(activity).inject(this)
   }
 
@@ -105,7 +105,7 @@ internal fun MainEntry(
   MainScreen(
       modifier = modifier,
       appName = appName,
-      state = viewModel.state,
+      state = viewModel,
       pagerState = pagerState,
       allTabs = allTabs,
       onActionSelected = {

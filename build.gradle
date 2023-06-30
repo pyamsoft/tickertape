@@ -20,11 +20,11 @@ buildscript {
   ext {
     minSdk = 24
     targetSdk = 33
-    compileSdk = 33
+    compileSdk = 34
 
     // Us
     pydroid = "26.7.0"
-    cachify = "0.3.0"
+    cachify = "0.3.1"
 
     // Jobs
     workmanager = "2.8.1"

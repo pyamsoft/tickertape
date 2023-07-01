@@ -55,13 +55,6 @@ dependencies {
   implementation("com.squareup.retrofit2:converter-moshi:${rootProject.extra["retrofit"]}")
   implementation("com.squareup.retrofit2:converter-scalars:${rootProject.extra["retrofit"]}")
 
-  // Since this is unmaintained we have to do this to get it to work
-  implementation("com.squareup.retrofit2:converter-simplexml:${rootProject.extra["retrofit"]}") {
-    exclude(group = "xpp3", module = "xpp3")
-    exclude(group = "stax", module = "stax-api")
-    exclude(group = "stax", module = "stax")
-  }
-
   // PYDroid
   implementation("com.github.pyamsoft.pydroid:bootstrap:${rootProject.extra["pydroid"]}")
 

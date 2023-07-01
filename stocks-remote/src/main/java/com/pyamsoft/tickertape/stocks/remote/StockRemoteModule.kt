@@ -117,24 +117,14 @@ abstract class StockRemoteModule {
     @Provides
     @JvmStatic
     internal fun provideQualifiedConverterFactory(
-        @Named("xml") xmlConverter: Converter.Factory,
         @Named("scalar") scalarConverter: Converter.Factory,
         // Need to use MutableSet instead of Set because of Java -> Kotlin fun.
         @StockApi converters: MutableSet<Converter.Factory>,
     ): Converter.Factory {
       return QualifiedTypeConverterFactory.create(
-          xml = xmlConverter,
           scalar = scalarConverter,
           converters = converters,
       )
-    }
-
-    @Provides
-    @JvmStatic
-    @Named("xml")
-    internal fun provideXmlConverterFactory(): Converter.Factory {
-      @Suppress("DEPRECATION")
-      return retrofit2.converter.simplexml.SimpleXmlConverterFactory.createNonStrict()
     }
 
     @Provides

@@ -17,16 +17,15 @@
 package com.pyamsoft.tickertape.stocks.remote.converter
 
 import androidx.annotation.CheckResult
-import java.lang.reflect.Type
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
+import java.lang.reflect.Type
 
 // https://github.com/square/retrofit/blob/master/samples/src/main/java/com/example/retrofit/JsonAndXmlConverters.java
 internal class QualifiedTypeConverterFactory
 private constructor(
-    private val xml: Converter.Factory,
     private val scalar: Converter.Factory,
     private val converters: Set<Converter.Factory>,
 ) : Converter.Factory() {
@@ -38,7 +37,6 @@ private constructor(
   ): Converter<ResponseBody, *>? {
     for (annotation in annotations) {
       when (annotation) {
-        is XmlResponse -> return xml.responseBodyConverter(type, annotations, retrofit)
         is ScalarResponse -> return scalar.responseBodyConverter(type, annotations, retrofit)
         else -> {
           // Otherwise, in any random iteration order, try the other converters until something
@@ -63,8 +61,6 @@ private constructor(
   ): Converter<*, RequestBody>? {
     for (annotation in parameterAnnotations) {
       when (annotation) {
-        is XmlResponse ->
-            return xml.requestBodyConverter(type, parameterAnnotations, methodAnnotations, retrofit)
         is ScalarResponse ->
             return scalar.requestBodyConverter(
                 type, parameterAnnotations, methodAnnotations, retrofit)
@@ -88,12 +84,10 @@ private constructor(
     @JvmStatic
     @CheckResult
     fun create(
-        xml: Converter.Factory,
         scalar: Converter.Factory,
         converters: Set<Converter.Factory>,
     ): Converter.Factory {
       return QualifiedTypeConverterFactory(
-          xml = xml,
           scalar = scalar,
           converters = converters,
       )

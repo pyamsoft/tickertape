@@ -16,124 +16,23 @@
 
 package com.pyamsoft.tickertape.stocks.remote.network
 
-import androidx.annotation.CheckResult
-import androidx.core.text.HtmlCompat
-import java.net.URL
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import org.simpleframework.xml.Element
-import org.simpleframework.xml.ElementList
-import org.simpleframework.xml.Namespace
-import org.simpleframework.xml.Path
-import org.simpleframework.xml.Root
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-/**
- * Can't be a data class because SimpleXML is weird yo
- *
- * Needs to be lazy because SimpleXML will create this class and later update the entries in it.
- */
-@Root(name = "rss", strict = false)
-internal class NetworkNewsResponse
-/** SimpleXML requires an empty constructor */
-internal constructor() {
+@JsonClass(generateAdapter = true)
+internal data class NetworkNewsResponse internal constructor(val results: List<News>) {
 
-  /** This needs to be a var because SimpleXML is weird yo */
-  @get:ElementList(name = "item", inline = true)
-  @get:Path("channel")
-  @set:ElementList(name = "item", inline = true)
-  @set:Path("channel")
-  internal var data: List<NewsArticle>? = null
-
-  // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-  @get:CheckResult val news by lazy(LazyThreadSafetyMode.NONE) { data ?: emptyList() }
-
-  /** Can't be a data class because SimpleXML is weird yo */
-  @Root(name = "item", strict = false)
-  internal class NewsArticle
-  /** SimpleXML requires an empty constructor */
-  internal constructor() {
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "guid", required = false)
-    @set:Element(name = "guid", required = false)
-    internal var articleGuid: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "link", required = false)
-    @set:Element(name = "link", required = false)
-    internal var articleUrl: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "title", required = false)
-    @set:Element(name = "title", required = false)
-    internal var articleTitle: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "description", required = false)
-    @set:Element(name = "description", required = false)
-    internal var articleDescription: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "pubDate", required = false)
-    @set:Element(name = "pubDate", required = false)
-    internal var articlePublishedAt: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
-    @get:Element(name = "creator", required = false)
-    @set:Namespace(reference = "http://purl.org/dc/elements/1.1/", prefix = "dc")
-    @set:Element(name = "creator", required = false)
-    internal var articleCreator: String? = null
-
-    /** This needs to be a var because SimpleXML is weird yo */
-    @get:Element(name = "tickers", required = false)
-    @get:Namespace(reference = "http://nasdaq.com/reference/feeds/1.0", prefix = "nasdaq")
-    @set:Element(name = "tickers", required = false)
-    @set:Namespace(reference = "http://nasdaq.com/reference/feeds/1.0", prefix = "nasdaq")
-    internal var articleTickers: String? = null
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult val id by lazy(LazyThreadSafetyMode.NONE) { articleGuid.orEmpty() }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult
-    val publishDate by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val p = articlePublishedAt
-          val parseFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
-          return@lazy if (p == null) null else LocalDateTime.parse(p, parseFormatter)
-        }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult val title by lazy(LazyThreadSafetyMode.NONE) { articleTitle.orEmpty() }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult
-    val description by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val d = articleDescription
-          return@lazy if (d == null) ""
-          else {
-            val spanned = HtmlCompat.fromHtml(d, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            spanned.toString()
-          }
-        }
-
-    private val articleUrlData by
-        lazy(LazyThreadSafetyMode.NONE) {
-          val u = articleUrl
-          return@lazy if (u == null) null else URL(u)
-        }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult
-    val link by lazy(LazyThreadSafetyMode.NONE) { articleUrlData?.toString().orEmpty() }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult val newsSource by lazy(LazyThreadSafetyMode.NONE) { articleCreator.orEmpty() }
-
-    // Needs to be lazy because SimpleXML will create this class and later update the entries in it.
-    @get:CheckResult
-    val tickers by lazy(LazyThreadSafetyMode.NONE) { articleTickers?.split(",") ?: emptyList() }
-  }
+  @JsonClass(generateAdapter = true)
+  internal data class News
+  internal constructor(
+      val uuid: String,
+      val url: String,
+      val author: String,
+      val source: String,
+      val title: String,
+      @Json(name = "api_source") val apiSource: String,
+      @Json(name = "preview_image_url") val imageUrl: String,
+      @Json(name = "published_at") val publishedAt: String,
+      @Json(name = "preview_text") val previewText: String,
+  )
 }

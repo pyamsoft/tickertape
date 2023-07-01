@@ -113,7 +113,21 @@ protected constructor(
   protected suspend inline fun <R : Any> attemptAuthedRequest(block: (T) -> R): R {
     enforcer.assertOffMainThread()
 
-    val token = awaitToken() ?: throw MISSING_COOKIE_EXCEPTION
+    var token = awaitToken() ?: throw MISSING_COOKIE_EXCEPTION
+
+    var attempt = 0
+    while (!validateToken(token)) {
+      if (attempt >= 3) {
+        Timber.w("We attempted to validate the token but were never able to.")
+        throw MISSING_COOKIE_EXCEPTION
+      }
+
+      ++attempt
+      Timber.w("Token failed to be validated. Claim again")
+      reset()
+      token = awaitToken() ?: throw MISSING_COOKIE_EXCEPTION
+    }
+
     return block(token)
   }
 
@@ -127,6 +141,8 @@ protected constructor(
         cookieCache.clear()
         tokenCache.clear()
       }
+
+  @CheckResult protected abstract suspend fun validateToken(token: T): Boolean
 
   @CheckResult protected abstract suspend fun getCookie(): String
 

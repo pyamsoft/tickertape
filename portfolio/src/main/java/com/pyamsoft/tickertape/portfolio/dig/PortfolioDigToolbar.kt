@@ -100,7 +100,6 @@ internal fun rememberTabs(
     } else {
       return@remember PortfolioDigSections.values()
           .asSequence()
-          .filterNot { PortfolioDigSections.NEWS == it }
           .filterNot { PortfolioDigSections.PRICE_ALERTS == it }
           .filterNot { PortfolioDigSections.OPTIONS_CHAIN == it }
           .filter { v ->

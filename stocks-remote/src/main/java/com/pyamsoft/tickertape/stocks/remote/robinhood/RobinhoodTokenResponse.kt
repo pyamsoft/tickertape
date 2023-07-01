@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.api
+package com.pyamsoft.tickertape.stocks.remote.robinhood
 
-import javax.inject.Qualifier
+import com.squareup.moshi.JsonClass
 
-@Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class NasdaqApi
+@JsonClass(generateAdapter = true)
+internal data class RobinhoodTokenResponse
+internal constructor(
+    val accessToken: String,
+    val expiresInMilliseconds: Long,
+)

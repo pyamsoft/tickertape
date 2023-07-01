@@ -69,8 +69,6 @@ interface StockNews {
 
   @get:CheckResult val imageUrl: String
 
-  @get:CheckResult val tickers: List<StockSymbol>
-
   companion object {
 
     @JvmStatic
@@ -84,7 +82,6 @@ interface StockNews {
         link: String,
         sourceName: String,
         imageUrl: String,
-        tickers: List<StockSymbol>
     ): StockNews {
       return StockNewsImpl(
           id = id,
@@ -95,7 +92,6 @@ interface StockNews {
           link = link,
           sourceName = sourceName,
           imageUrl = imageUrl,
-          tickers = tickers,
       )
     }
   }

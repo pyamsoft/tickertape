@@ -33,5 +33,5 @@ internal interface RobinhoodCookieService {
   /** Trade cookie for a token */
   @CheckResult
   @GET("https://robinhood.com/api/public/get_token")
-  suspend fun getCrumb(@Header("Cookie") cookie: String): RobinhoodToken
+  suspend fun getToken(@Header("Cookie") cookie: String): RobinhoodTokenResponse
 }

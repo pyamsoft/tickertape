@@ -30,7 +30,6 @@ internal data class StockNewsImpl(
     override val link: String,
     override val sourceName: String,
     override val imageUrl: String,
-    override val tickers: List<StockSymbol>,
 ) : StockNews
 
 internal data class StockNewsListImpl(

@@ -18,9 +18,12 @@ package com.pyamsoft.tickertape.stocks.remote
 
 import com.pyamsoft.tickertape.stocks.JsonParser
 import com.pyamsoft.tickertape.stocks.NetworkServiceCreator
-import com.pyamsoft.tickertape.stocks.remote.api.NasdaqApi
+import com.pyamsoft.tickertape.stocks.remote.api.RobinhoodApi
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.converter.QualifiedTypeConverterFactory
+import com.pyamsoft.tickertape.stocks.remote.robinhood.RobinhoodCookieService
+import com.pyamsoft.tickertape.stocks.remote.robinhood.RobinhoodCookieStorage
+import com.pyamsoft.tickertape.stocks.remote.robinhood.RobinhoodToken
 import com.pyamsoft.tickertape.stocks.remote.service.ChartService
 import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.remote.service.NewsService
@@ -29,7 +32,7 @@ import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
 import com.pyamsoft.tickertape.stocks.remote.service.RecommendationService
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
-import com.pyamsoft.tickertape.stocks.remote.source.NasdaqNewsSource
+import com.pyamsoft.tickertape.stocks.remote.source.RobinhoodNewsSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooChartSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooKeyStatisticsSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooOptionsSource
@@ -84,11 +87,17 @@ abstract class StockRemoteModule {
       impl: YahooRecommendationSource
   ): RecommendationSource
 
-  @Binds @StockApi internal abstract fun bindNewsSource(impl: NasdaqNewsSource): NewsSource
+  @Binds @StockApi internal abstract fun bindNewsSource(impl: RobinhoodNewsSource): NewsSource
 
   @Binds
   @YahooApi
   internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): CookieProvider<YahooCrumb>
+
+  @Binds
+  @RobinhoodApi
+  internal abstract fun bindRobinhoodProvider(
+      impl: RobinhoodCookieStorage
+  ): CookieProvider<RobinhoodToken>
 
   /** Expose globally */
   @Binds internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser
@@ -145,7 +154,7 @@ abstract class StockRemoteModule {
 
     @Provides
     @JvmStatic
-    @NasdaqApi
+    @RobinhoodApi
     internal fun provideNews(serviceCreator: NetworkServiceCreator): NewsService {
       return serviceCreator.create(NewsService::class)
     }
@@ -206,6 +215,15 @@ abstract class StockRemoteModule {
     @JvmStatic
     internal fun provideYahooCookies(serviceCreator: NetworkServiceCreator): YahooCookieService {
       return serviceCreator.create(YahooCookieService::class)
+    }
+
+    @Provides
+    @JvmStatic
+    @RobinhoodApi
+    internal fun provideRobinhoodCookies(
+        serviceCreator: NetworkServiceCreator
+    ): RobinhoodCookieService {
+      return serviceCreator.create(RobinhoodCookieService::class)
     }
   }
 }

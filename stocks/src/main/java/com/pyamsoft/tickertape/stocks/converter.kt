@@ -51,6 +51,14 @@ fun parseUTCDate(
       .toLocalDate()
 }
 
+@CheckResult
+fun parseUTCDateTime(
+    stamp: String,
+    localZoneId: ZoneId = ZoneId.systemDefault(),
+): LocalDateTime {
+  return Instant.parse(stamp).atZone(UTC_TIME_ZONE).withZoneSameLocal(localZoneId).toLocalDateTime()
+}
+
 /**
  * Parse market related timestamps to a local time
  *

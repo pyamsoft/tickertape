@@ -17,7 +17,6 @@
 package com.pyamsoft.tickertape.stocks.remote.service
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.remote.converter.XmlResponse
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkNewsResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -25,11 +24,11 @@ import retrofit2.http.Query
 
 internal interface NewsService {
 
-  @XmlResponse
   @CheckResult
   @GET("https://api.robinhood.com/midlands/news/")
   suspend fun getNews(
       @Query("symbol") symbol: String,
       @Header("Authorization") token: String,
+      @Header("User-Agent") userAgent: String,
   ): NetworkNewsResponse
 }

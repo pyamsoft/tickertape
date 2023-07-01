@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.converter
+package com.pyamsoft.tickertape.stocks.remote.api
 
-/**
- * Annotate a Service call with this to note it is an XML call
- *
- * Nothing uses this for now, its all JSON or scalars
- */
-@Retention(AnnotationRetention.RUNTIME) annotation class XmlResponse
+import javax.inject.Qualifier
+
+@Qualifier @Retention(AnnotationRetention.BINARY) internal annotation class RobinhoodApi

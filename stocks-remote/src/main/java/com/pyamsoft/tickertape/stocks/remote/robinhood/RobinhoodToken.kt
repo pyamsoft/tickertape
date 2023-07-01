@@ -16,21 +16,20 @@
 
 package com.pyamsoft.tickertape.stocks.remote.robinhood
 
-import com.squareup.moshi.JsonClass
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-@JsonClass(generateAdapter = true)
 internal data class RobinhoodToken
 internal constructor(
+    val cookie: String,
     val accessToken: String,
-    val expiresInMillis: Long,
+    val expiresInMilliseconds: Long,
 ) {
 
-  val expiresAt =
+  val expiresAt: LocalDateTime =
       LocalDateTime.now()
           // Figure out the expire time
-          .plusNanos(TimeUnit.MILLISECONDS.toNanos(expiresInMillis))
+          .plusNanos(TimeUnit.MILLISECONDS.toNanos(expiresInMilliseconds))
           // And then adjust just to be safe
           .minusSeconds(10)
 }

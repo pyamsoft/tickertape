@@ -14,55 +14,59 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.yahoo
+package com.pyamsoft.tickertape.stocks.remote.robinhood
 
 import com.pyamsoft.pydroid.core.ThreadEnforcer
-import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
+import com.pyamsoft.tickertape.stocks.remote.api.RobinhoodApi
 import com.pyamsoft.tickertape.stocks.remote.storage.AbstractStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import java.time.Clock
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class YahooCookieStorage
+internal class RobinhoodCookieStorage
 @Inject
 internal constructor(
     enforcer: ThreadEnforcer,
-    @YahooApi private val service: YahooCookieService,
+    @RobinhoodApi private val service: RobinhoodCookieService,
+    private val clock: Clock,
 ) :
-    AbstractStorage<YahooCrumb>(
+    AbstractStorage<RobinhoodToken>(
         enforcer = enforcer,
     ) {
 
   override suspend fun getCookie(): String {
-    val page = service.getCookie(accept = YF_ACCEPT_STRING)
+    val page = service.getCookie(accept = RH_ACCEPT_STRING)
     val cookies = page.headers().values("Set-Cookie")
     return cookies.joinToString(";")
   }
 
-  override suspend fun getToken(cookie: String): YahooCrumb {
-    val newCrumb = service.getCrumb(cookie = cookie)
-    return YahooCrumb(
+  override suspend fun getToken(cookie: String): RobinhoodToken {
+    val token = service.getToken(cookie = cookie)
+    return RobinhoodToken(
         cookie = cookie,
-        crumb = newCrumb,
+        accessToken = "Bearer ${token.accessToken}",
+        expiresInMilliseconds = token.expiresInMilliseconds,
     )
   }
 
-  override suspend fun validateToken(token: YahooCrumb): Boolean {
-    return true
+  override suspend fun validateToken(token: RobinhoodToken): Boolean {
+    return token.expiresAt > LocalDateTime.now(clock)
   }
 
-  override suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T =
+  override suspend fun <T : Any> withAuth(block: suspend (RobinhoodToken) -> T): T =
       withContext(context = Dispatchers.Default) {
         try {
           return@withContext attemptAuthedRequest { block(it) }
         } catch (e: Throwable) {
           if (e is HttpException) {
             if (e.code() == 401) {
-              Timber.w("YF returned a 401. We have a bad cookie or crumb.")
+              Timber.w("RH returned a 401. We have a bad cookie or crumb.")
 
               // Clear the cookie and crumb and try again
               reset()
@@ -78,8 +82,8 @@ internal constructor(
       }
 
   companion object {
-    // Need to pass this Accept header or YF does not return set-cookies
-    private const val YF_ACCEPT_STRING =
+    // Need to pass this Accept header or RH does not return set-cookies
+    private const val RH_ACCEPT_STRING =
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
   }
 }

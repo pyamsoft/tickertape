@@ -36,21 +36,22 @@ import com.pyamsoft.tickertape.stocks.parseUTCDate
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.network.NetworkQuoteResponse
 import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
+import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Singleton
 internal class YahooQuoteSource
 @Inject
 internal constructor(
     @YahooApi private val service: QuoteService,
-    @YahooApi private val cookie: YahooCrumbProvider,
+    @YahooApi private val cookie: CookieProvider<YahooCrumb>,
 ) : QuoteSource {
 
   override suspend fun getQuotes(symbols: List<StockSymbol>): List<StockQuote> =

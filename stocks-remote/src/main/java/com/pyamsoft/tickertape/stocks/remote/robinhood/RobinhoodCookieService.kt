@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.yahoo
+package com.pyamsoft.tickertape.stocks.remote.robinhood
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.tickertape.stocks.remote.converter.ScalarResponse
@@ -22,21 +22,16 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 
-internal interface YahooCookieService {
+internal interface RobinhoodCookieService {
 
-  /**
-   * Get a cookie
-   */
+  /** Get the Cookie from RH (we need to ask for some stock, just use AAPL) */
   @CheckResult
   @ScalarResponse
-  @GET("https://finance.yahoo.com")
+  @GET("https://robinhood.com/stocks/AAPL")
   suspend fun getCookie(@Header("Accept") accept: String): Response<String>
 
-  /**
-   * Trade cookie for a token
-   */
+  /** Trade cookie for a token */
   @CheckResult
-  @ScalarResponse
-  @GET("https://query1.finance.yahoo.com/v1/test/getcrumb")
-  suspend fun getCrumb(@Header("Cookie") cookie: String): String
+  @GET("https://robinhood.com/api/public/get_token")
+  suspend fun getCrumb(@Header("Cookie") cookie: String): RobinhoodToken
 }

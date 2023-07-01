@@ -22,20 +22,21 @@ import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.RecommendationService
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
+import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.RecommendationSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooRecommendationSource
 @Inject
 internal constructor(
     @YahooApi private val service: RecommendationService,
-    @YahooApi private val cookie: YahooCrumbProvider,
+    @YahooApi private val cookie: CookieProvider<YahooCrumb>,
 ) : RecommendationSource {
 
   override suspend fun getRecommendations(symbol: StockSymbol): StockRecommendations =

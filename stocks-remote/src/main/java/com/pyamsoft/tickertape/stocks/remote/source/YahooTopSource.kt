@@ -32,19 +32,20 @@ import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.api.asVolume
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.TopService
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
+import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.TopSource
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooTopSource
 @Inject
 internal constructor(
     @YahooApi private val service: TopService,
-    @YahooApi private val cookie: YahooCrumbProvider,
+    @YahooApi private val cookie: CookieProvider<YahooCrumb>,
 ) : TopSource {
 
   override suspend fun getTrending(count: Int): StockTrends =

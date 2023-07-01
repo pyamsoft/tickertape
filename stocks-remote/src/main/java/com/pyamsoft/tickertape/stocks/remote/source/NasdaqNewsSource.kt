@@ -52,10 +52,11 @@ internal constructor(@NasdaqApi private val service: NewsService) : NewsSource {
       withContext(context = Dispatchers.Default) {
         val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
         for (s in symbols) {
+          // TODO
           val resp =
               service.getNews(
                   symbol = s.raw,
-                  userAgent = pickRandomUserAgent(),
+                  token = pickRandomUserAgent(),
               )
           val news = resp.news.map { it.toNews(s) }
           for (n in news) {

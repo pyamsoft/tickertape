@@ -16,133 +16,40 @@
 
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
-import androidx.annotation.CheckResult
-import com.pyamsoft.cachify.cachify
-import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.pyamsoft.tickertape.stocks.remote.storage.AbstractStorage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 internal class YahooCookieStorage
 @Inject
 internal constructor(
-    private val enforcer: ThreadEnforcer,
-    @YahooApi service: YahooCookieService,
-) : YahooCrumbProvider {
+    enforcer: ThreadEnforcer,
+    @YahooApi private val service: YahooCookieService,
+) :
+    AbstractStorage<YahooCrumb>(
+        enforcer = enforcer,
+    ) {
 
-  private val mutex = Mutex()
-
-  private var storedCookie = ""
-  private var storedCrumb: YahooCrumb? = null
-
-  // Internally use a cachify so that we have do not make multiple upstream calls at the same time
-  private val cookieCache = cachify { service.getCookie(accept = YF_ACCEPT_STRING) }
-  private val crumbCache = multiCachify<String, String, String> { service.getCrumb(cookie = it) }
-
-  @CheckResult
-  private suspend fun getCookie(): String {
-    enforcer.assertOffMainThread()
-
-    val s = storedCookie
-    if (s.isNotBlank()) {
-      return s
-    }
-
-    return mutex.withLock {
-      if (storedCookie.isBlank()) {
-        storedCookie =
-            try {
-              val page = cookieCache.call()
-              val cookies = page.headers().values("Set-Cookie")
-              cookies.joinToString(";")
-            } catch (e: Throwable) {
-              Timber.e(e, "Error getting YF cookie")
-              ""
-            }
-      }
-
-      return@withLock storedCookie
-    }
+  override suspend fun getCookie(): String {
+    val page = service.getCookie(accept = YF_ACCEPT_STRING)
+    val cookies = page.headers().values("Set-Cookie")
+    return cookies.joinToString(";")
   }
 
-  @CheckResult
-  private suspend fun getCrumb(): YahooCrumb? {
-    enforcer.assertOffMainThread()
-    // Fast path
-    val s = storedCrumb
-    if (s != null) {
-      return s
-    }
-
-    // Get cookie from storage
-    val c = getCookie()
-    Timber.d("Got cookie from YF: $c")
-    if (c.isBlank()) {
-      return null
-    }
-
-    return mutex.withLock {
-      if (storedCrumb == null) {
-        storedCrumb =
-            try {
-              val newCrumb = crumbCache.key(c).call(c)
-              YahooCrumb(
-                  cookie = c,
-                  crumb = newCrumb,
-              )
-            } catch (e: Throwable) {
-              Timber.e(e, "Error getting YF crumb")
-              null
-            }
-      }
-
-      return@withLock storedCrumb
-    }
+  override suspend fun getToken(cookie: String): YahooCrumb {
+    val newCrumb = service.getCrumb(cookie = cookie)
+    return YahooCrumb(
+        cookie = cookie,
+        crumb = newCrumb,
+    )
   }
-
-  @CheckResult
-  private suspend fun resolveCrumb(): YahooCrumb? {
-    enforcer.assertOffMainThread()
-
-    var crumb = getCrumb()
-    var count = 0
-
-    // Attempt to do this a few times just in case
-    while (crumb == null && count < 2) {
-      clearStored()
-      crumb = getCrumb()
-      ++count
-    }
-
-    return crumb
-  }
-
-  @CheckResult
-  private suspend inline fun <T : Any> attemptAuthedRequest(block: (YahooCrumb) -> T): T {
-    enforcer.assertOffMainThread()
-
-    val crumb = resolveCrumb() ?: throw MISSING_COOKIE_EXCEPTION
-    return block(crumb)
-  }
-
-  private suspend fun clearStored() =
-      mutex.withLock {
-        enforcer.assertOffMainThread()
-
-        storedCrumb = null
-        storedCookie = ""
-
-        cookieCache.clear()
-        crumbCache.clear()
-      }
 
   override suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T =
       withContext(context = Dispatchers.Default) {
@@ -154,7 +61,7 @@ internal constructor(
               Timber.w("YF returned a 401. We have a bad cookie or crumb.")
 
               // Clear the cookie and crumb and try again
-              clearStored()
+              reset()
 
               // Try one more time
               Timber.w("Try again after cookie/crumb reset")
@@ -167,9 +74,6 @@ internal constructor(
       }
 
   companion object {
-    private val MISSING_COOKIE_EXCEPTION =
-        RuntimeException("Unable to authorize device for stock data, please try again")
-
     // Need to pass this Accept header or YF does not return set-cookies
     private const val YF_ACCEPT_STRING =
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"

@@ -23,7 +23,8 @@ import com.pyamsoft.tickertape.stocks.api.asCompany
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.service.SearchService
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
+import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.SearchSource
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,7 +37,7 @@ internal class YahooSearchSource
 @Inject
 internal constructor(
     @YahooApi private val service: SearchService,
-    @YahooApi private val cookie: YahooCrumbProvider,
+    @YahooApi private val cookie: CookieProvider<YahooCrumb>,
 ) : SearchSource {
 
   override suspend fun search(query: String): List<SearchResult> =

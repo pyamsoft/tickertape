@@ -27,9 +27,9 @@ internal interface NewsService {
 
   @XmlResponse
   @CheckResult
-  @GET("https://www.nasdaq.com/feed/rssoutbound")
+  @GET("https://api.robinhood.com/midlands/news/")
   suspend fun getNews(
       @Query("symbol") symbol: String,
-      @Header("User-Agent") userAgent: String,
+      @Header("Authorization") token: String,
   ): NetworkNewsResponse
 }

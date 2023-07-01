@@ -37,9 +37,10 @@ import com.pyamsoft.tickertape.stocks.remote.source.YahooQuoteSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooRecommendationSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooSearchSource
 import com.pyamsoft.tickertape.stocks.remote.source.YahooTopSource
+import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieService
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCookieStorage
-import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumbProvider
+import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.scope.StockApi
 import com.pyamsoft.tickertape.stocks.sources.ChartSource
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
@@ -87,7 +88,7 @@ abstract class StockRemoteModule {
 
   @Binds
   @YahooApi
-  internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): YahooCrumbProvider
+  internal abstract fun bindYahooCrumbProvider(impl: YahooCookieStorage): CookieProvider<YahooCrumb>
 
   /** Expose globally */
   @Binds internal abstract fun bindJsonParser(impl: MoshiJsonParser): JsonParser

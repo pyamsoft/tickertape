@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.yahoo
+package com.pyamsoft.tickertape.stocks.remote.robinhood
 
-import androidx.annotation.CheckResult
+import com.squareup.moshi.JsonClass
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
-internal interface YahooCrumbProvider {
+@JsonClass(generateAdapter = true)
+internal data class RobinhoodToken
+internal constructor(
+    val accessToken: String,
+    val expiresInMillis: Long,
+) {
 
-  @CheckResult suspend fun <T : Any> withAuth(block: suspend (YahooCrumb) -> T): T
+  val expiresAt =
+      LocalDateTime.now()
+          // Figure out the expire time
+          .plusNanos(TimeUnit.MILLISECONDS.toNanos(expiresInMillis))
+          // And then adjust just to be safe
+          .minusSeconds(10)
 }

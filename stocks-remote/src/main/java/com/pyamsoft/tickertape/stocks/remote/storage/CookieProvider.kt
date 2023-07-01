@@ -14,29 +14,11 @@
  * limitations under the License.
  */
 
-package com.pyamsoft.tickertape.stocks.remote.yahoo
+package com.pyamsoft.tickertape.stocks.remote.storage
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.remote.converter.ScalarResponse
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Header
 
-internal interface YahooCookieService {
+internal interface CookieProvider<T : Any> {
 
-  /**
-   * Get a cookie
-   */
-  @CheckResult
-  @ScalarResponse
-  @GET("https://finance.yahoo.com")
-  suspend fun getCookie(@Header("Accept") accept: String): Response<String>
-
-  /**
-   * Trade cookie for a token
-   */
-  @CheckResult
-  @ScalarResponse
-  @GET("https://query1.finance.yahoo.com/v1/test/getcrumb")
-  suspend fun getCrumb(@Header("Cookie") cookie: String): String
+  @CheckResult suspend fun <R : Any> withAuth(block: suspend (T) -> R): R
 }

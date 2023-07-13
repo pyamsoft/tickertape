@@ -45,6 +45,7 @@ internal class NewTickerInjector @Inject internal constructor() : ComposableInje
   }
 
   override fun onDispose() {
+    viewModel?.dispose()
     viewModel = null
   }
 }

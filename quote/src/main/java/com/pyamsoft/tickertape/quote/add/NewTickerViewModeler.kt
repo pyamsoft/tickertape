@@ -18,12 +18,9 @@ package com.pyamsoft.tickertape.quote.add
 
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.saveable.SaveableStateRegistry
-import com.pyamsoft.highlander.highlander
 import com.pyamsoft.pydroid.arch.AbstractViewModeler
-import com.pyamsoft.pydroid.core.ResultWrapper
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.db.DbInsert
-import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.SearchResult
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
@@ -31,57 +28,31 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject
 internal constructor(
     override val state: MutableNewTickerViewState,
     private val interactor: NewTickerInteractor,
-    interactorCache: NewTickerInteractor.Cache,
 ) : NewTickerViewState by state, AbstractViewModeler<NewTickerViewState>(state) {
 
-  private val tickerResolutionRunner =
-      highlander<ResultWrapper<Ticker>, Boolean, String> { force, query ->
-        val symbol = query.asSymbol()
-        if (force) {
-          interactorCache.invalidateTicker(symbol)
-        }
-        return@highlander interactor.resolveTicker(symbol)
-      }
-
-  private val optionLookupRunner =
-      highlander<ResultWrapper<StockOptions>, Boolean, StockSymbol, LocalDate?> {
-          force,
-          symbol,
-          expirationDate ->
-        if (force) {
-          interactorCache.invalidateOptionsChain(symbol)
-        }
-        return@highlander interactor.getOptionsChain(symbol, expirationDate)
-      }
-
-  private val symbolLookupRunner =
-      highlander<ResultWrapper<List<SearchResult>>, Boolean, String> { force, query ->
-        if (force) {
-          interactorCache.invalidateSearch(query)
-        }
-
-        return@highlander interactor.search(query)
-      }
+  private var symbolLookupJob: Job? = null
+  private var symbolResolutionJob: Job? = null
+  private var optionLookupJob: Job? = null
 
   private fun performSymbolResolution(
       scope: CoroutineScope,
       symbol: String,
   ) {
-    val s = state
-    s.resolvedTicker.value = null
+    state.resolvedTicker.value = null
 
     if (symbol.isBlank()) {
       Timber.w("Cannot resolve for empty symbol")
@@ -89,24 +60,27 @@ internal constructor(
     }
 
     val sym = symbol.uppercase()
-    scope.launch(context = Dispatchers.Default) {
-      tickerResolutionRunner
-          .call(false, sym)
-          .onSuccess { Timber.d("Resolved ticker for $sym $it") }
-          .onSuccess { s.resolvedTicker.value = it }
-          .onFailure { Timber.e(it, "Error resolving ticker for $sym") }
-          .onFailure { s.resolvedTicker.value = null }
-          .onSuccess { ticker ->
-            ticker.quote?.also { q ->
-              // Auto select the valid symbol if we found a quote for it
-              onSearchResultSelected(
-                  scope = this,
-                  symbol = q.symbol,
-                  dismiss = false,
-              )
-            }
-          }
-    }
+    symbolResolutionJob?.cancel()
+    symbolResolutionJob =
+        scope.launch(context = Dispatchers.Default) {
+          val s = sym.asSymbol()
+          interactor
+              .resolveTicker(s)
+              .onSuccess { Timber.d("Resolved ticker for $sym $it") }
+              .onSuccess { state.resolvedTicker.value = it }
+              .onFailure { Timber.e(it, "Error resolving ticker for $sym") }
+              .onFailure { state.resolvedTicker.value = null }
+              .onSuccess { ticker ->
+                ticker.quote?.also { q ->
+                  // Auto select the valid symbol if we found a quote for it
+                  onSearchResultSelected(
+                      scope = this,
+                      symbol = q.symbol,
+                      dismiss = false,
+                  )
+                }
+              }
+        }
   }
 
   private fun performSymbolLookup(
@@ -124,36 +98,38 @@ internal constructor(
       return
     }
 
-    scope.launch(context = Dispatchers.Default) {
-      symbolLookupRunner
-          .call(false, symbol)
-          .onFailure { Timber.e(it, "Error looking up results for $symbol") }
-          .onSuccess { Timber.d("Found search results for $symbol $it") }
-          .map { processLookupResults(it) }
-          .onSuccess { r ->
-            s.apply {
-              lookupError.value = null
-              lookupResults.value = r
-            }
-          }
-          .onSuccess { r ->
-            // Auto select a matching symbol if one is exact
-            r.firstOrNull { it.symbol == symbol.asSymbol() }
-                ?.also { result ->
-                  onSearchResultSelected(
-                      scope = scope,
-                      symbol = result.symbol,
-                      dismiss = false,
-                  )
+    symbolLookupJob?.cancel()
+    symbolLookupJob =
+        scope.launch(context = Dispatchers.Default) {
+          interactor
+              .search(symbol)
+              .onFailure { Timber.e(it, "Error looking up results for $symbol") }
+              .onSuccess { Timber.d("Found search results for $symbol $it") }
+              .map { processLookupResults(it) }
+              .onSuccess { r ->
+                s.apply {
+                  lookupError.value = null
+                  lookupResults.value = r
                 }
-          }
-          .onFailure { e ->
-            s.apply {
-              lookupError.value = e
-              lookupResults.value = emptyList()
-            }
-          }
-    }
+              }
+              .onSuccess { r ->
+                // Auto select a matching symbol if one is exact
+                r.firstOrNull { it.symbol == symbol.asSymbol() }
+                    ?.also { result ->
+                      onSearchResultSelected(
+                          scope = scope,
+                          symbol = result.symbol,
+                          dismiss = false,
+                      )
+                    }
+              }
+              .onFailure { e ->
+                s.apply {
+                  lookupError.value = e
+                  lookupResults.value = emptyList()
+                }
+              }
+        }
   }
 
   @CheckResult
@@ -201,25 +177,29 @@ internal constructor(
 
   private fun performLookupOptionData(scope: CoroutineScope, symbol: StockSymbol) {
     val s = state
-    scope.launch(context = Dispatchers.Default) {
-      optionLookupRunner
-          .call(false, symbol, s.optionExpirationDate.value)
-          .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
-          .onSuccess { Timber.d("Options data: $it") }
-          .onSuccess { option ->
-            s.resolvedOption.value = option
 
-            val strike = s.optionStrikePrice.value
-            if (strike != null) {
-              // Clear price if it is not present in Strike price list for current Option expiration
-              // date
-              if (!option.strikes.map { it.value }.contains(strike.value)) {
-                s.optionStrikePrice.value = null
+    optionLookupJob?.cancel()
+    optionLookupJob =
+        scope.launch(context = Dispatchers.Default) {
+          interactor
+              .getOptionsChain(symbol, s.optionExpirationDate.value)
+              .onFailure { Timber.e(it, "Error looking up options data: ${symbol.raw}") }
+              .onSuccess { Timber.d("Options data: $it") }
+              .onSuccess { option ->
+                s.resolvedOption.value = option
+
+                val strike = s.optionStrikePrice.value
+                if (strike != null) {
+                  // Clear price if it is not present in Strike price list for current Option
+                  // expiration
+                  // date
+                  if (!option.strikes.map { it.value }.contains(strike.value)) {
+                    s.optionStrikePrice.value = null
+                  }
+                }
               }
-            }
-          }
-          .onFailure { s.resolvedOption.value = null }
-    }
+              .onFailure { s.resolvedOption.value = null }
+        }
   }
 
   private fun MutableNewTickerViewState.dismissSearchResultsPopup() {
@@ -261,6 +241,17 @@ internal constructor(
     val s = state
 
     registry.consumeRestored(KEY_SYMBOL)?.let { it as String }?.also { s.symbol.value = it }
+  }
+
+  fun dispose() {
+    symbolResolutionJob?.cancel()
+    symbolResolutionJob = null
+
+    symbolLookupJob?.cancel()
+    symbolLookupJob = null
+
+    optionLookupJob?.cancel()
+    optionLookupJob = null
   }
 
   fun handleSearchResultsDismissed() {

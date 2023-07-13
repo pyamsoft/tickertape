@@ -40,7 +40,6 @@ import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.fromJson
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +48,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class PortfolioDigViewModeler
 @Inject
@@ -69,6 +69,9 @@ internal constructor(
         interactor,
         interactorCache,
     ) {
+
+  private var positionLoadJob: Deferred<ResultWrapper<List<PositionStock>>>? = null
+  private var splitLoadJob: Deferred<ResultWrapper<List<DbSplit>>>? = null
 
   @CheckResult
   private suspend fun handleLoadSplits(force: Boolean): ResultWrapper<List<DbSplit>> =
@@ -131,9 +134,8 @@ internal constructor(
         .apply {
 
           // Always load the ticker in parallel
-          add(async { loadTicker(force) })
+          add(loadTickerAsync(force))
 
-          @Suppress("ControlFlowWithEmptyBody", "IMPLICIT_CAST_TO_ANY")
           when (state.section.value) {
             PortfolioDigSections.PRICE_ALERTS -> {
               // TODO add price alerts work
@@ -142,23 +144,23 @@ internal constructor(
               // Chart doesn't need anything specific
             }
             PortfolioDigSections.NEWS -> {
-              add(async { loadNews(force) })
+              add(loadNewsAsync(force))
             }
             PortfolioDigSections.STATISTICS -> {
-              add(async { loadStatistics(force) })
+              add(loadStatisticsAsync(force))
             }
             PortfolioDigSections.SPLITS -> {
-              add(async { loadSplits(force) })
+              add(loadSplitsAsync(force))
             }
             PortfolioDigSections.POSITIONS -> {
-              add(async { loadSplits(force) })
-              add(async { loadPositions(force) })
+              add(loadSplitsAsync(force))
+              add(loadPositionsAsync(force))
             }
             PortfolioDigSections.RECOMMENDATIONS -> {
-              add(async { loadRecommendations(force) })
+              add(loadRecommendationsAsync(force))
             }
             PortfolioDigSections.OPTIONS_CHAIN -> {
-              add(async { loadOptionsChain(force) })
+              add(loadOptionsChainAsync(force))
             }
           }
         }
@@ -180,21 +182,31 @@ internal constructor(
     )
   }
 
-  private suspend fun loadSplits(force: Boolean) {
+  @CheckResult
+  private suspend fun CoroutineScope.loadSplitsAsync(
+      force: Boolean
+  ): Deferred<ResultWrapper<List<DbSplit>>> {
+    val scope = this
     val s = state
-    handleLoadSplits(force)
-        .onSuccess { sp ->
-          s.apply {
-            stockSplitError.value = null
-            s.handlePositionListRegenOnSplitsUpdated(splits = sp)
-          }
+
+    splitLoadJob?.cancel()
+    return scope
+        .async(context = Dispatchers.Default) {
+          handleLoadSplits(force)
+              .onSuccess { sp ->
+                s.apply {
+                  stockSplitError.value = null
+                  s.handlePositionListRegenOnSplitsUpdated(splits = sp)
+                }
+              }
+              .onFailure { e ->
+                s.apply {
+                  stockSplitError.value = e
+                  s.handlePositionListRegenOnSplitsUpdated(splits = emptyList())
+                }
+              }
         }
-        .onFailure { e ->
-          s.apply {
-            stockSplitError.value = e
-            s.handlePositionListRegenOnSplitsUpdated(splits = emptyList())
-          }
-        }
+        .also { splitLoadJob = it }
   }
 
   private suspend fun loadHolding(force: Boolean) {
@@ -213,23 +225,33 @@ internal constructor(
         }
   }
 
-  private suspend fun loadPositions(force: Boolean) {
+  @CheckResult
+  private suspend fun CoroutineScope.loadPositionsAsync(
+      force: Boolean
+  ): Deferred<ResultWrapper<List<PositionStock>>> {
+    val scope = this
+
     val s = state
     val splits = s.stockSplits.value
 
-    handleLoadPositions(force, splits)
-        .onSuccess { p ->
-          s.apply {
-            positionsError.value = null
-            s.handlePositionListRegenOnSplitsUpdated(positions = p)
-          }
+    positionLoadJob?.cancel()
+    return scope
+        .async(context = Dispatchers.Default) {
+          handleLoadPositions(force, splits)
+              .onSuccess { p ->
+                s.apply {
+                  positionsError.value = null
+                  s.handlePositionListRegenOnSplitsUpdated(positions = p)
+                }
+              }
+              .onFailure { e ->
+                s.apply {
+                  positionsError.value = e
+                  s.handlePositionListRegenOnSplitsUpdated(positions = emptyList())
+                }
+              }
         }
-        .onFailure { e ->
-          s.apply {
-            positionsError.value = e
-            s.handlePositionListRegenOnSplitsUpdated(positions = emptyList())
-          }
-        }
+        .also { positionLoadJob = it }
   }
 
   private fun onPositionChangeEvent(event: PositionChangeEvent) {
@@ -417,6 +439,14 @@ internal constructor(
         ?.let { jsonParser.fromJson<PortfolioDigParams.Json>(it) }
         ?.fromJson()
         ?.also { handleOpenRec(it) }
+  }
+
+  override fun onDispose() {
+    positionLoadJob?.cancel()
+    positionLoadJob = null
+
+    splitLoadJob?.cancel()
+    splitLoadJob = null
   }
 
   fun bind(scope: CoroutineScope) {

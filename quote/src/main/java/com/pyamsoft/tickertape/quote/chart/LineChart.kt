@@ -39,7 +39,6 @@ import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
 import com.patrykandpatryk.vico.compose.component.shape.shader.verticalGradient
 import com.patrykandpatryk.vico.compose.component.shapeComponent
 import com.patrykandpatryk.vico.compose.component.textComponent
-import com.patrykandpatryk.vico.core.axis.horizontal.HorizontalAxis
 import com.patrykandpatryk.vico.core.chart.decoration.Decoration
 import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatryk.vico.core.chart.line.LineChart as VicoLineChart
@@ -218,6 +217,7 @@ internal fun LineChart(
           startAxis(
               // No ticks
               tick = null,
+              guideline = null,
               // No labels on start axis
               valueFormatter = { _, _ -> "" },
           ),
@@ -225,14 +225,12 @@ internal fun LineChart(
           bottomAxis(
               // No ticks
               tick = null,
+              guideline = null,
               // No labels on bottom axis
               valueFormatter = { _, _ -> "" },
-              tickPosition =
-                  HorizontalAxis.TickPosition.Center(
-                      // Spacing so large there will not be any ticks
-                      // Offset by 1 to avoid a crash where Offset cannot be less than 1
-                      spacing = lines.models.maxX.roundToInt() * 2 + 1,
-                  ),
+              // Spacing so large there will not be any ticks
+              // Offset by 1 to avoid a crash where Offset cannot be less than 1
+              labelSpacing = lines.models.maxX.roundToInt() * 2 + 1,
           ),
       chartScrollSpec = scrollSpec,
   )

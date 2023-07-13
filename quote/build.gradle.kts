@@ -59,8 +59,6 @@ dependencies {
 
   implementation("androidx.activity:activity-compose:${rootProject.extra["composeActivity"]}")
 
-  implementation("com.github.pyamsoft:highlander:0.2.1")
-
   implementation(project(":core"))
   implementation(project(":db"))
   implementation(project(":stocks"))

@@ -61,6 +61,8 @@ internal constructor(
   }
 
   override fun onDispose() {
+    viewModel?.dispose()
+
     viewModel = null
     imageLoader = null
     clock = null

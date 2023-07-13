@@ -30,10 +30,10 @@ import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.enqueueAppWork
 import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TickerTape : Application() {
 
@@ -127,11 +127,6 @@ class TickerTape : Application() {
             "Simple in-memory caching of all the things",
         )
 
-        add(
-            "Highlander",
-            "https://github.com/pyamsoft/highlander",
-            "There can be only one.",
-        )
         add(
             "Room",
             "https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/room/",

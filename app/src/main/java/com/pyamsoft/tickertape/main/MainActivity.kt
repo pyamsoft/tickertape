@@ -30,7 +30,7 @@ import com.pyamsoft.pydroid.ui.app.installPYDroid
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogBuilder
 import com.pyamsoft.pydroid.ui.changelog.ChangeLogProvider
 import com.pyamsoft.pydroid.ui.changelog.buildChangeLog
-import com.pyamsoft.pydroid.util.doOnCreate
+import com.pyamsoft.pydroid.ui.util.fillUpToPortraitSize
 import com.pyamsoft.pydroid.util.stableLayoutHideNavigation
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.R
@@ -39,27 +39,13 @@ import com.pyamsoft.tickertape.alert.notification.bigmover.BigMoverNotificationD
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.stocks.api.asSymbol
 import com.pyamsoft.tickertape.ui.InstallPYDroidExtras
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainActivity : AppCompatActivity() {
 
   @JvmField @Inject internal var themeViewModel: ThemeViewModeler? = null
   @JvmField @Inject internal var viewModel: MainViewModeler? = null
-
-  init {
-    doOnCreate {
-      installPYDroid(
-          provider =
-              object : ChangeLogProvider {
-
-                override val applicationIcon = R.mipmap.ic_launcher_round
-
-                override val changelog: ChangeLogBuilder = buildChangeLog {}
-              },
-      )
-    }
-  }
 
   private inline fun <T : Any> retrieveFromIntent(
       key: String,
@@ -112,15 +98,37 @@ internal class MainActivity : AppCompatActivity() {
         )
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    stableLayoutHideNavigation()
+  private fun initializePYDroid() {
+    installPYDroid(
+        provider =
+            object : ChangeLogProvider {
 
+              override val applicationIcon = R.mipmap.ic_launcher_round
+
+              override val changelog: ChangeLogBuilder = buildChangeLog {}
+            },
+    )
+  }
+
+  private fun setupActivity() {
+    // Setup PYDroid first
+    initializePYDroid()
+
+    // Create and initialize the ObjectGraph
     val component = ObjectGraph.ApplicationScope.retrieve(this).plusMainComponent().create(this)
     component.inject(this)
     ObjectGraph.ActivityScope.install(this, component)
 
+    // Finally update the View
+    stableLayoutHideNavigation()
+
+    // And handle the intent
     handleLaunchIntent()
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setupActivity()
 
     val vm = themeViewModel.requireNotNull()
     val appName = getString(R.string.app_name)
@@ -134,7 +142,10 @@ internal class MainActivity : AppCompatActivity() {
         SystemBars(
             theme = theme,
         )
-        InstallPYDroidExtras()
+        InstallPYDroidExtras(
+          modifier = Modifier.fillUpToPortraitSize(),
+          appName = appName,
+        )
 
         MainEntry(
             modifier = Modifier.fillMaxSize(),

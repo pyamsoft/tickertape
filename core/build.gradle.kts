@@ -49,6 +49,8 @@ dependencies {
 
   kapt("com.google.dagger:dagger-compiler:${rootProject.extra["dagger"]}")
 
+  api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${rootProject.extra["coroutines"]}")
+
   api("com.jakewharton.timber:timber:5.0.1")
 
   // PYDroid

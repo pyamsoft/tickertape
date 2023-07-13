@@ -32,7 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import com.pyamsoft.pydroid.ui.util.fullScreenDialog
+import com.pyamsoft.pydroid.ui.util.fillUpToPortraitSize
 import com.pyamsoft.tickertape.portfolio.PortfolioStock
 import com.pyamsoft.tickertape.portfolio.dig.PortfolioDigEntry
 import com.pyamsoft.tickertape.quote.Ticker
@@ -100,7 +100,7 @@ internal fun MainScreen(
 
     portfolioDig?.also { p ->
       PortfolioDigEntry(
-          modifier = Modifier.fullScreenDialog(),
+          modifier = Modifier.fillUpToPortraitSize(),
           params = p,
           onDismiss = onCloseDig,
       )

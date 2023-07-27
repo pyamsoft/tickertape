@@ -29,7 +29,7 @@ internal interface YahooCookieService {
    */
   @CheckResult
   @ScalarResponse
-  @GET("https://finance.yahoo.com")
+  @GET("https://finance.yahoo.com/quote/AAPL")
   suspend fun getCookie(@Header("Accept") accept: String): Response<String>
 
   /**

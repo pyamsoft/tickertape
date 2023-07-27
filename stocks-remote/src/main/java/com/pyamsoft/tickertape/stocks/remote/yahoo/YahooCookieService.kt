@@ -37,6 +37,6 @@ internal interface YahooCookieService {
    */
   @CheckResult
   @ScalarResponse
-  @GET("https://query1.finance.yahoo.com/v1/test/getcrumb")
+  @GET("https://query2.finance.yahoo.com/v1/test/getcrumb")
   suspend fun getCrumb(@Header("Cookie") cookie: String): String
 }

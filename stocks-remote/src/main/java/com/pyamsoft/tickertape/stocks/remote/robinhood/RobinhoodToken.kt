@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit
 
 internal data class RobinhoodToken
 internal constructor(
-    val cookie: String,
     val accessToken: String,
     val expiresInMilliseconds: Long,
 ) {

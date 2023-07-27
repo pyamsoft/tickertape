@@ -29,6 +29,7 @@ import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,6 +57,7 @@ internal constructor(
 
   override suspend fun getNews(symbols: List<StockSymbol>): List<StockNewsList> =
       withContext(context = Dispatchers.Default) {
+        Timber.d("TRY GET NEWS: $service $cookie")
         val newsList = mutableMapOf<StockSymbol, MutableSet<StockNews>>()
         for (s in symbols) {
           val resp =

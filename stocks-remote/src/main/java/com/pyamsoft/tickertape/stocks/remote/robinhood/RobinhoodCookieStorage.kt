@@ -40,16 +40,9 @@ internal constructor(
         enforcer = enforcer,
     ) {
 
-  override suspend fun getCookie(): String {
-    val page = service.getCookie(accept = RH_ACCEPT_STRING)
-    val cookies = page.headers().values("Set-Cookie")
-    return cookies.joinToString(";")
-  }
-
-  override suspend fun getToken(cookie: String): RobinhoodToken {
-    val token = service.getToken(cookie = cookie)
+  override suspend fun getToken(): RobinhoodToken {
+    val token = service.getToken()
     return RobinhoodToken(
-        cookie = cookie,
         accessToken = "Bearer ${token.accessToken}",
         expiresInMilliseconds = token.expiresInMilliseconds,
     )
@@ -80,10 +73,4 @@ internal constructor(
           throw e
         }
       }
-
-  companion object {
-    // Need to pass this Accept header or RH does not return set-cookies
-    private const val RH_ACCEPT_STRING =
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
-  }
 }

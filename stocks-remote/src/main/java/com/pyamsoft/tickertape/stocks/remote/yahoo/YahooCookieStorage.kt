@@ -16,13 +16,12 @@
 
 package com.pyamsoft.tickertape.stocks.remote.yahoo
 
+import androidx.annotation.CheckResult
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.storage.AbstractStorage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,58 +41,44 @@ internal constructor(
         enforcer = enforcer,
     ) {
 
-  private var crumbFromWindowContext: String = ""
-  private val mutex = Mutex()
-
   /**
    * Simplified
    *
    * https://github.com/gadicc/node-yahoo-finance2/blob/devel/src/lib/getCrumb.ts
    */
-  private suspend fun potentiallyExtractCrumbFromWindowContext(body: String) {
+  @CheckResult
+  private fun potentiallyExtractCrumbFromWindowContext(body: String): String {
     val maybeJson = YF_CONTEXT_REGEX.findAll(body)
     if (maybeJson.none()) {
       Timber.w("Failed to find cookie in YF Context: ${YF_CONTEXT_REGEX.pattern}")
-      return
+      return ""
     }
 
     // We need just the JSON object part
     val jsonLike = maybeJson.first().value.replace("window.YAHOO.context = ", "")
 
-    val crumb =
-        try {
-          JSONObject(jsonLike).getString("crumb")
-        } catch (e: JSONException) {
-          Timber.e(e, "Error parsing JSON for window.YAHOO.context")
-          ""
-        }
-
-    mutex.withLock {
-      // If the crumb is blank, we just erase it since its bad
-      crumbFromWindowContext = crumb
+    return try {
+      JSONObject(jsonLike).getString("crumb")
+    } catch (e: JSONException) {
+      Timber.e(e, "Error parsing JSON for window.YAHOO.context")
+      ""
     }
   }
 
-  override suspend fun getCookie(): String {
+  override suspend fun getToken(): YahooCrumb {
     val page = service.getCookie(accept = YF_ACCEPT_STRING)
     val cookies = page.headers().values("Set-Cookie")
+    val cookieString = cookies.joinToString(";")
 
-    // SIDE-EFFECT: Pull the cookie from the page body
-    potentiallyExtractCrumbFromWindowContext(page.body().requireNotNull())
-
-    return cookies.joinToString(";")
-  }
-
-  override suspend fun getToken(cookie: String): YahooCrumb {
-    val existingCrumb = mutex.withLock { crumbFromWindowContext }
-    val crumb =
-        existingCrumb.ifBlank {
-          // Generally we get 429 from this fallback - but maybe sometimes it will work?
-          service.getCrumb(cookie = cookie)
-        }
+    // The crumb may be in the page
+    var crumb = potentiallyExtractCrumbFromWindowContext(page.body().requireNotNull())
+    if (crumb.isBlank()) {
+      // Generally we get 429 from this fallback - but maybe sometimes it will work?
+      crumb = service.getCrumb(cookie = cookieString)
+    }
 
     return YahooCrumb(
-        cookie = cookie,
+        cookie = cookieString,
         crumb = crumb,
     )
   }

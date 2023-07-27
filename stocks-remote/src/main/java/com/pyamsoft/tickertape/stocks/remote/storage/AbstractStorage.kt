@@ -18,7 +18,6 @@ package com.pyamsoft.tickertape.stocks.remote.storage
 
 import androidx.annotation.CheckResult
 import com.pyamsoft.cachify.cachify
-import com.pyamsoft.cachify.multiCachify
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -31,36 +30,10 @@ protected constructor(
 
   private val mutex = Mutex()
 
-  private var storedCookie = ""
   private var storedToken: T? = null
 
   // Internally use a cachify so that we have do not make multiple upstream calls at the same time
-  private val cookieCache = cachify { getCookie() }
-  private val tokenCache = multiCachify<String, T, String> { getToken(it) }
-
-  @CheckResult
-  private suspend fun resolveCookie(): String {
-    enforcer.assertOffMainThread()
-
-    val s = storedCookie
-    if (s.isNotBlank()) {
-      return s
-    }
-
-    return mutex.withLock {
-      if (storedCookie.isBlank()) {
-        storedCookie =
-            try {
-              cookieCache.call()
-            } catch (e: Throwable) {
-              Timber.e(e, "Error getting cookie")
-              ""
-            }
-      }
-
-      return@withLock storedCookie
-    }
-  }
+  private val tokenCache = cachify<T> { getToken() }
 
   @CheckResult
   private suspend fun resolveToken(): T? {
@@ -71,17 +44,11 @@ protected constructor(
       return s
     }
 
-    // Get cookie from storage
-    val c = resolveCookie()
-    if (c.isBlank()) {
-      return null
-    }
-
     return mutex.withLock {
       if (storedToken == null) {
         storedToken =
             try {
-              tokenCache.key(c).call(c)
+              tokenCache.call()
             } catch (e: Throwable) {
               Timber.e(e, "Error getting token")
               null
@@ -136,20 +103,18 @@ protected constructor(
         enforcer.assertOffMainThread()
 
         storedToken = null
-        storedCookie = ""
 
-        cookieCache.clear()
         tokenCache.clear()
       }
 
   @CheckResult protected abstract suspend fun validateToken(token: T): Boolean
 
-  @CheckResult protected abstract suspend fun getCookie(): String
-
-  @CheckResult protected abstract suspend fun getToken(cookie: String): T
+  @CheckResult protected abstract suspend fun getToken(): T
 
   companion object {
-    private val MISSING_COOKIE_EXCEPTION =
-        RuntimeException("Unable to authorize device for stock data, please try again")
+
+    private val MISSING_COOKIE_EXCEPTION by lazy {
+      RuntimeException("Unable to authorize device for stock data, please try again")
+    }
   }
 }

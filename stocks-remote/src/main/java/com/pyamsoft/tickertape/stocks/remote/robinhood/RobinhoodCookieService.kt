@@ -17,21 +17,11 @@
 package com.pyamsoft.tickertape.stocks.remote.robinhood
 
 import androidx.annotation.CheckResult
-import com.pyamsoft.tickertape.stocks.remote.converter.ScalarResponse
-import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 
 internal interface RobinhoodCookieService {
 
-  /** Get the Cookie from RH (we need to ask for some stock, just use AAPL) */
-  @CheckResult
-  @ScalarResponse
-  @GET("https://robinhood.com/stocks/AAPL")
-  suspend fun getCookie(@Header("Accept") accept: String): Response<String>
-
-  /** Trade cookie for a token */
   @CheckResult
   @GET("https://robinhood.com/api/public/get_token")
-  suspend fun getToken(@Header("Cookie") cookie: String): RobinhoodTokenResponse
+  suspend fun getToken(): RobinhoodTokenResponse
 }

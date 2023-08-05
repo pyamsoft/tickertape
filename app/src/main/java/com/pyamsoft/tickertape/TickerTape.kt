@@ -30,8 +30,11 @@ import com.pyamsoft.tickertape.core.TERMS_CONDITIONS_URL
 import com.pyamsoft.tickertape.worker.WorkerQueue
 import com.pyamsoft.tickertape.worker.enqueueAppWork
 import com.pyamsoft.tickertape.worker.workmanager.WorkerObjectGraph
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,7 +43,7 @@ class TickerTape : Application() {
   @Inject @JvmField internal var workerQueue: WorkerQueue? = null
 
   @CheckResult
-  private fun installPYDroid(): ModuleProvider {
+  private fun initPYDroid(): ModuleProvider {
     val url = "https://github.com/pyamsoft/tickertape"
 
     return installPYDroid(
@@ -86,11 +89,18 @@ class TickerTape : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    val modules = initPYDroid()
 
-    installLogger()
-    val modules = installPYDroid()
+    val scope =
+        CoroutineScope(
+            context = SupervisorJob() + Dispatchers.Default + CoroutineName(this::class.java.name),
+        )
+    installLogger(
+        scope = scope,
+        inAppDebugStatus = modules.get().inAppDebugStatus(),
+    )
+
     installComponent(modules)
-
     addLibraries()
     beginWork()
   }

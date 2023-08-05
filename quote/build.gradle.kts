@@ -55,7 +55,7 @@ dependencies {
   kapt("com.google.dagger:dagger-compiler:${rootProject.extra["dagger"]}")
   ksp("com.squareup.moshi:moshi-kotlin-codegen:${rootProject.extra["moshi"]}")
 
-  implementation("com.patrykandpatryk.vico:compose:1.7.1")
+  implementation("com.patrykandpatryk.vico:compose:1.8.1")
 
   implementation("androidx.activity:activity-compose:${rootProject.extra["composeActivity"]}")
 

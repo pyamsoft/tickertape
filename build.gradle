@@ -19,11 +19,11 @@
 buildscript {
   ext {
     minSdk = 24
-    targetSdk = 33
+    targetSdk = 34
     compileSdk = 34
 
     // Us
-    pydroid = "26.8.0"
+    pydroid = "26.8.1"
     cachify = "0.3.1"
 
     // Kotlin

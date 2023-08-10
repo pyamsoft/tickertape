@@ -79,6 +79,7 @@ fun NewTickerScreen(
 
       Crossfade(
           modifier = Modifier.fillMaxWidth(),
+          label = "LookupOrEquityTypePicker",
           targetState = equityType,
       ) { et ->
         if (et != null) {

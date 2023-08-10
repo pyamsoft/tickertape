@@ -85,6 +85,7 @@ fun DigChart(
       modifier = modifier.padding(MaterialTheme.keylines.content),
   ) {
     Crossfade(
+        label = "DigChart",
         targetState = chartError,
     ) { ce ->
       if (ce == null) {

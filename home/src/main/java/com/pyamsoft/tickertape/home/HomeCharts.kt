@@ -275,6 +275,7 @@ private fun HomeCharts(
   FirstRenderEffect { onRefresh() }
 
   Crossfade(
+      label = "Chart",
       targetState = error,
   ) { err ->
     if (err == null) {

@@ -23,7 +23,7 @@ buildscript {
     compileSdk = 34
 
     // Us
-    pydroid = "26.8.1"
+    pydroid = "26.8.2"
     cachify = "0.3.1"
 
     // Kotlin
@@ -46,10 +46,10 @@ buildscript {
     retrofit = "2.9.0"
 
     // Compose
-    compose = "1.4.3"
+    compose = "1.5.0"
     composeCompiler = "1.5.1"
     composeActivity = "1.7.2"
-    composeMaterial = "1.4.3"
+    composeMaterial = "1.5.0"
     accompanist = "0.30.1"
 
     desugar = "2.0.3"

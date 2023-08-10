@@ -112,7 +112,12 @@ fun PortfolioDigScreen(
   val holding by state.holding.collectAsState()
 
   val allTabs = rememberTabs(ticker.symbol, holding)
-  val pagerState = rememberPagerState()
+  val pagerState =
+      rememberPagerState(
+          initialPage = 0,
+          initialPageOffsetFraction = 0F,
+          pageCount = { allTabs.size },
+      )
 
   // Watch for a swipe causing a page change and update accordingly
   val handleTabUpdated by rememberUpdatedState(onTabUpdated)
@@ -146,6 +151,7 @@ fun PortfolioDigScreen(
       )
 
       Crossfade(
+          label = "DigScreen",
           modifier = Modifier.fillMaxWidth().weight(1F),
           targetState = loadingState,
       ) { loading ->
@@ -231,7 +237,6 @@ private fun Content(
 ) {
   HorizontalPager(
       modifier = modifier,
-      pageCount = allTabs.size,
       state = pagerState,
   ) { page ->
     val section =

@@ -39,9 +39,9 @@ import com.patrykandpatryk.vico.compose.chart.scroll.rememberChartScrollSpec
 import com.patrykandpatryk.vico.compose.component.shape.shader.verticalGradient
 import com.patrykandpatryk.vico.compose.component.shapeComponent
 import com.patrykandpatryk.vico.compose.component.textComponent
+import com.patrykandpatryk.vico.core.axis.AxisItemPlacer
 import com.patrykandpatryk.vico.core.chart.decoration.Decoration
 import com.patrykandpatryk.vico.core.chart.decoration.ThresholdLine
-import com.patrykandpatryk.vico.core.chart.line.LineChart as VicoLineChart
 import com.patrykandpatryk.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatryk.vico.core.dimensions.MutableDimensions
 import com.patrykandpatryk.vico.core.entry.ChartEntry
@@ -52,6 +52,7 @@ import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.theme.HairlineSize
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import kotlin.math.roundToInt
+import com.patrykandpatryk.vico.core.chart.line.LineChart as VicoLineChart
 
 @Stable
 private data class ChartLines(
@@ -228,9 +229,10 @@ internal fun LineChart(
               guideline = null,
               // No labels on bottom axis
               valueFormatter = { _, _ -> "" },
-              // Spacing so large there will not be any ticks
-              // Offset by 1 to avoid a crash where Offset cannot be less than 1
-              labelSpacing = lines.models.maxX.roundToInt() * 2 + 1,
+              itemPlacer =
+                  AxisItemPlacer.Horizontal.default(
+                      spacing = lines.models.maxX.roundToInt() * 2 + 1,
+                  ),
           ),
       chartScrollSpec = scrollSpec,
   )

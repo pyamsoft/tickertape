@@ -76,6 +76,7 @@ internal fun HomePortfolio(
 
   Crossfade(
       modifier = modifier,
+      label = "Portfolio Summary",
       targetState = portfolioError,
   ) { err ->
     if (err == null) {

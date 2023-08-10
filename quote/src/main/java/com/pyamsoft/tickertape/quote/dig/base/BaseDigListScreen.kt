@@ -89,6 +89,7 @@ private fun <T : Any> DigList(
     renderListItem: @Composable (T) -> Unit,
 ) {
   Crossfade(
+      label = "DigList",
       targetState = items,
   ) { stuff ->
     if (stuff.isEmpty()) {

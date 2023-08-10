@@ -32,10 +32,10 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
+import javax.inject.Inject
 
 internal class MainInjector @Inject internal constructor() : ComposableInjector() {
 
@@ -92,8 +92,13 @@ internal fun MainEntry(
   val component = rememberComposableInjector { MainInjector() }
   val viewModel = rememberNotNull(component.viewModel)
 
-  val pagerState = rememberPagerState()
   val allTabs = rememberAllTabs()
+  val pagerState =
+      rememberPagerState(
+          initialPage = 0,
+          initialPageOffsetFraction = 0F,
+          pageCount = { allTabs.size },
+      )
   val scope = rememberCoroutineScope()
 
   MountHooks(

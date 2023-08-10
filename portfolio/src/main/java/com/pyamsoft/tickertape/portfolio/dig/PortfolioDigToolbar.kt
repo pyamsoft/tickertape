@@ -263,11 +263,17 @@ private fun PreviewPortfolioDigToolbar() {
           clock = clock,
       )
   val holding by state.holding.collectAsState()
+  val allTabs = rememberTabs(symbol, holding)
 
   PortfolioDigToolbar(
       state = state,
-      pagerState = rememberPagerState(),
-      allTabs = rememberTabs(symbol, holding),
+      pagerState =
+          rememberPagerState(
+              initialPage = 0,
+              initialPageOffsetFraction = 0F,
+              pageCount = { allTabs.size },
+          ),
+      allTabs = allTabs,
       onClose = {},
   )
 }

@@ -24,14 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
 import coil.ImageLoader
 import com.pyamsoft.pydroid.arch.SaveStateDisposableEffect
 import com.pyamsoft.pydroid.ui.inject.ComposableInjector
 import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
-import com.pyamsoft.pydroid.ui.util.LifecycleEffect
+import com.pyamsoft.pydroid.ui.util.LifecycleEventEffect
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.quote.add.NewTickerSheetScreen
@@ -68,16 +66,12 @@ private fun MountHooks(
     )
   }
 
-  LifecycleEffect {
-    object : DefaultLifecycleObserver {
-
-      override fun onStart(owner: LifecycleOwner) {
-        viewModel.handleRefreshList(
-            scope = owner.lifecycleScope,
-            force = false,
-        )
-      }
-    }
+  val scope = rememberCoroutineScope()
+  LifecycleEventEffect(event = Lifecycle.Event.ON_START) {
+    viewModel.handleRefreshList(
+        scope = scope,
+        force = false,
+    )
   }
 }
 

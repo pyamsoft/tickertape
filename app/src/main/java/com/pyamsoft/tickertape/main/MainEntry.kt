@@ -32,10 +32,10 @@ import com.pyamsoft.pydroid.ui.inject.rememberComposableInjector
 import com.pyamsoft.pydroid.ui.util.rememberNotNull
 import com.pyamsoft.tickertape.ObjectGraph
 import com.pyamsoft.tickertape.stocks.api.StockOptionsQuote
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
-import javax.inject.Inject
 
 internal class MainInjector @Inject internal constructor() : ComposableInjector() {
 

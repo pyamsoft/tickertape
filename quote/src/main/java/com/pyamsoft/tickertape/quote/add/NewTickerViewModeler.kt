@@ -28,14 +28,14 @@ import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
 import com.pyamsoft.tickertape.stocks.api.TradeSide
 import com.pyamsoft.tickertape.stocks.api.asSymbol
+import java.time.LocalDate
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
-import javax.inject.Inject
 
 class NewTickerViewModeler
 @Inject

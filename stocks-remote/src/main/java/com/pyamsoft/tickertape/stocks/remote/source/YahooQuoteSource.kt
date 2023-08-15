@@ -39,12 +39,12 @@ import com.pyamsoft.tickertape.stocks.remote.service.QuoteService
 import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.QuoteSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 internal class YahooQuoteSource

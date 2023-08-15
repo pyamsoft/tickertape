@@ -30,6 +30,7 @@ import com.pyamsoft.tickertape.stocks.api.StockNewsList
 import com.pyamsoft.tickertape.stocks.api.StockOptions
 import com.pyamsoft.tickertape.stocks.api.StockRecommendations
 import com.pyamsoft.tickertape.stocks.api.StockSymbol
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
 
 abstract class DigViewModeler<S : MutableDigViewState>
 protected constructor(

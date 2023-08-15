@@ -21,14 +21,14 @@ import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.tickertape.stocks.remote.api.YahooApi
 import com.pyamsoft.tickertape.stocks.remote.storage.AbstractStorage
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooCookieStorage

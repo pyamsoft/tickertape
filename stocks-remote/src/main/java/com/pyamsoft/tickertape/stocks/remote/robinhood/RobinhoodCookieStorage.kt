@@ -19,14 +19,14 @@ package com.pyamsoft.tickertape.stocks.remote.robinhood
 import com.pyamsoft.pydroid.core.ThreadEnforcer
 import com.pyamsoft.tickertape.stocks.remote.api.RobinhoodApi
 import com.pyamsoft.tickertape.stocks.remote.storage.AbstractStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import timber.log.Timber
 
 @Singleton
 internal class RobinhoodCookieStorage

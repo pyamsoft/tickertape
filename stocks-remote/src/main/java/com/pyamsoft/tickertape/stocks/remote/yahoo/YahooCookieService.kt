@@ -24,17 +24,13 @@ import retrofit2.http.Header
 
 internal interface YahooCookieService {
 
-  /**
-   * Get a cookie
-   */
+  /** Get a cookie */
   @CheckResult
   @ScalarResponse
   @GET("https://finance.yahoo.com/quote/AAPL")
   suspend fun getCookie(@Header("Accept") accept: String): Response<String>
 
-  /**
-   * Trade cookie for a token
-   */
+  /** Trade cookie for a token */
   @CheckResult
   @ScalarResponse
   @GET("https://query2.finance.yahoo.com/v1/test/getcrumb")

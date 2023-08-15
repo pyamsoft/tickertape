@@ -122,9 +122,9 @@ fun HomeEntry(
   )
 
   if (isSettingsOpen) {
-      SettingsDialog(
-          modifier = Modifier.fillUpToPortraitSize(),
-          onDismiss = { viewModel.handleCloseSettings() },
-      )
+    SettingsDialog(
+        modifier = Modifier.fillUpToPortraitSize(),
+        onDismiss = { viewModel.handleCloseSettings() },
+    )
   }
 }

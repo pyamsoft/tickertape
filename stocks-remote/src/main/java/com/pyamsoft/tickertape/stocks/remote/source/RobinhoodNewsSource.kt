@@ -27,11 +27,11 @@ import com.pyamsoft.tickertape.stocks.remote.robinhood.RobinhoodToken
 import com.pyamsoft.tickertape.stocks.remote.service.NewsService
 import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
 import com.pyamsoft.tickertape.stocks.sources.NewsSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class RobinhoodNewsSource

@@ -26,6 +26,8 @@ import com.pyamsoft.tickertape.stocks.remote.service.KeyStatisticsService
 import com.pyamsoft.tickertape.stocks.remote.storage.CookieProvider
 import com.pyamsoft.tickertape.stocks.remote.yahoo.YahooCrumb
 import com.pyamsoft.tickertape.stocks.sources.KeyStatisticSource
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,8 +35,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class YahooKeyStatisticsSource

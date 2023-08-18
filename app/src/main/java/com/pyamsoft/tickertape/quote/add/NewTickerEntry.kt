@@ -20,7 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -93,7 +93,7 @@ private fun NewTickerEntry(
   val component = rememberComposableInjector { NewTickerInjector() }
   val viewModel = rememberNotNull(component.viewModel)
 
-  val equityType by viewModel.equityType.collectAsState()
+  val equityType by viewModel.equityType.collectAsStateWithLifecycle()
 
   val handleClose by rememberUpdatedState(onClose)
 

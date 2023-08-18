@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -93,7 +93,7 @@ internal fun PositionEntry(
     viewModel.handleOpenDateDialog(date)
   }
 
-  val dateDialog by viewModel.datePicker.collectAsState()
+  val dateDialog by viewModel.datePicker.collectAsStateWithLifecycle()
 
   MountHooks(
       viewModel = viewModel,

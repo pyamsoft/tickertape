@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.dig.position.add
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,12 +42,12 @@ fun PositionAddScreen(
     onSubmit: () -> Unit,
     onClose: () -> Unit,
 ) {
-  val isSubmitting by state.isSubmitting.collectAsState()
-  val isSubmittable by state.isSubmittable.collectAsState()
-  val pricePerShare by state.pricePerShare.collectAsState()
-  val numberOfShares by state.numberOfShares.collectAsState()
-  val dateOfPurchase by state.dateOfPurchase.collectAsState()
-  val equityType by state.equityType.collectAsState()
+  val isSubmitting by state.isSubmitting.collectAsStateWithLifecycle()
+  val isSubmittable by state.isSubmittable.collectAsStateWithLifecycle()
+  val pricePerShare by state.pricePerShare.collectAsStateWithLifecycle()
+  val numberOfShares by state.numberOfShares.collectAsStateWithLifecycle()
+  val dateOfPurchase by state.dateOfPurchase.collectAsStateWithLifecycle()
+  val equityType by state.equityType.collectAsStateWithLifecycle()
   val isOption = remember(equityType) { equityType == EquityType.OPTION }
 
   val isSubmitEnabled = remember(isSubmittable, isSubmitting) { isSubmittable && !isSubmitting }

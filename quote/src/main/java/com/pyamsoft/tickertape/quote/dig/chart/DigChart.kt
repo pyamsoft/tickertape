@@ -37,7 +37,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -74,10 +74,10 @@ fun DigChart(
     onScrub: (ChartData) -> Unit,
     onRangeSelected: (StockChart.IntervalRange) -> Unit,
 ) {
-  val ticker by state.ticker.collectAsState()
-  val range by state.range.collectAsState()
-  val chart by state.chart.collectAsState()
-  val chartError by state.chartError.collectAsState()
+  val ticker by state.ticker.collectAsStateWithLifecycle()
+  val range by state.range.collectAsStateWithLifecycle()
+  val chart by state.chart.collectAsStateWithLifecycle()
+  val chartError by state.chartError.collectAsStateWithLifecycle()
 
   val isOptions = remember(ticker) { ticker.quote?.type == EquityType.OPTION }
 
@@ -136,10 +136,10 @@ private fun CurrentScrub(
     modifier: Modifier = Modifier,
     state: ChartDigViewState,
 ) {
-  val range by state.range.collectAsState()
-  val currentDate by state.currentDate.collectAsState()
-  val currentPrice by state.currentPrice.collectAsState()
-  val openingPrice by state.openingPrice.collectAsState()
+  val range by state.range.collectAsStateWithLifecycle()
+  val currentDate by state.currentDate.collectAsStateWithLifecycle()
+  val currentPrice by state.currentPrice.collectAsStateWithLifecycle()
+  val openingPrice by state.openingPrice.collectAsStateWithLifecycle()
 
   AnimatedVisibility(
       visible = currentPrice != null,

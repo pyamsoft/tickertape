@@ -30,7 +30,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,8 +57,8 @@ fun DigRecommendations(
     onRefresh: () -> Unit,
     onRecClick: (Ticker) -> Unit,
 ) {
-  val error by state.recommendationError.collectAsState()
-  val recommendations by state.recommendations.collectAsState()
+  val error by state.recommendationError.collectAsStateWithLifecycle()
+  val recommendations by state.recommendations.collectAsStateWithLifecycle()
 
   LazyColumn(
       modifier = modifier.fillMaxSize().padding(MaterialTheme.keylines.content),

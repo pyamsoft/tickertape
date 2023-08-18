@@ -22,7 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,8 +40,8 @@ fun DigKeyStatistics(
     state: StatisticsDigViewState,
     onRefresh: () -> Unit,
 ) {
-  val error by state.statisticsError.collectAsState()
-  val statistics by state.statistics.collectAsState()
+  val error by state.statisticsError.collectAsStateWithLifecycle()
+  val statistics by state.statistics.collectAsStateWithLifecycle()
 
   LazyColumn(
       modifier = modifier.fillMaxSize().padding(MaterialTheme.keylines.content),

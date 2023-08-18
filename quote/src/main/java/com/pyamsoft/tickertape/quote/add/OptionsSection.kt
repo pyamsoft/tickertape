@@ -37,7 +37,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,7 +68,7 @@ internal fun OptionsSection(
     onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val equityType by state.equityType.collectAsState()
+  val equityType by state.equityType.collectAsStateWithLifecycle()
   val show = remember(equityType) { equityType == EquityType.OPTION }
 
   AnimatedVisibility(
@@ -106,9 +106,9 @@ private fun OptionsStrikeExpiration(
     onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val option by state.resolvedOption.collectAsState()
-  val selectedExpirationDate by state.optionExpirationDate.collectAsState()
-  val selectedStrikePrice by state.optionStrikePrice.collectAsState()
+  val option by state.resolvedOption.collectAsStateWithLifecycle()
+  val selectedExpirationDate by state.optionExpirationDate.collectAsStateWithLifecycle()
+  val selectedStrikePrice by state.optionStrikePrice.collectAsStateWithLifecycle()
 
   val isOptionResolved = remember(option) { option != null }
   val dateFormatter = DATE_FORMATTER.get().requireNotNull()
@@ -155,7 +155,7 @@ private fun OptionsType(
     state: NewTickerViewState,
     onOptionTypeSlected: (StockOptions.Contract.Type) -> Unit,
 ) {
-  val type by state.optionType.collectAsState()
+  val type by state.optionType.collectAsStateWithLifecycle()
   val isReverse = remember(type) { type == StockOptions.Contract.Type.PUT }
 
   ButtonBar(
@@ -256,7 +256,7 @@ private fun OptionsSide(
     state: NewTickerViewState,
     onTradeSideSelected: (TradeSide) -> Unit,
 ) {
-  val side by state.tradeSide.collectAsState()
+  val side by state.tradeSide.collectAsStateWithLifecycle()
   val isReverse = remember(side) { side == TradeSide.SELL }
 
   ButtonBar(

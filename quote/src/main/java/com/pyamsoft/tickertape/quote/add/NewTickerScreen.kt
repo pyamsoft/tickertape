@@ -23,7 +23,7 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -55,7 +55,7 @@ fun NewTickerScreen(
     onExpirationDateSelected: (LocalDate) -> Unit,
     onStrikeSelected: (StockMoneyValue) -> Unit,
 ) {
-  val equityType by state.equityType.collectAsState()
+  val equityType by state.equityType.collectAsStateWithLifecycle()
 
   val hasEquitySelection = remember(equityType) { equityType != null }
 

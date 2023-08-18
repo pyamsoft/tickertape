@@ -20,12 +20,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
 import com.pyamsoft.tickertape.db.pricealert.PriceAlert
 import com.pyamsoft.tickertape.quote.dig.BaseDigViewState
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
@@ -43,8 +43,8 @@ fun DigPriceAlerts(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val loadingState by state.loadingState.collectAsState()
-  val priceAlerts = state.priceAlerts.collectAsStateList()
+  val loadingState by state.loadingState.collectAsStateWithLifecycle()
+  val priceAlerts = state.priceAlerts.collectAsStateListWithLifecycle()
 
   val isAddVisible = remember(loadingState) { loadingState == BaseDigViewState.LoadingState.DONE }
 

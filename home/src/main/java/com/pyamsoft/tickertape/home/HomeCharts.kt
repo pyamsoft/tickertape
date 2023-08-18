@@ -34,7 +34,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
 import com.pyamsoft.tickertape.home.item.HomeChartItem
 import com.pyamsoft.tickertape.quote.Ticker
 import com.pyamsoft.tickertape.quote.dig.chart.ChartError
@@ -61,9 +61,9 @@ internal fun HomeIndexes(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingIndexes.collectAsState()
-  val error by state.indexesError.collectAsState()
-  val tickers = state.indexes.collectAsStateList()
+  val loadingState by state.isLoadingIndexes.collectAsStateWithLifecycle()
+  val error by state.indexesError.collectAsStateWithLifecycle()
+  val tickers = state.indexes.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -87,9 +87,9 @@ internal fun HomeGainers(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingGainers.collectAsState()
-  val error by state.gainersError.collectAsState()
-  val tickers = state.gainers.collectAsStateList()
+  val loadingState by state.isLoadingGainers.collectAsStateWithLifecycle()
+  val error by state.gainersError.collectAsStateWithLifecycle()
+  val tickers = state.gainers.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -113,9 +113,9 @@ internal fun HomeLosers(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingLosers.collectAsState()
-  val error by state.losersError.collectAsState()
-  val tickers = state.losers.collectAsStateList()
+  val loadingState by state.isLoadingLosers.collectAsStateWithLifecycle()
+  val error by state.losersError.collectAsStateWithLifecycle()
+  val tickers = state.losers.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -139,9 +139,9 @@ internal fun HomeTrending(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingTrending.collectAsState()
-  val error by state.trendingError.collectAsState()
-  val tickers = state.trending.collectAsStateList()
+  val loadingState by state.isLoadingTrending.collectAsStateWithLifecycle()
+  val error by state.trendingError.collectAsStateWithLifecycle()
+  val tickers = state.trending.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -165,9 +165,9 @@ internal fun HomeMostShorted(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingMostShorted.collectAsState()
-  val error by state.mostShortedError.collectAsState()
-  val tickers = state.mostShorted.collectAsStateList()
+  val loadingState by state.isLoadingMostShorted.collectAsStateWithLifecycle()
+  val error by state.mostShortedError.collectAsStateWithLifecycle()
+  val tickers = state.mostShorted.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -191,9 +191,9 @@ internal fun HomeMostActive(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingMostActive.collectAsState()
-  val error by state.mostActiveError.collectAsState()
-  val tickers = state.mostActive.collectAsStateList()
+  val loadingState by state.isLoadingMostActive.collectAsStateWithLifecycle()
+  val error by state.mostActiveError.collectAsStateWithLifecycle()
+  val tickers = state.mostActive.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -217,9 +217,9 @@ internal fun HomeGrowthTech(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingGrowthTech.collectAsState()
-  val error by state.growthTechError.collectAsState()
-  val tickers = state.growthTech.collectAsStateList()
+  val loadingState by state.isLoadingGrowthTech.collectAsStateWithLifecycle()
+  val error by state.growthTechError.collectAsStateWithLifecycle()
+  val tickers = state.growthTech.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 
@@ -243,9 +243,9 @@ internal fun HomeUndervaluedGrowth(
     onChartClicked: (Ticker) -> Unit,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingUndervaluedGrowth.collectAsState()
-  val error by state.undervaluedGrowthError.collectAsState()
-  val tickers = state.undervaluedGrowth.collectAsStateList()
+  val loadingState by state.isLoadingUndervaluedGrowth.collectAsStateWithLifecycle()
+  val error by state.undervaluedGrowthError.collectAsStateWithLifecycle()
+  val tickers = state.undervaluedGrowth.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState != HomeBaseViewState.LoadingState.DONE }
 

@@ -41,7 +41,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,11 +76,11 @@ fun DigOptionsChain(
   val contentColor = LocalContentColor.current
   val allTypes = remember { StockOptions.Contract.Type.values().toList().toMutableStateList() }
 
-  val section by state.optionsSection.collectAsState()
+  val section by state.optionsSection.collectAsStateWithLifecycle()
 
-  val error by state.optionsError.collectAsState()
-  val options by state.optionsChain.collectAsState()
-  val expirationDate by state.optionsExpirationDate.collectAsState()
+  val error by state.optionsError.collectAsStateWithLifecycle()
+  val options by state.optionsChain.collectAsStateWithLifecycle()
+  val expirationDate by state.optionsExpirationDate.collectAsStateWithLifecycle()
 
   val selectedTabIndex = section.ordinal
 

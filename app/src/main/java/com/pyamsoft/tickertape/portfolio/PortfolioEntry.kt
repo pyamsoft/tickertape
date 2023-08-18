@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.portfolio
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -87,7 +87,7 @@ internal fun PortfolioEntry(
 
     val scope = rememberCoroutineScope()
 
-    val removeDialog by viewModel.remove.collectAsState()
+    val removeDialog by viewModel.remove.collectAsStateWithLifecycle()
 
     MountHooks(
         viewModel = viewModel,

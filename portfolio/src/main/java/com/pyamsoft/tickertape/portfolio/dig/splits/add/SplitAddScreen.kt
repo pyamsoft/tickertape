@@ -17,7 +17,7 @@
 package com.pyamsoft.tickertape.portfolio.dig.splits.add
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,11 +38,11 @@ fun SplitAddScreen(
     onSubmit: () -> Unit,
     onClose: () -> Unit,
 ) {
-  val isSubmitting by state.isSubmitting.collectAsState()
-  val isSubmittable by state.isSubmittable.collectAsState()
-  val preSplitShareCount by state.preSplitShareCount.collectAsState()
-  val postSplitShareCount by state.postSplitShareCount.collectAsState()
-  val splitDate by state.splitDate.collectAsState()
+  val isSubmitting by state.isSubmitting.collectAsStateWithLifecycle()
+  val isSubmittable by state.isSubmittable.collectAsStateWithLifecycle()
+  val preSplitShareCount by state.preSplitShareCount.collectAsStateWithLifecycle()
+  val postSplitShareCount by state.postSplitShareCount.collectAsStateWithLifecycle()
+  val splitDate by state.splitDate.collectAsStateWithLifecycle()
 
   val isSubmitEnabled =
       remember(

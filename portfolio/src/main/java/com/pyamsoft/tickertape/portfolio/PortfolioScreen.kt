@@ -30,7 +30,7 @@ import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
 import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
 import com.pyamsoft.tickertape.quote.base.BaseListScreen
@@ -61,11 +61,11 @@ fun PortfolioScreen(
     onHoldingDeleteFinalized: () -> Unit,
     onHoldingRestored: () -> Unit,
 ) {
-  val loadingState by state.loadingState.collectAsState()
-  val pageError by state.error.collectAsState()
-  val search by state.query.collectAsState()
-  val tab by state.section.collectAsState()
-  val list = state.stocks.collectAsStateList()
+  val loadingState by state.loadingState.collectAsStateWithLifecycle()
+  val pageError by state.error.collectAsStateWithLifecycle()
+  val search by state.query.collectAsStateWithLifecycle()
+  val tab by state.section.collectAsStateWithLifecycle()
+  val list = state.stocks.collectAsStateListWithLifecycle()
 
   val isLoading = remember(loadingState) { loadingState == PortfolioViewState.LoadingState.LOADING }
 
@@ -125,7 +125,7 @@ private fun PortfolioSnackbar(
     onSnackbarAction: () -> Unit,
 ) {
   val deleteUndoState = remember { SnackbarHostState() }
-  val undoable by state.recentlyDeleteHolding.collectAsState()
+  val undoable by state.recentlyDeleteHolding.collectAsStateWithLifecycle()
 
   SnackbarHost(
       modifier = modifier,
@@ -177,8 +177,8 @@ private fun PortfolioSummary(
     modifier: Modifier = Modifier,
     state: PortfolioViewState,
 ) {
-  val portfolio by state.portfolio.collectAsState()
-  val section by state.section.collectAsState()
+  val portfolio by state.portfolio.collectAsStateWithLifecycle()
+  val section by state.section.collectAsStateWithLifecycle()
 
   val data =
       remember(section, portfolio) {

@@ -37,7 +37,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -139,7 +139,7 @@ internal fun PortfolioDigToolbar(
     allTabs: SnapshotStateList<PortfolioDigSections>,
     onClose: () -> Unit,
 ) {
-  val ticker by state.ticker.collectAsState()
+  val ticker by state.ticker.collectAsStateWithLifecycle()
 
   val title = remember(ticker) { ticker.quote?.company?.company ?: ticker.symbol.raw }
 
@@ -262,7 +262,7 @@ private fun PreviewPortfolioDigToolbar() {
               ),
           clock = clock,
       )
-  val holding by state.holding.collectAsState()
+  val holding by state.holding.collectAsStateWithLifecycle()
   val allTabs = rememberTabs(symbol, holding)
 
   PortfolioDigToolbar(

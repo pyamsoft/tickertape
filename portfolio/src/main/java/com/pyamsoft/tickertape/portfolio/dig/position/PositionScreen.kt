@@ -29,14 +29,14 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
 import com.pyamsoft.tickertape.db.Maybe
 import com.pyamsoft.tickertape.db.holding.DbHolding
 import com.pyamsoft.tickertape.db.position.DbPosition
@@ -68,11 +68,11 @@ internal fun PositionScreen(
     onAddNewHolding: () -> Unit,
 ) {
 
-  val loadingState by state.loadingState.collectAsState()
-  val positionError by state.positionsError.collectAsState()
-  val holding by state.holding.collectAsState()
-  val holdingError by state.holdingError.collectAsState()
-  val positions = state.positions.collectAsStateList()
+  val loadingState by state.loadingState.collectAsStateWithLifecycle()
+  val positionError by state.positionsError.collectAsStateWithLifecycle()
+  val holding by state.holding.collectAsStateWithLifecycle()
+  val holdingError by state.holdingError.collectAsStateWithLifecycle()
+  val positions = state.positions.collectAsStateListWithLifecycle()
 
   val isAddVisible =
       remember(loadingState, positionError, holdingError) {
@@ -148,7 +148,7 @@ private fun PositionSnackbar(
     onSnackbarAction: () -> Unit,
 ) {
   val deleteUndoState = remember { SnackbarHostState() }
-  val undoable by state.recentlyDeletePosition.collectAsState()
+  val undoable by state.recentlyDeletePosition.collectAsStateWithLifecycle()
 
   SnackbarHost(
       modifier = modifier,

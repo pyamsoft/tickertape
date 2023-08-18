@@ -30,7 +30,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,7 +45,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.pyamsoft.pydroid.core.requireNotNull
 import com.pyamsoft.pydroid.theme.keylines
-import com.pyamsoft.pydroid.ui.util.collectAsStateList
+import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
 import com.pyamsoft.tickertape.quote.dig.MutableDigViewState
 import com.pyamsoft.tickertape.quote.dig.NewsDigViewState
 import com.pyamsoft.tickertape.quote.test.TestSymbol
@@ -62,8 +62,8 @@ fun DigNews(
     state: NewsDigViewState,
     onRefresh: () -> Unit,
 ) {
-  val error by state.newsError.collectAsState()
-  val news = state.news.collectAsStateList()
+  val error by state.newsError.collectAsStateWithLifecycle()
+  val news = state.news.collectAsStateListWithLifecycle()
 
   LazyColumn(
       modifier = modifier.fillMaxSize(),

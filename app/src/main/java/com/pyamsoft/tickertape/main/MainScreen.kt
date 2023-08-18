@@ -27,7 +27,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -50,7 +50,7 @@ internal fun MainScreen(
     onPortfolioDig: (PortfolioStock) -> Unit,
     onCloseDig: () -> Unit,
 ) {
-  val portfolioDig by state.portfolioDigParams.collectAsState()
+  val portfolioDig by state.portfolioDigParams.collectAsStateWithLifecycle()
 
   val currentPage = pagerState.currentPage
   val page =

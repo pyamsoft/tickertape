@@ -31,7 +31,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -107,9 +107,9 @@ fun PortfolioDigScreen(
     onUpdatePriceAlert: (PriceAlert) -> Unit,
     onDeletePriceAlert: (PriceAlert) -> Unit,
 ) {
-  val loadingState by state.loadingState.collectAsState()
-  val ticker by state.ticker.collectAsState()
-  val holding by state.holding.collectAsState()
+  val loadingState by state.loadingState.collectAsStateWithLifecycle()
+  val ticker by state.ticker.collectAsStateWithLifecycle()
+  val holding by state.holding.collectAsStateWithLifecycle()
 
   val allTabs = rememberTabs(ticker.symbol, holding)
   val pagerState =

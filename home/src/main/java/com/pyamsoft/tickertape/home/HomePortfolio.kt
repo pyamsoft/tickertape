@@ -32,7 +32,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,9 +50,9 @@ internal fun HomePortfolio(
     state: HomePortfolioViewState,
     onRefresh: CoroutineScope.() -> Unit,
 ) {
-  val loadingState by state.isLoadingPortfolio.collectAsState()
-  val portfolio by state.portfolio.collectAsState()
-  val portfolioError by state.portfolioError.collectAsState()
+  val loadingState by state.isLoadingPortfolio.collectAsStateWithLifecycle()
+  val portfolio by state.portfolio.collectAsStateWithLifecycle()
+  val portfolioError by state.portfolioError.collectAsStateWithLifecycle()
 
   val isEmptyPortfolio =
       remember(portfolio) { portfolio.let { it == null || it.stocks.positions.isEmpty() } }

@@ -19,7 +19,7 @@ package com.pyamsoft.tickertape.notification
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.pyamsoft.pydroid.theme.keylines
@@ -31,7 +31,7 @@ internal fun BigMoverNotifications(
     state: NotificationViewState,
     onBigMoverNotificationToggled: () -> Unit,
 ) {
-  val isEnabled by state.isBigMoverEnabled.collectAsState()
+  val isEnabled by state.isBigMoverEnabled.collectAsStateWithLifecycle()
 
   NotificationCard(
       modifier = modifier.padding(horizontal = MaterialTheme.keylines.content),

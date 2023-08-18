@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -79,7 +79,7 @@ internal fun PortfolioDigEntry(
 
   val viewModel = rememberNotNull(component.viewModel)
 
-  val recDig by viewModel.recommendedDig.collectAsState()
+  val recDig by viewModel.recommendedDig.collectAsStateWithLifecycle()
 
   // Always run the mount hooks as this handles the VM save state
   MountHooks(
@@ -136,8 +136,8 @@ private fun PortfolioDigContent(
 
   val scope = rememberCoroutineScope()
 
-  val positionDialog by viewModel.positionDialog.collectAsState()
-  val splitDialog by viewModel.splitDialog.collectAsState()
+  val positionDialog by viewModel.positionDialog.collectAsStateWithLifecycle()
+  val splitDialog by viewModel.splitDialog.collectAsStateWithLifecycle()
 
   BackHandler(
       onBack = onDismiss,

@@ -18,7 +18,7 @@ package com.pyamsoft.tickertape.home
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import coil.ImageLoader
@@ -56,7 +56,7 @@ fun HomeEntry(
   val viewModel = rememberNotNull(component.viewModel)
   val imageLoader = rememberNotNull(component.imageLoader)
 
-  val isSettingsOpen by viewModel.isSettingsOpen.collectAsState()
+  val isSettingsOpen by viewModel.isSettingsOpen.collectAsStateWithLifecycle()
 
   HomeScreen(
       modifier = modifier,

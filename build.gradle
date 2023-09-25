@@ -27,7 +27,7 @@ buildscript {
     cachify = "0.3.1"
 
     // Kotlin
-    kotlin = "1.9.0"
+    kotlin = "1.9.10"
     coroutines = "1.7.3"
 
     // Jobs

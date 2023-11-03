@@ -66,91 +66,91 @@ abstract class RoomModule {
     @Provides
     @JvmStatic
     internal fun provideRoomHoldingQueryDao(@InternalApi db: RoomTickerDb): HoldingQueryDao {
-      return db.roomHoldingQueryDao
+      return db.roomHoldingQueryDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomHoldingInsertDao(@InternalApi db: RoomTickerDb): HoldingInsertDao {
-      return db.roomHoldingInsertDao
+      return db.roomHoldingInsertDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomHoldingDeleteDao(@InternalApi db: RoomTickerDb): HoldingDeleteDao {
-      return db.roomHoldingDeleteDao
+      return db.roomHoldingDeleteDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomPositionQueryDao(@InternalApi db: RoomTickerDb): PositionQueryDao {
-      return db.roomPositionQueryDao
+      return db.roomPositionQueryDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomPositionInsertDao(@InternalApi db: RoomTickerDb): PositionInsertDao {
-      return db.roomPositionInsertDao
+      return db.roomPositionInsertDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomPositionDeleteDao(@InternalApi db: RoomTickerDb): PositionDeleteDao {
-      return db.roomPositionDeleteDao
+      return db.roomPositionDeleteDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomBigMoverQueryDao(@InternalApi db: RoomTickerDb): BigMoverQueryDao {
-      return db.roomBigMoverQueryDao
+      return db.roomBigMoverQueryDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomBigMoverInsertDao(@InternalApi db: RoomTickerDb): BigMoverInsertDao {
-      return db.roomBigMoverInsertDao
+      return db.roomBigMoverInsertDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomBigMoverDeleteDao(@InternalApi db: RoomTickerDb): BigMoverDeleteDao {
-      return db.roomBigMoverDeleteDao
+      return db.roomBigMoverDeleteDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomSplitQueryDao(@InternalApi db: RoomTickerDb): SplitQueryDao {
-      return db.roomSplitQueryDao
+      return db.roomSplitQueryDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomSplitInsertDao(@InternalApi db: RoomTickerDb): SplitInsertDao {
-      return db.roomSplitInsertDao
+      return db.roomSplitInsertDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomSplitDeleteDao(@InternalApi db: RoomTickerDb): SplitDeleteDao {
-      return db.roomSplitDeleteDao
+      return db.roomSplitDeleteDao()
     }
 
     @DbApi
     @Provides
     @JvmStatic
     internal fun provideRoomPriceAlertQueryDao(@InternalApi db: RoomTickerDb): PriceAlertQueryDao {
-      return db.roomPriceAlertQueryDao
+      return db.roomPriceAlertQueryDao()
     }
 
     @DbApi
@@ -159,7 +159,7 @@ abstract class RoomModule {
     internal fun provideRoomPriceAlertInsertDao(
         @InternalApi db: RoomTickerDb
     ): PriceAlertInsertDao {
-      return db.roomPriceAlertInsertDao
+      return db.roomPriceAlertInsertDao()
     }
 
     @DbApi
@@ -168,7 +168,7 @@ abstract class RoomModule {
     internal fun provideRoomPriceAlertDeleteDao(
         @InternalApi db: RoomTickerDb
     ): PriceAlertDeleteDao {
-      return db.roomPriceAlertDeleteDao
+      return db.roomPriceAlertDeleteDao()
     }
   }
 }

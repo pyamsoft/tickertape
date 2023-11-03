@@ -36,27 +36,37 @@ import com.pyamsoft.tickertape.db.room.split.dao.RoomSplitQueryDao
 internal interface RoomTickerDb {
 
   // Holdings
-  @get:CheckResult val roomHoldingQueryDao: RoomHoldingQueryDao
-  @get:CheckResult val roomHoldingInsertDao: RoomHoldingInsertDao
-  @get:CheckResult val roomHoldingDeleteDao: RoomHoldingDeleteDao
+  @CheckResult fun roomHoldingQueryDao(): RoomHoldingQueryDao
+
+  @CheckResult fun roomHoldingInsertDao(): RoomHoldingInsertDao
+
+  @CheckResult fun roomHoldingDeleteDao(): RoomHoldingDeleteDao
 
   // Positions
-  @get:CheckResult val roomPositionQueryDao: RoomPositionQueryDao
-  @get:CheckResult val roomPositionInsertDao: RoomPositionInsertDao
-  @get:CheckResult val roomPositionDeleteDao: RoomPositionDeleteDao
+  @CheckResult fun roomPositionQueryDao(): RoomPositionQueryDao
+
+  @CheckResult fun roomPositionInsertDao(): RoomPositionInsertDao
+
+  @CheckResult fun roomPositionDeleteDao(): RoomPositionDeleteDao
 
   // Big Movers
-  @get:CheckResult val roomBigMoverQueryDao: RoomBigMoverQueryDao
-  @get:CheckResult val roomBigMoverInsertDao: RoomBigMoverInsertDao
-  @get:CheckResult val roomBigMoverDeleteDao: RoomBigMoverDeleteDao
+  @CheckResult fun roomBigMoverQueryDao(): RoomBigMoverQueryDao
+
+  @CheckResult fun roomBigMoverInsertDao(): RoomBigMoverInsertDao
+
+  @CheckResult fun roomBigMoverDeleteDao(): RoomBigMoverDeleteDao
 
   // Splits
-  @get:CheckResult val roomSplitQueryDao: RoomSplitQueryDao
-  @get:CheckResult val roomSplitInsertDao: RoomSplitInsertDao
-  @get:CheckResult val roomSplitDeleteDao: RoomSplitDeleteDao
+  @CheckResult fun roomSplitQueryDao(): RoomSplitQueryDao
+
+  @CheckResult fun roomSplitInsertDao(): RoomSplitInsertDao
+
+  @CheckResult fun roomSplitDeleteDao(): RoomSplitDeleteDao
 
   // Price Alerts
-  @get:CheckResult val roomPriceAlertQueryDao: RoomPriceAlertQueryDao
-  @get:CheckResult val roomPriceAlertInsertDao: RoomPriceAlertInsertDao
-  @get:CheckResult val roomPriceAlertDeleteDao: RoomPriceAlertDeleteDao
+  @CheckResult fun roomPriceAlertQueryDao(): RoomPriceAlertQueryDao
+
+  @CheckResult fun roomPriceAlertInsertDao(): RoomPriceAlertInsertDao
+
+  @CheckResult fun roomPriceAlertDeleteDao(): RoomPriceAlertDeleteDao
 }

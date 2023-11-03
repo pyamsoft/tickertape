@@ -44,6 +44,12 @@ android {
   buildFeatures { buildConfig = false }
 }
 
+ksp {
+  arg("room.schemaLocation", "${projectDir}/schemas")
+  arg("room.incremental", "true")
+  arg("room.generateKotlin", "true")
+}
+
 dependencies {
   coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:${rootProject.extra["desugar"]}")
 
@@ -59,5 +65,3 @@ dependencies {
   implementation(project(":db"))
   implementation(project(":stocks"))
 }
-
-room { schemaLocationDir.set(file("schemas")) }

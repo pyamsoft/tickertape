@@ -52,7 +52,7 @@ dependencies {
   // API for Dagger
   api("com.squareup.retrofit2:retrofit:${rootProject.extra["retrofit"]}")
 
-  implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+  implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
   implementation("com.github.pyamsoft.pydroid:bootstrap:${rootProject.extra["pydroid"]}")
 

@@ -64,7 +64,7 @@ dependencies {
   compileOnly("androidx.compose.ui:ui-tooling-preview:${rootProject.extra["compose"]}")
   debugApi("androidx.compose.ui:ui-tooling:${rootProject.extra["compose"]}")
 
-  api("io.coil-kt:coil-compose-base:2.4.0")
+  api("io.coil-kt:coil-compose-base:2.5.0")
 
   // PYDroid
   api("com.github.pyamsoft.pydroid:ui:${rootProject.extra["pydroid"]}")

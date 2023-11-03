@@ -23,7 +23,7 @@ buildscript {
     compileSdk = 34
 
     // Us
-    pydroid = "26.8.5"
+    pydroid = "26.9.0"
     cachify = "0.3.1"
 
     // Kotlin
@@ -40,19 +40,19 @@ buildscript {
     room = "2.6.0"
 
     // Dagger
-    dagger = "2.48"
+    dagger = "2.48.1"
 
     moshi = "1.15.0"
     retrofit = "2.9.0"
 
     // Compose
-    compose = "1.5.1"
+    compose = "1.5.4"
     composeCompiler = "1.5.3"
-    composeActivity = "1.7.2"
-    composeMaterial = "1.5.1"
+    composeActivity = "1.8.0"
+    composeMaterial = "1.5.4"
     accompanist = "0.32.0"
 
-    desugar = "2.0.3"
+    desugar = "2.0.4"
   }
 }
 

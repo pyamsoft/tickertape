@@ -97,29 +97,6 @@ private fun DisplayPortfolioData(
 
   val totalGainLossLabel = remember(data) { data.total.direction.asGainLoss().uppercase() }
 
-  val todayComposeColor =
-      remember(
-          data,
-          colors,
-          mediumAlpha,
-      ) {
-        resolveDirectionColor(
-            data.today.direction,
-            colors,
-            mediumAlpha,
-        )
-      }
-
-  val todayGainLoss =
-      remember(data) {
-        val today = data.today
-        val amount = "${today.direction.sign}${today.change.display}"
-        val pct = "${today.direction.sign}${today.changePercent.display}"
-        return@remember "$amount ($pct)"
-      }
-
-  val todayGainLossLabel = remember(data) { data.today.direction.asGainLoss().uppercase() }
-
   val labelColor =
       remember(
           colors,
@@ -129,6 +106,33 @@ private fun DisplayPortfolioData(
             alpha = mediumAlpha,
         )
       }
+
+  // 2024-01-02
+  // For some reason, using these values in a Text composable crashes Compose with a
+  // VerifyError - weird.
+  //
+  //    val todayComposeColor =
+  //        remember(
+  //            data,
+  //            colors,
+  //            mediumAlpha,
+  //        ) {
+  //            resolveDirectionColor(
+  //                data.today.direction,
+  //                colors,
+  //                mediumAlpha,
+  //            )
+  //        }
+  //
+  //    val todayGainLoss =
+  //        remember(data) {
+  //            val today = data.today
+  //            val amount = "${today.direction.sign}${today.change.display}"
+  //            val pct = "${today.direction.sign}${today.changePercent.display}"
+  //            return@remember "$amount ($pct)"
+  //        }
+  //
+  //    val todayGainLossLabel = remember(data) { data.today.direction.asGainLoss().uppercase() }
 
   Column(
       modifier = modifier.fillMaxWidth(),
@@ -168,23 +172,24 @@ private fun DisplayPortfolioData(
             ),
     )
 
-    Text(
-        text = "TODAY'S $todayGainLossLabel",
-        style =
-            MaterialTheme.typography.caption.copy(
-                fontWeight = FontWeight.W400,
-                color = labelColor,
-            ),
-    )
-    Text(
-        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
-        text = todayGainLoss,
-        style =
-            MaterialTheme.typography.h5.copy(
-                fontWeight = FontWeight.W400,
-                color = todayComposeColor,
-            ),
-    )
+    // Crashes Compose with an internal VerifyError
+    //    Text(
+    //        text = "TODAY'S $todayGainLossLabel",
+    //        style =
+    //            MaterialTheme.typography.caption.copy(
+    //                fontWeight = FontWeight.W400,
+    //                color = labelColor,
+    //            ),
+    //    )
+    //    Text(
+    //        modifier = Modifier.padding(bottom = MaterialTheme.keylines.baseline),
+    //        text = todayGainLoss,
+    //        style =
+    //            MaterialTheme.typography.h5.copy(
+    //                fontWeight = FontWeight.W400,
+    //                color = todayComposeColor,
+    //            ),
+    //    )
 
     val pos = data.positions
     Column(

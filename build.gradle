@@ -23,7 +23,7 @@ buildscript {
     compileSdk = 34
 
     // Us
-    pydroid = "26.9.3"
+    pydroid = "26.9.4"
     cachify = "0.3.1"
 
     // Kotlin

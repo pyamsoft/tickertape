@@ -39,8 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.pyamsoft.pydroid.theme.keylines
 import com.pyamsoft.pydroid.ui.util.collectAsStateListWithLifecycle
-import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
 import com.pyamsoft.tickertape.portfolio.item.PortfolioItem
+import com.pyamsoft.tickertape.portfolio.item.PortfolioSummaryItem
 import com.pyamsoft.tickertape.quote.base.BaseListScreen
 import com.pyamsoft.tickertape.stocks.api.EquityType
 import com.pyamsoft.tickertape.ui.PolinaGolubevaScreen
@@ -196,7 +196,7 @@ private fun PortfolioSummary(
       visible = data != null,
   ) {
     data?.also { d ->
-      PorfolioSummaryItem(
+      PortfolioSummaryItem(
           modifier =
               modifier
                   .statusBarsPadding()

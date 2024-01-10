@@ -304,7 +304,7 @@ private fun Ranges(
 ) {
   val allRanges =
       remember(isOptions) {
-        StockChart.IntervalRange.values().filter { range ->
+        StockChart.IntervalRange.entries.filter { range ->
           return@filter if (!isOptions) true
           else {
             // Options don't support these ranges

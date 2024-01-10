@@ -43,7 +43,7 @@ import com.pyamsoft.tickertape.ui.LongTermPurchaseDateTag
 import com.pyamsoft.tickertape.ui.ShortTermPurchaseDateTag
 
 @Composable
-fun PorfolioSummaryItem(
+fun PortfolioSummaryItem(
     modifier: Modifier = Modifier,
     data: PortfolioData.Data,
 ) {
@@ -247,7 +247,7 @@ private fun DisplayPortfolioData(
 @Composable
 private fun PreviewPortfolioSummaryItem() {
   Surface {
-    PorfolioSummaryItem(
+    PortfolioSummaryItem(
         data = PortfolioData.EMPTY.stocks,
     )
   }

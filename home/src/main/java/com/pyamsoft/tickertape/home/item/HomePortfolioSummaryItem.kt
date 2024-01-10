@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pyamsoft.tickertape.portfolio.PortfolioData
-import com.pyamsoft.tickertape.portfolio.item.PorfolioSummaryItem
+import com.pyamsoft.tickertape.portfolio.item.PortfolioSummaryItem
 
 @Composable
 @JvmOverloads
@@ -29,7 +29,7 @@ fun HomePortfolioSummaryItem(
     modifier: Modifier = Modifier,
     portfolio: PortfolioData,
 ) {
-  PorfolioSummaryItem(
+  PortfolioSummaryItem(
       modifier = modifier,
       data = portfolio.stocks,
   )

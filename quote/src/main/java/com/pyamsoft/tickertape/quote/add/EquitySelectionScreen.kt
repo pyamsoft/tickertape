@@ -43,7 +43,7 @@ internal fun EquitySelectionScreen(
     modifier: Modifier = Modifier,
     onTypeSelected: (EquityType) -> Unit,
 ) {
-  val possibleTypes = remember { EquityType.values().toList().toMutableStateList() }
+  val possibleTypes = remember { EquityType.entries.toMutableStateList() }
 
   LazyColumn(
       modifier = modifier,

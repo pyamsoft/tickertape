@@ -98,7 +98,7 @@ internal fun rememberTabs(
     if (holding == null) {
       return@remember mutableStateListOf()
     } else {
-      return@remember PortfolioDigSections.values()
+      return@remember PortfolioDigSections.entries
           .asSequence()
           .filterNot { PortfolioDigSections.PRICE_ALERTS == it }
           .filterNot { PortfolioDigSections.OPTIONS_CHAIN == it }

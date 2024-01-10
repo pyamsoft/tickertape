@@ -62,7 +62,7 @@ internal fun SearchBar(
     onTabUpdated: (EquityType) -> Unit,
 ) {
   val contentColor = LocalContentColor.current
-  val allTypes = remember { EquityType.values().toList().toMutableStateList() }
+  val allTypes = remember { EquityType.entries.toMutableStateList() }
   val selectedTabIndex = currentTab.ordinal
 
   Column(

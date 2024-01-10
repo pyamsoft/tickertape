@@ -17,28 +17,39 @@
 package com.pyamsoft.tickertape.portfolio
 
 import androidx.annotation.CheckResult
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pyamsoft.tickertape.stocks.api.StockDirection
 import com.pyamsoft.tickertape.stocks.api.StockMoneyValue
 import com.pyamsoft.tickertape.stocks.api.StockPercent
 
+@Stable
+@Immutable
 data class PortfolioData(
     val stocks: Data,
     val options: Data,
     val crypto: Data,
 ) {
 
+  @Stable
+  @Immutable
   data class Data(
       val current: StockMoneyValue,
       val total: Summary,
       val today: Summary,
       val positions: Positions,
   ) {
+
+    @Stable
+    @Immutable
     data class Summary(
         val change: StockMoneyValue,
         val changePercent: StockPercent,
         val direction: StockDirection,
     )
 
+    @Stable
+    @Immutable
     data class Positions(
         val shortTerm: Int,
         val longTerm: Int,

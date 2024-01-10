@@ -74,7 +74,7 @@ fun DigOptionsChain(
     onExpirationDateChanged: (LocalDate) -> Unit,
 ) {
   val contentColor = LocalContentColor.current
-  val allTypes = remember { StockOptions.Contract.Type.values().toList().toMutableStateList() }
+  val allTypes = remember { StockOptions.Contract.Type.entries.toMutableStateList() }
 
   val section by state.optionsSection.collectAsStateWithLifecycle()
 

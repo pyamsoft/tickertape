@@ -132,9 +132,6 @@ dependencies {
   // This pulls in all the UI bits too, which is a little lame.
   implementation("androidx.preference:preference:1.2.1")
 
-  implementation(
-      "com.google.accompanist:accompanist-systemuicontroller:${rootProject.extra["accompanist"]}")
-
   implementation(project(":alert"))
   implementation(project(":core"))
   implementation(project(":db"))

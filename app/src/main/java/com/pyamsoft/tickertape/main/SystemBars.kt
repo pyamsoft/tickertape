@@ -16,28 +16,49 @@
 
 package com.pyamsoft.tickertape.main
 
+import android.graphics.Color
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowInsetsControllerCompat
 import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.getSystemDarkMode
 
 @Composable
-internal fun SystemBars(
+internal fun ComponentActivity.SystemBars(
     theme: Theming.Mode,
 ) {
   // Dark icons in Light mode only
-  val darkMode = theme.getSystemDarkMode()
-  val darkIcons = remember(darkMode) { !darkMode }
+  val isDarkMode = theme.getSystemDarkMode()
 
-  val controller = rememberSystemUiController()
-  SideEffect {
-    controller.setSystemBarsColor(
-        color = Color.Transparent,
-        darkIcons = darkIcons,
-        isNavigationBarContrastEnforced = false,
+  val darkIcons = remember(isDarkMode) { !isDarkMode }
+
+  val view = LocalView.current
+  val w = window
+  val controller =
+      remember(
+          w,
+          view,
+      ) {
+        WindowInsetsControllerCompat(w, view)
+      }
+  LaunchedEffect(
+      isDarkMode,
+      darkIcons,
+      controller,
+  ) {
+    val style =
+        if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
+        else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+    enableEdgeToEdge(
+        statusBarStyle = style,
+        navigationBarStyle = style,
     )
+    controller.isAppearanceLightStatusBars = darkIcons
+    controller.isAppearanceLightNavigationBars = isDarkMode
   }
 }

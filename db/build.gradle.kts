@@ -50,9 +50,6 @@ dependencies {
   kapt("com.google.dagger:dagger-compiler:${rootProject.extra["dagger"]}")
   ksp("com.squareup.moshi:moshi-kotlin-codegen:${rootProject.extra["moshi"]}")
 
-  // Cachify
-  implementation("com.github.pyamsoft:cachify:0.3.1")
-
   // Compose Annotations
   implementation("androidx.compose.runtime:runtime:${rootProject.extra["compose"]}")
 

@@ -22,6 +22,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.FabPosition
@@ -81,7 +82,7 @@ internal fun MainScreen(
             exit = slideOutVertically { it },
         ) {
           MainBottomNav(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
               pagerState = pagerState,
               allTabs = allTabs,
               page = page,

@@ -32,18 +32,11 @@ import com.pyamsoft.pydroid.ui.theme.Theming
 import com.pyamsoft.tickertape.getSystemDarkMode
 
 private val LIGHT_MODE_SCRIM by lazy { Color.argb(0x60, 0x1B, 0x1B, 0x1B) }
-private val DARK_MODE_SCRIM by lazy { Color.argb(0x90, 0xCE, 0xCE, 0xCE) }
 
 /** Android below O has zero support for navbar color, the appearance method is a lie. */
 @CheckResult
 private fun needsNavbarScrim(): Boolean {
   return Build.VERSION.SDK_INT < Build.VERSION_CODES.O
-}
-
-@ColorInt
-@CheckResult
-private fun getDarkModeColor(): Int {
-  return if (needsNavbarScrim()) DARK_MODE_SCRIM else Color.TRANSPARENT
 }
 
 @ColorInt
@@ -75,12 +68,16 @@ internal fun ComponentActivity.SystemBars(
       darkIcons,
       controller,
   ) {
-    val style =
-        if (isDarkMode) SystemBarStyle.dark(getDarkModeColor())
+    val statusStyle =
+        if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
+        else SystemBarStyle.light(Color.TRANSPARENT, getLightModeColor())
+
+    val navStyle =
+        if (isDarkMode) SystemBarStyle.dark(Color.TRANSPARENT)
         else SystemBarStyle.light(Color.TRANSPARENT, getLightModeColor())
     enableEdgeToEdge(
-        statusBarStyle = style,
-        navigationBarStyle = style,
+        statusBarStyle = statusStyle,
+        navigationBarStyle = navStyle,
     )
     controller.isAppearanceLightStatusBars = darkIcons
     controller.isAppearanceLightNavigationBars = isDarkMode

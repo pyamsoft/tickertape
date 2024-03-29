@@ -112,6 +112,12 @@ subprojects {
     //     languageVersion.set(JavaLanguageVersion.of(17))
     //   }
     // }
+
+    kapt {
+      correctErrorTypes = true
+      keepJavacAnnotationProcessors = true
+    }
+
   }
 }
 

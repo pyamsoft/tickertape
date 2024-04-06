@@ -27,7 +27,7 @@ buildscript {
     cachify = "0.3.1"
 
     // Kotlin
-    kotlin = "1.9.22"
+    kotlin = "1.9.23"
     coroutines = "1.8.0"
 
     // Jobs
@@ -40,16 +40,16 @@ buildscript {
     room = "2.6.1"
 
     // Dagger
-    dagger = "2.51"
+    dagger = "2.51.1"
 
     moshi = "1.15.1"
-    retrofit = "2.9.0"
+    retrofit = "2.11.0"
 
     // Compose
-    compose = "1.6.3"
-    composeCompiler = "1.5.10"
+    compose = "1.6.5"
+    composeCompiler = "1.5.11"
     composeActivity = "1.8.2"
-    composeMaterial = "1.6.3"
+    composeMaterial = "1.6.5"
     accompanist = "0.34.0"
 
     desugar = "2.0.4"
@@ -84,7 +84,7 @@ plugins {
 
   // KSP
   // https://github.com/google/ksp
-  id("com.google.devtools.ksp") version "${kotlin}-1.0.17" apply false
+  id("com.google.devtools.ksp") version "${kotlin}-1.0.20" apply false
 
   // Gradle Doctor
   // https://runningcode.github.io/gradle-doctor/
